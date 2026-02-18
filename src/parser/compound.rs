@@ -426,12 +426,16 @@ impl<'src> Parser<'src> {
         self.parse_list_into(&mut statements)?;
 
         loop {
+            // After parse_list_into, the next token could be:
+            // - Newline (statement separator — skip and continue)
+            // - A command start (heredoc consumed the Newline — continue directly)
+            // - A closing keyword (fi, done, etc. — break)
             if self.stream.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
-                if self.can_start_command()? {
-                    self.parse_list_into(&mut statements)?;
-                    continue;
-                }
+            }
+            if self.can_start_command()? {
+                self.parse_list_into(&mut statements)?;
+                continue;
             }
             break;
         }

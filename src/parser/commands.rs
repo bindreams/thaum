@@ -110,7 +110,10 @@ impl<'src> Parser<'src> {
             }
         }
 
-        self.fill_heredoc_bodies(&mut redirects)?;
+        // NOTE: Heredoc body consumption is NOT done here. It's done in
+        // parse_list_into after the full statement is parsed, because the
+        // Newline + HereDocBody tokens follow the command and must be consumed
+        // as part of statement termination (like a semicolon).
 
         Ok(Command {
             assignments,
@@ -253,55 +256,5 @@ impl<'src> Parser<'src> {
             kind: RedirectKind::BashHereString(target),
             span: start_span.merge(target_span),
         })
-    }
-
-    /// Fill in heredoc bodies by consuming `HereDocBody` tokens from the stream.
-    ///
-    /// After a newline, the lexer emits one `HereDocBody(body)` token per
-    /// pending heredoc. We consume the newline (if present) and then match
-    /// `HereDocBody` tokens to the redirects in order.
-    ///
-    // TODO: Heredoc-after-semicolon is broken. `cat <<EOF; echo after\nhello\nEOF\n`
-    // fails because the `;` separator comes before the Newline. This method only
-    // finds the Newline if it's the immediate next token. When `;` or `&` separates
-    // the heredoc command from the next command on the same line, the body is never
-    // filled. The fix: consume tokens up to and including the Newline, not just one.
-    pub(super) fn fill_heredoc_bodies(
-        &mut self,
-        redirects: &mut [Redirect],
-    ) -> Result<(), ParseError> {
-        let has_heredocs = redirects
-            .iter()
-            .any(|r| matches!(&r.kind, RedirectKind::HereDoc { body, .. } if body.is_empty()));
-
-        if !has_heredocs {
-            return Ok(());
-        }
-
-        // Consume the newline that triggers heredoc body reading
-        if self.stream.peek()?.token == Token::Newline {
-            self.stream.advance()?;
-        }
-
-        // Now consume HereDocBody tokens in order
-        for redir in redirects.iter_mut() {
-            if let RedirectKind::HereDoc { body, .. } = &mut redir.kind {
-                if body.is_empty() {
-                    if let Token::HereDocBody(b) = &self.stream.peek()?.token {
-                        *body = b.clone();
-                        self.stream.advance()?;
-                    }
-                }
-            }
-        }
-
-        // Post-condition: every heredoc redirect should have a body
-        for redir in redirects.iter() {
-            debug_assert!(
-                !matches!(&redir.kind, RedirectKind::HereDoc { body, .. } if body.is_empty()),
-                "heredoc body not filled — HereDocBody token was lost"
-            );
-        }
-        Ok(())
     }
 }

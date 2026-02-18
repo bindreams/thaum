@@ -28,9 +28,19 @@ impl<'src> Parser<'src> {
     }
 
     /// Parse a `;`/`&`-separated list of statements.
+    ///
+    /// After parsing each expression, consumes any heredoc bodies that belong
+    /// to it (Newline + HereDocBody tokens). This ensures the statement owns
+    /// all its heredoc content before the next statement begins.
     pub(super) fn parse_list_into(&mut self, out: &mut Vec<Statement>) -> Result<(), ParseError> {
         let mut expr = self.parse_and_or()?;
         let mut span = expr_span(&expr);
+
+        // Consume heredoc bodies that belong to this expression
+        let bodies = self.consume_heredoc_bodies()?;
+        if !bodies.is_empty() {
+            fill_expression_heredocs(&mut expr, &bodies);
+        }
 
         loop {
             match self.stream.peek()?.token {
@@ -45,6 +55,10 @@ impl<'src> Parser<'src> {
                     if self.can_start_command()? {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
+                        let bodies = self.consume_heredoc_bodies()?;
+                        if !bodies.is_empty() {
+                            fill_expression_heredocs(&mut expr, &bodies);
+                        }
                     } else {
                         return Ok(());
                     }
@@ -60,6 +74,10 @@ impl<'src> Parser<'src> {
                     if self.can_start_command()? {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
+                        let bodies = self.consume_heredoc_bodies()?;
+                        if !bodies.is_empty() {
+                            fill_expression_heredocs(&mut expr, &bodies);
+                        }
                     } else {
                         return Ok(());
                     }
@@ -210,8 +228,31 @@ impl<'src> Parser<'src> {
             redirects.push(self.parse_redirect()?);
         }
 
-        self.fill_heredoc_bodies(&mut redirects)?;
+        // NOTE: Heredoc body consumption handled by parse_list_into
 
         Ok(Expression::Compound { body, redirects })
+    }
+}
+
+/// Fill heredoc bodies in an expression's redirects.
+///
+/// Finds all `RedirectKind::HereDoc` with empty bodies and fills them
+/// from the provided body strings, in order.
+fn fill_expression_heredocs(expr: &mut Expression, bodies: &[String]) {
+    let redirects = match expr {
+        Expression::Command(cmd) => &mut cmd.redirects,
+        Expression::Compound { redirects, .. } => redirects,
+        _ => return,
+    };
+
+    let mut body_iter = bodies.iter();
+    for redir in redirects.iter_mut() {
+        if let RedirectKind::HereDoc { body, .. } = &mut redir.kind {
+            if body.is_empty() {
+                if let Some(b) = body_iter.next() {
+                    *body = b.clone();
+                }
+            }
+        }
     }
 }

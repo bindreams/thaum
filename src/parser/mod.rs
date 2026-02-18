@@ -135,6 +135,41 @@ impl<'src> Parser<'src> {
         Ok(())
     }
 
+    /// Consume heredoc body tokens that belong to the just-parsed statement.
+    ///
+    /// After a command with heredoc redirects, the token stream contains:
+    /// `Newline, HereDocBody, HereDocBody, ...` The Newline is consumed as
+    /// part of statement termination, and the HereDocBody tokens are collected
+    /// and returned so the caller can fill them into the expression's redirects.
+    pub(super) fn consume_heredoc_bodies(&mut self) -> Result<Vec<String>, ParseError> {
+        // Check if there's a Newline followed by HereDocBody
+        if self.stream.peek()?.token != Token::Newline {
+            return Ok(Vec::new());
+        }
+
+        // Peek past the Newline to see if HereDocBody follows
+        // We need to use checkpoint/rewind to avoid consuming the Newline
+        // if there are no HereDocBody tokens after it.
+        let cp = self.stream.checkpoint();
+        self.stream.advance()?; // consume Newline tentatively
+
+        if !matches!(self.stream.peek()?.token, Token::HereDocBody(_)) {
+            // No heredoc bodies — put the Newline back
+            self.stream.rewind(cp);
+            return Ok(Vec::new());
+        }
+        self.stream.release(cp);
+
+        // Collect all HereDocBody tokens
+        let mut bodies = Vec::new();
+        while let Token::HereDocBody(body) = &self.stream.peek()?.token {
+            bodies.push(body.clone());
+            self.stream.advance()?;
+        }
+
+        Ok(bodies)
+    }
+
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {
         if self.stream.peek()?.token != Token::Newline {
             return Ok(false);

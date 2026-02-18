@@ -64,7 +64,7 @@ impl<'src> Parser<'src> {
                 }
             }
 
-            self.fill_heredoc_bodies(&mut redirects)?;
+            // NOTE: Heredoc body consumption handled by parse_list_into
 
             let cmd_span =
                 start_span.merge(arguments.last().map(argument_span).unwrap_or(word_span));

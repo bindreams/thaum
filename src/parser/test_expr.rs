@@ -101,6 +101,13 @@ impl<'src> Parser<'src> {
         // Check if next token is a binary operator
         if let Some(op) = self.peek_binary_test_op()? {
             self.advance_binary_op()?;
+            // TODO: When `op` is `RegexMatch` (`=~`), the right-hand side is a regex
+            // pattern where unquoted `(`, `)`, `|` are regex metacharacters, not shell
+            // syntax. Currently these characters cause parse errors because the lexer
+            // tokenizes them as operators (LParen, RParen, Pipe). The fix: when `=~`
+            // is detected, consume the RHS as raw text up to `]]`, respecting quoting
+            // but not interpreting shell operators.
+            // Failing example: [[ $x =~ ^([^:]*):([^:]*):([^,]*)(.*) ]]
             let right_word = self.consume_test_word()?;
             return Ok(BashTestExpr::Binary {
                 left: first_word,

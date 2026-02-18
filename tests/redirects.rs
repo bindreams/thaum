@@ -106,6 +106,61 @@ fn heredoc_with_separate_lines() {
 }
 
 #[test]
+fn heredoc_inside_if() {
+    // Heredocs inside compound commands must work — the body is consumed
+    // as part of statement termination, not by parse_compound_list.
+    let prog = parse_ok("if true; then\ncat <<EOF\nhello\nEOF\necho after\nfi\n");
+    if let Expression::Compound {
+        body: CompoundCommand::IfClause { then_body, .. },
+        ..
+    } = &prog.statements[0].expression
+    {
+        assert_eq!(then_body.len(), 2);
+        if let Expression::Command(cmd) = &then_body[0].expression {
+            if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
+                assert_eq!(body, "hello\n");
+            } else {
+                panic!("expected heredoc");
+            }
+        } else {
+            panic!("expected Command");
+        }
+    } else {
+        panic!("expected IfClause");
+    }
+}
+
+#[test]
+fn heredoc_inside_while() {
+    let prog = parse_ok("while true; do\ncat <<EOF\nhello\nEOF\nbreak\ndone\n");
+    if let Expression::Compound {
+        body: CompoundCommand::WhileClause { body, .. },
+        ..
+    } = &prog.statements[0].expression
+    {
+        assert_eq!(body.len(), 2); // cat with heredoc + break
+    } else {
+        panic!("expected WhileClause");
+    }
+}
+
+#[test]
+fn heredoc_with_redirect_inside_function() {
+    // The pattern from dockerd-rootless-setuptool.sh
+    let input = "f() {\n\tcat <<- EOT > /tmp/out\n\t\thello\n\tEOT\n\techo done\n}\n";
+    let prog = shell_parser::parse_with(input, shell_parser::Dialect::Bash).unwrap();
+    if let Expression::FunctionDef(f) = &prog.statements[0].expression {
+        if let CompoundCommand::BraceGroup { body, .. } = f.body.as_ref() {
+            assert_eq!(body.len(), 2); // cat with heredoc + echo
+        } else {
+            panic!("expected BraceGroup");
+        }
+    } else {
+        panic!("expected FunctionDef");
+    }
+}
+
+#[test]
 fn multiple_heredocs_on_one_line() {
     let input = "cmd <<A <<B\nbody1\nA\nbody2\nB\n";
     let cmd = first_cmd(input);

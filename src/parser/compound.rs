@@ -308,8 +308,12 @@ impl<'src> Parser<'src> {
         let start_span = self.stream.peek()?.span;
         self.expect(&Token::LParen)?;
 
-        // Check if this is (( -- arithmetic command
-        if self.options.arithmetic_command && self.stream.peek()?.token == Token::LParen {
+        // Check if this is (( -- arithmetic command.
+        // Only when the two parens are adjacent (no whitespace): `((` is arithmetic,
+        // but `( (` (space-separated) is a nested subshell.
+        if self.options.arithmetic_command && self.stream.peek()?.token == Token::LParen
+            && self.stream.peek()?.span.start.0 == start_span.end.0
+        {
             // It's (( -- consume second ( and read until ))
             self.stream.advance()?;
             let mut expr = String::new();

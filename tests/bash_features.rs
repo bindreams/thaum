@@ -186,6 +186,23 @@ fn posix_double_paren_is_subshell() {
 }
 
 #[test]
+fn bash_nested_subshell_not_arithmetic() {
+    // `( (echo hello) )` — space-separated parens are nested subshells, not `((`.
+    // The lexer produces two separate LParen tokens; the parser must not
+    // collapse them into an arithmetic command.
+    // Source: /usr/share/doc/socat/examples/test.sh
+    let input = "( (echo hello) )";
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
+fn bash_nested_subshell_in_pipeline() {
+    // Source: /usr/share/doc/socat/examples/test.sh
+    let input = "( (echo a; echo b) | cat ) &";
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
 fn bash_function_keyword() {
     let prog = parse_with("function greet { echo hello; }", Dialect::Bash).unwrap();
     let stmt = &prog.statements[0];

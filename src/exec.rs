@@ -9,6 +9,7 @@ pub mod pipeline;
 
 pub use environment::Environment;
 pub use error::ExecError;
+#[cfg(test)]
 use pattern::shell_pattern_match;
 
 use std::io::Write;

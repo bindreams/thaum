@@ -1,6 +1,8 @@
 mod color;
 mod error_fmt;
 mod source_map;
+mod yaml_emitter;
+mod yaml_value;
 mod yaml_writer;
 
 use std::io::{self, Read};
@@ -286,10 +288,8 @@ fn do_parse(cli: &CliArgs) {
         }
     };
 
-    let mut w = YamlWriter::new(&mapper, &filename);
-    w.write_program(&program);
-
-    let output = w.finish();
+    let w = YamlWriter::new(&mapper, &filename);
+    let output = w.write_program(&program);
     if colored::control::SHOULD_COLORIZE.should_colorize() {
         color::print_colored_yaml(&output);
     } else {

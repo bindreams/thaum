@@ -1,94 +1,63 @@
 use shell_parser::ast::*;
 use shell_parser::span::Span;
-use std::fmt::Write as FmtWrite;
 
 use super::source_map::SourceMapper;
+use super::yaml_emitter;
+use super::yaml_value::{MappingBuilder, YamlValue};
 
 pub(super) struct YamlWriter<'a> {
     mapper: &'a SourceMapper,
     filename: &'a str,
-    buf: String,
 }
 
 impl<'a> YamlWriter<'a> {
     pub(super) fn new(mapper: &'a SourceMapper, filename: &'a str) -> Self {
-        YamlWriter {
-            mapper,
-            filename,
-            buf: String::new(),
-        }
+        YamlWriter { mapper, filename }
     }
 
-    pub(super) fn finish(self) -> String {
-        self.buf
+    pub(super) fn write_program(&self, prog: &Program) -> String {
+        let value = self.build_program(prog);
+        yaml_emitter::emit(&value)
     }
 
     fn source(&self, span: Span) -> String {
         self.mapper.format_span(span, self.filename)
     }
 
-    // --- Primitives ---
-
-    fn indent(&mut self, level: usize) {
-        for _ in 0..level {
-            self.buf.push(' ');
-        }
-    }
-
-    fn key_value(&mut self, level: usize, key: &str, value: &str) {
-        self.indent(level);
-        let _ = writeln!(self.buf, "{}: {}", key, value);
-    }
-
-    fn key_block(&mut self, level: usize, key: &str) {
-        self.indent(level);
-        let _ = writeln!(self.buf, "{}:", key);
-    }
-
-    fn key_source(&mut self, level: usize, span: Span) {
-        self.key_value(level, "source", &self.source(span));
-    }
-
     // --- AST nodes ---
 
-    pub(super) fn write_program(&mut self, prog: &Program) {
-        self.key_source(0, prog.span);
-        self.key_block(0, "statements");
-        for s in &prog.statements {
-            self.write_statement(2, s);
-        }
+    fn build_program(&self, prog: &Program) -> YamlValue {
+        let stmts: Vec<YamlValue> = prog.statements.iter().map(|s| self.build_statement(s)).collect();
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(prog.span));
+        m.value("statements", YamlValue::Sequence(stmts));
+        m.build()
     }
 
-    fn write_statement(&mut self, level: usize, s: &Statement) {
-        self.indent(level);
-        self.buf.push_str("- ");
-        let src = self.source(s.span);
-        let _ = writeln!(self.buf, "source: {}", src);
+    fn build_statement(&self, s: &Statement) -> YamlValue {
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(s.span));
         match s.mode {
-            ExecutionMode::Background => {
-                self.key_value(level + 2, "mode", "Background");
-            }
-            ExecutionMode::Terminated => {
-                self.key_value(level + 2, "mode", "Terminated");
-            }
+            ExecutionMode::Background => { m.raw("mode", "Background"); }
+            ExecutionMode::Terminated => { m.raw("mode", "Terminated"); }
             ExecutionMode::Sequential => {}
         }
-        self.write_expression(level + 2, &s.expression);
+        self.extend_expression(&mut m, &s.expression);
+        m.build()
     }
 
-    /// Write an expression that appears inside a binary operator tree
-    /// (And/Or/Pipe/Not). These need their own source annotation since
-    /// they don't have a Statement wrapper.
-    fn write_inner_expression(&mut self, level: usize, expr: &Expression) {
+    /// Build a sub-mapping for expressions inside binary operator trees
+    /// (And/Or/Pipe/Not). These need their own source annotation.
+    fn build_inner_expression(&self, expr: &Expression) -> YamlValue {
         use shell_parser::parser::expr_span;
-        self.key_source(level, expr_span(expr));
-        self.write_expression(level, expr);
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(expr_span(expr)));
+        self.extend_expression(&mut m, expr);
+        m.build()
     }
 
-    /// Write an expression inline after a `- ` list prefix (first key
-    /// appears on the same line as `- `, no leading indent).
-    fn write_expression_inline(&mut self, level: usize, expr: &Expression) {
-        let type_name = match expr {
+    fn expression_type_name(expr: &Expression) -> &'static str {
+        match expr {
             Expression::Command(_) => "Command",
             Expression::Compound { .. } => "Compound",
             Expression::FunctionDef(_) => "FunctionDef",
@@ -96,341 +65,221 @@ impl<'a> YamlWriter<'a> {
             Expression::Or { .. } => "Or",
             Expression::Pipe { .. } => "Pipe",
             Expression::Not(_) => "Not",
-        };
-        let _ = writeln!(self.buf, "type: {}", type_name);
-        self.write_expression_body(level + 2, expr);
+        }
     }
 
-    fn write_expression(&mut self, level: usize, expr: &Expression) {
-        let type_name = match expr {
-            Expression::Command(_) => "Command",
-            Expression::Compound { .. } => "Compound",
-            Expression::FunctionDef(_) => "FunctionDef",
-            Expression::And { .. } => "And",
-            Expression::Or { .. } => "Or",
-            Expression::Pipe { .. } => "Pipe",
-            Expression::Not(_) => "Not",
-        };
-        self.key_value(level, "type", type_name);
-        self.write_expression_body(level, expr);
+    fn extend_expression(&self, m: &mut MappingBuilder, expr: &Expression) {
+        m.raw("type", Self::expression_type_name(expr));
+        self.extend_expression_body(m, expr);
     }
 
-    fn write_expression_body(&mut self, level: usize, expr: &Expression) {
+    fn extend_expression_body(&self, m: &mut MappingBuilder, expr: &Expression) {
         match expr {
             Expression::Command(c) => {
-                self.write_command(level, c);
+                self.extend_command(m, c);
             }
             Expression::Compound { body, redirects } => {
-                self.key_block(level, "body");
-                self.write_compound_command(level + 2, body);
+                m.value("body", self.build_compound_command(body));
                 if !redirects.is_empty() {
-                    self.key_block(level, "redirects");
-                    for r in redirects {
-                        self.write_redirect(level + 2, r);
-                    }
+                    let items: Vec<YamlValue> = redirects.iter().map(|r| self.build_redirect(r)).collect();
+                    m.value("redirects", YamlValue::Sequence(items));
                 }
             }
             Expression::FunctionDef(f) => {
-                self.write_function_def(level, f);
+                self.extend_function_def(m, f);
             }
             Expression::And { left, right } => {
-                self.key_block(level, "left");
-                self.write_inner_expression(level + 2, left);
-                self.key_block(level, "right");
-                self.write_inner_expression(level + 2, right);
+                m.value("left", self.build_inner_expression(left));
+                m.value("right", self.build_inner_expression(right));
             }
             Expression::Or { left, right } => {
-                self.key_block(level, "left");
-                self.write_inner_expression(level + 2, left);
-                self.key_block(level, "right");
-                self.write_inner_expression(level + 2, right);
+                m.value("left", self.build_inner_expression(left));
+                m.value("right", self.build_inner_expression(right));
             }
-            Expression::Pipe {
-                left,
-                right,
-                stderr,
-            } => {
+            Expression::Pipe { left, right, stderr } => {
                 if *stderr {
-                    self.key_value(level, "stderr", "true");
+                    m.raw("stderr", "true");
                 }
-                self.key_block(level, "left");
-                self.write_inner_expression(level + 2, left);
-                self.key_block(level, "right");
-                self.write_inner_expression(level + 2, right);
+                m.value("left", self.build_inner_expression(left));
+                m.value("right", self.build_inner_expression(right));
             }
             Expression::Not(inner) => {
-                self.key_block(level, "command");
-                self.write_inner_expression(level + 2, inner);
+                m.value("command", self.build_inner_expression(inner));
             }
         }
     }
 
-    fn write_command(&mut self, level: usize, cmd: &Command) {
+    fn extend_command(&self, m: &mut MappingBuilder, cmd: &Command) {
         if !cmd.assignments.is_empty() {
-            self.key_block(level, "assignments");
-            for a in &cmd.assignments {
-                self.write_assignment(level + 2, a);
-            }
+            let items: Vec<YamlValue> = cmd.assignments.iter().map(|a| self.build_assignment(a)).collect();
+            m.value("assignments", YamlValue::Sequence(items));
         }
-        self.key_block(level, "arguments");
-        for arg in &cmd.arguments {
-            self.write_argument(level + 2, arg);
-        }
+        let args: Vec<YamlValue> = cmd.arguments.iter().map(|a| self.build_argument(a)).collect();
+        m.value("arguments", YamlValue::Sequence(args));
         if !cmd.redirects.is_empty() {
-            self.key_block(level, "redirects");
-            for r in &cmd.redirects {
-                self.write_redirect(level + 2, r);
-            }
+            let items: Vec<YamlValue> = cmd.redirects.iter().map(|r| self.build_redirect(r)).collect();
+            m.value("redirects", YamlValue::Sequence(items));
         }
     }
 
-    fn write_assignment(&mut self, level: usize, a: &Assignment) {
-        self.indent(level);
-        let src = self.source(a.span);
-        let _ = writeln!(self.buf, "- source: {}", src);
-        self.key_value(level + 2, "name", &a.name);
+    fn build_assignment(&self, a: &Assignment) -> YamlValue {
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(a.span));
+        m.raw("name", &a.name);
         match &a.value {
             AssignmentValue::Scalar(word) => {
-                self.key_block(level + 2, "value");
-                self.write_word_inline(level + 4, word);
+                m.value("value", self.build_word_value(word));
             }
             AssignmentValue::BashArray(elements) => {
-                self.key_value(level + 2, "value_type", "BashArray");
+                m.raw("value_type", "BashArray");
                 if !elements.is_empty() {
-                    self.key_block(level + 2, "elements");
-                    for w in elements {
-                        self.write_word_list_item(level + 4, w);
-                    }
+                    let items: Vec<YamlValue> = elements.iter().map(|w| self.build_word_list_item(w)).collect();
+                    m.value("elements", YamlValue::Sequence(items));
                 }
             }
         }
+        m.build()
     }
 
-    fn write_function_def(&mut self, level: usize, f: &FunctionDef) {
-        self.key_source(level, f.span);
-        self.key_value(level, "name", &f.name);
-        self.key_block(level, "body");
-        self.write_compound_command(level + 2, &f.body);
+    fn extend_function_def(&self, m: &mut MappingBuilder, f: &FunctionDef) {
+        m.raw("source", &self.source(f.span));
+        m.raw("name", &f.name);
+        m.value("body", self.build_compound_command(&f.body));
         if !f.redirects.is_empty() {
-            self.key_block(level, "redirects");
-            for r in &f.redirects {
-                self.write_redirect(level + 2, r);
-            }
+            let items: Vec<YamlValue> = f.redirects.iter().map(|r| self.build_redirect(r)).collect();
+            m.value("redirects", YamlValue::Sequence(items));
         }
     }
 
-    fn write_compound_command(&mut self, level: usize, cmd: &CompoundCommand) {
+    fn build_compound_command(&self, cmd: &CompoundCommand) -> YamlValue {
+        let mut m = MappingBuilder::new();
         match cmd {
             CompoundCommand::BraceGroup { body, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BraceGroup");
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BraceGroup");
+                self.extend_statement_list(&mut m, "body", body);
             }
             CompoundCommand::Subshell { body, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "Subshell");
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+                m.raw("source", &self.source(*span));
+                m.raw("type", "Subshell");
+                self.extend_statement_list(&mut m, "body", body);
             }
-            CompoundCommand::ForClause {
-                variable,
-                words,
-                body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "ForClause");
-                self.key_value(level, "variable", variable);
+            CompoundCommand::ForClause { variable, words, body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "ForClause");
+                m.raw("variable", variable);
                 if let Some(word_list) = words {
-                    self.key_block(level, "words");
-                    for w in word_list {
-                        self.write_word_list_item(level + 2, w);
-                    }
+                    let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
+                    m.value("words", YamlValue::Sequence(items));
                 }
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+                self.extend_statement_list(&mut m, "body", body);
             }
             CompoundCommand::CaseClause { word, arms, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "CaseClause");
-                self.key_block(level, "word");
-                self.write_word_inline(level + 2, word);
-                self.key_block(level, "arms");
-                for arm in arms {
-                    self.write_case_arm(level + 2, arm);
-                }
+                m.raw("source", &self.source(*span));
+                m.raw("type", "CaseClause");
+                m.value("word", self.build_word_value(word));
+                let items: Vec<YamlValue> = arms.iter().map(|arm| self.build_case_arm(arm)).collect();
+                m.value("arms", YamlValue::Sequence(items));
             }
-            CompoundCommand::IfClause {
-                condition,
-                then_body,
-                elifs,
-                else_body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "IfClause");
-                self.key_block(level, "condition");
-                for c in condition {
-                    self.write_statement(level + 2, c);
-                }
-                self.key_block(level, "then_body");
-                for c in then_body {
-                    self.write_statement(level + 2, c);
-                }
+            CompoundCommand::IfClause { condition, then_body, elifs, else_body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "IfClause");
+                self.extend_statement_list(&mut m, "condition", condition);
+                self.extend_statement_list(&mut m, "then_body", then_body);
                 if !elifs.is_empty() {
-                    self.key_block(level, "elifs");
-                    for elif in elifs {
-                        self.write_elif(level + 2, elif);
-                    }
+                    let items: Vec<YamlValue> = elifs.iter().map(|e| self.build_elif(e)).collect();
+                    m.value("elifs", YamlValue::Sequence(items));
                 }
                 if let Some(else_cmds) = else_body {
-                    self.key_block(level, "else_body");
-                    for c in else_cmds {
-                        self.write_statement(level + 2, c);
-                    }
+                    self.extend_statement_list(&mut m, "else_body", else_cmds);
                 }
             }
-            CompoundCommand::WhileClause {
-                condition,
-                body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "WhileClause");
-                self.key_block(level, "condition");
-                for c in condition {
-                    self.write_statement(level + 2, c);
-                }
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+            CompoundCommand::WhileClause { condition, body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "WhileClause");
+                self.extend_statement_list(&mut m, "condition", condition);
+                self.extend_statement_list(&mut m, "body", body);
             }
-            CompoundCommand::UntilClause {
-                condition,
-                body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "UntilClause");
-                self.key_block(level, "condition");
-                for c in condition {
-                    self.write_statement(level + 2, c);
-                }
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+            CompoundCommand::UntilClause { condition, body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "UntilClause");
+                self.extend_statement_list(&mut m, "condition", condition);
+                self.extend_statement_list(&mut m, "body", body);
             }
             CompoundCommand::BashDoubleBracket { expression, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BashDoubleBracket");
-                self.key_block(level, "expression");
-                self.write_test_expr(level + 2, expression);
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BashDoubleBracket");
+                m.value("expression", self.build_test_expr(expression));
             }
             CompoundCommand::BashArithmeticCommand { expression, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BashArithmeticCommand");
-                self.key_block(level, "expression");
-                self.write_arith_expr(level + 2, expression);
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BashArithmeticCommand");
+                m.value("expression", self.build_arith_expr(expression));
             }
-            CompoundCommand::BashSelectClause {
-                variable,
-                words,
-                body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BashSelectClause");
-                self.key_value(level, "variable", variable);
+            CompoundCommand::BashSelectClause { variable, words, body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BashSelectClause");
+                m.raw("variable", variable);
                 if let Some(word_list) = words {
-                    self.key_block(level, "words");
-                    for w in word_list {
-                        self.write_word_list_item(level + 2, w);
-                    }
+                    let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
+                    m.value("words", YamlValue::Sequence(items));
                 }
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+                self.extend_statement_list(&mut m, "body", body);
             }
             CompoundCommand::BashCoproc { name, body, span } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BashCoproc");
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BashCoproc");
                 if let Some(n) = name {
-                    self.key_value(level, "name", n);
+                    m.raw("name", n);
                 }
-                self.key_block(level, "body");
-                self.write_expression(level + 2, body);
+                let mut inner = MappingBuilder::new();
+                self.extend_expression(&mut inner, body);
+                m.value("body", inner.build());
             }
-            CompoundCommand::BashArithmeticFor {
-                init,
-                condition,
-                update,
-                body,
-                span,
-            } => {
-                self.key_source(level, *span);
-                self.key_value(level, "type", "BashArithmeticFor");
+            CompoundCommand::BashArithmeticFor { init, condition, update, body, span } => {
+                m.raw("source", &self.source(*span));
+                m.raw("type", "BashArithmeticFor");
                 if let Some(init_expr) = init {
-                    self.key_block(level, "init");
-                    self.write_arith_expr(level + 2, init_expr);
+                    m.value("init", self.build_arith_expr(init_expr));
                 }
                 if let Some(cond_expr) = condition {
-                    self.key_block(level, "condition");
-                    self.write_arith_expr(level + 2, cond_expr);
+                    m.value("condition", self.build_arith_expr(cond_expr));
                 }
                 if let Some(update_expr) = update {
-                    self.key_block(level, "update");
-                    self.write_arith_expr(level + 2, update_expr);
+                    m.value("update", self.build_arith_expr(update_expr));
                 }
-                self.key_block(level, "body");
-                for c in body {
-                    self.write_statement(level + 2, c);
-                }
+                self.extend_statement_list(&mut m, "body", body);
             }
         }
+        m.build()
     }
 
-    fn write_case_arm(&mut self, level: usize, arm: &CaseArm) {
-        self.indent(level);
-        let src = self.source(arm.span);
-        let _ = writeln!(self.buf, "- source: {}", src);
-        self.key_block(level + 2, "patterns");
-        for p in &arm.patterns {
-            self.write_word_list_item(level + 4, p);
-        }
+    /// Helper: add a named statement list to a mapping.
+    fn extend_statement_list(&self, m: &mut MappingBuilder, key: &str, stmts: &[Statement]) {
+        let items: Vec<YamlValue> = stmts.iter().map(|s| self.build_statement(s)).collect();
+        m.value(key, YamlValue::Sequence(items));
+    }
+
+    fn build_case_arm(&self, arm: &CaseArm) -> YamlValue {
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(arm.span));
+        let patterns: Vec<YamlValue> = arm.patterns.iter().map(|p| self.build_word_list_item(p)).collect();
+        m.value("patterns", YamlValue::Sequence(patterns));
         if !arm.body.is_empty() {
-            self.key_block(level + 2, "body");
-            for c in &arm.body {
-                self.write_statement(level + 4, c);
-            }
+            self.extend_statement_list(&mut m, "body", &arm.body);
         }
+        m.build()
     }
 
-    fn write_elif(&mut self, level: usize, elif: &ElifClause) {
-        self.indent(level);
-        let src = self.source(elif.span);
-        let _ = writeln!(self.buf, "- source: {}", src);
-        self.key_block(level + 2, "condition");
-        for c in &elif.condition {
-            self.write_statement(level + 4, c);
-        }
-        self.key_block(level + 2, "body");
-        for c in &elif.body {
-            self.write_statement(level + 4, c);
-        }
+    fn build_elif(&self, elif: &ElifClause) -> YamlValue {
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(elif.span));
+        self.extend_statement_list(&mut m, "condition", &elif.condition);
+        self.extend_statement_list(&mut m, "body", &elif.body);
+        m.build()
     }
 
-    fn write_redirect(&mut self, level: usize, r: &Redirect) {
-        self.indent(level);
+    fn build_redirect(&self, r: &Redirect) -> YamlValue {
         let type_name = match &r.kind {
             RedirectKind::Input(_) => "Input",
             RedirectKind::Output(_) => "Output",
@@ -444,33 +293,18 @@ impl<'a> YamlWriter<'a> {
             RedirectKind::BashOutputAll(_) => "BashOutputAll",
             RedirectKind::BashAppendAll(_) => "BashAppendAll",
         };
-        let _ = writeln!(self.buf, "- type: {}", type_name);
-        self.key_source(level + 2, r.span);
+        let mut m = MappingBuilder::new();
+        m.raw("type", type_name);
+        m.raw("source", &self.source(r.span));
         if let Some(fd) = r.fd {
-            self.key_value(level + 2, "fd", &fd.to_string());
+            m.raw("fd", &fd.to_string());
         }
         match &r.kind {
-            RedirectKind::HereDoc {
-                delimiter,
-                body,
-                strip_tabs,
-                quoted,
-                ..
-            } => {
-                self.key_value(level + 2, "delimiter", delimiter);
-                if *strip_tabs {
-                    self.key_value(level + 2, "strip_tabs", "true");
-                }
-                if *quoted {
-                    self.key_value(level + 2, "quoted", "true");
-                }
-                self.key_block(level + 2, "body");
-                self.indent(level + 4);
-                self.buf.push_str("|\n");
-                for line in body.lines() {
-                    self.indent(level + 4);
-                    let _ = writeln!(self.buf, "{}", line);
-                }
+            RedirectKind::HereDoc { delimiter, body, strip_tabs, quoted, .. } => {
+                m.raw("delimiter", delimiter);
+                m.raw_if(*strip_tabs, "strip_tabs", "true");
+                m.raw_if(*quoted, "quoted", "true");
+                m.value("body", YamlValue::BlockScalar(body.clone()));
             }
             _ => {
                 let target = match &r.kind {
@@ -486,147 +320,100 @@ impl<'a> YamlWriter<'a> {
                     | RedirectKind::BashAppendAll(w) => w,
                     _ => unreachable!(),
                 };
-                self.key_block(level + 2, "target");
-                self.write_word_inline(level + 4, target);
+                m.value("target", self.build_word_value(target));
             }
         }
+        m.build()
     }
 
-    fn write_word_list_item(&mut self, level: usize, word: &Word) {
-        self.indent(level);
-        // If the word has a single Literal part, use a compact form
+    /// Build a word as a sequence item. Single-literal words use compact scalar form.
+    fn build_word_list_item(&self, word: &Word) -> YamlValue {
         if word.parts.len() == 1 {
             if let Fragment::Literal(s) = &word.parts[0] {
-                let _ = writeln!(self.buf, "- {}", yaml_escape(s));
-                return;
+                return YamlValue::scalar(s.clone());
             }
         }
-        let src = self.source(word.span);
-        let _ = writeln!(self.buf, "- source: {}", src);
-        self.key_block(level + 2, "parts");
-        for part in &word.parts {
-            self.write_fragment(level + 4, part);
-        }
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(word.span));
+        let parts: Vec<YamlValue> = word.parts.iter().map(|p| self.build_fragment(p)).collect();
+        m.value("parts", YamlValue::Sequence(parts));
+        m.build()
     }
 
-    fn write_argument(&mut self, level: usize, arg: &Argument) {
+    fn build_argument(&self, arg: &Argument) -> YamlValue {
         match arg {
-            Argument::Word(w) => {
-                self.write_word_list_item(level, w);
-            }
-            Argument::Atom(atom) => {
-                self.write_atom(level, atom);
-            }
+            Argument::Word(w) => self.build_word_list_item(w),
+            Argument::Atom(atom) => self.build_atom(atom),
         }
     }
 
-    fn write_atom(&mut self, level: usize, atom: &Atom) {
+    fn build_atom(&self, atom: &Atom) -> YamlValue {
         match atom {
-            Atom::BashProcessSubstitution {
-                direction,
-                body,
-                span,
-            } => {
-                self.indent(level);
-                let _ = writeln!(self.buf, "- type: BashProcessSubstitution");
-                self.key_source(level + 2, *span);
+            Atom::BashProcessSubstitution { direction, body, span } => {
                 let dir = match direction {
                     ProcessDirection::In => "<",
                     ProcessDirection::Out => ">",
                 };
-                self.key_value(level + 2, "direction", dir);
+                let mut m = MappingBuilder::new();
+                m.raw("type", "BashProcessSubstitution");
+                m.raw("source", &self.source(*span));
+                m.raw("direction", dir);
                 if !body.is_empty() {
-                    self.key_block(level + 2, "statements");
-                    for s in body {
-                        self.indent(level + 4);
-                        match s.mode {
-                            ExecutionMode::Background => {
-                                self.buf.push_str("- mode: Background\n");
-                                self.write_expression(level + 6, &s.expression);
-                            }
-                            ExecutionMode::Terminated => {
-                                self.buf.push_str("- mode: Terminated\n");
-                                self.write_expression(level + 6, &s.expression);
-                            }
-                            ExecutionMode::Sequential => {
-                                self.buf.push_str("- ");
-                                self.write_expression_inline(level + 4, &s.expression);
-                            }
-                        }
-                    }
+                    let stmts: Vec<YamlValue> = body.iter().map(|s| self.build_inner_statement(s)).collect();
+                    m.value("statements", YamlValue::Sequence(stmts));
                 }
+                m.build()
             }
         }
     }
 
-    fn write_word_inline(&mut self, level: usize, word: &Word) {
-        // If the word has a single Literal part, use a compact form
+    /// Build a word as an inline mapping value (not a sequence item).
+    /// Single-literal words use compact `literal: value` form.
+    fn build_word_value(&self, word: &Word) -> YamlValue {
         if word.parts.len() == 1 {
             if let Fragment::Literal(s) = &word.parts[0] {
-                self.key_value(level, "literal", &yaml_escape(s));
-                return;
+                let mut m = MappingBuilder::new();
+                m.scalar("literal", s);
+                return m.build();
             }
         }
-        self.key_source(level, word.span);
-        self.key_block(level, "parts");
-        for part in &word.parts {
-            self.write_fragment(level + 2, part);
-        }
+        let mut m = MappingBuilder::new();
+        m.raw("source", &self.source(word.span));
+        let parts: Vec<YamlValue> = word.parts.iter().map(|p| self.build_fragment(p)).collect();
+        m.value("parts", YamlValue::Sequence(parts));
+        m.build()
     }
 
-    fn write_fragment(&mut self, level: usize, part: &Fragment) {
-        self.indent(level);
+    fn build_fragment(&self, part: &Fragment) -> YamlValue {
+        let mut m = MappingBuilder::new();
         match part {
             Fragment::Literal(s) => {
-                let _ = writeln!(self.buf, "- type: Literal");
-                self.key_value(level + 2, "value", &yaml_escape(s));
+                m.raw("type", "Literal");
+                m.scalar("value", s);
             }
             Fragment::SingleQuoted(s) => {
-                let _ = writeln!(self.buf, "- type: SingleQuoted");
-                self.key_value(level + 2, "value", &yaml_escape(s));
+                m.raw("type", "SingleQuoted");
+                m.scalar("value", s);
             }
             Fragment::DoubleQuoted(parts) => {
-                let _ = writeln!(self.buf, "- type: DoubleQuoted");
-                self.key_block(level + 2, "parts");
-                for p in parts {
-                    self.write_fragment(level + 4, p);
-                }
+                m.raw("type", "DoubleQuoted");
+                let items: Vec<YamlValue> = parts.iter().map(|p| self.build_fragment(p)).collect();
+                m.value("parts", YamlValue::Sequence(items));
             }
             Fragment::Parameter(expansion) => {
-                let _ = writeln!(self.buf, "- type: Parameter");
-                self.write_param_expansion(level + 2, expansion);
+                m.raw("type", "Parameter");
+                self.extend_param_expansion(&mut m, expansion);
             }
             Fragment::CommandSubstitution(stmts) => {
-                let _ = writeln!(self.buf, "- type: CommandSubstitution");
+                m.raw("type", "CommandSubstitution");
                 if !stmts.is_empty() {
-                    // Note: source locations inside command substitutions are
-                    // relative to the substitution content, not the original
-                    // source. We emit expressions without source annotations
-                    // to avoid misleading locations.
-                    self.key_block(level + 2, "statements");
-                    for s in stmts {
-                        self.indent(level + 4);
-                        match s.mode {
-                            ExecutionMode::Background => {
-                                self.buf.push_str("- mode: Background\n");
-                                self.write_expression(level + 6, &s.expression);
-                            }
-                            ExecutionMode::Terminated => {
-                                self.buf.push_str("- mode: Terminated\n");
-                                self.write_expression(level + 6, &s.expression);
-                            }
-                            ExecutionMode::Sequential => {
-                                self.buf.push_str("- ");
-                                self.write_expression_inline(level + 4, &s.expression);
-                            }
-                        }
-                    }
+                    let items: Vec<YamlValue> = stmts.iter().map(|s| self.build_inner_statement(s)).collect();
+                    m.value("statements", YamlValue::Sequence(items));
                 }
             }
             Fragment::ArithmeticExpansion(expr) => {
-                let _ = writeln!(self.buf, "- type: ArithmeticExpansion");
-                self.key_block(level + 2, "expression");
-                self.write_arith_expr(level + 4, expr);
+                m.raw("type", "ArithmeticExpansion");
+                m.value("expression", self.build_arith_expr(expr));
             }
             Fragment::Glob(g) => {
                 let g_str = match g {
@@ -634,55 +421,50 @@ impl<'a> YamlWriter<'a> {
                     GlobChar::Question => "Question",
                     GlobChar::BracketOpen => "BracketOpen",
                 };
-                let _ = writeln!(self.buf, "- type: Glob");
-                self.key_value(level + 2, "value", g_str);
+                m.raw("type", "Glob");
+                m.raw("value", g_str);
             }
             Fragment::TildePrefix(s) => {
-                let _ = writeln!(self.buf, "- type: TildePrefix");
+                m.raw("type", "TildePrefix");
                 if s.is_empty() {
-                    self.key_value(level + 2, "value", "~");
+                    m.raw("value", "~");
                 } else {
-                    self.key_value(level + 2, "value", &format!("~{}", s));
+                    m.raw("value", &format!("~{}", s));
                 }
             }
             Fragment::BashAnsiCQuoted(s) => {
-                let _ = writeln!(self.buf, "- type: BashAnsiCQuoted");
-                self.key_value(level + 2, "value", &yaml_escape(s));
+                m.raw("type", "BashAnsiCQuoted");
+                m.scalar("value", s);
             }
             Fragment::BashLocaleQuoted(inner) => {
-                let _ = writeln!(self.buf, "- type: BashLocaleQuoted");
-                self.key_block(level + 2, "parts");
-                for p in inner {
-                    self.write_fragment(level + 4, p);
-                }
+                m.raw("type", "BashLocaleQuoted");
+                let items: Vec<YamlValue> = inner.iter().map(|p| self.build_fragment(p)).collect();
+                m.value("parts", YamlValue::Sequence(items));
             }
             Fragment::BashBraceExpansion(brace) => {
-                let _ = writeln!(self.buf, "- type: BashBraceExpansion");
+                m.raw("type", "BashBraceExpansion");
                 match brace {
                     BraceExpansionKind::List(items) => {
-                        self.key_value(level + 2, "kind", "list");
-                        self.key_block(level + 2, "items");
-                        for item in items {
+                        m.raw("kind", "list");
+                        let yaml_items: Vec<YamlValue> = items.iter().map(|item| {
                             if item.len() == 1 {
                                 if let Fragment::Literal(s) = &item[0] {
-                                    self.indent(level + 4);
-                                    let _ = writeln!(self.buf, "- {}", yaml_escape(s));
-                                    continue;
+                                    return YamlValue::scalar(s.clone());
                                 }
                             }
-                            self.indent(level + 4);
-                            let _ = writeln!(self.buf, "- parts:");
-                            for p in item {
-                                self.write_fragment(level + 8, p);
-                            }
-                        }
+                            let parts: Vec<YamlValue> = item.iter().map(|p| self.build_fragment(p)).collect();
+                            let mut im = MappingBuilder::new();
+                            im.value("parts", YamlValue::Sequence(parts));
+                            im.build()
+                        }).collect();
+                        m.value("items", YamlValue::Sequence(yaml_items));
                     }
                     BraceExpansionKind::Sequence { start, end, step } => {
-                        self.key_value(level + 2, "kind", "sequence");
-                        self.key_value(level + 2, "start", start);
-                        self.key_value(level + 2, "end", end);
+                        m.raw("kind", "sequence");
+                        m.raw("start", start);
+                        m.raw("end", end);
                         if let Some(s) = step {
-                            self.key_value(level + 2, "step", s);
+                            m.raw("step", s);
                         }
                     }
                 }
@@ -695,59 +477,65 @@ impl<'a> YamlWriter<'a> {
                     ExtGlobKind::ExactlyOne => "@",
                     ExtGlobKind::Not => "!",
                 };
-                let _ = writeln!(self.buf, "- type: BashExtGlob");
-                self.key_value(level + 2, "kind", kind_str);
-                self.key_value(level + 2, "pattern", &yaml_escape(pattern));
+                m.raw("type", "BashExtGlob");
+                m.raw("kind", kind_str);
+                m.scalar("pattern", pattern);
             }
         }
+        m.build()
     }
 
-    fn write_test_expr(&mut self, level: usize, expr: &BashTestExpr) {
+    /// Build a statement inside a command substitution or process substitution.
+    /// These don't get source annotations (inner offsets are relative).
+    fn build_inner_statement(&self, s: &Statement) -> YamlValue {
+        let mut m = MappingBuilder::new();
+        match s.mode {
+            ExecutionMode::Background => { m.raw("mode", "Background"); }
+            ExecutionMode::Terminated => { m.raw("mode", "Terminated"); }
+            ExecutionMode::Sequential => {}
+        }
+        self.extend_expression(&mut m, &s.expression);
+        m.build()
+    }
+
+    fn build_test_expr(&self, expr: &BashTestExpr) -> YamlValue {
+        let mut m = MappingBuilder::new();
         match expr {
             BashTestExpr::Unary { op, arg } => {
-                self.key_value(level, "type", "Unary");
-                self.key_value(level, "op", Self::unary_test_op_str(*op));
-                self.key_block(level, "arg");
-                self.write_word_inline(level + 2, arg);
+                m.raw("type", "Unary");
+                m.raw("op", Self::unary_test_op_str(*op));
+                m.value("arg", self.build_word_value(arg));
             }
             BashTestExpr::Binary { left, op, right } => {
-                self.key_value(level, "type", "Binary");
-                self.key_value(level, "op", Self::binary_test_op_str(*op));
-                self.key_block(level, "left");
-                self.write_word_inline(level + 2, left);
-                self.key_block(level, "right");
-                self.write_word_inline(level + 2, right);
+                m.raw("type", "Binary");
+                m.raw("op", Self::binary_test_op_str(*op));
+                m.value("left", self.build_word_value(left));
+                m.value("right", self.build_word_value(right));
             }
             BashTestExpr::And { left, right } => {
-                self.key_value(level, "type", "And");
-                self.key_block(level, "left");
-                self.write_test_expr(level + 2, left);
-                self.key_block(level, "right");
-                self.write_test_expr(level + 2, right);
+                m.raw("type", "And");
+                m.value("left", self.build_test_expr(left));
+                m.value("right", self.build_test_expr(right));
             }
             BashTestExpr::Or { left, right } => {
-                self.key_value(level, "type", "Or");
-                self.key_block(level, "left");
-                self.write_test_expr(level + 2, left);
-                self.key_block(level, "right");
-                self.write_test_expr(level + 2, right);
+                m.raw("type", "Or");
+                m.value("left", self.build_test_expr(left));
+                m.value("right", self.build_test_expr(right));
             }
             BashTestExpr::Not(inner) => {
-                self.key_value(level, "type", "Not");
-                self.key_block(level, "expr");
-                self.write_test_expr(level + 2, inner);
+                m.raw("type", "Not");
+                m.value("expr", self.build_test_expr(inner));
             }
             BashTestExpr::Group(inner) => {
-                self.key_value(level, "type", "Group");
-                self.key_block(level, "expr");
-                self.write_test_expr(level + 2, inner);
+                m.raw("type", "Group");
+                m.value("expr", self.build_test_expr(inner));
             }
             BashTestExpr::Word(w) => {
-                self.key_value(level, "type", "Word");
-                self.key_block(level, "value");
-                self.write_word_inline(level + 2, w);
+                m.raw("type", "Word");
+                m.value("value", self.build_word_value(w));
             }
         }
+        m.build()
     }
 
     fn unary_test_op_str(op: UnaryTestOp) -> &'static str {
@@ -797,19 +585,16 @@ impl<'a> YamlWriter<'a> {
         }
     }
 
-    /// Write an `ArithExpr` node.
-    ///
-    /// TODO: Produce a full tree when the arithmetic parser is implemented.
-    /// For now, the only variant in use is `Variable` holding a raw string.
-    fn write_arith_expr(&mut self, level: usize, expr: &ArithExpr) {
+    fn build_arith_expr(&self, expr: &ArithExpr) -> YamlValue {
+        let mut m = MappingBuilder::new();
         match expr {
             ArithExpr::Number(n) => {
-                self.key_value(level, "type", "Number");
-                self.key_value(level, "value", &n.to_string());
+                m.raw("type", "Number");
+                m.raw("value", &n.to_string());
             }
             ArithExpr::Variable(s) => {
-                self.key_value(level, "type", "Variable");
-                self.key_value(level, "value", &yaml_escape(s));
+                m.raw("type", "Variable");
+                m.scalar("value", s);
             }
             ArithExpr::Binary { left, op, right } => {
                 let op_str = match op {
@@ -833,39 +618,26 @@ impl<'a> YamlWriter<'a> {
                     ArithBinaryOp::Gt => ">",
                     ArithBinaryOp::Ge => ">=",
                 };
-                self.key_value(level, "type", "Binary");
-                self.key_value(level, "op", op_str);
-                self.key_block(level, "left");
-                self.write_arith_expr(level + 2, left);
-                self.key_block(level, "right");
-                self.write_arith_expr(level + 2, right);
+                m.raw("type", "Binary");
+                m.raw("op", op_str);
+                m.value("left", self.build_arith_expr(left));
+                m.value("right", self.build_arith_expr(right));
             }
             ArithExpr::UnaryPrefix { op, operand } => {
-                let op_str = Self::arith_unary_op_str(*op);
-                self.key_value(level, "type", "UnaryPrefix");
-                self.key_value(level, "op", op_str);
-                self.key_block(level, "operand");
-                self.write_arith_expr(level + 2, operand);
+                m.raw("type", "UnaryPrefix");
+                m.raw("op", Self::arith_unary_op_str(*op));
+                m.value("operand", self.build_arith_expr(operand));
             }
             ArithExpr::UnaryPostfix { operand, op } => {
-                let op_str = Self::arith_unary_op_str(*op);
-                self.key_value(level, "type", "UnaryPostfix");
-                self.key_value(level, "op", op_str);
-                self.key_block(level, "operand");
-                self.write_arith_expr(level + 2, operand);
+                m.raw("type", "UnaryPostfix");
+                m.raw("op", Self::arith_unary_op_str(*op));
+                m.value("operand", self.build_arith_expr(operand));
             }
-            ArithExpr::Ternary {
-                condition,
-                then_expr,
-                else_expr,
-            } => {
-                self.key_value(level, "type", "Ternary");
-                self.key_block(level, "condition");
-                self.write_arith_expr(level + 2, condition);
-                self.key_block(level, "then");
-                self.write_arith_expr(level + 2, then_expr);
-                self.key_block(level, "else");
-                self.write_arith_expr(level + 2, else_expr);
+            ArithExpr::Ternary { condition, then_expr, else_expr } => {
+                m.raw("type", "Ternary");
+                m.value("condition", self.build_arith_expr(condition));
+                m.value("then", self.build_arith_expr(then_expr));
+                m.value("else", self.build_arith_expr(else_expr));
             }
             ArithExpr::Assignment { target, op, value } => {
                 let op_str = match op {
@@ -881,25 +653,22 @@ impl<'a> YamlWriter<'a> {
                     ArithAssignOp::BitOrAssign => "|=",
                     ArithAssignOp::BitXorAssign => "^=",
                 };
-                self.key_value(level, "type", "Assignment");
-                self.key_value(level, "target", target);
-                self.key_value(level, "op", op_str);
-                self.key_block(level, "value");
-                self.write_arith_expr(level + 2, value);
+                m.raw("type", "Assignment");
+                m.raw("target", target);
+                m.raw("op", op_str);
+                m.value("value", self.build_arith_expr(value));
             }
             ArithExpr::Group(inner) => {
-                self.key_value(level, "type", "Group");
-                self.key_block(level, "expr");
-                self.write_arith_expr(level + 2, inner);
+                m.raw("type", "Group");
+                m.value("expr", self.build_arith_expr(inner));
             }
             ArithExpr::Comma { left, right } => {
-                self.key_value(level, "type", "Comma");
-                self.key_block(level, "left");
-                self.write_arith_expr(level + 2, left);
-                self.key_block(level, "right");
-                self.write_arith_expr(level + 2, right);
+                m.raw("type", "Comma");
+                m.value("left", self.build_arith_expr(left));
+                m.value("right", self.build_arith_expr(right));
             }
         }
+        m.build()
     }
 
     fn arith_unary_op_str(op: ArithUnaryOp) -> &'static str {
@@ -913,17 +682,13 @@ impl<'a> YamlWriter<'a> {
         }
     }
 
-    fn write_param_expansion(&mut self, level: usize, exp: &ParameterExpansion) {
+    fn extend_param_expansion(&self, m: &mut MappingBuilder, exp: &ParameterExpansion) {
         match exp {
             ParameterExpansion::Simple(name) => {
-                self.key_value(level, "name", &format!("${}", name));
+                m.raw("name", &format!("${}", name));
             }
-            ParameterExpansion::Complex {
-                name,
-                operator,
-                argument,
-            } => {
-                self.key_value(level, "name", name);
+            ParameterExpansion::Complex { name, operator, argument } => {
+                m.raw("name", name);
                 if let Some(op) = operator {
                     let op_str = match op {
                         ParamOp::Default => ":-",
@@ -936,54 +701,12 @@ impl<'a> YamlWriter<'a> {
                         ParamOp::TrimSmallPrefix => "#",
                         ParamOp::TrimLargePrefix => "##",
                     };
-                    self.key_value(level, "operator", op_str);
+                    m.raw("operator", op_str);
                 }
                 if let Some(arg) = argument {
-                    self.key_block(level, "argument");
-                    self.write_word_inline(level + 2, arg);
+                    m.value("argument", self.build_word_value(arg));
                 }
             }
         }
-    }
-}
-
-/// Escape a string for YAML output. Quotes it if it contains special chars.
-fn yaml_escape(s: &str) -> String {
-    if s.is_empty() {
-        return "\"\"".to_string();
-    }
-    let needs_quoting = s.contains(':')
-        || s.contains('#')
-        || s.contains('\'')
-        || s.contains('"')
-        || s.contains('\n')
-        || s.contains('\\')
-        || s.contains('[')
-        || s.contains(']')
-        || s.contains('{')
-        || s.contains('}')
-        || s.contains('&')
-        || s.contains('*')
-        || s.contains('!')
-        || s.contains('|')
-        || s.contains('>')
-        || s.contains('%')
-        || s.contains('@')
-        || s.contains('`')
-        || s.contains(',')
-        || s.contains('?')
-        || s.starts_with(' ')
-        || s.ends_with(' ')
-        || s.starts_with('-')
-        || s == "true"
-        || s == "false"
-        || s == "null"
-        || s == "~"
-        || s.parse::<f64>().is_ok();
-
-    if needs_quoting {
-        format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\""))
-    } else {
-        s.to_string()
     }
 }

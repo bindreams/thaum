@@ -5,13 +5,14 @@ edition = "2021"
 
 [features]
 default = []
-cli = ["dep:colored"]
+cli = ["dep:colored", "dep:clap"]
 
 [dependencies]
 thiserror = "2"
 contracts = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 colored = { version = "3", optional = true }
+clap = { version = "4", features = ["derive"], optional = true }
 
 [dev-dependencies]
 pretty_assertions = "1"

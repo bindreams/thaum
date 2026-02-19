@@ -4,12 +4,72 @@ mod source_map;
 mod yaml_writer;
 
 use std::io::{self, Read};
-use std::{env, fs, process};
+use std::{fs, process};
 
+use clap::Parser;
 use source_map::SourceMapper;
 use yaml_writer::YamlWriter;
 
 use shell_parser::exec::{ExecError, Executor};
+
+// ---------------------------------------------------------------------------
+// Clap argument definitions
+// ---------------------------------------------------------------------------
+
+/// Shell script parser and executor
+#[derive(Parser)]
+#[command(name = "shell-parse")]
+struct Cli {
+    /// Enable Bash dialect (default: POSIX)
+    #[arg(long, global = true)]
+    bash: bool,
+
+    #[command(subcommand)]
+    subcmd: Option<CliCommand>,
+
+    // Top-level args for the implicit "parse" default when no subcommand is given.
+    /// Read script from argument instead of file
+    #[arg(short, long = "command")]
+    c: Option<String>,
+
+    /// Script file (or "-" for stdin)
+    file: Option<String>,
+}
+
+#[derive(clap::Subcommand)]
+enum CliCommand {
+    /// Tokenize and display the token stream
+    Lex(SourceArgs),
+    /// Parse and display AST as YAML (default when no subcommand given)
+    Parse(SourceArgs),
+    /// Execute the script
+    Exec(ExecArgs),
+}
+
+#[derive(clap::Args)]
+struct SourceArgs {
+    /// Read script from argument instead of file
+    #[arg(short, long = "command")]
+    c: Option<String>,
+
+    /// Script file (or "-" for stdin)
+    file: Option<String>,
+}
+
+#[derive(clap::Args)]
+struct ExecArgs {
+    /// Read script from argument instead of file
+    #[arg(short, long = "command")]
+    c: Option<String>,
+
+    /// Script file (or "-" for stdin), followed by script arguments
+    #[arg(trailing_var_arg = true)]
+    args: Vec<String>,
+}
+
+// ---------------------------------------------------------------------------
+// Internal resolved args (kept from the original code)
+// ---------------------------------------------------------------------------
 
 #[derive(Clone, Copy, PartialEq)]
 enum Subcommand {
@@ -29,96 +89,88 @@ struct CliArgs {
     script_args: Vec<String>,
 }
 
-fn parse_args(args: &[String]) -> CliArgs {
-    let mut subcommand = None;
-    let mut bash_mode = false;
-    let mut command_str: Option<String> = None;
-    let mut file_arg: Option<String> = None;
-    let mut script_args: Vec<String> = Vec::new();
-    let mut expect_command_value = false;
-
-    for arg in &args[1..] {
-        if expect_command_value {
-            command_str = Some(arg.clone());
-            expect_command_value = false;
-            continue;
-        }
-
-        match arg.as_str() {
-            "-h" | "--help" => {
-                print_help(&args[0]);
-                process::exit(2);
-            }
-            "--bash" => bash_mode = true,
-            "-c" | "--command" => {
-                expect_command_value = true;
-            }
-            "lex" if subcommand.is_none() && file_arg.is_none() => {
-                subcommand = Some(Subcommand::Lex);
-            }
-            "parse" if subcommand.is_none() && file_arg.is_none() => {
-                subcommand = Some(Subcommand::Parse);
-            }
-            "exec" if subcommand.is_none() && file_arg.is_none() => {
-                subcommand = Some(Subcommand::Exec);
-            }
-            _ => {
-                if file_arg.is_none() {
-                    file_arg = Some(arg.clone());
-                } else {
-                    script_args.push(arg.clone());
-                }
-            }
+impl CliArgs {
+    fn dialect(&self) -> shell_parser::Dialect {
+        if self.bash_mode {
+            shell_parser::Dialect::Bash
+        } else {
+            shell_parser::Dialect::Posix
         }
     }
+}
 
-    if expect_command_value {
-        eprintln!("error: -c requires an argument");
-        process::exit(2);
+// ---------------------------------------------------------------------------
+// Resolve clap output into CliArgs
+// ---------------------------------------------------------------------------
+
+impl Cli {
+    fn resolve(self) -> CliArgs {
+        let bash_mode = self.bash;
+        match self.subcmd {
+            None => resolve_source(Subcommand::Parse, bash_mode, self.c, self.file),
+            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.c, a.file),
+            Some(CliCommand::Parse(a)) => {
+                resolve_source(Subcommand::Parse, bash_mode, a.c, a.file)
+            }
+            Some(CliCommand::Exec(a)) => resolve_exec(bash_mode, a.c, a.args),
+        }
     }
+}
 
-    // Default subcommand is parse (backward compat)
-    let subcommand = subcommand.unwrap_or(Subcommand::Parse);
-
-    // Lex/Parse mode doesn't accept extra positional args
-    if (subcommand == Subcommand::Parse || subcommand == Subcommand::Lex)
-        && !script_args.is_empty()
-    {
-        eprintln!("error: unexpected argument '{}'", script_args[0]);
-        process::exit(2);
-    }
-
-    // Must have either -c or a file argument
-    if command_str.is_none() && file_arg.is_none() {
-        print_help(&args[0]);
-        process::exit(2);
-    }
-
-    // Can't have both -c and a file (for lex/parse)
-    if command_str.is_some()
-        && file_arg.is_some()
-        && (subcommand == Subcommand::Parse || subcommand == Subcommand::Lex)
-    {
+fn resolve_source(
+    subcommand: Subcommand,
+    bash_mode: bool,
+    c: Option<String>,
+    file: Option<String>,
+) -> CliArgs {
+    if c.is_some() && file.is_some() {
         eprintln!("error: cannot use both -c and a file argument");
         process::exit(2);
     }
-
-    // For exec with -c, the file_arg becomes the first script arg
-    if command_str.is_some() && file_arg.is_some() && subcommand == Subcommand::Exec {
-        script_args.insert(0, file_arg.take().unwrap());
+    if c.is_none() && file.is_none() {
+        eprintln!("error: provide either -c <script> or a file argument");
+        process::exit(2);
     }
-
     CliArgs {
         subcommand,
         bash_mode,
-        command_str,
+        command_str: c,
+        file_arg: file,
+        script_args: Vec::new(),
+    }
+}
+
+fn resolve_exec(bash_mode: bool, c: Option<String>, args: Vec<String>) -> CliArgs {
+    if c.is_none() && args.is_empty() {
+        eprintln!("error: provide either -c <script> or a file argument");
+        process::exit(2);
+    }
+
+    let (file_arg, script_args) = if c.is_some() {
+        // With -c, all positional args are script args (no file needed).
+        (None, args)
+    } else {
+        // First positional is the file, rest are script args.
+        let mut args = args;
+        let file = args.remove(0);
+        (Some(file), args)
+    };
+
+    CliArgs {
+        subcommand: Subcommand::Exec,
+        bash_mode,
+        command_str: c,
         file_arg,
         script_args,
     }
 }
 
+// ---------------------------------------------------------------------------
+// Entry point
+// ---------------------------------------------------------------------------
+
 /// Determine the source text and display filename from CLI args.
-fn resolve_source(cli: &CliArgs) -> (String, String) {
+fn load_source(cli: &CliArgs) -> (String, String) {
     if let Some(cmd) = &cli.command_str {
         (cmd.clone(), "<command>".to_string())
     } else {
@@ -134,13 +186,13 @@ fn resolve_source(cli: &CliArgs) -> (String, String) {
 }
 
 pub fn run() {
-    let args: Vec<String> = env::args().collect();
-    let cli = parse_args(&args);
+    let cli = Cli::parse();
+    let args = cli.resolve();
 
-    match cli.subcommand {
-        Subcommand::Lex => do_lex(&cli),
-        Subcommand::Parse => do_parse(&cli),
-        Subcommand::Exec => do_exec(&cli),
+    match args.subcommand {
+        Subcommand::Lex => do_lex(&args),
+        Subcommand::Parse => do_parse(&args),
+        Subcommand::Exec => do_exec(&args),
     }
 }
 
@@ -148,13 +200,8 @@ fn do_lex(cli: &CliArgs) {
     use shell_parser::lexer::Lexer;
     use shell_parser::token::Token;
 
-    let options = if cli.bash_mode {
-        shell_parser::Dialect::Bash.options()
-    } else {
-        shell_parser::Dialect::Posix.options()
-    };
-
-    let (source, filename) = resolve_source(cli);
+    let options = cli.dialect().options();
+    let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
     let mut lexer = Lexer::new(&source, options);
 
@@ -227,13 +274,8 @@ fn do_lex(cli: &CliArgs) {
 }
 
 fn do_parse(cli: &CliArgs) {
-    let dialect = if cli.bash_mode {
-        shell_parser::Dialect::Bash
-    } else {
-        shell_parser::Dialect::Posix
-    };
-
-    let (source, filename) = resolve_source(cli);
+    let dialect = cli.dialect();
+    let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
 
     let program = match shell_parser::parse_with(&source, dialect) {
@@ -256,13 +298,8 @@ fn do_parse(cli: &CliArgs) {
 }
 
 fn do_exec(cli: &CliArgs) {
-    let dialect = if cli.bash_mode {
-        shell_parser::Dialect::Bash
-    } else {
-        shell_parser::Dialect::Posix
-    };
-
-    let (source, filename) = resolve_source(cli);
+    let dialect = cli.dialect();
+    let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
 
     let program = match shell_parser::parse_with(&source, dialect) {
@@ -307,22 +344,4 @@ fn read_source(file_arg: &str) -> String {
             process::exit(1);
         })
     }
-}
-
-fn print_help(program: &str) {
-    eprintln!("Usage: {} [parse] [--bash] [-c <script>] <file>", program);
-    eprintln!("       {} lex [--bash] [-c <script>] <file>", program);
-    eprintln!("       {} exec [--bash] [-c <script>] <file> [args...]", program);
-    eprintln!();
-    eprintln!("Commands:");
-    eprintln!("  lex      Tokenize and display the token stream");
-    eprintln!("  parse    Parse and display AST as YAML (default)");
-    eprintln!("  exec     Execute the script");
-    eprintln!();
-    eprintln!("Options:");
-    eprintln!("  --bash           Enable Bash dialect (default: POSIX)");
-    eprintln!("  -c, --command    Read script from argument instead of file");
-    eprintln!("  -h, --help       Show this help");
-    eprintln!();
-    eprintln!("Use - as <file> to read from stdin.");
 }

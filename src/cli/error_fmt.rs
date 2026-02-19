@@ -3,6 +3,14 @@ use shell_parser::exec::ExecError;
 
 use super::source_map::SourceMapper;
 
+fn print_error_header(msg: &str) {
+    if colored::control::SHOULD_COLORIZE.should_colorize() {
+        eprintln!("{}{} {}", "error".red().bold(), ":".bold(), msg.bold());
+    } else {
+        eprintln!("error: {}", msg);
+    }
+}
+
 pub(super) fn print_error(
     error: &shell_parser::ParseError,
     source: &str,
@@ -10,14 +18,7 @@ pub(super) fn print_error(
     mapper: &SourceMapper,
 ) {
     let colorize = colored::control::SHOULD_COLORIZE.should_colorize();
-    let msg = error.to_string();
-
-    // Error header
-    if colorize {
-        eprintln!("{}{} {}", "error".red().bold(), ":".bold(), msg.bold());
-    } else {
-        eprintln!("error: {}", msg);
-    }
+    print_error_header(&error.to_string());
 
     // Source context (if we have a span)
     if let Some(span) = error.span() {
@@ -79,12 +80,5 @@ pub(super) fn print_error(
 }
 
 pub(super) fn print_exec_error(error: &ExecError) {
-    let colorize = colored::control::SHOULD_COLORIZE.should_colorize();
-    let msg = error.to_string();
-
-    if colorize {
-        eprintln!("{}{} {}", "error".red().bold(), ":".bold(), msg.bold());
-    } else {
-        eprintln!("error: {}", msg);
-    }
+    print_error_header(&error.to_string());
 }

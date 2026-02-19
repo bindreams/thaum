@@ -38,7 +38,9 @@ pub fn run_builtin(
         "read" => builtin_read(args, env),
         "set" => builtin_set(args, env),
         "test" | "[" => builtin_test(name, args, stderr),
-        // eval, exec, ., source handled at executor level (need access to parser/executor)
+        "eval" | "exec" | "." | "source" => Err(ExecError::UnsupportedFeature(
+            format!("{} builtin", name),
+        )),
         _ => Err(ExecError::CommandNotFound(name.to_string())),
     }
 }
@@ -224,9 +226,10 @@ fn builtin_set(args: &[String], env: &mut Environment) -> Result<i32, ExecError>
         return Ok(0);
     }
 
-    // For now, ignore option flags like -e, -x, etc.
-    // TODO: implement shell options
-    Ok(0)
+    Err(ExecError::UnsupportedFeature(format!(
+        "shell option: {}",
+        args.join(" ")
+    )))
 }
 
 fn builtin_test(name: &str, args: &[String], stderr: &mut dyn Write) -> Result<i32, ExecError> {

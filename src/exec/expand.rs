@@ -69,13 +69,15 @@ fn expand_fragment(
         Fragment::Parameter(param) => {
             expand_parameter(param, env, out)?;
         }
-        Fragment::CommandSubstitution(_stmts) => {
-            // Command substitutions should be pre-resolved by Executor::resolve_cmd_subs()
-            // before reaching expand. If we get here, the substitution was not resolved.
-            // Expand to empty string (matches unresolved behavior).
+        Fragment::CommandSubstitution(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "unresolved command substitution".to_string(),
+            ));
         }
-        Fragment::ArithmeticExpansion(_expr) => {
-            // TODO: implement arithmetic expansion
+        Fragment::ArithmeticExpansion(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "arithmetic expansion $((expr))".to_string(),
+            ));
         }
         Fragment::Glob(_) => {
             match fragment {
@@ -93,8 +95,15 @@ fn expand_fragment(
                 expand_fragment_in_double_quotes(part, env, out)?;
             }
         }
-        Fragment::BashExtGlob { .. } | Fragment::BashBraceExpansion(_) => {
-            // TODO: Bash-specific expansions
+        Fragment::BashExtGlob { .. } => {
+            return Err(ExecError::UnsupportedFeature(
+                "bash extended glob".to_string(),
+            ));
+        }
+        Fragment::BashBraceExpansion(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "bash brace expansion".to_string(),
+            ));
         }
     }
     Ok(())
@@ -110,10 +119,14 @@ fn expand_fragment_in_double_quotes(
         Fragment::Literal(s) => out.push_str(s),
         Fragment::Parameter(param) => expand_parameter(param, env, out)?,
         Fragment::CommandSubstitution(_) => {
-            // Pre-resolved by Executor, or expand to empty.
+            return Err(ExecError::UnsupportedFeature(
+                "unresolved command substitution".to_string(),
+            ));
         }
         Fragment::ArithmeticExpansion(_) => {
-            // TODO: arithmetic expansion
+            return Err(ExecError::UnsupportedFeature(
+                "arithmetic expansion $((expr))".to_string(),
+            ));
         }
         Fragment::SingleQuoted(s) => out.push_str(s),
         Fragment::Glob(g) => {
@@ -138,7 +151,16 @@ fn expand_fragment_in_double_quotes(
                 expand_fragment_in_double_quotes(part, env, out)?;
             }
         }
-        Fragment::BashExtGlob { .. } | Fragment::BashBraceExpansion(_) => {}
+        Fragment::BashExtGlob { .. } => {
+            return Err(ExecError::UnsupportedFeature(
+                "bash extended glob".to_string(),
+            ));
+        }
+        Fragment::BashBraceExpansion(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "bash brace expansion".to_string(),
+            ));
+        }
     }
     Ok(())
 }
@@ -220,16 +242,9 @@ fn expand_complex_parameter(
             }
         }
         Some(ParamOp::DefaultAssign) => {
-            match value.as_deref() {
-                Some(v) if !v.is_empty() => out.push_str(v),
-                _ => {
-                    if let Some(arg) = argument {
-                        let expanded = expand_word(arg, env)?;
-                        out.push_str(&expanded);
-                        // TODO: handle ${var:=word} assignment through executor
-                    }
-                }
-            }
+            return Err(ExecError::UnsupportedFeature(
+                "${var:=word} default assignment".to_string(),
+            ));
         }
         Some(ParamOp::Error) => {
             match value.as_deref() {
@@ -255,26 +270,15 @@ fn expand_complex_parameter(
                 _ => {}
             }
         }
-        Some(ParamOp::TrimSmallSuffix) => {
-            // TODO: implement pattern trimming
-            if let Some(val) = value {
-                out.push_str(&val);
-            }
-        }
-        Some(ParamOp::TrimLargeSuffix) => {
-            if let Some(val) = value {
-                out.push_str(&val);
-            }
-        }
-        Some(ParamOp::TrimSmallPrefix) => {
-            if let Some(val) = value {
-                out.push_str(&val);
-            }
-        }
-        Some(ParamOp::TrimLargePrefix) => {
-            if let Some(val) = value {
-                out.push_str(&val);
-            }
+        Some(
+            ParamOp::TrimSmallSuffix
+            | ParamOp::TrimLargeSuffix
+            | ParamOp::TrimSmallPrefix
+            | ParamOp::TrimLargePrefix,
+        ) => {
+            return Err(ExecError::UnsupportedFeature(
+                "parameter pattern trimming".to_string(),
+            ));
         }
     }
     Ok(())

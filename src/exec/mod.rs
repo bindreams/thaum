@@ -64,11 +64,9 @@ impl Executor {
     fn execute_statement(&mut self, stmt: &Statement) -> Result<i32, ExecError> {
         match stmt.mode {
             ExecutionMode::Background => {
-                // TODO: implement background execution
-                // For now, run in foreground.
-                let status = self.execute_expression(&stmt.expression)?;
-                self.env.set_last_exit_status(status);
-                Ok(status)
+                return Err(ExecError::UnsupportedFeature(
+                    "background execution (&)".to_string(),
+                ));
             }
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
                 let status = self.execute_expression(&stmt.expression)?;
@@ -271,11 +269,9 @@ impl Executor {
                     }
                 }
                 _ => {
-                    // For non-simple commands in command substitution,
-                    // execute normally (output goes to real stdout).
-                    // TODO: proper output capture for compound commands
-                    let status = self.execute_expression(&stmt.expression)?;
-                    self.env.set_last_exit_status(status);
+                    return Err(ExecError::UnsupportedFeature(
+                        "compound command in command substitution".to_string(),
+                    ));
                 }
             }
         }
@@ -446,9 +442,11 @@ impl Executor {
                     })?;
                     match fd.unwrap_or(0) {
                         0 => { child_cmd.stdin(file); }
-                        _ => {
-                            // Arbitrary fd redirection requires unsafe pre_exec.
-                            // TODO: handle arbitrary fd redirects
+                        fd => {
+                            return Err(ExecError::UnsupportedFeature(format!(
+                                "input redirect on fd {}",
+                                fd,
+                            )));
                         }
                     }
                 }
@@ -461,8 +459,11 @@ impl Executor {
                     match fd.unwrap_or(1) {
                         1 => { child_cmd.stdout(file); }
                         2 => { child_cmd.stderr(file); }
-                        _ => {
-                            // TODO: arbitrary fd
+                        fd => {
+                            return Err(ExecError::UnsupportedFeature(format!(
+                                "output redirect on fd {}",
+                                fd,
+                            )));
                         }
                     }
                 }
@@ -477,20 +478,28 @@ impl Executor {
                     match fd.unwrap_or(1) {
                         1 => { child_cmd.stdout(file); }
                         2 => { child_cmd.stderr(file); }
-                        _ => {}
+                        fd => {
+                            return Err(ExecError::UnsupportedFeature(format!(
+                                "append redirect on fd {}",
+                                fd,
+                            )));
+                        }
                     }
                 }
                 RedirectKind::HereDoc { .. } => {
-                    // TODO: properly pipe heredoc body into stdin
-                    child_cmd.stdin(Stdio::piped());
+                    return Err(ExecError::UnsupportedFeature(
+                        "heredoc redirect".to_string(),
+                    ));
                 }
                 RedirectKind::DupInput(word) => {
                     let target = expand::expand_word(word, &self.env)?;
                     if target == "-" {
-                        // Close the fd
                         child_cmd.stdin(Stdio::null());
+                    } else {
+                        return Err(ExecError::UnsupportedFeature(
+                            "fd duplication".to_string(),
+                        ));
                     }
-                    // TODO: dup fd
                 }
                 RedirectKind::DupOutput(word) => {
                     let target = expand::expand_word(word, &self.env)?;
@@ -500,11 +509,16 @@ impl Executor {
                             2 => { child_cmd.stderr(Stdio::null()); }
                             _ => {}
                         }
+                    } else {
+                        return Err(ExecError::UnsupportedFeature(
+                            "fd duplication".to_string(),
+                        ));
                     }
-                    // TODO: dup fd
                 }
                 _ => {
-                    // ReadWrite, Bash extensions — not yet supported
+                    return Err(ExecError::UnsupportedFeature(
+                        "redirect kind not implemented".to_string(),
+                    ));
                 }
             }
         }
@@ -525,18 +539,22 @@ impl Executor {
     fn execute_compound(
         &mut self,
         body: &CompoundCommand,
-        _redirects: &[Redirect],
+        redirects: &[Redirect],
     ) -> Result<i32, ExecError> {
-        // TODO: apply redirections to compound commands
+        if !redirects.is_empty() {
+            return Err(ExecError::UnsupportedFeature(
+                "redirections on compound commands".to_string(),
+            ));
+        }
         match body {
             CompoundCommand::BraceGroup { body, .. } => {
                 self.execute_statements(body)
             }
 
-            CompoundCommand::Subshell { body, .. } => {
-                // TODO: proper fork-based subshell
-                // For now, simulate by running in same process (wrong for variable isolation)
-                self.execute_statements(body)
+            CompoundCommand::Subshell { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "subshell (requires fork)".to_string(),
+                ));
             }
 
             CompoundCommand::IfClause {
@@ -673,14 +691,30 @@ impl Executor {
                 Ok(status)
             }
 
-            // Bash-specific compound commands: not supported yet.
-            CompoundCommand::BashDoubleBracket { .. }
-            | CompoundCommand::BashArithmeticCommand { .. }
-            | CompoundCommand::BashSelectClause { .. }
-            | CompoundCommand::BashCoproc { .. }
-            | CompoundCommand::BashArithmeticFor { .. } => {
-                // TODO: Bash compound commands
-                Ok(0)
+            CompoundCommand::BashDoubleBracket { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "bash [[ ]] conditional".to_string(),
+                ));
+            }
+            CompoundCommand::BashArithmeticCommand { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "bash (( )) arithmetic command".to_string(),
+                ));
+            }
+            CompoundCommand::BashSelectClause { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "bash select clause".to_string(),
+                ));
+            }
+            CompoundCommand::BashCoproc { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "bash coproc".to_string(),
+                ));
+            }
+            CompoundCommand::BashArithmeticFor { .. } => {
+                return Err(ExecError::UnsupportedFeature(
+                    "bash arithmetic for loop".to_string(),
+                ));
             }
         }
     }

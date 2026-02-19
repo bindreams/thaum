@@ -25,6 +25,9 @@ pub enum ExecError {
     #[error("{0}: {1}")]
     InvalidNumber(String, String),
 
+    #[error("unsupported feature: {0}")]
+    UnsupportedFeature(String),
+
     // --- Control flow signals (not real errors) ---
     #[error("exit requested: {0}")]
     ExitRequested(i32),

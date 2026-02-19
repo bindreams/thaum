@@ -2,6 +2,7 @@ mod common;
 
 use common::*;
 use shell_parser::ast::*;
+use shell_parser::parse;
 
 #[test]
 fn if_with_test_command() {
@@ -143,6 +144,18 @@ fn empty_case_arms() {
     } else {
         panic!("expected case clause");
     }
+}
+
+#[test]
+fn case_pattern_backslash_newline_with_indent() {
+    // Case pattern continued across lines with `\<newline>` and indentation.
+    // Source: /usr/bin/gzexe, /usr/bin/nroff, /usr/bin/xzgrep, /usr/bin/zgrep,
+    //         /usr/lib/git-core/git-web--browse, /usr/bin/ldd
+    let input = "case $x in\n  aaa | bbb | \\\n  ccc) echo match;;\nesac";
+    assert!(
+        parse(input).is_ok(),
+        "case pattern with backslash-newline and indentation"
+    );
 }
 
 #[test]

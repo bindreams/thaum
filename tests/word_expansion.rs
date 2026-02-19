@@ -64,3 +64,16 @@ fn arithmetic_in_echo() {
         .iter()
         .any(|p| matches!(p, Fragment::ArithmeticExpansion(_))));
 }
+
+#[test]
+fn escaped_backtick_in_cmd_sub_double_quotes() {
+    // Inside $(), a double-quoted string containing \` (escaped backtick)
+    // followed by a single quote must not confuse the quoting context.
+    // Source: /etc/grub.d/10_linux, 20_linux_xen, 30_os-prober use
+    //   "$(gettext_printf "title \`%s' for ...")"
+    let input = r#"echo "$(cmd "a \`b'c")""#;
+    assert!(
+        shell_parser::parse(input).is_ok(),
+        "escaped backtick inside double quotes inside $() should not start backtick substitution"
+    );
+}

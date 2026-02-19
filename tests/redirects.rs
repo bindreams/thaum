@@ -176,3 +176,14 @@ fn multiple_heredocs_on_one_line() {
         panic!("expected second heredoc");
     }
 }
+
+#[test]
+fn heredoc_with_or_rhs_same_line() {
+    // Sanity check: when the RHS is on the same line as ||, it works.
+    let input = "cat <<EOF || echo \"heredoc failed\"\nhello world\nEOF";
+    let prog = parse_ok(input);
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Or { .. }
+    ));
+}

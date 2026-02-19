@@ -8,7 +8,7 @@ pub struct SpannedToken {
 }
 
 /// All token types recognized by the shell lexer.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Token {
     // === Value-carrying tokens ===
     /// A shell word (may contain quotes, expansions — still raw at this stage).
@@ -179,6 +179,14 @@ impl Token {
             "!" => Some(Token::Bang),
             _ => None,
         }
+    }
+
+    /// Token variant name for structured output (e.g. the `lex` CLI subcommand).
+    ///
+    /// Derived via `strum::IntoStaticStr` — returns the enum variant name
+    /// as a `&'static str` (e.g. `"Word"`, `"Pipe"`, `"AndIf"`).
+    pub fn token_name(&self) -> &'static str {
+        self.into()
     }
 
     /// Human-readable name for use in error messages.

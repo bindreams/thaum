@@ -10,6 +10,7 @@ cli = ["dep:colored"]
 [dependencies]
 thiserror = "2"
 contracts = "0.6"
+strum = { version = "0.27", features = ["derive"] }
 colored = { version = "3", optional = true }
 
 [dev-dependencies]

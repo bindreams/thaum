@@ -1,4 +1,5 @@
 use colored::Colorize;
+use shell_parser::exec::ExecError;
 
 use super::source_map::SourceMapper;
 
@@ -74,5 +75,16 @@ pub(super) fn print_error(
         } else {
             eprintln!("{} | {}{}", " ".repeat(gutter_width), padding, carets);
         }
+    }
+}
+
+pub(super) fn print_exec_error(error: &ExecError) {
+    let colorize = colored::control::SHOULD_COLORIZE.should_colorize();
+    let msg = error.to_string();
+
+    if colorize {
+        eprintln!("{}{} {}", "error".red().bold(), ":".bold(), msg.bold());
+    } else {
+        eprintln!("error: {}", msg);
     }
 }

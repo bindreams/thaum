@@ -1,6 +1,6 @@
 //! Tests for the CLI tool's YAML output.
 //!
-//! These tests run the `shell-parse` binary and verify the output format
+//! These tests run the `thaum` binary and verify the output format
 //! is correct. They catch formatting regressions like duplicate keys,
 //! empty lines, wrong source locations, YAML tags, etc.
 
@@ -8,9 +8,9 @@
 
 use std::process::Command;
 
-/// Run shell-parse on the given input and return stdout.
+/// Run thaum on the given input and return stdout.
 fn run(input: &str) -> String {
-    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let bin = env!("CARGO_BIN_EXE_thaum");
     let output = Command::new(bin)
         .arg("-")
         .stdin(std::process::Stdio::piped())
@@ -27,11 +27,11 @@ fn run(input: &str) -> String {
                 .unwrap();
             child.wait_with_output()
         })
-        .expect("failed to run shell-parse");
+        .expect("failed to run thaum");
 
     assert!(
         output.status.success(),
-        "shell-parse failed: {}",
+        "thaum failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
     String::from_utf8(output.stdout).expect("non-utf8 output")
@@ -229,9 +229,9 @@ fn cli_redirects_no_tags() {
 // Error output — compiler-style diagnostics
 // ============================================================
 
-/// Run shell-parse on invalid input and return stderr.
+/// Run thaum on invalid input and return stderr.
 fn run_err(input: &str) -> String {
-    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let bin = env!("CARGO_BIN_EXE_thaum");
     let output = Command::new(bin)
         .arg("-")
         .env("NO_COLOR", "1")
@@ -249,11 +249,11 @@ fn run_err(input: &str) -> String {
                 .unwrap();
             child.wait_with_output()
         })
-        .expect("failed to run shell-parse");
+        .expect("failed to run thaum");
 
     assert!(
         !output.status.success(),
-        "expected shell-parse to fail, but it succeeded"
+        "expected thaum to fail, but it succeeded"
     );
     String::from_utf8(output.stderr).expect("non-utf8 stderr")
 }
@@ -341,13 +341,13 @@ fn cli_error_no_debug_token_names() {
 // Exec subcommand
 // ============================================================
 
-/// Run shell-parse exec on the given input and return (stdout, stderr, exit_code).
+/// Run thaum exec on the given input and return (stdout, stderr, exit_code).
 fn run_exec(input: &str) -> (String, String, i32) {
     run_exec_with_args(&["exec", "-"], input)
 }
 
 fn run_exec_with_args(args: &[&str], input: &str) -> (String, String, i32) {
-    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let bin = env!("CARGO_BIN_EXE_thaum");
     let output = Command::new(bin)
         .args(args)
         .env("NO_COLOR", "1")
@@ -365,7 +365,7 @@ fn run_exec_with_args(args: &[&str], input: &str) -> (String, String, i32) {
                 .unwrap();
             child.wait_with_output()
         })
-        .expect("failed to run shell-parse exec");
+        .expect("failed to run thaum exec");
 
     let code = output.status.code().unwrap_or(128);
     let stdout = String::from_utf8(output.stdout).unwrap();
@@ -443,16 +443,16 @@ fn cli_exec_variable_and_status() {
 // -c / --command flag
 // ============================================================
 
-/// Run shell-parse with given args (no stdin needed) and return (stdout, stderr, exit_code).
+/// Run thaum with given args (no stdin needed) and return (stdout, stderr, exit_code).
 fn run_cli(args: &[&str]) -> (String, String, i32) {
-    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let bin = env!("CARGO_BIN_EXE_thaum");
     let output = Command::new(bin)
         .args(args)
         .env("NO_COLOR", "1")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .output()
-        .expect("failed to run shell-parse");
+        .expect("failed to run thaum");
 
     let code = output.status.code().unwrap_or(128);
     let stdout = String::from_utf8(output.stdout).unwrap();

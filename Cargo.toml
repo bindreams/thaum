@@ -1,5 +1,5 @@
 [package]
-name = "shell-parser"
+name = "thaum"
 version = "0.1.0"
 edition = "2021"
 
@@ -18,6 +18,6 @@ clap = { version = "4", features = ["derive"], optional = true }
 pretty_assertions = "1"
 
 [[bin]]
-name = "shell-parse"
+name = "thaum"
 path = "src/main.rs"
 required-features = ["cli"]

@@ -1,8 +1,8 @@
 mod common;
 
 use common::*;
-use shell_parser::ast::*;
-use shell_parser::parse;
+use thaum::ast::*;
+use thaum::parse;
 
 #[test]
 fn if_with_test_command() {

@@ -1,5 +1,5 @@
-use shell_parser::ast::*;
-use shell_parser::parse;
+use thaum::ast::*;
+use thaum::parse;
 
 pub fn parse_ok(input: &str) -> Program {
     parse(input).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", input, e))

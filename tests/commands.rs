@@ -1,7 +1,7 @@
 mod common;
 
 use common::*;
-use shell_parser::ast::*;
+use thaum::ast::*;
 
 #[test]
 fn simple_ls() {

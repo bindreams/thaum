@@ -1,5 +1,5 @@
-use shell_parser::ast::*;
-use shell_parser::span::Span;
+use thaum::ast::*;
+use thaum::span::Span;
 
 use super::source_map::SourceMapper;
 use super::yaml_emitter;
@@ -49,7 +49,7 @@ impl<'a> YamlWriter<'a> {
     /// Build a sub-mapping for expressions inside binary operator trees
     /// (And/Or/Pipe/Not). These need their own source annotation.
     fn build_inner_expression(&self, expr: &Expression) -> YamlValue {
-        use shell_parser::parser::expr_span;
+        use thaum::parser::expr_span;
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(expr_span(expr)));
         self.extend_expression(&mut m, expr);

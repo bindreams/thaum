@@ -12,7 +12,7 @@ use clap::Parser;
 use source_map::SourceMapper;
 use yaml_writer::YamlWriter;
 
-use shell_parser::exec::{ExecError, Executor};
+use thaum::exec::{ExecError, Executor};
 
 // ---------------------------------------------------------------------------
 // Clap argument definitions
@@ -20,7 +20,7 @@ use shell_parser::exec::{ExecError, Executor};
 
 /// Shell script parser and executor
 #[derive(Parser)]
-#[command(name = "shell-parse")]
+#[command(name = "thaum")]
 struct Cli {
     /// Enable Bash dialect (default: POSIX)
     #[arg(long, global = true)]
@@ -92,11 +92,11 @@ struct CliArgs {
 }
 
 impl CliArgs {
-    fn dialect(&self) -> shell_parser::Dialect {
+    fn dialect(&self) -> thaum::Dialect {
         if self.bash_mode {
-            shell_parser::Dialect::Bash
+            thaum::Dialect::Bash
         } else {
-            shell_parser::Dialect::Posix
+            thaum::Dialect::Posix
         }
     }
 }
@@ -199,8 +199,8 @@ pub fn run() {
 }
 
 fn do_lex(cli: &CliArgs) {
-    use shell_parser::lexer::Lexer;
-    use shell_parser::token::Token;
+    use thaum::lexer::Lexer;
+    use thaum::token::Token;
 
     let options = cli.dialect().options();
     let (source, filename) = load_source(cli);
@@ -236,7 +236,7 @@ fn do_lex(cli: &CliArgs) {
             }
             Err(e) => {
                 let mapper = SourceMapper::new(&source);
-                let parse_err = shell_parser::ParseError::from(e);
+                let parse_err = thaum::ParseError::from(e);
                 error_fmt::print_error(&parse_err, &source, &filename, &mapper);
                 process::exit(1);
             }
@@ -280,7 +280,7 @@ fn do_parse(cli: &CliArgs) {
     let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
 
-    let program = match shell_parser::parse_with(&source, dialect) {
+    let program = match thaum::parse_with(&source, dialect) {
         Ok(ast) => ast,
         Err(e) => {
             error_fmt::print_error(&e, &source, &filename, &mapper);
@@ -302,7 +302,7 @@ fn do_exec(cli: &CliArgs) {
     let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
 
-    let program = match shell_parser::parse_with(&source, dialect) {
+    let program = match thaum::parse_with(&source, dialect) {
         Ok(ast) => ast,
         Err(e) => {
             error_fmt::print_error(&e, &source, &filename, &mapper);

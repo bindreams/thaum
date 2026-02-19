@@ -1,11 +1,11 @@
 mod common;
 
-use shell_parser::exec::{ExecError, Executor};
-use shell_parser::Dialect;
+use thaum::exec::{ExecError, Executor};
+use thaum::Dialect;
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 fn exec_ok(script: &str) -> (String, i32) {
-    let program = shell_parser::parse(script)
+    let program = thaum::parse(script)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
@@ -68,7 +68,7 @@ fn variable_assignment_and_echo() {
 #[test]
 fn variable_used_in_later_command() {
     // X=hello; exit status of assignment is 0
-    let program = shell_parser::parse("X=hello\ntrue").unwrap();
+    let program = thaum::parse("X=hello\ntrue").unwrap();
     let mut executor = Executor::new();
     let status = executor.execute(&program).unwrap();
     assert_eq!(status, 0);
@@ -121,7 +121,7 @@ fn multiple_statements_last_status() {
 
 #[test]
 fn exit_status_variable() {
-    let program = shell_parser::parse("false\ntrue").unwrap();
+    let program = thaum::parse("false\ntrue").unwrap();
     let mut executor = Executor::new();
 
     // After executing, last exit status should be from `true` (0).
@@ -133,7 +133,7 @@ fn exit_status_variable() {
 
 #[test]
 fn if_true_branch() {
-    let program = shell_parser::parse("if true; then X=yes; else X=no; fi").unwrap();
+    let program = thaum::parse("if true; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("yes"));
@@ -141,7 +141,7 @@ fn if_true_branch() {
 
 #[test]
 fn if_false_branch() {
-    let program = shell_parser::parse("if false; then X=yes; else X=no; fi").unwrap();
+    let program = thaum::parse("if false; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("no"));
@@ -149,7 +149,7 @@ fn if_false_branch() {
 
 #[test]
 fn if_no_else_false() {
-    let program = shell_parser::parse("if false; then X=yes; fi").unwrap();
+    let program = thaum::parse("if false; then X=yes; fi").unwrap();
     let mut executor = Executor::new();
     let status = executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), None);
@@ -162,7 +162,7 @@ fn if_no_else_false() {
 fn while_loop_counts() {
     // Arithmetic expansion not yet implemented, so use a simpler test.
     // This test currently tests the while structure only.
-    let program = shell_parser::parse("X=0\nwhile test $X != done; do X=done; done").unwrap();
+    let program = thaum::parse("X=0\nwhile test $X != done; do X=done; done").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("done"));
@@ -172,7 +172,7 @@ fn while_loop_counts() {
 
 #[test]
 fn for_loop_over_words() {
-    let program = shell_parser::parse("RESULT=\nfor i in a b c; do RESULT=${RESULT}${i}; done").unwrap();
+    let program = thaum::parse("RESULT=\nfor i in a b c; do RESULT=${RESULT}${i}; done").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("RESULT"), Some("abc"));
@@ -182,7 +182,7 @@ fn for_loop_over_words() {
 
 #[test]
 fn case_exact_match() {
-    let program = shell_parser::parse(r#"
+    let program = thaum::parse(r#"
 case hello in
     hello) X=matched ;;
     *) X=default ;;
@@ -195,7 +195,7 @@ esac
 
 #[test]
 fn case_wildcard_match() {
-    let program = shell_parser::parse(r#"
+    let program = thaum::parse(r#"
 case world in
     hello) X=hello ;;
     *) X=default ;;
@@ -210,7 +210,7 @@ esac
 
 #[test]
 fn brace_group() {
-    let program = shell_parser::parse("{ X=inside; }").unwrap();
+    let program = thaum::parse("{ X=inside; }").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("inside"));
@@ -220,7 +220,7 @@ fn brace_group() {
 
 #[test]
 fn function_define_and_call() {
-    let program = shell_parser::parse("greet() { X=hello; }\ngreet").unwrap();
+    let program = thaum::parse("greet() { X=hello; }\ngreet").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("hello"));
@@ -230,7 +230,7 @@ fn function_define_and_call() {
 
 #[test]
 fn export_builtin() {
-    let program = shell_parser::parse("export FOO=bar").unwrap();
+    let program = thaum::parse("export FOO=bar").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("FOO"), Some("bar"));
@@ -241,7 +241,7 @@ fn export_builtin() {
 
 #[test]
 fn unset_builtin() {
-    let program = shell_parser::parse("X=hello\nunset X").unwrap();
+    let program = thaum::parse("X=hello\nunset X").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), None);
@@ -289,7 +289,7 @@ fn bracket_test_syntax() {
 
 #[test]
 fn break_in_while() {
-    let program = shell_parser::parse(r#"
+    let program = thaum::parse(r#"
 X=0
 while true; do
     X=1
@@ -304,7 +304,7 @@ done
 
 #[test]
 fn continue_in_for() {
-    let program = shell_parser::parse(r#"
+    let program = thaum::parse(r#"
 RESULT=
 for i in a skip b; do
     if test "$i" = skip; then
@@ -322,7 +322,7 @@ done
 
 #[test]
 fn command_substitution_builtin() {
-    let program = shell_parser::parse("X=$(echo hello)").unwrap();
+    let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("hello"));
@@ -330,7 +330,7 @@ fn command_substitution_builtin() {
 
 #[test]
 fn command_substitution_external() {
-    let program = shell_parser::parse("X=$(/bin/echo world)").unwrap();
+    let program = thaum::parse("X=$(/bin/echo world)").unwrap();
     let mut executor = Executor::new();
     let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin");
     executor.execute(&program).unwrap();
@@ -339,7 +339,7 @@ fn command_substitution_external() {
 
 #[test]
 fn command_substitution_strips_trailing_newlines() {
-    let program = shell_parser::parse("X=$(echo hello)").unwrap();
+    let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     // echo produces "hello\n", cmd sub strips trailing newlines
@@ -349,7 +349,7 @@ fn command_substitution_strips_trailing_newlines() {
 #[test]
 fn command_substitution_in_argument() {
     // Test that $(...) works in command arguments
-    let program = shell_parser::parse("X=$(echo inner)\nY=${X}").unwrap();
+    let program = thaum::parse("X=$(echo inner)\nY=${X}").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("inner"));
@@ -358,7 +358,7 @@ fn command_substitution_in_argument() {
 
 #[test]
 fn command_substitution_exit_status() {
-    let program = shell_parser::parse("X=$(false)").unwrap();
+    let program = thaum::parse("X=$(false)").unwrap();
     let mut executor = Executor::new();
     executor.execute(&program).unwrap();
     // $? should reflect the command substitution's exit status
@@ -369,7 +369,7 @@ fn command_substitution_exit_status() {
 // --- Unsupported features produce explicit errors ---
 
 fn expect_unsupported(script: &str) {
-    let program = shell_parser::parse(script)
+    let program = thaum::parse(script)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
     let _ = executor
@@ -387,7 +387,7 @@ fn expect_unsupported(script: &str) {
 }
 
 fn expect_unsupported_bash(script: &str) {
-    let program = shell_parser::parse_with(script, Dialect::Bash)
+    let program = thaum::parse_with(script, Dialect::Bash)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
     let err = executor

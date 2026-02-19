@@ -1,11 +1,11 @@
-# shell-parser
+# thaum
 
 A POSIX shell syntax parser written in Rust, with optional Bash extensions.
 
 ## Library
 
 ```rust
-use shell_parser::{parse, parse_with, Dialect};
+use thaum::{parse, parse_with, Dialect};
 
 // POSIX mode (default)
 let program = parse("echo hello | grep h").unwrap();

@@ -1,4 +1,4 @@
-use shell_parser::span::Span;
+use thaum::span::Span;
 
 pub(super) struct SourceMapper {
     /// Byte offset of the start of each line (0-indexed).

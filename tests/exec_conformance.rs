@@ -14,7 +14,7 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use shell_parser::exec::{ExecError, Executor};
+use thaum::exec::{ExecError, Executor};
 
 /// Check if conformance tests should run (Docker must be available).
 fn should_run() -> bool {
@@ -43,7 +43,7 @@ struct ShellResult {
 
 /// Run a script in our executor, capturing stdout.
 fn run_ours(script: &str) -> ShellResult {
-    let program = shell_parser::parse(script)
+    let program = thaum::parse(script)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     // We can't easily capture stdout from our executor since it writes to

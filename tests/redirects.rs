@@ -1,7 +1,7 @@
 mod common;
 
 use common::*;
-use shell_parser::ast::*;
+use thaum::ast::*;
 
 #[test]
 fn stderr_redirect() {
@@ -148,7 +148,7 @@ fn heredoc_inside_while() {
 fn heredoc_with_redirect_inside_function() {
     // The pattern from dockerd-rootless-setuptool.sh
     let input = "f() {\n\tcat <<- EOT > /tmp/out\n\t\thello\n\tEOT\n\techo done\n}\n";
-    let prog = shell_parser::parse_with(input, shell_parser::Dialect::Bash).unwrap();
+    let prog = thaum::parse_with(input, thaum::Dialect::Bash).unwrap();
     if let Expression::FunctionDef(f) = &prog.statements[0].expression {
         if let CompoundCommand::BraceGroup { body, .. } = f.body.as_ref() {
             assert_eq!(body.len(), 2); // cat with heredoc + echo

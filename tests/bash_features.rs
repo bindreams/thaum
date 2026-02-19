@@ -1,11 +1,11 @@
-use shell_parser::ast::*;
-use shell_parser::{parse, parse_with, Dialect, ParseOptions};
+use thaum::ast::*;
+use thaum::{parse, parse_with, Dialect, ParseOptions};
 
 #[test]
 fn bash_here_string() {
     let mut opts = ParseOptions::default();
     opts.here_strings = true;
-    let prog = shell_parser::parser::parse_with_options("cat <<< hello", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("cat <<< hello", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
@@ -65,7 +65,7 @@ fn posix_ampersand_is_background() {
 fn bash_double_brackets() {
     let mut opts = ParseOptions::default();
     opts.double_brackets = true;
-    let prog = shell_parser::parser::parse_with_options(r#"[[ -f /etc/passwd ]]"#, opts).unwrap();
+    let prog = thaum::parser::parse_with_options(r#"[[ -f /etc/passwd ]]"#, opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashDoubleBracket { expression, .. },
@@ -151,7 +151,7 @@ fn posix_rejects_double_brackets() {
 fn bash_arithmetic_command() {
     let mut opts = ParseOptions::default();
     opts.arithmetic_command = true;
-    let prog = shell_parser::parser::parse_with_options("(( x + 1 ))", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("(( x + 1 ))", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashArithmeticCommand { expression, .. },
@@ -239,7 +239,7 @@ fn posix_rejects_function_keyword() {
 fn bash_process_substitution_input() {
     let mut opts = ParseOptions::default();
     opts.process_substitution = true;
-    let prog = shell_parser::parser::parse_with_options("diff <(sort a) <(sort b)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("diff <(sort a) <(sort b)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 3);
@@ -266,7 +266,7 @@ fn bash_process_substitution_input() {
 fn bash_process_substitution_output() {
     let mut opts = ParseOptions::default();
     opts.process_substitution = true;
-    let prog = shell_parser::parser::parse_with_options("tee >(grep err > log)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("tee >(grep err > log)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 2);
@@ -290,11 +290,11 @@ fn process_substitution_requires_whitespace() {
     // this is a parse error — matching bash behavior.
     let mut opts = ParseOptions::default();
     opts.process_substitution = true;
-    let result = shell_parser::parser::parse_with_options("echo foo<(sort a)", opts.clone());
+    let result = thaum::parser::parse_with_options("echo foo<(sort a)", opts.clone());
     assert!(result.is_err());
 
     // With a space, `< <(sort a)` IS valid: redirect from process substitution
-    let prog = shell_parser::parser::parse_with_options("echo foo < <(sort a)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("echo foo < <(sort a)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
@@ -355,7 +355,7 @@ fn bash_select_loop() {
     let mut opts = ParseOptions::default();
     opts.select = true;
     let prog =
-        shell_parser::parser::parse_with_options("select opt in a b c; do echo $opt; done", opts)
+        thaum::parser::parse_with_options("select opt in a b c; do echo $opt; done", opts)
             .unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
@@ -382,7 +382,7 @@ fn bash_select_no_in() {
     let mut opts = ParseOptions::default();
     opts.select = true;
     let prog =
-        shell_parser::parser::parse_with_options("select opt\ndo\necho $opt\ndone", opts).unwrap();
+        thaum::parser::parse_with_options("select opt\ndo\necho $opt\ndone", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashSelectClause {
@@ -413,7 +413,7 @@ fn posix_rejects_select() {
 fn bash_coproc_simple() {
     let mut opts = ParseOptions::default();
     opts.coproc = true;
-    let prog = shell_parser::parser::parse_with_options("coproc cat", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("coproc cat", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashCoproc { name, body, .. },
@@ -431,7 +431,7 @@ fn bash_coproc_simple() {
 fn bash_coproc_named() {
     let mut opts = ParseOptions::default();
     opts.coproc = true;
-    let prog = shell_parser::parser::parse_with_options("coproc mycoproc { cat; }", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("coproc mycoproc { cat; }", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashCoproc { name, body, .. },
@@ -466,7 +466,7 @@ fn posix_rejects_coproc() {
 fn bash_array_assignment() {
     let mut opts = ParseOptions::default();
     opts.arrays = true;
-    let prog = shell_parser::parser::parse_with_options("arr=(one two three)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("arr=(one two three)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
@@ -485,7 +485,7 @@ fn bash_array_assignment() {
 fn bash_array_assignment_empty() {
     let mut opts = ParseOptions::default();
     opts.arrays = true;
-    let prog = shell_parser::parser::parse_with_options("arr=()", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("arr=()", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
@@ -503,7 +503,7 @@ fn bash_array_assignment_empty() {
 fn bash_array_assignment_with_command() {
     let mut opts = ParseOptions::default();
     opts.arrays = true;
-    let prog = shell_parser::parser::parse_with_options("arr=(a b) echo hello", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("arr=(a b) echo hello", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
@@ -520,7 +520,7 @@ fn bash_pipe_stderr() {
     // cmd1 |& cmd2 — pipe both stdout and stderr
     let mut opts = ParseOptions::default();
     opts.pipe_stderr = true;
-    let prog = shell_parser::parser::parse_with_options("cmd1 |& cmd2", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("cmd1 |& cmd2", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Pipe {
         left,
@@ -541,7 +541,7 @@ fn bash_pipe_stderr_in_chain() {
     // a |& b | c — first pipe has stderr, second doesn't
     let mut opts = ParseOptions::default();
     opts.pipe_stderr = true;
-    let prog = shell_parser::parser::parse_with_options("a |& b | c", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("a |& b | c", opts).unwrap();
     let stmt = &prog.statements[0];
     // Left-associative: Pipe(Pipe(a, b, stderr=true), c, stderr=false)
     if let Expression::Pipe {
@@ -588,7 +588,7 @@ fn posix_pipe_ampersand_is_background() {
 fn bash_ansi_c_quoting() {
     let mut opts = ParseOptions::default();
     opts.ansi_c_quoting = true;
-    let prog = shell_parser::parser::parse_with_options(r"echo $'\n\t'", opts).unwrap();
+    let prog = thaum::parser::parse_with_options(r"echo $'\n\t'", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 2);
@@ -610,7 +610,7 @@ fn bash_ansi_c_quoting_concatenated() {
     // prefix$'\n'suffix — three fragments
     let mut opts = ParseOptions::default();
     opts.ansi_c_quoting = true;
-    let prog = shell_parser::parser::parse_with_options(r"echo prefix$'\n'suffix", opts).unwrap();
+    let prog = thaum::parser::parse_with_options(r"echo prefix$'\n'suffix", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -648,7 +648,7 @@ fn posix_dollar_single_quote_is_dollar_plus_string() {
 fn bash_locale_quoted() {
     let mut opts = ParseOptions::default();
     opts.locale_translation = true;
-    let prog = shell_parser::parser::parse_with_options(r#"echo $"hello $USER""#, opts).unwrap();
+    let prog = thaum::parser::parse_with_options(r#"echo $"hello $USER""#, opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -687,7 +687,7 @@ fn posix_dollar_double_quote_is_dollar_plus_string() {
 fn bash_extglob_zero_or_more() {
     let mut opts = ParseOptions::default();
     opts.extglob = true;
-    let prog = shell_parser::parser::parse_with_options("echo *(*.txt)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("echo *(*.txt)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -710,7 +710,7 @@ fn bash_extglob_zero_or_more() {
 fn bash_extglob_not() {
     let mut opts = ParseOptions::default();
     opts.extglob = true;
-    let prog = shell_parser::parser::parse_with_options("echo !(*.bak)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("echo !(*.bak)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -734,7 +734,7 @@ fn bash_extglob_in_word() {
     // file.@(txt|md) — extglob after a literal prefix
     let mut opts = ParseOptions::default();
     opts.extglob = true;
-    let prog = shell_parser::parser::parse_with_options("echo file.@(txt|md)", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("echo file.@(txt|md)", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -1179,7 +1179,7 @@ fn test_expr_binary_eq_single_equals() {
 fn test_expr_unclosed_double_bracket_is_error() {
     let mut opts = ParseOptions::default();
     opts.double_brackets = true;
-    let result = shell_parser::parser::parse_with_options("[[ -f foo", opts);
+    let result = thaum::parser::parse_with_options("[[ -f foo", opts);
     assert!(result.is_err());
 }
 
@@ -1296,7 +1296,7 @@ fn test_expr_all_binary_word_ops() {
 fn parse_arith_cmd(input: &str) -> ArithExpr {
     let mut opts = ParseOptions::default();
     opts.arithmetic_command = true;
-    let prog = shell_parser::parser::parse_with_options(input, opts).unwrap();
+    let prog = thaum::parser::parse_with_options(input, opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body: CompoundCommand::BashArithmeticCommand { expression, .. },
@@ -1465,7 +1465,7 @@ fn bash_arithmetic_for_basic() {
     opts.arithmetic_for = true;
     opts.arithmetic_command = true;
     let prog =
-        shell_parser::parser::parse_with_options("for ((i=0; i<10; i++)); do echo $i; done", opts)
+        thaum::parser::parse_with_options("for ((i=0; i<10; i++)); do echo $i; done", opts)
             .unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
@@ -1495,7 +1495,7 @@ fn bash_arithmetic_for_empty_parts() {
     opts.arithmetic_for = true;
     opts.arithmetic_command = true;
     let prog =
-        shell_parser::parser::parse_with_options("for ((;;)); do break; done", opts).unwrap();
+        thaum::parser::parse_with_options("for ((;;)); do break; done", opts).unwrap();
     let stmt = &prog.statements[0];
     if let Expression::Compound {
         body:

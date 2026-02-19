@@ -1,7 +1,7 @@
 mod common;
 
 use common::*;
-use shell_parser::ast::*;
+use thaum::ast::*;
 
 #[test]
 fn tilde_expansion_in_assignment() {
@@ -73,7 +73,7 @@ fn escaped_backtick_in_cmd_sub_double_quotes() {
     //   "$(gettext_printf "title \`%s' for ...")"
     let input = r#"echo "$(cmd "a \`b'c")""#;
     assert!(
-        shell_parser::parse(input).is_ok(),
+        thaum::parse(input).is_ok(),
         "escaped backtick inside double quotes inside $() should not start backtick substitution"
     );
 }

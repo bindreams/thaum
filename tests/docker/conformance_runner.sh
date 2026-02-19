@@ -1,5 +1,5 @@
 #!/bin/sh
-# Conformance test runner for shell-parser.
+# Conformance test runner for thaum.
 #
 # Usage: echo 'script' | conformance_runner.sh <shell>
 #   <shell> is "dash" or "bash-posix"

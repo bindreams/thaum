@@ -1,4 +1,4 @@
-use shell_parser::parse;
+use thaum::parse;
 
 #[test]
 fn error_unclosed_if() {

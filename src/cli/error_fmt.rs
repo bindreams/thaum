@@ -1,5 +1,5 @@
 use colored::Colorize;
-use shell_parser::exec::ExecError;
+use thaum::exec::ExecError;
 
 use super::source_map::SourceMapper;
 
@@ -12,7 +12,7 @@ fn print_error_header(msg: &str) {
 }
 
 pub(super) fn print_error(
-    error: &shell_parser::ParseError,
+    error: &thaum::ParseError,
     source: &str,
     filename: &str,
     mapper: &SourceMapper,

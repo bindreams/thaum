@@ -138,6 +138,16 @@ pub enum AssignmentValue {
     BashArray(Vec<Word>),
 }
 
+impl AssignmentValue {
+    /// Get the value as a scalar `Word`, panicking on `BashArray`.
+    pub fn as_scalar(&self) -> &Word {
+        match self {
+            AssignmentValue::Scalar(w) => w,
+            AssignmentValue::BashArray(_) => panic!("expected scalar assignment, got array"),
+        }
+    }
+}
+
 /// A function definition: `name () compound_command [redirects]`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionDef {

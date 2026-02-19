@@ -64,10 +64,9 @@ impl<'src> Parser<'src> {
                         } else {
                             assignments.push(Assignment {
                                 name,
-                                value: AssignmentValue::Scalar(Word {
-                                    parts: vec![Fragment::Literal(value_str)],
-                                    span: word_span,
-                                }),
+                                value: AssignmentValue::Scalar(
+                                    make_word(value_str, word_span, &self.options),
+                                ),
                                 span: word_span,
                             });
                             end_span = word_span;

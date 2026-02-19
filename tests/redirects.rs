@@ -178,6 +178,20 @@ fn multiple_heredocs_on_one_line() {
 }
 
 #[test]
+fn heredoc_with_or_rhs_after_body() {
+    // When `||` appears on the same line as `<<EOF`, the RHS command may
+    // follow after the heredoc body. The heredoc body should be transparent
+    // to the || operator.
+    // Source: /usr/share/doc/git/contrib/vscode/init.sh
+    let input = "cat <<EOF ||\nhello world\nEOF\necho \"heredoc failed\"";
+    let prog = parse_ok(input);
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Or { .. }
+    ));
+}
+
+#[test]
 fn heredoc_with_or_rhs_same_line() {
     // Sanity check: when the RHS is on the same line as ||, it works.
     let input = "cat <<EOF || echo \"heredoc failed\"\nhello world\nEOF";
@@ -185,5 +199,16 @@ fn heredoc_with_or_rhs_same_line() {
     assert!(matches!(
         &prog.statements[0].expression,
         Expression::Or { .. }
+    ));
+}
+
+#[test]
+fn heredoc_with_and_rhs_after_body() {
+    // Same issue with && instead of ||.
+    let input = "cat <<EOF &&\nhello world\nEOF\necho \"next\"";
+    let prog = parse_ok(input);
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::And { .. }
     ));
 }

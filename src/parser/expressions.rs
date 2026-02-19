@@ -99,6 +99,13 @@ impl<'src> Parser<'src> {
             match self.stream.peek()?.token {
                 Token::AndIf => {
                     self.stream.advance()?;
+                    // Consume heredoc bodies belonging to the left-hand side.
+                    // When the LHS has a heredoc (e.g. `cat <<EOF &&`), the body
+                    // tokens appear after the newline following `&&`.
+                    let bodies = self.consume_heredoc_bodies()?;
+                    if !bodies.is_empty() {
+                        fill_expression_heredocs(&mut left, &bodies);
+                    }
                     self.skip_linebreak()?;
                     let right = self.parse_pipeline()?;
                     left = Expression::And {
@@ -108,6 +115,10 @@ impl<'src> Parser<'src> {
                 }
                 Token::OrIf => {
                     self.stream.advance()?;
+                    let bodies = self.consume_heredoc_bodies()?;
+                    if !bodies.is_empty() {
+                        fill_expression_heredocs(&mut left, &bodies);
+                    }
                     self.skip_linebreak()?;
                     let right = self.parse_pipeline()?;
                     left = Expression::Or {

@@ -336,3 +336,285 @@ fn cli_error_no_debug_token_names() {
         err
     );
 }
+
+// ============================================================
+// Exec subcommand
+// ============================================================
+
+/// Run shell-parse exec on the given input and return (stdout, stderr, exit_code).
+fn run_exec(input: &str) -> (String, String, i32) {
+    run_exec_with_args(&["exec", "-"], input)
+}
+
+fn run_exec_with_args(args: &[&str], input: &str) -> (String, String, i32) {
+    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let output = Command::new(bin)
+        .args(args)
+        .env("NO_COLOR", "1")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .and_then(|mut child| {
+            use std::io::Write;
+            child
+                .stdin
+                .as_mut()
+                .unwrap()
+                .write_all(input.as_bytes())
+                .unwrap();
+            child.wait_with_output()
+        })
+        .expect("failed to run shell-parse exec");
+
+    let code = output.status.code().unwrap_or(128);
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    (stdout, stderr, code)
+}
+
+#[test]
+fn cli_exec_true() {
+    let (_, _, code) = run_exec("true");
+    assert_eq!(code, 0);
+}
+
+#[test]
+fn cli_exec_false() {
+    let (_, _, code) = run_exec("false");
+    assert_eq!(code, 1);
+}
+
+#[test]
+fn cli_exec_echo() {
+    let (stdout, _, code) = run_exec("echo hello world");
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "hello world");
+}
+
+#[test]
+fn cli_exec_exit_code() {
+    let (_, _, code) = run_exec("exit 42");
+    assert_eq!(code, 42);
+}
+
+#[test]
+fn cli_exec_unsupported_feature_error() {
+    let (_, stderr, code) = run_exec("echo hello &");
+    assert_ne!(code, 0);
+    assert!(
+        stderr.contains("unsupported feature"),
+        "stderr should mention unsupported feature: {}",
+        stderr,
+    );
+}
+
+#[test]
+fn cli_exec_parse_error() {
+    let (_, stderr, code) = run_exec("if true; then fi");
+    assert_eq!(code, 1);
+    assert!(
+        stderr.contains("error:"),
+        "stderr should contain error: {}",
+        stderr,
+    );
+}
+
+#[test]
+fn cli_exec_with_bash_flag() {
+    let (_, _, code) = run_exec_with_args(&["exec", "--bash", "-"], "true");
+    assert_eq!(code, 0);
+}
+
+#[test]
+fn cli_exec_bash_flag_before_exec() {
+    let (_, _, code) = run_exec_with_args(&["--bash", "exec", "-"], "true");
+    assert_eq!(code, 0);
+}
+
+#[test]
+fn cli_exec_variable_and_status() {
+    let (stdout, _, code) = run_exec("X=hello; echo $X");
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "hello");
+}
+
+// ============================================================
+// -c / --command flag
+// ============================================================
+
+/// Run shell-parse with given args (no stdin needed) and return (stdout, stderr, exit_code).
+fn run_cli(args: &[&str]) -> (String, String, i32) {
+    let bin = env!("CARGO_BIN_EXE_shell-parse");
+    let output = Command::new(bin)
+        .args(args)
+        .env("NO_COLOR", "1")
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .output()
+        .expect("failed to run shell-parse");
+
+    let code = output.status.code().unwrap_or(128);
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    (stdout, stderr, code)
+}
+
+#[test]
+fn cli_parse_c_flag() {
+    let (stdout, _, code) = run_cli(&["-c", "echo hello"]);
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: Command"));
+    assert!(stdout.contains("- echo"));
+}
+
+#[test]
+fn cli_parse_command_long_flag() {
+    let (stdout, _, code) = run_cli(&["--command", "echo hello"]);
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: Command"));
+}
+
+#[test]
+fn cli_parse_subcommand_with_c() {
+    let (stdout, _, code) = run_cli(&["parse", "-c", "true"]);
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: Command"));
+}
+
+#[test]
+fn cli_parse_subcommand_with_bash_c() {
+    let (stdout, _, code) = run_cli(&["parse", "--bash", "-c", "[[ -n hello ]]"]);
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: BashDoubleBracket"));
+}
+
+#[test]
+fn cli_exec_c_flag() {
+    let (stdout, _, code) = run_cli(&["exec", "-c", "echo hello world"]);
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "hello world");
+}
+
+#[test]
+fn cli_exec_c_with_script_args() {
+    let (stdout, _, code) = run_cli(&["exec", "-c", "echo $1 $2", "foo", "bar"]);
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "foo bar");
+}
+
+#[test]
+fn cli_exec_command_long_flag() {
+    let (stdout, _, code) = run_cli(&["exec", "--command", "echo ok"]);
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "ok");
+}
+
+// ============================================================
+// Explicit parse subcommand
+// ============================================================
+
+#[test]
+fn cli_parse_subcommand_stdin() {
+    let (stdout, _, code) = run_exec_with_args(&["parse", "-"], "echo hello");
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: Command"));
+    assert!(stdout.contains("- echo"));
+}
+
+#[test]
+fn cli_parse_subcommand_bash() {
+    let (stdout, _, code) = run_exec_with_args(&["parse", "--bash", "-"], "[[ -n x ]]");
+    assert_eq!(code, 0);
+    assert_valid_output(&stdout);
+    assert!(stdout.contains("type: BashDoubleBracket"));
+}
+
+// ============================================================
+// Lex subcommand
+// ============================================================
+
+#[test]
+fn cli_lex_simple_command() {
+    let (stdout, _, code) = run_cli(&["lex", "-c", "echo hello"]);
+    assert_eq!(code, 0);
+    // Should have a header
+    assert!(stdout.contains("LOCATION"));
+    assert!(stdout.contains("TOKEN"));
+    assert!(stdout.contains("TEXT"));
+    // Should contain the tokens
+    assert!(stdout.contains("Word"));
+    assert!(stdout.contains("echo"));
+    assert!(stdout.contains("hello"));
+}
+
+#[test]
+fn cli_lex_operators() {
+    let (stdout, _, code) = run_cli(&["lex", "-c", "a && b || c | d"]);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("AndIf"));
+    assert!(stdout.contains("OrIf"));
+    assert!(stdout.contains("Pipe"));
+}
+
+#[test]
+fn cli_lex_redirects() {
+    let (stdout, _, code) = run_cli(&["lex", "-c", "cat < in > out >> log"]);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("RedirectFromFile"));
+    assert!(stdout.contains("RedirectToFile"));
+    assert!(stdout.contains("Append"));
+}
+
+#[test]
+fn cli_lex_semicolon_and_amp() {
+    let (stdout, _, code) = run_cli(&["lex", "-c", "a; b &"]);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("Semicolon"));
+    assert!(stdout.contains("Ampersand"));
+}
+
+#[test]
+fn cli_lex_newlines() {
+    let (stdout, _, code) = run_exec_with_args(&["lex", "-"], "a\nb");
+    assert_eq!(code, 0);
+    assert!(stdout.contains("Newline"));
+    assert!(stdout.contains("\\n"));
+}
+
+#[test]
+fn cli_lex_io_number() {
+    let (stdout, _, code) = run_cli(&["lex", "-c", "cmd 2>&1"]);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("IoNumber"));
+    assert!(stdout.contains("RedirectToFd"));
+}
+
+#[test]
+fn cli_lex_with_bash_flag() {
+    let (stdout, _, code) = run_cli(&["lex", "--bash", "-c", "cmd |& cat"]);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("BashPipeAmpersand"));
+}
+
+#[test]
+fn cli_lex_error() {
+    let (_, stderr, code) = run_cli(&["lex", "-c", "echo 'unterminated"]);
+    assert_ne!(code, 0);
+    assert!(stderr.contains("error:"));
+}
+
+#[test]
+fn cli_lex_from_stdin() {
+    let (stdout, _, code) = run_exec_with_args(&["lex", "-"], "true; false");
+    assert_eq!(code, 0);
+    assert!(stdout.contains("Word"));
+    assert!(stdout.contains("Semicolon"));
+    assert!(stdout.contains("true"));
+    assert!(stdout.contains("false"));
+}

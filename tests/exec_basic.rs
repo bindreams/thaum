@@ -1,6 +1,7 @@
 mod common;
 
 use shell_parser::exec::{ExecError, Executor};
+use shell_parser::Dialect;
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 fn exec_ok(script: &str) -> (String, i32) {
@@ -363,4 +364,89 @@ fn command_substitution_exit_status() {
     // $? should reflect the command substitution's exit status
     // (though the assignment itself succeeds with status 0)
     assert_eq!(executor.env().get_var("X"), Some(""));
+}
+
+// --- Unsupported features produce explicit errors ---
+
+fn expect_unsupported(script: &str) {
+    let program = shell_parser::parse(script)
+        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let mut executor = Executor::new();
+    let _ = executor
+        .env_mut()
+        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let err = executor
+        .execute(&program)
+        .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
+    assert!(
+        matches!(err, ExecError::UnsupportedFeature(_)),
+        "expected UnsupportedFeature, got {:?} for {:?}",
+        err,
+        script,
+    );
+}
+
+fn expect_unsupported_bash(script: &str) {
+    let program = shell_parser::parse_with(script, Dialect::Bash)
+        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let mut executor = Executor::new();
+    let err = executor
+        .execute(&program)
+        .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
+    assert!(
+        matches!(err, ExecError::UnsupportedFeature(_)),
+        "expected UnsupportedFeature, got {:?} for {:?}",
+        err,
+        script,
+    );
+}
+
+#[test]
+fn unsupported_background() {
+    expect_unsupported("echo hello &");
+}
+
+#[test]
+fn unsupported_arithmetic_expansion() {
+    expect_unsupported("echo $((1+2))");
+}
+
+#[test]
+fn unsupported_heredoc() {
+    expect_unsupported("cat <<EOF\nhello\nEOF");
+}
+
+#[test]
+fn unsupported_compound_redirect() {
+    expect_unsupported("if true; then echo hi; fi > /tmp/claude/test-out");
+}
+
+#[test]
+fn unsupported_subshell() {
+    expect_unsupported("(echo hello)");
+}
+
+#[test]
+fn unsupported_set_options() {
+    expect_unsupported("set -e");
+}
+
+#[test]
+fn unsupported_pattern_trim() {
+    expect_unsupported("X=hello.txt; echo ${X%.txt}");
+}
+
+#[test]
+fn unsupported_bash_double_bracket() {
+    expect_unsupported_bash("[[ -n hello ]]");
+}
+
+#[test]
+fn unsupported_eval_builtin() {
+    expect_unsupported("eval echo hello");
+}
+
+#[test]
+fn unsupported_default_assign() {
+    expect_unsupported("echo ${UNSET_VAR:=default}");
 }

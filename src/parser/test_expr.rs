@@ -101,14 +101,13 @@ impl<'src> Parser<'src> {
         // Check if next token is a binary operator
         if let Some(op) = self.peek_binary_test_op()? {
             self.advance_binary_op()?;
-            // TODO: When `op` is `RegexMatch` (`=~`), the right-hand side is a regex
-            // pattern where unquoted `(`, `)`, `|` are regex metacharacters, not shell
-            // syntax. Currently these characters cause parse errors because the lexer
-            // tokenizes them as operators (LParen, RParen, Pipe). The fix: when `=~`
-            // is detected, consume the RHS as raw text up to `]]`, respecting quoting
-            // but not interpreting shell operators.
-            // Failing example: [[ $x =~ ^([^:]*):([^:]*):([^,]*)(.*) ]]
-            let right_word = self.consume_test_word()?;
+            let right_word = if op == BinaryTestOp::RegexMatch {
+                // After `=~`, the RHS is a regex pattern where unquoted `(`, `)`,
+                // `|` are metacharacters, not shell syntax.
+                self.consume_regex_pattern()?
+            } else {
+                self.consume_test_word()?
+            };
             return Ok(BashTestExpr::Binary {
                 left: first_word,
                 op,
@@ -118,6 +117,62 @@ impl<'src> Parser<'src> {
 
         // Bare word — implicit -n test
         Ok(BashTestExpr::Word(first_word))
+    }
+
+    /// Consume all tokens up to `]]` as a regex pattern literal.
+    ///
+    /// After `=~`, shell operators like `(`, `)`, `|` are regex metacharacters.
+    /// We collect them as raw text into a single `Fragment::Literal` word.
+    fn consume_regex_pattern(&mut self) -> Result<Word, ParseError> {
+        let start_span = self.stream.peek()?.span;
+        let mut text = String::new();
+        let mut end_span = start_span;
+
+        loop {
+            let peeked = self.stream.peek()?.clone();
+            match &peeked.token {
+                Token::BashDblRBracket | Token::Eof | Token::Newline => break,
+                Token::Word(s) => {
+                    if !text.is_empty() {
+                        text.push(' ');
+                    }
+                    text.push_str(s);
+                    end_span = peeked.span;
+                    self.stream.advance()?;
+                }
+                _ => {
+                    // Operators become literal regex text
+                    let ch = match &peeked.token {
+                        Token::LParen => "(",
+                        Token::RParen => ")",
+                        Token::Pipe => "|",
+                        Token::Ampersand => "&",
+                        Token::Semicolon => ";",
+                        Token::AndIf => "&&",
+                        Token::OrIf => "||",
+                        Token::RedirectFromFile => "<",
+                        Token::RedirectToFile => ">",
+                        other => other.display_name().trim_matches('\''),
+                    };
+                    text.push_str(ch);
+                    end_span = peeked.span;
+                    self.stream.advance()?;
+                }
+            }
+        }
+
+        if text.is_empty() {
+            return Err(ParseError::UnexpectedToken {
+                found: self.stream.peek()?.token.display_name().to_string(),
+                expected: "a regex pattern after =~".to_string(),
+                span: start_span,
+            });
+        }
+
+        Ok(Word {
+            parts: vec![Fragment::Literal(text)],
+            span: start_span.merge(end_span),
+        })
     }
 
     /// Consume the next token as a word inside `[[ ]]`.

@@ -1004,6 +1004,30 @@ fn test_expr_binary_regex_match() {
 }
 
 #[test]
+fn test_expr_regex_with_unquoted_parens() {
+    // Parentheses in a =~ regex are capturing groups, not shell syntax.
+    // Source: /usr/bin/socat-chain.sh
+    let input = r#"[[ "$x" =~ ^([^:]*):([^:]*) ]]"#;
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
+fn test_expr_regex_with_alternation_in_parens() {
+    // Pipe inside regex parens is alternation, not a shell pipe.
+    // Source: /usr/lib/snapd/complete.sh
+    let input = r#"[[ "${BASH_SOURCE[0]}" =~ ^(/var/lib|/usr/share)/completions/ ]]"#;
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
+fn test_expr_regex_with_escaped_parens() {
+    // Mixed escaped and unescaped parens in regex.
+    // Source: /usr/local/go/.../mkerrors.bash
+    let input = r#"[[ $line =~ ^#define\ +([A-Z]+)\ +\(\(([A-Z]+)\)([0-9]+)\) ]]"#;
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
 fn test_expr_binary_file_newer() {
     let expr = parse_test_expr("[[ a.txt -nt b.txt ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {

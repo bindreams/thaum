@@ -393,6 +393,62 @@ impl<'src> Lexer<'src> {
                                     word.push(c);
                                 }
                             }
+                            // $(...) / $((...)) / ${...} create new quoting contexts
+                            Some('$') => {
+                                word.push('$');
+                                match self.cursor.peek() {
+                                    Some('(') => {
+                                        self.cursor.advance();
+                                        word.push('(');
+                                        if self.cursor.peek() == Some('(') {
+                                            self.cursor.advance();
+                                            word.push('(');
+                                            self.read_balanced_into(
+                                                &mut word, '(', ')', 2, quote_start,
+                                            )?;
+                                        } else {
+                                            self.read_balanced_into(
+                                                &mut word, '(', ')', 1, quote_start,
+                                            )?;
+                                        }
+                                    }
+                                    Some('{') => {
+                                        self.cursor.advance();
+                                        word.push('{');
+                                        self.read_balanced_into(
+                                            &mut word, '{', '}', 1, quote_start,
+                                        )?;
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            // Backtick command substitution creates a new quoting context
+                            Some('`') => {
+                                word.push('`');
+                                loop {
+                                    match self.cursor.advance() {
+                                        Some('`') => {
+                                            word.push('`');
+                                            break;
+                                        }
+                                        Some('\\') => {
+                                            word.push('\\');
+                                            if let Some(c) = self.cursor.advance() {
+                                                word.push(c);
+                                            }
+                                        }
+                                        Some(c) => word.push(c),
+                                        None => {
+                                            return Err(LexError::UnterminatedBackquote {
+                                                span: Span::new(
+                                                    quote_start,
+                                                    self.cursor.pos().0,
+                                                ),
+                                            });
+                                        }
+                                    }
+                                }
+                            }
                             Some(c) => word.push(c),
                             None => {
                                 return Err(LexError::UnterminatedDoubleQuote {

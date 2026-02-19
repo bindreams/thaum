@@ -2,6 +2,7 @@ mod common;
 
 use common::*;
 use shell_parser::ast::*;
+use shell_parser::parse;
 
 #[test]
 fn pipeline_two_commands() {
@@ -121,4 +122,83 @@ fn subshell_pipeline() {
     } else {
         panic!("expected Pipe");
     }
+}
+
+// --- backslash-newline line continuation ---
+
+#[test]
+fn backslash_newline_mid_word() {
+    // \<newline> inside a word is line continuation — removed entirely
+    let e = first_expr("ec\\\nho hello");
+    if let Expression::Command(c) = &e {
+        assert_eq!(word_literal(&c.arguments[0]), "echo");
+    } else {
+        panic!("expected Command");
+    }
+}
+
+// --- backslash-newline line continuation before compound commands ---
+// The lexer should consume `\<newline>` between tokens so that
+// `cmd | \<newline>while ...` is equivalent to `cmd | while ...`.
+
+#[test]
+fn backslash_newline_pipe_into_while() {
+    // Source: /usr/sbin/pam_namespace_helper, /usr/sbin/aa-remove-unknown
+    let input = "echo |\n while read x; do echo \"$x\"; done";
+    assert!(parse(input).is_ok(), "bare newline after pipe works");
+
+    let input = "echo | \\\nwhile read x; do echo \"$x\"; done";
+    assert!(
+        parse(input).is_ok(),
+        "backslash-newline after pipe should also work"
+    );
+}
+
+#[test]
+fn backslash_newline_pipe_into_for() {
+    let input = "echo | \\\nfor x in a b; do echo \"$x\"; done";
+    assert!(
+        parse(input).is_ok(),
+        "for loop after pipe with line continuation"
+    );
+}
+
+#[test]
+fn backslash_newline_pipe_into_if() {
+    // Source: /usr/bin/ssh-copy-id
+    let input = "printf '%s\\n' \"$x\" | \\\n  if [ \"$y\" ] ; then\n    echo sftp\n  else\n    echo ssh\n  fi";
+    assert!(
+        parse(input).is_ok(),
+        "pipe into if with line continuation"
+    );
+}
+
+#[test]
+fn backslash_newline_and_then_brace_group() {
+    // Source: /etc/cron.daily/man-db (if ... && \<newline> { ...; }; then)
+    let input = "true && \\\n{ echo yes; }";
+    assert!(
+        parse(input).is_ok(),
+        "brace group after && with line continuation"
+    );
+}
+
+#[test]
+fn backslash_newline_or_then_brace_group() {
+    // Source: /usr/bin/savelog
+    let input = "false || \\\n{\n  echo fallback\n}";
+    assert!(
+        parse(input).is_ok(),
+        "brace group after || with line continuation"
+    );
+}
+
+#[test]
+fn backslash_newline_or_then_if() {
+    // Source: /usr/lib/git-core/git-instaweb
+    let input = "cmd1 || \\\nif test -f foo\nthen\n  echo yes\nfi";
+    assert!(
+        parse(input).is_ok(),
+        "if command after || with line continuation"
+    );
 }

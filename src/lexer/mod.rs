@@ -145,13 +145,19 @@ impl<'src> Lexer<'src> {
         Ok(tok)
     }
 
-    /// Skip spaces and tabs (but NOT newlines).
+    /// Skip spaces, tabs, and `\<newline>` line continuations (but NOT bare newlines).
     fn skip_blanks(&mut self) {
-        while let Some(ch) = self.cursor.peek() {
-            if ch == ' ' || ch == '\t' {
-                self.cursor.advance();
-            } else {
-                break;
+        loop {
+            match self.cursor.peek() {
+                Some(' ') | Some('\t') => {
+                    self.cursor.advance();
+                }
+                Some('\\') if self.cursor.peek_second() == Some('\n') => {
+                    // Line continuation: \<newline> is removed entirely (POSIX 2.2.1)
+                    self.cursor.advance(); // consume backslash
+                    self.cursor.advance(); // consume newline
+                }
+                _ => break,
             }
         }
     }
@@ -399,6 +405,12 @@ impl<'src> Lexer<'src> {
 
                 // Backslash escape (outside quotes)
                 '\\' => {
+                    if self.cursor.peek_second() == Some('\n') {
+                        // Line continuation: \<newline> is removed entirely (POSIX 2.2.1)
+                        self.cursor.advance(); // skip backslash
+                        self.cursor.advance(); // skip newline
+                        continue;
+                    }
                     all_digits = false;
                     self.cursor.advance();
                     word.push('\\');

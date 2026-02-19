@@ -1521,3 +1521,28 @@ fn posix_rejects_arithmetic_for() {
     let result = parse("for ((i=0; i<10; i++)); do echo $i; done");
     assert!(result.is_err());
 }
+
+// --- parameter expansion inside arithmetic ---
+
+#[test]
+fn arith_brace_param_expansion() {
+    // `(( ${x} + 1 ))` — simple brace expansion in arithmetic.
+    let input = "(( ${x} + 1 ))";
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
+fn arith_string_length_param() {
+    // `(( ${#x} ))` — string length in arithmetic context.
+    // Source: /usr/sbin/lvmdump uses `(( ! ${#files[@]} ))`
+    let input = "(( ${#x} ))";
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}
+
+#[test]
+fn arith_array_length() {
+    // `(( ${#arr[@]} ))` — array length in arithmetic context.
+    // Source: /usr/sbin/lvmdump
+    let input = "arr=(a b c); (( ${#arr[@]} ))";
+    assert!(parse_with(input, Dialect::Bash).is_ok());
+}

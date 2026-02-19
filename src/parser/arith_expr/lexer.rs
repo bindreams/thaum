@@ -292,7 +292,28 @@ impl ArithLexer {
             }
             '$' => {
                 self.next_char();
-                Ok(ArithToken::Dollar)
+                if self.peek_char() == Some('{') {
+                    // ${...} brace parameter expansion — consume as a single Ident
+                    self.next_char(); // consume {
+                    let start = self.pos;
+                    let mut depth = 1;
+                    while depth > 0 {
+                        match self.next_char() {
+                            Some('{') => depth += 1,
+                            Some('}') => depth -= 1,
+                            None => {
+                                return Err(
+                                    "unclosed ${ in arithmetic expression".to_string()
+                                )
+                            }
+                            _ => {}
+                        }
+                    }
+                    let inner: String = self.chars[start..self.pos - 1].iter().collect();
+                    Ok(ArithToken::Ident(format!("${{{}}}", inner)))
+                } else {
+                    Ok(ArithToken::Dollar)
+                }
             }
             _ => Err(format!(
                 "unexpected character '{}' in arithmetic expression",

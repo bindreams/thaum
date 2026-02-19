@@ -10,7 +10,6 @@ impl<'src> Lexer<'src> {
     pub(super) fn try_scan_operator(
         &mut self,
         start: usize,
-        preceded_by_blank: bool,
     ) -> Result<Option<SpannedToken>, LexError> {
         let ch = match self.cursor.peek() {
             Some(c) => c,
@@ -91,7 +90,7 @@ impl<'src> Lexer<'src> {
                         (Token::HereDocOp, 2)
                     }
                 }
-                Some('(') if self.options.process_substitution && preceded_by_blank => {
+                Some('(') if self.options.process_substitution && self.last_was_blank => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectFromFile, 1),
@@ -100,7 +99,7 @@ impl<'src> Lexer<'src> {
                 Some('>') => (Token::Append, 2),
                 Some('&') => (Token::RedirectToFd, 2),
                 Some('|') => (Token::Clobber, 2),
-                Some('(') if self.options.process_substitution && preceded_by_blank => {
+                Some('(') if self.options.process_substitution && self.last_was_blank => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectToFile, 1),

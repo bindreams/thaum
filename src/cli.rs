@@ -200,7 +200,7 @@ pub fn run() {
 
 fn do_lex(cli: &CliArgs) {
     use thaum::lexer::Lexer;
-    use thaum::token::Token;
+    use thaum::token::{self, Token};
 
     let options = cli.dialect().options();
     let (source, filename) = load_source(cli);
@@ -219,7 +219,36 @@ fn do_lex(cli: &CliArgs) {
                     break;
                 }
                 let text = match &spanned.token {
-                    Token::Word(s) => s.clone(),
+                    Token::Literal(s) => s.clone(),
+                    Token::SingleQuoted(s) => format!("'{}'", s),
+                    Token::DoubleQuoted(s) => format!("\"{}\"", s),
+                    Token::SimpleParam(s) => format!("${}", s),
+                    Token::BraceParam(s) => format!("${{{}}}", s),
+                    Token::CommandSub(s) => format!("$({})", s),
+                    Token::BacktickSub(s) => format!("`{}`", s),
+                    Token::ArithSub(s) => format!("$(({})))", s),
+                    Token::Glob(k) => match k {
+                        token::GlobKind::Star => "*".to_string(),
+                        token::GlobKind::Question => "?".to_string(),
+                        token::GlobKind::BracketOpen => "[".to_string(),
+                    },
+                    Token::TildePrefix(s) => format!("~{}", s),
+                    Token::BashAnsiCQuoted(s) => format!("$'{}'", s),
+                    Token::BashLocaleQuoted(s) => format!("$\"{}\"", s),
+                    Token::BashExtGlob { kind, pattern } => {
+                        let prefix = match kind {
+                            token::ExtGlobTokenKind::ZeroOrOne => "?",
+                            token::ExtGlobTokenKind::ZeroOrMore => "*",
+                            token::ExtGlobTokenKind::OneOrMore => "+",
+                            token::ExtGlobTokenKind::ExactlyOne => "@",
+                            token::ExtGlobTokenKind::Not => "!",
+                        };
+                        format!("{}({})", prefix, pattern)
+                    }
+                    Token::BashProcessSub { direction, content } => {
+                        format!("{}({})", direction, content)
+                    }
+                    Token::Blank => " ".to_string(),
                     Token::IoNumber(n) => n.to_string(),
                     Token::HereDocBody(s) => {
                         let preview = s.replace('\n', "\\n");

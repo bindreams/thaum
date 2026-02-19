@@ -2,11 +2,12 @@ use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;
 
-use super::helpers::{make_argument, make_word};
+use super::helpers::is_valid_name;
 use super::Parser;
 
 impl<'src> Parser<'src> {
     pub(super) fn parse_command(&mut self) -> Result<Command, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         let mut assignments = Vec::new();
         let mut arguments = Vec::new();
@@ -21,17 +22,18 @@ impl<'src> Parser<'src> {
                 continue;
             }
 
-            if let Token::Word(ref w) = self.stream.peek()?.token {
+            // Assignment detection: first Literal in a word contains '='
+            if let Token::Literal(ref w) = self.stream.peek()?.token {
                 if let Some(eq_pos) = w.find('=') {
                     let name = &w[..eq_pos];
-                    if super::helpers::is_valid_name(name) && !name.is_empty() {
-                        let value_str = w[eq_pos + 1..].to_string();
+                    if is_valid_name(name) && !name.is_empty() {
+                        let value_prefix = w[eq_pos + 1..].to_string();
                         let name = name.to_string();
                         let word_span = self.stream.peek()?.span;
-                        self.stream.advance()?;
+                        self.stream.advance()?; // consume the Literal("name=value...")
 
                         // Array assignment: name=( ... ) (Bash)
-                        if value_str.is_empty()
+                        if value_prefix.is_empty()
                             && self.options.arrays
                             && self.stream.peek()?.token == Token::LParen
                         {
@@ -43,11 +45,9 @@ impl<'src> Parser<'src> {
                                     break;
                                 }
                                 if self.is_word()? {
-                                    let ws = self.stream.peek()?.span;
-                                    if let Token::Word(s) = &self.stream.peek()?.token {
-                                        elements.push(make_word(s.clone(), ws, &self.options));
+                                    if let Some(w) = self.collect_word()? {
+                                        elements.push(w);
                                     }
-                                    self.stream.advance()?;
                                 } else {
                                     break;
                                 }
@@ -62,11 +62,10 @@ impl<'src> Parser<'src> {
                             });
                             end_span = rparen_span;
                         } else {
+                            let value_word = self.collect_assignment_value(&value_prefix, word_span)?;
                             assignments.push(Assignment {
                                 name,
-                                value: AssignmentValue::Scalar(
-                                    make_word(value_str, word_span, &self.options),
-                                ),
+                                value: AssignmentValue::Scalar(value_word),
                                 span: word_span,
                             });
                             end_span = word_span;
@@ -80,14 +79,14 @@ impl<'src> Parser<'src> {
         }
 
         if self.is_word()? {
-            let w = self.stream.peek()?.token.clone();
             end_span = self.stream.peek()?.span;
-            if let Token::Word(s) = w {
-                arguments.push(make_argument(s, self.stream.peek()?.span, &self.options));
+            if let Some(arg) = self.collect_argument()? {
+                arguments.push(arg);
             }
-            self.stream.advance()?;
 
             loop {
+                self.stream.skip_blanks()?;
+
                 if self.is_redirect_op()? {
                     let redir = self.parse_redirect()?;
                     end_span = redir.span;
@@ -96,23 +95,16 @@ impl<'src> Parser<'src> {
                 }
 
                 if self.is_word()? {
-                    let span = self.stream.peek()?.span;
-                    end_span = span;
-                    if let Token::Word(s) = &self.stream.peek()?.token {
-                        arguments.push(make_argument(s.clone(), span, &self.options));
+                    end_span = self.stream.peek()?.span;
+                    if let Some(arg) = self.collect_argument()? {
+                        arguments.push(arg);
                     }
-                    self.stream.advance()?;
                     continue;
                 }
 
                 break;
             }
         }
-
-        // NOTE: Heredoc body consumption is NOT done here. It's done in
-        // parse_list_into after the full statement is parsed, because the
-        // Newline + HereDocBody tokens follow the command and must be consumed
-        // as part of statement termination (like a semicolon).
 
         Ok(Command {
             assignments,
@@ -123,6 +115,7 @@ impl<'src> Parser<'src> {
     }
 
     pub(super) fn parse_redirect(&mut self) -> Result<Redirect, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
 
         let fd = if let Token::IoNumber(n) = self.stream.peek()?.token {
@@ -153,14 +146,8 @@ impl<'src> Parser<'src> {
             });
         }
 
-        let target_str = match &self.stream.peek()?.token {
-            Token::Word(s) => s.clone(),
-            _ => unreachable!(),
-        };
-        let target_span = self.stream.peek()?.span;
-        let target = make_word(target_str, target_span, &self.options);
-
-        self.stream.advance()?;
+        let target = self.collect_word()?.unwrap();
+        let target_span = target.span;
 
         let kind = match op_token {
             Token::RedirectFromFile => RedirectKind::Input(target),
@@ -182,17 +169,13 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse a here-document redirect (`<<` or `<<-`).
-    ///
-    /// The lexer has already auto-registered the pending heredoc when it saw
-    /// the delimiter word. We just need to record the redirect with an empty
-    /// body — `fill_heredoc_bodies` will fill it in from `HereDocBody` tokens.
     fn parse_here_redirect(
         &mut self,
         fd: Option<i32>,
         strip_tabs: bool,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
+        self.stream.skip_blanks()?;
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
@@ -201,25 +184,33 @@ impl<'src> Parser<'src> {
             });
         }
 
+        // The heredoc delimiter was scanned as a single raw Literal by the lexer
         let raw_delimiter = match &self.stream.peek()?.token {
-            Token::Word(s) => s.clone(),
-            _ => unreachable!(),
+            Token::Literal(s) => s.clone(),
+            _ => {
+                // If it's some other fragment, collect the whole word as raw text
+                let w = self.collect_word()?.unwrap();
+                // Reconstruct raw text from fragments (approximation)
+                w.parts.iter().map(|f| match f {
+                    Fragment::Literal(s) => s.as_str(),
+                    _ => "",
+                }).collect::<String>()
+            }
         };
         let delim_span = self.stream.peek()?.span;
 
-        // TODO: strip_heredoc_quotes is called twice — once in the lexer (when
-        // auto-registering the heredoc) and once here for the AST. The fix: include
-        // `quoted` and `delimiter` in the HereDocBody token so the parser doesn't
-        // need to recompute them.
         let (delimiter, quoted) = crate::lexer::heredoc::strip_heredoc_quotes(&raw_delimiter);
 
-        self.stream.advance()?;
+        // Consume the delimiter token(s)
+        if matches!(self.stream.peek()?.token, Token::Literal(_)) {
+            self.stream.advance()?;
+        }
 
         Ok(Redirect {
             fd,
             kind: RedirectKind::HereDoc {
                 delimiter,
-                body: String::new(), // filled in by fill_heredoc_bodies
+                body: String::new(),
                 strip_tabs,
                 quoted,
             },
@@ -227,12 +218,12 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse `<<< word` (here-string).
     fn parse_here_string_redirect(
         &mut self,
         fd: Option<i32>,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
+        self.stream.skip_blanks()?;
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
@@ -241,14 +232,8 @@ impl<'src> Parser<'src> {
             });
         }
 
-        let target_str = match &self.stream.peek()?.token {
-            Token::Word(s) => s.clone(),
-            _ => unreachable!(),
-        };
-        let target_span = self.stream.peek()?.span;
-        let target = make_word(target_str, target_span, &self.options);
-
-        self.stream.advance()?;
+        let target = self.collect_word()?.unwrap();
+        let target_span = target.span;
 
         Ok(Redirect {
             fd,

@@ -7,6 +7,7 @@ use super::Parser;
 
 impl<'src> Parser<'src> {
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.skip_linebreak()?;
 
@@ -27,22 +28,17 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse a `;`/`&`-separated list of statements.
-    ///
-    /// After parsing each expression, consumes any heredoc bodies that belong
-    /// to it (Newline + HereDocBody tokens). This ensures the statement owns
-    /// all its heredoc content before the next statement begins.
     pub(super) fn parse_list_into(&mut self, out: &mut Vec<Statement>) -> Result<(), ParseError> {
         let mut expr = self.parse_and_or()?;
         let mut span = expr_span(&expr);
 
-        // Consume heredoc bodies that belong to this expression
         let bodies = self.consume_heredoc_bodies()?;
         if !bodies.is_empty() {
             fill_expression_heredocs(&mut expr, &bodies);
         }
 
         loop {
+            self.stream.skip_blanks()?;
             match self.stream.peek()?.token {
                 Token::Semicolon => {
                     out.push(Statement {
@@ -91,17 +87,14 @@ impl<'src> Parser<'src> {
         Ok(())
     }
 
-    /// and_or: pipeline ((AND_IF | OR_IF) linebreak pipeline)*
     pub(super) fn parse_and_or(&mut self) -> Result<Expression, ParseError> {
         let mut left = self.parse_pipeline()?;
 
         loop {
+            self.stream.skip_blanks()?;
             match self.stream.peek()?.token {
                 Token::AndIf => {
                     self.stream.advance()?;
-                    // Consume heredoc bodies belonging to the left-hand side.
-                    // When the LHS has a heredoc (e.g. `cat <<EOF &&`), the body
-                    // tokens appear after the newline following `&&`.
                     let bodies = self.consume_heredoc_bodies()?;
                     if !bodies.is_empty() {
                         fill_expression_heredocs(&mut left, &bodies);
@@ -133,13 +126,13 @@ impl<'src> Parser<'src> {
         Ok(left)
     }
 
-    /// pipeline: [!] pipe_sequence
     fn parse_pipeline(&mut self) -> Result<Expression, ParseError> {
         let negated = self.eat_keyword("!")?;
 
         let mut left = self.parse_leaf_expression()?;
 
         loop {
+            self.stream.skip_blanks()?;
             let pipe_token = &self.stream.peek()?.token;
             let stderr = match pipe_token {
                 Token::Pipe => false,
@@ -163,66 +156,86 @@ impl<'src> Parser<'src> {
         Ok(left)
     }
 
-    /// A leaf expression: command | compound_command redirect_list? | function_definition
     fn parse_leaf_expression(&mut self) -> Result<Expression, ParseError> {
+        self.stream.skip_blanks()?;
         let tok = self.stream.peek()?.token.clone();
         match &tok {
-            Token::Word(w) => {
-                match w.as_str() {
-                    "if" | "while" | "until" | "for" | "case" | "{" => {
-                        self.parse_compound_expression()
-                    }
-                    "select" if self.options.select => self.parse_compound_expression(),
-                    "coproc" if self.options.coproc => self.parse_coproc(),
-                    "function" if self.options.function_keyword => self.parse_function_definition(),
-                    kw if Self::is_closing_keyword(kw) => Err(ParseError::UnexpectedToken {
-                        found: keyword_display_name(kw),
-                        expected: "a command".to_string(),
-                        span: self.stream.peek()?.span,
-                    }),
-                    _ => {
-                        // Try POSIX function definition: name() { ... }
-                        // Uses speculative parsing: peek at name + `(`, rewind if not.
-                        if let Some(func) = self.try_parse(|p| {
-                            let name = match &p.stream.peek()?.token {
-                                Token::Word(w) if is_valid_name(w) => w.clone(),
-                                _ => return Ok(None),
-                            };
-                            let start_span = p.stream.peek()?.span;
-                            p.stream.advance()?; // consume name
-                            if p.stream.peek()?.token != Token::LParen {
-                                return Ok(None); // not name( -> rewind
-                            }
-                            p.stream.advance()?; // consume (
-                            p.expect(&Token::RParen)?; // expect )
-                            p.skip_linebreak()?;
-                            let body = p.parse_compound_command()?;
-                            let mut redirects = Vec::new();
-                            while p.is_redirect_op()? {
-                                redirects.push(p.parse_redirect()?);
-                            }
-                            let end_span = redirects
-                                .last()
-                                .map(|r| r.span)
-                                .unwrap_or(compound_command_span(&body));
-                            Ok(Some(Expression::FunctionDef(FunctionDef {
-                                name,
-                                body: Box::new(body),
-                                redirects,
-                                span: start_span.merge(end_span),
-                            })))
-                        })? {
-                            Ok(func)
-                        } else {
-                            Ok(Expression::Command(self.parse_command()?))
+            Token::Literal(w) => {
+                let is_lone = {
+                    let next = self.stream.peek_at_offset(1)?;
+                    !next.token.is_fragment()
+                };
+
+                if is_lone {
+                    match w.as_str() {
+                        "if" | "while" | "until" | "for" | "case" | "{" => {
+                            return self.parse_compound_expression();
                         }
+                        "select" if self.options.select => {
+                            return self.parse_compound_expression();
+                        }
+                        "coproc" if self.options.coproc => {
+                            return self.parse_coproc();
+                        }
+                        "function" if self.options.function_keyword => {
+                            return self.parse_function_definition();
+                        }
+                        kw if Self::is_closing_keyword(kw) => {
+                            return Err(ParseError::UnexpectedToken {
+                                found: keyword_display_name(kw),
+                                expected: "a command".to_string(),
+                                span: self.stream.peek()?.span,
+                            });
+                        }
+                        _ => {}
                     }
                 }
+
+                if is_lone && is_valid_name(w) {
+                    if let Some(func) = self.try_parse(|p| {
+                        p.stream.skip_blanks()?;
+                        let name = match &p.stream.peek()?.token {
+                            Token::Literal(w) if is_valid_name(w) => w.clone(),
+                            _ => return Ok(None),
+                        };
+                        let start_span = p.stream.peek()?.span;
+                        p.stream.advance()?;
+                        p.stream.skip_blanks()?;
+                        if p.stream.peek()?.token != Token::LParen {
+                            return Ok(None);
+                        }
+                        p.stream.advance()?;
+                        p.expect(&Token::RParen)?;
+                        p.skip_linebreak()?;
+                        let body = p.parse_compound_command()?;
+                        let mut redirects = Vec::new();
+                        while p.is_redirect_op()? {
+                            redirects.push(p.parse_redirect()?);
+                        }
+                        let end_span = redirects
+                            .last()
+                            .map(|r| r.span)
+                            .unwrap_or(compound_command_span(&body));
+                        Ok(Some(Expression::FunctionDef(FunctionDef {
+                            name,
+                            body: Box::new(body),
+                            redirects,
+                            span: start_span.merge(end_span),
+                        })))
+                    })? {
+                        return Ok(func);
+                    }
+                }
+
+                Ok(Expression::Command(self.parse_command()?))
             }
             Token::LParen => self.parse_compound_expression(),
             Token::BashDblLBracket => self.parse_compound_expression(),
             Token::IoNumber(_) => Ok(Expression::Command(self.parse_command()?)),
             _ if tok.is_redirect_op() => Ok(Expression::Command(self.parse_command()?)),
+            _ if tok.is_fragment() => {
+                Ok(Expression::Command(self.parse_command()?))
+            }
             _ => Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
                 expected: "a command".to_string(),
@@ -239,16 +252,11 @@ impl<'src> Parser<'src> {
             redirects.push(self.parse_redirect()?);
         }
 
-        // NOTE: Heredoc body consumption handled by parse_list_into
-
         Ok(Expression::Compound { body, redirects })
     }
 }
 
 /// Fill heredoc bodies in an expression's redirects.
-///
-/// Finds all `RedirectKind::HereDoc` with empty bodies and fills them
-/// from the provided body strings, in order.
 fn fill_expression_heredocs(expr: &mut Expression, bodies: &[String]) {
     let redirects = match expr {
         Expression::Command(cmd) => &mut cmd.redirects,

@@ -8,9 +8,6 @@ use super::Lexer;
 pub(super) struct PendingHereDoc {
     pub(super) delimiter: String,
     pub(super) strip_tabs: bool,
-    /// Whether the delimiter was quoted (affects expansion in future iterations).
-    #[allow(dead_code)]
-    pub(super) quoted: bool,
 }
 
 impl<'src> Lexer<'src> {

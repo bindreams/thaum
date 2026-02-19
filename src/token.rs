@@ -7,41 +7,83 @@ pub struct SpannedToken {
     pub span: Span,
 }
 
+/// Glob metacharacter kind for the `Glob` token.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GlobKind {
+    Star,
+    Question,
+    BracketOpen,
+}
+
+/// Extended glob prefix kind for the `BashExtGlob` token.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExtGlobTokenKind {
+    /// `?(`
+    ZeroOrOne,
+    /// `*(`
+    ZeroOrMore,
+    /// `+(`
+    OneOrMore,
+    /// `@(`
+    ExactlyOne,
+    /// `!(`
+    Not,
+}
+
 /// All token types recognized by the shell lexer.
 #[derive(Debug, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Token {
-    // === Value-carrying tokens ===
-    /// A shell word (may contain quotes, expansions — still raw at this stage).
-    Word(String),
+    // === Fragment tokens ===
+    /// Unquoted literal text. Carries RAW characters including backslash escapes.
+    /// De-escaping happens during AST construction, not here.
+    Literal(String),
+    /// Content between `'...'` (without the quote characters).
+    SingleQuoted(String),
+    /// Raw content between `"..."` (without outer quotes).
+    /// The parser invokes an inner lexer in double-quote mode on this content.
+    DoubleQuoted(String),
+    /// `$VAR`, `$1`, `$@`, etc. — the name/char after `$`.
+    SimpleParam(String),
+    /// Raw content of `${...}` (without the `${` and `}`).
+    /// Internal structure (name, operator, argument) parsed by a helper.
+    BraceParam(String),
+    /// Raw content of `$(...)` (without the `$(` and `)`).
+    /// Recursive parser invocation produces `Vec<Statement>`.
+    CommandSub(String),
+    /// Raw content of `` `...` `` (without the backticks).
+    BacktickSub(String),
+    /// Raw content of `$((...))` (without the `$((` and `))`).
+    ArithSub(String),
+    /// Glob metacharacter: `*`, `?`, or `[`.
+    Glob(GlobKind),
+    /// `~user` at word start. String is the user part (empty for bare `~`).
+    TildePrefix(String),
+    /// `$'...'` content (without `$'` and `'`). Bash only.
+    BashAnsiCQuoted(String),
+    /// `$"..."` raw content (without `$"` and `"`). Bash only.
+    /// The parser invokes an inner lexer in double-quote mode on this content.
+    BashLocaleQuoted(String),
+    /// `?(pat)`, `*(pat)`, `+(pat)`, `@(pat)`, `!(pat)`. Bash only.
+    BashExtGlob {
+        kind: ExtGlobTokenKind,
+        pattern: String,
+    },
+    /// `<(...)` or `>(...)` — process substitution (Bash).
+    BashProcessSub {
+        /// `'<'` for input, `'>'` for output.
+        direction: char,
+        /// Raw content between the parentheses.
+        content: String,
+    },
+    /// Unquoted whitespace between words (word boundary marker).
+    Blank,
+
+    // === Other value-carrying tokens ===
     /// An IO_NUMBER: a digit sequence immediately preceding `<` or `>`.
     IoNumber(i32),
 
     // === Newline (semantically significant in shell) ===
     Newline,
-
-    // === Reserved words ===
-    // TODO: These variants are never produced by the lexer (it always emits Word).
-    // They're only used by reserved_word_from_str() and display_name(). Consider
-    // removing them and using string constants instead.
-    If,
-    Then,
-    Else,
-    Elif,
-    Fi,
-    Do,
-    Done,
-    Case,
-    Esac,
-    While,
-    Until,
-    For,
-    In,
-    /// `{` — brace group open.
-    LBrace,
-    /// `}` — brace group close.
-    RBrace,
-    /// `!` — pipeline negation.
-    Bang,
 
     // === Multi-character operators ===
     /// `&&` — logical AND (POSIX: `AND_IF`).
@@ -65,7 +107,7 @@ pub enum Token {
     /// `<<-` — here-document with leading tab stripping (POSIX: `DLESSDASH`).
     HereDocStripOp,
 
-    // === Bash extensions ===
+    // === Bash extension operators ===
     /// `<<<` — here-string (Bash).
     BashHereStringOp,
     /// `&>` — redirect stdout+stderr to file (Bash).
@@ -80,12 +122,6 @@ pub enum Token {
     BashCaseContinue,
     /// `;;&` — case fall-through: test next pattern (Bash).
     BashCaseFallThrough,
-    /// `function` keyword (Bash).
-    BashFunction,
-    /// `select` keyword (Bash).
-    BashSelect,
-    /// `coproc` keyword (Bash).
-    BashCoproc,
     /// `|&` — pipe stdout+stderr (Bash).
     BashPipeAmpersand,
 
@@ -113,29 +149,24 @@ pub enum Token {
 }
 
 impl Token {
-    /// Returns `true` if this token is a reserved word.
-    pub fn is_reserved_word(&self) -> bool {
+    /// Returns `true` if this is a fragment token (part of a word).
+    pub fn is_fragment(&self) -> bool {
         matches!(
             self,
-            Token::If
-                | Token::Then
-                | Token::Else
-                | Token::Elif
-                | Token::Fi
-                | Token::Do
-                | Token::Done
-                | Token::Case
-                | Token::Esac
-                | Token::While
-                | Token::Until
-                | Token::For
-                | Token::In
-                | Token::LBrace
-                | Token::RBrace
-                | Token::Bang
-                | Token::BashFunction
-                | Token::BashSelect
-                | Token::BashCoproc
+            Token::Literal(_)
+                | Token::SingleQuoted(_)
+                | Token::DoubleQuoted(_)
+                | Token::SimpleParam(_)
+                | Token::BraceParam(_)
+                | Token::CommandSub(_)
+                | Token::BacktickSub(_)
+                | Token::ArithSub(_)
+                | Token::Glob(_)
+                | Token::TildePrefix(_)
+                | Token::BashAnsiCQuoted(_)
+                | Token::BashLocaleQuoted(_)
+                | Token::BashExtGlob { .. }
+                | Token::BashProcessSub { .. }
         )
     }
 
@@ -158,33 +189,10 @@ impl Token {
         )
     }
 
-    /// Try to classify a word string as a reserved word token.
-    pub fn reserved_word_from_str(s: &str) -> Option<Token> {
-        match s {
-            "if" => Some(Token::If),
-            "then" => Some(Token::Then),
-            "else" => Some(Token::Else),
-            "elif" => Some(Token::Elif),
-            "fi" => Some(Token::Fi),
-            "do" => Some(Token::Do),
-            "done" => Some(Token::Done),
-            "case" => Some(Token::Case),
-            "esac" => Some(Token::Esac),
-            "while" => Some(Token::While),
-            "until" => Some(Token::Until),
-            "for" => Some(Token::For),
-            "in" => Some(Token::In),
-            "{" => Some(Token::LBrace),
-            "}" => Some(Token::RBrace),
-            "!" => Some(Token::Bang),
-            _ => None,
-        }
-    }
-
     /// Token variant name for structured output (e.g. the `lex` CLI subcommand).
     ///
     /// Derived via `strum::IntoStaticStr` — returns the enum variant name
-    /// as a `&'static str` (e.g. `"Word"`, `"Pipe"`, `"AndIf"`).
+    /// as a `&'static str` (e.g. `"Literal"`, `"Pipe"`, `"AndIf"`).
     pub fn token_name(&self) -> &'static str {
         self.into()
     }
@@ -192,25 +200,23 @@ impl Token {
     /// Human-readable name for use in error messages.
     pub fn display_name(&self) -> &'static str {
         match self {
-            Token::Word(_) => "a word",
+            Token::Literal(_) => "a word",
+            Token::SingleQuoted(_) => "a word",
+            Token::DoubleQuoted(_) => "a word",
+            Token::SimpleParam(_) => "a word",
+            Token::BraceParam(_) => "a word",
+            Token::CommandSub(_) => "a word",
+            Token::BacktickSub(_) => "a word",
+            Token::ArithSub(_) => "a word",
+            Token::Glob(_) => "a word",
+            Token::TildePrefix(_) => "a word",
+            Token::BashAnsiCQuoted(_) => "a word",
+            Token::BashLocaleQuoted(_) => "a word",
+            Token::BashExtGlob { .. } => "a word",
+            Token::BashProcessSub { .. } => "a word",
+            Token::Blank => "blank",
             Token::IoNumber(_) => "a file descriptor",
             Token::Newline => "newline",
-            Token::If => "'if'",
-            Token::Then => "'then'",
-            Token::Else => "'else'",
-            Token::Elif => "'elif'",
-            Token::Fi => "'fi'",
-            Token::Do => "'do'",
-            Token::Done => "'done'",
-            Token::Case => "'case'",
-            Token::Esac => "'esac'",
-            Token::While => "'while'",
-            Token::Until => "'until'",
-            Token::For => "'for'",
-            Token::In => "'in'",
-            Token::LBrace => "'{'",
-            Token::RBrace => "'}'",
-            Token::Bang => "'!'",
             Token::AndIf => "'&&'",
             Token::OrIf => "'||'",
             Token::CaseBreak => "';;'",
@@ -228,9 +234,6 @@ impl Token {
             Token::BashDblRBracket => "']]'",
             Token::BashCaseContinue => "';&'",
             Token::BashCaseFallThrough => "';;&'",
-            Token::BashFunction => "'function'",
-            Token::BashSelect => "'select'",
-            Token::BashCoproc => "'coproc'",
             Token::BashPipeAmpersand => "'|&'",
             Token::Pipe => "'|'",
             Token::Semicolon => "';'",

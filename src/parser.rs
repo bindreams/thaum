@@ -6,6 +6,7 @@ mod expressions;
 mod helpers;
 mod test_expr;
 mod token_stream;
+mod word_collect;
 
 use crate::ast::*;
 use crate::dialect::ParseOptions;
@@ -14,7 +15,7 @@ use crate::lexer::Lexer;
 use crate::span::Span;
 use crate::token::{SpannedToken, Token};
 
-use helpers::{is_keyword, keyword_display_name};
+use helpers::keyword_display_name;
 use token_stream::TokenStream;
 
 pub use helpers::expr_span;
@@ -53,10 +54,15 @@ impl<'src> Parser<'src> {
 
     // ================================================================
     // Helper methods
+    //
+    // These all call skip_blanks() so callers don't have to.
+    // Word collection code (word_collect.rs) deliberately bypasses
+    // these to see Blank tokens as word boundaries.
     // ================================================================
 
     /// Consume the current token if it matches the expected operator token.
     fn eat(&mut self, expected: &Token) -> Result<bool, ParseError> {
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token == *expected {
             self.stream.advance()?;
             Ok(true)
@@ -67,7 +73,7 @@ impl<'src> Parser<'src> {
 
     /// Consume the current token if it is a keyword matching the given string.
     fn eat_keyword(&mut self, keyword: &str) -> Result<bool, ParseError> {
-        if is_keyword(&self.stream.peek()?.token, keyword) {
+        if self.is_lone_literal(keyword)? {
             self.stream.advance()?;
             Ok(true)
         } else {
@@ -77,8 +83,8 @@ impl<'src> Parser<'src> {
 
     /// Expect and consume an operator token. Returns error if not matched.
     fn expect(&mut self, expected: &Token) -> Result<SpannedToken, ParseError> {
-        let peeked = self.stream.peek()?;
-        if peeked.token == *expected {
+        self.stream.skip_blanks()?;
+        if self.stream.peek()?.token == *expected {
             self.stream.advance()
         } else {
             Err(ParseError::UnexpectedToken {
@@ -89,11 +95,12 @@ impl<'src> Parser<'src> {
         }
     }
 
-    /// Expect and consume a keyword (reserved word that comes as Word("...")).
+    /// Expect and consume a keyword (a lone Literal matching the string).
     fn expect_keyword(&mut self, keyword: &str) -> Result<SpannedToken, ParseError> {
-        if is_keyword(&self.stream.peek()?.token, keyword) {
+        if self.is_lone_literal(keyword)? {
             self.stream.advance()
         } else {
+            self.stream.skip_blanks()?;
             Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
                 expected: keyword_display_name(keyword),
@@ -110,9 +117,10 @@ impl<'src> Parser<'src> {
         opening: &str,
         opening_span: Span,
     ) -> Result<SpannedToken, ParseError> {
-        if is_keyword(&self.stream.peek()?.token, keyword) {
+        if self.is_lone_literal(keyword)? {
             return self.stream.advance();
         }
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token == Token::Eof {
             Err(ParseError::UnclosedConstruct {
                 keyword: keyword_display_name(keyword),
@@ -129,38 +137,31 @@ impl<'src> Parser<'src> {
     }
 
     fn skip_linebreak(&mut self) -> Result<(), ParseError> {
+        self.stream.skip_blanks()?;
         while self.stream.peek()?.token == Token::Newline {
             self.stream.advance()?;
+            self.stream.skip_blanks()?;
         }
         Ok(())
     }
 
     /// Consume heredoc body tokens that belong to the just-parsed statement.
-    ///
-    /// After a command with heredoc redirects, the token stream contains:
-    /// `Newline, HereDocBody, HereDocBody, ...` The Newline is consumed as
-    /// part of statement termination, and the HereDocBody tokens are collected
-    /// and returned so the caller can fill them into the expression's redirects.
     pub(super) fn consume_heredoc_bodies(&mut self) -> Result<Vec<String>, ParseError> {
-        // Check if there's a Newline followed by HereDocBody
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token != Token::Newline {
             return Ok(Vec::new());
         }
 
-        // Peek past the Newline to see if HereDocBody follows
-        // We need to use checkpoint/rewind to avoid consuming the Newline
-        // if there are no HereDocBody tokens after it.
         let cp = self.stream.checkpoint();
         self.stream.advance()?; // consume Newline tentatively
+        self.stream.skip_blanks()?;
 
         if !matches!(self.stream.peek()?.token, Token::HereDocBody(_)) {
-            // No heredoc bodies — put the Newline back
             self.stream.rewind(cp);
             return Ok(Vec::new());
         }
         self.stream.release(cp);
 
-        // Collect all HereDocBody tokens
         let mut bodies = Vec::new();
         while let Token::HereDocBody(body) = &self.stream.peek()?.token {
             bodies.push(body.clone());
@@ -171,24 +172,25 @@ impl<'src> Parser<'src> {
     }
 
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token != Token::Newline {
             return Ok(false);
         }
         while self.stream.peek()?.token == Token::Newline {
             self.stream.advance()?;
+            self.stream.skip_blanks()?;
         }
         Ok(true)
     }
 
-    /// Returns true if the current token is any Word (including reserved words).
-    /// Use this in argument position where reserved words are just words.
+    /// Returns true if the current token starts a word (any fragment token).
     fn is_word(&mut self) -> Result<bool, ParseError> {
-        Ok(matches!(self.stream.peek()?.token, Token::Word(_)))
+        self.stream.skip_blanks()?;
+        Ok(self.stream.peek()?.token.is_fragment())
     }
 
     /// Returns true if a word string is a "closing" reserved keyword that
-    /// cannot start a new command. These are structure keywords that
-    /// terminate or separate compound command clauses.
+    /// cannot start a new command.
     fn is_closing_keyword(w: &str) -> bool {
         matches!(
             w,
@@ -197,12 +199,16 @@ impl<'src> Parser<'src> {
     }
 
     fn can_start_command(&mut self) -> Result<bool, ParseError> {
+        self.stream.skip_blanks()?;
         let tok = &self.stream.peek()?.token;
         Ok(match tok {
-            Token::Word(w) => {
-                // Words can start a command UNLESS they are closing keywords
-                // (then, fi, done, do, else, elif, esac, }, in)
-                !Self::is_closing_keyword(w)
+            Token::Literal(w) => {
+                if Self::is_closing_keyword(w) {
+                    let next = self.stream.peek_at_offset(1)?;
+                    next.token.is_fragment()
+                } else {
+                    true
+                }
             }
             Token::IoNumber(_)
             | Token::LParen
@@ -219,31 +225,38 @@ impl<'src> Parser<'src> {
             | Token::BashRedirectAllOp
             | Token::BashAppendAllOp
             | Token::BashDblLBracket => true,
+            _ if tok.is_fragment() => true,
             _ => false,
         })
     }
 
     fn is_redirect_op(&mut self) -> Result<bool, ParseError> {
+        self.stream.skip_blanks()?;
         let tok = &self.stream.peek()?.token;
         Ok(tok.is_redirect_op() || matches!(tok, Token::IoNumber(_)))
     }
 
-    /// Check if a Word token is a compound command keyword.
     fn is_compound_keyword(w: &str) -> bool {
         matches!(w, "if" | "while" | "until" | "for" | "case" | "{")
     }
 
-    /// Check if a Word token is a keyword that starts a compound command,
-    /// including Bash extensions.
     fn is_compound_start_word(&self, w: &str) -> bool {
         Self::is_compound_keyword(w) || (w == "select" && self.options.select)
     }
 
     /// Check if the current token starts a compound command.
     fn is_compound_start(&mut self) -> Result<bool, ParseError> {
+        self.stream.skip_blanks()?;
         let tok = self.stream.peek()?.token.clone();
         Ok(match &tok {
-            Token::Word(w) => self.is_compound_start_word(w),
+            Token::Literal(w) => {
+                if self.is_compound_start_word(w) {
+                    let next = self.stream.peek_at_offset(1)?;
+                    !next.token.is_fragment()
+                } else {
+                    false
+                }
+            }
             Token::LParen | Token::BashDblLBracket => true,
             _ => false,
         })

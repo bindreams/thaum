@@ -244,10 +244,6 @@ impl Environment {
         self.last_exit_status = status;
     }
 
-    pub fn set_last_bg_pid(&mut self, pid: u32) {
-        self.last_bg_pid = Some(pid);
-    }
-
     // --- Working directory ---
 
     pub fn cwd(&self) -> &PathBuf {
@@ -277,10 +273,6 @@ impl Environment {
 
     pub fn set_function(&mut self, name: String, func: StoredFunction) {
         self.functions.insert(name, func);
-    }
-
-    pub fn unset_function(&mut self, name: &str) {
-        self.functions.remove(name);
     }
 
     // --- Scope management (for function calls) ---

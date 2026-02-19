@@ -1,12 +1,6 @@
 use crate::ast::*;
-use crate::dialect::ParseOptions;
 use crate::span::Span;
-use crate::token::Token;
-
-/// Check if a token is a keyword matching the given string.
-pub(super) fn is_keyword(token: &Token, keyword: &str) -> bool {
-    matches!(token, Token::Word(w) if w == keyword)
-}
+use crate::token::{GlobKind, Token};
 
 /// Display name for a keyword string (for error messages).
 pub(super) fn keyword_display_name(keyword: &str) -> String {
@@ -29,14 +23,6 @@ pub(super) fn compound_command_span(cmd: &CompoundCommand) -> Span {
         | CompoundCommand::BashCoproc { span, .. }
         | CompoundCommand::BashArithmeticFor { span, .. } => *span,
     }
-}
-
-pub(super) fn make_word(s: String, span: Span, options: &ParseOptions) -> Word {
-    crate::word::parse_word(&s, span, options)
-}
-
-pub(super) fn make_argument(s: String, span: Span, options: &ParseOptions) -> Argument {
-    crate::word::parse_argument(&s, span, options)
 }
 
 pub(super) fn argument_span(arg: &Argument) -> Span {
@@ -73,5 +59,56 @@ pub fn expr_span(expr: &Expression) -> Span {
         Expression::Or { left, right } => expr_span(left).merge(expr_span(right)),
         Expression::Pipe { left, right, .. } => expr_span(left).merge(expr_span(right)),
         Expression::Not(inner) => expr_span(inner),
+    }
+}
+
+/// De-escape a raw literal string: remove backslash escaping.
+/// `\\c` -> `c`, other characters pass through unchanged.
+pub(super) fn de_escape_literal(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut chars = s.chars();
+    while let Some(c) = chars.next() {
+        if c == '\\' {
+            if let Some(next) = chars.next() {
+                result.push(next);
+            }
+        } else {
+            result.push(c);
+        }
+    }
+    result
+}
+
+/// Convert a fragment token to its source text for raw-text contexts
+/// like arithmetic parsing. Does NOT include `$` prefixes.
+pub(super) fn fragment_token_to_text(token: &Token) -> &str {
+    match token {
+        Token::Literal(s) => s,
+        Token::SimpleParam(s) => s,
+        Token::BraceParam(s) => s,
+        Token::Glob(GlobKind::Star) => "*",
+        Token::Glob(GlobKind::Question) => "?",
+        Token::Glob(GlobKind::BracketOpen) => "[",
+        Token::TildePrefix(_) => "~",
+        _ => token.display_name().trim_matches('\''),
+    }
+}
+
+/// Convert a fragment token to its full source text including `$` prefixes.
+pub(super) fn fragment_token_to_source(token: &Token) -> String {
+    match token {
+        Token::Literal(s) => s.clone(),
+        Token::SimpleParam(s) => format!("${}", s),
+        Token::BraceParam(s) => format!("${{{}}}", s),
+        Token::CommandSub(s) => format!("$({})", s),
+        Token::BacktickSub(s) => format!("`{}`", s),
+        Token::ArithSub(s) => format!("$(({}))", s),
+        Token::SingleQuoted(s) => format!("'{}'", s),
+        Token::DoubleQuoted(s) => format!("\"{}\"", s),
+        Token::Glob(GlobKind::Star) => "*".to_string(),
+        Token::Glob(GlobKind::Question) => "?".to_string(),
+        Token::Glob(GlobKind::BracketOpen) => "[".to_string(),
+        Token::TildePrefix(s) => format!("~{}", s),
+        _ => token.display_name().trim_matches('\'').to_string(),
     }
 }

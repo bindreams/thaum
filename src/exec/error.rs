@@ -41,16 +41,3 @@ pub enum ExecError {
     #[error("return requested: {0}")]
     ReturnRequested(i32),
 }
-
-impl ExecError {
-    /// Returns true if this is a control-flow signal rather than a real error.
-    pub fn is_control_flow(&self) -> bool {
-        matches!(
-            self,
-            ExecError::ExitRequested(_)
-                | ExecError::BreakRequested(_)
-                | ExecError::ContinueRequested(_)
-                | ExecError::ReturnRequested(_)
-        )
-    }
-}

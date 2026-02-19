@@ -13,7 +13,7 @@ fn make_stream(input: &str) -> TokenStream<'_> {
 #[test]
 fn peek_returns_first_token() {
     let mut s = make_stream("echo hello");
-    assert_eq!(s.peek().unwrap().token, Token::Word("echo".into()));
+    assert_eq!(s.peek().unwrap().token, Token::Literal("echo".into()));
 }
 
 #[test]
@@ -33,10 +33,11 @@ fn advance_returns_peeked() {
 }
 
 #[test]
-fn advance_moves_forward() {
+fn advance_then_skip_blanks() {
     let mut s = make_stream("echo hello");
     s.advance().unwrap(); // consume "echo"
-    assert_eq!(s.peek().unwrap().token, Token::Word("hello".into()));
+    s.skip_blanks().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Literal("hello".into()));
 }
 
 #[test]
@@ -55,10 +56,12 @@ fn rewind_restores_position() {
     let mut s = make_stream("a b c");
     let cp = s.checkpoint();
     s.advance().unwrap(); // consume "a"
+    s.skip_blanks().unwrap();
     s.advance().unwrap(); // consume "b"
-    assert_eq!(s.peek().unwrap().token, Token::Word("c".into()));
+    s.skip_blanks().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Literal("c".into()));
     s.rewind(cp);
-    assert_eq!(s.peek().unwrap().token, Token::Word("a".into()));
+    assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
 }
 
 #[test]
@@ -66,9 +69,11 @@ fn rewind_allows_replay() {
     let mut s = make_stream("a b");
     let cp = s.checkpoint();
     let t1 = s.advance().unwrap().token;
+    s.skip_blanks().unwrap();
     let t2 = s.advance().unwrap().token;
     s.rewind(cp);
     assert_eq!(s.advance().unwrap().token, t1);
+    s.skip_blanks().unwrap();
     assert_eq!(s.advance().unwrap().token, t2);
 }
 
@@ -77,14 +82,13 @@ fn nested_checkpoints() {
     let mut s = make_stream("a b c d");
     let cp_a = s.checkpoint();
     s.advance().unwrap(); // consume "a"
+    s.skip_blanks().unwrap();
     let cp_b = s.checkpoint();
     s.advance().unwrap(); // consume "b"
-                          // Rewind to B — should see "b"
     s.rewind(cp_b);
-    assert_eq!(s.peek().unwrap().token, Token::Word("b".into()));
-    // Rewind to A — should see "a"
+    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
     s.rewind(cp_a);
-    assert_eq!(s.peek().unwrap().token, Token::Word("a".into()));
+    assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
 }
 
 #[test]
@@ -93,11 +97,13 @@ fn rewind_then_advance_past_original() {
     let cp = s.checkpoint();
     s.advance().unwrap(); // "a"
     s.rewind(cp);
-    // Now advance past where we were before
     s.advance().unwrap(); // "a"
+    s.skip_blanks().unwrap();
     s.advance().unwrap(); // "b"
+    s.skip_blanks().unwrap();
     s.advance().unwrap(); // "c"
-    assert_eq!(s.peek().unwrap().token, Token::Word("d".into()));
+    s.skip_blanks().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Literal("d".into()));
 }
 
 // --- Release / buffer cleanup ---
@@ -107,11 +113,11 @@ fn release_allows_buffer_drain() {
     let mut s = make_stream("a b c d e");
     let cp = s.checkpoint();
     for _ in 0..5 {
+        s.skip_blanks().unwrap();
         s.advance().unwrap();
     }
     let buf_before = s.buffer.len();
     s.release(cp);
-    // Buffer should have been drained
     assert!(s.buffer.len() < buf_before);
 }
 
@@ -120,16 +126,14 @@ fn release_with_older_checkpoint_alive() {
     let mut s = make_stream("a b c d e");
     let _cp_old = s.checkpoint();
     s.advance().unwrap(); // "a"
+    s.skip_blanks().unwrap();
     s.advance().unwrap(); // "b"
+    s.skip_blanks().unwrap();
     let cp_new = s.checkpoint();
     s.advance().unwrap(); // "c"
     let buf_len = s.buffer.len();
-    // Release the newer checkpoint — old one still alive
     s.release(cp_new);
-    // Buffer should NOT have been drained
     assert_eq!(s.buffer.len(), buf_len);
-    // Note: cp_old is deliberately leaked here — we're testing that
-    // releasing a newer checkpoint doesn't drain when an older exists.
 }
 
 #[test]
@@ -137,10 +141,10 @@ fn release_oldest_frees_buffer() {
     let mut s = make_stream("a b c d e");
     let cp = s.checkpoint();
     for _ in 0..5 {
+        s.skip_blanks().unwrap();
         s.advance().unwrap();
     }
     s.release(cp);
-    // After release, pos should be 0 (rebased)
     assert_eq!(s.pos, 0);
 }
 
@@ -160,4 +164,23 @@ fn peek_after_rewind() {
     s.advance().unwrap();
     s.rewind(cp);
     assert_eq!(s.peek().unwrap().token, first);
+}
+
+// --- skip_blanks ---
+
+#[test]
+fn peek_sees_blank_without_skip() {
+    let mut s = make_stream("a b");
+    s.advance().unwrap(); // consume "a"
+    // Without skip_blanks, peek sees Blank
+    assert_eq!(s.peek().unwrap().token, Token::Blank);
+}
+
+#[test]
+fn skip_blanks_then_peek() {
+    let mut s = make_stream("a b");
+    s.advance().unwrap(); // consume "a"
+    s.skip_blanks().unwrap();
+    // After skip_blanks, peek sees "b"
+    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }

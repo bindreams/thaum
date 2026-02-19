@@ -8,9 +8,10 @@ use super::Parser;
 
 impl<'src> Parser<'src> {
     pub(super) fn parse_compound_command(&mut self) -> Result<CompoundCommand, ParseError> {
+        self.stream.skip_blanks()?;
         let tok = self.stream.peek()?.token.clone();
         match &tok {
-            Token::Word(w) => match w.as_str() {
+            Token::Literal(w) => match w.as_str() {
                 "if" => self.parse_if_clause(),
                 "while" => self.parse_while_clause(),
                 "until" => self.parse_until_clause(),
@@ -43,7 +44,7 @@ impl<'src> Parser<'src> {
         let then_body = self.parse_required_compound_list("then body")?;
 
         let mut elifs = Vec::new();
-        while is_keyword(&self.stream.peek()?.token, "elif") {
+        while self.is_lone_literal("elif")? {
             let elif_span = self.stream.peek()?.span;
             self.stream.advance()?;
             let elif_cond = self.parse_required_compound_list("elif condition")?;
@@ -57,7 +58,7 @@ impl<'src> Parser<'src> {
             });
         }
 
-        let else_body = if is_keyword(&self.stream.peek()?.token, "else") {
+        let else_body = if self.is_lone_literal("else")? {
             self.stream.advance()?;
             Some(self.parse_compound_list()?)
         } else {
@@ -104,16 +105,18 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_for_clause(&mut self) -> Result<CompoundCommand, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.expect_keyword("for")?;
 
-        // Check for arithmetic for: for (( init ; cond ; update ))
+        self.stream.skip_blanks()?;
         if self.options.arithmetic_for && self.stream.peek()?.token == Token::LParen {
             return self.parse_arithmetic_for(start_span);
         }
 
+        self.stream.skip_blanks()?;
         let var_name = match &self.stream.peek()?.token {
-            Token::Word(s) => s.clone(),
+            Token::Literal(s) => s.clone(),
             _ => {
                 return Err(ParseError::UnexpectedToken {
                     found: self.stream.peek()?.token.display_name().to_string(),
@@ -125,15 +128,13 @@ impl<'src> Parser<'src> {
         self.stream.advance()?;
         self.skip_linebreak()?;
 
-        let words = if is_keyword(&self.stream.peek()?.token, "in") {
+        let words = if self.is_lone_literal("in")? {
             self.stream.advance()?;
             let mut word_list = Vec::new();
             while self.is_word()? {
-                let span = self.stream.peek()?.span;
-                if let Token::Word(s) = &self.stream.peek()?.token {
-                    word_list.push(make_word(s.clone(), span, &self.options));
+                if let Some(w) = self.collect_word()? {
+                    word_list.push(w);
                 }
-                self.stream.advance()?;
             }
             if self.stream.peek()?.token == Token::Semicolon {
                 self.stream.advance()?;
@@ -161,6 +162,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_case_clause(&mut self) -> Result<CompoundCommand, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.expect_keyword("case")?;
 
@@ -171,15 +173,10 @@ impl<'src> Parser<'src> {
                 span: self.stream.peek()?.span,
             });
         }
-        let word_span = self.stream.peek()?.span;
-        let case_word = match &self.stream.peek()?.token {
-            Token::Word(s) => make_word(s.clone(), word_span, &self.options),
-            _ => unreachable!(),
-        };
-        self.stream.advance()?;
+        let case_word = self.collect_word()?.unwrap();
         self.skip_linebreak()?;
 
-        if !is_keyword(&self.stream.peek()?.token, "in") {
+        if !self.is_lone_literal("in")? {
             return Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
                 expected: "'in'".to_string(),
@@ -190,7 +187,7 @@ impl<'src> Parser<'src> {
         self.skip_linebreak()?;
 
         let mut arms = Vec::new();
-        while !is_keyword(&self.stream.peek()?.token, "esac")
+        while !self.is_lone_literal("esac")?
             && self.stream.peek()?.token != Token::Eof
         {
             arms.push(self.parse_case_arm()?);
@@ -207,6 +204,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_case_arm(&mut self) -> Result<CaseArm, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.eat(&Token::LParen)?;
 
@@ -218,12 +216,9 @@ impl<'src> Parser<'src> {
                 span: self.stream.peek()?.span,
             });
         }
-        let span = self.stream.peek()?.span;
-        if let Token::Word(s) = &self.stream.peek()?.token {
-            patterns.push(make_word(s.clone(), span, &self.options));
-        }
-        self.stream.advance()?;
+        patterns.push(self.collect_word()?.unwrap());
 
+        self.stream.skip_blanks()?;
         while self.stream.peek()?.token == Token::Pipe {
             self.stream.advance()?;
             if !self.is_word()? {
@@ -233,24 +228,23 @@ impl<'src> Parser<'src> {
                     span: self.stream.peek()?.span,
                 });
             }
-            let span = self.stream.peek()?.span;
-            if let Token::Word(s) = &self.stream.peek()?.token {
-                patterns.push(make_word(s.clone(), span, &self.options));
-            }
-            self.stream.advance()?;
+            patterns.push(self.collect_word()?.unwrap());
+            self.stream.skip_blanks()?;
         }
 
         self.expect(&Token::RParen)?;
         self.skip_linebreak()?;
 
+        self.stream.skip_blanks()?;
         let body = if self.stream.peek()?.token == Token::CaseBreak
-            || is_keyword(&self.stream.peek()?.token, "esac")
+            || self.is_lone_literal("esac")?
         {
             Vec::new()
         } else {
             self.parse_compound_list()?
         };
 
+        self.stream.skip_blanks()?;
         let end_span = self.stream.peek()?.span;
         let terminator = match self.stream.peek()?.token {
             Token::CaseBreak => {
@@ -276,16 +270,14 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse `[[ expression ]]` — extended test command (Bash).
-    ///
-    /// Consumes `[[`, parses the boolean expression tree via
-    /// `parse_test_expression`, then expects `]]`.
     fn parse_double_bracket(&mut self) -> Result<CompoundCommand, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.expect(&Token::BashDblLBracket)?;
 
         let expression = self.parse_test_expression()?;
 
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token == Token::Eof {
             return Err(ParseError::UnclosedConstruct {
                 keyword: "']]'".to_string(),
@@ -295,7 +287,7 @@ impl<'src> Parser<'src> {
         }
 
         let end_span = self.stream.peek()?.span;
-        self.stream.advance()?; // consume ]]
+        self.stream.advance()?;
 
         Ok(CompoundCommand::BashDoubleBracket {
             expression,
@@ -303,27 +295,23 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse `(( ... ))` or `( ... )` -- dispatches based on next char.
     fn parse_subshell_or_arithmetic(&mut self) -> Result<CompoundCommand, ParseError> {
+        self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;
         self.expect(&Token::LParen)?;
 
-        // Check if this is (( -- arithmetic command.
-        // Only when the two parens are adjacent (no whitespace): `((` is arithmetic,
-        // but `( (` (space-separated) is a nested subshell.
         if self.options.arithmetic_command && self.stream.peek()?.token == Token::LParen
             && self.stream.peek()?.span.start.0 == start_span.end.0
         {
-            // It's (( -- consume second ( and read until ))
             self.stream.advance()?;
             let mut expr = String::new();
             let mut depth = 0i32;
 
+            // Use raw API to see Blank tokens (arithmetic needs all content)
             loop {
-                match &self.stream.peek()?.token {
+                let tok = self.stream.peek()?.token.clone();
+                match &tok {
                     Token::RParen if depth == 0 => {
-                        // First ), check if next is also )
-                        let _inner_span = self.stream.peek()?.span;
                         self.stream.advance()?;
                         if self.stream.peek()?.token == Token::RParen {
                             let end_span = self.stream.peek()?.span;
@@ -340,9 +328,7 @@ impl<'src> Parser<'src> {
                                 span: start_span.merge(end_span),
                             });
                         } else {
-                            // Single ), part of expression
                             expr.push(')');
-                            // Continue
                         }
                     }
                     Token::LParen => {
@@ -362,18 +348,21 @@ impl<'src> Parser<'src> {
                             span: start_span,
                         });
                     }
-                    Token::Word(s) => {
+                    Token::Blank => {
                         if !expr.is_empty() {
                             expr.push(' ');
                         }
-                        expr.push_str(s);
+                        self.stream.advance()?;
+                    }
+                    tok if tok.is_fragment() => {
+                        expr.push_str(&fragment_token_to_source(tok));
                         self.stream.advance()?;
                     }
                     _ => {
                         if !expr.is_empty() {
                             expr.push(' ');
                         }
-                        let text = self.stream.peek()?.token.display_name().trim_matches('\'');
+                        let text = tok.display_name().trim_matches('\'');
                         expr.push_str(text);
                         self.stream.advance()?;
                     }
@@ -381,7 +370,6 @@ impl<'src> Parser<'src> {
             }
         }
 
-        // Regular subshell
         let body = self.parse_compound_list()?;
         let rparen = self.expect(&Token::RParen)?;
         Ok(CompoundCommand::Subshell {
@@ -401,7 +389,6 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Parse a compound list that must contain at least one statement.
     pub(super) fn parse_required_compound_list(
         &mut self,
         context: &str,
@@ -417,7 +404,6 @@ impl<'src> Parser<'src> {
         Ok(list)
     }
 
-    /// Parse a compound list (inside compound commands). Returns Vec<Statement>.
     pub(super) fn parse_compound_list(&mut self) -> Result<Vec<Statement>, ParseError> {
         self.skip_linebreak()?;
 
@@ -430,10 +416,7 @@ impl<'src> Parser<'src> {
         self.parse_list_into(&mut statements)?;
 
         loop {
-            // After parse_list_into, the next token could be:
-            // - Newline (statement separator — skip and continue)
-            // - A command start (heredoc consumed the Newline — continue directly)
-            // - A closing keyword (fi, done, etc. — break)
+            self.stream.skip_blanks()?;
             if self.stream.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
             }
@@ -447,13 +430,13 @@ impl<'src> Parser<'src> {
         Ok(statements)
     }
 
-    /// Parse `for (( init ; cond ; update )); do body; done`.
     fn parse_arithmetic_for(
         &mut self,
         start_span: crate::span::Span,
     ) -> Result<CompoundCommand, ParseError> {
-        // Consume (( — first ( is current token
+        self.stream.skip_blanks()?;
         self.expect(&Token::LParen)?;
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token != Token::LParen {
             return Err(ParseError::UnexpectedToken {
                 found: self.stream.peek()?.token.display_name().to_string(),
@@ -461,16 +444,14 @@ impl<'src> Parser<'src> {
                 span: self.stream.peek()?.span,
             });
         }
-        self.stream.advance()?; // consume second (
+        self.stream.advance()?;
 
-        // Read everything between (( and )) as a raw string, then split on ;
         let raw = self.read_arith_for_content()?;
         let parts: Vec<&str> = raw.splitn(3, ';').collect();
         let init_str = parts.first().map(|s| s.trim()).unwrap_or("");
         let cond_str = parts.get(1).map(|s| s.trim()).unwrap_or("");
         let update_str = parts.get(2).map(|s| s.trim()).unwrap_or("");
 
-        // Parse each part (empty strings → None)
         let parse_part = |s: &str| -> Option<ArithExpr> {
             let trimmed = s.trim();
             if trimmed.is_empty() {
@@ -487,7 +468,7 @@ impl<'src> Parser<'src> {
         let condition = parse_part(cond_str);
         let update = parse_part(update_str);
 
-        // Optional semicolon after ))
+        self.stream.skip_blanks()?;
         if self.stream.peek()?.token == Token::Semicolon {
             self.stream.advance()?;
         }
@@ -506,17 +487,17 @@ impl<'src> Parser<'src> {
         })
     }
 
-    /// Read the raw content between `((` and `))` in an arithmetic for loop.
-    /// Returns the full string, which the caller splits on `;`.
     fn read_arith_for_content(&mut self) -> Result<String, ParseError> {
         let mut content = String::new();
         let mut depth = 0i32;
+        // Use raw API to see Blank tokens
         loop {
-            match &self.stream.peek()?.token {
+            let tok = self.stream.peek()?.token.clone();
+            match &tok {
                 Token::RParen if depth == 0 => {
-                    self.stream.advance()?; // first )
+                    self.stream.advance()?;
                     if self.stream.peek()?.token == Token::RParen {
-                        self.stream.advance()?; // second )
+                        self.stream.advance()?;
                         return Ok(content);
                     }
                     content.push(')');
@@ -536,7 +517,6 @@ impl<'src> Parser<'src> {
                     self.stream.advance()?;
                 }
                 Token::CaseBreak => {
-                    // `;;` tokenized as one token — emit as two semicolons
                     content.push_str(";;");
                     self.stream.advance()?;
                 }
@@ -545,18 +525,24 @@ impl<'src> Parser<'src> {
                         expected: "'))' closing arithmetic for loop".to_string(),
                     });
                 }
-                Token::Word(s) => {
+                Token::Blank => {
                     if !content.is_empty() && !content.ends_with(';') {
                         content.push(' ');
                     }
-                    content.push_str(s);
+                    self.stream.advance()?;
+                }
+                tok if tok.is_fragment() => {
+                    if matches!(tok, Token::SimpleParam(_)) {
+                        content.push('$');
+                    }
+                    content.push_str(fragment_token_to_text(tok));
                     self.stream.advance()?;
                 }
                 _ => {
                     if !content.is_empty() && !content.ends_with(';') {
                         content.push(' ');
                     }
-                    let text = self.stream.peek()?.token.display_name().trim_matches('\'');
+                    let text = tok.display_name().trim_matches('\'');
                     content.push_str(text);
                     self.stream.advance()?;
                 }

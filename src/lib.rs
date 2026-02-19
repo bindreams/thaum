@@ -1,6 +1,7 @@
 pub mod ast;
 pub mod dialect;
 pub mod error;
+pub mod exec;
 pub mod lexer;
 pub mod parser;
 pub mod span;

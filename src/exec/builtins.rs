@@ -1,0 +1,502 @@
+use std::io::Write;
+
+use crate::exec::environment::Environment;
+use crate::exec::error::ExecError;
+
+/// Check if a command name is a built-in.
+pub fn is_builtin(name: &str) -> bool {
+    matches!(
+        name,
+        "echo" | "true" | "false" | "exit" | ":" | "cd" | "export" | "unset" | "return"
+            | "break" | "continue" | "shift" | "read" | "eval" | "exec" | "." | "source"
+            | "set" | "test" | "["
+    )
+}
+
+/// Execute a built-in command.
+///
+/// Returns the exit status. Writes to `stdout`/`stderr` as needed.
+pub fn run_builtin(
+    name: &str,
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    match name {
+        "echo" => builtin_echo(args, stdout),
+        "true" | ":" => Ok(0),
+        "false" => Ok(1),
+        "exit" => builtin_exit(args),
+        "cd" => builtin_cd(args, env, stderr),
+        "export" => builtin_export(args, env),
+        "unset" => builtin_unset(args, env),
+        "return" => builtin_return(args),
+        "break" => builtin_break(args),
+        "continue" => builtin_continue(args),
+        "shift" => builtin_shift(args, env, stderr),
+        "read" => builtin_read(args, env),
+        "set" => builtin_set(args, env),
+        "test" | "[" => builtin_test(name, args, stderr),
+        // eval, exec, ., source handled at executor level (need access to parser/executor)
+        _ => Err(ExecError::CommandNotFound(name.to_string())),
+    }
+}
+
+fn builtin_echo(args: &[String], stdout: &mut dyn Write) -> Result<i32, ExecError> {
+    // POSIX echo: no option parsing, just print args separated by spaces.
+    // XSI extension: -n suppresses trailing newline.
+    let (suppress_newline, start_idx) = if args.first().map(|s| s.as_str()) == Some("-n") {
+        (true, 1)
+    } else {
+        (false, 0)
+    };
+
+    let output: Vec<&str> = args[start_idx..].iter().map(|s| s.as_str()).collect();
+    write!(stdout, "{}", output.join(" ")).map_err(ExecError::Io)?;
+
+    if !suppress_newline {
+        writeln!(stdout).map_err(ExecError::Io)?;
+    }
+
+    Ok(0)
+}
+
+fn builtin_exit(args: &[String]) -> Result<i32, ExecError> {
+    let code = if let Some(arg) = args.first() {
+        arg.parse::<i32>().unwrap_or(2)
+    } else {
+        0
+    };
+    Err(ExecError::ExitRequested(code))
+}
+
+fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+    let target = if let Some(dir) = args.first() {
+        if dir == "-" {
+            // cd - : go to previous directory ($OLDPWD)
+            match env.get_var("OLDPWD") {
+                Some(old) => std::path::PathBuf::from(old),
+                None => {
+                    let _ = writeln!(stderr, "cd: OLDPWD not set");
+                    return Ok(1);
+                }
+            }
+        } else {
+            std::path::PathBuf::from(dir)
+        }
+    } else {
+        // cd with no args: go to $HOME
+        match env.get_var("HOME") {
+            Some(home) => std::path::PathBuf::from(home),
+            None => {
+                let _ = writeln!(stderr, "cd: HOME not set");
+                return Ok(1);
+            }
+        }
+    };
+
+    // Resolve relative paths against CWD.
+    let resolved = if target.is_relative() {
+        env.cwd().join(&target)
+    } else {
+        target
+    };
+
+    let old_cwd = env.cwd().to_path_buf();
+    match env.set_cwd(resolved) {
+        Ok(()) => {
+            let _ = env.set_var("OLDPWD", &old_cwd.to_string_lossy());
+            let _ = env.set_var("PWD", &env.cwd().to_string_lossy().to_string());
+            Ok(0)
+        }
+        Err(e) => {
+            let _ = writeln!(stderr, "cd: {}", e);
+            Ok(1)
+        }
+    }
+}
+
+fn builtin_export(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    for arg in args {
+        if let Some((name, value)) = arg.split_once('=') {
+            env.set_var(name, value)?;
+            env.export_var(name);
+        } else {
+            env.export_var(arg);
+        }
+    }
+    Ok(0)
+}
+
+fn builtin_unset(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    for arg in args {
+        // Skip -v (variable, default) and -f (function) flags
+        if arg == "-v" || arg == "-f" {
+            continue;
+        }
+        env.unset_var(arg)?;
+    }
+    Ok(0)
+}
+
+fn builtin_return(args: &[String]) -> Result<i32, ExecError> {
+    let code = if let Some(arg) = args.first() {
+        arg.parse::<i32>().unwrap_or(2)
+    } else {
+        0
+    };
+    Err(ExecError::ReturnRequested(code))
+}
+
+fn builtin_break(args: &[String]) -> Result<i32, ExecError> {
+    let n = if let Some(arg) = args.first() {
+        arg.parse::<usize>().unwrap_or(1).max(1)
+    } else {
+        1
+    };
+    Err(ExecError::BreakRequested(n))
+}
+
+fn builtin_continue(args: &[String]) -> Result<i32, ExecError> {
+    let n = if let Some(arg) = args.first() {
+        arg.parse::<usize>().unwrap_or(1).max(1)
+    } else {
+        1
+    };
+    Err(ExecError::ContinueRequested(n))
+}
+
+fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+    let n = if let Some(arg) = args.first() {
+        match arg.parse::<usize>() {
+            Ok(n) => n,
+            Err(_) => {
+                let _ = writeln!(stderr, "shift: {}: numeric argument required", arg);
+                return Ok(2);
+            }
+        }
+    } else {
+        1
+    };
+
+    let params = env.positional_params().to_vec();
+    if n > params.len() {
+        let _ = writeln!(stderr, "shift: shift count out of range");
+        return Ok(1);
+    }
+
+    env.set_positional_params(params[n..].to_vec());
+    Ok(0)
+}
+
+fn builtin_read(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    // Minimal `read VAR` implementation: read one line from stdin.
+    let var_name = args.first().map(|s| s.as_str()).unwrap_or("REPLY");
+
+    let mut line = String::new();
+    match std::io::stdin().read_line(&mut line) {
+        Ok(0) => return Ok(1), // EOF
+        Ok(_) => {
+            // Remove trailing newline
+            if line.ends_with('\n') {
+                line.pop();
+                if line.ends_with('\r') {
+                    line.pop();
+                }
+            }
+            env.set_var(var_name, &line)?;
+            Ok(0)
+        }
+        Err(e) => Err(ExecError::Io(e)),
+    }
+}
+
+fn builtin_set(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    if args.is_empty() {
+        // `set` with no args: print all variables (simplified — just return 0)
+        return Ok(0);
+    }
+
+    if args[0] == "--" {
+        // `set -- arg1 arg2 ...` sets positional parameters
+        env.set_positional_params(args[1..].to_vec());
+        return Ok(0);
+    }
+
+    // For now, ignore option flags like -e, -x, etc.
+    // TODO: implement shell options
+    Ok(0)
+}
+
+fn builtin_test(name: &str, args: &[String], stderr: &mut dyn Write) -> Result<i32, ExecError> {
+    // If invoked as `[`, the last arg must be `]`
+    let args = if name == "[" {
+        if args.last().map(|s| s.as_str()) != Some("]") {
+            let _ = writeln!(stderr, "[: missing `]`");
+            return Ok(2);
+        }
+        &args[..args.len() - 1]
+    } else {
+        args
+    };
+
+    let result = evaluate_test(args);
+    Ok(if result { 0 } else { 1 })
+}
+
+/// Evaluate a POSIX test expression.
+fn evaluate_test(args: &[String]) -> bool {
+    match args.len() {
+        0 => false,
+        1 => {
+            // `test STRING` — true if string is non-empty
+            !args[0].is_empty()
+        }
+        2 => {
+            // Unary operators
+            match args[0].as_str() {
+                "!" => !evaluate_test(&args[1..]),
+                "-n" => !args[1].is_empty(),
+                "-z" => args[1].is_empty(),
+                "-e" => std::path::Path::new(&args[1]).exists(),
+                "-f" => std::path::Path::new(&args[1]).is_file(),
+                "-d" => std::path::Path::new(&args[1]).is_dir(),
+                "-r" => {
+                    // Readable check (simplified: just check existence)
+                    std::path::Path::new(&args[1]).exists()
+                }
+                "-w" => std::path::Path::new(&args[1]).exists(),
+                "-x" => {
+                    #[cfg(unix)]
+                    {
+                        use std::os::unix::fs::PermissionsExt;
+                        std::fs::metadata(&args[1])
+                            .map(|m| m.permissions().mode() & 0o111 != 0)
+                            .unwrap_or(false)
+                    }
+                    #[cfg(not(unix))]
+                    {
+                        std::path::Path::new(&args[1]).exists()
+                    }
+                }
+                "-s" => {
+                    std::fs::metadata(&args[1])
+                        .map(|m| m.len() > 0)
+                        .unwrap_or(false)
+                }
+                "-L" | "-h" => {
+                    std::fs::symlink_metadata(&args[1])
+                        .map(|m| m.file_type().is_symlink())
+                        .unwrap_or(false)
+                }
+                _ => false,
+            }
+        }
+        3 => {
+            // Binary operators
+            match args[1].as_str() {
+                "=" | "==" => args[0] == args[2],
+                "!=" => args[0] != args[2],
+                "-eq" => parse_int(&args[0]) == parse_int(&args[2]),
+                "-ne" => parse_int(&args[0]) != parse_int(&args[2]),
+                "-lt" => parse_int(&args[0]) < parse_int(&args[2]),
+                "-le" => parse_int(&args[0]) <= parse_int(&args[2]),
+                "-gt" => parse_int(&args[0]) > parse_int(&args[2]),
+                "-ge" => parse_int(&args[0]) >= parse_int(&args[2]),
+                "-nt" => {
+                    // File newer than
+                    let a = std::fs::metadata(&args[0]).and_then(|m| m.modified()).ok();
+                    let b = std::fs::metadata(&args[2]).and_then(|m| m.modified()).ok();
+                    matches!((a, b), (Some(a), Some(b)) if a > b)
+                }
+                "-ot" => {
+                    let a = std::fs::metadata(&args[0]).and_then(|m| m.modified()).ok();
+                    let b = std::fs::metadata(&args[2]).and_then(|m| m.modified()).ok();
+                    matches!((a, b), (Some(a), Some(b)) if a < b)
+                }
+                _ => {
+                    // Unknown operator
+                    false
+                }
+            }
+        }
+        4 => {
+            // `! expr` with 3-arg expression
+            if args[0] == "!" {
+                !evaluate_test(&args[1..])
+            } else {
+                false
+            }
+        }
+        _ => false,
+    }
+}
+
+fn parse_int(s: &str) -> i64 {
+    s.parse().unwrap_or(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn echo_simple() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("echo", &["hello".into(), "world".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+        assert_eq!(String::from_utf8(out).unwrap(), "hello world\n");
+    }
+
+    #[test]
+    fn echo_n_flag() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("echo", &["-n".into(), "no newline".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+        assert_eq!(String::from_utf8(out).unwrap(), "no newline");
+    }
+
+    #[test]
+    fn echo_no_args() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("echo", &[], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+        assert_eq!(String::from_utf8(out).unwrap(), "\n");
+    }
+
+    #[test]
+    fn true_returns_zero() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("true", &[], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn false_returns_one() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("false", &[], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 1);
+    }
+
+    #[test]
+    fn colon_returns_zero() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin(":", &[], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn exit_default() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let result = run_builtin("exit", &[], &mut env, &mut out, &mut err);
+        assert!(matches!(result, Err(ExecError::ExitRequested(0))));
+    }
+
+    #[test]
+    fn exit_with_code() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let result = run_builtin("exit", &["42".into()], &mut env, &mut out, &mut err);
+        assert!(matches!(result, Err(ExecError::ExitRequested(42))));
+    }
+
+    #[test]
+    fn export_sets_and_exports() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        run_builtin("export", &["FOO=bar".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(env.get_var("FOO"), Some("bar"));
+        assert!(env.is_exported("FOO"));
+    }
+
+    #[test]
+    fn unset_removes_var() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        env.set_var("X", "val").unwrap();
+        run_builtin("unset", &["X".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(env.get_var("X"), None);
+    }
+
+    #[test]
+    fn shift_removes_params() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        env.set_positional_params(vec!["a".into(), "b".into(), "c".into()]);
+        run_builtin("shift", &[], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(env.positional_params(), &["b".to_string(), "c".to_string()]);
+    }
+
+    #[test]
+    fn test_string_non_empty() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("test", &["hello".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn test_string_empty() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("test", &["".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 1);
+    }
+
+    #[test]
+    fn test_string_equals() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("test", &["a".into(), "=".into(), "a".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn test_int_eq() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("test", &["5".into(), "-eq".into(), "5".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn test_bracket_syntax() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("[", &["hello".into(), "]".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn test_bracket_missing_close() {
+        let mut env = Environment::new();
+        let mut out = Vec::new();
+        let mut err = Vec::new();
+        let status = run_builtin("[", &["hello".into()], &mut env, &mut out, &mut err).unwrap();
+        assert_eq!(status, 2);
+    }
+}

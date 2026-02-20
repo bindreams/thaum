@@ -7,7 +7,10 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_command(&mut self) -> Result<Command, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_command"
+        );
         let start_span = self.lexer.peek()?.span;
         let mut assignments = Vec::new();
         let mut arguments = Vec::new();
@@ -119,7 +122,10 @@ impl Parser {
     }
 
     pub(super) fn parse_redirect(&mut self) -> Result<Redirect, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_redirect"
+        );
         let start_span = self.lexer.peek()?.span;
 
         let fd = if let Token::IoNumber(n) = self.lexer.peek()?.token {
@@ -180,7 +186,10 @@ impl Parser {
         strip_tabs: bool,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_here_redirect"
+        );
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -228,7 +237,10 @@ impl Parser {
         fd: Option<i32>,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_here_string_redirect"
+        );
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),

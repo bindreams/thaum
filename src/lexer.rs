@@ -131,19 +131,21 @@ impl Lexer {
     // Token-level buffered API (merged from TokenStream)
     // ================================================================
 
-    /// Consume all `Whitespace` tokens at the current position.
+    /// Consume a `Whitespace` token at the current position, if present.
+    /// At most one can exist (consecutive Whitespace is prevented by the lexer).
     pub(crate) fn skip_whitespace(&mut self) -> Result<(), ParseError> {
-        loop {
-            self.ensure_buffered()?;
-            if self.buffer[self.buf_pos].token == Token::Whitespace {
-                if self.speculation_depth == 0 {
-                    self.buffer.pop_front();
-                } else {
-                    self.buf_pos += 1;
-                }
+        self.ensure_buffered()?;
+        if self.buffer[self.buf_pos].token == Token::Whitespace {
+            if self.speculation_depth == 0 {
+                self.buffer.pop_front();
             } else {
-                break;
+                self.buf_pos += 1;
             }
+            debug_assert!(
+                self.buf_pos >= self.buffer.len()
+                    || self.buffer[self.buf_pos].token != Token::Whitespace,
+                "consecutive Whitespace tokens should not exist"
+            );
         }
         Ok(())
     }

@@ -8,7 +8,10 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_compound_command(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_compound_command"
+        );
         let tok = self.lexer.peek()?.token.clone();
         match &tok {
             Token::Literal(w) => match w.as_str() {
@@ -110,7 +113,10 @@ impl Parser {
     }
 
     fn parse_for_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_for_clause"
+        );
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("for")?;
 
@@ -170,7 +176,10 @@ impl Parser {
     }
 
     fn parse_case_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_case_clause"
+        );
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
@@ -289,7 +298,10 @@ impl Parser {
     }
 
     fn parse_double_bracket(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_double_bracket"
+        );
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::BashDblLBracket)?;
 
@@ -314,7 +326,10 @@ impl Parser {
     }
 
     fn parse_subshell_or_arithmetic(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_subshell_or_arithmetic"
+        );
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::LParen)?;
 

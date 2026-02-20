@@ -7,7 +7,10 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_coproc(&mut self) -> Result<Expression, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_coproc"
+        );
         let start_span = self.lexer.peek()?.span;
         self.lexer.advance()?; // consume "coproc"
 
@@ -97,7 +100,10 @@ impl Parser {
     }
 
     pub(super) fn parse_select_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_select_clause"
+        );
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("select")?;
 
@@ -152,7 +158,10 @@ impl Parser {
     }
 
     pub(super) fn parse_function_definition(&mut self) -> Result<Expression, ParseError> {
-        self.lexer.skip_whitespace()?;
+        debug_assert!(
+            self.lexer.peek()?.token != Token::Whitespace,
+            "caller must skip whitespace before parse_function_definition"
+        );
         let start_span = self.lexer.peek()?.span;
 
         let tok = self.lexer.peek()?.token.clone();

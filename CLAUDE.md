@@ -14,13 +14,14 @@ Use the `contracts` crate and `debug_assert!` to verify pre-conditions, post-con
 - **`#[debug_ensures(condition)]`** — postcondition on a function. Use when the condition can be expressed over `self` and `ret` (the return value). Supports `old()` to capture pre-call state.
 - **`debug_assert!(condition)`** — inline assertion for conditions that don't fit attribute syntax (conditional checks, iteration over collections, mid-function invariants).
 
-Place contracts on every function where there is a meaningful invariant to check. Contracts are documentation that also catches regressions.
+Place contracts on every function where there is a meaningful invariant to check. Contracts are documentation that also catches regressions. Contracts and assertions are free in debug builds — in debug mode, safety and correctness are more important than performance. Add checks liberally.
 
 ## Interface Design
 
 1. **Method names reflect intent.** Observing actions use prefixes like `is_*`, `can_*`, `peek_*`, `as_*`. Mutating actions use verbs like `advance`, `skip`, `scan`, `push`, `pop`.
 2. **Observing actions must not call mutating actions.** The only exception is mutating an internal cache, which must be wrapped in a `Cell`/`RefCell`.
 3. **Query logic belongs on the data, not the consumer.** Token-level queries (is this a keyword? can a command start here?) are methods on `Token`. The parser peeks tokens itself and calls Token methods — it does not wrap peek+query in its own methods.
+4. **Token ownership.** A parsing function consumes only the tokens that constitute the AST node it creates. Leading whitespace is the caller's responsibility to skip; trailing whitespace is the next consumer's responsibility. For example, `collect_word()` does not skip whitespace before or after — the caller handles word boundaries. Helper methods (`eat`, `expect`, `expect_keyword`, `expect_closing_keyword`) skip whitespace internally because they are boundary utilities, not AST-building functions.
 
 ## Architecture
 

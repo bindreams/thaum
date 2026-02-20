@@ -8,7 +8,7 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_compound_command(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         match &tok {
             Token::Literal(w) => match w.as_str() {
@@ -45,7 +45,7 @@ impl Parser {
 
         let mut elifs = Vec::new();
         loop {
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             let tok = self.lexer.peek()?.token.clone();
             if !tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "elif") { break; }
             let elif_span = self.lexer.peek()?.span;
@@ -61,7 +61,7 @@ impl Parser {
             });
         }
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         let else_body = if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "else") {
             self.lexer.advance()?;
@@ -110,16 +110,16 @@ impl Parser {
     }
 
     fn parse_for_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("for")?;
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if self.options.arithmetic_for && self.lexer.peek()?.token == Token::LParen {
             return self.parse_arithmetic_for(start_span);
         }
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
@@ -138,7 +138,7 @@ impl Parser {
             self.lexer.advance()?;
             let mut word_list = Vec::new();
             loop {
-                self.lexer.skip_blanks()?;
+                self.lexer.skip_whitespace()?;
                 if !self.lexer.peek()?.token.is_fragment() { break; }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
@@ -170,11 +170,11 @@ impl Parser {
     }
 
     fn parse_case_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -198,7 +198,7 @@ impl Parser {
 
         let mut arms = Vec::new();
         loop {
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             let tok = self.lexer.peek()?.token.clone();
             if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
                 || tok == Token::Eof
@@ -219,12 +219,12 @@ impl Parser {
     }
 
     fn parse_case_arm(&mut self) -> Result<CaseArm, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.eat(&Token::LParen)?;
 
         let mut patterns = Vec::new();
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -234,10 +234,10 @@ impl Parser {
         }
         patterns.push(self.collect_word()?.unwrap());
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         while self.lexer.peek()?.token == Token::Pipe {
             self.lexer.advance()?;
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             if !self.lexer.peek()?.token.is_fragment() {
                 return Err(ParseError::UnexpectedToken {
                     found: self.lexer.peek()?.token.display_name().to_string(),
@@ -246,13 +246,13 @@ impl Parser {
                 });
             }
             patterns.push(self.collect_word()?.unwrap());
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
         }
 
         self.expect(&Token::RParen)?;
         self.skip_linebreak()?;
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         let body = if tok == Token::CaseBreak
             || tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
@@ -262,7 +262,7 @@ impl Parser {
             self.parse_compound_list()?
         };
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let end_span = self.lexer.peek()?.span;
         let terminator = match self.lexer.peek()?.token {
             Token::CaseBreak => {
@@ -289,13 +289,13 @@ impl Parser {
     }
 
     fn parse_double_bracket(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::BashDblLBracket)?;
 
         let expression = self.parse_test_expression()?;
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if self.lexer.peek()?.token == Token::Eof {
             return Err(ParseError::UnclosedConstruct {
                 keyword: "']]'".to_string(),
@@ -314,7 +314,7 @@ impl Parser {
     }
 
     fn parse_subshell_or_arithmetic(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::LParen)?;
 
@@ -325,7 +325,7 @@ impl Parser {
             let mut expr = String::new();
             let mut depth = 0i32;
 
-            // Use raw API to see Blank tokens (arithmetic needs all content)
+            // Use raw API to see Whitespace tokens (arithmetic needs all content)
             loop {
                 let tok = self.lexer.peek()?.token.clone();
                 match &tok {
@@ -366,7 +366,7 @@ impl Parser {
                             span: start_span,
                         });
                     }
-                    Token::Blank => {
+                    Token::Whitespace => {
                         if !expr.is_empty() {
                             expr.push(' ');
                         }
@@ -427,7 +427,7 @@ impl Parser {
 
         let mut statements = Vec::new();
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if !tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
             return Ok(statements);
@@ -436,11 +436,11 @@ impl Parser {
         self.parse_list_into(&mut statements)?;
 
         loop {
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             if self.lexer.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
             }
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             let tok = self.lexer.peek()?.token.clone();
             if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                 self.parse_list_into(&mut statements)?;
@@ -456,9 +456,9 @@ impl Parser {
         &mut self,
         start_span: crate::span::Span,
     ) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         self.expect(&Token::LParen)?;
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if self.lexer.peek()?.token != Token::LParen {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -490,7 +490,7 @@ impl Parser {
         let condition = parse_part(cond_str);
         let update = parse_part(update_str);
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if self.lexer.peek()?.token == Token::Semicolon {
             self.lexer.advance()?;
         }
@@ -512,7 +512,7 @@ impl Parser {
     fn read_arith_for_content(&mut self) -> Result<String, ParseError> {
         let mut content = String::new();
         let mut depth = 0i32;
-        // Use raw API to see Blank tokens
+        // Use raw API to see Whitespace tokens
         loop {
             let tok = self.lexer.peek()?.token.clone();
             match &tok {
@@ -547,7 +547,7 @@ impl Parser {
                         expected: "'))' closing arithmetic for loop".to_string(),
                     });
                 }
-                Token::Blank => {
+                Token::Whitespace => {
                     if !content.is_empty() && !content.ends_with(';') {
                         content.push(' ');
                     }

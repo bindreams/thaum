@@ -7,12 +7,12 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_coproc(&mut self) -> Result<Expression, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.lexer.advance()?; // consume "coproc"
 
         // If the next token starts a compound command, there's no name
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_compound_start(&self.lexer.peek_at_offset(1)?.token, self.options.select) {
             let body_expr = self.parse_compound_expression()?;
@@ -39,7 +39,7 @@ impl Parser {
             }).collect::<String>();
 
             // If now we see a compound command start, the word was the name
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             let tok = self.lexer.peek()?.token.clone();
             if tok.is_compound_start(&self.lexer.peek_at_offset(1)?.token, self.options.select) {
                 let body_expr = self.parse_compound_expression()?;
@@ -59,7 +59,7 @@ impl Parser {
             let mut redirects = Vec::new();
 
             loop {
-                self.lexer.skip_blanks()?;
+                self.lexer.skip_whitespace()?;
                 if self.lexer.peek()?.token.is_redirect_start() {
                     redirects.push(self.parse_redirect()?);
                 } else if self.lexer.peek()?.token.is_fragment() {
@@ -97,11 +97,11 @@ impl Parser {
     }
 
     pub(super) fn parse_select_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("select")?;
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
@@ -120,7 +120,7 @@ impl Parser {
             self.lexer.advance()?;
             let mut word_list = Vec::new();
             loop {
-                self.lexer.skip_blanks()?;
+                self.lexer.skip_whitespace()?;
                 if !self.lexer.peek()?.token.is_fragment() { break; }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
@@ -152,7 +152,7 @@ impl Parser {
     }
 
     pub(super) fn parse_function_definition(&mut self) -> Result<Expression, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
 
         let tok = self.lexer.peek()?.token.clone();
@@ -161,7 +161,7 @@ impl Parser {
             self.lexer.advance()?;
         }
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
@@ -175,7 +175,7 @@ impl Parser {
 
         if has_function_keyword {
             self.lexer.advance()?;
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             if self.lexer.peek()?.token == Token::LParen {
                 self.lexer.advance()?;
                 self.expect(&Token::RParen)?;
@@ -191,7 +191,7 @@ impl Parser {
 
         let mut redirects = Vec::new();
         loop {
-            self.lexer.skip_blanks()?;
+            self.lexer.skip_whitespace()?;
             if !self.lexer.peek()?.token.is_redirect_start() { break; }
             redirects.push(self.parse_redirect()?);
         }

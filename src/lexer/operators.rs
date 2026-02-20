@@ -66,7 +66,7 @@ impl Lexer {
                         (Token::HereDocOp, 2)
                     }
                 }
-                Some('(') if self.options.process_substitution && self.last_was_blank => {
+                Some('(') if self.options.process_substitution && self.last_was_whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectFromFile, 1),
@@ -75,7 +75,7 @@ impl Lexer {
                 Some('>') => (Token::Append, 2),
                 Some('&') => (Token::RedirectToFd, 2),
                 Some('|') => (Token::Clobber, 2),
-                Some('(') if self.options.process_substitution && self.last_was_blank => {
+                Some('(') if self.options.process_substitution && self.last_was_whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectToFile, 1),

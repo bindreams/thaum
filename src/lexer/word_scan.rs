@@ -429,7 +429,7 @@ impl Lexer {
                 // Word delimiter — return an empty literal? No, we should let
                 // next_token handle this. But we're mid-scan_fragment...
                 // Actually, the line continuation should have been consumed in
-                // scan_blanks_and_comments or scan_literal. Having it reach
+                // scan_whitespace_and_comments or scan_literal. Having it reach
                 // scan_backslash_escape means the cursor is at \<newline> at
                 // the start of a fragment. After consuming it, the next thing
                 // could be a blank. We need to return *something*.

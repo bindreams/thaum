@@ -7,7 +7,7 @@ use super::Parser;
 
 impl Parser {
     pub(super) fn parse_command(&mut self) -> Result<Command, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         let mut assignments = Vec::new();
         let mut arguments = Vec::new();
@@ -19,7 +19,7 @@ impl Parser {
                 let redir = self.parse_redirect()?;
                 end_span = redir.span;
                 redirects.push(redir);
-                self.lexer.skip_blanks()?;
+                self.lexer.skip_whitespace()?;
                 continue;
             }
 
@@ -45,7 +45,7 @@ impl Parser {
                                 if self.lexer.peek()?.token == Token::RParen {
                                     break;
                                 }
-                                self.lexer.skip_blanks()?;
+                                self.lexer.skip_whitespace()?;
                                 if self.lexer.peek()?.token.is_fragment() {
                                     if let Some(w) = self.collect_word()? {
                                         elements.push(w);
@@ -72,7 +72,7 @@ impl Parser {
                             });
                             end_span = word_span;
                         }
-                        self.lexer.skip_blanks()?;
+                        self.lexer.skip_whitespace()?;
                         continue;
                     }
                 }
@@ -81,7 +81,7 @@ impl Parser {
             break;
         }
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if self.lexer.peek()?.token.is_fragment() {
             end_span = self.lexer.peek()?.span;
             if let Some(arg) = self.collect_argument()? {
@@ -89,7 +89,7 @@ impl Parser {
             }
 
             loop {
-                self.lexer.skip_blanks()?;
+                self.lexer.skip_whitespace()?;
 
                 if self.lexer.peek()?.token.is_redirect_start() {
                     let redir = self.parse_redirect()?;
@@ -119,7 +119,7 @@ impl Parser {
     }
 
     pub(super) fn parse_redirect(&mut self) -> Result<Redirect, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
 
         let fd = if let Token::IoNumber(n) = self.lexer.peek()?.token {
@@ -142,7 +142,7 @@ impl Parser {
             _ => {}
         }
 
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -180,7 +180,7 @@ impl Parser {
         strip_tabs: bool,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -228,7 +228,7 @@ impl Parser {
         fd: Option<i32>,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.lexer.skip_blanks()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),

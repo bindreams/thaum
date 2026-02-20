@@ -7,7 +7,7 @@ fn fragment_tokens_recognized() {
     assert!(Token::SimpleParam("x".into()).is_fragment());
     assert!(Token::Glob(GlobKind::Star).is_fragment());
     assert!(!Token::Pipe.is_fragment());
-    assert!(!Token::Blank.is_fragment());
+    assert!(!Token::Whitespace.is_fragment());
     assert!(!Token::Newline.is_fragment());
     assert!(!Token::Eof.is_fragment());
 }

@@ -27,12 +27,12 @@ pub(crate) enum LexerMode {
 /// The shell lexer.
 ///
 /// Emits fragment-level tokens (Literal, SimpleParam, DoubleQuoted, etc.)
-/// plus Blank tokens as word boundary markers.
+/// plus Whitespace tokens as word boundary markers.
 ///
 /// Also provides a buffered token stream with `peek()`/`advance()`/`speculate()`
-/// for use by the parser. Call `skip_blanks()` to consume `Blank` tokens before
+/// for use by the parser. Call `skip_whitespace()` to consume `Whitespace` tokens before
 /// peeking/advancing. Word collection code deliberately skips the call to see
-/// `Blank` tokens as word boundaries.
+/// `Whitespace` tokens as word boundaries.
 pub struct Lexer {
     // --- Constants (never change after construction) ---
     pub(crate) options: ParseOptions,
@@ -45,9 +45,9 @@ pub struct Lexer {
     pending_heredocs: Vec<PendingHereDoc>,
     expecting_heredoc_delimiter: bool,
     pending_strip_tabs: bool,
-    /// Whether the last scanned token was Blank. Used by operator scanner
+    /// Whether the last scanned token was Whitespace. Used by operator scanner
     /// for process substitution detection (<( and >( preceded by blank).
-    last_was_blank: bool,
+    last_was_whitespace: bool,
     /// Whether we've already scanned a fragment for the current word.
     /// Used for tilde prefix detection (~ is special only at word start).
     word_started: bool,
@@ -83,7 +83,7 @@ impl Lexer {
             pending_heredocs: Vec::new(),
             expecting_heredoc_delimiter: false,
             pending_strip_tabs: false,
-            last_was_blank: false,
+            last_was_whitespace: false,
             word_started: false,
             buffer: VecDeque::new(),
             buf_pos: 0,
@@ -119,11 +119,11 @@ impl Lexer {
     // Token-level buffered API (merged from TokenStream)
     // ================================================================
 
-    /// Consume all `Blank` tokens at the current position.
-    pub(crate) fn skip_blanks(&mut self) -> Result<(), ParseError> {
+    /// Consume all `Whitespace` tokens at the current position.
+    pub(crate) fn skip_whitespace(&mut self) -> Result<(), ParseError> {
         loop {
             self.ensure_buffered()?;
-            if self.buffer[self.buf_pos].token == Token::Blank {
+            if self.buffer[self.buf_pos].token == Token::Whitespace {
                 if self.speculation_depth == 0 {
                     self.buffer.pop_front();
                 } else {
@@ -233,7 +233,7 @@ impl Lexer {
     ///
     /// The lexer is context-free — it never promotes words to reserved word
     /// tokens. That's the parser's job. The lexer produces fragment tokens
-    /// (Literal, SimpleParam, etc.), Blank, IoNumber, operators, Newline,
+    /// (Literal, SimpleParam, etc.), Whitespace, IoNumber, operators, Newline,
     /// HereDocBody, and Eof.
     fn scan_next(&mut self) -> Result<(), LexError> {
         if self.mode == LexerMode::DoubleQuote {
@@ -244,13 +244,13 @@ impl Lexer {
 
         let start = self.cursor_pos().0;
 
-        // Blanks + comments -> Blank token
-        if self.scan_blanks_and_comments() {
+        // Whitespaces + comments -> Whitespace token
+        if self.scan_whitespace_and_comments() {
             let end = self.cursor_pos().0;
-            self.last_was_blank = true;
+            self.last_was_whitespace = true;
             self.word_started = false;
             self.buffer.push_back(SpannedToken {
-                token: Token::Blank,
+                token: Token::Whitespace,
                 span: Span::new(start, end),
             });
             return Ok(());
@@ -271,7 +271,7 @@ impl Lexer {
         if ch == '\n' {
             self.advance_char();
             let newline_span = Span::new(start, start + 1);
-            self.last_was_blank = false;
+            self.last_was_whitespace = false;
             self.word_started = false;
 
             self.buffer.push_back(SpannedToken {
@@ -311,7 +311,7 @@ impl Lexer {
                 self.expecting_heredoc_delimiter = true;
                 self.pending_strip_tabs = true;
             }
-            self.last_was_blank = false;
+            self.last_was_whitespace = false;
             self.word_started = false;
             self.buffer.push_back(tok);
             return Ok(());
@@ -330,7 +330,7 @@ impl Lexer {
                     strip_tabs: self.pending_strip_tabs,
                 });
             }
-            self.last_was_blank = false;
+            self.last_was_whitespace = false;
             self.word_started = true;
             self.buffer.push_back(tok);
             return Ok(());
@@ -338,7 +338,7 @@ impl Lexer {
 
         // Fragment token
         let tok = self.scan_fragment(start)?;
-        self.last_was_blank = false;
+        self.last_was_whitespace = false;
         self.word_started = true;
         self.buffer.push_back(tok);
         Ok(())
@@ -407,7 +407,7 @@ impl Lexer {
     /// Returns true if actual whitespace (spaces/tabs) or a comment was consumed.
     /// Line continuations (`\<newline>`) are consumed but do NOT count as whitespace —
     /// they are invisible joins, not word boundaries.
-    fn scan_blanks_and_comments(&mut self) -> bool {
+    fn scan_whitespace_and_comments(&mut self) -> bool {
         let mut has_actual_blank = false;
         loop {
             match self.peek_char() {

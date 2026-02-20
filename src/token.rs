@@ -77,7 +77,7 @@ pub enum Token {
         content: String,
     },
     /// Unquoted whitespace between words (word boundary marker).
-    Blank,
+    Whitespace,
 
     // === Other value-carrying tokens ===
     /// An IO_NUMBER: a digit sequence immediately preceding `<` or `>`.
@@ -215,7 +215,7 @@ impl Token {
             Token::BashLocaleQuoted(_) => "a word",
             Token::BashExtGlob { .. } => "a word",
             Token::BashProcessSub { .. } => "a word",
-            Token::Blank => "blank",
+            Token::Whitespace => "whitespace",
             Token::IoNumber(_) => "a file descriptor",
             Token::Newline => "newline",
             Token::AndIf => "'&&'",

@@ -1,7 +1,7 @@
 //! Word collection: gathers adjacent fragment tokens into Word AST nodes.
 //!
 //! The lexer emits fragment-level tokens (Literal, SimpleParam, etc.) with
-//! Blank tokens as word boundaries. This module provides Parser methods to
+//! Whitespace tokens as word boundaries. This module provides Parser methods to
 //! collect those fragments into structured Word and Argument nodes.
 
 use crate::ast::*;
@@ -15,7 +15,7 @@ use super::Parser;
 
 impl Parser {
     /// Collect adjacent fragment tokens into a Word AST node.
-    /// Uses the raw API to see Blank tokens as word boundaries.
+    /// Uses the raw API to see Whitespace tokens as word boundaries.
     /// Returns None if the current token is not a fragment.
     pub(super) fn collect_word(&mut self) -> Result<Option<Word>, ParseError> {
         if !self.lexer.peek()?.token.is_fragment() {

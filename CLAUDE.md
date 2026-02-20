@@ -25,7 +25,7 @@ Place contracts on every function where there is a meaningful invariant to check
 ## Architecture
 
 ### Lexer/Parser pipeline
-- The **lexer is context-free** — it produces fragment tokens (`Literal`, `SimpleParam`, `DoubleQuoted`, etc.), `Blank`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
+- The **lexer is context-free** — it produces fragment tokens (`Literal`, `SimpleParam`, `DoubleQuoted`, etc.), `Whitespace`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
 - The **parser promotes keywords** — it checks `Token::Literal("if")` etc. when the grammatical context expects a keyword.
 - The **lexer has no lifetime parameter** — it owns a `CharSource` backed by `Read`. Constructed via `Lexer::from_str()` or `Lexer::from_reader()`.
 - The **parser holds the lexer directly** — no separate TokenStream layer.

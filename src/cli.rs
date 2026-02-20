@@ -248,7 +248,7 @@ fn do_lex(cli: &CliArgs) {
                     Token::BashProcessSub { direction, content } => {
                         format!("{}({})", direction, content)
                     }
-                    Token::Blank => " ".to_string(),
+                    Token::Whitespace => " ".to_string(),
                     Token::IoNumber(n) => n.to_string(),
                     Token::HereDocBody(s) => {
                         let preview = s.replace('\n', "\\n");

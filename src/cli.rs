@@ -205,7 +205,7 @@ fn do_lex(cli: &CliArgs) {
     let options = cli.dialect().options();
     let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
-    let mut lexer = Lexer::new(&source, options);
+    let mut lexer = Lexer::from_str(&source, options);
 
     let mut rows: Vec<(String, &'static str, String)> = Vec::new();
 

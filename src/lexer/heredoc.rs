@@ -10,28 +10,28 @@ pub(super) struct PendingHereDoc {
     pub(super) strip_tabs: bool,
 }
 
-impl<'src> Lexer<'src> {
+impl Lexer {
     /// Read a single here-document body until the delimiter line is found.
     pub(super) fn read_single_heredoc(
         &mut self,
         delimiter: &str,
         strip_tabs: bool,
     ) -> Result<String, LexError> {
-        let start = self.cursor.pos().0;
+        let start = self.cursor_pos().0;
         let mut body = String::new();
 
         loop {
-            if self.cursor.is_eof() {
+            if self.is_at_eof() {
                 return Err(LexError::UnterminatedHereDoc {
                     delimiter: delimiter.to_string(),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 });
             }
 
             // Read one line
             let mut line = String::new();
             loop {
-                match self.cursor.advance() {
+                match self.advance_char() {
                     Some('\n') => break,
                     Some(c) => line.push(c),
                     None => break,

@@ -13,14 +13,14 @@ use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};
 use super::helpers::de_escape_literal;
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     /// Check if the current token is a lone Literal matching the keyword.
     /// "Lone" means no adjacent fragment tokens (it stands alone as a word).
     pub(super) fn is_lone_literal(&mut self, expected: &str) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        match &self.stream.peek()?.token {
+        self.lexer.skip_blanks()?;
+        match &self.lexer.peek()?.token {
             Token::Literal(w) if w == expected => {
-                let next = self.stream.peek_at_offset(1)?;
+                let next = self.lexer.peek_at_offset(1)?;
                 Ok(!next.token.is_fragment())
             }
             _ => Ok(false),
@@ -31,16 +31,16 @@ impl<'src> Parser<'src> {
     /// Uses the raw API to see Blank tokens as word boundaries.
     /// Returns None if the current token is not a fragment.
     pub(super) fn collect_word(&mut self) -> Result<Option<Word>, ParseError> {
-        if !self.stream.peek()?.token.is_fragment() {
+        if !self.lexer.peek()?.token.is_fragment() {
             return Ok(None);
         }
 
-        let start_span = self.stream.peek()?.span;
+        let start_span = self.lexer.peek()?.span;
         let mut fragments = Vec::new();
         let mut end_span = start_span;
 
-        while self.stream.peek()?.token.is_fragment() {
-            let st = self.stream.advance()?;
+        while self.lexer.peek()?.token.is_fragment() {
+            let st = self.lexer.advance()?;
             end_span = st.span;
             let frag = self.token_to_fragment(st)?;
             fragments.push(frag);
@@ -63,8 +63,8 @@ impl<'src> Parser<'src> {
     /// Collect adjacent fragment tokens into an Argument AST node.
     /// Handles BashProcessSub -> Atom conversion.
     pub(super) fn collect_argument(&mut self) -> Result<Option<Argument>, ParseError> {
-        if let Token::BashProcessSub { .. } = &self.stream.peek()?.token {
-            let st = self.stream.advance()?;
+        if let Token::BashProcessSub { .. } = &self.lexer.peek()?.token {
+            let st = self.lexer.advance()?;
             if let Token::BashProcessSub { direction, content } = st.token {
                 let dir = if direction == '<' {
                     ProcessDirection::In
@@ -99,8 +99,8 @@ impl<'src> Parser<'src> {
             fragments.push(Fragment::Literal(de_escape_literal(value_prefix)));
         }
 
-        while self.stream.peek()?.token.is_fragment() {
-            let st = self.stream.advance()?;
+        while self.lexer.peek()?.token.is_fragment() {
+            let st = self.lexer.advance()?;
             end_span = st.span;
             let frag = self.token_to_fragment(st)?;
             fragments.push(frag);

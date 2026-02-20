@@ -20,6 +20,9 @@ pub enum LexError {
 
     #[error("unterminated {kind}")]
     UnterminatedExpansion { kind: String, span: Span },
+
+    #[error("I/O error: {0}")]
+    Io(String),
 }
 
 impl LexError {
@@ -31,6 +34,7 @@ impl LexError {
             | LexError::UnterminatedHereDoc { span, .. }
             | LexError::UnterminatedBackquote { span }
             | LexError::UnterminatedExpansion { span, .. } => Some(*span),
+            LexError::Io(_) => None,
         }
     }
 }

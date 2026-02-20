@@ -5,7 +5,6 @@ mod compound;
 mod expressions;
 mod helpers;
 mod test_expr;
-mod token_stream;
 mod word_collect;
 
 use crate::ast::*;
@@ -16,7 +15,6 @@ use crate::span::Span;
 use crate::token::{SpannedToken, Token};
 
 use helpers::keyword_display_name;
-use token_stream::TokenStream;
 
 pub use helpers::expr_span;
 
@@ -40,16 +38,15 @@ fn stmt(expression: Expression, span: Span) -> Statement {
     }
 }
 
-pub(crate) struct Parser<'src> {
-    pub(super) stream: TokenStream<'src>,
+pub(crate) struct Parser {
+    pub(super) lexer: Lexer,
     pub(super) options: ParseOptions,
 }
 
-impl<'src> Parser<'src> {
-    pub fn new(input: &'src str, options: ParseOptions) -> Result<Self, ParseError> {
-        let lexer = Lexer::new(input, options.clone());
-        let stream = TokenStream::new(lexer)?;
-        Ok(Parser { stream, options })
+impl Parser {
+    pub fn new(input: &str, options: ParseOptions) -> Result<Self, ParseError> {
+        let lexer = Lexer::from_str(input, options.clone());
+        Ok(Parser { lexer, options })
     }
 
     // ================================================================
@@ -62,9 +59,9 @@ impl<'src> Parser<'src> {
 
     /// Consume the current token if it matches the expected operator token.
     fn eat(&mut self, expected: &Token) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token == *expected {
-            self.stream.advance()?;
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token == *expected {
+            self.lexer.advance()?;
             Ok(true)
         } else {
             Ok(false)
@@ -74,7 +71,7 @@ impl<'src> Parser<'src> {
     /// Consume the current token if it is a keyword matching the given string.
     fn eat_keyword(&mut self, keyword: &str) -> Result<bool, ParseError> {
         if self.is_lone_literal(keyword)? {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             Ok(true)
         } else {
             Ok(false)
@@ -83,14 +80,14 @@ impl<'src> Parser<'src> {
 
     /// Expect and consume an operator token. Returns error if not matched.
     fn expect(&mut self, expected: &Token) -> Result<SpannedToken, ParseError> {
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token == *expected {
-            self.stream.advance()
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token == *expected {
+            self.lexer.advance()
         } else {
             Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: expected.display_name().to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             })
         }
     }
@@ -98,13 +95,13 @@ impl<'src> Parser<'src> {
     /// Expect and consume a keyword (a lone Literal matching the string).
     fn expect_keyword(&mut self, keyword: &str) -> Result<SpannedToken, ParseError> {
         if self.is_lone_literal(keyword)? {
-            self.stream.advance()
+            self.lexer.advance()
         } else {
-            self.stream.skip_blanks()?;
+            self.lexer.skip_blanks()?;
             Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: keyword_display_name(keyword),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             })
         }
     }
@@ -118,10 +115,10 @@ impl<'src> Parser<'src> {
         opening_span: Span,
     ) -> Result<SpannedToken, ParseError> {
         if self.is_lone_literal(keyword)? {
-            return self.stream.advance();
+            return self.lexer.advance();
         }
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token == Token::Eof {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token == Token::Eof {
             Err(ParseError::UnclosedConstruct {
                 keyword: keyword_display_name(keyword),
                 opening: opening.to_string(),
@@ -129,30 +126,30 @@ impl<'src> Parser<'src> {
             })
         } else {
             Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: keyword_display_name(keyword),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             })
         }
     }
 
     fn skip_linebreak(&mut self) -> Result<(), ParseError> {
-        self.stream.skip_blanks()?;
-        while self.stream.peek()?.token == Token::Newline {
-            self.stream.advance()?;
-            self.stream.skip_blanks()?;
+        self.lexer.skip_blanks()?;
+        while self.lexer.peek()?.token == Token::Newline {
+            self.lexer.advance()?;
+            self.lexer.skip_blanks()?;
         }
         Ok(())
     }
 
     /// Consume heredoc body tokens that belong to the just-parsed statement.
     pub(super) fn consume_heredoc_bodies(&mut self) -> Result<Vec<String>, ParseError> {
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token != Token::Newline {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token != Token::Newline {
             return Ok(Vec::new());
         }
 
-        let result = self.stream.speculate(|s| {
+        let result = self.lexer.speculate(|s| {
             s.advance()?; // consume Newline tentatively
             s.skip_blanks()?;
             if !matches!(s.peek()?.token, Token::HereDocBody(_)) {
@@ -170,21 +167,21 @@ impl<'src> Parser<'src> {
     }
 
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token != Token::Newline {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token != Token::Newline {
             return Ok(false);
         }
-        while self.stream.peek()?.token == Token::Newline {
-            self.stream.advance()?;
-            self.stream.skip_blanks()?;
+        while self.lexer.peek()?.token == Token::Newline {
+            self.lexer.advance()?;
+            self.lexer.skip_blanks()?;
         }
         Ok(true)
     }
 
     /// Returns true if the current token starts a word (any fragment token).
     fn is_word(&mut self) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        Ok(self.stream.peek()?.token.is_fragment())
+        self.lexer.skip_blanks()?;
+        Ok(self.lexer.peek()?.token.is_fragment())
     }
 
     /// Returns true if a word string is a "closing" reserved keyword that
@@ -197,12 +194,12 @@ impl<'src> Parser<'src> {
     }
 
     fn can_start_command(&mut self) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        let tok = &self.stream.peek()?.token;
+        self.lexer.skip_blanks()?;
+        let tok = &self.lexer.peek()?.token;
         Ok(match tok {
             Token::Literal(w) => {
                 if Self::is_closing_keyword(w) {
-                    let next = self.stream.peek_at_offset(1)?;
+                    let next = self.lexer.peek_at_offset(1)?;
                     next.token.is_fragment()
                 } else {
                     true
@@ -229,8 +226,8 @@ impl<'src> Parser<'src> {
     }
 
     fn is_redirect_op(&mut self) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        let tok = &self.stream.peek()?.token;
+        self.lexer.skip_blanks()?;
+        let tok = &self.lexer.peek()?.token;
         Ok(tok.is_redirect_op() || matches!(tok, Token::IoNumber(_)))
     }
 
@@ -244,12 +241,12 @@ impl<'src> Parser<'src> {
 
     /// Check if the current token starts a compound command.
     fn is_compound_start(&mut self) -> Result<bool, ParseError> {
-        self.stream.skip_blanks()?;
-        let tok = self.stream.peek()?.token.clone();
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
         Ok(match &tok {
             Token::Literal(w) => {
                 if self.is_compound_start_word(w) {
-                    let next = self.stream.peek_at_offset(1)?;
+                    let next = self.lexer.peek_at_offset(1)?;
                     !next.token.is_fragment()
                 } else {
                     false

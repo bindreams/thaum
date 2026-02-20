@@ -3,7 +3,7 @@ use crate::token::GlobKind;
 
 /// Helper: lex all tokens from input, including Blank tokens.
 fn lex_all(input: &str) -> Result<Vec<Token>, LexError> {
-    let mut lexer = Lexer::new(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ParseOptions::default());
     let mut tokens = Vec::new();
     loop {
         let st = lexer.next_token()?;
@@ -310,7 +310,7 @@ fn lex_bang_is_just_a_word() {
 
 #[test]
 fn lex_span_tracking() {
-    let mut lexer = Lexer::new("echo hello", ParseOptions::default());
+    let mut lexer = Lexer::from_str("echo hello", ParseOptions::default());
     let t1 = lexer.next_token().unwrap();
     assert_eq!(t1.span, Span::new(0, 4));
     assert_eq!(t1.token, Token::Literal("echo".into()));
@@ -325,7 +325,7 @@ fn lex_span_tracking() {
 
 #[test]
 fn lex_span_operators() {
-    let mut lexer = Lexer::new("&&||", ParseOptions::default());
+    let mut lexer = Lexer::from_str("&&||", ParseOptions::default());
     let t1 = lexer.next_token().unwrap();
     assert_eq!(t1.span, Span::new(0, 2));
 
@@ -338,7 +338,7 @@ fn lex_span_operators() {
 #[test]
 fn lex_heredoc_basic() {
     let input = "cat <<EOF\nhello world\nEOF\n";
-    let mut lexer = Lexer::new(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ParseOptions::default());
 
     assert_eq!(lexer.next_token().unwrap().token, Token::Literal("cat".into()));
     assert_eq!(lexer.next_token().unwrap().token, Token::Blank);
@@ -358,7 +358,7 @@ fn lex_heredoc_basic() {
 #[test]
 fn lex_heredoc_strip_tabs() {
     let input = "cat <<-EOF\n\thello\n\tworld\n\tEOF\n";
-    let mut lexer = Lexer::new(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ParseOptions::default());
 
     lexer.next_token().unwrap(); // cat
     lexer.next_token().unwrap(); // Blank
@@ -377,7 +377,7 @@ fn lex_heredoc_strip_tabs() {
 #[test]
 fn lex_heredoc_unterminated() {
     let input = "cat <<EOF\nhello world\n";
-    let mut lexer = Lexer::new(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ParseOptions::default());
 
     lexer.next_token().unwrap(); // cat
     lexer.next_token().unwrap(); // Blank
@@ -467,4 +467,123 @@ fn lex_lone_dollar() {
             Token::Literal("foo".into()),
         ]
     );
+}
+
+// === Token-level buffered API (migrated from token_stream_tests) ===
+
+fn make_lexer(input: &str) -> Lexer {
+    Lexer::from_str(input, ParseOptions::default())
+}
+
+#[test]
+fn peek_returns_first_token() {
+    let mut s = make_lexer("echo hello");
+    assert_eq!(s.peek().unwrap().token, Token::Literal("echo".into()));
+}
+
+#[test]
+fn peek_is_idempotent() {
+    let mut s = make_lexer("echo hello");
+    let t1 = s.peek().unwrap().token.clone();
+    let t2 = s.peek().unwrap().token.clone();
+    assert_eq!(t1, t2);
+}
+
+#[test]
+fn advance_returns_peeked() {
+    let mut s = make_lexer("echo hello");
+    let peeked = s.peek().unwrap().token.clone();
+    let advanced = s.advance().unwrap().token;
+    assert_eq!(peeked, advanced);
+}
+
+#[test]
+fn advance_then_skip_blanks() {
+    let mut s = make_lexer("echo hello");
+    s.advance().unwrap();
+    s.skip_blanks().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Literal("hello".into()));
+}
+
+#[test]
+fn advance_past_eof() {
+    let mut s = make_lexer("x");
+    s.advance().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Eof);
+    assert_eq!(s.advance().unwrap().token, Token::Eof);
+}
+
+#[test]
+fn peek_sees_blank_without_skip() {
+    let mut s = make_lexer("a b");
+    s.advance().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Blank);
+}
+
+#[test]
+fn skip_blanks_then_peek() {
+    let mut s = make_lexer("a b");
+    s.advance().unwrap();
+    s.skip_blanks().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
+}
+
+#[test]
+fn speculate_rewinds_on_none() {
+    let mut s = make_lexer("a b c");
+    let result: Option<()> = s.speculate(|s| {
+        s.advance()?;
+        s.skip_blanks()?;
+        s.advance()?;
+        Ok(None)
+    }).unwrap();
+    assert!(result.is_none());
+    assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
+}
+
+#[test]
+fn speculate_keeps_position_on_some() {
+    let mut s = make_lexer("a b c");
+    let result = s.speculate(|s| {
+        s.advance()?;
+        s.skip_blanks()?;
+        Ok(Some("found"))
+    }).unwrap();
+    assert_eq!(result, Some("found"));
+    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
+}
+
+#[test]
+fn empty_input_peek() {
+    let mut s = make_lexer("");
+    assert_eq!(s.peek().unwrap().token, Token::Eof);
+}
+
+// === Speculation keeps tokens in buffer ===
+
+#[test]
+fn speculate_tokens_stay_in_buffer() {
+    // Speculate past a << operator and heredoc. On rewind, buf_pos moves
+    // back but the scanned tokens stay in the buffer. Re-reading gives
+    // the same token sequence — no re-scanning needed.
+    let mut s = make_lexer("<<EOF\nhello\nEOF\n");
+    let result: Option<()> = s.speculate(|s| {
+        assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
+        assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
+        assert_eq!(s.advance().unwrap().token, Token::Newline);
+        assert!(matches!(s.advance().unwrap().token, Token::HereDocBody(_)));
+        // Rewind
+        Ok(None)
+    }).unwrap();
+    assert!(result.is_none());
+    // After rewind: same tokens are re-read from buffer
+    assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
+    assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
+    assert_eq!(s.advance().unwrap().token, Token::Newline);
+    let body_tok = s.advance().unwrap();
+    if let Token::HereDocBody(body) = &body_tok.token {
+        assert_eq!(body, "hello\n");
+    } else {
+        panic!("expected HereDocBody, got {:?}", body_tok.token);
+    }
 }

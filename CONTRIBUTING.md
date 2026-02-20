@@ -32,13 +32,14 @@ src/
   error.rs             — LexError, ParseError with spans
 
   lexer/
-    mod.rs             — Lexer struct, tokenization, operators, word scanning
-    cursor.rs          — low-level character cursor over source text
-    heredoc.rs         — here-document reading
+    mod.rs             — Lexer struct, tokenization, token buffer, speculation
+    char_source.rs     — CharSource: Read-backed character stream with lookahead
+    operators.rs       — operator scanning (peek_at-based, no backtracking)
+    word_scan.rs       — fragment scanning (literals, quotes, expansions, globs)
+    heredoc.rs         — here-document body reading
 
   parser/
     mod.rs             — Parser struct, helpers, public parse functions
-    token_stream.rs    — TokenStream: buffered peek/advance with checkpoint/rewind
     expressions.rs     — program, lists, and-or, pipelines, leaf expressions
     commands.rs        — simple commands, redirects, heredoc helpers
     compound.rs        — if/while/for/case/brace/subshell/[[ ]]/((  ))
@@ -97,10 +98,37 @@ From lowest to highest:
 
 ### Lexer/Parser architecture
 
-- The **lexer is context-free** — it produces only `Word`, `IoNumber`, operators, `Newline`, and `Eof`. It never promotes words to reserved word tokens.
-- The **parser promotes keywords** — it checks `Token::Word("if")` etc. when the grammatical context expects a keyword.
-- **TokenStream** sits between lexer and parser: buffers tokens, provides `peek()`/`advance()`, and supports `checkpoint()`/`rewind()`/`release()` for speculative parsing.
-- **`try_parse`** on the Parser uses closures for speculative parsing (e.g., detecting POSIX function definitions).
+The Lexer has two levels: a **character source** and a **token buffer**.
+
+**Character source** (`CharSource`): reads characters from any `Read` source via
+`BufReader`. Provides `peek()`, `peek_at(n)`, and `advance()`. Peek operations use
+`RefCell` for interior mutability (logically pure — they just fill the lookahead
+buffer from the reader). The character source is forward-only; there is no way to
+seek backward. Operator scanning uses `peek_at(n)` for up to 3-char lookahead
+instead of advance-and-restore.
+
+**Token buffer**: a `VecDeque<SpannedToken>` that tokens are scanned into via
+`scan_next()`. The parser reads tokens through `peek()`/`advance()` which pull
+from this buffer. When the buffer runs out, `scan_next()` reads from the character
+source and pushes one or more tokens (e.g. a newline followed by heredoc bodies).
+
+**Speculation** (`speculate()`): saves `buf_pos`, runs a closure, and rewinds
+`buf_pos` on failure. Tokens scanned during speculation stay in the buffer —
+scanning state is purely cursor-side and doesn't need saving. The buffer only
+shrinks from the front (on commit), never from the back.
+
+**Key design rules**:
+- The **lexer is context-free** — it produces fragment tokens (`Literal`,
+  `SimpleParam`, `DoubleQuoted`, etc.), `Blank`, `IoNumber`, operators, `Newline`,
+  `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
+- The **parser promotes keywords** — it checks `Token::Literal("if")` etc. when
+  the grammatical context expects a keyword.
+- The **lexer has no lifetime parameter** — `Lexer` (not `Lexer<'src>`). It owns
+  its character source. Constructed via `Lexer::from_str()` or `Lexer::from_reader()`.
+- The **parser holds the lexer directly** — `Parser { lexer: Lexer, ... }`. No
+  separate TokenStream layer.
+- **`speculate()`** on the Lexer uses closures for speculative parsing (e.g.,
+  detecting POSIX function definitions, consuming heredoc bodies).
 
 ### Dialect system
 

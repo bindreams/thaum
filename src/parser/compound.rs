@@ -6,10 +6,10 @@ use super::arith_expr::parse_arith_expr;
 use super::helpers::*;
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     pub(super) fn parse_compound_command(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let tok = self.stream.peek()?.token.clone();
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
         match &tok {
             Token::Literal(w) => match w.as_str() {
                 "if" => self.parse_if_clause(),
@@ -20,23 +20,23 @@ impl<'src> Parser<'src> {
                 "{" => self.parse_brace_group(),
                 "select" if self.options.select => self.parse_select_clause(),
                 _ => Err(ParseError::UnexpectedToken {
-                    found: self.stream.peek()?.token.display_name().to_string(),
+                    found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a compound command".to_string(),
-                    span: self.stream.peek()?.span,
+                    span: self.lexer.peek()?.span,
                 }),
             },
             Token::LParen => self.parse_subshell_or_arithmetic(),
             Token::BashDblLBracket => self.parse_double_bracket(),
             _ => Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a compound command".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             }),
         }
     }
 
     fn parse_if_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        let start_span = self.stream.peek()?.span;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("if")?;
 
         let condition = self.parse_required_compound_list("if condition")?;
@@ -45,8 +45,8 @@ impl<'src> Parser<'src> {
 
         let mut elifs = Vec::new();
         while self.is_lone_literal("elif")? {
-            let elif_span = self.stream.peek()?.span;
-            self.stream.advance()?;
+            let elif_span = self.lexer.peek()?.span;
+            self.lexer.advance()?;
             let elif_cond = self.parse_required_compound_list("elif condition")?;
             self.expect_closing_keyword("then", "elif", elif_span)?;
             let elif_body = self.parse_required_compound_list("elif body")?;
@@ -59,7 +59,7 @@ impl<'src> Parser<'src> {
         }
 
         let else_body = if self.is_lone_literal("else")? {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             Some(self.parse_compound_list()?)
         } else {
             None
@@ -77,7 +77,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_while_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        let start_span = self.stream.peek()?.span;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("while")?;
         let condition = self.parse_required_compound_list("while condition")?;
         self.expect_closing_keyword("do", "while", start_span)?;
@@ -91,7 +91,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_until_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        let start_span = self.stream.peek()?.span;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("until")?;
         let condition = self.parse_required_compound_list("until condition")?;
         self.expect_closing_keyword("do", "until", start_span)?;
@@ -105,45 +105,45 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_for_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("for")?;
 
-        self.stream.skip_blanks()?;
-        if self.options.arithmetic_for && self.stream.peek()?.token == Token::LParen {
+        self.lexer.skip_blanks()?;
+        if self.options.arithmetic_for && self.lexer.peek()?.token == Token::LParen {
             return self.parse_arithmetic_for(start_span);
         }
 
-        self.stream.skip_blanks()?;
-        let var_name = match &self.stream.peek()?.token {
+        self.lexer.skip_blanks()?;
+        let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
                 return Err(ParseError::UnexpectedToken {
-                    found: self.stream.peek()?.token.display_name().to_string(),
+                    found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a variable name".to_string(),
-                    span: self.stream.peek()?.span,
+                    span: self.lexer.peek()?.span,
                 });
             }
         };
-        self.stream.advance()?;
+        self.lexer.advance()?;
         self.skip_linebreak()?;
 
         let words = if self.is_lone_literal("in")? {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             let mut word_list = Vec::new();
             while self.is_word()? {
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
             }
-            if self.stream.peek()?.token == Token::Semicolon {
-                self.stream.advance()?;
+            if self.lexer.peek()?.token == Token::Semicolon {
+                self.lexer.advance()?;
             }
             self.skip_linebreak()?;
             Some(word_list)
         } else {
-            if self.stream.peek()?.token == Token::Semicolon {
-                self.stream.advance()?;
+            if self.lexer.peek()?.token == Token::Semicolon {
+                self.lexer.advance()?;
             }
             self.skip_linebreak()?;
             None
@@ -162,15 +162,15 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_case_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a word after 'case'".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
         let case_word = self.collect_word()?.unwrap();
@@ -178,17 +178,17 @@ impl<'src> Parser<'src> {
 
         if !self.is_lone_literal("in")? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "'in'".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
-        self.stream.advance()?;
+        self.lexer.advance()?;
         self.skip_linebreak()?;
 
         let mut arms = Vec::new();
         while !self.is_lone_literal("esac")?
-            && self.stream.peek()?.token != Token::Eof
+            && self.lexer.peek()?.token != Token::Eof
         {
             arms.push(self.parse_case_arm()?);
             self.skip_linebreak()?;
@@ -204,39 +204,39 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_case_arm(&mut self) -> Result<CaseArm, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.eat(&Token::LParen)?;
 
         let mut patterns = Vec::new();
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a pattern in case arm".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
         patterns.push(self.collect_word()?.unwrap());
 
-        self.stream.skip_blanks()?;
-        while self.stream.peek()?.token == Token::Pipe {
-            self.stream.advance()?;
+        self.lexer.skip_blanks()?;
+        while self.lexer.peek()?.token == Token::Pipe {
+            self.lexer.advance()?;
             if !self.is_word()? {
                 return Err(ParseError::UnexpectedToken {
-                    found: self.stream.peek()?.token.display_name().to_string(),
+                    found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a pattern after '|'".to_string(),
-                    span: self.stream.peek()?.span,
+                    span: self.lexer.peek()?.span,
                 });
             }
             patterns.push(self.collect_word()?.unwrap());
-            self.stream.skip_blanks()?;
+            self.lexer.skip_blanks()?;
         }
 
         self.expect(&Token::RParen)?;
         self.skip_linebreak()?;
 
-        self.stream.skip_blanks()?;
-        let body = if self.stream.peek()?.token == Token::CaseBreak
+        self.lexer.skip_blanks()?;
+        let body = if self.lexer.peek()?.token == Token::CaseBreak
             || self.is_lone_literal("esac")?
         {
             Vec::new()
@@ -244,19 +244,19 @@ impl<'src> Parser<'src> {
             self.parse_compound_list()?
         };
 
-        self.stream.skip_blanks()?;
-        let end_span = self.stream.peek()?.span;
-        let terminator = match self.stream.peek()?.token {
+        self.lexer.skip_blanks()?;
+        let end_span = self.lexer.peek()?.span;
+        let terminator = match self.lexer.peek()?.token {
             Token::CaseBreak => {
-                self.stream.advance()?;
+                self.lexer.advance()?;
                 Some(CaseTerminator::Break)
             }
             Token::BashCaseContinue => {
-                self.stream.advance()?;
+                self.lexer.advance()?;
                 Some(CaseTerminator::BashContinue)
             }
             Token::BashCaseFallThrough => {
-                self.stream.advance()?;
+                self.lexer.advance()?;
                 Some(CaseTerminator::BashFallThrough)
             }
             _ => None,
@@ -271,14 +271,14 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_double_bracket(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.expect(&Token::BashDblLBracket)?;
 
         let expression = self.parse_test_expression()?;
 
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token == Token::Eof {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token == Token::Eof {
             return Err(ParseError::UnclosedConstruct {
                 keyword: "']]'".to_string(),
                 opening: "[[".to_string(),
@@ -286,8 +286,8 @@ impl<'src> Parser<'src> {
             });
         }
 
-        let end_span = self.stream.peek()?.span;
-        self.stream.advance()?;
+        let end_span = self.lexer.peek()?.span;
+        self.lexer.advance()?;
 
         Ok(CompoundCommand::BashDoubleBracket {
             expression,
@@ -296,26 +296,26 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_subshell_or_arithmetic(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.expect(&Token::LParen)?;
 
-        if self.options.arithmetic_command && self.stream.peek()?.token == Token::LParen
-            && self.stream.peek()?.span.start.0 == start_span.end.0
+        if self.options.arithmetic_command && self.lexer.peek()?.token == Token::LParen
+            && self.lexer.peek()?.span.start.0 == start_span.end.0
         {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             let mut expr = String::new();
             let mut depth = 0i32;
 
             // Use raw API to see Blank tokens (arithmetic needs all content)
             loop {
-                let tok = self.stream.peek()?.token.clone();
+                let tok = self.lexer.peek()?.token.clone();
                 match &tok {
                     Token::RParen if depth == 0 => {
-                        self.stream.advance()?;
-                        if self.stream.peek()?.token == Token::RParen {
-                            let end_span = self.stream.peek()?.span;
-                            self.stream.advance()?;
+                        self.lexer.advance()?;
+                        if self.lexer.peek()?.token == Token::RParen {
+                            let end_span = self.lexer.peek()?.span;
+                            self.lexer.advance()?;
                             let expression = parse_arith_expr(expr.trim()).map_err(|msg| {
                                 ParseError::UnexpectedToken {
                                     found: msg,
@@ -334,12 +334,12 @@ impl<'src> Parser<'src> {
                     Token::LParen => {
                         depth += 1;
                         expr.push('(');
-                        self.stream.advance()?;
+                        self.lexer.advance()?;
                     }
                     Token::RParen => {
                         depth -= 1;
                         expr.push(')');
-                        self.stream.advance()?;
+                        self.lexer.advance()?;
                     }
                     Token::Eof => {
                         return Err(ParseError::UnclosedConstruct {
@@ -352,11 +352,11 @@ impl<'src> Parser<'src> {
                         if !expr.is_empty() {
                             expr.push(' ');
                         }
-                        self.stream.advance()?;
+                        self.lexer.advance()?;
                     }
                     tok if tok.is_fragment() => {
                         expr.push_str(&fragment_token_to_source(tok));
-                        self.stream.advance()?;
+                        self.lexer.advance()?;
                     }
                     _ => {
                         if !expr.is_empty() {
@@ -364,7 +364,7 @@ impl<'src> Parser<'src> {
                         }
                         let text = tok.display_name().trim_matches('\'');
                         expr.push_str(text);
-                        self.stream.advance()?;
+                        self.lexer.advance()?;
                     }
                 }
             }
@@ -379,7 +379,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_brace_group(&mut self) -> Result<CompoundCommand, ParseError> {
-        let start_span = self.stream.peek()?.span;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("{")?;
         let body = self.parse_compound_list()?;
         let rbrace = self.expect_closing_keyword("}", "{", start_span)?;
@@ -396,9 +396,9 @@ impl<'src> Parser<'src> {
         let list = self.parse_compound_list()?;
         if list.is_empty() {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: format!("a command in {}", context),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
         Ok(list)
@@ -416,8 +416,8 @@ impl<'src> Parser<'src> {
         self.parse_list_into(&mut statements)?;
 
         loop {
-            self.stream.skip_blanks()?;
-            if self.stream.peek()?.token == Token::Newline {
+            self.lexer.skip_blanks()?;
+            if self.lexer.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
             }
             if self.can_start_command()? {
@@ -434,17 +434,17 @@ impl<'src> Parser<'src> {
         &mut self,
         start_span: crate::span::Span,
     ) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
+        self.lexer.skip_blanks()?;
         self.expect(&Token::LParen)?;
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token != Token::LParen {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token != Token::LParen {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "'(' for arithmetic for loop".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
-        self.stream.advance()?;
+        self.lexer.advance()?;
 
         let raw = self.read_arith_for_content()?;
         let parts: Vec<&str> = raw.splitn(3, ';').collect();
@@ -468,9 +468,9 @@ impl<'src> Parser<'src> {
         let condition = parse_part(cond_str);
         let update = parse_part(update_str);
 
-        self.stream.skip_blanks()?;
-        if self.stream.peek()?.token == Token::Semicolon {
-            self.stream.advance()?;
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token == Token::Semicolon {
+            self.lexer.advance()?;
         }
         self.skip_linebreak()?;
 
@@ -492,12 +492,12 @@ impl<'src> Parser<'src> {
         let mut depth = 0i32;
         // Use raw API to see Blank tokens
         loop {
-            let tok = self.stream.peek()?.token.clone();
+            let tok = self.lexer.peek()?.token.clone();
             match &tok {
                 Token::RParen if depth == 0 => {
-                    self.stream.advance()?;
-                    if self.stream.peek()?.token == Token::RParen {
-                        self.stream.advance()?;
+                    self.lexer.advance()?;
+                    if self.lexer.peek()?.token == Token::RParen {
+                        self.lexer.advance()?;
                         return Ok(content);
                     }
                     content.push(')');
@@ -505,20 +505,20 @@ impl<'src> Parser<'src> {
                 Token::LParen => {
                     depth += 1;
                     content.push('(');
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 Token::RParen => {
                     depth -= 1;
                     content.push(')');
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 Token::Semicolon => {
                     content.push(';');
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 Token::CaseBreak => {
                     content.push_str(";;");
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 Token::Eof => {
                     return Err(ParseError::UnexpectedEof {
@@ -529,14 +529,14 @@ impl<'src> Parser<'src> {
                     if !content.is_empty() && !content.ends_with(';') {
                         content.push(' ');
                     }
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 tok if tok.is_fragment() => {
                     if matches!(tok, Token::SimpleParam(_)) {
                         content.push('$');
                     }
                     content.push_str(fragment_token_to_text(tok));
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 _ => {
                     if !content.is_empty() && !content.ends_with(';') {
@@ -544,7 +544,7 @@ impl<'src> Parser<'src> {
                     }
                     let text = tok.display_name().trim_matches('\'');
                     content.push_str(text);
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
             }
         }

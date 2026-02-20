@@ -5,19 +5,19 @@ use crate::token::Token;
 use super::helpers::*;
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.skip_linebreak()?;
 
         let mut statements = Vec::new();
-        while self.stream.peek()?.token != Token::Eof {
+        while self.lexer.peek()?.token != Token::Eof {
             self.parse_list_into(&mut statements)?;
             self.skip_linebreak()?;
         }
 
-        let end_span = self.stream.peek()?.span;
+        let end_span = self.lexer.peek()?.span;
         Ok(Program {
             span: if statements.is_empty() {
                 start_span
@@ -38,15 +38,15 @@ impl<'src> Parser<'src> {
         }
 
         loop {
-            self.stream.skip_blanks()?;
-            match self.stream.peek()?.token {
+            self.lexer.skip_blanks()?;
+            match self.lexer.peek()?.token {
                 Token::Semicolon => {
                     out.push(Statement {
                         expression: expr,
                         mode: ExecutionMode::Terminated,
                         span,
                     });
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                     self.skip_linebreak()?;
                     if self.can_start_command()? {
                         expr = self.parse_and_or()?;
@@ -65,7 +65,7 @@ impl<'src> Parser<'src> {
                         mode: ExecutionMode::Background,
                         span,
                     });
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                     self.skip_linebreak()?;
                     if self.can_start_command()? {
                         expr = self.parse_and_or()?;
@@ -91,10 +91,10 @@ impl<'src> Parser<'src> {
         let mut left = self.parse_pipeline()?;
 
         loop {
-            self.stream.skip_blanks()?;
-            match self.stream.peek()?.token {
+            self.lexer.skip_blanks()?;
+            match self.lexer.peek()?.token {
                 Token::AndIf => {
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                     let bodies = self.consume_heredoc_bodies()?;
                     if !bodies.is_empty() {
                         fill_expression_heredocs(&mut left, &bodies);
@@ -107,7 +107,7 @@ impl<'src> Parser<'src> {
                     };
                 }
                 Token::OrIf => {
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                     let bodies = self.consume_heredoc_bodies()?;
                     if !bodies.is_empty() {
                         fill_expression_heredocs(&mut left, &bodies);
@@ -132,14 +132,14 @@ impl<'src> Parser<'src> {
         let mut left = self.parse_leaf_expression()?;
 
         loop {
-            self.stream.skip_blanks()?;
-            let pipe_token = &self.stream.peek()?.token;
+            self.lexer.skip_blanks()?;
+            let pipe_token = &self.lexer.peek()?.token;
             let stderr = match pipe_token {
                 Token::Pipe => false,
                 Token::BashPipeAmpersand => true,
                 _ => break,
             };
-            self.stream.advance()?;
+            self.lexer.advance()?;
             self.skip_linebreak()?;
             let right = self.parse_leaf_expression()?;
             left = Expression::Pipe {
@@ -157,12 +157,12 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_leaf_expression(&mut self) -> Result<Expression, ParseError> {
-        self.stream.skip_blanks()?;
-        let tok = self.stream.peek()?.token.clone();
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
         match &tok {
             Token::Literal(w) => {
                 let is_lone = {
-                    let next = self.stream.peek_at_offset(1)?;
+                    let next = self.lexer.peek_at_offset(1)?;
                     !next.token.is_fragment()
                 };
 
@@ -184,7 +184,7 @@ impl<'src> Parser<'src> {
                             return Err(ParseError::UnexpectedToken {
                                 found: keyword_display_name(kw),
                                 expected: "a command".to_string(),
-                                span: self.stream.peek()?.span,
+                                span: self.lexer.peek()?.span,
                             });
                         }
                         _ => {}
@@ -194,7 +194,7 @@ impl<'src> Parser<'src> {
                 // Try POSIX function definition: name() { ... }
                 // Phase 1: speculate on the stream to check for name ( )
                 if is_lone && is_valid_name(w) {
-                    let func_head = self.stream.speculate(|s| {
+                    let func_head = self.lexer.speculate(|s| {
                         s.skip_blanks()?;
                         let name = match &s.peek()?.token {
                             Token::Literal(w) if is_valid_name(w) => w.clone(),
@@ -246,9 +246,9 @@ impl<'src> Parser<'src> {
                 Ok(Expression::Command(self.parse_command()?))
             }
             _ => Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a command".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             }),
         }
     }

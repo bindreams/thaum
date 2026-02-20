@@ -4,45 +4,45 @@ use crate::token::Token;
 
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     pub(super) fn parse_test_expression(&mut self) -> Result<BashTestExpr, ParseError> {
         self.parse_test_or()
     }
 
     fn parse_test_or(&mut self) -> Result<BashTestExpr, ParseError> {
         let mut left = self.parse_test_and()?;
-        self.stream.skip_blanks()?;
-        while self.stream.peek()?.token == Token::OrIf {
-            self.stream.advance()?;
+        self.lexer.skip_blanks()?;
+        while self.lexer.peek()?.token == Token::OrIf {
+            self.lexer.advance()?;
             let right = self.parse_test_and()?;
             left = BashTestExpr::Or {
                 left: Box::new(left),
                 right: Box::new(right),
             };
-            self.stream.skip_blanks()?;
+            self.lexer.skip_blanks()?;
         }
         Ok(left)
     }
 
     fn parse_test_and(&mut self) -> Result<BashTestExpr, ParseError> {
         let mut left = self.parse_test_not()?;
-        self.stream.skip_blanks()?;
-        while self.stream.peek()?.token == Token::AndIf {
-            self.stream.advance()?;
+        self.lexer.skip_blanks()?;
+        while self.lexer.peek()?.token == Token::AndIf {
+            self.lexer.advance()?;
             let right = self.parse_test_not()?;
             left = BashTestExpr::And {
                 left: Box::new(left),
                 right: Box::new(right),
             };
-            self.stream.skip_blanks()?;
+            self.lexer.skip_blanks()?;
         }
         Ok(left)
     }
 
     fn parse_test_not(&mut self) -> Result<BashTestExpr, ParseError> {
-        self.stream.skip_blanks()?;
+        self.lexer.skip_blanks()?;
         if self.is_lone_literal("!")? {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             let inner = self.parse_test_not()?;
             return Ok(BashTestExpr::Not(Box::new(inner)));
         }
@@ -50,20 +50,20 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_test_primary(&mut self) -> Result<BashTestExpr, ParseError> {
-        self.stream.skip_blanks()?;
-        let peeked = self.stream.peek()?.clone();
+        self.lexer.skip_blanks()?;
+        let peeked = self.lexer.peek()?.clone();
 
         // Grouped expression: ( expr )
         let is_lparen = matches!(&peeked.token, Token::LParen)
             || matches!(&peeked.token, Token::Literal(w) if w == "(");
         if is_lparen {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             let inner = self.parse_test_or()?;
-            let close = self.stream.peek()?;
+            let close = self.lexer.peek()?;
             let is_rparen = matches!(&close.token, Token::RParen)
                 || matches!(&close.token, Token::Literal(w) if w == ")");
             if is_rparen {
-                self.stream.advance()?;
+                self.lexer.advance()?;
             } else {
                 return Err(ParseError::UnexpectedToken {
                     found: close.token.display_name().to_string(),
@@ -77,7 +77,7 @@ impl<'src> Parser<'src> {
         // Unary test: -op word
         if let Token::Literal(w) = &peeked.token {
             if let Some(op) = Self::parse_unary_test_op(w) {
-                self.stream.advance()?;
+                self.lexer.advance()?;
                 let arg_word = self.consume_test_word()?;
                 return Ok(BashTestExpr::Unary { op, arg: arg_word });
             }
@@ -104,13 +104,13 @@ impl<'src> Parser<'src> {
     }
 
     fn consume_regex_pattern(&mut self) -> Result<Word, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         let mut text = String::new();
         let mut end_span = start_span;
 
         loop {
-            let peeked = self.stream.peek()?.clone();
+            let peeked = self.lexer.peek()?.clone();
             match &peeked.token {
                 Token::BashDblRBracket | Token::Eof | Token::Newline => break,
                 tok if tok.is_fragment() => {
@@ -124,7 +124,7 @@ impl<'src> Parser<'src> {
                         _ => text.push_str(tok.display_name().trim_matches('\'')),
                     }
                     end_span = peeked.span;
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
                 _ => {
                     let ch = match &peeked.token {
@@ -141,14 +141,14 @@ impl<'src> Parser<'src> {
                     };
                     text.push_str(ch);
                     end_span = peeked.span;
-                    self.stream.advance()?;
+                    self.lexer.advance()?;
                 }
             }
         }
 
         if text.is_empty() {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a regex pattern after =~".to_string(),
                 span: start_span,
             });
@@ -165,7 +165,7 @@ impl<'src> Parser<'src> {
             return Ok(self.collect_word()?.unwrap());
         }
 
-        let peeked = self.stream.peek()?.clone();
+        let peeked = self.lexer.peek()?.clone();
         match &peeked.token {
             Token::BashDblRBracket | Token::Eof => Err(ParseError::UnexpectedToken {
                 found: peeked.token.display_name().to_string(),
@@ -210,8 +210,8 @@ impl<'src> Parser<'src> {
     }
 
     fn peek_binary_test_op(&mut self) -> Result<Option<BinaryTestOp>, ParseError> {
-        self.stream.skip_blanks()?;
-        let peeked = self.stream.peek()?;
+        self.lexer.skip_blanks()?;
+        let peeked = self.lexer.peek()?;
         match &peeked.token {
             Token::Literal(s) => Ok(Self::word_as_binary_test_op(s)),
             Token::RedirectFromFile => Ok(Some(BinaryTestOp::StringLessThan)),
@@ -239,7 +239,7 @@ impl<'src> Parser<'src> {
     }
 
     fn advance_binary_op(&mut self) -> Result<(), ParseError> {
-        self.stream.advance()?;
+        self.lexer.advance()?;
         Ok(())
     }
 }

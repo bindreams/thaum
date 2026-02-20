@@ -1,16 +1,17 @@
-mod cursor;
+pub(crate) mod char_source;
 pub(crate) mod heredoc;
 mod operators;
 mod word_scan;
 
 use std::collections::VecDeque;
+use std::io::Read;
 
 use crate::dialect::ParseOptions;
-use crate::error::LexError;
-use crate::span::Span;
+use crate::error::{LexError, ParseError};
+use crate::span::{BytePos, Span};
 use crate::token::{SpannedToken, Token};
 
-use cursor::Cursor;
+use char_source::CharSource;
 use heredoc::PendingHereDoc;
 
 /// Lexer operating mode.
@@ -27,114 +28,259 @@ pub(crate) enum LexerMode {
 ///
 /// Emits fragment-level tokens (Literal, SimpleParam, DoubleQuoted, etc.)
 /// plus Blank tokens as word boundary markers.
-pub struct Lexer<'src> {
-    cursor: Cursor<'src>,
-    pending_heredocs: Vec<PendingHereDoc>,
-    /// When true, the next token sequence is a heredoc delimiter (scanned as raw Literal).
-    expecting_heredoc_delimiter: bool,
-    /// Whether the current pending heredoc delimiter should strip tabs.
-    pending_strip_tabs: bool,
-    // TODO: expecting_heredoc_delimiter and pending_heredocs are lexer state not
-    // covered by TokenStream checkpoint/rewind. If speculative parsing (try_parse)
-    // ever lexes past `<<` or a delimiter word (advancing past the buffer), these
-    // flags get set and won't be cleared on rewind. Currently safe because try_parse
-    // only peeks 1-2 tokens for function definitions.
-    /// Extra tokens to emit before scanning more source (heredoc bodies, newlines).
-    queued_tokens: VecDeque<SpannedToken>,
+///
+/// Also provides a buffered token stream with `peek()`/`advance()`/`speculate()`
+/// for use by the parser. Call `skip_blanks()` to consume `Blank` tokens before
+/// peeking/advancing. Word collection code deliberately skips the call to see
+/// `Blank` tokens as word boundaries.
+pub struct Lexer {
+    // --- Constants (never change after construction) ---
     pub(crate) options: ParseOptions,
     mode: LexerMode,
-    /// Whether the last emitted token was Blank. Used by operator scanner
+
+    // --- Character source (forward-only) ---
+    pub(super) chars: CharSource,
+
+    // --- Scanning state (only matters at cursor, not touched by speculation) ---
+    pending_heredocs: Vec<PendingHereDoc>,
+    expecting_heredoc_delimiter: bool,
+    pending_strip_tabs: bool,
+    /// Whether the last scanned token was Blank. Used by operator scanner
     /// for process substitution detection (<( and >( preceded by blank).
     last_was_blank: bool,
-    /// Whether we've already emitted a fragment for the current word.
+    /// Whether we've already scanned a fragment for the current word.
     /// Used for tilde prefix detection (~ is special only at word start).
     word_started: bool,
+
+    // --- Stream infrastructure ---
+    buffer: VecDeque<SpannedToken>,
+    buf_pos: usize,
+    speculation_depth: usize,
 }
 
-impl<'src> Lexer<'src> {
-    pub fn new(source: &'src str, options: ParseOptions) -> Self {
-        Lexer {
-            cursor: Cursor::new(source),
-            pending_heredocs: Vec::new(),
-            expecting_heredoc_delimiter: false,
-            pending_strip_tabs: false,
-            queued_tokens: VecDeque::new(),
-            options,
-            mode: LexerMode::Normal,
-            last_was_blank: false,
-            word_started: false,
-        }
+impl Lexer {
+    /// Create a lexer from a string source.
+    pub fn from_str(source: &str, options: ParseOptions) -> Self {
+        Self::build(CharSource::from_str(source), options, LexerMode::Normal)
+    }
+
+    /// Create a lexer from any Read source.
+    pub fn from_reader(reader: impl Read + 'static, options: ParseOptions) -> Self {
+        Self::build(CharSource::from_reader(reader), options, LexerMode::Normal)
     }
 
     /// Create a lexer in double-quote mode for parsing the inner content
     /// of a double-quoted string.
-    pub(crate) fn new_double_quote_mode(source: &'src str, options: ParseOptions) -> Self {
+    pub(crate) fn new_double_quote_mode(source: &str, options: ParseOptions) -> Self {
+        Self::build(CharSource::from_str(source), options, LexerMode::DoubleQuote)
+    }
+
+    fn build(chars: CharSource, options: ParseOptions, mode: LexerMode) -> Self {
         Lexer {
-            cursor: Cursor::new(source),
+            options,
+            mode,
+            chars,
             pending_heredocs: Vec::new(),
             expecting_heredoc_delimiter: false,
             pending_strip_tabs: false,
-            queued_tokens: VecDeque::new(),
-            options,
-            mode: LexerMode::DoubleQuote,
             last_was_blank: false,
             word_started: false,
+            buffer: VecDeque::new(),
+            buf_pos: 0,
+            speculation_depth: 0,
         }
     }
 
-    /// Get the next token from the source.
+    // ================================================================
+    // Character-level helpers (delegate to CharSource)
+    // ================================================================
+
+    pub(super) fn peek_char(&self) -> Option<char> {
+        self.chars.peek()
+    }
+
+    pub(super) fn peek_second_char(&self) -> Option<char> {
+        self.chars.peek_at(1)
+    }
+
+    pub(super) fn advance_char(&mut self) -> Option<char> {
+        self.chars.advance()
+    }
+
+    pub(super) fn cursor_pos(&self) -> BytePos {
+        BytePos(self.chars.byte_pos())
+    }
+
+    pub(super) fn is_at_eof(&self) -> bool {
+        self.chars.is_eof()
+    }
+
+    // ================================================================
+    // Token-level buffered API (merged from TokenStream)
+    // ================================================================
+
+    /// Consume all `Blank` tokens at the current position.
+    pub(crate) fn skip_blanks(&mut self) -> Result<(), ParseError> {
+        loop {
+            self.ensure_buffered()?;
+            if self.buffer[self.buf_pos].token == Token::Blank {
+                if self.speculation_depth == 0 {
+                    self.buffer.pop_front();
+                } else {
+                    self.buf_pos += 1;
+                }
+            } else {
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    /// Look at the next token without consuming it.
+    pub(crate) fn peek(&mut self) -> Result<&SpannedToken, ParseError> {
+        self.ensure_buffered()?;
+        Ok(&self.buffer[self.buf_pos])
+    }
+
+    /// Consume and return the next token.
+    pub(crate) fn advance(&mut self) -> Result<SpannedToken, ParseError> {
+        self.ensure_buffered()?;
+        if self.speculation_depth == 0 {
+            debug_assert_eq!(self.buf_pos, 0, "buf_pos should be 0 outside speculation");
+            Ok(self.buffer.pop_front().unwrap())
+        } else {
+            let tok = self.buffer[self.buf_pos].clone();
+            self.buf_pos += 1;
+            Ok(tok)
+        }
+    }
+
+    /// Peek at a token at an offset from the current position.
+    pub(crate) fn peek_at_offset(
+        &mut self,
+        offset: usize,
+    ) -> Result<&SpannedToken, ParseError> {
+        let target = self.buf_pos + offset;
+        self.ensure_buffered_at(target)?;
+        Ok(&self.buffer[target])
+    }
+
+    /// Try a speculative parse. Saves the buffer read position, runs the
+    /// closure, and rewinds `buf_pos` if the closure returns `None`.
+    /// Tokens scanned during speculation stay in the buffer — scanning state
+    /// is purely cursor-side and doesn't need saving.
+    pub(crate) fn speculate<T>(
+        &mut self,
+        f: impl FnOnce(&mut Self) -> Result<Option<T>, ParseError>,
+    ) -> Result<Option<T>, ParseError> {
+        let saved_buf_pos = self.buf_pos;
+        self.speculation_depth += 1;
+        let result = f(self);
+        self.speculation_depth -= 1;
+        match result? {
+            Some(v) => {
+                // Commit: compact consumed tokens from the front
+                for _ in 0..self.buf_pos {
+                    self.buffer.pop_front();
+                }
+                self.buf_pos = 0;
+                Ok(Some(v))
+            }
+            None => {
+                // Rewind: move read head back, tokens stay in buffer
+                self.buf_pos = saved_buf_pos;
+                Ok(None)
+            }
+        }
+    }
+
+    fn ensure_buffered(&mut self) -> Result<(), ParseError> {
+        while self.buf_pos >= self.buffer.len() {
+            self.scan_next()?;
+        }
+        Ok(())
+    }
+
+    fn ensure_buffered_at(&mut self, target: usize) -> Result<(), ParseError> {
+        while target >= self.buffer.len() {
+            self.scan_next()?;
+        }
+        Ok(())
+    }
+
+    // ================================================================
+    // Raw token scanning
+    // ================================================================
+
+    /// Get the next token from the source. Scans into the buffer, then
+    /// returns the next buffered token.
+    ///
+    /// Used by external callers (cli, tests, inner double-quote lexers).
+    /// The parser uses `peek()`/`advance()` instead, which call `scan_next()`
+    /// via `ensure_buffered()`.
+    pub(crate) fn next_token(&mut self) -> Result<SpannedToken, LexError> {
+        self.scan_next()?;
+        if self.speculation_depth == 0 {
+            Ok(self.buffer.pop_front().unwrap())
+        } else {
+            let tok = self.buffer[self.buf_pos].clone();
+            self.buf_pos += 1;
+            Ok(tok)
+        }
+    }
+
+    /// Scan the next source construct and push one or more tokens into the buffer.
     ///
     /// The lexer is context-free — it never promotes words to reserved word
     /// tokens. That's the parser's job. The lexer produces fragment tokens
     /// (Literal, SimpleParam, etc.), Blank, IoNumber, operators, Newline,
     /// HereDocBody, and Eof.
-    pub fn next_token(&mut self) -> Result<SpannedToken, LexError> {
+    fn scan_next(&mut self) -> Result<(), LexError> {
         if self.mode == LexerMode::DoubleQuote {
-            return self.next_dq_token();
+            let tok = self.next_dq_token()?;
+            self.buffer.push_back(tok);
+            return Ok(());
         }
 
-        // Return queued tokens first (heredoc bodies + deferred newline)
-        if let Some(tok) = self.queued_tokens.pop_front() {
-            return Ok(tok);
-        }
-
-        let start = self.cursor.pos().0;
+        let start = self.cursor_pos().0;
 
         // Blanks + comments -> Blank token
         if self.scan_blanks_and_comments() {
-            let end = self.cursor.pos().0;
+            let end = self.cursor_pos().0;
             self.last_was_blank = true;
             self.word_started = false;
-            return Ok(SpannedToken {
+            self.buffer.push_back(SpannedToken {
                 token: Token::Blank,
                 span: Span::new(start, end),
             });
+            return Ok(());
         }
 
         // EOF
-        if self.cursor.is_eof() {
-            debug_assert!(
-                self.queued_tokens.is_empty(),
-                "EOF reached with {} queued tokens undrained",
-                self.queued_tokens.len()
-            );
-            return Ok(SpannedToken {
+        if self.is_at_eof() {
+            self.buffer.push_back(SpannedToken {
                 token: Token::Eof,
                 span: Span::empty(start),
             });
+            return Ok(());
         }
 
-        let ch = self.cursor.peek().unwrap();
+        let ch = self.peek_char().unwrap();
 
         // Newline — also triggers heredoc body reading
         if ch == '\n' {
-            self.cursor.advance();
+            self.advance_char();
             let newline_span = Span::new(start, start + 1);
             self.last_was_blank = false;
             self.word_started = false;
 
+            self.buffer.push_back(SpannedToken {
+                token: Token::Newline,
+                span: newline_span,
+            });
+
             if !self.pending_heredocs.is_empty() {
-                // Read all pending heredoc bodies
+                // Read all pending heredoc bodies directly into buffer
                 let pending = std::mem::take(&mut self.pending_heredocs);
                 for heredoc in &pending {
                     let body =
@@ -142,22 +288,14 @@ impl<'src> Lexer<'src> {
                     // TODO: The span should cover the actual body content in the source,
                     // not the newline. Track the cursor position before/after reading
                     // the body and use that for the span.
-                    self.queued_tokens.push_back(SpannedToken {
+                    self.buffer.push_back(SpannedToken {
                         token: Token::HereDocBody(body),
                         span: newline_span, // wrong — should be the body's span
                     });
                 }
-                // Return the Newline immediately, bodies are queued
-                return Ok(SpannedToken {
-                    token: Token::Newline,
-                    span: newline_span,
-                });
             }
 
-            return Ok(SpannedToken {
-                token: Token::Newline,
-                span: newline_span,
-            });
+            return Ok(());
         }
 
         // Operators
@@ -175,7 +313,8 @@ impl<'src> Lexer<'src> {
             }
             self.last_was_blank = false;
             self.word_started = false;
-            return Ok(tok);
+            self.buffer.push_back(tok);
+            return Ok(());
         }
 
         // Heredoc delimiter special case: read the entire delimiter as a single
@@ -193,28 +332,30 @@ impl<'src> Lexer<'src> {
             }
             self.last_was_blank = false;
             self.word_started = true;
-            return Ok(tok);
+            self.buffer.push_back(tok);
+            return Ok(());
         }
 
         // Fragment token
         let tok = self.scan_fragment(start)?;
         self.last_was_blank = false;
         self.word_started = true;
-        Ok(tok)
+        self.buffer.push_back(tok);
+        Ok(())
     }
 
     /// Tokenize inside a double-quoted string. Only recognizes expansions
     /// ($, backtick) and limited backslash escaping. No operators or word splitting.
     fn next_dq_token(&mut self) -> Result<SpannedToken, LexError> {
-        if self.cursor.is_eof() {
+        if self.is_at_eof() {
             return Ok(SpannedToken {
                 token: Token::Eof,
-                span: Span::empty(self.cursor.pos().0),
+                span: Span::empty(self.cursor_pos().0),
             });
         }
 
-        let start = self.cursor.pos().0;
-        let ch = self.cursor.peek().unwrap();
+        let start = self.cursor_pos().0;
+        let ch = self.peek_char().unwrap();
 
         match ch {
             '$' => self.scan_dollar(start),
@@ -227,20 +368,20 @@ impl<'src> Lexer<'src> {
     /// Scan a backslash escape inside double quotes. Only $, `, ", \, and
     /// newline are escapable; other backslashes are literal.
     fn scan_dq_backslash(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume backslash
-        match self.cursor.peek() {
+        self.advance_char(); // consume backslash
+        match self.peek_char() {
             Some(c) if c == '$' || c == '`' || c == '"' || c == '\\' || c == '\n' => {
-                self.cursor.advance();
+                self.advance_char();
                 Ok(SpannedToken {
                     token: Token::Literal(c.to_string()),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
             _ => {
                 // Backslash is literal
                 Ok(SpannedToken {
                     token: Token::Literal("\\".to_string()),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
         }
@@ -249,16 +390,16 @@ impl<'src> Lexer<'src> {
     /// Scan literal text inside double quotes until an expansion or EOF.
     fn scan_dq_literal(&mut self, start: usize) -> Result<SpannedToken, LexError> {
         let mut literal = String::new();
-        while let Some(ch) = self.cursor.peek() {
+        while let Some(ch) = self.peek_char() {
             if ch == '$' || ch == '`' || ch == '\\' {
                 break;
             }
             literal.push(ch);
-            self.cursor.advance();
+            self.advance_char();
         }
         Ok(SpannedToken {
             token: Token::Literal(literal),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
@@ -269,27 +410,27 @@ impl<'src> Lexer<'src> {
     fn scan_blanks_and_comments(&mut self) -> bool {
         let mut has_actual_blank = false;
         loop {
-            match self.cursor.peek() {
+            match self.peek_char() {
                 Some(' ') | Some('\t') => {
                     has_actual_blank = true;
-                    self.cursor.advance();
+                    self.advance_char();
                 }
-                Some('\\') if self.cursor.peek_second() == Some('\n') => {
+                Some('\\') if self.peek_second_char() == Some('\n') => {
                     // Line continuation: \<newline> is removed entirely (POSIX 2.2.1)
-                    self.cursor.advance(); // consume backslash
-                    self.cursor.advance(); // consume newline
+                    self.advance_char(); // consume backslash
+                    self.advance_char(); // consume newline
                 }
                 _ => break,
             }
         }
         // Skip comment if present
-        if self.cursor.peek() == Some('#') {
+        if self.peek_char() == Some('#') {
             has_actual_blank = true;
-            while let Some(ch) = self.cursor.peek() {
+            while let Some(ch) = self.peek_char() {
                 if ch == '\n' {
                     break;
                 }
-                self.cursor.advance();
+                self.advance_char();
             }
         }
         has_actual_blank

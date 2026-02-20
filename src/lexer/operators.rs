@@ -4,14 +4,14 @@ use crate::token::{SpannedToken, Token};
 
 use super::Lexer;
 
-impl<'src> Lexer<'src> {
+impl Lexer {
     /// Try to scan a multi-char or single-char operator. Returns `None` if the
     /// current character doesn't start an operator.
     pub(super) fn try_scan_operator(
         &mut self,
         start: usize,
     ) -> Result<Option<SpannedToken>, LexError> {
-        let ch = match self.cursor.peek() {
+        let ch = match self.peek_char() {
             Some(c) => c,
             None => return Ok(None),
         };
@@ -20,19 +20,12 @@ impl<'src> Lexer<'src> {
             '(' => (Token::LParen, 1),
             ')' => (Token::RParen, 1),
             '&' => {
-                if self.cursor.peek_second() == Some('&') {
+                if self.chars.peek_at(1) == Some('&') {
                     (Token::AndIf, 2)
-                } else if self.options.ampersand_redirect && self.cursor.peek_second() == Some('>')
-                {
-                    // Check for &>> vs &>
-                    let saved_pos = self.cursor.pos;
-                    self.cursor.advance(); // &
-                    self.cursor.advance(); // >
-                    if self.cursor.peek() == Some('>') {
-                        self.cursor.pos = saved_pos;
+                } else if self.options.ampersand_redirect && self.chars.peek_at(1) == Some('>') {
+                    if self.chars.peek_at(2) == Some('>') {
                         (Token::BashAppendAllOp, 3)
                     } else {
-                        self.cursor.pos = saved_pos;
                         (Token::BashRedirectAllOp, 2)
                     }
                 } else {
@@ -40,53 +33,36 @@ impl<'src> Lexer<'src> {
                 }
             }
             '|' => {
-                if self.cursor.peek_second() == Some('|') {
+                if self.chars.peek_at(1) == Some('|') {
                     (Token::OrIf, 2)
-                } else if self.options.pipe_stderr && self.cursor.peek_second() == Some('&') {
+                } else if self.options.pipe_stderr && self.chars.peek_at(1) == Some('&') {
                     (Token::BashPipeAmpersand, 2)
                 } else {
                     (Token::Pipe, 1)
                 }
             }
             ';' => {
-                if self.cursor.peek_second() == Some(';') {
-                    if self.options.extended_case {
-                        // Check for ;;& (three chars)
-                        let saved_pos = self.cursor.pos;
-                        self.cursor.advance(); // ;
-                        self.cursor.advance(); // ;
-                        if self.cursor.peek() == Some('&') {
-                            self.cursor.pos = saved_pos;
-                            (Token::BashCaseFallThrough, 3)
-                        } else {
-                            self.cursor.pos = saved_pos;
-                            (Token::CaseBreak, 2)
-                        }
+                if self.chars.peek_at(1) == Some(';') {
+                    if self.options.extended_case && self.chars.peek_at(2) == Some('&') {
+                        (Token::BashCaseFallThrough, 3)
                     } else {
                         (Token::CaseBreak, 2)
                     }
-                } else if self.options.extended_case && self.cursor.peek_second() == Some('&') {
+                } else if self.options.extended_case && self.chars.peek_at(1) == Some('&') {
                     (Token::BashCaseContinue, 2)
                 } else {
                     (Token::Semicolon, 1)
                 }
             }
-            '<' => match self.cursor.peek_second() {
+            '<' => match self.chars.peek_at(1) {
                 Some('&') => (Token::RedirectFromFd, 2),
                 Some('>') => (Token::ReadWrite, 2),
                 Some('<') => {
-                    // Could be <<, <<-, or <<< (here-string)
-                    let saved_pos = self.cursor.pos;
-                    self.cursor.advance(); // consume first <
-                    self.cursor.advance(); // consume second <
-                    if self.cursor.peek() == Some('-') {
-                        self.cursor.pos = saved_pos;
+                    if self.chars.peek_at(2) == Some('-') {
                         (Token::HereDocStripOp, 3)
-                    } else if self.options.here_strings && self.cursor.peek() == Some('<') {
-                        self.cursor.pos = saved_pos;
+                    } else if self.options.here_strings && self.chars.peek_at(2) == Some('<') {
                         (Token::BashHereStringOp, 3)
                     } else {
-                        self.cursor.pos = saved_pos;
                         (Token::HereDocOp, 2)
                     }
                 }
@@ -95,7 +71,7 @@ impl<'src> Lexer<'src> {
                 }
                 _ => (Token::RedirectFromFile, 1),
             },
-            '>' => match self.cursor.peek_second() {
+            '>' => match self.chars.peek_at(1) {
                 Some('>') => (Token::Append, 2),
                 Some('&') => (Token::RedirectToFd, 2),
                 Some('|') => (Token::Clobber, 2),
@@ -104,10 +80,10 @@ impl<'src> Lexer<'src> {
                 }
                 _ => (Token::RedirectToFile, 1),
             },
-            '[' if self.options.double_brackets && self.cursor.peek_second() == Some('[') => {
+            '[' if self.options.double_brackets && self.chars.peek_at(1) == Some('[') => {
                 (Token::BashDblLBracket, 2)
             }
-            ']' if self.options.double_brackets && self.cursor.peek_second() == Some(']') => {
+            ']' if self.options.double_brackets && self.chars.peek_at(1) == Some(']') => {
                 (Token::BashDblRBracket, 2)
             }
             _ => return Ok(None),
@@ -115,12 +91,12 @@ impl<'src> Lexer<'src> {
 
         // Advance by `len` characters
         for _ in 0..len {
-            self.cursor.advance();
+            self.advance_char();
         }
 
         Ok(Some(SpannedToken {
             token,
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         }))
     }
 }

@@ -4,11 +4,11 @@ use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};
 
 use super::Lexer;
 
-impl<'src> Lexer<'src> {
+impl Lexer {
     /// Scan one fragment token. Called when the cursor is at a non-blank,
     /// non-operator, non-newline character in normal mode.
     pub(super) fn scan_fragment(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        let ch = self.cursor.peek().unwrap();
+        let ch = self.peek_char().unwrap();
 
         match ch {
             '\'' => self.scan_single_quoted(start),
@@ -20,14 +20,14 @@ impl<'src> Lexer<'src> {
             '*' | '?' => self.scan_glob_or_extglob(start, ch),
             '[' if self.has_bracket_close_in_word() => self.scan_bracket_glob(start),
             '+' | '@' | '!'
-                if self.options.extglob && self.cursor.peek_second() == Some('(') =>
+                if self.options.extglob && self.peek_second_char() == Some('(') =>
             {
                 self.scan_extglob(start, ch)
             }
             '<' | '>'
                 if !self.word_started
                     && self.options.process_substitution
-                    && self.cursor.peek_second() == Some('(') =>
+                    && self.peek_second_char() == Some('(') =>
             {
                 self.scan_process_sub(start, ch)
             }
@@ -41,7 +41,7 @@ impl<'src> Lexer<'src> {
         let mut literal = String::new();
         let mut all_digits = true;
 
-        while let Some(ch) = self.cursor.peek() {
+        while let Some(ch) = self.peek_char() {
             match ch {
                 // Word delimiters
                 ' ' | '\t' | '\n' => break,
@@ -54,7 +54,7 @@ impl<'src> Lexer<'src> {
                         if let Ok(fd) = literal.parse::<i32>() {
                             return Ok(SpannedToken {
                                 token: Token::IoNumber(fd),
-                                span: Span::new(start, self.cursor.pos().0),
+                                span: Span::new(start, self.cursor_pos().0),
                             });
                         }
                     }
@@ -69,7 +69,7 @@ impl<'src> Lexer<'src> {
                 '~' if literal.is_empty() && !self.word_started => break,
                 // ExtGlob prefix with ( following
                 '+' | '@' | '!'
-                    if self.options.extglob && self.cursor.peek_second() == Some('(') =>
+                    if self.options.extglob && self.peek_second_char() == Some('(') =>
                 {
                     break;
                 }
@@ -80,19 +80,19 @@ impl<'src> Lexer<'src> {
                         all_digits = false;
                     }
                     literal.push(ch);
-                    self.cursor.advance();
+                    self.advance_char();
                 }
             }
         }
 
         // IoNumber detection at EOF or when followed by < or >
         if all_digits && !literal.is_empty() {
-            if let Some(ch) = self.cursor.peek() {
+            if let Some(ch) = self.peek_char() {
                 if ch == '<' || ch == '>' {
                     if let Ok(fd) = literal.parse::<i32>() {
                         return Ok(SpannedToken {
                             token: Token::IoNumber(fd),
-                            span: Span::new(start, self.cursor.pos().0),
+                            span: Span::new(start, self.cursor_pos().0),
                         });
                     }
                 }
@@ -101,57 +101,57 @@ impl<'src> Lexer<'src> {
 
         Ok(SpannedToken {
             token: Token::Literal(literal),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a single-quoted string: content between '...' (without quote chars).
     fn scan_single_quoted(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume opening '
-        let quote_start = self.cursor.pos().0 - 1;
+        self.advance_char(); // consume opening '
+        let quote_start = self.cursor_pos().0 - 1;
         let mut content = String::new();
         loop {
-            match self.cursor.advance() {
+            match self.advance_char() {
                 Some('\'') => break,
                 Some(c) => content.push(c),
                 None => {
                     return Err(LexError::UnterminatedSingleQuote {
-                        span: Span::new(quote_start, self.cursor.pos().0),
+                        span: Span::new(quote_start, self.cursor_pos().0),
                     });
                 }
             }
         }
         Ok(SpannedToken {
             token: Token::SingleQuoted(content),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a double-quoted string: raw content between "..." (without quote chars).
     /// The content is not parsed here — the parser spawns an inner lexer for it.
     fn scan_double_quoted(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume opening "
-        let quote_start = self.cursor.pos().0 - 1;
+        self.advance_char(); // consume opening "
+        let quote_start = self.cursor_pos().0 - 1;
         let mut content = String::new();
         loop {
-            match self.cursor.advance() {
+            match self.advance_char() {
                 Some('"') => break,
                 Some('\\') => {
                     // Preserve backslash escapes in raw content for inner lexer
                     content.push('\\');
-                    if let Some(c) = self.cursor.advance() {
+                    if let Some(c) = self.advance_char() {
                         content.push(c);
                     }
                 }
                 // $(...) / $((...)) / ${...} create new quoting contexts
                 Some('$') => {
                     content.push('$');
-                    match self.cursor.peek() {
+                    match self.peek_char() {
                         Some('(') => {
-                            self.cursor.advance();
+                            self.advance_char();
                             content.push('(');
-                            if self.cursor.peek() == Some('(') {
-                                self.cursor.advance();
+                            if self.peek_char() == Some('(') {
+                                self.advance_char();
                                 content.push('(');
                                 self.read_balanced_into(
                                     &mut content,
@@ -171,7 +171,7 @@ impl<'src> Lexer<'src> {
                             }
                         }
                         Some('{') => {
-                            self.cursor.advance();
+                            self.advance_char();
                             content.push('{');
                             self.read_balanced_into(
                                 &mut content,
@@ -188,21 +188,21 @@ impl<'src> Lexer<'src> {
                 Some('`') => {
                     content.push('`');
                     loop {
-                        match self.cursor.advance() {
+                        match self.advance_char() {
                             Some('`') => {
                                 content.push('`');
                                 break;
                             }
                             Some('\\') => {
                                 content.push('\\');
-                                if let Some(c) = self.cursor.advance() {
+                                if let Some(c) = self.advance_char() {
                                     content.push(c);
                                 }
                             }
                             Some(c) => content.push(c),
                             None => {
                                 return Err(LexError::UnterminatedBackquote {
-                                    span: Span::new(quote_start, self.cursor.pos().0),
+                                    span: Span::new(quote_start, self.cursor_pos().0),
                                 });
                             }
                         }
@@ -211,116 +211,116 @@ impl<'src> Lexer<'src> {
                 Some(c) => content.push(c),
                 None => {
                     return Err(LexError::UnterminatedDoubleQuote {
-                        span: Span::new(quote_start, self.cursor.pos().0),
+                        span: Span::new(quote_start, self.cursor_pos().0),
                     });
                 }
             }
         }
         Ok(SpannedToken {
             token: Token::DoubleQuoted(content),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a dollar-prefixed construct: $VAR, ${...}, $(...), $((...)),
     /// $'...', $"...", or lone $.
     pub(super) fn scan_dollar(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume $
-        let dollar_pos = self.cursor.pos().0 - 1;
+        self.advance_char(); // consume $
+        let dollar_pos = self.cursor_pos().0 - 1;
 
-        match self.cursor.peek() {
+        match self.peek_char() {
             Some('(') => {
-                self.cursor.advance(); // consume (
-                if self.cursor.peek() == Some('(') {
+                self.advance_char(); // consume (
+                if self.peek_char() == Some('(') {
                     // Arithmetic expansion: $((expr))
-                    self.cursor.advance(); // consume second (
+                    self.advance_char(); // consume second (
                     let content = self.read_balanced_content('(', ')', 2, dollar_pos)?;
                     Ok(SpannedToken {
                         token: Token::ArithSub(content),
-                        span: Span::new(start, self.cursor.pos().0),
+                        span: Span::new(start, self.cursor_pos().0),
                     })
                 } else {
                     // Command substitution: $(cmd)
                     let content = self.read_balanced_content('(', ')', 1, dollar_pos)?;
                     Ok(SpannedToken {
                         token: Token::CommandSub(content),
-                        span: Span::new(start, self.cursor.pos().0),
+                        span: Span::new(start, self.cursor_pos().0),
                     })
                 }
             }
             Some('{') => {
-                self.cursor.advance(); // consume {
+                self.advance_char(); // consume {
                 let content = self.read_balanced_content('{', '}', 1, dollar_pos)?;
                 Ok(SpannedToken {
                     token: Token::BraceParam(content),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
             // $'...' — ANSI-C quoting (Bash, only in normal mode)
             Some('\'') if self.mode == super::LexerMode::Normal && self.options.ansi_c_quoting => {
-                self.cursor.advance(); // consume '
+                self.advance_char(); // consume '
                 let mut content = String::new();
                 loop {
-                    match self.cursor.advance() {
+                    match self.advance_char() {
                         Some('\'') => break,
                         Some('\\') => {
                             // Keep escape sequences literally — the executor interprets them
                             content.push('\\');
-                            if let Some(c) = self.cursor.advance() {
+                            if let Some(c) = self.advance_char() {
                                 content.push(c);
                             }
                         }
                         Some(c) => content.push(c),
                         None => {
                             return Err(LexError::UnterminatedSingleQuote {
-                                span: Span::new(dollar_pos, self.cursor.pos().0),
+                                span: Span::new(dollar_pos, self.cursor_pos().0),
                             });
                         }
                     }
                 }
                 Ok(SpannedToken {
                     token: Token::BashAnsiCQuoted(content),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
             // $"..." — locale translation (Bash, only in normal mode)
             Some('"') if self.mode == super::LexerMode::Normal && self.options.locale_translation => {
-                self.cursor.advance(); // consume "
+                self.advance_char(); // consume "
                 let mut content = String::new();
                 loop {
-                    match self.cursor.advance() {
+                    match self.advance_char() {
                         Some('"') => break,
                         Some('\\') => {
                             content.push('\\');
-                            if let Some(c) = self.cursor.advance() {
+                            if let Some(c) = self.advance_char() {
                                 content.push(c);
                             }
                         }
                         Some(c) => content.push(c),
                         None => {
                             return Err(LexError::UnterminatedDoubleQuote {
-                                span: Span::new(dollar_pos, self.cursor.pos().0),
+                                span: Span::new(dollar_pos, self.cursor_pos().0),
                             });
                         }
                     }
                 }
                 Ok(SpannedToken {
                     token: Token::BashLocaleQuoted(content),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
             Some(c) if c.is_ascii_alphanumeric() || c == '_' || is_special_param(c) => {
                 let name = self.scan_param_name();
                 Ok(SpannedToken {
                     token: Token::SimpleParam(name),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
             _ => {
                 // Lone $ is literal
                 Ok(SpannedToken {
                     token: Token::Literal("$".to_string()),
-                    span: Span::new(start, self.cursor.pos().0),
+                    span: Span::new(start, self.cursor_pos().0),
                 })
             }
         }
@@ -329,23 +329,23 @@ impl<'src> Lexer<'src> {
     /// Scan a simple parameter name after $: $name, $1, $@, etc.
     fn scan_param_name(&mut self) -> String {
         let mut name = String::new();
-        if let Some(c) = self.cursor.peek() {
+        if let Some(c) = self.peek_char() {
             if is_special_param(c) {
                 name.push(c);
-                self.cursor.advance();
+                self.advance_char();
                 return name;
             }
             if c.is_ascii_digit() {
                 name.push(c);
-                self.cursor.advance();
+                self.advance_char();
                 return name;
             }
         }
         // Regular name: [A-Za-z_][A-Za-z0-9_]*
-        while let Some(c) = self.cursor.peek() {
+        while let Some(c) = self.peek_char() {
             if c.is_ascii_alphanumeric() || c == '_' {
                 name.push(c);
-                self.cursor.advance();
+                self.advance_char();
             } else {
                 break;
             }
@@ -353,39 +353,37 @@ impl<'src> Lexer<'src> {
         name
     }
 
-    /// Scan a backtick command substitution: `...`
     /// Check if there's a `]` before the next word delimiter starting from
     /// the current position. Used to decide if `[` starts a bracket glob.
     fn has_bracket_close_in_word(&self) -> bool {
-        let source = &self.cursor.source[self.cursor.pos..];
-        let mut chars = source.chars();
-        chars.next(); // skip the [
+        let mut i = 1; // skip the [
         // POSIX bracket expression rules: negation and first ] are special
-        if matches!(chars.clone().next(), Some('!') | Some('^')) {
-            chars.next();
+        if matches!(self.chars.peek_at(i), Some('!') | Some('^')) {
+            i += 1;
         }
-        if chars.clone().next() == Some(']') {
-            chars.next(); // ] immediately after [ or [! is literal
+        if self.chars.peek_at(i) == Some(']') {
+            i += 1; // ] immediately after [ or [! is literal
         }
-        for c in chars {
-            match c {
-                ']' => return true,
-                ' ' | '\t' | '\n' | '|' | '&' | ';' | '<' | '>' | '(' | ')' => return false,
-                _ => continue,
+        loop {
+            match self.chars.peek_at(i) {
+                Some(']') => return true,
+                Some(' ' | '\t' | '\n' | '|' | '&' | ';' | '<' | '>' | '(' | ')') | None => {
+                    return false
+                }
+                _ => i += 1,
             }
         }
-        false
     }
 
     pub(super) fn scan_backtick(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume `
-        let bt_start = self.cursor.pos().0 - 1;
+        self.advance_char(); // consume `
+        let bt_start = self.cursor_pos().0 - 1;
         let mut content = String::new();
         loop {
-            match self.cursor.advance() {
+            match self.advance_char() {
                 Some('`') => break,
                 Some('\\') => {
-                    if let Some(c) = self.cursor.advance() {
+                    if let Some(c) = self.advance_char() {
                         if c == '`' || c == '\\' || c == '$' {
                             content.push(c);
                         } else {
@@ -397,36 +395,36 @@ impl<'src> Lexer<'src> {
                 Some(c) => content.push(c),
                 None => {
                     return Err(LexError::UnterminatedBackquote {
-                        span: Span::new(bt_start, self.cursor.pos().0),
+                        span: Span::new(bt_start, self.cursor_pos().0),
                     });
                 }
             }
         }
         Ok(SpannedToken {
             token: Token::BacktickSub(content),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a backslash escape in unquoted context.
     fn scan_backslash_escape(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        if self.cursor.peek_second() == Some('\n') {
+        if self.peek_second_char() == Some('\n') {
             // Line continuation: \<newline> is removed entirely (POSIX 2.2.1)
-            self.cursor.advance(); // skip backslash
-            self.cursor.advance(); // skip newline
+            self.advance_char(); // skip backslash
+            self.advance_char(); // skip newline
             // Continue to the next fragment (line continuation is invisible)
             // Emit nothing — let next_token call scan_fragment again.
             // But we're in scan_fragment which must return a token...
             // Recursively try the next fragment.
-            let new_start = self.cursor.pos().0;
-            if self.cursor.is_eof() {
+            let new_start = self.cursor_pos().0;
+            if self.is_at_eof() {
                 return Ok(SpannedToken {
                     token: Token::Eof,
                     span: Span::empty(new_start),
                 });
             }
             // Check if the next char is still a fragment character
-            let ch = self.cursor.peek().unwrap();
+            let ch = self.peek_char().unwrap();
             if ch == ' ' || ch == '\t' || ch == '\n' {
                 // Word delimiter — return an empty literal? No, we should let
                 // next_token handle this. But we're mid-scan_fragment...
@@ -445,22 +443,22 @@ impl<'src> Lexer<'src> {
         }
 
         // Regular backslash escape: preserve backslash + escaped char as raw literal
-        self.cursor.advance(); // consume backslash
+        self.advance_char(); // consume backslash
         let mut raw = String::from('\\');
-        if let Some(c) = self.cursor.advance() {
+        if let Some(c) = self.advance_char() {
             raw.push(c);
         }
         Ok(SpannedToken {
             token: Token::Literal(raw),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a tilde prefix: ~user at the start of a word.
     fn scan_tilde_prefix(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume ~
+        self.advance_char(); // consume ~
         let mut user = String::new();
-        while let Some(ch) = self.cursor.peek() {
+        while let Some(ch) = self.peek_char() {
             if ch == '/' || ch == ':' || ch == ' ' || ch == '\t' || ch == '\n' {
                 break;
             }
@@ -473,11 +471,11 @@ impl<'src> Lexer<'src> {
                 break;
             }
             user.push(ch);
-            self.cursor.advance();
+            self.advance_char();
         }
         Ok(SpannedToken {
             token: Token::TildePrefix(user),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
@@ -488,11 +486,11 @@ impl<'src> Lexer<'src> {
         ch: char,
     ) -> Result<SpannedToken, LexError> {
         // Check for extglob: ?(...) or *(...)
-        if self.options.extglob && self.cursor.peek_second() == Some('(') {
+        if self.options.extglob && self.peek_second_char() == Some('(') {
             return self.scan_extglob(start, ch);
         }
 
-        self.cursor.advance(); // consume * or ?
+        self.advance_char(); // consume * or ?
         let kind = match ch {
             '*' => GlobKind::Star,
             '?' => GlobKind::Question,
@@ -500,28 +498,28 @@ impl<'src> Lexer<'src> {
         };
         Ok(SpannedToken {
             token: Token::Glob(kind),
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
     /// Scan a bracket glob expression: [ followed by bracket content through ].
     fn scan_bracket_glob(&mut self, start: usize) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume [
-        let glob_span = Span::new(start, self.cursor.pos().0);
+        self.advance_char(); // consume [
+        let glob_span = Span::new(start, self.cursor_pos().0);
 
         // Read bracket content through closing ]
-        let bracket_start = self.cursor.pos().0;
+        let bracket_start = self.cursor_pos().0;
         let mut bracket_content = String::new();
 
         // Handle negation and first ]
-        if self.cursor.peek() == Some('!') || self.cursor.peek() == Some('^') {
-            bracket_content.push(self.cursor.advance().unwrap());
+        if self.peek_char() == Some('!') || self.peek_char() == Some('^') {
+            bracket_content.push(self.advance_char().unwrap());
         }
-        if self.cursor.peek() == Some(']') {
-            bracket_content.push(self.cursor.advance().unwrap());
+        if self.peek_char() == Some(']') {
+            bracket_content.push(self.advance_char().unwrap());
         }
         loop {
-            match self.cursor.advance() {
+            match self.advance_char() {
                 Some(']') => {
                     bracket_content.push(']');
                     break;
@@ -531,11 +529,11 @@ impl<'src> Lexer<'src> {
             }
         }
 
-        // Queue the bracket content as a Literal token
+        // Push the bracket content as a Literal token into the buffer
         if !bracket_content.is_empty() {
-            self.queued_tokens.push_back(SpannedToken {
+            self.buffer.push_back(SpannedToken {
                 token: Token::Literal(bracket_content),
-                span: Span::new(bracket_start, self.cursor.pos().0),
+                span: Span::new(bracket_start, self.cursor_pos().0),
             });
         }
 
@@ -555,13 +553,13 @@ impl<'src> Lexer<'src> {
             '!' => ExtGlobTokenKind::Not,
             _ => unreachable!(),
         };
-        self.cursor.advance(); // consume prefix char
-        self.cursor.advance(); // consume (
+        self.advance_char(); // consume prefix char
+        self.advance_char(); // consume (
 
         let mut pattern = String::new();
         let mut depth = 1;
         loop {
-            match self.cursor.advance() {
+            match self.advance_char() {
                 Some('(') => {
                     depth += 1;
                     pattern.push('(');
@@ -579,7 +577,7 @@ impl<'src> Lexer<'src> {
         }
         Ok(SpannedToken {
             token: Token::BashExtGlob { kind, pattern },
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
@@ -589,15 +587,15 @@ impl<'src> Lexer<'src> {
         start: usize,
         direction: char,
     ) -> Result<SpannedToken, LexError> {
-        self.cursor.advance(); // consume < or >
-        self.cursor.advance(); // consume (
+        self.advance_char(); // consume < or >
+        self.advance_char(); // consume (
         let content = self.read_balanced_content('(', ')', 1, start)?;
         Ok(SpannedToken {
             token: Token::BashProcessSub {
                 direction,
                 content,
             },
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 
@@ -610,17 +608,17 @@ impl<'src> Lexer<'src> {
     ) -> Result<SpannedToken, LexError> {
         let mut word = String::new();
 
-        while let Some(ch) = self.cursor.peek() {
+        while let Some(ch) = self.peek_char() {
             match ch {
                 ' ' | '\t' | '\n' => break,
                 '|' | '&' | ';' | '<' | '>' | '(' | ')' => break,
 
                 '\'' => {
-                    self.cursor.advance();
+                    self.advance_char();
                     word.push('\'');
-                    let quote_start = self.cursor.pos().0 - 1;
+                    let quote_start = self.cursor_pos().0 - 1;
                     loop {
-                        match self.cursor.advance() {
+                        match self.advance_char() {
                             Some('\'') => {
                                 word.push('\'');
                                 break;
@@ -628,7 +626,7 @@ impl<'src> Lexer<'src> {
                             Some(c) => word.push(c),
                             None => {
                                 return Err(LexError::UnterminatedSingleQuote {
-                                    span: Span::new(quote_start, self.cursor.pos().0),
+                                    span: Span::new(quote_start, self.cursor_pos().0),
                                 });
                             }
                         }
@@ -636,25 +634,25 @@ impl<'src> Lexer<'src> {
                 }
 
                 '"' => {
-                    self.cursor.advance();
+                    self.advance_char();
                     word.push('"');
-                    let quote_start = self.cursor.pos().0 - 1;
+                    let quote_start = self.cursor_pos().0 - 1;
                     loop {
-                        match self.cursor.advance() {
+                        match self.advance_char() {
                             Some('"') => {
                                 word.push('"');
                                 break;
                             }
                             Some('\\') => {
                                 word.push('\\');
-                                if let Some(c) = self.cursor.advance() {
+                                if let Some(c) = self.advance_char() {
                                     word.push(c);
                                 }
                             }
                             Some(c) => word.push(c),
                             None => {
                                 return Err(LexError::UnterminatedDoubleQuote {
-                                    span: Span::new(quote_start, self.cursor.pos().0),
+                                    span: Span::new(quote_start, self.cursor_pos().0),
                                 });
                             }
                         }
@@ -662,21 +660,21 @@ impl<'src> Lexer<'src> {
                 }
 
                 '\\' => {
-                    self.cursor.advance();
+                    self.advance_char();
                     word.push('\\');
-                    if let Some(c) = self.cursor.advance() {
+                    if let Some(c) = self.advance_char() {
                         word.push(c);
                     }
                 }
 
                 _ => {
                     word.push(ch);
-                    self.cursor.advance();
+                    self.advance_char();
                 }
             }
         }
 
-        let end = self.cursor.pos().0;
+        let end = self.cursor_pos().0;
         if word.is_empty() {
             return Ok(SpannedToken {
                 token: Token::Eof,
@@ -701,7 +699,7 @@ impl<'src> Lexer<'src> {
         mut depth: i32,
         start: usize,
     ) -> Result<(), LexError> {
-        while let Some(ch) = self.cursor.advance() {
+        while let Some(ch) = self.advance_char() {
             word.push(ch);
             if ch == open {
                 depth += 1;
@@ -712,7 +710,7 @@ impl<'src> Lexer<'src> {
                 }
             } else if ch == '\'' {
                 loop {
-                    match self.cursor.advance() {
+                    match self.advance_char() {
                         Some('\'') => {
                             word.push('\'');
                             break;
@@ -720,53 +718,53 @@ impl<'src> Lexer<'src> {
                         Some(c) => word.push(c),
                         None => {
                             return Err(LexError::UnterminatedSingleQuote {
-                                span: Span::new(start, self.cursor.pos().0),
+                                span: Span::new(start, self.cursor_pos().0),
                             });
                         }
                     }
                 }
             } else if ch == '"' {
                 loop {
-                    match self.cursor.advance() {
+                    match self.advance_char() {
                         Some('"') => {
                             word.push('"');
                             break;
                         }
                         Some('\\') => {
                             word.push('\\');
-                            if let Some(c) = self.cursor.advance() {
+                            if let Some(c) = self.advance_char() {
                                 word.push(c);
                             }
                         }
                         Some(c) => word.push(c),
                         None => {
                             return Err(LexError::UnterminatedDoubleQuote {
-                                span: Span::new(start, self.cursor.pos().0),
+                                span: Span::new(start, self.cursor_pos().0),
                             });
                         }
                     }
                 }
             } else if ch == '\\' {
-                if let Some(c) = self.cursor.advance() {
+                if let Some(c) = self.advance_char() {
                     word.push(c);
                 }
             } else if ch == '`' {
                 loop {
-                    match self.cursor.advance() {
+                    match self.advance_char() {
                         Some('`') => {
                             word.push('`');
                             break;
                         }
                         Some('\\') => {
                             word.push('\\');
-                            if let Some(c) = self.cursor.advance() {
+                            if let Some(c) = self.advance_char() {
                                 word.push(c);
                             }
                         }
                         Some(c) => word.push(c),
                         None => {
                             return Err(LexError::UnterminatedBackquote {
-                                span: Span::new(start, self.cursor.pos().0),
+                                span: Span::new(start, self.cursor_pos().0),
                             });
                         }
                     }
@@ -781,7 +779,7 @@ impl<'src> Lexer<'src> {
         };
         Err(LexError::UnterminatedExpansion {
             kind,
-            span: Span::new(start, self.cursor.pos().0),
+            span: Span::new(start, self.cursor_pos().0),
         })
     }
 

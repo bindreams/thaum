@@ -5,11 +5,11 @@ use crate::token::Token;
 use super::helpers::*;
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     pub(super) fn parse_coproc(&mut self) -> Result<Expression, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
-        self.stream.advance()?; // consume "coproc"
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
+        self.lexer.advance()?; // consume "coproc"
 
         // If the next token starts a compound command, there's no name
         if self.is_compound_start()? {
@@ -85,47 +85,47 @@ impl<'src> Parser<'src> {
         }
 
         Err(ParseError::UnexpectedToken {
-            found: self.stream.peek()?.token.display_name().to_string(),
+            found: self.lexer.peek()?.token.display_name().to_string(),
             expected: "a command after 'coproc'".to_string(),
-            span: self.stream.peek()?.span,
+            span: self.lexer.peek()?.span,
         })
     }
 
     pub(super) fn parse_select_clause(&mut self) -> Result<CompoundCommand, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         self.expect_keyword("select")?;
 
-        self.stream.skip_blanks()?;
-        let var_name = match &self.stream.peek()?.token {
+        self.lexer.skip_blanks()?;
+        let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
                 return Err(ParseError::UnexpectedToken {
-                    found: self.stream.peek()?.token.display_name().to_string(),
+                    found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a variable name".to_string(),
-                    span: self.stream.peek()?.span,
+                    span: self.lexer.peek()?.span,
                 });
             }
         };
-        self.stream.advance()?;
+        self.lexer.advance()?;
         self.skip_linebreak()?;
 
         let words = if self.is_lone_literal("in")? {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             let mut word_list = Vec::new();
             while self.is_word()? {
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
             }
-            if self.stream.peek()?.token == Token::Semicolon {
-                self.stream.advance()?;
+            if self.lexer.peek()?.token == Token::Semicolon {
+                self.lexer.advance()?;
             }
             self.skip_linebreak()?;
             Some(word_list)
         } else {
-            if self.stream.peek()?.token == Token::Semicolon {
-                self.stream.advance()?;
+            if self.lexer.peek()?.token == Token::Semicolon {
+                self.lexer.advance()?;
             }
             self.skip_linebreak()?;
             None
@@ -144,35 +144,35 @@ impl<'src> Parser<'src> {
     }
 
     pub(super) fn parse_function_definition(&mut self) -> Result<Expression, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
 
         let has_function_keyword = self.is_lone_literal("function")?;
         if has_function_keyword {
-            self.stream.advance()?;
+            self.lexer.advance()?;
         }
 
-        self.stream.skip_blanks()?;
-        let name = match &self.stream.peek()?.token {
+        self.lexer.skip_blanks()?;
+        let name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
                 return Err(ParseError::UnexpectedToken {
-                    found: self.stream.peek()?.token.display_name().to_string(),
+                    found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a function name".to_string(),
-                    span: self.stream.peek()?.span,
+                    span: self.lexer.peek()?.span,
                 });
             }
         };
 
         if has_function_keyword {
-            self.stream.advance()?;
-            self.stream.skip_blanks()?;
-            if self.stream.peek()?.token == Token::LParen {
-                self.stream.advance()?;
+            self.lexer.advance()?;
+            self.lexer.skip_blanks()?;
+            if self.lexer.peek()?.token == Token::LParen {
+                self.lexer.advance()?;
                 self.expect(&Token::RParen)?;
             }
         } else {
-            self.stream.advance()?;
+            self.lexer.advance()?;
             self.expect(&Token::LParen)?;
             self.expect(&Token::RParen)?;
         }

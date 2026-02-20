@@ -5,10 +5,10 @@ use crate::token::Token;
 use super::helpers::is_valid_name;
 use super::Parser;
 
-impl<'src> Parser<'src> {
+impl Parser {
     pub(super) fn parse_command(&mut self) -> Result<Command, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
         let mut assignments = Vec::new();
         let mut arguments = Vec::new();
         let mut redirects = Vec::new();
@@ -23,25 +23,25 @@ impl<'src> Parser<'src> {
             }
 
             // Assignment detection: first Literal in a word contains '='
-            if let Token::Literal(ref w) = self.stream.peek()?.token {
+            if let Token::Literal(ref w) = self.lexer.peek()?.token {
                 if let Some(eq_pos) = w.find('=') {
                     let name = &w[..eq_pos];
                     if is_valid_name(name) && !name.is_empty() {
                         let value_prefix = w[eq_pos + 1..].to_string();
                         let name = name.to_string();
-                        let word_span = self.stream.peek()?.span;
-                        self.stream.advance()?; // consume the Literal("name=value...")
+                        let word_span = self.lexer.peek()?.span;
+                        self.lexer.advance()?; // consume the Literal("name=value...")
 
                         // Array assignment: name=( ... ) (Bash)
                         if value_prefix.is_empty()
                             && self.options.arrays
-                            && self.stream.peek()?.token == Token::LParen
+                            && self.lexer.peek()?.token == Token::LParen
                         {
-                            self.stream.advance()?; // consume (
+                            self.lexer.advance()?; // consume (
                             let mut elements = Vec::new();
                             loop {
                                 self.skip_linebreak()?;
-                                if self.stream.peek()?.token == Token::RParen {
+                                if self.lexer.peek()?.token == Token::RParen {
                                     break;
                                 }
                                 if self.is_word()? {
@@ -52,8 +52,8 @@ impl<'src> Parser<'src> {
                                     break;
                                 }
                             }
-                            let rparen_span = self.stream.peek()?.span;
-                            self.stream.advance()?; // consume )
+                            let rparen_span = self.lexer.peek()?.span;
+                            self.lexer.advance()?; // consume )
                             let arr_span = word_span.merge(rparen_span);
                             assignments.push(Assignment {
                                 name,
@@ -79,13 +79,13 @@ impl<'src> Parser<'src> {
         }
 
         if self.is_word()? {
-            end_span = self.stream.peek()?.span;
+            end_span = self.lexer.peek()?.span;
             if let Some(arg) = self.collect_argument()? {
                 arguments.push(arg);
             }
 
             loop {
-                self.stream.skip_blanks()?;
+                self.lexer.skip_blanks()?;
 
                 if self.is_redirect_op()? {
                     let redir = self.parse_redirect()?;
@@ -95,7 +95,7 @@ impl<'src> Parser<'src> {
                 }
 
                 if self.is_word()? {
-                    end_span = self.stream.peek()?.span;
+                    end_span = self.lexer.peek()?.span;
                     if let Some(arg) = self.collect_argument()? {
                         arguments.push(arg);
                     }
@@ -115,18 +115,18 @@ impl<'src> Parser<'src> {
     }
 
     pub(super) fn parse_redirect(&mut self) -> Result<Redirect, ParseError> {
-        self.stream.skip_blanks()?;
-        let start_span = self.stream.peek()?.span;
+        self.lexer.skip_blanks()?;
+        let start_span = self.lexer.peek()?.span;
 
-        let fd = if let Token::IoNumber(n) = self.stream.peek()?.token {
-            self.stream.advance()?;
+        let fd = if let Token::IoNumber(n) = self.lexer.peek()?.token {
+            self.lexer.advance()?;
             Some(n)
         } else {
             None
         };
 
-        let op_token = self.stream.peek()?.token.clone();
-        self.stream.advance()?;
+        let op_token = self.lexer.peek()?.token.clone();
+        self.lexer.advance()?;
 
         match op_token {
             Token::HereDocOp | Token::HereDocStripOp => {
@@ -140,9 +140,9 @@ impl<'src> Parser<'src> {
 
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a filename for redirection".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
 
@@ -175,17 +175,17 @@ impl<'src> Parser<'src> {
         strip_tabs: bool,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.stream.skip_blanks()?;
+        self.lexer.skip_blanks()?;
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a here-document delimiter".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
 
         // The heredoc delimiter was scanned as a single raw Literal by the lexer
-        let raw_delimiter = match &self.stream.peek()?.token {
+        let raw_delimiter = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
                 // If it's some other fragment, collect the whole word as raw text
@@ -197,13 +197,13 @@ impl<'src> Parser<'src> {
                 }).collect::<String>()
             }
         };
-        let delim_span = self.stream.peek()?.span;
+        let delim_span = self.lexer.peek()?.span;
 
         let (delimiter, quoted) = crate::lexer::heredoc::strip_heredoc_quotes(&raw_delimiter);
 
         // Consume the delimiter token(s)
-        if matches!(self.stream.peek()?.token, Token::Literal(_)) {
-            self.stream.advance()?;
+        if matches!(self.lexer.peek()?.token, Token::Literal(_)) {
+            self.lexer.advance()?;
         }
 
         Ok(Redirect {
@@ -223,12 +223,12 @@ impl<'src> Parser<'src> {
         fd: Option<i32>,
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
-        self.stream.skip_blanks()?;
+        self.lexer.skip_blanks()?;
         if !self.is_word()? {
             return Err(ParseError::UnexpectedToken {
-                found: self.stream.peek()?.token.display_name().to_string(),
+                found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a word for here-string".to_string(),
-                span: self.stream.peek()?.span,
+                span: self.lexer.peek()?.span,
             });
         }
 

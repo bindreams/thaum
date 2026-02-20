@@ -19,10 +19,11 @@ Place contracts on every function where there is a meaningful invariant to check
 ## Architecture
 
 ### Lexer/Parser pipeline
-- The **lexer is context-free** — it produces `Word`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
-- The **parser promotes keywords** — it matches `Token::Word("if")` etc. when the grammatical context expects a keyword.
-- **TokenStream** sits between lexer and parser: buffers tokens, provides `peek()`/`advance()`, and supports `checkpoint()`/`rewind()`/`release()` for speculative parsing.
-- **`try_parse`** on the Parser uses closures for speculative parsing (e.g., detecting POSIX function definitions).
+- The **lexer is context-free** — it produces fragment tokens (`Literal`, `SimpleParam`, `DoubleQuoted`, etc.), `Blank`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
+- The **parser promotes keywords** — it checks `Token::Literal("if")` etc. when the grammatical context expects a keyword.
+- The **lexer has no lifetime parameter** — it owns a `CharSource` backed by `Read`. Constructed via `Lexer::from_str()` or `Lexer::from_reader()`.
+- The **parser holds the lexer directly** — no separate TokenStream layer.
+- **`speculate()`** on the Lexer saves `buf_pos`, runs a closure, and rewinds on failure. Tokens scanned during speculation stay in the buffer — scanning state is purely cursor-side and doesn't need saving.
 - The lexer handles heredocs autonomously — no parser→lexer feedback.
 
 ### AST naming conventions
@@ -56,8 +57,8 @@ Place contracts on every function where there is a meaningful invariant to check
 - Source spans inside command substitutions are relative to the substring
 
 ### Project structure
-- `src/lexer/` — context-free tokenizer (cursor, heredoc, operators, words)
-- `src/parser/` — recursive descent (token_stream, expressions, commands, compound, bash, helpers)
+- `src/lexer/` — context-free tokenizer (char_source, heredoc, operators, word_scan)
+- `src/parser/` — recursive descent (expressions, commands, compound, bash, helpers)
 - `src/word/` — word expansion parsing (fragments, params, substitution)
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
 - `tests/` — split by topic: commands, pipelines, compound, redirects, errors, word_expansion, bash_features, cli_output

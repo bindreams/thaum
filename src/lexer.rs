@@ -263,6 +263,12 @@ impl Lexer {
                 self.last_scanned = LastScanned::Whitespace;
                 if was_fragment {
                     // Significant: word boundary between fragments — emit token.
+                    debug_assert!(
+                        self.buffer.is_empty()
+                            || self.buffer.back().map(|t| &t.token)
+                                != Some(&Token::Whitespace),
+                        "consecutive Whitespace tokens must not be emitted"
+                    );
                     self.buffer.push_back(SpannedToken {
                         token: Token::Whitespace,
                         span: Span::new(start, self.cursor_pos().0),

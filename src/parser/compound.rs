@@ -120,12 +120,12 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("for")?;
 
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         if self.options.arithmetic_for && self.lexer.peek()?.token == Token::LParen {
             return self.parse_arithmetic_for(start_span);
         }
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: line 123 already ate
         let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
@@ -183,7 +183,7 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -207,7 +207,7 @@ impl Parser {
 
         let mut arms = Vec::new();
         loop {
-            self.lexer.eat_whitespace()?;
+            // No eat_whitespace: preceded by skip_linebreak (line 206/218)
             let tok = self.lexer.peek()?.token.clone();
             if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
                 || tok == Token::Eof
@@ -228,12 +228,12 @@ impl Parser {
     }
 
     fn parse_case_arm(&mut self) -> Result<CaseArm, ParseError> {
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: caller's skip_linebreak already ate
         let start_span = self.lexer.peek()?.span;
         self.eat(&Token::LParen)?;
 
         let mut patterns = Vec::new();
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: eat(LParen) ate WS or consumed ( (operator → no WS)
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -246,7 +246,7 @@ impl Parser {
         self.lexer.eat_whitespace()?;
         while self.lexer.peek()?.token == Token::Pipe {
             self.lexer.advance()?;
-            self.lexer.eat_whitespace()?;
+            // No eat_whitespace: after | (operator → LastScanned::Other)
             if !self.lexer.peek()?.token.is_fragment() {
                 return Err(ParseError::UnexpectedToken {
                     found: self.lexer.peek()?.token.display_name().to_string(),
@@ -261,7 +261,7 @@ impl Parser {
         self.expect(&Token::RParen)?;
         self.skip_linebreak()?;
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: skip_linebreak already ate
         let tok = self.lexer.peek()?.token.clone();
         let body = if tok == Token::CaseBreak
             || tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
@@ -442,7 +442,7 @@ impl Parser {
 
         let mut statements = Vec::new();
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: skip_linebreak already ate
         let tok = self.lexer.peek()?.token.clone();
         if !tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
             return Ok(statements);
@@ -455,7 +455,7 @@ impl Parser {
             if self.lexer.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
             }
-            self.lexer.eat_whitespace()?;
+            // No eat_whitespace: either skip_newline_list or line 454 already ate
             let tok = self.lexer.peek()?.token.clone();
             if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                 self.parse_list_into(&mut statements)?;
@@ -471,9 +471,9 @@ impl Parser {
         &mut self,
         start_span: crate::span::Span,
     ) -> Result<CompoundCommand, ParseError> {
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: caller (parse_for_clause line 123) already ate
         self.expect(&Token::LParen)?;
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: after ( (operator → LastScanned::Other)
         if self.lexer.peek()?.token != Token::LParen {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
@@ -505,7 +505,7 @@ impl Parser {
         let condition = parse_part(cond_str);
         let update = parse_part(update_str);
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: read_arith_for_content consumed )) (operators → no WS)
         if self.lexer.peek()?.token == Token::Semicolon {
             self.lexer.advance()?;
         }

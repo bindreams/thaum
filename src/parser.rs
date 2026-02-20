@@ -140,7 +140,7 @@ impl Parser {
         self.lexer.eat_whitespace()?;
         while self.lexer.peek()?.token == Token::Newline {
             self.lexer.advance()?;
-            self.lexer.eat_whitespace()?;
+            // No eat_whitespace here: after Newline, LastScanned::Other → WS suppressed
         }
         Ok(())
     }
@@ -154,7 +154,7 @@ impl Parser {
 
         let result = self.lexer.speculate(|s| {
             s.advance()?; // consume Newline tentatively
-            s.eat_whitespace()?;
+            // No eat_whitespace: after Newline, LastScanned::Other → WS suppressed
             if !matches!(s.peek()?.token, Token::HereDocBody(_)) {
                 return Ok(None);
             }
@@ -176,7 +176,7 @@ impl Parser {
         }
         while self.lexer.peek()?.token == Token::Newline {
             self.lexer.advance()?;
-            self.lexer.eat_whitespace()?;
+            // No eat_whitespace: after Newline, LastScanned::Other → WS suppressed
         }
         Ok(true)
     }

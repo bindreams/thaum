@@ -48,7 +48,7 @@ impl Parser {
                                 if self.lexer.peek()?.token == Token::RParen {
                                     break;
                                 }
-                                self.lexer.eat_whitespace()?;
+                                // No eat_whitespace: skip_linebreak already ate
                                 if self.lexer.peek()?.token.is_fragment() {
                                     if let Some(w) = self.collect_word()? {
                                         elements.push(w);
@@ -84,7 +84,7 @@ impl Parser {
             break;
         }
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: prefix loop's last iteration ate, or debug_assert at entry guarantees none
         if self.lexer.peek()?.token.is_fragment() {
             end_span = self.lexer.peek()?.span;
             if let Some(arg) = self.collect_argument()? {
@@ -148,7 +148,7 @@ impl Parser {
             _ => {}
         }
 
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: after redirect operator, LastScanned::Other → WS suppressed
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),

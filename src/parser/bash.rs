@@ -15,7 +15,7 @@ impl Parser {
         self.lexer.advance()?; // consume "coproc"
 
         // If the next token starts a compound command, there's no name
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_compound_start(&self.lexer.peek_at_offset(1)?.token, self.options.select) {
             let body_expr = self.parse_compound_expression()?;
@@ -107,7 +107,7 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("select")?;
 
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         let var_name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {
@@ -170,7 +170,7 @@ impl Parser {
             self.lexer.advance()?;
         }
 
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         let name = match &self.lexer.peek()?.token {
             Token::Literal(s) => s.clone(),
             _ => {

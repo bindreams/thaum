@@ -87,7 +87,7 @@ impl Parser {
         // Consume the first word, then check for binary operator
         let first_word = self.consume_test_word()?;
 
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         if let Some(op) = self.lexer.peek()?.token.as_binary_test_op() {
             self.advance_binary_op()?;
             let right_word = if op == BinaryTestOp::RegexMatch {
@@ -106,7 +106,7 @@ impl Parser {
     }
 
     fn consume_regex_pattern(&mut self) -> Result<Word, ParseError> {
-        self.lexer.eat_whitespace()?;
+        self.lexer.skip_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         let mut text = String::new();
         let mut end_span = start_span;

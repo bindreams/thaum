@@ -7,7 +7,7 @@ use super::Parser;
 
 impl Parser {
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
-        self.lexer.eat_whitespace()?;
+        // No eat_whitespace: start of input → LastScanned::Other → WS suppressed
         let start_span = self.lexer.peek()?.span;
         self.skip_linebreak()?;
 
@@ -48,7 +48,7 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    self.lexer.eat_whitespace()?;
+                    // No eat_whitespace: skip_linebreak already ate any WS
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
@@ -69,7 +69,7 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    self.lexer.eat_whitespace()?;
+                    // No eat_whitespace: skip_linebreak already ate any WS
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
@@ -199,7 +199,7 @@ impl Parser {
                 // Phase 1: speculate on the stream to check for name ( )
                 if is_lone && is_valid_name(w) {
                     let func_head = self.lexer.speculate(|s| {
-                        s.eat_whitespace()?;
+                        // No eat_whitespace: line 164 already ate; we're at the Literal
                         let name = match &s.peek()?.token {
                             Token::Literal(w) if is_valid_name(w) => w.clone(),
                             _ => return Ok(None),
@@ -211,7 +211,7 @@ impl Parser {
                             return Ok(None);
                         }
                         s.advance()?; // consume (
-                        s.eat_whitespace()?;
+                        // No eat_whitespace: after ( (operator → LastScanned::Other)
                         if s.peek()?.token != Token::RParen {
                             return Ok(None);
                         }

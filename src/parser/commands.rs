@@ -15,10 +15,11 @@ impl Parser {
         let mut end_span = start_span;
 
         loop {
-            if self.is_redirect_op()? {
+            if self.lexer.peek()?.token.is_redirect_start() {
                 let redir = self.parse_redirect()?;
                 end_span = redir.span;
                 redirects.push(redir);
+                self.lexer.skip_blanks()?;
                 continue;
             }
 
@@ -44,7 +45,8 @@ impl Parser {
                                 if self.lexer.peek()?.token == Token::RParen {
                                     break;
                                 }
-                                if self.is_word()? {
+                                self.lexer.skip_blanks()?;
+                                if self.lexer.peek()?.token.is_fragment() {
                                     if let Some(w) = self.collect_word()? {
                                         elements.push(w);
                                     }
@@ -70,6 +72,7 @@ impl Parser {
                             });
                             end_span = word_span;
                         }
+                        self.lexer.skip_blanks()?;
                         continue;
                     }
                 }
@@ -78,7 +81,8 @@ impl Parser {
             break;
         }
 
-        if self.is_word()? {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token.is_fragment() {
             end_span = self.lexer.peek()?.span;
             if let Some(arg) = self.collect_argument()? {
                 arguments.push(arg);
@@ -87,14 +91,14 @@ impl Parser {
             loop {
                 self.lexer.skip_blanks()?;
 
-                if self.is_redirect_op()? {
+                if self.lexer.peek()?.token.is_redirect_start() {
                     let redir = self.parse_redirect()?;
                     end_span = redir.span;
                     redirects.push(redir);
                     continue;
                 }
 
-                if self.is_word()? {
+                if self.lexer.peek()?.token.is_fragment() {
                     end_span = self.lexer.peek()?.span;
                     if let Some(arg) = self.collect_argument()? {
                         arguments.push(arg);
@@ -138,7 +142,8 @@ impl Parser {
             _ => {}
         }
 
-        if !self.is_word()? {
+        self.lexer.skip_blanks()?;
+        if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a filename for redirection".to_string(),
@@ -176,7 +181,7 @@ impl Parser {
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
         self.lexer.skip_blanks()?;
-        if !self.is_word()? {
+        if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a here-document delimiter".to_string(),
@@ -224,7 +229,7 @@ impl Parser {
         start_span: crate::span::Span,
     ) -> Result<Redirect, ParseError> {
         self.lexer.skip_blanks()?;
-        if !self.is_word()? {
+        if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a word for here-string".to_string(),

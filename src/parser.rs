@@ -52,7 +52,6 @@ impl Parser {
     // ================================================================
     // Helper methods
     //
-    // These all call skip_blanks() so callers don't have to.
     // Word collection code (word_collect.rs) deliberately bypasses
     // these to see Blank tokens as word boundaries.
     // ================================================================
@@ -70,7 +69,9 @@ impl Parser {
 
     /// Consume the current token if it is a keyword matching the given string.
     fn eat_keyword(&mut self, keyword: &str) -> Result<bool, ParseError> {
-        if self.is_lone_literal(keyword)? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             self.lexer.advance()?;
             Ok(true)
         } else {
@@ -94,10 +95,11 @@ impl Parser {
 
     /// Expect and consume a keyword (a lone Literal matching the string).
     fn expect_keyword(&mut self, keyword: &str) -> Result<SpannedToken, ParseError> {
-        if self.is_lone_literal(keyword)? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             self.lexer.advance()
         } else {
-            self.lexer.skip_blanks()?;
             Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: keyword_display_name(keyword),
@@ -114,11 +116,12 @@ impl Parser {
         opening: &str,
         opening_span: Span,
     ) -> Result<SpannedToken, ParseError> {
-        if self.is_lone_literal(keyword)? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             return self.lexer.advance();
         }
-        self.lexer.skip_blanks()?;
-        if self.lexer.peek()?.token == Token::Eof {
+        if tok == Token::Eof {
             Err(ParseError::UnclosedConstruct {
                 keyword: keyword_display_name(keyword),
                 opening: opening.to_string(),
@@ -126,7 +129,7 @@ impl Parser {
             })
         } else {
             Err(ParseError::UnexpectedToken {
-                found: self.lexer.peek()?.token.display_name().to_string(),
+                found: tok.display_name().to_string(),
                 expected: keyword_display_name(keyword),
                 span: self.lexer.peek()?.span,
             })
@@ -176,85 +179,6 @@ impl Parser {
             self.lexer.skip_blanks()?;
         }
         Ok(true)
-    }
-
-    /// Returns true if the current token starts a word (any fragment token).
-    fn is_word(&mut self) -> Result<bool, ParseError> {
-        self.lexer.skip_blanks()?;
-        Ok(self.lexer.peek()?.token.is_fragment())
-    }
-
-    /// Returns true if a word string is a "closing" reserved keyword that
-    /// cannot start a new command.
-    fn is_closing_keyword(w: &str) -> bool {
-        matches!(
-            w,
-            "then" | "else" | "elif" | "fi" | "do" | "done" | "esac" | "}" | "in"
-        )
-    }
-
-    fn can_start_command(&mut self) -> Result<bool, ParseError> {
-        self.lexer.skip_blanks()?;
-        let tok = &self.lexer.peek()?.token;
-        Ok(match tok {
-            Token::Literal(w) => {
-                if Self::is_closing_keyword(w) {
-                    let next = self.lexer.peek_at_offset(1)?;
-                    next.token.is_fragment()
-                } else {
-                    true
-                }
-            }
-            Token::IoNumber(_)
-            | Token::LParen
-            | Token::RedirectFromFile
-            | Token::RedirectToFile
-            | Token::HereDocOp
-            | Token::HereDocStripOp
-            | Token::Append
-            | Token::RedirectFromFd
-            | Token::RedirectToFd
-            | Token::ReadWrite
-            | Token::Clobber
-            | Token::BashHereStringOp
-            | Token::BashRedirectAllOp
-            | Token::BashAppendAllOp
-            | Token::BashDblLBracket => true,
-            _ if tok.is_fragment() => true,
-            _ => false,
-        })
-    }
-
-    fn is_redirect_op(&mut self) -> Result<bool, ParseError> {
-        self.lexer.skip_blanks()?;
-        let tok = &self.lexer.peek()?.token;
-        Ok(tok.is_redirect_op() || matches!(tok, Token::IoNumber(_)))
-    }
-
-    fn is_compound_keyword(w: &str) -> bool {
-        matches!(w, "if" | "while" | "until" | "for" | "case" | "{")
-    }
-
-    fn is_compound_start_word(&self, w: &str) -> bool {
-        Self::is_compound_keyword(w) || (w == "select" && self.options.select)
-    }
-
-    /// Check if the current token starts a compound command.
-    fn is_compound_start(&mut self) -> Result<bool, ParseError> {
-        self.lexer.skip_blanks()?;
-        let tok = self.lexer.peek()?.token.clone();
-        Ok(match &tok {
-            Token::Literal(w) => {
-                if self.is_compound_start_word(w) {
-                    let next = self.lexer.peek_at_offset(1)?;
-                    !next.token.is_fragment()
-                } else {
-                    false
-                }
-            }
-            Token::LParen | Token::BashDblLBracket => true,
-            _ => false,
-        })
     }
 }
 

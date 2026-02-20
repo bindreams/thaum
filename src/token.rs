@@ -1,3 +1,4 @@
+use crate::ast::BinaryTestOp;
 use crate::span::Span;
 
 /// A token with its source location.
@@ -244,6 +245,109 @@ impl Token {
             Token::RParen => "')'",
             Token::HereDocBody(_) => "here-document body",
             Token::Eof => "end of input",
+        }
+    }
+
+    // ================================================================
+    // Grammar-level queries
+    //
+    // These are pure functions on token values. The caller is responsible
+    // for peeking the token(s) from the lexer — these methods never
+    // interact with the lexer or its buffer.
+    // ================================================================
+
+    /// Can a redirect start with this token? (redirect operator or IO number)
+    pub fn is_redirect_start(&self) -> bool {
+        self.is_redirect_op() || matches!(self, Token::IoNumber(_))
+    }
+
+    /// Is this a lone Literal matching `expected` (i.e. a keyword)?
+    /// `next` is the following token — a keyword is only recognized when
+    /// it is not glued to adjacent fragments.
+    pub fn is_keyword(&self, next: &Token, expected: &str) -> bool {
+        matches!(self, Token::Literal(w) if w == expected) && !next.is_fragment()
+    }
+
+    /// Can a simple command begin with this token?
+    /// `next` is the following token — needed to distinguish closing
+    /// keywords (which cannot start commands) from identically-named
+    /// literals that are glued to fragments (which can).
+    pub fn can_start_command(&self, next: &Token) -> bool {
+        match self {
+            Token::Literal(w) if Self::is_closing_keyword(w) => next.is_fragment(),
+            Token::Literal(_) => true,
+            Token::IoNumber(_)
+            | Token::LParen
+            | Token::RedirectFromFile
+            | Token::RedirectToFile
+            | Token::HereDocOp
+            | Token::HereDocStripOp
+            | Token::Append
+            | Token::RedirectFromFd
+            | Token::RedirectToFd
+            | Token::ReadWrite
+            | Token::Clobber
+            | Token::BashHereStringOp
+            | Token::BashRedirectAllOp
+            | Token::BashAppendAllOp
+            | Token::BashDblLBracket => true,
+            _ if self.is_fragment() => true,
+            _ => false,
+        }
+    }
+
+    /// Does this token start a compound command?
+    /// `next` is the following token (keyword isolation check).
+    /// `select_enabled` controls whether `select` is recognized.
+    pub fn is_compound_start(&self, next: &Token, select_enabled: bool) -> bool {
+        match self {
+            Token::Literal(w) if Self::is_compound_keyword(w, select_enabled) => {
+                !next.is_fragment()
+            }
+            Token::LParen | Token::BashDblLBracket => true,
+            _ => false,
+        }
+    }
+
+    /// Map this token to a binary test operator (for `[[ ]]` expressions).
+    pub fn as_binary_test_op(&self) -> Option<BinaryTestOp> {
+        match self {
+            Token::Literal(s) => Self::word_as_binary_test_op(s),
+            Token::RedirectFromFile => Some(BinaryTestOp::StringLessThan),
+            Token::RedirectToFile => Some(BinaryTestOp::StringGreaterThan),
+            _ => None,
+        }
+    }
+
+    /// Is this word a closing reserved keyword that cannot start a command?
+    pub fn is_closing_keyword(w: &str) -> bool {
+        matches!(
+            w,
+            "then" | "else" | "elif" | "fi" | "do" | "done" | "esac" | "}" | "in"
+        )
+    }
+
+    /// Is this word a compound-command keyword?
+    pub fn is_compound_keyword(w: &str, select_enabled: bool) -> bool {
+        matches!(w, "if" | "while" | "until" | "for" | "case" | "{")
+            || (select_enabled && w == "select")
+    }
+
+    fn word_as_binary_test_op(s: &str) -> Option<BinaryTestOp> {
+        match s {
+            "==" | "=" => Some(BinaryTestOp::StringEquals),
+            "!=" => Some(BinaryTestOp::StringNotEquals),
+            "=~" => Some(BinaryTestOp::RegexMatch),
+            "-eq" => Some(BinaryTestOp::IntEq),
+            "-ne" => Some(BinaryTestOp::IntNe),
+            "-lt" => Some(BinaryTestOp::IntLt),
+            "-le" => Some(BinaryTestOp::IntLe),
+            "-gt" => Some(BinaryTestOp::IntGt),
+            "-ge" => Some(BinaryTestOp::IntGe),
+            "-nt" => Some(BinaryTestOp::FileNewerThan),
+            "-ot" => Some(BinaryTestOp::FileOlderThan),
+            "-ef" => Some(BinaryTestOp::FileSameDevice),
+            _ => None,
         }
     }
 }

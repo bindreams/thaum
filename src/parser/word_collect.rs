@@ -14,19 +14,6 @@ use super::helpers::de_escape_literal;
 use super::Parser;
 
 impl Parser {
-    /// Check if the current token is a lone Literal matching the keyword.
-    /// "Lone" means no adjacent fragment tokens (it stands alone as a word).
-    pub(super) fn is_lone_literal(&mut self, expected: &str) -> Result<bool, ParseError> {
-        self.lexer.skip_blanks()?;
-        match &self.lexer.peek()?.token {
-            Token::Literal(w) if w == expected => {
-                let next = self.lexer.peek_at_offset(1)?;
-                Ok(!next.token.is_fragment())
-            }
-            _ => Ok(false),
-        }
-    }
-
     /// Collect adjacent fragment tokens into a Word AST node.
     /// Uses the raw API to see Blank tokens as word boundaries.
     /// Returns None if the current token is not a fragment.

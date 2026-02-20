@@ -48,7 +48,9 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    if self.can_start_command()? {
+                    self.lexer.skip_blanks()?;
+                    let tok = self.lexer.peek()?.token.clone();
+                    if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
                         let bodies = self.consume_heredoc_bodies()?;
@@ -67,7 +69,9 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    if self.can_start_command()? {
+                    self.lexer.skip_blanks()?;
+                    let tok = self.lexer.peek()?.token.clone();
+                    if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
                         let bodies = self.consume_heredoc_bodies()?;
@@ -180,7 +184,7 @@ impl Parser {
                         "function" if self.options.function_keyword => {
                             return self.parse_function_definition();
                         }
-                        kw if Self::is_closing_keyword(kw) => {
+                        kw if Token::is_closing_keyword(kw) => {
                             return Err(ParseError::UnexpectedToken {
                                 found: keyword_display_name(kw),
                                 expected: "a command".to_string(),
@@ -220,7 +224,9 @@ impl Parser {
                         self.skip_linebreak()?;
                         let body = self.parse_compound_command()?;
                         let mut redirects = Vec::new();
-                        while self.is_redirect_op()? {
+                        loop {
+                            self.lexer.skip_blanks()?;
+                            if !self.lexer.peek()?.token.is_redirect_start() { break; }
                             redirects.push(self.parse_redirect()?);
                         }
                         let end_span = redirects
@@ -257,7 +263,9 @@ impl Parser {
         let body = self.parse_compound_command()?;
 
         let mut redirects = Vec::new();
-        while self.is_redirect_op()? {
+        loop {
+            self.lexer.skip_blanks()?;
+            if !self.lexer.peek()?.token.is_redirect_start() { break; }
             redirects.push(self.parse_redirect()?);
         }
 

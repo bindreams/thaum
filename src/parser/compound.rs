@@ -44,7 +44,10 @@ impl Parser {
         let then_body = self.parse_required_compound_list("then body")?;
 
         let mut elifs = Vec::new();
-        while self.is_lone_literal("elif")? {
+        loop {
+            self.lexer.skip_blanks()?;
+            let tok = self.lexer.peek()?.token.clone();
+            if !tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "elif") { break; }
             let elif_span = self.lexer.peek()?.span;
             self.lexer.advance()?;
             let elif_cond = self.parse_required_compound_list("elif condition")?;
@@ -58,7 +61,9 @@ impl Parser {
             });
         }
 
-        let else_body = if self.is_lone_literal("else")? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        let else_body = if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "else") {
             self.lexer.advance()?;
             Some(self.parse_compound_list()?)
         } else {
@@ -128,10 +133,13 @@ impl Parser {
         self.lexer.advance()?;
         self.skip_linebreak()?;
 
-        let words = if self.is_lone_literal("in")? {
+        let tok = self.lexer.peek()?.token.clone();
+        let words = if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "in") {
             self.lexer.advance()?;
             let mut word_list = Vec::new();
-            while self.is_word()? {
+            loop {
+                self.lexer.skip_blanks()?;
+                if !self.lexer.peek()?.token.is_fragment() { break; }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
@@ -166,7 +174,8 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
-        if !self.is_word()? {
+        self.lexer.skip_blanks()?;
+        if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a word after 'case'".to_string(),
@@ -176,7 +185,8 @@ impl Parser {
         let case_word = self.collect_word()?.unwrap();
         self.skip_linebreak()?;
 
-        if !self.is_lone_literal("in")? {
+        let tok = self.lexer.peek()?.token.clone();
+        if !tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "in") {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "'in'".to_string(),
@@ -187,9 +197,14 @@ impl Parser {
         self.skip_linebreak()?;
 
         let mut arms = Vec::new();
-        while !self.is_lone_literal("esac")?
-            && self.lexer.peek()?.token != Token::Eof
-        {
+        loop {
+            self.lexer.skip_blanks()?;
+            let tok = self.lexer.peek()?.token.clone();
+            if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
+                || tok == Token::Eof
+            {
+                break;
+            }
             arms.push(self.parse_case_arm()?);
             self.skip_linebreak()?;
         }
@@ -209,7 +224,8 @@ impl Parser {
         self.eat(&Token::LParen)?;
 
         let mut patterns = Vec::new();
-        if !self.is_word()? {
+        self.lexer.skip_blanks()?;
+        if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a pattern in case arm".to_string(),
@@ -221,7 +237,8 @@ impl Parser {
         self.lexer.skip_blanks()?;
         while self.lexer.peek()?.token == Token::Pipe {
             self.lexer.advance()?;
-            if !self.is_word()? {
+            self.lexer.skip_blanks()?;
+            if !self.lexer.peek()?.token.is_fragment() {
                 return Err(ParseError::UnexpectedToken {
                     found: self.lexer.peek()?.token.display_name().to_string(),
                     expected: "a pattern after '|'".to_string(),
@@ -236,8 +253,9 @@ impl Parser {
         self.skip_linebreak()?;
 
         self.lexer.skip_blanks()?;
-        let body = if self.lexer.peek()?.token == Token::CaseBreak
-            || self.is_lone_literal("esac")?
+        let tok = self.lexer.peek()?.token.clone();
+        let body = if tok == Token::CaseBreak
+            || tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
         {
             Vec::new()
         } else {
@@ -409,7 +427,9 @@ impl Parser {
 
         let mut statements = Vec::new();
 
-        if !self.can_start_command()? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        if !tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
             return Ok(statements);
         }
 
@@ -420,7 +440,9 @@ impl Parser {
             if self.lexer.peek()?.token == Token::Newline {
                 self.skip_newline_list()?;
             }
-            if self.can_start_command()? {
+            self.lexer.skip_blanks()?;
+            let tok = self.lexer.peek()?.token.clone();
+            if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                 self.parse_list_into(&mut statements)?;
                 continue;
             }

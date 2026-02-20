@@ -12,7 +12,9 @@ impl Parser {
         self.lexer.advance()?; // consume "coproc"
 
         // If the next token starts a compound command, there's no name
-        if self.is_compound_start()? {
+        self.lexer.skip_blanks()?;
+        let tok = self.lexer.peek()?.token.clone();
+        if tok.is_compound_start(&self.lexer.peek_at_offset(1)?.token, self.options.select) {
             let body_expr = self.parse_compound_expression()?;
             let span = start_span.merge(expr_span(&body_expr));
             return Ok(Expression::Compound {
@@ -26,7 +28,7 @@ impl Parser {
         }
 
         // Next token should be a word -- might be a name or the start of a simple command
-        if self.is_word()? {
+        if self.lexer.peek()?.token.is_fragment() {
             // Collect the first word as a plain string for the name candidate
             let first_word = self.collect_word()?.unwrap();
             let word_span = first_word.span;
@@ -37,7 +39,9 @@ impl Parser {
             }).collect::<String>();
 
             // If now we see a compound command start, the word was the name
-            if self.is_compound_start()? {
+            self.lexer.skip_blanks()?;
+            let tok = self.lexer.peek()?.token.clone();
+            if tok.is_compound_start(&self.lexer.peek_at_offset(1)?.token, self.options.select) {
                 let body_expr = self.parse_compound_expression()?;
                 let span = start_span.merge(expr_span(&body_expr));
                 return Ok(Expression::Compound {
@@ -55,9 +59,10 @@ impl Parser {
             let mut redirects = Vec::new();
 
             loop {
-                if self.is_redirect_op()? {
+                self.lexer.skip_blanks()?;
+                if self.lexer.peek()?.token.is_redirect_start() {
                     redirects.push(self.parse_redirect()?);
-                } else if self.is_word()? {
+                } else if self.lexer.peek()?.token.is_fragment() {
                     if let Some(arg) = self.collect_argument()? {
                         arguments.push(arg);
                     }
@@ -110,10 +115,13 @@ impl Parser {
         self.lexer.advance()?;
         self.skip_linebreak()?;
 
-        let words = if self.is_lone_literal("in")? {
+        let tok = self.lexer.peek()?.token.clone();
+        let words = if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "in") {
             self.lexer.advance()?;
             let mut word_list = Vec::new();
-            while self.is_word()? {
+            loop {
+                self.lexer.skip_blanks()?;
+                if !self.lexer.peek()?.token.is_fragment() { break; }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
@@ -147,7 +155,8 @@ impl Parser {
         self.lexer.skip_blanks()?;
         let start_span = self.lexer.peek()?.span;
 
-        let has_function_keyword = self.is_lone_literal("function")?;
+        let tok = self.lexer.peek()?.token.clone();
+        let has_function_keyword = tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "function");
         if has_function_keyword {
             self.lexer.advance()?;
         }
@@ -181,7 +190,9 @@ impl Parser {
         let body = self.parse_compound_command()?;
 
         let mut redirects = Vec::new();
-        while self.is_redirect_op()? {
+        loop {
+            self.lexer.skip_blanks()?;
+            if !self.lexer.peek()?.token.is_redirect_start() { break; }
             redirects.push(self.parse_redirect()?);
         }
 

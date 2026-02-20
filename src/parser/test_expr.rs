@@ -41,7 +41,8 @@ impl Parser {
 
     fn parse_test_not(&mut self) -> Result<BashTestExpr, ParseError> {
         self.lexer.skip_blanks()?;
-        if self.is_lone_literal("!")? {
+        let tok = self.lexer.peek()?.token.clone();
+        if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "!") {
             self.lexer.advance()?;
             let inner = self.parse_test_not()?;
             return Ok(BashTestExpr::Not(Box::new(inner)));
@@ -86,7 +87,8 @@ impl Parser {
         // Consume the first word, then check for binary operator
         let first_word = self.consume_test_word()?;
 
-        if let Some(op) = self.peek_binary_test_op()? {
+        self.lexer.skip_blanks()?;
+        if let Some(op) = self.lexer.peek()?.token.as_binary_test_op() {
             self.advance_binary_op()?;
             let right_word = if op == BinaryTestOp::RegexMatch {
                 self.consume_regex_pattern()?
@@ -161,7 +163,8 @@ impl Parser {
     }
 
     fn consume_test_word(&mut self) -> Result<Word, ParseError> {
-        if self.is_word()? {
+        self.lexer.skip_blanks()?;
+        if self.lexer.peek()?.token.is_fragment() {
             return Ok(self.collect_word()?.unwrap());
         }
 
@@ -205,35 +208,6 @@ impl Parser {
             "-n" => Some(UnaryTestOp::StringIsNonEmpty),
             "-v" => Some(UnaryTestOp::VariableIsSet),
             "-R" => Some(UnaryTestOp::VariableIsNameRef),
-            _ => None,
-        }
-    }
-
-    fn peek_binary_test_op(&mut self) -> Result<Option<BinaryTestOp>, ParseError> {
-        self.lexer.skip_blanks()?;
-        let peeked = self.lexer.peek()?;
-        match &peeked.token {
-            Token::Literal(s) => Ok(Self::word_as_binary_test_op(s)),
-            Token::RedirectFromFile => Ok(Some(BinaryTestOp::StringLessThan)),
-            Token::RedirectToFile => Ok(Some(BinaryTestOp::StringGreaterThan)),
-            _ => Ok(None),
-        }
-    }
-
-    fn word_as_binary_test_op(s: &str) -> Option<BinaryTestOp> {
-        match s {
-            "==" | "=" => Some(BinaryTestOp::StringEquals),
-            "!=" => Some(BinaryTestOp::StringNotEquals),
-            "=~" => Some(BinaryTestOp::RegexMatch),
-            "-eq" => Some(BinaryTestOp::IntEq),
-            "-ne" => Some(BinaryTestOp::IntNe),
-            "-lt" => Some(BinaryTestOp::IntLt),
-            "-le" => Some(BinaryTestOp::IntLe),
-            "-gt" => Some(BinaryTestOp::IntGt),
-            "-ge" => Some(BinaryTestOp::IntGe),
-            "-nt" => Some(BinaryTestOp::FileNewerThan),
-            "-ot" => Some(BinaryTestOp::FileOlderThan),
-            "-ef" => Some(BinaryTestOp::FileSameDevice),
             _ => None,
         }
     }

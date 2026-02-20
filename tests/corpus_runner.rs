@@ -16,7 +16,8 @@ struct TestSpec {
     dialect: String,
     source: Option<String>,
 
-    parse: String,
+    #[serde(rename = "is-valid", default = "default_true")]
+    is_valid: bool,
     error_contains: Option<String>,
 
     // ast is parsed separately from the raw YAML header using yaml_rust2
@@ -27,20 +28,14 @@ struct TestSpec {
     stderr: Option<OutputMatcher>,
 }
 
+fn default_true() -> bool { true }
+
 impl TestSpec {
     fn dialect(&self) -> Result<thaum::Dialect, String> {
         match self.dialect.as_str() {
             "posix" => Ok(thaum::Dialect::Posix),
             "bash" => Ok(thaum::Dialect::Bash),
             other => Err(format!("unknown dialect: {:?}", other)),
-        }
-    }
-
-    fn parse_expectation(&self) -> Result<bool, String> {
-        match self.parse.as_str() {
-            "ok" => Ok(true),
-            "error" => Ok(false),
-            other => Err(format!("parse must be 'ok' or 'error', got {:?}", other)),
         }
     }
 }
@@ -244,12 +239,11 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     let spec = &parsed.spec;
     let input = &parsed.shell_input;
     let dialect = spec.dialect().map_err(|e| e.to_string())?;
-    let expect_ok = spec.parse_expectation().map_err(|e| e.to_string())?;
 
     // 1. Parse
     let parse_result = thaum::parse_with(input, dialect);
 
-    if expect_ok {
+    if spec.is_valid {
         let program = parse_result.map_err(|e| {
             format!("expected parse: ok, but got error: {}", e)
         })?;

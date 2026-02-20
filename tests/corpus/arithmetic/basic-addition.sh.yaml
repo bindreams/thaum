@@ -1,6 +1,5 @@
 name: basic arithmetic addition
 dialect: posix
-parse: ok
 status: 0
 ast:
   statements:

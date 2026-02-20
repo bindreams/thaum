@@ -80,11 +80,6 @@ impl MappingBuilder {
         self
     }
 
-    /// Add a key with a raw boolean value (`true` / `false`).
-    pub fn raw_bool(&mut self, key: &str, value: bool) -> &mut Self {
-        self.raw(key, if value { "true" } else { "false" })
-    }
-
     /// Add a key with an empty sequence (`[]`).
     pub fn empty_seq(&mut self, key: &str) -> &mut Self {
         self.entries

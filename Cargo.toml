@@ -17,7 +17,8 @@ clap = { version = "4", features = ["derive"], optional = true }
 [dev-dependencies]
 pretty_assertions = "1"
 serde = { version = "1", features = ["derive"] }
-serde_yml = "0.0.12"
+serde_yaml2 = "0.1"
+yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
 regex = "1"
 

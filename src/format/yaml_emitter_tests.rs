@@ -1,6 +1,103 @@
 use super::*;
 use crate::format::yaml_value::{MappingBuilder, YamlValue};
 
+// ---------------------------------------------------------------------------
+// Round-trip safety: emitted YAML must parse back as strings (not numbers,
+// booleans, or null) when string values are used.
+// ---------------------------------------------------------------------------
+
+/// Parse emitted YAML and extract a scalar value by key, verifying it's a
+/// String in the yaml_rust2 data model.
+fn roundtrip_string(key: &str, value: &str) {
+    let yaml_value = YamlValue::mapping().scalar(key, value).build();
+    let emitted = emit(&yaml_value);
+    let docs = yaml_rust2::YamlLoader::load_from_str(&emitted)
+        .unwrap_or_else(|e| panic!("emitted YAML is invalid: {}\n---\n{}", e, emitted));
+    let doc = &docs[0];
+    let actual = &doc[key];
+    assert!(
+        matches!(actual, yaml_rust2::Yaml::String(_)),
+        "expected String for key {:?} with value {:?}, got {:?}\nemitted: {}",
+        key, value, actual, emitted
+    );
+    assert_eq!(
+        actual.as_str().unwrap(),
+        value,
+        "round-trip value mismatch for key {:?}",
+        key
+    );
+}
+
+#[test]
+fn roundtrip_number_stays_string() {
+    roundtrip_string("value", "9");
+    roundtrip_string("value", "0");
+    roundtrip_string("value", "42");
+    roundtrip_string("value", "3.14");
+    roundtrip_string("value", "0x1F");
+    roundtrip_string("value", "-1");
+}
+
+#[test]
+fn roundtrip_bool_stays_string() {
+    roundtrip_string("strip_tabs", "true");
+    roundtrip_string("strip_tabs", "false");
+}
+
+#[test]
+fn roundtrip_null_stays_string() {
+    roundtrip_string("value", "~");
+    roundtrip_string("value", "null");
+}
+
+#[test]
+fn roundtrip_yaml_special_chars_stay_string() {
+    roundtrip_string("op", "*");
+    roundtrip_string("op", ">");
+    roundtrip_string("op", "<");
+    roundtrip_string("op", "|");
+    roundtrip_string("op", "!");
+    roundtrip_string("op", "&");
+    roundtrip_string("op", "%");
+    roundtrip_string("direction", "<");
+    roundtrip_string("direction", ">");
+    roundtrip_string("op", "-");
+    roundtrip_string("op", "+");
+    roundtrip_string("op", "++");
+    roundtrip_string("op", "--");
+    roundtrip_string("op", "==");
+    roundtrip_string("op", "!=");
+    roundtrip_string("op", "=~");
+    roundtrip_string("op", "&&");
+    roundtrip_string("op", "||");
+}
+
+#[test]
+fn roundtrip_param_operators_stay_string() {
+    roundtrip_string("operator", ":-");
+    roundtrip_string("operator", ":=");
+    roundtrip_string("operator", ":?");
+    roundtrip_string("operator", ":+");
+    roundtrip_string("operator", "#");
+    roundtrip_string("operator", "%");
+    roundtrip_string("operator", "%%");
+    roundtrip_string("operator", "##");
+}
+
+/// Verify that yaml_rust2 (our reader) implements YAML 1.2, where bare
+/// `no`, `yes`, `on`, `off` are strings — not booleans as in YAML 1.1.
+#[test]
+fn yaml_reader_is_1_2() {
+    let docs = yaml_rust2::YamlLoader::load_from_str("value: no").unwrap();
+    let val = &docs[0]["value"];
+    assert!(
+        matches!(val, yaml_rust2::Yaml::String(_)),
+        "expected String(\"no\") under YAML 1.2, got {:?} — reader may be YAML 1.1",
+        val
+    );
+    assert_eq!(val.as_str().unwrap(), "no");
+}
+
 #[test]
 fn emit_simple_mapping() {
     let value = YamlValue::mapping()

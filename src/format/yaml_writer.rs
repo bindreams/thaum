@@ -113,7 +113,7 @@ impl<'a> YamlWriter<'a> {
             }
             Expression::Pipe { left, right, stderr } => {
                 if *stderr || self.verbose {
-                    m.raw_bool("stderr", *stderr);
+                    m.scalar("stderr", if *stderr { "true" } else { "false" });
                 }
                 m.value("left", self.build_inner_expression(left));
                 m.value("right", self.build_inner_expression(right));
@@ -144,7 +144,7 @@ impl<'a> YamlWriter<'a> {
     fn build_assignment(&self, a: &Assignment) -> YamlValue {
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(a.span));
-        m.raw("name", &a.name);
+        m.scalar("name", &a.name);
         match &a.value {
             AssignmentValue::Scalar(word) => {
                 m.value("value", self.build_word_value(word));
@@ -164,7 +164,7 @@ impl<'a> YamlWriter<'a> {
 
     fn extend_function_def(&self, m: &mut MappingBuilder, f: &FunctionDef) {
         m.raw("source", &self.source(f.span));
-        m.raw("name", &f.name);
+        m.scalar("name", &f.name);
         m.value("body", self.build_compound_command(&f.body));
         if !f.redirects.is_empty() {
             let items: Vec<YamlValue> = f.redirects.iter().map(|r| self.build_redirect(r)).collect();
@@ -190,7 +190,7 @@ impl<'a> YamlWriter<'a> {
             CompoundCommand::ForClause { variable, words, body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "ForClause");
-                m.raw("variable", variable);
+                m.scalar("variable", variable);
                 if let Some(word_list) = words {
                     let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
@@ -248,7 +248,7 @@ impl<'a> YamlWriter<'a> {
             CompoundCommand::BashSelectClause { variable, words, body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "BashSelectClause");
-                m.raw("variable", variable);
+                m.scalar("variable", variable);
                 if let Some(word_list) = words {
                     let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
@@ -261,7 +261,7 @@ impl<'a> YamlWriter<'a> {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "BashCoproc");
                 if let Some(n) = name {
-                    m.raw("name", n);
+                    m.scalar("name", n);
                 } else if self.verbose {
                     m.null("name");
                 }
@@ -338,18 +338,18 @@ impl<'a> YamlWriter<'a> {
         m.raw("type", type_name);
         m.raw("source", &self.source(r.span));
         if let Some(fd) = r.fd {
-            m.raw("fd", &fd.to_string());
+            m.scalar("fd", &fd.to_string());
         } else if self.verbose {
             m.null("fd");
         }
         match &r.kind {
             RedirectKind::HereDoc { delimiter, body, strip_tabs, quoted, .. } => {
-                m.raw("delimiter", delimiter);
+                m.scalar("delimiter", delimiter);
                 if *strip_tabs || self.verbose {
-                    m.raw_bool("strip_tabs", *strip_tabs);
+                    m.scalar("strip_tabs", if *strip_tabs { "true" } else { "false" });
                 }
                 if *quoted || self.verbose {
-                    m.raw_bool("quoted", *quoted);
+                    m.scalar("quoted", if *quoted { "true" } else { "false" });
                 }
                 m.value("body", YamlValue::BlockScalar(body.clone()));
             }
@@ -405,7 +405,7 @@ impl<'a> YamlWriter<'a> {
                 let mut m = MappingBuilder::new();
                 m.raw("type", "BashProcessSubstitution");
                 m.raw("source", &self.source(*span));
-                m.raw("direction", dir);
+                m.scalar("direction", dir);
                 if !body.is_empty() {
                     let stmts: Vec<YamlValue> = body.iter().map(|s| self.build_inner_statement(s)).collect();
                     m.value("statements", YamlValue::Sequence(stmts));
@@ -480,9 +480,9 @@ impl<'a> YamlWriter<'a> {
             Fragment::TildePrefix(s) => {
                 m.raw("type", "TildePrefix");
                 if s.is_empty() {
-                    m.raw("value", "~");
+                    m.scalar("value", "~");
                 } else {
-                    m.raw("value", &format!("~{}", s));
+                    m.scalar("value", &format!("~{}", s));
                 }
             }
             Fragment::BashAnsiCQuoted(s) => {
@@ -514,10 +514,10 @@ impl<'a> YamlWriter<'a> {
                     }
                     BraceExpansionKind::Sequence { start, end, step } => {
                         m.raw("kind", "sequence");
-                        m.raw("start", start);
-                        m.raw("end", end);
+                        m.scalar("start", start);
+                        m.scalar("end", end);
                         if let Some(s) = step {
-                            m.raw("step", s);
+                            m.scalar("step", s);
                         } else if self.verbose {
                             m.null("step");
                         }
@@ -533,7 +533,7 @@ impl<'a> YamlWriter<'a> {
                     ExtGlobKind::Not => "!",
                 };
                 m.raw("type", "BashExtGlob");
-                m.raw("kind", kind_str);
+                m.scalar("kind", kind_str);
                 m.scalar("pattern", pattern);
             }
         }
@@ -554,12 +554,12 @@ impl<'a> YamlWriter<'a> {
         match expr {
             BashTestExpr::Unary { op, arg } => {
                 m.raw("type", "Unary");
-                m.raw("op", Self::unary_test_op_str(*op));
+                m.scalar("op", Self::unary_test_op_str(*op));
                 m.value("arg", self.build_word_value(arg));
             }
             BashTestExpr::Binary { left, op, right } => {
                 m.raw("type", "Binary");
-                m.raw("op", Self::binary_test_op_str(*op));
+                m.scalar("op", Self::binary_test_op_str(*op));
                 m.value("left", self.build_word_value(left));
                 m.value("right", self.build_word_value(right));
             }
@@ -641,7 +641,7 @@ impl<'a> YamlWriter<'a> {
         match expr {
             ArithExpr::Number(n) => {
                 m.raw("type", "Number");
-                m.raw("value", &n.to_string());
+                m.scalar("value", &n.to_string());
             }
             ArithExpr::Variable(s) => {
                 m.raw("type", "Variable");
@@ -670,18 +670,18 @@ impl<'a> YamlWriter<'a> {
                     ArithBinaryOp::Ge => ">=",
                 };
                 m.raw("type", "Binary");
-                m.raw("op", op_str);
+                m.scalar("op", op_str);
                 m.value("left", self.build_arith_expr(left));
                 m.value("right", self.build_arith_expr(right));
             }
             ArithExpr::UnaryPrefix { op, operand } => {
                 m.raw("type", "UnaryPrefix");
-                m.raw("op", Self::arith_unary_op_str(*op));
+                m.scalar("op", Self::arith_unary_op_str(*op));
                 m.value("operand", self.build_arith_expr(operand));
             }
             ArithExpr::UnaryPostfix { operand, op } => {
                 m.raw("type", "UnaryPostfix");
-                m.raw("op", Self::arith_unary_op_str(*op));
+                m.scalar("op", Self::arith_unary_op_str(*op));
                 m.value("operand", self.build_arith_expr(operand));
             }
             ArithExpr::Ternary { condition, then_expr, else_expr } => {
@@ -705,8 +705,8 @@ impl<'a> YamlWriter<'a> {
                     ArithAssignOp::BitXorAssign => "^=",
                 };
                 m.raw("type", "Assignment");
-                m.raw("target", target);
-                m.raw("op", op_str);
+                m.scalar("target", target);
+                m.scalar("op", op_str);
                 m.value("value", self.build_arith_expr(value));
             }
             ArithExpr::Group(inner) => {
@@ -736,10 +736,10 @@ impl<'a> YamlWriter<'a> {
     fn extend_param_expansion(&self, m: &mut MappingBuilder, exp: &ParameterExpansion) {
         match exp {
             ParameterExpansion::Simple(name) => {
-                m.raw("name", &format!("${}", name));
+                m.scalar("name", &format!("${}", name));
             }
             ParameterExpansion::Complex { name, operator, argument } => {
-                m.raw("name", name);
+                m.scalar("name", name);
                 if let Some(op) = operator {
                     let op_str = match op {
                         ParamOp::Default => ":-",
@@ -752,7 +752,7 @@ impl<'a> YamlWriter<'a> {
                         ParamOp::TrimSmallPrefix => "#",
                         ParamOp::TrimLargePrefix => "##",
                     };
-                    m.raw("operator", op_str);
+                    m.scalar("operator", op_str);
                 } else if self.verbose {
                     m.null("operator");
                 }

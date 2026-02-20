@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use libtest_mimic::{Arguments, Failed, Trial};
 use serde::Deserialize;
+use yaml_rust2::Yaml;
 
 // ---------------------------------------------------------------------------
 // Test spec schema
@@ -12,41 +13,36 @@ struct TestSpec {
     name: String,
     #[serde(default)]
     tags: Vec<String>,
-    dialect: DialectSpec,
+    dialect: String,
     source: Option<String>,
 
-    parse: ParseExpectation,
+    parse: String,
     error_contains: Option<String>,
 
-    #[serde(default)]
-    ast: Option<serde_yml::Value>,
+    // ast is parsed separately from the raw YAML header using yaml_rust2
+    // to avoid version mismatches with serde_yaml2's wrapper type.
 
     status: Option<i32>,
     stdout: Option<OutputMatcher>,
     stderr: Option<OutputMatcher>,
 }
 
-#[derive(Deserialize, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-enum DialectSpec {
-    Posix,
-    Bash,
-}
-
-impl From<DialectSpec> for thaum::Dialect {
-    fn from(d: DialectSpec) -> Self {
-        match d {
-            DialectSpec::Posix => thaum::Dialect::Posix,
-            DialectSpec::Bash => thaum::Dialect::Bash,
+impl TestSpec {
+    fn dialect(&self) -> Result<thaum::Dialect, String> {
+        match self.dialect.as_str() {
+            "posix" => Ok(thaum::Dialect::Posix),
+            "bash" => Ok(thaum::Dialect::Bash),
+            other => Err(format!("unknown dialect: {:?}", other)),
         }
     }
-}
 
-#[derive(Deserialize, Clone, Copy, PartialEq)]
-#[serde(rename_all = "lowercase")]
-enum ParseExpectation {
-    Ok,
-    Error,
+    fn parse_expectation(&self) -> Result<bool, String> {
+        match self.parse.as_str() {
+            "ok" => Ok(true),
+            "error" => Ok(false),
+            other => Err(format!("parse must be 'ok' or 'error', got {:?}", other)),
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -103,19 +99,20 @@ impl OutputMatcher {
 }
 
 // ---------------------------------------------------------------------------
-// YAML subset matching
+// YAML subset matching (using yaml_rust2::Yaml)
 // ---------------------------------------------------------------------------
 
 /// Compare YAML scalars that may differ in type due to YAML's implicit typing.
-/// E.g., `9` (Number) should equal `"9"` (String) since our YAML emitter writes
-/// numbers without quotes.
-fn scalars_equivalent(a: &serde_yml::Value, b: &serde_yml::Value) -> bool {
-    fn to_str(v: &serde_yml::Value) -> Option<String> {
+/// E.g., `9` (Integer) should equal `"9"` (String) since our YAML emitter
+/// now quotes values but test authors may write unquoted numbers.
+fn scalars_equivalent(a: &Yaml, b: &Yaml) -> bool {
+    fn to_str(v: &Yaml) -> Option<String> {
         match v {
-            serde_yml::Value::String(s) => Some(s.clone()),
-            serde_yml::Value::Number(n) => Some(n.to_string()),
-            serde_yml::Value::Bool(b) => Some(b.to_string()),
-            serde_yml::Value::Null => Some("null".to_string()),
+            Yaml::String(s) => Some(s.clone()),
+            Yaml::Integer(n) => Some(n.to_string()),
+            Yaml::Real(s) => Some(s.clone()),
+            Yaml::Boolean(b) => Some(b.to_string()),
+            Yaml::Null => Some("null".to_string()),
             _ => None,
         }
     }
@@ -125,18 +122,12 @@ fn scalars_equivalent(a: &serde_yml::Value, b: &serde_yml::Value) -> bool {
     }
 }
 
-fn yaml_is_subset(
-    expected: &serde_yml::Value,
-    actual: &serde_yml::Value,
-    path: &str,
-) -> Result<(), String> {
-    use serde_yml::Value;
-
+fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), String> {
     match (expected, actual) {
-        (Value::Mapping(exp_map), Value::Mapping(act_map)) => {
+        (Yaml::Hash(exp_map), Yaml::Hash(act_map)) => {
             for (key, exp_val) in exp_map {
                 let key_str = match key {
-                    Value::String(s) => s.clone(),
+                    Yaml::String(s) => s.clone(),
                     _ => format!("{:?}", key),
                 };
                 let child_path = if path.is_empty() {
@@ -151,7 +142,7 @@ fn yaml_is_subset(
             }
             Ok(())
         }
-        (Value::Sequence(exp_seq), Value::Sequence(act_seq)) => {
+        (Yaml::Array(exp_seq), Yaml::Array(act_seq)) => {
             for (i, exp_item) in exp_seq.iter().enumerate() {
                 let child_path = format!("{}[{}]", path, i);
                 let act_item = act_seq.get(i).ok_or_else(|| {
@@ -167,9 +158,6 @@ fn yaml_is_subset(
             Ok(())
         }
         _ => {
-            // Handle YAML type ambiguity: unquoted `9` is Number, quoted `"9"` is String.
-            // Our emitter writes numbers unquoted, so compare by string representation
-            // when the types differ.
             if expected == actual {
                 Ok(())
             } else if scalars_equivalent(expected, actual) {
@@ -184,12 +172,22 @@ fn yaml_is_subset(
     }
 }
 
+/// Parse a YAML string into a yaml_rust2::Yaml value (first document).
+fn parse_yaml(s: &str) -> Result<Yaml, String> {
+    let docs = yaml_rust2::YamlLoader::load_from_str(s)
+        .map_err(|e| format!("YAML parse error: {}", e))?;
+    docs.into_iter()
+        .next()
+        .ok_or_else(|| "empty YAML document".to_string())
+}
+
 // ---------------------------------------------------------------------------
 // File parsing
 // ---------------------------------------------------------------------------
 
 struct ParsedTestFile {
     spec: TestSpec,
+    ast: Option<Yaml>,
     shell_input: String,
 }
 
@@ -216,10 +214,26 @@ fn parse_test_file(path: &Path) -> Result<ParsedTestFile, String> {
         content[shell_start..].to_string()
     };
 
-    let spec: TestSpec = serde_yml::from_str(yaml_header)
+    let spec: TestSpec = serde_yaml2::from_str(yaml_header)
         .map_err(|e| format!("{}: invalid YAML header: {}", path.display(), e))?;
 
-    Ok(ParsedTestFile { spec, shell_input })
+    // Parse `ast:` field separately using yaml_rust2 (YAML 1.2) to get
+    // a dynamic Yaml value for subset matching.
+    let ast = extract_ast_field(yaml_header)?;
+
+    Ok(ParsedTestFile { spec, ast, shell_input })
+}
+
+/// Extract the `ast:` field from the YAML header as a yaml_rust2::Yaml value.
+/// Returns None if the field is absent.
+fn extract_ast_field(yaml_header: &str) -> Result<Option<Yaml>, String> {
+    let doc = parse_yaml(yaml_header)?;
+    match doc {
+        Yaml::Hash(ref map) => {
+            Ok(map.get(&Yaml::String("ast".to_string())).cloned())
+        }
+        _ => Ok(None),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -229,74 +243,77 @@ fn parse_test_file(path: &Path) -> Result<ParsedTestFile, String> {
 fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     let spec = &parsed.spec;
     let input = &parsed.shell_input;
-    let dialect: thaum::Dialect = spec.dialect.into();
+    let dialect = spec.dialect().map_err(|e| e.to_string())?;
+    let expect_ok = spec.parse_expectation().map_err(|e| e.to_string())?;
 
     // 1. Parse
     let parse_result = thaum::parse_with(input, dialect);
 
-    match spec.parse {
-        ParseExpectation::Ok => {
-            let program = parse_result.map_err(|e| {
-                format!("expected parse: ok, but got error: {}", e)
+    if expect_ok {
+        let program = parse_result.map_err(|e| {
+            format!("expected parse: ok, but got error: {}", e)
+        })?;
+
+        // 2. AST assertion (optional)
+        if let Some(expected_yaml) = &parsed.ast {
+            let mapper = thaum::format::SourceMapper::new(input);
+            let writer = thaum::format::YamlWriter::new_verbose(&mapper, "<test>");
+            let actual_yaml_str = writer.write_program(&program);
+            let actual_yaml = parse_yaml(&actual_yaml_str).map_err(|e| {
+                format!(
+                    "failed to re-parse verbose YAML: {}\n---\n{}",
+                    e, actual_yaml_str
+                )
             })?;
-
-            // 2. AST assertion (optional)
-            if let Some(expected_ast) = &spec.ast {
-                let mapper = thaum::format::SourceMapper::new(input);
-                let writer = thaum::format::YamlWriter::new_verbose(&mapper, "<test>");
-                let actual_yaml_str = writer.write_program(&program);
-                let actual_ast: serde_yml::Value =
-                    serde_yml::from_str(&actual_yaml_str).map_err(|e| {
-                        format!("failed to re-parse verbose YAML: {}\n---\n{}", e, actual_yaml_str)
-                    })?;
-                yaml_is_subset(expected_ast, &actual_ast, "").map_err(|msg| {
-                    format!("AST mismatch: {}\n\nActual verbose YAML:\n{}", msg, actual_yaml_str)
-                })?;
-            }
-
-            // 3. Execution assertions (optional)
-            // TODO: stdout/stderr capture requires executor changes
-            if spec.stdout.is_some() || spec.stderr.is_some() {
-                return Err("stdout/stderr assertions not yet supported \
-                    (executor does not capture output)"
-                    .into());
-            }
-
-            if spec.status.is_some() {
-                let mut executor = thaum::exec::Executor::new();
-                let exit_code = match executor.execute(&program) {
-                    Ok(code) => code,
-                    Err(thaum::exec::ExecError::ExitRequested(code)) => code,
-                    Err(thaum::exec::ExecError::CommandNotFound(_)) => 127,
-                    Err(e) => {
-                        return Err(format!("execution error: {}", e).into());
-                    }
-                };
-
-                if let Some(expected_status) = spec.status {
-                    if exit_code != expected_status {
-                        return Err(format!(
-                            "status mismatch: expected {}, got {}",
-                            expected_status, exit_code
-                        )
-                        .into());
-                    }
-                }
-            }
+            yaml_is_subset(expected_yaml, &actual_yaml, "").map_err(|msg| {
+                format!(
+                    "AST mismatch: {}\n\nActual verbose YAML:\n{}",
+                    msg, actual_yaml_str
+                )
+            })?;
         }
-        ParseExpectation::Error => {
-            let err = parse_result.err().ok_or_else(|| {
-                "expected parse: error, but parsing succeeded".to_string()
-            })?;
-            if let Some(ref substr) = spec.error_contains {
-                let msg = err.to_string();
-                if !msg.contains(substr.as_str()) {
+
+        // 3. Execution assertions (optional)
+        // TODO: stdout/stderr capture requires executor changes
+        if spec.stdout.is_some() || spec.stderr.is_some() {
+            return Err("stdout/stderr assertions not yet supported \
+                (executor does not capture output)"
+                .into());
+        }
+
+        if spec.status.is_some() {
+            let mut executor = thaum::exec::Executor::new();
+            let exit_code = match executor.execute(&program) {
+                Ok(code) => code,
+                Err(thaum::exec::ExecError::ExitRequested(code)) => code,
+                Err(thaum::exec::ExecError::CommandNotFound(_)) => 127,
+                Err(e) => {
+                    return Err(format!("execution error: {}", e).into());
+                }
+            };
+
+            if let Some(expected_status) = spec.status {
+                if exit_code != expected_status {
                     return Err(format!(
-                        "error message does not contain {:?}:\n  actual: {:?}",
-                        substr, msg
+                        "status mismatch: expected {}, got {}",
+                        expected_status, exit_code
                     )
                     .into());
                 }
+            }
+        }
+    } else {
+        let err = parse_result.err().ok_or_else(|| {
+            "expected parse: error, but parsing succeeded".to_string()
+        })?;
+        if let Some(ref substr) = spec.error_contains {
+            let msg = err.to_string();
+            if !msg.contains(substr.as_str()) {
+                return Err(format!(
+                    "error message does not contain {:?}:\n  actual: {:?}",
+                    substr, msg
+                )
+                .into());
             }
         }
     }
@@ -328,7 +345,6 @@ fn collect_files_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
         if path.is_dir() {
             collect_files_recursive(&path, out);
         } else if path.extension().and_then(|e| e.to_str()) == Some("yaml") {
-            // Check for .sh.yaml by looking at the stem
             if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
                 if name.ends_with(".sh.yaml") {
                     out.push(path);

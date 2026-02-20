@@ -155,6 +155,22 @@ fn write_indent(buf: &mut String, level: usize) {
     }
 }
 
+/// Check if a string looks like a YAML 1.2 integer that `parse::<f64>` might miss.
+/// YAML 1.2 recognizes `0x1F` (hex), `0o17` (octal), `0b1010` (binary).
+fn looks_like_yaml_int(s: &str) -> bool {
+    let s = s.strip_prefix(['+', '-']).unwrap_or(s);
+    if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        return !hex.is_empty() && hex.chars().all(|c| c.is_ascii_hexdigit());
+    }
+    if let Some(oct) = s.strip_prefix("0o").or_else(|| s.strip_prefix("0O")) {
+        return !oct.is_empty() && oct.chars().all(|c| matches!(c, '0'..='7'));
+    }
+    if let Some(bin) = s.strip_prefix("0b").or_else(|| s.strip_prefix("0B")) {
+        return !bin.is_empty() && bin.chars().all(|c| matches!(c, '0' | '1'));
+    }
+    false
+}
+
 /// Escape a string for YAML output. Quotes it if it contains special chars.
 fn yaml_escape(s: &str) -> String {
     if s.is_empty() {
@@ -187,7 +203,8 @@ fn yaml_escape(s: &str) -> String {
         || s == "false"
         || s == "null"
         || s == "~"
-        || s.parse::<f64>().is_ok();
+        || s.parse::<f64>().is_ok()
+        || looks_like_yaml_int(s);
 
     if needs_quoting {
         format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\""))

@@ -1,0 +1,3 @@
+FROM alpine:latest
+COPY thaum /usr/local/bin/thaum
+ENTRYPOINT ["thaum", "exec"]

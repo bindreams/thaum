@@ -1,8 +1,14 @@
+mod common;
+
 use std::path::{Path, PathBuf};
+use std::sync::atomic::AtomicBool;
 
 use libtest_mimic::{Arguments, Failed, Trial};
 use serde::Deserialize;
 use yaml_rust2::Yaml;
+
+/// Checked once at startup; cached to avoid repeated docker calls.
+static DOCKER_AVAILABLE: AtomicBool = AtomicBool::new(false);
 
 // ---------------------------------------------------------------------------
 // Test spec schema
@@ -267,34 +273,30 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
             })?;
         }
 
-        // 3. Execution assertions (optional)
+        // 3. Execution assertions (optional, requires Docker)
         if spec.status.is_some() || spec.stdout.is_some() || spec.stderr.is_some() {
-            let mut executor = thaum::exec::Executor::new();
-            let mut captured = thaum::exec::CapturedIo::new();
-            let exit_code = match executor.execute(&program, &mut captured.context()) {
-                Ok(code) => code,
-                Err(thaum::exec::ExecError::ExitRequested(code)) => code,
-                Err(thaum::exec::ExecError::CommandNotFound(_)) => 127,
-                Err(e) => {
-                    return Err(format!("execution error: {}", e).into());
-                }
-            };
+            if !DOCKER_AVAILABLE.load(std::sync::atomic::Ordering::Relaxed) {
+                return Ok(());
+            }
+
+            let bash_flag = spec.dialect.as_str() == "bash";
+            let result = common::docker::run_thaum_in_docker(input, bash_flag);
 
             if let Some(expected_status) = spec.status {
-                if exit_code != expected_status {
+                if result.exit_code != expected_status {
                     return Err(format!(
                         "status mismatch: expected {}, got {}",
-                        expected_status, exit_code
+                        expected_status, result.exit_code
                     )
                     .into());
                 }
             }
 
             if let Some(ref stdout_matcher) = spec.stdout {
-                stdout_matcher.check(&captured.stdout_string(), "stdout")?;
+                stdout_matcher.check(&result.stdout, "stdout")?;
             }
             if let Some(ref stderr_matcher) = spec.stderr {
-                stderr_matcher.check(&captured.stderr_string(), "stderr")?;
+                stderr_matcher.check(&result.stderr, "stderr")?;
             }
         }
     } else {
@@ -351,6 +353,14 @@ fn collect_files_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
 
 fn main() {
     let args = Arguments::from_args();
+
+    // Check Docker availability once at startup
+    let docker_ok = common::docker::docker_image_available("thaum-corpus-exec");
+    DOCKER_AVAILABLE.store(docker_ok, std::sync::atomic::Ordering::Relaxed);
+    if !docker_ok {
+        eprintln!("note: thaum-corpus-exec Docker image not found; execution assertions will be skipped");
+        eprintln!("      run scripts/build-corpus-docker.sh to enable them");
+    }
 
     let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");
     let files = discover_corpus_files(&corpus_dir);

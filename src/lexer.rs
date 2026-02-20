@@ -248,7 +248,7 @@ impl Lexer {
     /// Used by external callers (cli, tests, inner double-quote lexers).
     /// The parser uses `peek()`/`advance()` instead, which call `scan_next()`
     /// via `ensure_buffered()`.
-    pub(crate) fn next_token(&mut self) -> Result<SpannedToken, LexError> {
+    pub fn next_token(&mut self) -> Result<SpannedToken, LexError> {
         self.scan_next()?;
         if self.speculation_depth == 0 {
             Ok(self.buffer.pop_front().unwrap())

@@ -1,3 +1,5 @@
+pub mod docker;
+
 use thaum::ast::*;
 use thaum::parse;
 

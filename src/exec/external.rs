@@ -3,6 +3,7 @@ use std::process::Stdio;
 use crate::ast::{Redirect, RedirectKind};
 use crate::exec::error::ExecError;
 use crate::exec::expand;
+use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
 
 impl Executor {
@@ -13,6 +14,7 @@ impl Executor {
         args: &[String],
         assignments: &[crate::ast::Assignment],
         redirects: &[Redirect],
+        io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
         let mut child_cmd = std::process::Command::new(name);
         child_cmd.args(args);
@@ -39,11 +41,11 @@ impl Executor {
                 Ok(status.code().unwrap_or(128))
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                eprintln!("{}: command not found", name);
+                let _ = writeln!(io.stderr, "{}: command not found", name);
                 Ok(127)
             }
             Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                eprintln!("{}: permission denied", name);
+                let _ = writeln!(io.stderr, "{}: permission denied", name);
                 Ok(126)
             }
             Err(e) => Err(ExecError::Io(e)),

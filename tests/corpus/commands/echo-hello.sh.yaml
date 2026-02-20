@@ -1,0 +1,7 @@
+name: echo produces stdout
+dialect: posix
+parse: ok
+status: 0
+stdout: "hello\n"
+---
+echo hello

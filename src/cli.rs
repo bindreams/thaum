@@ -7,7 +7,7 @@ use std::{fs, process};
 use clap::Parser;
 use thaum::format::{SourceMapper, YamlWriter};
 
-use thaum::exec::{ExecError, Executor};
+use thaum::exec::{ExecError, Executor, ProcessIo};
 
 // ---------------------------------------------------------------------------
 // Clap argument definitions
@@ -352,7 +352,8 @@ fn do_exec(cli: &CliArgs) {
         .env_mut()
         .set_positional_params(cli.script_args.clone());
 
-    match executor.execute(&program) {
+    let mut process_io = ProcessIo::new();
+    match executor.execute(&program, &mut process_io.context()) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(ExecError::CommandNotFound(name)) => {

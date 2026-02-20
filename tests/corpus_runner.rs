@@ -274,16 +274,10 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
         }
 
         // 3. Execution assertions (optional)
-        // TODO: stdout/stderr capture requires executor changes
-        if spec.stdout.is_some() || spec.stderr.is_some() {
-            return Err("stdout/stderr assertions not yet supported \
-                (executor does not capture output)"
-                .into());
-        }
-
-        if spec.status.is_some() {
+        if spec.status.is_some() || spec.stdout.is_some() || spec.stderr.is_some() {
             let mut executor = thaum::exec::Executor::new();
-            let exit_code = match executor.execute(&program) {
+            let mut captured = thaum::exec::CapturedIo::new();
+            let exit_code = match executor.execute(&program, &mut captured.context()) {
                 Ok(code) => code,
                 Err(thaum::exec::ExecError::ExitRequested(code)) => code,
                 Err(thaum::exec::ExecError::CommandNotFound(_)) => 127,
@@ -300,6 +294,13 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
                     )
                     .into());
                 }
+            }
+
+            if let Some(ref stdout_matcher) = spec.stdout {
+                stdout_matcher.check(&captured.stdout_string(), "stdout")?;
+            }
+            if let Some(ref stderr_matcher) = spec.stderr {
+                stderr_matcher.check(&captured.stderr_string(), "stderr")?;
             }
         }
     } else {

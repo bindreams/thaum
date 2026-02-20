@@ -1,6 +1,6 @@
 mod common;
 
-use thaum::exec::{ExecError, Executor};
+use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum::Dialect;
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
@@ -14,13 +14,10 @@ fn exec_ok(script: &str) -> (String, i32) {
         .env_mut()
         .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
 
-    match executor.execute(&program) {
-        Ok(status) => {
-            // We can't easily capture stdout from external commands in-process.
-            // For now, return empty stdout and just the status.
-            (String::new(), status)
-        }
-        Err(ExecError::ExitRequested(code)) => (String::new(), code),
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => (captured.stdout_string(), status),
+        Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), code),
         Err(e) => panic!("exec failed for {:?}: {}", script, e),
     }
 }
@@ -70,7 +67,8 @@ fn variable_used_in_later_command() {
     // X=hello; exit status of assignment is 0
     let program = thaum::parse("X=hello\ntrue").unwrap();
     let mut executor = Executor::new();
-    let status = executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(status, 0);
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
@@ -123,9 +121,10 @@ fn multiple_statements_last_status() {
 fn exit_status_variable() {
     let program = thaum::parse("false\ntrue").unwrap();
     let mut executor = Executor::new();
+    let mut captured = CapturedIo::new();
 
     // After executing, last exit status should be from `true` (0).
-    let status = executor.execute(&program).unwrap();
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(status, 0);
 }
 
@@ -135,7 +134,8 @@ fn exit_status_variable() {
 fn if_true_branch() {
     let program = thaum::parse("if true; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("yes"));
 }
 
@@ -143,7 +143,8 @@ fn if_true_branch() {
 fn if_false_branch() {
     let program = thaum::parse("if false; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("no"));
 }
 
@@ -151,7 +152,8 @@ fn if_false_branch() {
 fn if_no_else_false() {
     let program = thaum::parse("if false; then X=yes; fi").unwrap();
     let mut executor = Executor::new();
-    let status = executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), None);
     assert_eq!(status, 0);
 }
@@ -164,7 +166,8 @@ fn while_loop_counts() {
     // This test currently tests the while structure only.
     let program = thaum::parse("X=0\nwhile test $X != done; do X=done; done").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("done"));
 }
 
@@ -174,7 +177,8 @@ fn while_loop_counts() {
 fn for_loop_over_words() {
     let program = thaum::parse("RESULT=\nfor i in a b c; do RESULT=${RESULT}${i}; done").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("RESULT"), Some("abc"));
 }
 
@@ -189,7 +193,8 @@ case hello in
 esac
 "#).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("matched"));
 }
 
@@ -202,7 +207,8 @@ case world in
 esac
 "#).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("default"));
 }
 
@@ -212,7 +218,8 @@ esac
 fn brace_group() {
     let program = thaum::parse("{ X=inside; }").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("inside"));
 }
 
@@ -222,7 +229,8 @@ fn brace_group() {
 fn function_define_and_call() {
     let program = thaum::parse("greet() { X=hello; }\ngreet").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
@@ -232,7 +240,8 @@ fn function_define_and_call() {
 fn export_builtin() {
     let program = thaum::parse("export FOO=bar").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("FOO"), Some("bar"));
     assert!(executor.env().is_exported("FOO"));
 }
@@ -243,7 +252,8 @@ fn export_builtin() {
 fn unset_builtin() {
     let program = thaum::parse("X=hello\nunset X").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), None);
 }
 
@@ -298,7 +308,8 @@ while true; do
 done
 "#).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("1"));
 }
 
@@ -314,7 +325,8 @@ for i in a skip b; do
 done
 "#).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("RESULT"), Some("ab"));
 }
 
@@ -324,7 +336,8 @@ done
 fn command_substitution_builtin() {
     let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
@@ -333,7 +346,8 @@ fn command_substitution_external() {
     let program = thaum::parse("X=$(/bin/echo world)").unwrap();
     let mut executor = Executor::new();
     let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin");
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("world"));
 }
 
@@ -341,7 +355,8 @@ fn command_substitution_external() {
 fn command_substitution_strips_trailing_newlines() {
     let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     // echo produces "hello\n", cmd sub strips trailing newlines
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
@@ -351,7 +366,8 @@ fn command_substitution_in_argument() {
     // Test that $(...) works in command arguments
     let program = thaum::parse("X=$(echo inner)\nY=${X}").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("inner"));
     assert_eq!(executor.env().get_var("Y"), Some("inner"));
 }
@@ -360,7 +376,8 @@ fn command_substitution_in_argument() {
 fn command_substitution_exit_status() {
     let program = thaum::parse("X=$(false)").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     // $? should reflect the command substitution's exit status
     // (though the assignment itself succeeds with status 0)
     assert_eq!(executor.env().get_var("X"), Some(""));
@@ -375,8 +392,9 @@ fn expect_unsupported(script: &str) {
     let _ = executor
         .env_mut()
         .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut captured = CapturedIo::new();
     let err = executor
-        .execute(&program)
+        .execute(&program, &mut captured.context())
         .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
     assert!(
         matches!(err, ExecError::UnsupportedFeature(_)),
@@ -390,8 +408,9 @@ fn expect_unsupported_bash(script: &str) {
     let program = thaum::parse_with(script, Dialect::Bash)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
+    let mut captured = CapturedIo::new();
     let err = executor
-        .execute(&program)
+        .execute(&program, &mut captured.context())
         .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
     assert!(
         matches!(err, ExecError::UnsupportedFeature(_)),
@@ -412,7 +431,8 @@ fn unsupported_background() {
 fn arith_expansion_simple() {
     let program = thaum::parse("X=$((1+2))").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("3"));
 }
 
@@ -420,7 +440,8 @@ fn arith_expansion_simple() {
 fn arith_expansion_with_variables() {
     let program = thaum::parse("A=10\nX=$((A+5))").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("15"));
 }
 
@@ -428,7 +449,8 @@ fn arith_expansion_with_variables() {
 fn arith_expansion_in_double_quotes() {
     let program = thaum::parse(r#"X="val: $((2*3))""#).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("val: 6"));
 }
 
@@ -436,7 +458,8 @@ fn arith_expansion_in_double_quotes() {
 fn arith_expansion_with_assignment_side_effect() {
     let program = thaum::parse("X=$((y=5))").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("5"));
     assert_eq!(executor.env().get_var("y"), Some("5"));
 }
@@ -445,7 +468,8 @@ fn arith_expansion_with_assignment_side_effect() {
 fn arith_expansion_division_by_zero() {
     let program = thaum::parse("X=$((1/0))").unwrap();
     let mut executor = Executor::new();
-    let err = executor.execute(&program).unwrap_err();
+    let mut captured = CapturedIo::new();
+    let err = executor.execute(&program, &mut captured.context()).unwrap_err();
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
@@ -453,7 +477,8 @@ fn arith_expansion_division_by_zero() {
 fn arith_expansion_nested_ops() {
     let program = thaum::parse("X=$(( (2 + 3) * 4 ))").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("20"));
 }
 
@@ -461,7 +486,8 @@ fn arith_expansion_nested_ops() {
 fn arith_expansion_unset_var_is_zero() {
     let program = thaum::parse("X=$((UNSET + 1))").unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("1"));
 }
 
@@ -471,21 +497,24 @@ fn arith_expansion_unset_var_is_zero() {
 fn bash_arith_command_nonzero_is_success() {
     let program = thaum::parse_with("(( 5 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
-    assert_eq!(executor.execute(&program).unwrap(), 0);
+    let mut captured = CapturedIo::new();
+    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 0);
 }
 
 #[test]
 fn bash_arith_command_zero_is_failure() {
     let program = thaum::parse_with("(( 0 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
-    assert_eq!(executor.execute(&program).unwrap(), 1);
+    let mut captured = CapturedIo::new();
+    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 1);
 }
 
 #[test]
 fn bash_arith_command_with_assignment() {
     let program = thaum::parse_with("(( x = 42 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
-    let status = executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(status, 0); // 42 != 0 → success
     assert_eq!(executor.env().get_var("x"), Some("42"));
 }
@@ -499,7 +528,8 @@ fn bash_arith_for_basic() {
         Dialect::Bash,
     ).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("i"), Some("5"));
 }
 
@@ -510,7 +540,8 @@ fn bash_arith_for_sum() {
         Dialect::Bash,
     ).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("sum"), Some("55"));
 }
 
@@ -521,7 +552,8 @@ fn bash_arith_for_break() {
         Dialect::Bash,
     ).unwrap();
     let mut executor = Executor::new();
-    executor.execute(&program).unwrap();
+    let mut captured = CapturedIo::new();
+    executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("i"), Some("3"));
 }
 

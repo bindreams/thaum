@@ -1,0 +1,7 @@
+name: echo joins args with space
+dialect: posix
+parse: ok
+status: 0
+stdout: "hello world\n"
+---
+echo hello world

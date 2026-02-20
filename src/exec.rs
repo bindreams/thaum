@@ -5,15 +5,16 @@ pub mod environment;
 pub mod error;
 pub mod expand;
 mod external;
+pub mod io_context;
 mod pattern;
 pub mod pipeline;
 
 pub use environment::Environment;
 pub use error::ExecError;
+pub use io_context::{CapturedIo, IoContext, ProcessIo};
 #[cfg(test)]
 use pattern::shell_pattern_match;
 
-use std::io::Write;
 use std::process::Stdio;
 
 use crate::ast::{Command, Expression, ExecutionMode, Program, Statement};
@@ -50,21 +51,21 @@ impl Executor {
     }
 
     /// Execute a parsed program. Returns the exit status of the last command.
-    pub fn execute(&mut self, program: &Program) -> Result<i32, ExecError> {
-        self.execute_statements(&program.statements)
+    pub fn execute(&mut self, program: &Program, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+        self.execute_statements(&program.statements, io)
     }
 
     /// Execute a list of statements, returning the last exit status.
-    pub fn execute_statements(&mut self, stmts: &[Statement]) -> Result<i32, ExecError> {
+    pub fn execute_statements(&mut self, stmts: &[Statement], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let mut status = 0;
         for stmt in stmts {
-            status = self.execute_statement(stmt)?;
+            status = self.execute_statement(stmt, io)?;
         }
         Ok(status)
     }
 
     /// Execute a single statement.
-    fn execute_statement(&mut self, stmt: &Statement) -> Result<i32, ExecError> {
+    fn execute_statement(&mut self, stmt: &Statement, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match stmt.mode {
             ExecutionMode::Background => {
                 return Err(ExecError::UnsupportedFeature(
@@ -72,7 +73,7 @@ impl Executor {
                 ));
             }
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
-                let status = self.execute_expression(&stmt.expression)?;
+                let status = self.execute_expression(&stmt.expression, io)?;
                 self.env.set_last_exit_status(status);
                 Ok(status)
             }
@@ -80,12 +81,12 @@ impl Executor {
     }
 
     /// Execute an expression, returning its exit status.
-    pub fn execute_expression(&mut self, expr: &Expression) -> Result<i32, ExecError> {
+    pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match expr {
-            Expression::Command(cmd) => self.execute_command(cmd),
+            Expression::Command(cmd) => self.execute_command(cmd, io),
 
             Expression::Compound { body, redirects } => {
-                self.execute_compound(body, redirects)
+                self.execute_compound(body, redirects, io)
             }
 
             Expression::FunctionDef(fndef) => {
@@ -95,20 +96,20 @@ impl Executor {
             }
 
             Expression::And { left, right } => {
-                let left_status = self.execute_expression(left)?;
+                let left_status = self.execute_expression(left, io)?;
                 self.env.set_last_exit_status(left_status);
                 if left_status == 0 {
-                    self.execute_expression(right)
+                    self.execute_expression(right, io)
                 } else {
                     Ok(left_status)
                 }
             }
 
             Expression::Or { left, right } => {
-                let left_status = self.execute_expression(left)?;
+                let left_status = self.execute_expression(left, io)?;
                 self.env.set_last_exit_status(left_status);
                 if left_status != 0 {
-                    self.execute_expression(right)
+                    self.execute_expression(right, io)
                 } else {
                     Ok(0)
                 }
@@ -116,11 +117,11 @@ impl Executor {
 
             Expression::Pipe { .. } => {
                 let stages = pipeline::flatten_pipeline(expr);
-                pipeline::execute_pipeline(self, &stages)
+                pipeline::execute_pipeline(self, &stages, io)
             }
 
             Expression::Not(inner) => {
-                let status = self.execute_expression(inner)?;
+                let status = self.execute_expression(inner, io)?;
                 Ok(if status == 0 { 1 } else { 0 })
             }
         }
@@ -208,6 +209,8 @@ impl Executor {
     ///
     /// Runs the statements and captures stdout. For builtins, captures
     /// the output buffer. For external commands, uses piped stdout.
+    /// Creates its own internal IoContext with a capture buffer for stdout
+    /// and io::sink() for stderr (discarding stderr from command substitutions).
     fn execute_command_substitution(
         &mut self,
         stmts: &[Statement],
@@ -237,10 +240,12 @@ impl Executor {
 
                     if builtins::is_builtin(cmd_name) {
                         let mut stderr_buf = Vec::new();
+                        let mut sink_stdin = std::io::empty();
                         let status = builtins::run_builtin(
                             cmd_name,
                             cmd_args,
                             &mut self.env,
+                            &mut sink_stdin,
                             &mut captured,
                             &mut stderr_buf,
                         );
@@ -287,7 +292,7 @@ impl Executor {
     }
 
     /// Execute a simple command.
-    fn execute_command(&mut self, cmd: &Command) -> Result<i32, ExecError> {
+    fn execute_command(&mut self, cmd: &Command, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         // Expand arguments
         let mut expanded_args: Vec<String> = Vec::new();
         for arg in &cmd.arguments {
@@ -315,7 +320,7 @@ impl Executor {
             // Push new scope with positional params
             self.env.push_scope(cmd_args.to_vec());
 
-            let result = self.execute_compound(&func.body, &func.redirects);
+            let result = self.execute_compound(&func.body, &func.redirects, io);
 
             // Pop scope
             self.env.pop_scope();
@@ -339,16 +344,16 @@ impl Executor {
             let mut stderr_buf: Vec<u8> = Vec::new();
 
             let result =
-                builtins::run_builtin(cmd_name, cmd_args, &mut self.env, &mut stdout_buf, &mut stderr_buf);
+                builtins::run_builtin(cmd_name, cmd_args, &mut self.env, io.stdin, &mut stdout_buf, &mut stderr_buf);
 
-            // Write captured output to actual stdout/stderr
+            // Write captured output to io context stdout/stderr
             if !stdout_buf.is_empty() {
-                std::io::stdout()
+                io.stdout
                     .write_all(&stdout_buf)
                     .map_err(ExecError::Io)?;
             }
             if !stderr_buf.is_empty() {
-                std::io::stderr()
+                io.stderr
                     .write_all(&stderr_buf)
                     .map_err(ExecError::Io)?;
             }
@@ -360,7 +365,7 @@ impl Executor {
         }
 
         // External command
-        self.execute_external(cmd_name, cmd_args, &cmd.assignments, &cmd.redirects)
+        self.execute_external(cmd_name, cmd_args, &cmd.assignments, &cmd.redirects, io)
     }
 
     /// Apply prefix assignments temporarily, returning saved values.
@@ -402,7 +407,8 @@ pub fn run(input: &str) -> Result<i32, ExecError> {
         ExecError::BadSubstitution(format!("parse error: {}", e))
     })?;
     let mut executor = Executor::new();
-    match executor.execute(&program) {
+    let mut process_io = ProcessIo::new();
+    match executor.execute(&program, &mut process_io.context()) {
         Ok(status) => Ok(status),
         Err(ExecError::ExitRequested(code)) => Ok(code),
         Err(e) => Err(e),

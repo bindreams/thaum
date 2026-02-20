@@ -3,6 +3,7 @@ use std::process::{Child, Command, Stdio};
 
 use crate::ast::Expression;
 use crate::exec::error::ExecError;
+use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
 
 /// Flatten a pipe tree into a list of expressions (left to right).
@@ -30,11 +31,11 @@ fn collect_pipeline_stages<'a>(expr: &'a Expression, stages: &mut Vec<&'a Expres
 /// Execute a pipeline of commands connected by pipes.
 ///
 /// Returns the exit status of the last command in the pipeline.
-pub fn execute_pipeline(executor: &mut Executor, stages: &[&Expression]) -> Result<i32, ExecError> {
+pub fn execute_pipeline(executor: &mut Executor, stages: &[&Expression], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
     debug_assert!(!stages.is_empty());
 
     if stages.len() == 1 {
-        return executor.execute_expression(stages[0]);
+        return executor.execute_expression(stages[0], io);
     }
 
     // Build the pipeline: spawn each stage, connecting stdout→stdin.
@@ -51,6 +52,7 @@ pub fn execute_pipeline(executor: &mut Executor, stages: &[&Expression]) -> Resu
             stage,
             prev_stdout.take(),
             !is_last, // pipe_stdout: all but last
+            io,
         )?;
 
         if let Some(mut child) = child {
@@ -81,6 +83,7 @@ fn spawn_pipeline_stage(
     expr: &Expression,
     stdin: Option<std::process::ChildStdout>,
     pipe_stdout: bool,
+    io: &mut IoContext<'_>,
 ) -> Result<Option<Child>, ExecError> {
     match expr {
         Expression::Command(cmd) => {
@@ -117,6 +120,7 @@ fn spawn_pipeline_stage(
                     cmd_name,
                     cmd_args,
                     executor.env_mut(),
+                    io.stdin,
                     &mut stdout_buf,
                     &mut stderr_buf,
                 );
@@ -139,12 +143,12 @@ fn spawn_pipeline_stage(
                 } else {
                     // Last stage or no output — write directly
                     if !stdout_buf.is_empty() {
-                        std::io::stdout()
+                        io.stdout
                             .write_all(&stdout_buf)
                             .map_err(ExecError::Io)?;
                     }
                     if !stderr_buf.is_empty() {
-                        std::io::stderr()
+                        io.stderr
                             .write_all(&stderr_buf)
                             .map_err(ExecError::Io)?;
                     }
@@ -185,7 +189,7 @@ fn spawn_pipeline_stage(
             match child_cmd.spawn() {
                 Ok(child) => Ok(Some(child)),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    eprintln!("{}: command not found", cmd_name);
+                    let _ = writeln!(io.stderr, "{}: command not found", cmd_name);
                     Ok(None)
                 }
                 Err(e) => Err(ExecError::Io(e)),
@@ -194,7 +198,7 @@ fn spawn_pipeline_stage(
         // For compound commands in pipeline stages, we'd need to fork.
         // For now, fall back to sequential execution.
         _ => {
-            let status = executor.execute_expression(expr)?;
+            let status = executor.execute_expression(expr, io)?;
             executor.env_mut().set_last_exit_status(status);
             Ok(None)
         }

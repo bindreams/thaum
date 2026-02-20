@@ -14,7 +14,7 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use thaum::exec::{ExecError, Executor};
+use thaum::exec::{CapturedIo, ExecError, Executor};
 
 /// Check if conformance tests should run (Docker must be available).
 fn should_run() -> bool {
@@ -46,35 +46,22 @@ fn run_ours(script: &str) -> ShellResult {
     let program = thaum::parse(script)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    // We can't easily capture stdout from our executor since it writes to
-    // the real stdout for external commands. For built-in-only scripts,
-    // we can capture via the builtins module.
-    //
-    // For a proper implementation, we'd need to redirect our executor's
-    // stdout to a pipe. For now, we run the script via our own binary
-    // and capture its output.
-    //
-    // Simpler approach: run as external process using `sh -c` style,
-    // or use the built-in execution with captured I/O.
-    //
-    // For this initial version: execute and capture via environment.
     let mut executor = Executor::new();
     // Set a minimal PATH
     let _ = executor
         .env_mut()
         .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
 
-    let exit_code = match executor.execute(&program) {
+    let mut captured = CapturedIo::new();
+    let exit_code = match executor.execute(&program, &mut captured.context()) {
         Ok(status) => status,
         Err(ExecError::ExitRequested(code)) => code,
         Err(e) => panic!("exec failed for {:?}: {}", script, e),
     };
 
-    // TODO: capture stdout/stderr properly
-    // For now, return empty stdout — we'll compare exit codes at minimum.
     ShellResult {
-        stdout: String::new(),
-        stderr: String::new(),
+        stdout: captured.stdout_string(),
+        stderr: captured.stderr_string(),
         exit_code,
     }
 }

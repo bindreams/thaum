@@ -1,6 +1,7 @@
 use crate::ast::{CompoundCommand, Redirect};
 use crate::exec::arithmetic;
 use crate::exec::error::ExecError;
+use crate::exec::io_context::IoContext;
 use crate::exec::pattern::shell_pattern_match;
 use crate::exec::Executor;
 
@@ -10,6 +11,7 @@ impl Executor {
         &mut self,
         body: &CompoundCommand,
         redirects: &[Redirect],
+        io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
         if !redirects.is_empty() {
             return Err(ExecError::UnsupportedFeature(
@@ -18,7 +20,7 @@ impl Executor {
         }
         match body {
             CompoundCommand::BraceGroup { body, .. } => {
-                self.execute_statements(body)
+                self.execute_statements(body, io)
             }
 
             CompoundCommand::Subshell { .. } => {
@@ -34,18 +36,18 @@ impl Executor {
                 else_body,
                 ..
             } => {
-                let cond_status = self.execute_statements(condition)?;
+                let cond_status = self.execute_statements(condition, io)?;
                 if cond_status == 0 {
-                    return self.execute_statements(then_body);
+                    return self.execute_statements(then_body, io);
                 }
                 for elif in elifs {
-                    let elif_status = self.execute_statements(&elif.condition)?;
+                    let elif_status = self.execute_statements(&elif.condition, io)?;
                     if elif_status == 0 {
-                        return self.execute_statements(&elif.body);
+                        return self.execute_statements(&elif.body, io);
                     }
                 }
                 if let Some(else_body) = else_body {
-                    self.execute_statements(else_body)
+                    self.execute_statements(else_body, io)
                 } else {
                     Ok(0)
                 }
@@ -56,11 +58,11 @@ impl Executor {
             } => {
                 let mut status = 0;
                 loop {
-                    let cond_status = self.execute_statements(condition)?;
+                    let cond_status = self.execute_statements(condition, io)?;
                     if cond_status != 0 {
                         break;
                     }
-                    match self.execute_statements(body) {
+                    match self.execute_statements(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -81,11 +83,11 @@ impl Executor {
             } => {
                 let mut status = 0;
                 loop {
-                    let cond_status = self.execute_statements(condition)?;
+                    let cond_status = self.execute_statements(condition, io)?;
                     if cond_status == 0 {
                         break;
                     }
-                    match self.execute_statements(body) {
+                    match self.execute_statements(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -122,7 +124,7 @@ impl Executor {
                 let mut status = 0;
                 for value in &word_list {
                     self.env.set_var(variable, value)?;
-                    match self.execute_statements(body) {
+                    match self.execute_statements(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -152,7 +154,7 @@ impl Executor {
                         }
                     }
                     if matched {
-                        status = self.execute_statements(&arm.body)?;
+                        status = self.execute_statements(&arm.body, io)?;
                         // For POSIX `;;`, break after first match.
                         // Bash `;;&` and `;&` are handled differently (not yet).
                         break;
@@ -203,7 +205,7 @@ impl Executor {
                         }
                     }
 
-                    let should_update = match self.execute_statements(body) {
+                    let should_update = match self.execute_statements(body, io) {
                         Ok(s) => {
                             status = s;
                             true

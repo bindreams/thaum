@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::{Read, Write};
 
 use crate::exec::environment::Environment;
 use crate::exec::error::ExecError;
@@ -20,6 +20,7 @@ pub fn run_builtin(
     name: &str,
     args: &[String],
     env: &mut Environment,
+    stdin: &mut dyn Read,
     stdout: &mut dyn Write,
     stderr: &mut dyn Write,
 ) -> Result<i32, ExecError> {
@@ -35,7 +36,7 @@ pub fn run_builtin(
         "break" => builtin_break(args),
         "continue" => builtin_continue(args),
         "shift" => builtin_shift(args, env, stderr),
-        "read" => builtin_read(args, env),
+        "read" => builtin_read(args, env, stdin),
         "set" => builtin_set(args, env),
         "test" | "[" => builtin_test(name, args, stderr),
         "eval" | "exec" | "." | "source" => Err(ExecError::UnsupportedFeature(
@@ -192,12 +193,14 @@ fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write)
     Ok(0)
 }
 
-fn builtin_read(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+fn builtin_read(args: &[String], env: &mut Environment, stdin: &mut dyn Read) -> Result<i32, ExecError> {
+    use std::io::BufRead;
     // Minimal `read VAR` implementation: read one line from stdin.
     let var_name = args.first().map(|s| s.as_str()).unwrap_or("REPLY");
 
+    let mut reader = std::io::BufReader::new(stdin);
     let mut line = String::new();
-    match std::io::stdin().read_line(&mut line) {
+    match reader.read_line(&mut line) {
         Ok(0) => return Ok(1), // EOF
         Ok(_) => {
             // Remove trailing newline

@@ -7,7 +7,7 @@ use super::Parser;
 
 impl Parser {
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         self.skip_linebreak()?;
 
@@ -38,7 +38,7 @@ impl Parser {
         }
 
         loop {
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
             match self.lexer.peek()?.token {
                 Token::Semicolon => {
                     out.push(Statement {
@@ -48,7 +48,7 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    self.lexer.skip_whitespace()?;
+                    self.lexer.eat_whitespace()?;
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
@@ -69,7 +69,7 @@ impl Parser {
                     });
                     self.lexer.advance()?;
                     self.skip_linebreak()?;
-                    self.lexer.skip_whitespace()?;
+                    self.lexer.eat_whitespace()?;
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
@@ -95,7 +95,7 @@ impl Parser {
         let mut left = self.parse_pipeline()?;
 
         loop {
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
             match self.lexer.peek()?.token {
                 Token::AndIf => {
                     self.lexer.advance()?;
@@ -136,7 +136,7 @@ impl Parser {
         let mut left = self.parse_leaf_expression()?;
 
         loop {
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
             let pipe_token = &self.lexer.peek()?.token;
             let stderr = match pipe_token {
                 Token::Pipe => false,
@@ -161,7 +161,7 @@ impl Parser {
     }
 
     fn parse_leaf_expression(&mut self) -> Result<Expression, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         match &tok {
             Token::Literal(w) => {
@@ -199,19 +199,19 @@ impl Parser {
                 // Phase 1: speculate on the stream to check for name ( )
                 if is_lone && is_valid_name(w) {
                     let func_head = self.lexer.speculate(|s| {
-                        s.skip_whitespace()?;
+                        s.eat_whitespace()?;
                         let name = match &s.peek()?.token {
                             Token::Literal(w) if is_valid_name(w) => w.clone(),
                             _ => return Ok(None),
                         };
                         let start_span = s.peek()?.span;
                         s.advance()?;
-                        s.skip_whitespace()?;
+                        s.eat_whitespace()?;
                         if s.peek()?.token != Token::LParen {
                             return Ok(None);
                         }
                         s.advance()?; // consume (
-                        s.skip_whitespace()?;
+                        s.eat_whitespace()?;
                         if s.peek()?.token != Token::RParen {
                             return Ok(None);
                         }
@@ -225,7 +225,7 @@ impl Parser {
                         let body = self.parse_compound_command()?;
                         let mut redirects = Vec::new();
                         loop {
-                            self.lexer.skip_whitespace()?;
+                            self.lexer.eat_whitespace()?;
                             if !self.lexer.peek()?.token.is_redirect_start() { break; }
                             redirects.push(self.parse_redirect()?);
                         }
@@ -264,7 +264,7 @@ impl Parser {
 
         let mut redirects = Vec::new();
         loop {
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
             if !self.lexer.peek()?.token.is_redirect_start() { break; }
             redirects.push(self.parse_redirect()?);
         }

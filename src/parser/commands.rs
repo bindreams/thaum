@@ -22,7 +22,7 @@ impl Parser {
                 let redir = self.parse_redirect()?;
                 end_span = redir.span;
                 redirects.push(redir);
-                self.lexer.skip_whitespace()?;
+                self.lexer.eat_whitespace()?;
                 continue;
             }
 
@@ -48,7 +48,7 @@ impl Parser {
                                 if self.lexer.peek()?.token == Token::RParen {
                                     break;
                                 }
-                                self.lexer.skip_whitespace()?;
+                                self.lexer.eat_whitespace()?;
                                 if self.lexer.peek()?.token.is_fragment() {
                                     if let Some(w) = self.collect_word()? {
                                         elements.push(w);
@@ -75,7 +75,7 @@ impl Parser {
                             });
                             end_span = word_span;
                         }
-                        self.lexer.skip_whitespace()?;
+                        self.lexer.eat_whitespace()?;
                         continue;
                     }
                 }
@@ -84,7 +84,7 @@ impl Parser {
             break;
         }
 
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token.is_fragment() {
             end_span = self.lexer.peek()?.span;
             if let Some(arg) = self.collect_argument()? {
@@ -92,7 +92,7 @@ impl Parser {
             }
 
             loop {
-                self.lexer.skip_whitespace()?;
+                self.lexer.eat_whitespace()?;
 
                 if self.lexer.peek()?.token.is_redirect_start() {
                     let redir = self.parse_redirect()?;
@@ -148,7 +148,7 @@ impl Parser {
             _ => {}
         }
 
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),

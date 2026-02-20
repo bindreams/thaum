@@ -47,9 +47,10 @@ pub(super) enum LastScanned {
 /// plus Whitespace tokens as word boundary markers.
 ///
 /// Also provides a buffered token stream with `peek()`/`advance()`/`speculate()`
-/// for use by the parser. Call `skip_whitespace()` to consume `Whitespace` tokens before
-/// peeking/advancing. Word collection code deliberately skips the call to see
-/// `Whitespace` tokens as word boundaries.
+/// for use by the parser. Use `eat_whitespace()` to optionally consume a
+/// `Whitespace` token, or `skip_whitespace()` when one must be present.
+/// Word collection code deliberately uses neither to see `Whitespace` tokens
+/// as word boundaries.
 pub struct Lexer {
     // --- Constants (never change after construction) ---
     pub(crate) options: ParseOptions,
@@ -131,23 +132,38 @@ impl Lexer {
     // Token-level buffered API (merged from TokenStream)
     // ================================================================
 
-    /// Consume a `Whitespace` token at the current position, if present.
-    /// At most one can exist (consecutive Whitespace is prevented by the lexer).
+    /// Consume a `Whitespace` token that must be present at the current position.
+    /// Panics (debug) if the current token is not `Whitespace`.
     pub(crate) fn skip_whitespace(&mut self) -> Result<(), ParseError> {
         self.ensure_buffered()?;
-        if self.buffer[self.buf_pos].token == Token::Whitespace {
-            if self.speculation_depth == 0 {
-                self.buffer.pop_front();
-            } else {
-                self.buf_pos += 1;
-            }
-            debug_assert!(
-                self.buf_pos >= self.buffer.len()
-                    || self.buffer[self.buf_pos].token != Token::Whitespace,
-                "consecutive Whitespace tokens should not exist"
-            );
-        }
+        debug_assert_eq!(
+            self.buffer[self.buf_pos].token,
+            Token::Whitespace,
+            "skip_whitespace: expected Whitespace token, found {:?}",
+            self.buffer[self.buf_pos].token,
+        );
+        self.consume_front();
         Ok(())
+    }
+
+    /// Consume a `Whitespace` token if present. Returns `true` if one was consumed.
+    pub(crate) fn eat_whitespace(&mut self) -> Result<bool, ParseError> {
+        self.ensure_buffered()?;
+        if self.buffer[self.buf_pos].token == Token::Whitespace {
+            self.consume_front();
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    /// Advance the buffer read position by one token (speculation-aware).
+    fn consume_front(&mut self) {
+        if self.speculation_depth == 0 {
+            self.buffer.pop_front();
+        } else {
+            self.buf_pos += 1;
+        }
     }
 
     /// Look at the next token without consuming it.

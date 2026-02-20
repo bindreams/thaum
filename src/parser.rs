@@ -58,7 +58,7 @@ impl Parser {
 
     /// Consume the current token if it matches the expected operator token.
     fn eat(&mut self, expected: &Token) -> Result<bool, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token == *expected {
             self.lexer.advance()?;
             Ok(true)
@@ -69,7 +69,7 @@ impl Parser {
 
     /// Consume the current token if it is a keyword matching the given string.
     fn eat_keyword(&mut self, keyword: &str) -> Result<bool, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             self.lexer.advance()?;
@@ -81,7 +81,7 @@ impl Parser {
 
     /// Expect and consume an operator token. Returns error if not matched.
     fn expect(&mut self, expected: &Token) -> Result<SpannedToken, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token == *expected {
             self.lexer.advance()
         } else {
@@ -95,7 +95,7 @@ impl Parser {
 
     /// Expect and consume a keyword (a lone Literal matching the string).
     fn expect_keyword(&mut self, keyword: &str) -> Result<SpannedToken, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             self.lexer.advance()
@@ -116,7 +116,7 @@ impl Parser {
         opening: &str,
         opening_span: Span,
     ) -> Result<SpannedToken, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, keyword) {
             return self.lexer.advance();
@@ -137,24 +137,24 @@ impl Parser {
     }
 
     fn skip_linebreak(&mut self) -> Result<(), ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         while self.lexer.peek()?.token == Token::Newline {
             self.lexer.advance()?;
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
         }
         Ok(())
     }
 
     /// Consume heredoc body tokens that belong to the just-parsed statement.
     pub(super) fn consume_heredoc_bodies(&mut self) -> Result<Vec<String>, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token != Token::Newline {
             return Ok(Vec::new());
         }
 
         let result = self.lexer.speculate(|s| {
             s.advance()?; // consume Newline tentatively
-            s.skip_whitespace()?;
+            s.eat_whitespace()?;
             if !matches!(s.peek()?.token, Token::HereDocBody(_)) {
                 return Ok(None);
             }
@@ -170,13 +170,13 @@ impl Parser {
     }
 
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token != Token::Newline {
             return Ok(false);
         }
         while self.lexer.peek()?.token == Token::Newline {
             self.lexer.advance()?;
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
         }
         Ok(true)
     }

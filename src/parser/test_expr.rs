@@ -11,7 +11,7 @@ impl Parser {
 
     fn parse_test_or(&mut self) -> Result<BashTestExpr, ParseError> {
         let mut left = self.parse_test_and()?;
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         while self.lexer.peek()?.token == Token::OrIf {
             self.lexer.advance()?;
             let right = self.parse_test_and()?;
@@ -19,14 +19,14 @@ impl Parser {
                 left: Box::new(left),
                 right: Box::new(right),
             };
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
         }
         Ok(left)
     }
 
     fn parse_test_and(&mut self) -> Result<BashTestExpr, ParseError> {
         let mut left = self.parse_test_not()?;
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         while self.lexer.peek()?.token == Token::AndIf {
             self.lexer.advance()?;
             let right = self.parse_test_not()?;
@@ -34,13 +34,13 @@ impl Parser {
                 left: Box::new(left),
                 right: Box::new(right),
             };
-            self.lexer.skip_whitespace()?;
+            self.lexer.eat_whitespace()?;
         }
         Ok(left)
     }
 
     fn parse_test_not(&mut self) -> Result<BashTestExpr, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let tok = self.lexer.peek()?.token.clone();
         if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "!") {
             self.lexer.advance()?;
@@ -51,7 +51,7 @@ impl Parser {
     }
 
     fn parse_test_primary(&mut self) -> Result<BashTestExpr, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let peeked = self.lexer.peek()?.clone();
 
         // Grouped expression: ( expr )
@@ -87,7 +87,7 @@ impl Parser {
         // Consume the first word, then check for binary operator
         let first_word = self.consume_test_word()?;
 
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if let Some(op) = self.lexer.peek()?.token.as_binary_test_op() {
             self.advance_binary_op()?;
             let right_word = if op == BinaryTestOp::RegexMatch {
@@ -106,7 +106,7 @@ impl Parser {
     }
 
     fn consume_regex_pattern(&mut self) -> Result<Word, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         let mut text = String::new();
         let mut end_span = start_span;
@@ -163,7 +163,7 @@ impl Parser {
     }
 
     fn consume_test_word(&mut self) -> Result<Word, ParseError> {
-        self.lexer.skip_whitespace()?;
+        self.lexer.eat_whitespace()?;
         if self.lexer.peek()?.token.is_fragment() {
             return Ok(self.collect_word()?.unwrap());
         }

@@ -12,7 +12,7 @@ use super::yaml_value::YamlValue;
 ///   - value1
 ///   - value2
 /// ```
-pub(super) fn emit(value: &YamlValue) -> String {
+pub fn emit(value: &YamlValue) -> String {
     let mut buf = String::new();
     emit_mapping_entries(&mut buf, value, 0);
     buf
@@ -42,6 +42,9 @@ fn emit_kv(buf: &mut String, key: &str, value: &YamlValue, indent: usize) {
 /// for child content.
 fn emit_kv_after_prefix(buf: &mut String, key: &str, value: &YamlValue, indent: usize) {
     match value {
+        YamlValue::Null => {
+            let _ = writeln!(buf, "{}: null", key);
+        }
         YamlValue::Scalar(s) => {
             let _ = writeln!(buf, "{}: {}", key, yaml_escape(s));
         }
@@ -56,6 +59,9 @@ fn emit_kv_after_prefix(buf: &mut String, key: &str, value: &YamlValue, indent: 
                 write_indent(buf, indent + 2);
                 let _ = writeln!(buf, "{}", line);
             }
+        }
+        YamlValue::Sequence(items) if items.is_empty() => {
+            let _ = writeln!(buf, "{}: []", key);
         }
         YamlValue::Sequence(items) => {
             let _ = writeln!(buf, "{}:", key);
@@ -98,6 +104,10 @@ fn emit_seq_item(buf: &mut String, item: &YamlValue, indent: usize) {
             write_indent(buf, indent);
             let _ = writeln!(buf, "- {}", s);
         }
+        YamlValue::Null => {
+            write_indent(buf, indent);
+            let _ = writeln!(buf, "- null");
+        }
         _ => {
             // Empty mapping, sequence of sequences, or block scalar in a list
             write_indent(buf, indent);
@@ -110,6 +120,9 @@ fn emit_seq_item(buf: &mut String, item: &YamlValue, indent: usize) {
 /// Emit a value without a key prefix. Used for non-mapping, non-kv contexts.
 fn emit_value(buf: &mut String, value: &YamlValue, indent: usize) {
     match value {
+        YamlValue::Null => {
+            let _ = writeln!(buf, "null");
+        }
         YamlValue::Scalar(s) => {
             let _ = writeln!(buf, "{}", yaml_escape(s));
         }

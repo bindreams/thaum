@@ -1,9 +1,9 @@
 /// A lightweight YAML data model for structured emission.
 ///
 /// This is not a general-purpose YAML type — it models exactly the subset
-/// of YAML used by the AST output: mappings, sequences, and scalars.
+/// of YAML used by the AST output: mappings, sequences, scalars, and null.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) enum YamlValue {
+pub enum YamlValue {
     /// A scalar string that will be escaped if it contains YAML special chars.
     Scalar(String),
     /// A scalar string that is written verbatim (no escaping). Used for
@@ -15,6 +15,8 @@ pub(super) enum YamlValue {
     Sequence(Vec<YamlValue>),
     /// An ordered mapping of string keys to values.
     Mapping(Vec<(String, YamlValue)>),
+    /// YAML null value. Used in verbose mode for absent optional fields.
+    Null,
 }
 
 impl YamlValue {
@@ -32,7 +34,7 @@ impl YamlValue {
 }
 
 /// Builder for constructing YAML mappings incrementally.
-pub(super) struct MappingBuilder {
+pub struct MappingBuilder {
     entries: Vec<(String, YamlValue)>,
 }
 
@@ -69,6 +71,24 @@ impl MappingBuilder {
         if cond {
             self.raw(key, value);
         }
+        self
+    }
+
+    /// Add a key with a null value. Used in verbose mode for absent optionals.
+    pub fn null(&mut self, key: &str) -> &mut Self {
+        self.entries.push((key.to_string(), YamlValue::Null));
+        self
+    }
+
+    /// Add a key with a raw boolean value (`true` / `false`).
+    pub fn raw_bool(&mut self, key: &str, value: bool) -> &mut Self {
+        self.raw(key, if value { "true" } else { "false" })
+    }
+
+    /// Add a key with an empty sequence (`[]`).
+    pub fn empty_seq(&mut self, key: &str) -> &mut Self {
+        self.entries
+            .push((key.to_string(), YamlValue::Sequence(Vec::new())));
         self
     }
 

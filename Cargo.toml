@@ -16,6 +16,15 @@ clap = { version = "4", features = ["derive"], optional = true }
 
 [dev-dependencies]
 pretty_assertions = "1"
+serde = { version = "1", features = ["derive"] }
+serde_yml = "0.0.12"
+libtest-mimic = "0.8"
+regex = "1"
+
+[[test]]
+name = "corpus"
+path = "tests/corpus_runner.rs"
+harness = false
 
 [[bin]]
 name = "thaum"

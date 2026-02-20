@@ -1,7 +1,7 @@
 use colored::Colorize;
 use thaum::exec::ExecError;
 
-use super::source_map::SourceMapper;
+use thaum::format::SourceMapper;
 
 fn print_error_header(msg: &str) {
     if colored::control::SHOULD_COLORIZE.should_colorize() {

@@ -1,0 +1,6 @@
+name: unclosed if statement
+dialect: posix
+parse: error
+error_contains: "fi"
+---
+if true; then echo yes

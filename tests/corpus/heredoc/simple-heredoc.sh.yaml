@@ -1,0 +1,13 @@
+name: simple heredoc
+dialect: posix
+parse: ok
+ast:
+  statements:
+    - type: Command
+      redirects:
+        - type: HereDoc
+          delimiter: EOF
+---
+cat <<EOF
+hello world
+EOF

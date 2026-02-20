@@ -1,0 +1,13 @@
+name: octal constant in arithmetic
+dialect: bash
+parse: ok
+ast:
+  statements:
+    - type: Compound
+      body:
+        type: BashArithmeticCommand
+        expression:
+          type: Number
+          value: 9
+---
+(( 011 ))

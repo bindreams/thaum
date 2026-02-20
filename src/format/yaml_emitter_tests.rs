@@ -1,5 +1,5 @@
 use super::*;
-use crate::cli::yaml_value::{MappingBuilder, YamlValue};
+use crate::format::yaml_value::{MappingBuilder, YamlValue};
 
 #[test]
 fn emit_simple_mapping() {
@@ -62,7 +62,7 @@ fn emit_empty_sequence() {
     let value = YamlValue::mapping()
         .value("arguments", YamlValue::Sequence(vec![]))
         .build();
-    assert_eq!(emit(&value), "arguments:\n");
+    assert_eq!(emit(&value), "arguments: []\n");
 }
 
 #[test]

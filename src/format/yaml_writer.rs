@@ -1,21 +1,26 @@
-use thaum::ast::*;
-use thaum::span::Span;
+use crate::ast::*;
+use crate::span::Span;
 
 use super::source_map::SourceMapper;
 use super::yaml_emitter;
 use super::yaml_value::{MappingBuilder, YamlValue};
 
-pub(super) struct YamlWriter<'a> {
+pub struct YamlWriter<'a> {
     mapper: &'a SourceMapper,
     filename: &'a str,
+    verbose: bool,
 }
 
 impl<'a> YamlWriter<'a> {
-    pub(super) fn new(mapper: &'a SourceMapper, filename: &'a str) -> Self {
-        YamlWriter { mapper, filename }
+    pub fn new(mapper: &'a SourceMapper, filename: &'a str) -> Self {
+        YamlWriter { mapper, filename, verbose: false }
     }
 
-    pub(super) fn write_program(&self, prog: &Program) -> String {
+    pub fn new_verbose(mapper: &'a SourceMapper, filename: &'a str) -> Self {
+        YamlWriter { mapper, filename, verbose: true }
+    }
+
+    pub fn write_program(&self, prog: &Program) -> String {
         let value = self.build_program(prog);
         yaml_emitter::emit(&value)
     }
@@ -34,14 +39,22 @@ impl<'a> YamlWriter<'a> {
         m.build()
     }
 
+    fn emit_mode(&self, m: &mut MappingBuilder, mode: ExecutionMode) {
+        match mode {
+            ExecutionMode::Background => { m.raw("mode", "Background"); }
+            ExecutionMode::Terminated => { m.raw("mode", "Terminated"); }
+            ExecutionMode::Sequential => {
+                if self.verbose {
+                    m.raw("mode", "Sequential");
+                }
+            }
+        }
+    }
+
     fn build_statement(&self, s: &Statement) -> YamlValue {
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(s.span));
-        match s.mode {
-            ExecutionMode::Background => { m.raw("mode", "Background"); }
-            ExecutionMode::Terminated => { m.raw("mode", "Terminated"); }
-            ExecutionMode::Sequential => {}
-        }
+        self.emit_mode(&mut m, s.mode);
         self.extend_expression(&mut m, &s.expression);
         m.build()
     }
@@ -49,7 +62,7 @@ impl<'a> YamlWriter<'a> {
     /// Build a sub-mapping for expressions inside binary operator trees
     /// (And/Or/Pipe/Not). These need their own source annotation.
     fn build_inner_expression(&self, expr: &Expression) -> YamlValue {
-        use thaum::parser::expr_span;
+        use crate::parser::expr_span;
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(expr_span(expr)));
         self.extend_expression(&mut m, expr);
@@ -83,6 +96,8 @@ impl<'a> YamlWriter<'a> {
                 if !redirects.is_empty() {
                     let items: Vec<YamlValue> = redirects.iter().map(|r| self.build_redirect(r)).collect();
                     m.value("redirects", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.empty_seq("redirects");
                 }
             }
             Expression::FunctionDef(f) => {
@@ -97,8 +112,8 @@ impl<'a> YamlWriter<'a> {
                 m.value("right", self.build_inner_expression(right));
             }
             Expression::Pipe { left, right, stderr } => {
-                if *stderr {
-                    m.raw("stderr", "true");
+                if *stderr || self.verbose {
+                    m.raw_bool("stderr", *stderr);
                 }
                 m.value("left", self.build_inner_expression(left));
                 m.value("right", self.build_inner_expression(right));
@@ -113,12 +128,16 @@ impl<'a> YamlWriter<'a> {
         if !cmd.assignments.is_empty() {
             let items: Vec<YamlValue> = cmd.assignments.iter().map(|a| self.build_assignment(a)).collect();
             m.value("assignments", YamlValue::Sequence(items));
+        } else if self.verbose {
+            m.empty_seq("assignments");
         }
         let args: Vec<YamlValue> = cmd.arguments.iter().map(|a| self.build_argument(a)).collect();
         m.value("arguments", YamlValue::Sequence(args));
         if !cmd.redirects.is_empty() {
             let items: Vec<YamlValue> = cmd.redirects.iter().map(|r| self.build_redirect(r)).collect();
             m.value("redirects", YamlValue::Sequence(items));
+        } else if self.verbose {
+            m.empty_seq("redirects");
         }
     }
 
@@ -135,6 +154,8 @@ impl<'a> YamlWriter<'a> {
                 if !elements.is_empty() {
                     let items: Vec<YamlValue> = elements.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("elements", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.empty_seq("elements");
                 }
             }
         }
@@ -148,6 +169,8 @@ impl<'a> YamlWriter<'a> {
         if !f.redirects.is_empty() {
             let items: Vec<YamlValue> = f.redirects.iter().map(|r| self.build_redirect(r)).collect();
             m.value("redirects", YamlValue::Sequence(items));
+        } else if self.verbose {
+            m.empty_seq("redirects");
         }
     }
 
@@ -171,6 +194,8 @@ impl<'a> YamlWriter<'a> {
                 if let Some(word_list) = words {
                     let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.null("words");
                 }
                 self.extend_statement_list(&mut m, "body", body);
             }
@@ -189,9 +214,13 @@ impl<'a> YamlWriter<'a> {
                 if !elifs.is_empty() {
                     let items: Vec<YamlValue> = elifs.iter().map(|e| self.build_elif(e)).collect();
                     m.value("elifs", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.empty_seq("elifs");
                 }
                 if let Some(else_cmds) = else_body {
                     self.extend_statement_list(&mut m, "else_body", else_cmds);
+                } else if self.verbose {
+                    m.null("else_body");
                 }
             }
             CompoundCommand::WhileClause { condition, body, span } => {
@@ -223,6 +252,8 @@ impl<'a> YamlWriter<'a> {
                 if let Some(word_list) = words {
                     let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.null("words");
                 }
                 self.extend_statement_list(&mut m, "body", body);
             }
@@ -231,6 +262,8 @@ impl<'a> YamlWriter<'a> {
                 m.raw("type", "BashCoproc");
                 if let Some(n) = name {
                     m.raw("name", n);
+                } else if self.verbose {
+                    m.null("name");
                 }
                 let mut inner = MappingBuilder::new();
                 self.extend_expression(&mut inner, body);
@@ -241,12 +274,18 @@ impl<'a> YamlWriter<'a> {
                 m.raw("type", "BashArithmeticFor");
                 if let Some(init_expr) = init {
                     m.value("init", self.build_arith_expr(init_expr));
+                } else if self.verbose {
+                    m.null("init");
                 }
                 if let Some(cond_expr) = condition {
                     m.value("condition", self.build_arith_expr(cond_expr));
+                } else if self.verbose {
+                    m.null("condition");
                 }
                 if let Some(update_expr) = update {
                     m.value("update", self.build_arith_expr(update_expr));
+                } else if self.verbose {
+                    m.null("update");
                 }
                 self.extend_statement_list(&mut m, "body", body);
             }
@@ -267,6 +306,8 @@ impl<'a> YamlWriter<'a> {
         m.value("patterns", YamlValue::Sequence(patterns));
         if !arm.body.is_empty() {
             self.extend_statement_list(&mut m, "body", &arm.body);
+        } else if self.verbose {
+            m.empty_seq("body");
         }
         m.build()
     }
@@ -298,12 +339,18 @@ impl<'a> YamlWriter<'a> {
         m.raw("source", &self.source(r.span));
         if let Some(fd) = r.fd {
             m.raw("fd", &fd.to_string());
+        } else if self.verbose {
+            m.null("fd");
         }
         match &r.kind {
             RedirectKind::HereDoc { delimiter, body, strip_tabs, quoted, .. } => {
                 m.raw("delimiter", delimiter);
-                m.raw_if(*strip_tabs, "strip_tabs", "true");
-                m.raw_if(*quoted, "quoted", "true");
+                if *strip_tabs || self.verbose {
+                    m.raw_bool("strip_tabs", *strip_tabs);
+                }
+                if *quoted || self.verbose {
+                    m.raw_bool("quoted", *quoted);
+                }
                 m.value("body", YamlValue::BlockScalar(body.clone()));
             }
             _ => {
@@ -326,9 +373,10 @@ impl<'a> YamlWriter<'a> {
         m.build()
     }
 
-    /// Build a word as a sequence item. Single-literal words use compact scalar form.
+    /// Build a word as a sequence item. Single-literal words use compact scalar form
+    /// in normal mode; verbose mode always uses the full `parts` form.
     fn build_word_list_item(&self, word: &Word) -> YamlValue {
-        if word.parts.len() == 1 {
+        if !self.verbose && word.parts.len() == 1 {
             if let Fragment::Literal(s) = &word.parts[0] {
                 return YamlValue::scalar(s.clone());
             }
@@ -361,6 +409,8 @@ impl<'a> YamlWriter<'a> {
                 if !body.is_empty() {
                     let stmts: Vec<YamlValue> = body.iter().map(|s| self.build_inner_statement(s)).collect();
                     m.value("statements", YamlValue::Sequence(stmts));
+                } else if self.verbose {
+                    m.empty_seq("statements");
                 }
                 m.build()
             }
@@ -368,9 +418,10 @@ impl<'a> YamlWriter<'a> {
     }
 
     /// Build a word as an inline mapping value (not a sequence item).
-    /// Single-literal words use compact `literal: value` form.
+    /// Single-literal words use compact `literal: value` form in normal mode;
+    /// verbose mode always uses the full `parts` form.
     fn build_word_value(&self, word: &Word) -> YamlValue {
-        if word.parts.len() == 1 {
+        if !self.verbose && word.parts.len() == 1 {
             if let Fragment::Literal(s) = &word.parts[0] {
                 let mut m = MappingBuilder::new();
                 m.scalar("literal", s);
@@ -409,6 +460,8 @@ impl<'a> YamlWriter<'a> {
                 if !stmts.is_empty() {
                     let items: Vec<YamlValue> = stmts.iter().map(|s| self.build_inner_statement(s)).collect();
                     m.value("statements", YamlValue::Sequence(items));
+                } else if self.verbose {
+                    m.empty_seq("statements");
                 }
             }
             Fragment::ArithmeticExpansion(expr) => {
@@ -447,7 +500,7 @@ impl<'a> YamlWriter<'a> {
                     BraceExpansionKind::List(items) => {
                         m.raw("kind", "list");
                         let yaml_items: Vec<YamlValue> = items.iter().map(|item| {
-                            if item.len() == 1 {
+                            if !self.verbose && item.len() == 1 {
                                 if let Fragment::Literal(s) = &item[0] {
                                     return YamlValue::scalar(s.clone());
                                 }
@@ -465,6 +518,8 @@ impl<'a> YamlWriter<'a> {
                         m.raw("end", end);
                         if let Some(s) = step {
                             m.raw("step", s);
+                        } else if self.verbose {
+                            m.null("step");
                         }
                     }
                 }
@@ -489,11 +544,7 @@ impl<'a> YamlWriter<'a> {
     /// These don't get source annotations (inner offsets are relative).
     fn build_inner_statement(&self, s: &Statement) -> YamlValue {
         let mut m = MappingBuilder::new();
-        match s.mode {
-            ExecutionMode::Background => { m.raw("mode", "Background"); }
-            ExecutionMode::Terminated => { m.raw("mode", "Terminated"); }
-            ExecutionMode::Sequential => {}
-        }
+        self.emit_mode(&mut m, s.mode);
         self.extend_expression(&mut m, &s.expression);
         m.build()
     }
@@ -702,9 +753,13 @@ impl<'a> YamlWriter<'a> {
                         ParamOp::TrimLargePrefix => "##",
                     };
                     m.raw("operator", op_str);
+                } else if self.verbose {
+                    m.null("operator");
                 }
                 if let Some(arg) = argument {
                     m.value("argument", self.build_word_value(arg));
+                } else if self.verbose {
+                    m.null("argument");
                 }
             }
         }

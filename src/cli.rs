@@ -1,16 +1,11 @@
 mod color;
 mod error_fmt;
-mod source_map;
-mod yaml_emitter;
-mod yaml_value;
-mod yaml_writer;
 
 use std::io::{self, Read};
 use std::{fs, process};
 
 use clap::Parser;
-use source_map::SourceMapper;
-use yaml_writer::YamlWriter;
+use thaum::format::{SourceMapper, YamlWriter};
 
 use thaum::exec::{ExecError, Executor};
 
@@ -54,6 +49,10 @@ struct SourceArgs {
     #[arg(short, long = "command")]
     c: Option<String>,
 
+    /// Emit all AST fields including defaults
+    #[arg(long)]
+    verbose: bool,
+
     /// Script file (or "-" for stdin)
     file: Option<String>,
 }
@@ -83,6 +82,7 @@ enum Subcommand {
 struct CliArgs {
     subcommand: Subcommand,
     bash_mode: bool,
+    verbose: bool,
     /// Source from -c/--command <string>.
     command_str: Option<String>,
     /// File argument (filename or "-" for stdin).
@@ -109,10 +109,10 @@ impl Cli {
     fn resolve(self) -> CliArgs {
         let bash_mode = self.bash;
         match self.subcmd {
-            None => resolve_source(Subcommand::Parse, bash_mode, self.c, self.file),
-            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.c, a.file),
+            None => resolve_source(Subcommand::Parse, bash_mode, false, self.c, self.file),
+            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file),
             Some(CliCommand::Parse(a)) => {
-                resolve_source(Subcommand::Parse, bash_mode, a.c, a.file)
+                resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file)
             }
             Some(CliCommand::Exec(a)) => resolve_exec(bash_mode, a.c, a.args),
         }
@@ -122,6 +122,7 @@ impl Cli {
 fn resolve_source(
     subcommand: Subcommand,
     bash_mode: bool,
+    verbose: bool,
     c: Option<String>,
     file: Option<String>,
 ) -> CliArgs {
@@ -136,6 +137,7 @@ fn resolve_source(
     CliArgs {
         subcommand,
         bash_mode,
+        verbose,
         command_str: c,
         file_arg: file,
         script_args: Vec::new(),
@@ -161,6 +163,7 @@ fn resolve_exec(bash_mode: bool, c: Option<String>, args: Vec<String>) -> CliArg
     CliArgs {
         subcommand: Subcommand::Exec,
         bash_mode,
+        verbose: false,
         command_str: c,
         file_arg,
         script_args,
@@ -317,7 +320,11 @@ fn do_parse(cli: &CliArgs) {
         }
     };
 
-    let w = YamlWriter::new(&mapper, &filename);
+    let w = if cli.verbose {
+        YamlWriter::new_verbose(&mapper, &filename)
+    } else {
+        YamlWriter::new(&mapper, &filename)
+    };
     let output = w.write_program(&program);
     if colored::control::SHOULD_COLORIZE.should_colorize() {
         color::print_colored_yaml(&output);

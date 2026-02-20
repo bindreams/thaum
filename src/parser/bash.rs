@@ -143,23 +143,6 @@ impl<'src> Parser<'src> {
         })
     }
 
-    pub(super) fn try_parse<T>(
-        &mut self,
-        f: impl FnOnce(&mut Self) -> Result<Option<T>, ParseError>,
-    ) -> Result<Option<T>, ParseError> {
-        let saved = self.stream.checkpoint();
-        match f(self)? {
-            Some(v) => {
-                self.stream.release(saved);
-                Ok(Some(v))
-            }
-            None => {
-                self.stream.rewind(saved);
-                Ok(None)
-            }
-        }
-    }
-
     pub(super) fn parse_function_definition(&mut self) -> Result<Expression, ParseError> {
         self.stream.skip_blanks()?;
         let start_span = self.stream.peek()?.span;

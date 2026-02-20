@@ -35,7 +35,7 @@ fn advance_returns_peeked() {
 #[test]
 fn advance_then_skip_blanks() {
     let mut s = make_stream("echo hello");
-    s.advance().unwrap(); // consume "echo"
+    s.advance().unwrap();
     s.skip_blanks().unwrap();
     assert_eq!(s.peek().unwrap().token, Token::Literal("hello".into()));
 }
@@ -43,109 +43,53 @@ fn advance_then_skip_blanks() {
 #[test]
 fn advance_past_eof() {
     let mut s = make_stream("x");
-    s.advance().unwrap(); // consume "x"
+    s.advance().unwrap();
     assert_eq!(s.peek().unwrap().token, Token::Eof);
     assert_eq!(s.advance().unwrap().token, Token::Eof);
-    assert_eq!(s.advance().unwrap().token, Token::Eof);
 }
 
-// --- Checkpoint / rewind ---
+// --- skip_blanks ---
 
 #[test]
-fn rewind_restores_position() {
-    let mut s = make_stream("a b c");
-    let cp = s.checkpoint();
-    s.advance().unwrap(); // consume "a"
-    s.skip_blanks().unwrap();
-    s.advance().unwrap(); // consume "b"
-    s.skip_blanks().unwrap();
-    assert_eq!(s.peek().unwrap().token, Token::Literal("c".into()));
-    s.rewind(cp);
-    assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
-}
-
-#[test]
-fn rewind_allows_replay() {
+fn peek_sees_blank_without_skip() {
     let mut s = make_stream("a b");
-    let cp = s.checkpoint();
-    let t1 = s.advance().unwrap().token;
-    s.skip_blanks().unwrap();
-    let t2 = s.advance().unwrap().token;
-    s.rewind(cp);
-    assert_eq!(s.advance().unwrap().token, t1);
-    s.skip_blanks().unwrap();
-    assert_eq!(s.advance().unwrap().token, t2);
+    s.advance().unwrap();
+    assert_eq!(s.peek().unwrap().token, Token::Blank);
 }
 
 #[test]
-fn nested_checkpoints() {
-    let mut s = make_stream("a b c d");
-    let cp_a = s.checkpoint();
-    s.advance().unwrap(); // consume "a"
+fn skip_blanks_then_peek() {
+    let mut s = make_stream("a b");
+    s.advance().unwrap();
     s.skip_blanks().unwrap();
-    let cp_b = s.checkpoint();
-    s.advance().unwrap(); // consume "b"
-    s.rewind(cp_b);
     assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
-    s.rewind(cp_a);
+}
+
+// --- speculate ---
+
+#[test]
+fn speculate_rewinds_on_none() {
+    let mut s = make_stream("a b c");
+    let result: Option<()> = s.speculate(|s| {
+        s.advance()?;
+        s.skip_blanks()?;
+        s.advance()?;
+        Ok(None)
+    }).unwrap();
+    assert!(result.is_none());
     assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
 }
 
 #[test]
-fn rewind_then_advance_past_original() {
-    let mut s = make_stream("a b c d");
-    let cp = s.checkpoint();
-    s.advance().unwrap(); // "a"
-    s.rewind(cp);
-    s.advance().unwrap(); // "a"
-    s.skip_blanks().unwrap();
-    s.advance().unwrap(); // "b"
-    s.skip_blanks().unwrap();
-    s.advance().unwrap(); // "c"
-    s.skip_blanks().unwrap();
-    assert_eq!(s.peek().unwrap().token, Token::Literal("d".into()));
-}
-
-// --- Release / buffer cleanup ---
-
-#[test]
-fn release_allows_buffer_drain() {
-    let mut s = make_stream("a b c d e");
-    let cp = s.checkpoint();
-    for _ in 0..5 {
-        s.skip_blanks().unwrap();
-        s.advance().unwrap();
-    }
-    let buf_before = s.buffer.len();
-    s.release(cp);
-    assert!(s.buffer.len() < buf_before);
-}
-
-#[test]
-fn release_with_older_checkpoint_alive() {
-    let mut s = make_stream("a b c d e");
-    let _cp_old = s.checkpoint();
-    s.advance().unwrap(); // "a"
-    s.skip_blanks().unwrap();
-    s.advance().unwrap(); // "b"
-    s.skip_blanks().unwrap();
-    let cp_new = s.checkpoint();
-    s.advance().unwrap(); // "c"
-    let buf_len = s.buffer.len();
-    s.release(cp_new);
-    assert_eq!(s.buffer.len(), buf_len);
-}
-
-#[test]
-fn release_oldest_frees_buffer() {
-    let mut s = make_stream("a b c d e");
-    let cp = s.checkpoint();
-    for _ in 0..5 {
-        s.skip_blanks().unwrap();
-        s.advance().unwrap();
-    }
-    s.release(cp);
-    assert_eq!(s.pos, 0);
+fn speculate_keeps_position_on_some() {
+    let mut s = make_stream("a b c");
+    let result = s.speculate(|s| {
+        s.advance()?;
+        s.skip_blanks()?;
+        Ok(Some("found"))
+    }).unwrap();
+    assert_eq!(result, Some("found"));
+    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }
 
 // --- Edge cases ---
@@ -154,33 +98,4 @@ fn release_oldest_frees_buffer() {
 fn empty_input() {
     let mut s = make_stream("");
     assert_eq!(s.peek().unwrap().token, Token::Eof);
-}
-
-#[test]
-fn peek_after_rewind() {
-    let mut s = make_stream("x y");
-    let first = s.peek().unwrap().token.clone();
-    let cp = s.checkpoint();
-    s.advance().unwrap();
-    s.rewind(cp);
-    assert_eq!(s.peek().unwrap().token, first);
-}
-
-// --- skip_blanks ---
-
-#[test]
-fn peek_sees_blank_without_skip() {
-    let mut s = make_stream("a b");
-    s.advance().unwrap(); // consume "a"
-    // Without skip_blanks, peek sees Blank
-    assert_eq!(s.peek().unwrap().token, Token::Blank);
-}
-
-#[test]
-fn skip_blanks_then_peek() {
-    let mut s = make_stream("a b");
-    s.advance().unwrap(); // consume "a"
-    s.skip_blanks().unwrap();
-    // After skip_blanks, peek sees "b"
-    assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }

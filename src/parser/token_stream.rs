@@ -1,14 +1,8 @@
-use contracts::debug_requires;
-
 use crate::error::ParseError;
 use crate::lexer::Lexer;
 use crate::token::{SpannedToken, Token};
 
-/// Opaque checkpoint handle. Can only be created by `TokenStream::checkpoint()`.
-/// Consumed by `rewind()` or `release()` — the compiler enforces single use.
-pub(super) struct Checkpoint(usize);
-
-/// Buffered token stream with checkpoint/rewind for speculative parsing.
+/// Buffered token stream with speculative parsing support.
 ///
 /// Call `skip_blanks()` to consume `Blank` tokens before peeking/advancing.
 /// Most parser code calls `skip_blanks()` via Parser helper methods (`eat`,
@@ -18,7 +12,6 @@ pub(crate) struct TokenStream<'src> {
     lexer: Lexer<'src>,
     buffer: Vec<SpannedToken>,
     pos: usize,
-    earliest_checkpoint: usize,
 }
 
 impl<'src> TokenStream<'src> {
@@ -27,17 +20,12 @@ impl<'src> TokenStream<'src> {
             lexer,
             buffer: Vec::new(),
             pos: 0,
-            earliest_checkpoint: usize::MAX,
         };
         stream.ensure_buffered()?;
         Ok(stream)
     }
 
     /// Consume all `Blank` tokens at the current position.
-    ///
-    /// Call this before `peek()`/`advance()` when you want to skip word
-    /// boundaries. Word collection code omits this call to see where
-    /// one word ends and the next begins.
     pub(super) fn skip_blanks(&mut self) -> Result<(), ParseError> {
         loop {
             self.ensure_buffered()?;
@@ -65,7 +53,6 @@ impl<'src> TokenStream<'src> {
     }
 
     /// Peek at a token at an offset from the current position.
-    /// offset=0 is the current token, offset=1 is the next, etc.
     pub(super) fn peek_at_offset(
         &mut self,
         offset: usize,
@@ -75,30 +62,18 @@ impl<'src> TokenStream<'src> {
         Ok(&self.buffer[target])
     }
 
-    // === Checkpoint/rewind ===
-
-    /// Save current position for potential rewind.
-    pub(super) fn checkpoint(&mut self) -> Checkpoint {
+    /// Try a speculative parse. Saves the current position, runs the
+    /// closure, and rewinds if the closure returns `None`.
+    pub(super) fn speculate<T>(
+        &mut self,
+        f: impl FnOnce(&mut Self) -> Result<Option<T>, ParseError>,
+    ) -> Result<Option<T>, ParseError> {
         let saved = self.pos;
-        self.earliest_checkpoint = self.earliest_checkpoint.min(saved);
-        Checkpoint(saved)
-    }
-
-    /// Rewind to a saved position. Consumes the checkpoint.
-    #[debug_requires(cp.0 <= self.pos, "can't rewind to the future")]
-    pub(super) fn rewind(&mut self, cp: Checkpoint) {
-        self.pos = cp.0;
-    }
-
-    /// Release a checkpoint, allowing buffer cleanup. Consumes the checkpoint.
-    #[debug_requires(cp.0 <= self.pos, "can't release a future checkpoint")]
-    pub(super) fn release(&mut self, cp: Checkpoint) {
-        if cp.0 <= self.earliest_checkpoint {
-            self.earliest_checkpoint = self.pos;
-            if self.pos > 0 {
-                self.buffer.drain(..self.pos);
-                self.pos = 0;
-                self.earliest_checkpoint = 0;
+        match f(self)? {
+            Some(v) => Ok(Some(v)),
+            None => {
+                self.pos = saved;
+                Ok(None)
             }
         }
     }

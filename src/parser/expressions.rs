@@ -191,39 +191,48 @@ impl<'src> Parser<'src> {
                     }
                 }
 
+                // Try POSIX function definition: name() { ... }
+                // Phase 1: speculate on the stream to check for name ( )
                 if is_lone && is_valid_name(w) {
-                    if let Some(func) = self.try_parse(|p| {
-                        p.stream.skip_blanks()?;
-                        let name = match &p.stream.peek()?.token {
+                    let func_head = self.stream.speculate(|s| {
+                        s.skip_blanks()?;
+                        let name = match &s.peek()?.token {
                             Token::Literal(w) if is_valid_name(w) => w.clone(),
                             _ => return Ok(None),
                         };
-                        let start_span = p.stream.peek()?.span;
-                        p.stream.advance()?;
-                        p.stream.skip_blanks()?;
-                        if p.stream.peek()?.token != Token::LParen {
+                        let start_span = s.peek()?.span;
+                        s.advance()?;
+                        s.skip_blanks()?;
+                        if s.peek()?.token != Token::LParen {
                             return Ok(None);
                         }
-                        p.stream.advance()?;
-                        p.expect(&Token::RParen)?;
-                        p.skip_linebreak()?;
-                        let body = p.parse_compound_command()?;
+                        s.advance()?; // consume (
+                        s.skip_blanks()?;
+                        if s.peek()?.token != Token::RParen {
+                            return Ok(None);
+                        }
+                        s.advance()?; // consume )
+                        Ok(Some((name, start_span)))
+                    })?;
+
+                    // Phase 2: if matched, parse the body (committed, no rewind)
+                    if let Some((name, start_span)) = func_head {
+                        self.skip_linebreak()?;
+                        let body = self.parse_compound_command()?;
                         let mut redirects = Vec::new();
-                        while p.is_redirect_op()? {
-                            redirects.push(p.parse_redirect()?);
+                        while self.is_redirect_op()? {
+                            redirects.push(self.parse_redirect()?);
                         }
                         let end_span = redirects
                             .last()
                             .map(|r| r.span)
                             .unwrap_or(compound_command_span(&body));
-                        Ok(Some(Expression::FunctionDef(FunctionDef {
+                        return Ok(Expression::FunctionDef(FunctionDef {
                             name,
                             body: Box::new(body),
                             redirects,
                             span: start_span.merge(end_span),
-                        })))
-                    })? {
-                        return Ok(func);
+                        }));
                     }
                 }
 

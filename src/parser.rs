@@ -152,23 +152,21 @@ impl<'src> Parser<'src> {
             return Ok(Vec::new());
         }
 
-        let cp = self.stream.checkpoint();
-        self.stream.advance()?; // consume Newline tentatively
-        self.stream.skip_blanks()?;
+        let result = self.stream.speculate(|s| {
+            s.advance()?; // consume Newline tentatively
+            s.skip_blanks()?;
+            if !matches!(s.peek()?.token, Token::HereDocBody(_)) {
+                return Ok(None);
+            }
+            let mut bodies = Vec::new();
+            while let Token::HereDocBody(body) = &s.peek()?.token {
+                bodies.push(body.clone());
+                s.advance()?;
+            }
+            Ok(Some(bodies))
+        })?;
 
-        if !matches!(self.stream.peek()?.token, Token::HereDocBody(_)) {
-            self.stream.rewind(cp);
-            return Ok(Vec::new());
-        }
-        self.stream.release(cp);
-
-        let mut bodies = Vec::new();
-        while let Token::HereDocBody(body) = &self.stream.peek()?.token {
-            bodies.push(body.clone());
-            self.stream.advance()?;
-        }
-
-        Ok(bodies)
+        Ok(result.unwrap_or_default())
     }
 
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {

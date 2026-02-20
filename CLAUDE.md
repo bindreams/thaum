@@ -25,47 +25,26 @@ Place contracts on every function where there is a meaningful invariant to check
 
 ## Architecture
 
+See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, dialect system, adding new features).
+
 ### Lexer/Parser pipeline
 - The **lexer is context-free** — it produces fragment tokens (`Literal`, `SimpleParam`, `DoubleQuoted`, etc.), `Whitespace`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
 - The **parser promotes keywords** — it checks `Token::Literal("if")` etc. when the grammatical context expects a keyword.
 - The **lexer has no lifetime parameter** — it owns a `CharSource` backed by `Read`. Constructed via `Lexer::from_str()` or `Lexer::from_reader()`.
 - The **parser holds the lexer directly** — no separate TokenStream layer.
 - **`speculate()`** on the Lexer saves `buf_pos`, runs a closure, and rewinds on failure. Tokens scanned during speculation stay in the buffer — scanning state is purely cursor-side and doesn't need saving.
+- **`LastScanned`** — one-token lookbehind enum (`Fragment`, `Whitespace`, `Other`) that governs whitespace significance, process substitution detection (`<(`/`>(` only after whitespace), and tilde prefix recognition. `Whitespace` tokens are only emitted when significant (between fragments).
 - The lexer handles heredocs autonomously — no parser→lexer feedback.
-
-### AST naming conventions
-- **Statement** — top-level wrapper with `ExecutionMode` (Sequential/Terminated/Background). Only appears at list boundaries.
-- **Expression** — the command tree enum: `Command`, `Compound`, `FunctionDef`, `And`, `Or`, `Pipe`, `Not`.
-- **Argument** — `Word(Word)` | `Atom(Atom)`. One slot in a command's argument list.
-- **Word** — `Vec<Fragment>`. Concatenable pieces forming one shell word.
-- **Fragment** — Literal, SingleQuoted, DoubleQuoted, Parameter, CommandSubstitution, etc.
-- **Atom** — standalone argument (BashProcessSubstitution). Cannot be concatenated.
-- **AssignmentValue** — `Scalar(Word)` | `BashArray(Vec<Word>)`.
-
-### Dialect system
-- `ParseOptions` has individual boolean flags for each Bash feature
-- `Dialect::Posix` = all false, `Dialect::Bash` = all true
-- The lexer conditionally recognizes Bash operator tokens based on options
-- The parser checks options before accepting Bash keywords
-- In tests, enable only the specific flag being tested
 
 ### Token naming
 - Bash-specific tokens use `Bash` prefix: `BashHereStringOp`, `BashDblLBracket`, etc.
 - Semantic names, not character mnemonics: `RedirectFromFile` not `Less`
 - POSIX spec names in doc comments: `/// '<' — redirect input (POSIX: LESS)`
 
-### Key design decisions
-- `&&`, `||`, `|` are binary tree nodes in `Expression`, not flat lists
-- `!` wraps the entire pipe chain: `! a | b` → `Not(Pipe(a, b))`
-- Precedence (low→high): `&&`/`||`, `!`, `|`
-- `;` and `&` only exist on `Statement`, never on inner `Expression` nodes
-- `ExecutionMode::Terminated` (`;`) vs `Sequential` (newline) is semantically significant for `set -e`
-- Command substitutions (`$(...)`) are recursively parsed into `Vec<Statement>`
-- Source spans inside command substitutions are relative to the substring
-
 ### Project structure
 - `src/lexer/` — context-free tokenizer (char_source, heredoc, operators, word_scan)
 - `src/parser/` — recursive descent (expressions, commands, compound, bash, helpers)
 - `src/word/` — word expansion parsing (fragments, params, substitution)
+- `src/exec/` — runtime evaluation (arithmetic)
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
-- `tests/` — split by topic: commands, pipelines, compound, redirects, errors, word_expansion, bash_features, cli_output
+- `tests/` — split by topic: commands, pipelines, compound, redirects, errors, word_expansion, bash_features, cli_output, exec_basic, exec_conformance

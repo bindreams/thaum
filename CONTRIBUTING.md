@@ -51,9 +51,15 @@ src/
     params.rs          — parameter expansion ($var, ${var:-default}, etc.)
     subst.rs           — command substitution, arithmetic expansion
 
+  exec/
+    mod.rs             — runtime evaluation entry point
+    arithmetic.rs      — arithmetic expression evaluator
+
   cli/
     mod.rs             — CLI arg parsing and dispatch
     yaml_writer.rs     — YAML AST output (YamlWriter)
+    yaml_emitter.rs    — low-level YAML serialization
+    yaml_value.rs      — YAML value types
     error_fmt.rs       — compiler-style error display
     source_map.rs      — byte offset → line:col mapping
     color.rs           — colored terminal output
@@ -67,6 +73,8 @@ tests/
   word_expansion.rs — parameter expansion, command substitution, globs
   bash_features.rs  — all Bash extensions with POSIX rejection tests
   cli_output.rs     — CLI output format regression tests (requires --features cli)
+  exec_basic.rs     — basic execution tests
+  exec_conformance.rs — execution conformance tests
 ```
 
 ## Architecture
@@ -116,6 +124,16 @@ source and pushes one or more tokens (e.g. a newline followed by heredoc bodies)
 `buf_pos` on failure. Tokens scanned during speculation stay in the buffer —
 scanning state is purely cursor-side and doesn't need saving. The buffer only
 shrinks from the front (on commit), never from the back.
+
+**LastScanned** (one-token lookbehind): a `LastScanned` enum with three states —
+`Fragment` (after word/fragment), `Whitespace` (after whitespace/comment), `Other`
+(after operator/newline/start of input). It governs:
+- **Whitespace significance**: `Whitespace` tokens are only emitted when the
+  previous token was a `Fragment` (i.e. between words). Non-significant whitespace
+  is consumed silently. Consecutive `Whitespace` tokens cannot exist.
+- **Process substitution detection**: `<(` and `>(` are only recognized as process
+  substitution when `LastScanned` is `Whitespace` (otherwise `<` is a redirect).
+- **Tilde prefix recognition**: `~` at word start after whitespace or `=`.
 
 **Key design rules**:
 - The **lexer is context-free** — it produces fragment tokens (`Literal`,

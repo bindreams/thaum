@@ -1,3 +1,4 @@
+pub mod arithmetic;
 pub mod builtins;
 mod compound;
 pub mod environment;
@@ -187,6 +188,10 @@ impl Executor {
                     // Strip trailing newlines (POSIX behavior)
                     let trimmed = output.trim_end_matches('\n').to_string();
                     result.push(Fragment::Literal(trimmed));
+                }
+                Fragment::ArithmeticExpansion(expr) => {
+                    let value = arithmetic::evaluate_arith_expr(expr, &mut self.env)?;
+                    result.push(Fragment::Literal(value.to_string()));
                 }
                 Fragment::DoubleQuoted(parts) => {
                     let resolved = self.resolve_cmd_subs_in_fragments(parts)?;

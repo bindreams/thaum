@@ -1,4 +1,5 @@
 use crate::ast::{CompoundCommand, Redirect};
+use crate::exec::arithmetic;
 use crate::exec::error::ExecError;
 use crate::exec::pattern::shell_pattern_match;
 use crate::exec::Executor;
@@ -165,10 +166,11 @@ impl Executor {
                     "bash [[ ]] conditional".to_string(),
                 ));
             }
-            CompoundCommand::BashArithmeticCommand { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "bash (( )) arithmetic command".to_string(),
-                ));
+            CompoundCommand::BashArithmeticCommand { expression, .. } => {
+                let value = arithmetic::evaluate_arith_expr(expression, &mut self.env)?;
+                // (( )) returns 0 (success) if expression is non-zero,
+                // 1 (failure) if expression is zero.
+                Ok(if value != 0 { 0 } else { 1 })
             }
             CompoundCommand::BashSelectClause { .. } => {
                 return Err(ExecError::UnsupportedFeature(
@@ -180,10 +182,51 @@ impl Executor {
                     "bash coproc".to_string(),
                 ));
             }
-            CompoundCommand::BashArithmeticFor { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "bash arithmetic for loop".to_string(),
-                ));
+            CompoundCommand::BashArithmeticFor {
+                init,
+                condition,
+                update,
+                body,
+                ..
+            } => {
+                if let Some(init_expr) = init {
+                    arithmetic::evaluate_arith_expr(init_expr, &mut self.env)?;
+                }
+
+                let mut status = 0;
+                loop {
+                    // Empty condition means infinite loop
+                    if let Some(cond_expr) = condition {
+                        let cond = arithmetic::evaluate_arith_expr(cond_expr, &mut self.env)?;
+                        if cond == 0 {
+                            break;
+                        }
+                    }
+
+                    let should_update = match self.execute_statements(body) {
+                        Ok(s) => {
+                            status = s;
+                            true
+                        }
+                        Err(ExecError::BreakRequested(1)) => break,
+                        Err(ExecError::BreakRequested(n)) => {
+                            return Err(ExecError::BreakRequested(n - 1));
+                        }
+                        // continue still evaluates the update expression
+                        Err(ExecError::ContinueRequested(1)) => true,
+                        Err(ExecError::ContinueRequested(n)) => {
+                            return Err(ExecError::ContinueRequested(n - 1));
+                        }
+                        Err(e) => return Err(e),
+                    };
+
+                    if should_update {
+                        if let Some(update_expr) = update {
+                            arithmetic::evaluate_arith_expr(update_expr, &mut self.env)?;
+                        }
+                    }
+                }
+                Ok(status)
             }
         }
     }

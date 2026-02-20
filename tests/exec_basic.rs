@@ -406,9 +406,123 @@ fn unsupported_background() {
     expect_unsupported("echo hello &");
 }
 
+// --- Arithmetic expansion $((expr)) ---
+
 #[test]
-fn unsupported_arithmetic_expansion() {
-    expect_unsupported("echo $((1+2))");
+fn arith_expansion_simple() {
+    let program = thaum::parse("X=$((1+2))").unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("3"));
+}
+
+#[test]
+fn arith_expansion_with_variables() {
+    let program = thaum::parse("A=10\nX=$((A+5))").unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("15"));
+}
+
+#[test]
+fn arith_expansion_in_double_quotes() {
+    let program = thaum::parse(r#"X="val: $((2*3))""#).unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("val: 6"));
+}
+
+#[test]
+fn arith_expansion_with_assignment_side_effect() {
+    let program = thaum::parse("X=$((y=5))").unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("5"));
+    assert_eq!(executor.env().get_var("y"), Some("5"));
+}
+
+#[test]
+fn arith_expansion_division_by_zero() {
+    let program = thaum::parse("X=$((1/0))").unwrap();
+    let mut executor = Executor::new();
+    let err = executor.execute(&program).unwrap_err();
+    assert!(matches!(err, ExecError::DivisionByZero));
+}
+
+#[test]
+fn arith_expansion_nested_ops() {
+    let program = thaum::parse("X=$(( (2 + 3) * 4 ))").unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("20"));
+}
+
+#[test]
+fn arith_expansion_unset_var_is_zero() {
+    let program = thaum::parse("X=$((UNSET + 1))").unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("X"), Some("1"));
+}
+
+// --- Bash (( )) arithmetic command ---
+
+#[test]
+fn bash_arith_command_nonzero_is_success() {
+    let program = thaum::parse_with("(( 5 ))", Dialect::Bash).unwrap();
+    let mut executor = Executor::new();
+    assert_eq!(executor.execute(&program).unwrap(), 0);
+}
+
+#[test]
+fn bash_arith_command_zero_is_failure() {
+    let program = thaum::parse_with("(( 0 ))", Dialect::Bash).unwrap();
+    let mut executor = Executor::new();
+    assert_eq!(executor.execute(&program).unwrap(), 1);
+}
+
+#[test]
+fn bash_arith_command_with_assignment() {
+    let program = thaum::parse_with("(( x = 42 ))", Dialect::Bash).unwrap();
+    let mut executor = Executor::new();
+    let status = executor.execute(&program).unwrap();
+    assert_eq!(status, 0); // 42 != 0 → success
+    assert_eq!(executor.env().get_var("x"), Some("42"));
+}
+
+// --- Bash for (( )) arithmetic for loop ---
+
+#[test]
+fn bash_arith_for_basic() {
+    let program = thaum::parse_with(
+        "for ((i=0; i<5; i++)); do true; done",
+        Dialect::Bash,
+    ).unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("i"), Some("5"));
+}
+
+#[test]
+fn bash_arith_for_sum() {
+    let program = thaum::parse_with(
+        "sum=0\nfor ((i=1; i<=10; i++)); do sum=$((sum+i)); done",
+        Dialect::Bash,
+    ).unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("sum"), Some("55"));
+}
+
+#[test]
+fn bash_arith_for_break() {
+    let program = thaum::parse_with(
+        "for ((i=0; i<100; i++)); do if test $i -eq 3; then break; fi; done",
+        Dialect::Bash,
+    ).unwrap();
+    let mut executor = Executor::new();
+    executor.execute(&program).unwrap();
+    assert_eq!(executor.env().get_var("i"), Some("3"));
 }
 
 #[test]

@@ -7,8 +7,8 @@ use crate::exec::error::ExecError;
 /// This performs the POSIX word expansion steps (in order):
 /// 1. Tilde expansion
 /// 2. Parameter expansion
-/// 3. Command substitution (must be pre-resolved before calling this)
-/// 4. Arithmetic expansion (TODO)
+/// 3. Command substitution (pre-resolved by Executor before calling this)
+/// 4. Arithmetic expansion (pre-resolved by Executor before calling this)
 /// 5. Field splitting (done at a higher level)
 /// 6. Pathname expansion / globbing (done at a higher level)
 /// 7. Quote removal

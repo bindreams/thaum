@@ -17,11 +17,28 @@ use heredoc::PendingHereDoc;
 /// Lexer operating mode.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum LexerMode {
-    /// Normal shell tokenization: operators, blanks, newlines, fragments.
+    /// Normal shell tokenization: operators, whitespace, newlines, fragments.
     Normal,
     /// Inside double-quoted string: only expansions and literal text.
     /// No operators, no word splitting, limited backslash escaping.
     DoubleQuote,
+}
+
+/// What was scanned most recently. One-token lookbehind used for:
+/// - **Process substitution detection**: `<(` and `>(` are only process substitutions
+///   when preceded by whitespace (`LastScanned::Whitespace`), not when attached to a word.
+/// - **Significant whitespace**: a Whitespace token is only emitted when the previous
+///   scan was a fragment (`LastScanned::Fragment`), since that's the only position where
+///   whitespace serves as a word boundary.
+/// - **Tilde prefix**: `~` is special only at word start (`LastScanned != Fragment`).
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum LastScanned {
+    /// Previous token was a fragment (Literal, SingleQuoted, etc.) or heredoc delimiter.
+    Fragment,
+    /// Previous scan consumed whitespace/comment (may or may not have emitted a token).
+    Whitespace,
+    /// Previous token was an operator, newline, EOF, or nothing (start of input).
+    Other,
 }
 
 /// The shell lexer.
@@ -45,12 +62,8 @@ pub struct Lexer {
     pending_heredocs: Vec<PendingHereDoc>,
     expecting_heredoc_delimiter: bool,
     pending_strip_tabs: bool,
-    /// Whether the last scanned token was Whitespace. Used by operator scanner
-    /// for process substitution detection (<( and >( preceded by blank).
-    last_was_whitespace: bool,
-    /// Whether we've already scanned a fragment for the current word.
-    /// Used for tilde prefix detection (~ is special only at word start).
-    word_started: bool,
+    /// One-token lookbehind. See `LastScanned` doc comment for details.
+    pub(super) last_scanned: LastScanned,
 
     // --- Stream infrastructure ---
     buffer: VecDeque<SpannedToken>,
@@ -83,8 +96,7 @@ impl Lexer {
             pending_heredocs: Vec::new(),
             expecting_heredoc_delimiter: false,
             pending_strip_tabs: false,
-            last_was_whitespace: false,
-            word_started: false,
+            last_scanned: LastScanned::Other,
             buffer: VecDeque::new(),
             buf_pos: 0,
             speculation_depth: 0,
@@ -242,106 +254,110 @@ impl Lexer {
             return Ok(());
         }
 
-        let start = self.cursor_pos().0;
+        loop {
+            let start = self.cursor_pos().0;
 
-        // Whitespaces + comments -> Whitespace token
-        if self.scan_whitespace_and_comments() {
-            let end = self.cursor_pos().0;
-            self.last_was_whitespace = true;
-            self.word_started = false;
-            self.buffer.push_back(SpannedToken {
-                token: Token::Whitespace,
-                span: Span::new(start, end),
-            });
-            return Ok(());
-        }
-
-        // EOF
-        if self.is_at_eof() {
-            self.buffer.push_back(SpannedToken {
-                token: Token::Eof,
-                span: Span::empty(start),
-            });
-            return Ok(());
-        }
-
-        let ch = self.peek_char().unwrap();
-
-        // Newline — also triggers heredoc body reading
-        if ch == '\n' {
-            self.advance_char();
-            let newline_span = Span::new(start, start + 1);
-            self.last_was_whitespace = false;
-            self.word_started = false;
-
-            self.buffer.push_back(SpannedToken {
-                token: Token::Newline,
-                span: newline_span,
-            });
-
-            if !self.pending_heredocs.is_empty() {
-                // Read all pending heredoc bodies directly into buffer
-                let pending = std::mem::take(&mut self.pending_heredocs);
-                for heredoc in &pending {
-                    let body =
-                        self.read_single_heredoc(&heredoc.delimiter, heredoc.strip_tabs)?;
-                    // TODO: The span should cover the actual body content in the source,
-                    // not the newline. Track the cursor position before/after reading
-                    // the body and use that for the span.
+            // Whitespace + comments
+            if self.scan_whitespace_and_comments() {
+                let was_fragment = self.last_scanned == LastScanned::Fragment;
+                self.last_scanned = LastScanned::Whitespace;
+                if was_fragment {
+                    // Significant: word boundary between fragments — emit token.
                     self.buffer.push_back(SpannedToken {
-                        token: Token::HereDocBody(body),
-                        span: newline_span, // wrong — should be the body's span
+                        token: Token::Whitespace,
+                        span: Span::new(start, self.cursor_pos().0),
+                    });
+                    return Ok(());
+                }
+                // Non-significant (after operator/newline/start): suppress token,
+                // but last_scanned is set for process substitution detection.
+                continue;
+            }
+
+            // EOF
+            if self.is_at_eof() {
+                self.last_scanned = LastScanned::Other;
+                self.buffer.push_back(SpannedToken {
+                    token: Token::Eof,
+                    span: Span::empty(start),
+                });
+                return Ok(());
+            }
+
+            let ch = self.peek_char().unwrap();
+
+            // Newline — also triggers heredoc body reading
+            if ch == '\n' {
+                self.advance_char();
+                let newline_span = Span::new(start, start + 1);
+                self.last_scanned = LastScanned::Other;
+
+                self.buffer.push_back(SpannedToken {
+                    token: Token::Newline,
+                    span: newline_span,
+                });
+
+                if !self.pending_heredocs.is_empty() {
+                    // Read all pending heredoc bodies directly into buffer
+                    let pending = std::mem::take(&mut self.pending_heredocs);
+                    for heredoc in &pending {
+                        let body =
+                            self.read_single_heredoc(&heredoc.delimiter, heredoc.strip_tabs)?;
+                        // TODO: The span should cover the actual body content in the source,
+                        // not the newline. Track the cursor position before/after reading
+                        // the body and use that for the span.
+                        self.buffer.push_back(SpannedToken {
+                            token: Token::HereDocBody(body),
+                            span: newline_span, // wrong — should be the body's span
+                        });
+                    }
+                }
+
+                return Ok(());
+            }
+
+            // Operators
+            if let Some(tok) = self.try_scan_operator(start)? {
+                // Track heredoc operators — next word is the delimiter
+                // TODO: If `<<` is at EOF or followed by a newline (no delimiter word),
+                // the flag stays set and is never cleared. This produces a generic parse
+                // error but leaves lexer state unclean. The fix: clear the flag on Newline/Eof.
+                if tok.token == Token::HereDocOp {
+                    self.expecting_heredoc_delimiter = true;
+                    self.pending_strip_tabs = false;
+                } else if tok.token == Token::HereDocStripOp {
+                    self.expecting_heredoc_delimiter = true;
+                    self.pending_strip_tabs = true;
+                }
+                self.last_scanned = LastScanned::Other;
+                self.buffer.push_back(tok);
+                return Ok(());
+            }
+
+            // Heredoc delimiter special case: read the entire delimiter as a single
+            // Literal token using the old word-scanning logic, so that
+            // strip_heredoc_quotes can process it.
+            if self.expecting_heredoc_delimiter {
+                self.expecting_heredoc_delimiter = false;
+                let tok = self.scan_heredoc_delimiter(start)?;
+                if let Token::Literal(ref raw) = tok.token {
+                    let (delimiter, _quoted) = heredoc::strip_heredoc_quotes(raw);
+                    self.pending_heredocs.push(PendingHereDoc {
+                        delimiter,
+                        strip_tabs: self.pending_strip_tabs,
                     });
                 }
+                self.last_scanned = LastScanned::Fragment;
+                self.buffer.push_back(tok);
+                return Ok(());
             }
 
-            return Ok(());
-        }
-
-        // Operators
-        if let Some(tok) = self.try_scan_operator(start)? {
-            // Track heredoc operators — next word is the delimiter
-            // TODO: If `<<` is at EOF or followed by a newline (no delimiter word),
-            // the flag stays set and is never cleared. This produces a generic parse
-            // error but leaves lexer state unclean. The fix: clear the flag on Newline/Eof.
-            if tok.token == Token::HereDocOp {
-                self.expecting_heredoc_delimiter = true;
-                self.pending_strip_tabs = false;
-            } else if tok.token == Token::HereDocStripOp {
-                self.expecting_heredoc_delimiter = true;
-                self.pending_strip_tabs = true;
-            }
-            self.last_was_whitespace = false;
-            self.word_started = false;
+            // Fragment token
+            let tok = self.scan_fragment(start)?;
+            self.last_scanned = LastScanned::Fragment;
             self.buffer.push_back(tok);
             return Ok(());
         }
-
-        // Heredoc delimiter special case: read the entire delimiter as a single
-        // Literal token using the old word-scanning logic, so that
-        // strip_heredoc_quotes can process it.
-        if self.expecting_heredoc_delimiter {
-            self.expecting_heredoc_delimiter = false;
-            let tok = self.scan_heredoc_delimiter(start)?;
-            if let Token::Literal(ref raw) = tok.token {
-                let (delimiter, _quoted) = heredoc::strip_heredoc_quotes(raw);
-                self.pending_heredocs.push(PendingHereDoc {
-                    delimiter,
-                    strip_tabs: self.pending_strip_tabs,
-                });
-            }
-            self.last_was_whitespace = false;
-            self.word_started = true;
-            self.buffer.push_back(tok);
-            return Ok(());
-        }
-
-        // Fragment token
-        let tok = self.scan_fragment(start)?;
-        self.last_was_whitespace = false;
-        self.word_started = true;
-        self.buffer.push_back(tok);
-        Ok(())
     }
 
     /// Tokenize inside a double-quoted string. Only recognizes expansions

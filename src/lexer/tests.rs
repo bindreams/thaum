@@ -34,8 +34,9 @@ fn lex_empty_input() {
 
 #[test]
 fn lex_only_whitespace() {
+    // All whitespace at start of input — no preceding fragment, so suppressed.
     let tokens = lex_all("   \t  ").unwrap();
-    assert_eq!(tokens, vec![Token::Whitespace]);
+    assert_eq!(tokens, vec![]);
 }
 
 // === Words (now fragment tokens) ===
@@ -176,9 +177,9 @@ fn lex_non_number_before_redirect_is_word() {
 
 #[test]
 fn lex_comment_skipped() {
+    // Comment at start of input — no preceding fragment, so suppressed.
     let tokens = lex_all("# this is a comment").unwrap();
-    // Comment is consumed as blank
-    assert_eq!(tokens, vec![Token::Whitespace]);
+    assert_eq!(tokens, vec![]);
 }
 
 #[test]
@@ -194,6 +195,63 @@ fn lex_comment_after_word() {
 fn lex_hash_inside_word_not_comment() {
     let tokens = lex_all("foo#bar").unwrap();
     assert_eq!(tokens, vec![Token::Literal("foo#bar".into())]);
+}
+
+// === Whitespace suppression ===
+
+#[test]
+fn lex_leading_whitespace_suppressed() {
+    // No preceding fragment → suppressed.
+    let tokens = lex_all("  echo").unwrap();
+    assert_eq!(tokens, vec![Token::Literal("echo".into())]);
+}
+
+#[test]
+fn lex_whitespace_after_operator_suppressed() {
+    let tokens = lex_all("; echo").unwrap();
+    assert_eq!(
+        tokens,
+        vec![Token::Semicolon, Token::Literal("echo".into())]
+    );
+}
+
+#[test]
+fn lex_whitespace_after_newline_suppressed() {
+    let tokens = lex_all("\n echo").unwrap();
+    assert_eq!(
+        tokens,
+        vec![Token::Newline, Token::Literal("echo".into())]
+    );
+}
+
+#[test]
+fn lex_whitespace_between_words_emitted() {
+    let tokens = lex_all("a b").unwrap();
+    assert_eq!(
+        tokens,
+        vec![
+            Token::Literal("a".into()),
+            Token::Whitespace,
+            Token::Literal("b".into()),
+        ]
+    );
+}
+
+#[test]
+fn lex_process_sub_after_suppressed_whitespace() {
+    // Whitespace after `;` is suppressed (no token emitted), but
+    // last_scanned is still Whitespace, so `<(` is recognized as
+    // process substitution, not a redirect operator.
+    use crate::dialect::Dialect;
+    let mut lexer = Lexer::from_str("; <(ls)", Dialect::Bash.options());
+    assert_eq!(lexer.next_token().unwrap().token, Token::Semicolon);
+    // Next should be a process substitution fragment, not RedirectFromFile
+    let tok = lexer.next_token().unwrap().token;
+    assert!(
+        matches!(tok, Token::BashProcessSub { direction: '<', .. }),
+        "expected BashProcessSub, got {:?}",
+        tok
+    );
 }
 
 // === Quoting ===

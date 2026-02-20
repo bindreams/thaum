@@ -2,7 +2,7 @@ use crate::error::LexError;
 use crate::span::Span;
 use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};
 
-use super::Lexer;
+use super::{LastScanned, Lexer};
 
 impl Lexer {
     /// Scan one fragment token. Called when the cursor is at a non-blank,
@@ -16,7 +16,7 @@ impl Lexer {
             '$' => self.scan_dollar(start),
             '`' => self.scan_backtick(start),
             '\\' => self.scan_backslash_escape(start),
-            '~' if !self.word_started => self.scan_tilde_prefix(start),
+            '~' if self.last_scanned != LastScanned::Fragment => self.scan_tilde_prefix(start),
             '*' | '?' => self.scan_glob_or_extglob(start, ch),
             '[' if self.has_bracket_close_in_word() => self.scan_bracket_glob(start),
             '+' | '@' | '!'
@@ -25,7 +25,7 @@ impl Lexer {
                 self.scan_extglob(start, ch)
             }
             '<' | '>'
-                if !self.word_started
+                if self.last_scanned != LastScanned::Fragment
                     && self.options.process_substitution
                     && self.peek_second_char() == Some('(') =>
             {
@@ -66,7 +66,7 @@ impl Lexer {
                 '[' if self.has_bracket_close_in_word() => break,
                 // Tilde at word start is a fragment boundary (but only if literal is empty,
                 // meaning ~ would be handled by scan_tilde_prefix from scan_fragment)
-                '~' if literal.is_empty() && !self.word_started => break,
+                '~' if literal.is_empty() && self.last_scanned != LastScanned::Fragment => break,
                 // ExtGlob prefix with ( following
                 '+' | '@' | '!'
                     if self.options.extglob && self.peek_second_char() == Some('(') =>
@@ -74,7 +74,7 @@ impl Lexer {
                     break;
                 }
                 // Hash at word start is a comment
-                '#' if literal.is_empty() && !self.word_started => break,
+                '#' if literal.is_empty() && self.last_scanned != LastScanned::Fragment => break,
                 _ => {
                     if !ch.is_ascii_digit() {
                         all_digits = false;

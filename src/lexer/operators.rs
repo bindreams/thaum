@@ -2,7 +2,7 @@ use crate::error::LexError;
 use crate::span::Span;
 use crate::token::{SpannedToken, Token};
 
-use super::Lexer;
+use super::{LastScanned, Lexer};
 
 impl Lexer {
     /// Try to scan a multi-char or single-char operator. Returns `None` if the
@@ -66,7 +66,7 @@ impl Lexer {
                         (Token::HereDocOp, 2)
                     }
                 }
-                Some('(') if self.options.process_substitution && self.last_was_whitespace => {
+                Some('(') if self.options.process_substitution && self.last_scanned == LastScanned::Whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectFromFile, 1),
@@ -75,7 +75,7 @@ impl Lexer {
                 Some('>') => (Token::Append, 2),
                 Some('&') => (Token::RedirectToFd, 2),
                 Some('|') => (Token::Clobber, 2),
-                Some('(') if self.options.process_substitution && self.last_was_whitespace => {
+                Some('(') if self.options.process_substitution && self.last_scanned == LastScanned::Whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectToFile, 1),

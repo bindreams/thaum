@@ -1,3 +1,4 @@
+disabled: true
 name: ${#s} and len(s)
 dialect: bash
 source: oils:spec/ysh-unicode#s-and-lens

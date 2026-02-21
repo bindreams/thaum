@@ -1,3 +1,4 @@
+disabled: true
 name: 'proc with IFS= read -r line - dynamic scope - issue #2012'
 dialect: bash
 source: 

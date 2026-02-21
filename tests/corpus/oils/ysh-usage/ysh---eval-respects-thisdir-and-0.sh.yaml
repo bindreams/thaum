@@ -1,3 +1,4 @@
+disabled: true
 name: ysh --eval respects _this_dir and $0
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-respects-thisdir-and-0

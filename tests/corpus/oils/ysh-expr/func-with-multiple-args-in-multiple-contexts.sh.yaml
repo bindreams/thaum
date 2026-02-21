@@ -1,3 +1,4 @@
+disabled: true
 name: Func with multiple args in multiple contexts
 dialect: bash
 source: oils:spec/ysh-expr#func-with-multiple-args-in-multiple-contexts

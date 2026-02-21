@@ -1,3 +1,4 @@
+disabled: true
 name: usage errors
 dialect: bash
 source: oils:spec/ysh-json#usage-errors

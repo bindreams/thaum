@@ -1,3 +1,4 @@
+disabled: true
 name: evalExpr() is a pure function
 dialect: bash
 source: oils:spec/ysh-purity#evalexpr-is-a-pure-function

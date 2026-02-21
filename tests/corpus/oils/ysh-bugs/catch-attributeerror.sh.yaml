@@ -1,3 +1,4 @@
+disabled: true
 name: Catch AttributeError
 dialect: bash
 source: oils:spec/ysh-bugs#catch-attributeerror

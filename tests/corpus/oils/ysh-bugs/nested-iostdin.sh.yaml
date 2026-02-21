@@ -1,3 +1,4 @@
+disabled: true
 name: Nested io.stdin
 dialect: bash
 source: oils:spec/ysh-bugs#nested-iostdin

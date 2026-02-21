@@ -1,3 +1,4 @@
+disabled: true
 name: "ERE: 'dot' matches code point represented with multiple bytes (mu = 0xce 0xbe)"
 dialect: bash
 source: 

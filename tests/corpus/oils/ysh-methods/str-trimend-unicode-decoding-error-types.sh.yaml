@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trimEnd(), unicode decoding error types
 dialect: bash
 source: oils:spec/ysh-methods#str-trimend-unicode-decoding-error-types

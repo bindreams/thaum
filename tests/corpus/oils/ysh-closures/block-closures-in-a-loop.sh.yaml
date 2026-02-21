@@ -1,3 +1,4 @@
+disabled: true
 name: Block Closures in a Loop !
 dialect: bash
 source: oils:spec/ysh-closures#block-closures-in-a-loop

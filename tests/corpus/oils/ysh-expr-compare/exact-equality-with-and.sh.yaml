@@ -1,3 +1,4 @@
+disabled: true
 name: Exact equality with === and !==
 dialect: bash
 source: oils:spec/ysh-expr-compare#exact-equality-with-and

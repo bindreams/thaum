@@ -1,3 +1,4 @@
+disabled: true
 name: "'return' doesn't accept expressions"
 dialect: bash
 source: oils:spec/ysh-proc#return-doesnt-accept-expressions

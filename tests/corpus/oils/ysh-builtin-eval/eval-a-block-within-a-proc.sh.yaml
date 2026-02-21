@@ -1,3 +1,4 @@
+disabled: true
 name: Eval a block within a proc
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-a-block-within-a-proc

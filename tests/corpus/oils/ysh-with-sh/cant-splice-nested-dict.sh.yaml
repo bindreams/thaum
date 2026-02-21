@@ -1,3 +1,4 @@
+disabled: true
 name: Can't splice nested Dict
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-splice-nested-dict

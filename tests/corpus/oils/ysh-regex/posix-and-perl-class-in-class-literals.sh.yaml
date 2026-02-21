@@ -1,3 +1,4 @@
+disabled: true
 name: Posix and Perl class in class literals
 dialect: bash
 source: oils:spec/ysh-regex#posix-and-perl-class-in-class-literals

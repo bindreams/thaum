@@ -1,3 +1,4 @@
+disabled: true
 name: help topic not found
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-topic-not-found

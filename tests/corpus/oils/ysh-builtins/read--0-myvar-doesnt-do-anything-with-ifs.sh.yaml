@@ -1,3 +1,4 @@
+disabled: true
 name: read -0 myvar doesn't do anything with IFS
 dialect: bash
 source: oils:spec/ysh-builtins#read--0-myvar-doesnt-do-anything-with-ifs

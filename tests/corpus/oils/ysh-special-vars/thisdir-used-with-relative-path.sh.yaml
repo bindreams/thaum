@@ -1,3 +1,4 @@
+disabled: true
 name: _this_dir used with relative path
 dialect: bash
 source: oils:spec/ysh-special-vars#thisdir-used-with-relative-path

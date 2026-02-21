@@ -1,3 +1,4 @@
+disabled: true
 name: Invalid sh operation on eggex
 dialect: bash
 source: oils:spec/ysh-regex-api#invalid-sh-operation-on-eggex

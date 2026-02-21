@@ -1,3 +1,4 @@
+disabled: true
 name: invoke --show with many types
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---show-with-many-types

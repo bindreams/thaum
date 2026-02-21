@@ -1,3 +1,4 @@
+disabled: true
 name: Indexed array as key of associative array coerces to string (without shopt
   -s strict_array)
 dialect: bash

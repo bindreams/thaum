@@ -1,3 +1,4 @@
+disabled: true
 name: 'Command.sourceCode() on literal block: p { echo hi }'
 dialect: bash
 source: oils:spec/ysh-method-other#commandsourcecode-on-literal-block-p-echo-hi

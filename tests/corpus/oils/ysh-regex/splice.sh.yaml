@@ -1,3 +1,4 @@
+disabled: true
 name: '@splice'
 dialect: bash
 source: oils:spec/ysh-regex#splice

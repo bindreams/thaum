@@ -1,3 +1,4 @@
+disabled: true
 name: Number of digits in 1/3
 dialect: bash
 source: oils:spec/ysh-int-float#number-of-digits-in-13

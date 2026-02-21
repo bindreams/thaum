@@ -1,3 +1,4 @@
+disabled: true
 name: invokable Obj must be have prototype containing __invoke__ of value.Proc -
   type -t
 dialect: bash

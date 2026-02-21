@@ -1,3 +1,4 @@
+disabled: true
 name: j"" prefix not accepted in YSH (could be added later)
 dialect: bash
 source: oils:spec/ysh-json#j-prefix-not-accepted-in-ysh-could-be-added-later

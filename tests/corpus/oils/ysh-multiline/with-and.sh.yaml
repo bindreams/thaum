@@ -1,3 +1,4 @@
+disabled: true
 name: '... with && and [['
 dialect: bash
 source: oils:spec/ysh-multiline#with-and

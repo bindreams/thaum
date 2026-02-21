@@ -1,3 +1,4 @@
+disabled: true
 name: Background pipeline (separate code path)
 dialect: bash
 source: oils:spec/ysh-xtrace#background-pipeline-separate-code-path

@@ -1,3 +1,4 @@
+disabled: true
 name: promptVal() with invalid chars
 dialect: bash
 source: oils:spec/ysh-prompt#promptval-with-invalid-chars

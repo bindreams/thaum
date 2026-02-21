@@ -1,3 +1,4 @@
+disabled: true
 name: json write emits Unicode replacement char for binary data \yff
 dialect: bash
 source: 

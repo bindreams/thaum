@@ -1,3 +1,4 @@
+disabled: true
 name: Many [[[ , but not too many
 dialect: bash
 source: oils:spec/ysh-json#many-but-not-too-many

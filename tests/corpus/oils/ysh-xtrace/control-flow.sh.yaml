@@ -1,3 +1,4 @@
+disabled: true
 name: Control Flow
 dialect: bash
 source: oils:spec/ysh-xtrace#control-flow

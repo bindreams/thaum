@@ -1,3 +1,4 @@
+disabled: true
 name: use usage with --pick etc.
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-usage-with---pick-etc

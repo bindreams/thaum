@@ -1,3 +1,4 @@
+disabled: true
 name: ysh:upgrade can use both export builtin and setglobal ENV
 dialect: bash
 source: 

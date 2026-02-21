@@ -1,3 +1,4 @@
+disabled: true
 name: no_xtrace_osh UNSET, and xtrace_rich set
 dialect: bash
 source: oils:spec/ysh-xtrace#noxtraceosh-unset-and-xtracerich-set

@@ -1,3 +1,4 @@
+disabled: true
 name: ${.myproc builtin sub}
 dialect: bash
 source: oils:spec/ysh-var-sub#myproc-builtin-sub

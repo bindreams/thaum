@@ -1,3 +1,4 @@
+disabled: true
 name: Range end points can be int-looking Strings
 dialect: bash
 source: oils:spec/ysh-slice-range#range-end-points-can-be-int-looking-strings

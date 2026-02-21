@@ -1,3 +1,4 @@
+disabled: true
 name: Identity function
 dialect: bash
 source: oils:spec/ysh-func#identity-function

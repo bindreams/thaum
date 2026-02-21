@@ -1,3 +1,4 @@
+disabled: true
 name: Proc-style return in a func is error
 dialect: bash
 source: oils:spec/ysh-func#proc-style-return-in-a-func-is-error

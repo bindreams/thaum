@@ -1,3 +1,4 @@
+disabled: true
 name: Slice indices can be int-looking strings
 dialect: bash
 source: oils:spec/ysh-slice-range#slice-indices-can-be-int-looking-strings

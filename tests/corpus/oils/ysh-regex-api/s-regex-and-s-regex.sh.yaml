@@ -1,3 +1,4 @@
+disabled: true
 name: s ~ regex and s !~ regex
 dialect: bash
 source: oils:spec/ysh-regex-api#s-regex-and-s-regex

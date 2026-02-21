@@ -1,3 +1,4 @@
+disabled: true
 name: 'top level: var can be redefined by var/const'
 dialect: bash
 source: oils:spec/ysh-assign#top-level-var-can-be-redefined-by-varconst

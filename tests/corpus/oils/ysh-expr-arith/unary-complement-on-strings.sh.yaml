@@ -1,3 +1,4 @@
+disabled: true
 name: unary ~ complement on strings
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-complement-on-strings

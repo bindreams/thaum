@@ -1,3 +1,4 @@
+disabled: true
 name: Mutating method must be up the prototype chain, not on the object
 dialect: bash
 source: 

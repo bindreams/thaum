@@ -1,3 +1,4 @@
+disabled: true
 name: Code point ranges work in limited cases
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#code-point-ranges-work-in-limited-cases

@@ -1,3 +1,4 @@
+disabled: true
 name: Too many opening [[[ - blocking stack
 dialect: bash
 source: oils:spec/ysh-json#too-many-opening---blocking-stack

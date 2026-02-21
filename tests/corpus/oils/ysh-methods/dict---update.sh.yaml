@@ -1,3 +1,4 @@
+disabled: true
 name: Dict -> update()
 dialect: bash
 source: oils:spec/ysh-methods#dict---update

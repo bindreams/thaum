@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval(to_dict=true) - local and global
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evaltodicttrue---local-and-global

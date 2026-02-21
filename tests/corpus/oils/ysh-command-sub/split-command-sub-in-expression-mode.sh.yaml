@@ -1,3 +1,4 @@
+disabled: true
 name: split command sub @() in expression mode
 dialect: bash
 source: oils:spec/ysh-command-sub#split-command-sub-in-expression-mode

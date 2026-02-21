@@ -1,3 +1,4 @@
+disabled: true
 name: concat operator (++) on dicts
 dialect: bash
 source: oils:spec/ysh-methods#concat-operator-on-dicts

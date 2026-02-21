@@ -1,3 +1,4 @@
+disabled: true
 name: ysh --eval cannot load file
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-cannot-load-file

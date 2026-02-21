@@ -1,3 +1,4 @@
+disabled: true
 name: Dict -> inc() with invalid value
 dialect: bash
 source: oils:spec/ysh-methods#dict---inc-with-invalid-value

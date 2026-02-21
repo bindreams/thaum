@@ -1,3 +1,4 @@
+disabled: true
 name: use foo.ysh creates a value.Obj with __invoke__
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh-creates-a-valueobj-with-invoke

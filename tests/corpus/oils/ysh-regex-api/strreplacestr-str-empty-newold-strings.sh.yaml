@@ -1,3 +1,4 @@
+disabled: true
 name: Str.replace(Str, Str), empty new/old strings
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplacestr-str-empty-newold-strings

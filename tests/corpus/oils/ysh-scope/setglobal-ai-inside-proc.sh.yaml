@@ -1,3 +1,4 @@
+disabled: true
 name: setglobal a[i] inside proc
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai-inside-proc

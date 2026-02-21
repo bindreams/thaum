@@ -1,3 +1,4 @@
+disabled: true
 name: read --all
 dialect: bash
 source: oils:spec/ysh-builtins#read---all

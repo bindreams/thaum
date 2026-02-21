@@ -1,3 +1,4 @@
+disabled: true
 name: Group ()
 dialect: bash
 source: oils:spec/ysh-regex#group

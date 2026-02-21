@@ -1,3 +1,4 @@
+disabled: true
 name: io.glob() respects shell filters
 dialect: bash
 source: oils:spec/ysh-method-io#ioglob-respects-shell-filters

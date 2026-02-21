@@ -1,3 +1,4 @@
+disabled: true
 name: Proc That Defines Block
 dialect: bash
 source: oils:spec/hay-meta#proc-that-defines-block

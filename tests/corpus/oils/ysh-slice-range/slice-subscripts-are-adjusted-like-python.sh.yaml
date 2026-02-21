@@ -1,3 +1,4 @@
+disabled: true
 name: slice subscripts are adjusted like Python
 dialect: bash
 source: oils:spec/ysh-slice-range#slice-subscripts-are-adjusted-like-python

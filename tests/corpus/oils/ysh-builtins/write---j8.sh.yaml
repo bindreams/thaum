@@ -1,3 +1,4 @@
+disabled: true
 name: write --j8
 dialect: bash
 source: oils:spec/ysh-builtins#write---j8

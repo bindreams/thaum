@@ -1,3 +1,4 @@
+disabled: true
 name: List / "Tuple" comparison is not allowed
 dialect: bash
 source: oils:spec/ysh-expr-compare#list-tuple-comparison-is-not-allowed

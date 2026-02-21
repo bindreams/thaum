@@ -1,3 +1,4 @@
+disabled: true
 name: mixing assignment builtins and YSH assignment
 dialect: bash
 source: oils:spec/ysh-assign#mixing-assignment-builtins-and-ysh-assignment

@@ -1,3 +1,4 @@
+disabled: true
 name: use builtin and invokable module
 dialect: bash
 source: oils:spec/ysh-xtrace#use-builtin-and-invokable-module

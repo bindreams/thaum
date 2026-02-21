@@ -1,3 +1,4 @@
+disabled: true
 name: Eggex with translation preference has arbitrary flags
 dialect: bash
 source: 

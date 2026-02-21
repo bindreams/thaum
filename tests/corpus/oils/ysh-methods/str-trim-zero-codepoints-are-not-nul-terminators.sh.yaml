@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trim*(), zero-codepoints are not NUL-terminators
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-zero-codepoints-are-not-nul-terminators

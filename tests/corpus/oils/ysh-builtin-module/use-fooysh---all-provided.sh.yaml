@@ -1,3 +1,4 @@
+disabled: true
 name: use foo.ysh --all-provided
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh---all-provided

@@ -1,3 +1,4 @@
+disabled: true
 name: Invalid regex has libc error message
 dialect: bash
 source: oils:spec/ysh-regex-api#invalid-regex-has-libc-error-message

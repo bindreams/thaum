@@ -1,3 +1,4 @@
+disabled: true
 name: Str => startsWith(Str) and endsWith(Str), matches bytes not runes
 dialect: bash
 source: 

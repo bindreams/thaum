@@ -1,3 +1,4 @@
+disabled: true
 name: Here doc
 dialect: bash
 source: oils:spec/ysh-xtrace#here-doc

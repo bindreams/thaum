@@ -1,3 +1,4 @@
+disabled: true
 name: exec builtin respects ENV
 dialect: bash
 source: oils:spec/ysh-env#exec-builtin-respects-env

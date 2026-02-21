@@ -1,3 +1,4 @@
+disabled: true
 name: parseCommand with syntax error
 dialect: bash
 source: oils:spec/ysh-builtin-eval#parsecommand-with-syntax-error

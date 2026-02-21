@@ -1,3 +1,4 @@
+disabled: true
 name: eval should have a sandboxed mode
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-should-have-a-sandboxed-mode

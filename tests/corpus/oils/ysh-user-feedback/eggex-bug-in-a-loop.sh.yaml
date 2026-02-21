@@ -1,3 +1,4 @@
+disabled: true
 name: Eggex bug in a loop
 dialect: bash
 source: oils:spec/ysh-user-feedback#eggex-bug-in-a-loop

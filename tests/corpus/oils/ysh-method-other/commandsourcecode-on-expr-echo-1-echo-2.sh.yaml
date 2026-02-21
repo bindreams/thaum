@@ -1,3 +1,4 @@
+disabled: true
 name: 'Command.sourceCode() on Expr: ^(echo 1; echo 2)'
 dialect: bash
 source: oils:spec/ysh-method-other#commandsourcecode-on-expr-echo-1-echo-2

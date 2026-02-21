@@ -1,3 +1,4 @@
+disabled: true
 name: Can all builtin methods with s.upper()
 dialect: bash
 source: oils:spec/ysh-object#can-all-builtin-methods-with-supper

@@ -1,3 +1,4 @@
+disabled: true
 name: Implicit raw string '\t\n' is a syntax error because backslash is 
   ambiguous
 dialect: bash

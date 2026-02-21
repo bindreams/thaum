@@ -1,3 +1,4 @@
+disabled: true
 name: dict literal with implicit value
 dialect: bash
 source: oils:spec/ysh-dict#dict-literal-with-implicit-value

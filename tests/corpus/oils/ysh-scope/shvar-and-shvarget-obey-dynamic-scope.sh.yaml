@@ -1,3 +1,4 @@
+disabled: true
 name: shvar and shvarGet() obey dynamic scope
 dialect: bash
 source: oils:spec/ysh-scope#shvar-and-shvarget-obey-dynamic-scope

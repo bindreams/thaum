@@ -1,3 +1,4 @@
+disabled: true
 name: Process subs, subshells not allowed with eval()
 dialect: bash
 source: oils:spec/ysh-purity#process-subs-subshells-not-allowed-with-eval

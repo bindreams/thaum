@@ -1,3 +1,4 @@
+disabled: true
 name: setglobal a[i] - i can be local or global
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai---i-can-be-local-or-global

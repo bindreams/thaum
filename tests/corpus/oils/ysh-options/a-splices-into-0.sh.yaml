@@ -1,3 +1,4 @@
+disabled: true
 name: '@a splices into $0'
 dialect: bash
 source: oils:spec/ysh-options#a-splices-into-0

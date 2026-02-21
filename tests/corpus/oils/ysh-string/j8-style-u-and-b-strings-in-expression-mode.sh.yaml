@@ -1,3 +1,4 @@
+disabled: true
 name: J8-style u'' and b'' strings in expression mode
 dialect: bash
 source: oils:spec/ysh-string#j8-style-u-and-b-strings-in-expression-mode

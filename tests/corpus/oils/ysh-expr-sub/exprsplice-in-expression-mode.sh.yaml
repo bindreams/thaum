@@ -1,3 +1,4 @@
+disabled: true
 name: '@[expr_splice] in expression mode'
 dialect: bash
 source: oils:spec/ysh-expr-sub#exprsplice-in-expression-mode

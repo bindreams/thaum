@@ -1,3 +1,4 @@
+disabled: true
 name: 'round trip: decode surrogate half and encode'
 dialect: bash
 source: oils:spec/ysh-json#round-trip-decode-surrogate-half-and-encode

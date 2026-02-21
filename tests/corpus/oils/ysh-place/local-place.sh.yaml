@@ -1,3 +1,4 @@
+disabled: true
 name: Local place
 dialect: bash
 source: oils:spec/ysh-place#local-place

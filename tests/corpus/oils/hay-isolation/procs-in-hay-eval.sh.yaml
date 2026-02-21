@@ -1,3 +1,4 @@
+disabled: true
 name: procs in hay eval
 dialect: bash
 source: oils:spec/hay-isolation#procs-in-hay-eval

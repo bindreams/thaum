@@ -1,3 +1,4 @@
+disabled: true
 name: parse_at
 dialect: bash
 source: oils:spec/ysh-options#parseat

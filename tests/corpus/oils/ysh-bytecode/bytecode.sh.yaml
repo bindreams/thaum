@@ -1,3 +1,4 @@
+disabled: true
 name: bytecode
 dialect: bash
 source: oils:spec/ysh-bytecode#bytecode

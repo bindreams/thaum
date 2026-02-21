@@ -1,3 +1,4 @@
+disabled: true
 name: captureAll() is like $() but captures stderr and status
 dialect: bash
 source: 

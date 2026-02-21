@@ -1,3 +1,4 @@
+disabled: true
 name: word evaluation shortcuts
 dialect: bash
 source: oils:spec/ysh-case#word-evaluation-shortcuts

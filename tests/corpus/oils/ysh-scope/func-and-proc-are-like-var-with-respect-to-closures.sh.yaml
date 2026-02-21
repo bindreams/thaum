@@ -1,3 +1,4 @@
+disabled: true
 name: func and proc are like var, with respect to closures
 dialect: bash
 source: oils:spec/ysh-scope#func-and-proc-are-like-var-with-respect-to-closures

@@ -1,3 +1,4 @@
+disabled: true
 name: compgen -A function shows user-defined invokables - shell funcs, Proc, Obj
 dialect: bash
 source: 

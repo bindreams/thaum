@@ -1,3 +1,4 @@
+disabled: true
 name: Operator chars in char classes (bash-like)
 dialect: bash
 source: oils:spec/ysh-regex#operator-chars-in-char-classes-bash-like

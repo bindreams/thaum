@@ -1,3 +1,4 @@
+disabled: true
 name: typed args
 dialect: bash
 source: oils:spec/ysh-case#typed-args

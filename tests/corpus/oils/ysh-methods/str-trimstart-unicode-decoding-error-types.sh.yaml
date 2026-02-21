@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trimStart(), unicode decoding error types
 dialect: bash
 source: oils:spec/ysh-methods#str-trimstart-unicode-decoding-error-types

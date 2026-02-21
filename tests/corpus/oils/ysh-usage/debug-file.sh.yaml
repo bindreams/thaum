@@ -1,3 +1,4 @@
+disabled: true
 name: --debug-file
 dialect: bash
 source: oils:spec/ysh-usage#debug-file

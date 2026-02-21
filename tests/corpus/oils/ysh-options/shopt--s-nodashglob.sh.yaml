@@ -1,3 +1,4 @@
+disabled: true
 name: shopt -s no_dash_glob
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-nodashglob

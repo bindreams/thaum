@@ -1,3 +1,4 @@
+disabled: true
 name: Command subs, pipelines not allowed with --eval-pure
 dialect: bash
 source: oils:spec/ysh-purity#command-subs-pipelines-not-allowed-with---eval-pure

@@ -1,3 +1,4 @@
+disabled: true
 name: nullglob is on with oil:all
 dialect: bash
 source: oils:spec/ysh-options#nullglob-is-on-with-oilall

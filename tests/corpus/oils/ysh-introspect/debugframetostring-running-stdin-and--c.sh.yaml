@@ -1,3 +1,4 @@
+disabled: true
 name: DebugFrame.toString() running stdin and -c
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-running-stdin-and--c

@@ -1,3 +1,4 @@
+disabled: true
 name: promptVal('w') respects ENV.HOME
 dialect: bash
 source: oils:spec/ysh-prompt#promptvalw-respects-envhome

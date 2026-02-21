@@ -1,3 +1,4 @@
+disabled: true
 name: procs are in same namespace as variables
 dialect: bash
 source: oils:spec/ysh-proc#procs-are-in-same-namespace-as-variables

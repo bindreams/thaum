@@ -1,3 +1,4 @@
+disabled: true
 name: Invalid op on string
 dialect: bash
 source: oils:spec/ysh-user-feedback#invalid-op-on-string

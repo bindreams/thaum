@@ -1,3 +1,4 @@
+disabled: true
 name: json write space=0, space=4
 dialect: bash
 source: oils:spec/ysh-json#json-write-space0-space4

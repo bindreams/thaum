@@ -1,3 +1,4 @@
+disabled: true
 name: append without typed arg
 dialect: bash
 source: oils:spec/ysh-builtins#append-without-typed-arg

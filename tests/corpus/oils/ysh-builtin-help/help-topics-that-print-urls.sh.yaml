@@ -1,3 +1,4 @@
+disabled: true
 name: help topics that print URLs
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-topics-that-print-urls

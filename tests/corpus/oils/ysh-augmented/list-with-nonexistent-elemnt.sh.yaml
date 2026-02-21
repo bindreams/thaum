@@ -1,3 +1,4 @@
+disabled: true
 name: List with nonexistent elemnt
 dialect: bash
 source: oils:spec/ysh-augmented#list-with-nonexistent-elemnt

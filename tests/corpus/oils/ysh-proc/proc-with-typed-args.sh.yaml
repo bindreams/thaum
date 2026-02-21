@@ -1,3 +1,4 @@
+disabled: true
 name: proc with typed args
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-typed-args

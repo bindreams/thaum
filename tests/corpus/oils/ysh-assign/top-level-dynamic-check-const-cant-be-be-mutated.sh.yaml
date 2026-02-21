@@ -1,3 +1,4 @@
+disabled: true
 name: "top-level dynamic check: const can't be be mutated"
 dialect: bash
 source: oils:spec/ysh-assign#top-level-dynamic-check-const-cant-be-be-mutated

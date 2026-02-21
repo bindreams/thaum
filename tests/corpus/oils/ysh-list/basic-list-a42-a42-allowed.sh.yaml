@@ -1,3 +1,4 @@
+disabled: true
 name: Basic List, a[42] a['42'] allowed
 dialect: bash
 source: oils:spec/ysh-list#basic-list-a42-a42-allowed

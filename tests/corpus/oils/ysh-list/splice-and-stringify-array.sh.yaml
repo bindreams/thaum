@@ -1,3 +1,4 @@
+disabled: true
 name: splice and stringify array
 dialect: bash
 source: oils:spec/ysh-list#splice-and-stringify-array

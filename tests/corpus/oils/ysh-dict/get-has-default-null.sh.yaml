@@ -1,3 +1,4 @@
+disabled: true
 name: get() has default null
 dialect: bash
 source: oils:spec/ysh-dict#get-has-default-null

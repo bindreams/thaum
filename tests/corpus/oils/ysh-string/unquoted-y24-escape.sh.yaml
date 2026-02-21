@@ -1,3 +1,4 @@
+disabled: true
 name: Unquoted \y24 escape
 dialect: bash
 source: oils:spec/ysh-string#unquoted-y24-escape

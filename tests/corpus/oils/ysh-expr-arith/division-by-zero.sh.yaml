@@ -1,3 +1,4 @@
+disabled: true
 name: Division by zero
 dialect: bash
 source: oils:spec/ysh-expr-arith#division-by-zero

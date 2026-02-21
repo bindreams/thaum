@@ -1,3 +1,4 @@
+disabled: true
 name: => operator for pure computation is allowed (may be mandatory later)
 dialect: bash
 source: 

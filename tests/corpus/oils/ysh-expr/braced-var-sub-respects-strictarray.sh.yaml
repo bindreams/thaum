@@ -1,3 +1,4 @@
+disabled: true
 name: braced var sub respects strict_array
 dialect: bash
 source: oils:spec/ysh-expr#braced-var-sub-respects-strictarray

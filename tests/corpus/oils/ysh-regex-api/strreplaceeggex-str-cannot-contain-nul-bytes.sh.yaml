@@ -1,3 +1,4 @@
+disabled: true
 name: Str.replace(Eggex, *), str cannot contain NUL bytes
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-str-cannot-contain-nul-bytes

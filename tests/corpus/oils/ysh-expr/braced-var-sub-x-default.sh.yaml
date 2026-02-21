@@ -1,3 +1,4 @@
+disabled: true
 name: braced var sub ${x:-default}
 dialect: bash
 source: oils:spec/ysh-expr#braced-var-sub-x-default

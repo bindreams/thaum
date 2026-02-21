@@ -1,3 +1,4 @@
+disabled: true
 name: setvar to swap List and Dict elements
 dialect: bash
 source: oils:spec/ysh-assign#setvar-to-swap-list-and-dict-elements

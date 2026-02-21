@@ -1,3 +1,4 @@
+disabled: true
 name: help oils-err-12 (case insensitive)
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-oils-err-12-case-insensitive

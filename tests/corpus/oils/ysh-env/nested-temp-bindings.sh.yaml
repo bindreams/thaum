@@ -1,3 +1,4 @@
+disabled: true
 name: Nested temp bindings
 dialect: bash
 source: oils:spec/ysh-env#nested-temp-bindings

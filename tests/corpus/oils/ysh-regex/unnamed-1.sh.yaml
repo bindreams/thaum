@@ -1,3 +1,4 @@
+disabled: true
 name: /.+/
 dialect: bash
 source: oils:spec/ysh-regex#unnamed

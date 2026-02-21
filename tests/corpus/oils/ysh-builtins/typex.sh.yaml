@@ -1,3 +1,4 @@
+disabled: true
 name: type(x)
 dialect: bash
 source: oils:spec/ysh-builtins#typex

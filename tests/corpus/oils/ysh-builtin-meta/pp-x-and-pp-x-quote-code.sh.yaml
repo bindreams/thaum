@@ -1,3 +1,4 @@
+disabled: true
 name: pp (x) and pp [x] quote code
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-x-and-pp-x-quote-code

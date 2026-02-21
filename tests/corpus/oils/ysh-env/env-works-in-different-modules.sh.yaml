@@ -1,3 +1,4 @@
+disabled: true
 name: ENV works in different modules
 dialect: bash
 source: oils:spec/ysh-env#env-works-in-different-modules

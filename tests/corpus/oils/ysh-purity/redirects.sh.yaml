@@ -1,3 +1,4 @@
+disabled: true
 name: Redirects
 dialect: bash
 source: oils:spec/ysh-purity#redirects

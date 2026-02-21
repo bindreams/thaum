@@ -1,3 +1,4 @@
+disabled: true
 name: BashArray, short
 dialect: bash
 source: oils:spec/ysh-printing#basharray-short

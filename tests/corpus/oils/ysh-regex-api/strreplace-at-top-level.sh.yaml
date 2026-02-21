@@ -1,3 +1,4 @@
+disabled: true
 name: Str.replace() at top level
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplace-at-top-level

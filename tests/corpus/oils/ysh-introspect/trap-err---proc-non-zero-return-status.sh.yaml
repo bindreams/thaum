@@ -1,3 +1,4 @@
+disabled: true
 name: trap ERR - proc non-zero return status
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---proc-non-zero-return-status

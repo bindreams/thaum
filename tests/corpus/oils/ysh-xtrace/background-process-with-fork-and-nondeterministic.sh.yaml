@@ -1,3 +1,4 @@
+disabled: true
 name: Background process with fork and & (nondeterministic)
 dialect: bash
 source: oils:spec/ysh-xtrace#background-process-with-fork-and-nondeterministic

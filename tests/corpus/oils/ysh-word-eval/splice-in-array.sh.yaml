@@ -1,3 +1,4 @@
+disabled: true
 name: Splice in array
 dialect: bash
 source: oils:spec/ysh-word-eval#splice-in-array

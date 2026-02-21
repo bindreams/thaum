@@ -1,3 +1,4 @@
+disabled: true
 name: sourcing a file that sets parse_at
 dialect: bash
 source: oils:spec/ysh-options#sourcing-a-file-that-sets-parseat

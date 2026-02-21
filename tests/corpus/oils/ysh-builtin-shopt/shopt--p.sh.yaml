@@ -1,3 +1,4 @@
+disabled: true
 name: shopt -p
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt--p

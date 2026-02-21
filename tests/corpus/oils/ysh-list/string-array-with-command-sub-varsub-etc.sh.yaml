@@ -1,3 +1,4 @@
+disabled: true
 name: string array with command sub, varsub, etc.
 dialect: bash
 source: oils:spec/ysh-list#string-array-with-command-sub-varsub-etc

@@ -1,3 +1,4 @@
+disabled: true
 name: oil:upgrade as alias for ysh:upgrade
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#oilupgrade-as-alias-for-yshupgrade

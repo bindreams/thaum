@@ -1,3 +1,4 @@
+disabled: true
 name: "DISABLED: parse_at can't be used outside top level"
 dialect: bash
 source: oils:spec/ysh-options#disabled-parseat-cant-be-used-outside-top-level

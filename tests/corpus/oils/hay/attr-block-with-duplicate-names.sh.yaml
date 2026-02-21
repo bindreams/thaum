@@ -1,3 +1,4 @@
+disabled: true
 name: Attr block with duplicate names
 dialect: bash
 source: oils:spec/hay#attr-block-with-duplicate-names

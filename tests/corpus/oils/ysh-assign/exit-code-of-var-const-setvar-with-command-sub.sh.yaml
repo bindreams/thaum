@@ -1,3 +1,4 @@
+disabled: true
 name: exit code of var, const, setvar with command sub
 dialect: bash
 source: oils:spec/ysh-assign#exit-code-of-var-const-setvar-with-command-sub

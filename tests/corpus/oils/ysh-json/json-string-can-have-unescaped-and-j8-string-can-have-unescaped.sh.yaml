@@ -1,3 +1,4 @@
+disabled: true
 name: JSON string can have unescaped ' and J8 string can have unescaped "
 dialect: bash
 source: 

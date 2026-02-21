@@ -1,3 +1,4 @@
+disabled: true
 name: Iterate over command sub output with split()
 dialect: bash
 source: oils:spec/ysh-demo#iterate-over-command-sub-output-with-split

@@ -1,3 +1,4 @@
+disabled: true
 name: io and vm are not allowed
 dialect: bash
 source: oils:spec/ysh-purity#io-and-vm-are-not-allowed

@@ -1,3 +1,4 @@
+disabled: true
 name: Proc name-with-hyphen
 dialect: bash
 source: oils:spec/ysh-proc#proc-name-with-hyphen

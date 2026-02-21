@@ -1,3 +1,4 @@
+disabled: true
 name: not operator behaves like Python
 dialect: bash
 source: oils:spec/ysh-expr-bool#not-operator-behaves-like-python

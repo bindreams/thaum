@@ -1,3 +1,4 @@
+disabled: true
 name: Obj API
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#obj-api

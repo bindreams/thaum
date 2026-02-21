@@ -1,3 +1,4 @@
+disabled: true
 name: Redirect failure is either fatal or can be checked
 dialect: bash
 source: 

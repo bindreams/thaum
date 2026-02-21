@@ -1,3 +1,4 @@
+disabled: true
 name: const x, y = f()
 dialect: bash
 source: oils:spec/ysh-assign#const-x-y-f

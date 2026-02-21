@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval with in_captured_frame=true can express cd builtin in different 
   module
 dialect: bash

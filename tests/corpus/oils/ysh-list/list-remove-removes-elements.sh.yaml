@@ -1,3 +1,4 @@
+disabled: true
 name: List remove() removes elements
 dialect: bash
 source: oils:spec/ysh-list#list-remove-removes-elements

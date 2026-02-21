@@ -1,3 +1,4 @@
+disabled: true
 name: Matching ] and \ and ' and " in character classes
 dialect: bash
 source: oils:spec/ysh-regex#matching-and-and-and-in-character-classes

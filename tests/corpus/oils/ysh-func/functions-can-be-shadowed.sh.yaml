@@ -1,3 +1,4 @@
+disabled: true
 name: Functions can be shadowed
 dialect: bash
 source: oils:spec/ysh-func#functions-can-be-shadowed

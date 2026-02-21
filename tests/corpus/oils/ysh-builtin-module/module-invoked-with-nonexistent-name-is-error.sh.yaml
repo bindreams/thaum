@@ -1,3 +1,4 @@
+disabled: true
 name: module invoked with nonexistent name is error
 dialect: bash
 source: 

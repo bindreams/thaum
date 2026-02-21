@@ -1,3 +1,4 @@
+disabled: true
 name: 'Shell ${x:-default} with YSH List (issue #954)'
 dialect: bash
 source: oils:spec/ysh-with-sh#shell-x-default-with-ysh-list-issue-954

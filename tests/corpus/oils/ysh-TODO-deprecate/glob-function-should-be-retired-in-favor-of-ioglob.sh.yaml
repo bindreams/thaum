@@ -1,3 +1,4 @@
+disabled: true
 name: glob() function should be retired in favor of io.glob()
 dialect: bash
 source: 

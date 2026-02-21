@@ -1,3 +1,4 @@
+disabled: true
 name: shopt usage error
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt-usage-error

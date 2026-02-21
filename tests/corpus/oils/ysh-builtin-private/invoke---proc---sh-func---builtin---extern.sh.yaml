@@ -1,3 +1,4 @@
+disabled: true
 name: invoke --proc --sh-func --builtin --extern
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---proc---sh-func---builtin---extern

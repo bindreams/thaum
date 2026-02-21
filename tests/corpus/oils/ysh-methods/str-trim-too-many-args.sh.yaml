@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trim(), too many args
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-too-many-args

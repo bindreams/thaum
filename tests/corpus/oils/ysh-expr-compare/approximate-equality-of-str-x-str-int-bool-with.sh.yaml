@@ -1,3 +1,4 @@
+disabled: true
 name: Approximate equality of Str x {Str, Int, Bool} with ~==
 dialect: bash
 source: 

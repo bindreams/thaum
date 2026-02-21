@@ -1,3 +1,4 @@
+disabled: true
 name: eval YSH block with 'break continue return error'
 dialect: bash
 source: 

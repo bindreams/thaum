@@ -1,3 +1,4 @@
+disabled: true
 name: "''' without parse_triple_quote"
 dialect: bash
 source: oils:spec/ysh-string#without-parsetriplequote

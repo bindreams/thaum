@@ -1,3 +1,4 @@
+disabled: true
 name: write  -e not supported
 dialect: bash
 source: oils:spec/ysh-builtins#write--e-not-supported

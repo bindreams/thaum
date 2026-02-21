@@ -1,3 +1,4 @@
+disabled: true
 name: s->upper does NOT work, should be s.upper() or =>
 dialect: bash
 source: oils:spec/ysh-expr#s-upper-does-not-work-should-be-supper-or

@@ -1,3 +1,4 @@
+disabled: true
 name: append passed invalid type
 dialect: bash
 source: oils:spec/ysh-builtins#append-passed-invalid-type

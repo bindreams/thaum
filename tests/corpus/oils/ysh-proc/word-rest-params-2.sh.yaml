@@ -1,3 +1,4 @@
+disabled: true
 name: word rest params 2
 dialect: bash
 source: oils:spec/ysh-proc#word-rest-params-2

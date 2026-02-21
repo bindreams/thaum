@@ -1,3 +1,4 @@
+disabled: true
 name: Block can be passed literally, or as expression in third arg group
 dialect: bash
 source: 

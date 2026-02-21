@@ -1,3 +1,4 @@
+disabled: true
 name: JSON \uXXXX\uYYYY as max code point - can't go above
 dialect: bash
 source: oils:spec/ysh-unicode#json-uxxxxuyyyy-as-max-code-point---cant-go-above

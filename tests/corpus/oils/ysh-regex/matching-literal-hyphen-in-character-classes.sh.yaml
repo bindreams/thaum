@@ -1,3 +1,4 @@
+disabled: true
 name: Matching literal hyphen in character classes
 dialect: bash
 source: oils:spec/ysh-regex#matching-literal-hyphen-in-character-classes

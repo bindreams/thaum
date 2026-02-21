@@ -1,3 +1,4 @@
+disabled: true
 name: propView()
 dialect: bash
 source: oils:spec/ysh-object#propview

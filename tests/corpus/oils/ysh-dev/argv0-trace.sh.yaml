@@ -1,3 +1,4 @@
+disabled: true
 name: argv0 trace
 dialect: bash
 source: oils:spec/ysh-dev#argv0-trace

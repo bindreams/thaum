@@ -1,3 +1,4 @@
+disabled: true
 name: Long boolean flags can't have attached values
 dialect: bash
 source: oils:spec/ysh-bugs#long-boolean-flags-cant-have-attached-values

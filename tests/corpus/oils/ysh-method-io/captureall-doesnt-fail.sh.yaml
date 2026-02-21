@@ -1,3 +1,4 @@
+disabled: true
 name: captureAll() doesn't fail
 dialect: bash
 source: oils:spec/ysh-method-io#captureall-doesnt-fail

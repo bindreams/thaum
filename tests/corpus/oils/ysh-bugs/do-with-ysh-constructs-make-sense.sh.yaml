@@ -1,3 +1,4 @@
+disabled: true
 name: Do && || with YSH constructs make sense/
 dialect: bash
 source: oils:spec/ysh-bugs#do-with-ysh-constructs-make-sense

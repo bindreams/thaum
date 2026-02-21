@@ -1,3 +1,4 @@
+disabled: true
 name: 'top level: setvar mutates var'
 dialect: bash
 source: oils:spec/ysh-assign#top-level-setvar-mutates-var

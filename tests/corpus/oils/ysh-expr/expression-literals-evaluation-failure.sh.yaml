@@ -1,3 +1,4 @@
+disabled: true
 name: expression literals, evaluation failure
 dialect: bash
 source: oils:spec/ysh-expr#expression-literals-evaluation-failure

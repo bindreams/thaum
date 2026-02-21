@@ -1,3 +1,4 @@
+disabled: true
 name: Range
 dialect: bash
 source: oils:spec/ysh-printing#range

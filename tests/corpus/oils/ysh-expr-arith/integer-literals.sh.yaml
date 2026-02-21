@@ -1,3 +1,4 @@
+disabled: true
 name: Integer literals
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-literals

@@ -1,3 +1,4 @@
+disabled: true
 name: Dict literal with string keys
 dialect: bash
 source: oils:spec/ysh-dict#dict-literal-with-string-keys

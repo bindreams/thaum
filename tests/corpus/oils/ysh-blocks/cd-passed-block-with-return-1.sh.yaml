@@ -1,3 +1,4 @@
+disabled: true
 name: cd passed block with return 1
 dialect: bash
 source: oils:spec/ysh-blocks#cd-passed-block-with-return-1

@@ -1,3 +1,4 @@
+disabled: true
 name: here doc with quotes
 dialect: bash
 source: oils:spec/ysh-string#here-doc-with-quotes

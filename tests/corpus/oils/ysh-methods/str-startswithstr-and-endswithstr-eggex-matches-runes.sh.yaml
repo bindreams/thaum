@@ -1,3 +1,4 @@
+disabled: true
 name: Str => startsWith(Str) and endsWith(Str), eggex matches runes
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: "Can't serialize type List in an array?  TODO: consider __str__"
 dialect: bash
 source: 

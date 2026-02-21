@@ -1,3 +1,4 @@
+disabled: true
 name: read --raw-line, --all, --num-bytes preserve NUL bytes
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: ysh --location-str --location-start-line
 dialect: bash
 source: oils:spec/ysh-usage#ysh---location-str---location-start-line

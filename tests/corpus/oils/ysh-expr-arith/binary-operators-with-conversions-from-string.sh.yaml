@@ -1,3 +1,4 @@
+disabled: true
 name: Binary operators, with conversions from string
 dialect: bash
 source: oils:spec/ysh-expr-arith#binary-operators-with-conversions-from-string

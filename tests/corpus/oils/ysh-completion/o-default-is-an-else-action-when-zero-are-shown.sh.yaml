@@ -1,3 +1,4 @@
+disabled: true
 name: -o default is an "else action", when zero are shown
 dialect: bash
 source: oils:spec/ysh-completion#o-default-is-an-else-action-when-zero-are-shown

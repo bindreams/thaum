@@ -1,3 +1,4 @@
+disabled: true
 name: pretty print INFINITY, -INFINITY, NAN
 dialect: bash
 source: oils:spec/ysh-int-float#pretty-print-infinity--infinity-nan

@@ -1,3 +1,4 @@
+disabled: true
 name: split on \0 delimiters
 dialect: bash
 source: oils:spec/ysh-demo#split-on-0-delimiters

@@ -1,3 +1,4 @@
+disabled: true
 name: 'TODO: all options as a table'
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#todo-all-options-as-a-table

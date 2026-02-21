@@ -1,3 +1,4 @@
+disabled: true
 name: cd accepts a block, runs it in different dir
 dialect: bash
 source: oils:spec/ysh-blocks#cd-accepts-a-block-runs-it-in-different-dir

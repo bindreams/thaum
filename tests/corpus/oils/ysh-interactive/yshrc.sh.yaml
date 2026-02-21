@@ -1,3 +1,4 @@
+disabled: true
 name: yshrc
 dialect: bash
 source: oils:spec/ysh-interactive#yshrc

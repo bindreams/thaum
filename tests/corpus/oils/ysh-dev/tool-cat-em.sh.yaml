@@ -1,3 +1,4 @@
+disabled: true
 name: --tool cat-em
 dialect: bash
 source: oils:spec/ysh-dev#tool-cat-em

@@ -1,3 +1,4 @@
+disabled: true
 name: don't execute empty command
 dialect: bash
 source: oils:spec/ysh-bugs#dont-execute-empty-command

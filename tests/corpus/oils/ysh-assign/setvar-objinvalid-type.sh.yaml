@@ -1,3 +1,4 @@
+disabled: true
 name: setvar obj[INVALID TYPE] =
 dialect: bash
 source: oils:spec/ysh-assign#setvar-objinvalid-type

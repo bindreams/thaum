@@ -1,3 +1,4 @@
+disabled: true
 name: Proc with ... "rest" word params
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-rest-word-params

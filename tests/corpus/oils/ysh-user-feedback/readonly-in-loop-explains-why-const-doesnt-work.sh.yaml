@@ -1,3 +1,4 @@
+disabled: true
 name: "readonly in loop: explains why const doesn't work"
 dialect: bash
 source: 

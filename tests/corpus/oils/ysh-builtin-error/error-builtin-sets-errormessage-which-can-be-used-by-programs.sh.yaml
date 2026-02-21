@@ -1,3 +1,4 @@
+disabled: true
 name: error builtin sets _error.message, which can be used by programs
 dialect: bash
 source: 

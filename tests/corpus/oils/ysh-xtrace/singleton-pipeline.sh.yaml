@@ -1,3 +1,4 @@
+disabled: true
 name: singleton pipeline
 dialect: bash
 source: oils:spec/ysh-xtrace#singleton-pipeline

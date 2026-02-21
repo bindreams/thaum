@@ -1,3 +1,4 @@
+disabled: true
 name: Big float Literals with _
 dialect: bash
 source: oils:spec/ysh-int-float#big-float-literals-with

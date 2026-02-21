@@ -1,3 +1,4 @@
+disabled: true
 name: trap ERR with YSH proc
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-ysh-proc

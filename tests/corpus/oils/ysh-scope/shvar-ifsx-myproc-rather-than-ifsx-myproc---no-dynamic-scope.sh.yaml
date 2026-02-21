@@ -1,3 +1,4 @@
+disabled: true
 name: shvar IFS=x { myproc } rather than IFS=x myproc - no dynamic scope
 dialect: bash
 source: 

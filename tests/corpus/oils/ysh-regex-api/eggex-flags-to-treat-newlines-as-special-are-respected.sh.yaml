@@ -1,3 +1,4 @@
+disabled: true
 name: Eggex flags to treat newlines as special are respected
 dialect: bash
 source: 

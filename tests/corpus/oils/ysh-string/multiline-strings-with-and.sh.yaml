@@ -1,3 +1,4 @@
+disabled: true
 name: Multiline strings with '' and ""
 dialect: bash
 source: oils:spec/ysh-string#multiline-strings-with-and

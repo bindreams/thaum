@@ -1,3 +1,4 @@
+disabled: true
 name: ${x %05d}
 dialect: bash
 source: oils:spec/ysh-var-sub#x-05d

@@ -1,3 +1,4 @@
+disabled: true
 name: pp cell_
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-cell

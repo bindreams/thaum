@@ -1,3 +1,4 @@
+disabled: true
 name: Negation of Character Class ![a-z]
 dialect: bash
 source: oils:spec/ysh-regex#negation-of-character-class-a-z

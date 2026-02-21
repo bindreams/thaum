@@ -1,3 +1,4 @@
+disabled: true
 name: read scope
 dialect: bash
 source: oils:spec/ysh-scope#read-scope

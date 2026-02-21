@@ -1,3 +1,4 @@
+disabled: true
 name: source-guard is an old way of preventing redefinition - could remove it
 dialect: bash
 source: 

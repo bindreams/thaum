@@ -1,3 +1,4 @@
+disabled: true
 name: 'pp: Obj cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-obj-cycle

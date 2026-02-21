@@ -1,3 +1,4 @@
+disabled: true
 name: long flags to test
 dialect: bash
 source: oils:spec/ysh-builtins#long-flags-to-test

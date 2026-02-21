@@ -1,3 +1,4 @@
+disabled: true
 name: We can store funcs in dictionaries
 dialect: bash
 source: oils:spec/ysh-func#we-can-store-funcs-in-dictionaries

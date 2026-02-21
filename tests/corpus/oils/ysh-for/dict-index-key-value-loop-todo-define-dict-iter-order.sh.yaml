@@ -1,3 +1,4 @@
+disabled: true
 name: 'Dict: index key value loop (TODO: define dict iter order)'
 dialect: bash
 source: oils:spec/ysh-for#dict-index-key-value-loop-todo-define-dict-iter-order

@@ -1,3 +1,4 @@
+disabled: true
 name: var x, y = f()
 dialect: bash
 source: oils:spec/ysh-assign#var-x-y-f

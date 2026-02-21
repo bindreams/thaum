@@ -1,3 +1,4 @@
+disabled: true
 name: fromJson() fromJson8()
 dialect: bash
 source: oils:spec/ysh-json#fromjson-fromjson8

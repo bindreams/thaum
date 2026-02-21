@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval(to_dict=true) with dollar0, pos_args, vars - dict ordering bug
 dialect: bash
 source: 

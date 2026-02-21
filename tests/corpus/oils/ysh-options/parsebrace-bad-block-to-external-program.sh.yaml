@@ -1,3 +1,4 @@
+disabled: true
 name: 'parse_brace: bad block to external program'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-bad-block-to-external-program

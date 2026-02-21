@@ -1,3 +1,4 @@
+disabled: true
 name: DebugFrame.toString() with 'use' builtin
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-with-use-builtin

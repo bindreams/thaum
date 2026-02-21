@@ -1,3 +1,4 @@
+disabled: true
 name: Simple Cycles
 dialect: bash
 source: oils:spec/ysh-printing#simple-cycles

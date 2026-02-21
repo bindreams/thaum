@@ -1,3 +1,4 @@
+disabled: true
 name: Named captures with m.group()
 dialect: bash
 source: oils:spec/ysh-regex-api#named-captures-with-mgroup

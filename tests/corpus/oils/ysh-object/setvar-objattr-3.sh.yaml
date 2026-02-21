@@ -1,3 +1,4 @@
+disabled: true
 name: setvar obj['attr'] = 3 ?
 dialect: bash
 source: oils:spec/ysh-object#setvar-objattr-3

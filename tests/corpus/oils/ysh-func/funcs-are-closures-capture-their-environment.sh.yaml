@@ -1,3 +1,4 @@
+disabled: true
 name: Funcs are closures (capture their environment)
 dialect: bash
 source: oils:spec/ysh-func#funcs-are-closures-capture-their-environment

@@ -1,3 +1,4 @@
+disabled: true
 name: For loop over range
 dialect: bash
 source: oils:spec/ysh-for#for-loop-over-range

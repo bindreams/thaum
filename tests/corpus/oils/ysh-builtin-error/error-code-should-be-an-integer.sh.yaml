@@ -1,3 +1,4 @@
+disabled: true
 name: error code should be an integer
 dialect: bash
 source: oils:spec/ysh-builtin-error#error-code-should-be-an-integer

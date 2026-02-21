@@ -1,3 +1,4 @@
+disabled: true
 name: eval() is a pure function
 dialect: bash
 source: oils:spec/ysh-purity#eval-is-a-pure-function

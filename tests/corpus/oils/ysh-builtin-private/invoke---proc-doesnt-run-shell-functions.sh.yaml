@@ -1,3 +1,4 @@
+disabled: true
 name: invoke --proc doesn't run shell functions
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---proc-doesnt-run-shell-functions

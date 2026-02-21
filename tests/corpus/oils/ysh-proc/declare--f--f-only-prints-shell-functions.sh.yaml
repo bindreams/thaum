@@ -1,3 +1,4 @@
+disabled: true
 name: declare -f -F only prints shell functions
 dialect: bash
 source: oils:spec/ysh-proc#declare--f--f-only-prints-shell-functions

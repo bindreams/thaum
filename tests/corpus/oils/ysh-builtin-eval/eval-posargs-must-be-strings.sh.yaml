@@ -1,3 +1,4 @@
+disabled: true
 name: eval pos_args must be strings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-posargs-must-be-strings

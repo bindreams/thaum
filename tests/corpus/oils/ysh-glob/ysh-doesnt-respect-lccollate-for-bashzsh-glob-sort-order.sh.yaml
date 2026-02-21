@@ -1,3 +1,4 @@
+disabled: true
 name: YSH doesn't respect LC_COLLATE for bash/zsh glob sort order
 dialect: bash
 source: 

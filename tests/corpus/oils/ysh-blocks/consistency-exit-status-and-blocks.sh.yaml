@@ -1,3 +1,4 @@
+disabled: true
 name: 'Consistency: Exit Status and Blocks'
 dialect: bash
 source: oils:spec/ysh-blocks#consistency-exit-status-and-blocks

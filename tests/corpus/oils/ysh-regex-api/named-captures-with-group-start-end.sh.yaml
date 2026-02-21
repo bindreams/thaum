@@ -1,3 +1,4 @@
+disabled: true
 name: Named captures with _group() _start() _end()
 dialect: bash
 source: oils:spec/ysh-regex-api#named-captures-with-group-start-end

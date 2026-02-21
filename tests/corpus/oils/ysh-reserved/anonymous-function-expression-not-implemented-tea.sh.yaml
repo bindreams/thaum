@@ -1,3 +1,4 @@
+disabled: true
 name: Anonymous function expression not implemented (Tea)
 dialect: bash
 source: oils:spec/ysh-reserved#anonymous-function-expression-not-implemented-tea

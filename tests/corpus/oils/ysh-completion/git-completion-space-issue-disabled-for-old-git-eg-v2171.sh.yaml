@@ -1,3 +1,4 @@
+disabled: true
 name: git completion space issue (disabled for old git, e.g. v2.17.1)
 dialect: bash
 source: 

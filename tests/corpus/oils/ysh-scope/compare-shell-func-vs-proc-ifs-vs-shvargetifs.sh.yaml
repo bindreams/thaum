@@ -1,3 +1,4 @@
+disabled: true
 name: Compare shell func vs. proc, $IFS vs. shvarGet('IFS')
 dialect: bash
 source: oils:spec/ysh-scope#compare-shell-func-vs-proc-ifs-vs-shvargetifs

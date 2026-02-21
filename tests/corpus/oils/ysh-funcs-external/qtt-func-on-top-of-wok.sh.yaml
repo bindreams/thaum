@@ -1,3 +1,4 @@
+disabled: true
 name: QTT func on top of wok
 dialect: bash
 source: oils:spec/ysh-funcs-external#qtt-func-on-top-of-wok

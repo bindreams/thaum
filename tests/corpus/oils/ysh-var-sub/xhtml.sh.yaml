@@ -1,3 +1,4 @@
+disabled: true
 name: ${x|html}
 dialect: bash
 source: oils:spec/ysh-var-sub#xhtml

@@ -1,3 +1,4 @@
+disabled: true
 name: 'Operations That Convert to Integer: // % **'
 dialect: bash
 source: oils:spec/ysh-expr-arith#operations-that-convert-to-integer

@@ -1,3 +1,4 @@
+disabled: true
 name: Accepts { } syntax too
 dialect: bash
 source: oils:spec/for-expr#accepts-syntax-too

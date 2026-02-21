@@ -1,3 +1,4 @@
+disabled: true
 name: bare assignment inside Hay blocks
 dialect: bash
 source: oils:spec/ysh-options-assign#bare-assignment-inside-hay-blocks

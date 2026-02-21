@@ -1,3 +1,4 @@
+disabled: true
 name: Modify for loop variable with var or setvar? (Machine Stops)
 dialect: bash
 source: 

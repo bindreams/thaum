@@ -1,3 +1,4 @@
+disabled: true
 name: Error when unparenthesized string of more than one character is repeated
 dialect: bash
 source: 

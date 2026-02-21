@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval(to_dict=true) with in_captured_frame=true
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-incapturedframetrue

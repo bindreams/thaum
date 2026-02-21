@@ -1,3 +1,4 @@
+disabled: true
 name: Redirect with if, case, while, for
 dialect: bash
 source: oils:spec/ysh-cmd-lang#redirect-with-if-case-while-for

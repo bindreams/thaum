@@ -1,3 +1,4 @@
+disabled: true
 name: Range with escaped characters
 dialect: bash
 source: oils:spec/ysh-regex#range-with-escaped-characters

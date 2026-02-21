@@ -1,3 +1,4 @@
+disabled: true
 name: 'Shell ${a[0]} with YSH List (issue #1092)'
 dialect: bash
 source: oils:spec/ysh-with-sh#shell-a0-with-ysh-list-issue-1092

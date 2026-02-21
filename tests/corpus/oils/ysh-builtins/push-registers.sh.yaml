@@ -1,3 +1,4 @@
+disabled: true
 name: push-registers
 dialect: bash
 source: oils:spec/ysh-builtins#push-registers

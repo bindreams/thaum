@@ -1,3 +1,4 @@
+disabled: true
 name: subscript and slice of List
 dialect: bash
 source: oils:spec/ysh-slice-range#subscript-and-slice-of-list

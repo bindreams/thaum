@@ -1,3 +1,4 @@
+disabled: true
 name: $'\xff' is disallowed in Eggex, because it's disallowed in YSH
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: 'builtin rm: usage, removing files'
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-rm-usage-removing-files

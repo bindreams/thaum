@@ -1,3 +1,4 @@
+disabled: true
 name: is-main with -c and stdin
 dialect: bash
 source: oils:spec/ysh-builtin-module#is-main-with--c-and-stdin

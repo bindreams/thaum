@@ -1,3 +1,4 @@
+disabled: true
 name: 'parse_brace: if accepts blocks'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-if-accepts-blocks

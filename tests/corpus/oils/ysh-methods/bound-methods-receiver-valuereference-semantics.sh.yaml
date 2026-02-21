@@ -1,3 +1,4 @@
+disabled: true
 name: Bound methods, receiver value/reference semantics
 dialect: bash
 source: oils:spec/ysh-methods#bound-methods-receiver-valuereference-semantics

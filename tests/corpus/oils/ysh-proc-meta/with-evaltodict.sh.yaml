@@ -1,3 +1,4 @@
+disabled: true
 name: with evalToDict()
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-evaltodict

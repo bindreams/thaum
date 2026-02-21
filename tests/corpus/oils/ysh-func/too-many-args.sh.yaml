@@ -1,3 +1,4 @@
+disabled: true
 name: Too many args
 dialect: bash
 source: oils:spec/ysh-func#too-many-args

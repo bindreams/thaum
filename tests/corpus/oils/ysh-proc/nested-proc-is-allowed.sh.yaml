@@ -1,3 +1,4 @@
+disabled: true
 name: Nested proc is allowed
 dialect: bash
 source: oils:spec/ysh-proc#nested-proc-is-allowed

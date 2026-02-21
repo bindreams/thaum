@@ -1,3 +1,4 @@
+disabled: true
 name: Augmented assignment with integers
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-with-integers

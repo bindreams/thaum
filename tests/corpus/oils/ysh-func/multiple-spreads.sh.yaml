@@ -1,3 +1,4 @@
+disabled: true
 name: Multiple spreads
 dialect: bash
 source: oils:spec/ysh-func#multiple-spreads

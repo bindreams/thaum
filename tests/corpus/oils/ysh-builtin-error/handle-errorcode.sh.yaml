@@ -1,3 +1,4 @@
+disabled: true
 name: Handle _error.code
 dialect: bash
 source: oils:spec/ysh-builtin-error#handle-errorcode

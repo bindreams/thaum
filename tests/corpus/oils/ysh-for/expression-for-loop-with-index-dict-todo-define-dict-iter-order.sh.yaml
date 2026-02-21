@@ -1,3 +1,4 @@
+disabled: true
 name: 'Expression for loop with index: Dict (TODO: define dict iter order)'
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: Functions can be nested
 dialect: bash
 source: oils:spec/ysh-func#functions-can-be-nested

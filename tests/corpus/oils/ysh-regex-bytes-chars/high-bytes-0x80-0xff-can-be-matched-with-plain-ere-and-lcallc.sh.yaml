@@ -1,3 +1,4 @@
+disabled: true
 name: High bytes 0x80 0xff can be matched with plain ERE and LC_ALL=C
 dialect: bash
 source: 

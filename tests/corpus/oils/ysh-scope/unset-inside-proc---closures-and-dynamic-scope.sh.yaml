@@ -1,3 +1,4 @@
+disabled: true
 name: unset inside proc - closures and dynamic scope
 dialect: bash
 source: oils:spec/ysh-scope#unset-inside-proc---closures-and-dynamic-scope

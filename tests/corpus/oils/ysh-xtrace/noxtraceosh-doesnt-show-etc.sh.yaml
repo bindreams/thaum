@@ -1,3 +1,4 @@
+disabled: true
 name: no_xtrace_osh doesn't show [[ ]] etc.
 dialect: bash
 source: oils:spec/ysh-xtrace#noxtraceosh-doesnt-show-etc

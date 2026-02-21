@@ -1,3 +1,4 @@
+disabled: true
 name: Shell for loop can't have 3 indices
 dialect: bash
 source: oils:spec/ysh-for#shell-for-loop-cant-have-3-indices

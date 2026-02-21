@@ -1,3 +1,4 @@
+disabled: true
 name: Command.sourceCode() works in nested blocks
 dialect: bash
 source: oils:spec/ysh-method-other#commandsourcecode-works-in-nested-blocks

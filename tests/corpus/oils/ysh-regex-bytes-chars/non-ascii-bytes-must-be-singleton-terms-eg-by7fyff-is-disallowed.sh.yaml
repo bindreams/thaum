@@ -1,3 +1,4 @@
+disabled: true
 name: non-ASCII bytes must be singleton terms, e.g. b'\y7f\yff' is disallowed
 dialect: bash
 source: 

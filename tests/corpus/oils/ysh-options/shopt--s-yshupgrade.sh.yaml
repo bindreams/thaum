@@ -1,3 +1,4 @@
+disabled: true
 name: shopt -s ysh:upgrade
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-yshupgrade

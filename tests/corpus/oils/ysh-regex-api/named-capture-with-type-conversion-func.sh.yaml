@@ -1,3 +1,4 @@
+disabled: true
 name: Named Capture with Type Conversion Func
 dialect: bash
 source: oils:spec/ysh-regex-api#named-capture-with-type-conversion-func

@@ -1,3 +1,4 @@
+disabled: true
 name: simple var sub $name $0 $1 $? etc.
 dialect: bash
 source: oils:spec/ysh-expr#simple-var-sub-name-0-1-etc

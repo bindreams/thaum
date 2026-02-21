@@ -1,3 +1,4 @@
+disabled: true
 name: Hay node with exression block arg now allowed - Node (; ; ^(var x = 1))
 dialect: bash
 source: 

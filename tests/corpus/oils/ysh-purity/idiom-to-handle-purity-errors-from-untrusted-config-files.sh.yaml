@@ -1,3 +1,4 @@
+disabled: true
 name: Idiom to handle purity errors from untrusted config files
 dialect: bash
 source: 

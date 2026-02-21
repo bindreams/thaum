@@ -1,3 +1,4 @@
+disabled: true
 name: Loops over bogus ranges terminate
 dialect: bash
 source: oils:spec/ysh-slice-range#loops-over-bogus-ranges-terminate

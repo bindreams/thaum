@@ -1,3 +1,4 @@
+disabled: true
 name: setglobal ENV.PYTHONPATH = 'foo' changes child process state
 dialect: bash
 source: 

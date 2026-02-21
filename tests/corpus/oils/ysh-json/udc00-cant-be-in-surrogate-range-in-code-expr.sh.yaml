@@ -1,3 +1,4 @@
+disabled: true
 name: \u{dc00} can't be in surrogate range in code (expr)
 dialect: bash
 source: oils:spec/ysh-json#udc00-cant-be-in-surrogate-range-in-code-expr

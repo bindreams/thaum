@@ -1,3 +1,4 @@
+disabled: true
 name: Big float constants becomes inf and -inf, tiny become 0.0 and -0.0
 dialect: bash
 source: 

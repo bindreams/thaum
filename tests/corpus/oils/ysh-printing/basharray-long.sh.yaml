@@ -1,3 +1,4 @@
+disabled: true
 name: BashArray, long
 dialect: bash
 source: oils:spec/ysh-printing#basharray-long

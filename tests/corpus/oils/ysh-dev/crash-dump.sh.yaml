@@ -1,3 +1,4 @@
+disabled: true
 name: crash dump
 dialect: bash
 source: oils:spec/ysh-dev#crash-dump

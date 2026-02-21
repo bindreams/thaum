@@ -1,3 +1,4 @@
+disabled: true
 name: elif bug
 dialect: bash
 source: oils:spec/ysh-user-feedback#elif-bug

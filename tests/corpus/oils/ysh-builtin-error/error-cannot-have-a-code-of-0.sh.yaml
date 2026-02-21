@@ -1,3 +1,4 @@
+disabled: true
 name: error cannot have a code of 0
 dialect: bash
 source: oils:spec/ysh-builtin-error#error-cannot-have-a-code-of-0

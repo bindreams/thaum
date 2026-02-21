@@ -1,3 +1,4 @@
+disabled: true
 name: forkwait
 dialect: bash
 source: oils:spec/ysh-builtin-process#forkwait

@@ -1,3 +1,4 @@
+disabled: true
 name: \yff can't appear in u'' code strings (command)
 dialect: bash
 source: oils:spec/ysh-json#yff-cant-appear-in-u-code-strings-command

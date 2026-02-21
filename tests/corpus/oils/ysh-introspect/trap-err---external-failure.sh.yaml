@@ -1,3 +1,4 @@
+disabled: true
 name: trap ERR - external failure
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---external-failure

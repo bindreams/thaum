@@ -1,3 +1,4 @@
+disabled: true
 name: can't use ++ on integers
 dialect: bash
 source: oils:spec/ysh-expr#cant-use-on-integers

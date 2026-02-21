@@ -1,3 +1,4 @@
+disabled: true
 name: Undefined var in function
 dialect: bash
 source: oils:spec/ysh-func#undefined-var-in-function

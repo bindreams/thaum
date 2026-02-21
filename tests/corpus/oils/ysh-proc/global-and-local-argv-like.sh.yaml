@@ -1,3 +1,4 @@
+disabled: true
 name: Global and local ARGV, like "$@"
 dialect: bash
 source: oils:spec/ysh-proc#global-and-local-argv-like

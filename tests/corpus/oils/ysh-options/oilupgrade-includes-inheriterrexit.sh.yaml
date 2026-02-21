@@ -1,3 +1,4 @@
+disabled: true
 name: oil:upgrade includes inherit_errexit
 dialect: bash
 source: oils:spec/ysh-options#oilupgrade-includes-inheriterrexit

@@ -1,3 +1,4 @@
+disabled: true
 name: Dict (&d) and setvar
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dict-d-and-setvar

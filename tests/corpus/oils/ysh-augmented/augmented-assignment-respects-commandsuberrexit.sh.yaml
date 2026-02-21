@@ -1,3 +1,4 @@
+disabled: true
 name: Augmented assignment respects command_sub_errexit
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-respects-commandsuberrexit

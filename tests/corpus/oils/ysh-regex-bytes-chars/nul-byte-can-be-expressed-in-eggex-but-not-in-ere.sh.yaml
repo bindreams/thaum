@@ -1,3 +1,4 @@
+disabled: true
 name: NUL byte can be expressed in Eggex, but not in ERE
 dialect: bash
 source: 

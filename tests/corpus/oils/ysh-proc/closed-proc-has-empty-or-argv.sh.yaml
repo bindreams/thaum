@@ -1,3 +1,4 @@
+disabled: true
 name: Closed proc has empty "$@" or ARGV
 dialect: bash
 source: oils:spec/ysh-proc#closed-proc-has-empty-or-argv

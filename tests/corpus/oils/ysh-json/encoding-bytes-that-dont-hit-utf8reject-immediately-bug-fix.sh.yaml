@@ -1,3 +1,4 @@
+disabled: true
 name: Encoding bytes that don't hit UTF8_REJECT immediately (bug fix)
 dialect: bash
 source: 

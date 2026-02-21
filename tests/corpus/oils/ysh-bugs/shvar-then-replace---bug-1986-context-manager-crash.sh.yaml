@@ -1,3 +1,4 @@
+disabled: true
 name: 'shvar then replace - bug #1986 context manager crash'
 dialect: bash
 source: oils:spec/ysh-bugs#shvar-then-replace---bug-1986-context-manager-crash

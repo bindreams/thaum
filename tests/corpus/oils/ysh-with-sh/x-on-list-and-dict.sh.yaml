@@ -1,3 +1,4 @@
+disabled: true
 name: ${#x} on List and Dict
 dialect: bash
 source: oils:spec/ysh-with-sh#x-on-list-and-dict

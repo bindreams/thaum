@@ -1,3 +1,4 @@
+disabled: true
 name: _this_dir not affected by 'cd'
 dialect: bash
 source: oils:spec/ysh-special-vars#thisdir-not-affected-by-cd

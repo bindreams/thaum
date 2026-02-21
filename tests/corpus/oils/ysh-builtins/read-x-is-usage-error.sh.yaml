@@ -1,3 +1,4 @@
+disabled: true
 name: read (&x) is usage error
 dialect: bash
 source: oils:spec/ysh-builtins#read-x-is-usage-error

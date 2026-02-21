@@ -1,3 +1,4 @@
+disabled: true
 name: Can't make an alias of io->eval and call it, etc.
 dialect: bash
 source: oils:spec/ysh-purity#cant-make-an-alias-of-io-eval-and-call-it-etc

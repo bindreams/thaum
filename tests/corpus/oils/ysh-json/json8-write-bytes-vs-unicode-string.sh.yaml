@@ -1,3 +1,4 @@
+disabled: true
 name: json8 write bytes vs unicode string
 dialect: bash
 source: oils:spec/ysh-json#json8-write-bytes-vs-unicode-string

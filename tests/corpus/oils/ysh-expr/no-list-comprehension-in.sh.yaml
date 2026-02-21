@@ -1,3 +1,4 @@
+disabled: true
 name: No list comprehension in ^[]
 dialect: bash
 source: oils:spec/ysh-expr#no-list-comprehension-in

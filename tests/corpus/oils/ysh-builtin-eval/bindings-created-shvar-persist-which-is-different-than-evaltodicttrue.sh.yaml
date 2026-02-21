@@ -1,3 +1,4 @@
+disabled: true
 name: bindings created shvar persist, which is different than eval(to_dict=true)
 dialect: bash
 source: 

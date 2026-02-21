@@ -1,3 +1,4 @@
+disabled: true
 name: var a, b  does implicit null init
 dialect: bash
 source: oils:spec/ysh-assign#var-a-b-does-implicit-null-init

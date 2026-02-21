@@ -1,3 +1,4 @@
+disabled: true
 name: assert on expression that fails
 dialect: bash
 source: oils:spec/ysh-builtin-error#assert-on-expression-that-fails

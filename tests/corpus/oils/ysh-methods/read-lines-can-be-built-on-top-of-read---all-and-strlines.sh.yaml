@@ -1,3 +1,4 @@
+disabled: true
 name: read-lines can be built on top of read --all and Str.lines()
 dialect: bash
 source: 

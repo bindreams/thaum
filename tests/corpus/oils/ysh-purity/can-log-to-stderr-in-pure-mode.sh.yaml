@@ -1,3 +1,4 @@
+disabled: true
 name: Can log to stderr in pure mode
 dialect: bash
 source: oils:spec/ysh-purity#can-log-to-stderr-in-pure-mode

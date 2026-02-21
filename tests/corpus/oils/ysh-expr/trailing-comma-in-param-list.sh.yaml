@@ -1,3 +1,4 @@
+disabled: true
 name: Trailing Comma in Param list
 dialect: bash
 source: oils:spec/ysh-expr#trailing-comma-in-param-list

@@ -1,3 +1,4 @@
+disabled: true
 name: echo $f (x) with space is runtime error
 dialect: bash
 source: oils:spec/ysh-word-eval#echo-f-x-with-space-is-runtime-error

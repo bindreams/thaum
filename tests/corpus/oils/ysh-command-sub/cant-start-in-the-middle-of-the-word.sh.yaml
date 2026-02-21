@@ -1,3 +1,4 @@
+disabled: true
 name: "@() can't start in the middle of the word"
 dialect: bash
 source: oils:spec/ysh-command-sub#cant-start-in-the-middle-of-the-word

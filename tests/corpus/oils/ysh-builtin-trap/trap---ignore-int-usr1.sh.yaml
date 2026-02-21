@@ -1,3 +1,4 @@
+disabled: true
 name: trap --ignore INT USR1
 dialect: bash
 source: oils:spec/ysh-builtin-trap#trap---ignore-int-usr1

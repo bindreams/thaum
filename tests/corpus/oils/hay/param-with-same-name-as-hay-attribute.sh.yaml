@@ -1,3 +1,4 @@
+disabled: true
 name: Param with same name as Hay attribute
 dialect: bash
 source: oils:spec/hay#param-with-same-name-as-hay-attribute

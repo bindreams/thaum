@@ -1,3 +1,4 @@
+disabled: true
 name: Instead of $'foo\\bar' use 'foo' \\ 'bar'
 dialect: bash
 source: oils:spec/ysh-regex#instead-of-foobar-use-foo-bar

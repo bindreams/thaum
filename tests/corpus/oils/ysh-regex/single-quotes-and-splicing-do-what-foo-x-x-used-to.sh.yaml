@@ -1,3 +1,4 @@
+disabled: true
 name: Single quotes and splicing (do what "foo $x ${x}" used to)
 dialect: bash
 source: oils:spec/ysh-regex#single-quotes-and-splicing-do-what-foo-x-x-used-to

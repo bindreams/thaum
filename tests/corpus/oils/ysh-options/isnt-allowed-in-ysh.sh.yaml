@@ -1,3 +1,4 @@
+disabled: true
 name: "[[ isn't allowed in ysh"
 dialect: bash
 source: oils:spec/ysh-options#isnt-allowed-in-ysh

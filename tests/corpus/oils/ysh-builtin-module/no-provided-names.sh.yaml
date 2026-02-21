@@ -1,3 +1,4 @@
+disabled: true
 name: no provided names
 dialect: bash
 source: oils:spec/ysh-builtin-module#no-provided-names

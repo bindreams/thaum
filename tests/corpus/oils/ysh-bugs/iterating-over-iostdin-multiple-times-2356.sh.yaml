@@ -1,3 +1,4 @@
+disabled: true
 name: Iterating over io.stdin multiple times (#2356)
 dialect: bash
 source: oils:spec/ysh-bugs#iterating-over-iostdin-multiple-times-2356

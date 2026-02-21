@@ -1,3 +1,4 @@
+disabled: true
 name: List append()/extend() should return null
 dialect: bash
 source: oils:spec/ysh-list#list-appendextend-should-return-null

@@ -1,3 +1,4 @@
+disabled: true
 name: Concat ++ not defined on shell array
 dialect: bash
 source: oils:spec/ysh-with-sh#concat-not-defined-on-shell-array

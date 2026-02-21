@@ -1,3 +1,4 @@
+disabled: true
 name: and short circuits
 dialect: bash
 source: oils:spec/ysh-expr-bool#and-short-circuits

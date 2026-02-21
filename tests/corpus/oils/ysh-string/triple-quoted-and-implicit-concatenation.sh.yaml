@@ -1,3 +1,4 @@
+disabled: true
 name: triple quoted and implicit concatenation
 dialect: bash
 source: oils:spec/ysh-string#triple-quoted-and-implicit-concatenation

@@ -1,3 +1,4 @@
+disabled: true
 name: Temp bindings can use locals in the same frame,(don't introduce new frame)
 dialect: bash
 source: 

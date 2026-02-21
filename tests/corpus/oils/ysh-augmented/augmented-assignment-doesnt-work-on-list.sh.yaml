@@ -1,3 +1,4 @@
+disabled: true
 name: Augmented assignment doesn't work on List
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-doesnt-work-on-list

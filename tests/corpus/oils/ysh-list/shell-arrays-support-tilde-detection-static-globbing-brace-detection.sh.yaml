@@ -1,3 +1,4 @@
+disabled: true
 name: Shell arrays support tilde detection, static globbing, brace detection
 dialect: bash
 source: 

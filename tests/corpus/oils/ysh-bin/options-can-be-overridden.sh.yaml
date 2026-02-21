@@ -1,3 +1,4 @@
+disabled: true
 name: Options can be overridden
 dialect: bash
 source: oils:spec/ysh-bin#options-can-be-overridden

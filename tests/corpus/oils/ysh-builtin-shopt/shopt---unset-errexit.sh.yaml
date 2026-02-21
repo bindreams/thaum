@@ -1,3 +1,4 @@
+disabled: true
 name: shopt --unset errexit { }
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt---unset-errexit

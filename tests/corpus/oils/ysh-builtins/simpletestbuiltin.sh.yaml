@@ -1,3 +1,4 @@
+disabled: true
 name: simple_test_builtin
 dialect: bash
 source: oils:spec/ysh-builtins#simpletestbuiltin

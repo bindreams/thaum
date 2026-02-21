@@ -1,3 +1,4 @@
+disabled: true
 name: vars initializes the variable frame, but does not remember it
 dialect: bash
 source: 

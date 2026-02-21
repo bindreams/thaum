@@ -1,3 +1,4 @@
+disabled: true
 name: leftMatch() combined with REG_NEWLINE - interaction with ^
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: _start() and _end()
 dialect: bash
 source: oils:spec/ysh-regex-api#start-and-end

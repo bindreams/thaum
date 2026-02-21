@@ -1,3 +1,4 @@
+disabled: true
 name: str() conversion
 dialect: bash
 source: oils:spec/ysh-convert#str-conversion

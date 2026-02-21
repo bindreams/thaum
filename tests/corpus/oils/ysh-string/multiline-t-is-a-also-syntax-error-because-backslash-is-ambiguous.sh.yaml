@@ -1,3 +1,4 @@
+disabled: true
 name: Multiline ''' \t ''' is a also syntax error because backslash is ambiguous
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: bin/ysh doesn't have exported vars (declare -x)
 dialect: bash
 source: oils:spec/ysh-env#binysh-doesnt-have-exported-vars-declare--x

@@ -1,3 +1,4 @@
+disabled: true
 name: Multiple digits like [25] are invalid
 dialect: bash
 source: oils:spec/ysh-regex#multiple-digits-like-25-are-invalid

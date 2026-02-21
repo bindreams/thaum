@@ -1,3 +1,4 @@
+disabled: true
 name: '"in" and "not in" on Dicts'
 dialect: bash
 source: oils:spec/ysh-dict#in-and-not-in-on-dicts

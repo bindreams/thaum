@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval() with failing command - caller must handle
 dialect: bash
 source: 

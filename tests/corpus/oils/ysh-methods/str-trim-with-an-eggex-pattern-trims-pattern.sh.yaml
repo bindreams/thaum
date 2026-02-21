@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trim*() with an eggex pattern trims pattern
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-pattern

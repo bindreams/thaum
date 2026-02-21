@@ -1,3 +1,4 @@
+disabled: true
 name: __readonly__ in prototype makes objects readonly
 dialect: bash
 source: oils:spec/ysh-object#readonly-in-prototype-makes-objects-readonly

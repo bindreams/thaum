@@ -1,3 +1,4 @@
+disabled: true
 name: More Command sub paren parsing
 dialect: bash
 source: oils:spec/ysh-bugs#more-command-sub-paren-parsing

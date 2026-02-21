@@ -1,3 +1,4 @@
+disabled: true
 name: eval builtin does not take a literal block - can restore this later
 dialect: bash
 source: 

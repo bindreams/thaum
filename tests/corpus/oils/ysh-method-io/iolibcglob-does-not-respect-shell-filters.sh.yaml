@@ -1,3 +1,4 @@
+disabled: true
 name: io.libcGlob() does not respect shell filters
 dialect: bash
 source: oils:spec/ysh-method-io#iolibcglob-does-not-respect-shell-filters

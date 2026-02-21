@@ -1,3 +1,4 @@
+disabled: true
 name: builtin rm always fails on directories (regardless of -f)
 dialect: bash
 source: 

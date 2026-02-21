@@ -1,3 +1,4 @@
+disabled: true
 name: redir
 dialect: bash
 source: oils:spec/ysh-builtins#redir

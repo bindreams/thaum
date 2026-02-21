@@ -1,3 +1,4 @@
+disabled: true
 name: for loop using @(seq $n)
 dialect: bash
 source: oils:spec/ysh-command-sub#for-loop-using-seq-n

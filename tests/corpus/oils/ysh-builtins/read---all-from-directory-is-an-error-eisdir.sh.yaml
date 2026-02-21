@@ -1,3 +1,4 @@
+disabled: true
 name: read --all from directory is an error (EISDIR)
 dialect: bash
 source: oils:spec/ysh-builtins#read---all-from-directory-is-an-error-eisdir

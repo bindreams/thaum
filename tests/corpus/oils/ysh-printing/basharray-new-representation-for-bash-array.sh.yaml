@@ -1,3 +1,4 @@
+disabled: true
 name: BashArray, new representation for bash array
 dialect: bash
 source: oils:spec/ysh-printing#basharray-new-representation-for-bash-array

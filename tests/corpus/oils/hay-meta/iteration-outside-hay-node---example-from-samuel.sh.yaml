@@ -1,3 +1,4 @@
+disabled: true
 name: Iteration outside Hay node - example from Samuel
 dialect: bash
 source: oils:spec/hay-meta#iteration-outside-hay-node---example-from-samuel

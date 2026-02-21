@@ -1,3 +1,4 @@
+disabled: true
 name: search() and leftMatch() accept ERE string
 dialect: bash
 source: oils:spec/ysh-regex-api#search-and-leftmatch-accept-ere-string

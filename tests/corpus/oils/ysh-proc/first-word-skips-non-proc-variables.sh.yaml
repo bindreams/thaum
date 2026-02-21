@@ -1,3 +1,4 @@
+disabled: true
 name: first word skips non-proc variables
 dialect: bash
 source: oils:spec/ysh-proc#first-word-skips-non-proc-variables

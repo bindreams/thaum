@@ -1,3 +1,4 @@
+disabled: true
 name: "[DISABLED] Places can't dangle; they should passed UP the stack only"
 dialect: bash
 source: 

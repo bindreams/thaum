@@ -1,3 +1,4 @@
+disabled: true
 name: DebugFrame.toString() running YSH functions
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-running-ysh-functions

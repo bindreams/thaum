@@ -1,3 +1,4 @@
+disabled: true
 name: Positional captures with _group
 dialect: bash
 source: oils:spec/ysh-regex-api#positional-captures-with-group

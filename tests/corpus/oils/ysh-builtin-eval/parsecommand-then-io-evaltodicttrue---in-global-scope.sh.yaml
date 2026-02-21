@@ -1,3 +1,4 @@
+disabled: true
 name: parseCommand then io->eval(to_dict=true) - in global scope
 dialect: bash
 source: 

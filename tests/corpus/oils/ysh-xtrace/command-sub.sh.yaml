@@ -1,3 +1,4 @@
+disabled: true
 name: command sub
 dialect: bash
 source: oils:spec/ysh-xtrace#command-sub

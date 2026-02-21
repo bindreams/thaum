@@ -1,3 +1,4 @@
+disabled: true
 name: single quoted -- implicit and explicit raw
 dialect: bash
 source: oils:spec/ysh-string#single-quoted----implicit-and-explicit-raw

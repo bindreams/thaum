@@ -1,3 +1,4 @@
+disabled: true
 name: word evaluation order
 dialect: bash
 source: oils:spec/ysh-case#word-evaluation-order

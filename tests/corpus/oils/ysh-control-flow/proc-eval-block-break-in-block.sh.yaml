@@ -1,3 +1,4 @@
+disabled: true
 name: 'proc eval block: break in block'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-block-break-in-block

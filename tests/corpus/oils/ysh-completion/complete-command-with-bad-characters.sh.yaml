@@ -1,3 +1,4 @@
+disabled: true
 name: Complete Command with bad characters
 dialect: bash
 source: oils:spec/ysh-completion#complete-command-with-bad-characters

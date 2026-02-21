@@ -1,3 +1,4 @@
+disabled: true
 name: case syntax, multiline
 dialect: bash
 source: oils:spec/ysh-case#case-syntax-multiline

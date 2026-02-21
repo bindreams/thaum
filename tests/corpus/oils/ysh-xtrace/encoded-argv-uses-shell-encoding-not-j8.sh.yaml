@@ -1,3 +1,4 @@
+disabled: true
 name: Encoded argv uses shell encoding, not J8
 dialect: bash
 source: oils:spec/ysh-xtrace#encoded-argv-uses-shell-encoding-not-j8

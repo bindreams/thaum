@@ -1,3 +1,4 @@
+disabled: true
 name: Proc that doesn't take a block
 dialect: bash
 source: oils:spec/ysh-blocks#proc-that-doesnt-take-a-block

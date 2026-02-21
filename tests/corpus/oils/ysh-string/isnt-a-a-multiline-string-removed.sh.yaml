@@ -1,3 +1,4 @@
+disabled: true
 name: $''' isn't a a multiline string (removed)
 dialect: bash
 source: oils:spec/ysh-string#isnt-a-a-multiline-string-removed

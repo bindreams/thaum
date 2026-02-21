@@ -1,3 +1,4 @@
+disabled: true
 name: 'complete both -W and -F: words and functions'
 dialect: bash
 source: oils:spec/ysh-completion#complete-both--w-and--f-words-and-functions

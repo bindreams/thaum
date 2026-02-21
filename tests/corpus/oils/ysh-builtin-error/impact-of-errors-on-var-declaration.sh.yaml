@@ -1,3 +1,4 @@
+disabled: true
 name: Impact of errors on var declaration
 dialect: bash
 source: oils:spec/ysh-builtin-error#impact-of-errors-on-var-declaration

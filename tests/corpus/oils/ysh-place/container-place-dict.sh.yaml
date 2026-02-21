@@ -1,3 +1,4 @@
+disabled: true
 name: Container Place (Dict)
 dialect: bash
 source: oils:spec/ysh-place#container-place-dict

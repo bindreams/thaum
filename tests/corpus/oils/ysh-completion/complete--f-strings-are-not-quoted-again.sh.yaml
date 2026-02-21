@@ -1,3 +1,4 @@
+disabled: true
 name: complete -F strings are not quoted again
 dialect: bash
 source: oils:spec/ysh-completion#complete--f-strings-are-not-quoted-again

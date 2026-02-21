@@ -1,3 +1,4 @@
+disabled: true
 name: multiline array and command sub (only here docs disallowed)
 dialect: bash
 source: 

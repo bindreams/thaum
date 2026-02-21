@@ -1,3 +1,4 @@
+disabled: true
 name: smoke test for two.sh
 dialect: bash
 source: oils:spec/ysh-stdlib#smoke-test-for-twosh

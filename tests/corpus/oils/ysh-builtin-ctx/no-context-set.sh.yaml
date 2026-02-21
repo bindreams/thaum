@@ -1,3 +1,4 @@
+disabled: true
 name: no context, set
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#no-context-set

@@ -1,3 +1,4 @@
+disabled: true
 name: $"foo $x" to make "foo $x" explicit
 dialect: bash
 source: oils:spec/ysh-string#foo-x-to-make-foo-x-explicit

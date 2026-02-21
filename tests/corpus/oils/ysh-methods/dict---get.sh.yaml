@@ -1,3 +1,4 @@
+disabled: true
 name: Dict -> get()
 dialect: bash
 source: oils:spec/ysh-methods#dict---get

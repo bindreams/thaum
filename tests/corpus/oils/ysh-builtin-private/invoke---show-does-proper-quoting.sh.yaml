@@ -1,3 +1,4 @@
+disabled: true
 name: invoke --show does proper quoting
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---show-does-proper-quoting

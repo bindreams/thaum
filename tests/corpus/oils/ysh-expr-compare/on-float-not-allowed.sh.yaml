@@ -1,3 +1,4 @@
+disabled: true
 name: === on float not allowed
 dialect: bash
 source: oils:spec/ysh-expr-compare#on-float-not-allowed

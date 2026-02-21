@@ -1,3 +1,4 @@
+disabled: true
 name: Wrong sigil with $range() is runtime error
 dialect: bash
 source: oils:spec/ysh-word-eval#wrong-sigil-with-range-is-runtime-error

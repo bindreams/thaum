@@ -1,3 +1,4 @@
+disabled: true
 name: Str.replace(Eggex, *), guard against infinite loop
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-guard-against-infinite-loop

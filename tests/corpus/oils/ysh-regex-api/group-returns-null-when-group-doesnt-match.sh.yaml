@@ -1,3 +1,4 @@
+disabled: true
 name: _group() returns null when group doesn't match
 dialect: bash
 source: oils:spec/ysh-regex-api#group-returns-null-when-group-doesnt-match

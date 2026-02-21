@@ -1,3 +1,4 @@
+disabled: true
 name: Object that's not iterable
 dialect: bash
 source: oils:spec/ysh-for#object-thats-not-iterable

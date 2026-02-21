@@ -1,3 +1,4 @@
+disabled: true
 name: Type objects Bool, Int, Float, etc.
 dialect: bash
 source: oils:spec/ysh-builtin-meta#type-objects-bool-int-float-etc

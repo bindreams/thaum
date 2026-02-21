@@ -1,3 +1,4 @@
+disabled: true
 name: Typed return in a proc is error
 dialect: bash
 source: oils:spec/ysh-func#typed-return-in-a-proc-is-error

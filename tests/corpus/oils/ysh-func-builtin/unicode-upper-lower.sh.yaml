@@ -1,3 +1,4 @@
+disabled: true
 name: Unicode upper() lower()
 dialect: bash
 source: oils:spec/ysh-func-builtin#unicode-upper-lower

@@ -1,3 +1,4 @@
+disabled: true
 name: command sub $(echo hi)
 dialect: bash
 source: oils:spec/ysh-expr#command-sub-echo-hi

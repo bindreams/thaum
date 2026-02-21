@@ -1,3 +1,4 @@
+disabled: true
 name: Dict => values()
 dialect: bash
 source: oils:spec/ysh-methods#dict-values

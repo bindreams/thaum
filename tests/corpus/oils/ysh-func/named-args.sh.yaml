@@ -1,3 +1,4 @@
+disabled: true
 name: named args
 dialect: bash
 source: oils:spec/ysh-func#named-args

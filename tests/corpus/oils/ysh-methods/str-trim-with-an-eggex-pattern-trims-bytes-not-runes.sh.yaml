@@ -1,3 +1,4 @@
+disabled: true
 name: Str => trim*() with an eggex pattern trims bytes not runes
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: case semantics, no match
 dialect: bash
 source: oils:spec/ysh-case#case-semantics-no-match

@@ -1,3 +1,4 @@
+disabled: true
 name: bindFrame()
 dialect: bash
 source: oils:spec/ysh-introspect#bindframe

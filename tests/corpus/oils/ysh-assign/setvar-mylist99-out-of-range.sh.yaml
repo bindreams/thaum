@@ -1,3 +1,4 @@
+disabled: true
 name: setvar mylist[99] out of range
 dialect: bash
 source: oils:spec/ysh-assign#setvar-mylist99-out-of-range

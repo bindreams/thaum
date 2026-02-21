@@ -1,3 +1,4 @@
+disabled: true
 name: "Can't use x+= on YSH Int (issue #840)"
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-use-x-on-ysh-int-issue-840

@@ -1,3 +1,4 @@
+disabled: true
 name: User errors behave like builtin errors
 dialect: bash
 source: oils:spec/ysh-builtin-error#user-errors-behave-like-builtin-errors

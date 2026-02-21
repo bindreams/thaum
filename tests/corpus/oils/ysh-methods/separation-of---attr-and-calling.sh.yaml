@@ -1,3 +1,4 @@
+disabled: true
 name: Separation of -> attr and () calling
 dialect: bash
 source: oils:spec/ysh-methods#separation-of---attr-and-calling

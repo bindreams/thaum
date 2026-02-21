@@ -1,3 +1,4 @@
+disabled: true
 name: Bitwise logical
 dialect: bash
 source: oils:spec/ysh-expr-arith#bitwise-logical

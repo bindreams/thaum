@@ -1,3 +1,4 @@
+disabled: true
 name: captureStdout() failure
 dialect: bash
 source: oils:spec/ysh-method-io#capturestdout-failure

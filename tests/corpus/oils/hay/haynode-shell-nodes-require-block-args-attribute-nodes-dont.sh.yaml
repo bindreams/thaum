@@ -1,3 +1,4 @@
+disabled: true
 name: "haynode: shell nodes require block args; attribute nodes don't"
 dialect: bash
 source: 

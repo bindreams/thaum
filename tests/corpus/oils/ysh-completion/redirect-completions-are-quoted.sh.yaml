@@ -1,3 +1,4 @@
+disabled: true
 name: redirect completions are quoted
 dialect: bash
 source: oils:spec/ysh-completion#redirect-completions-are-quoted

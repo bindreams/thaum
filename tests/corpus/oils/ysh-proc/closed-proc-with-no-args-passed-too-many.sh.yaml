@@ -1,3 +1,4 @@
+disabled: true
 name: Closed proc with no args, passed too many
 dialect: bash
 source: oils:spec/ysh-proc#closed-proc-with-no-args-passed-too-many

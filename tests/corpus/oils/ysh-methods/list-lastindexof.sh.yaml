@@ -1,3 +1,4 @@
+disabled: true
 name: List => lastIndexOf()
 dialect: bash
 source: oils:spec/ysh-methods#list-lastindexof

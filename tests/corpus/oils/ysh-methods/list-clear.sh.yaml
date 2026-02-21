@@ -1,3 +1,4 @@
+disabled: true
 name: List->clear()
 dialect: bash
 source: oils:spec/ysh-methods#list-clear

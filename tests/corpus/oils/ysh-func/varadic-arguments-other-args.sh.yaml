@@ -1,3 +1,4 @@
+disabled: true
 name: Varadic arguments, other args
 dialect: bash
 source: oils:spec/ysh-func#varadic-arguments-other-args

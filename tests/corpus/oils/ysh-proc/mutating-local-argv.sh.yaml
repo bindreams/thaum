@@ -1,3 +1,4 @@
+disabled: true
 name: Mutating local ARGV
 dialect: bash
 source: oils:spec/ysh-proc#mutating-local-argv

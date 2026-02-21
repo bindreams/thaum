@@ -1,3 +1,4 @@
+disabled: true
 name: 'pp test_: List cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-list-cycle

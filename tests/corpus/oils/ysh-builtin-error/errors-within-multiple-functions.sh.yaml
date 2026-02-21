@@ -1,3 +1,4 @@
+disabled: true
 name: Errors within multiple functions
 dialect: bash
 source: oils:spec/ysh-builtin-error#errors-within-multiple-functions

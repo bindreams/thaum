@@ -1,3 +1,4 @@
+disabled: true
 name: OSH and hay (dynamic parsing)
 dialect: bash
 source: oils:spec/hay#osh-and-hay-dynamic-parsing

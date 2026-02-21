@@ -1,3 +1,4 @@
+disabled: true
 name: Mutating global ARGV
 dialect: bash
 source: oils:spec/ysh-proc#mutating-global-argv

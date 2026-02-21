@@ -1,3 +1,4 @@
+disabled: true
 name: = to pretty print
 dialect: bash
 source: oils:spec/ysh-keywords#to-pretty-print

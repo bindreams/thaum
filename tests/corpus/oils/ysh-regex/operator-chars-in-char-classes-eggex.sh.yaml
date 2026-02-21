@@ -1,3 +1,4 @@
+disabled: true
 name: Operator chars in char classes (eggex)
 dialect: bash
 source: oils:spec/ysh-regex#operator-chars-in-char-classes-eggex

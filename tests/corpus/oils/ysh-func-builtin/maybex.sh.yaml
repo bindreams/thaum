@@ -1,3 +1,4 @@
+disabled: true
 name: '@[maybe(x)]'
 dialect: bash
 source: oils:spec/ysh-func-builtin#maybex

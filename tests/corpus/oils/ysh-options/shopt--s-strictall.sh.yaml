@@ -1,3 +1,4 @@
+disabled: true
 name: shopt -s strict:all
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-strictall

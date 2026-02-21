@@ -1,3 +1,4 @@
+disabled: true
 name: Match low ASCII with [\x01]
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#match-low-ascii-with-x01

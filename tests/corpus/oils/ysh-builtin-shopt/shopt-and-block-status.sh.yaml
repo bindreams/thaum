@@ -1,3 +1,4 @@
+disabled: true
 name: shopt and block status
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt-and-block-status

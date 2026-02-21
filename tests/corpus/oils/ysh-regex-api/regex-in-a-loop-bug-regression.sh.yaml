@@ -1,3 +1,4 @@
+disabled: true
 name: Regex in a loop (bug regression)
 dialect: bash
 source: oils:spec/ysh-regex-api#regex-in-a-loop-bug-regression

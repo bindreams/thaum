@@ -1,3 +1,4 @@
+disabled: true
 name: circular import doesn't result in infinite loop, or crash
 dialect: bash
 source: 

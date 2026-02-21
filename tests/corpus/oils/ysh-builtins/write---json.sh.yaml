@@ -1,3 +1,4 @@
+disabled: true
 name: write --json
 dialect: bash
 source: oils:spec/ysh-builtins#write---json

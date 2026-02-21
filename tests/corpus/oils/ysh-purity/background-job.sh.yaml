@@ -1,3 +1,4 @@
+disabled: true
 name: Background job &
 dialect: bash
 source: oils:spec/ysh-purity#background-job

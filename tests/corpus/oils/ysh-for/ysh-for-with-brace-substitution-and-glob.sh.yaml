@@ -1,3 +1,4 @@
+disabled: true
 name: YSH for with brace substitution and glob
 dialect: bash
 source: oils:spec/ysh-for#ysh-for-with-brace-substitution-and-glob

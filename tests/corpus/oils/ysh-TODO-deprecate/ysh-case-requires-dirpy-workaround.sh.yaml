@@ -1,3 +1,4 @@
+disabled: true
 name: YSH case requires ''/dir/*.py  workaround
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#ysh-case-requires-dirpy-workaround

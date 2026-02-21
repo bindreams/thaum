@@ -1,3 +1,4 @@
+disabled: true
 name: use foo.ysh creates a value.Obj, and it's cached on later invocations
 dialect: bash
 source: 

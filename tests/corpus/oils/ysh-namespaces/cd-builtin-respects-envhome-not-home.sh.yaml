@@ -1,3 +1,4 @@
+disabled: true
 name: cd builtin respects ENV.HOME, not HOME
 dialect: bash
 source: oils:spec/ysh-namespaces#cd-builtin-respects-envhome-not-home

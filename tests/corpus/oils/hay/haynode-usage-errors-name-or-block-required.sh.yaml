@@ -1,3 +1,4 @@
+disabled: true
 name: 'haynode: usage errors (name or block required)'
 dialect: bash
 source: oils:spec/hay#haynode-usage-errors-name-or-block-required

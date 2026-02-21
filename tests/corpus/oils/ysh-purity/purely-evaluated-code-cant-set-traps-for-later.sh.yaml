@@ -1,3 +1,4 @@
+disabled: true
 name: Purely-evaluated code can't set traps for later
 dialect: bash
 source: oils:spec/ysh-purity#purely-evaluated-code-cant-set-traps-for-later

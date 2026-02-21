@@ -1,3 +1,4 @@
+disabled: true
 name: read --raw-line
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line

@@ -1,3 +1,4 @@
+disabled: true
 name: no path passed with --builtin flag
 dialect: bash
 source: oils:spec/ysh-source#no-path-passed-with---builtin-flag

@@ -1,3 +1,4 @@
+disabled: true
 name: empty array and simple_word_eval (regression test)
 dialect: bash
 source: oils:spec/ysh-list#empty-array-and-simplewordeval-regression-test

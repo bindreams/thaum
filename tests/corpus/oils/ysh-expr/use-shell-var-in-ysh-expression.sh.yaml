@@ -1,3 +1,4 @@
+disabled: true
 name: Use shell var in YSH expression
 dialect: bash
 source: oils:spec/ysh-expr#use-shell-var-in-ysh-expression

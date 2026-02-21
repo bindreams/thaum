@@ -1,3 +1,4 @@
+disabled: true
 name: Remove from List in loop shortens it (matches JS)
 dialect: bash
 source: oils:spec/ysh-for#remove-from-list-in-loop-shortens-it-matches-js

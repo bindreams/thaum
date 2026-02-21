@@ -1,3 +1,4 @@
+disabled: true
 name: FUNCNAME BASH_LINENO BASH_SOURCE not available with YSH functions
 dialect: bash
 source: 

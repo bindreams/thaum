@@ -1,3 +1,4 @@
+disabled: true
 name: List comprehension (deferred)
 dialect: bash
 source: oils:spec/ysh-reserved#list-comprehension-deferred

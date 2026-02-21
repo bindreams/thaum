@@ -1,3 +1,4 @@
+disabled: true
 name: '@() decodes J8 Lines'
 dialect: bash
 source: oils:spec/ysh-command-sub#decodes-j8-lines

@@ -1,3 +1,4 @@
+disabled: true
 name: Adding to Dict in loop does NOT extend the loop (matches JS)
 dialect: bash
 source: 

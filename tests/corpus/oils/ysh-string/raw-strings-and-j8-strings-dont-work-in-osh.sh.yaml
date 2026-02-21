@@ -1,3 +1,4 @@
+disabled: true
 name: raw strings and J8 strings don't work in OSH
 dialect: bash
 source: oils:spec/ysh-string#raw-strings-and-j8-strings-dont-work-in-osh

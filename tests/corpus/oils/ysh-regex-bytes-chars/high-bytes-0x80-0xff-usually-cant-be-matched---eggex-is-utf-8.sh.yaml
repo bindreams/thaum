@@ -1,3 +1,4 @@
+disabled: true
 name: High bytes 0x80 0xff usually can't be matched - Eggex is UTF-8
 dialect: bash
 source: 

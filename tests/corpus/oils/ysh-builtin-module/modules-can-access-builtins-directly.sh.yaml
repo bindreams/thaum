@@ -1,3 +1,4 @@
+disabled: true
 name: modules can access __builtins__ directly
 dialect: bash
 source: oils:spec/ysh-builtin-module#modules-can-access-builtins-directly

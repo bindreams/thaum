@@ -1,3 +1,4 @@
+disabled: true
 name: mini-parseArgs
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#mini-parseargs

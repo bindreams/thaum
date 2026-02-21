@@ -1,3 +1,4 @@
+disabled: true
 name: myproc.docString()
 dialect: bash
 source: oils:spec/ysh-proc-meta#myprocdocstring

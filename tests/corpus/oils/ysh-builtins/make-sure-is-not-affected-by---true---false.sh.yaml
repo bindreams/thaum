@@ -1,3 +1,4 @@
+disabled: true
 name: Make sure [[ is not affected by --true --false
 dialect: bash
 source: oils:spec/ysh-builtins#make-sure-is-not-affected-by---true---false

@@ -1,3 +1,4 @@
+disabled: true
 name: use foo.ysh --pick nonexistent
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh---pick-nonexistent

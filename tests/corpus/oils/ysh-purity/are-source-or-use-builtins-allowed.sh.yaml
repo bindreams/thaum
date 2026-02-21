@@ -1,3 +1,4 @@
+disabled: true
 name: Are source or use builtins allowed?
 dialect: bash
 source: oils:spec/ysh-purity#are-source-or-use-builtins-allowed

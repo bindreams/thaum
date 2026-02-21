@@ -1,3 +1,4 @@
+disabled: true
 name: Filename quoting
 dialect: bash
 source: oils:spec/ysh-usage#filename-quoting

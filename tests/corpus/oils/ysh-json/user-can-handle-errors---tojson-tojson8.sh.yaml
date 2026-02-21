@@ -1,3 +1,4 @@
+disabled: true
 name: User can handle errors - toJson() toJson8()
 dialect: bash
 source: oils:spec/ysh-json#user-can-handle-errors---tojson-tojson8

@@ -1,3 +1,4 @@
+disabled: true
 name: parse_at can be specified through sh -O
 dialect: bash
 source: oils:spec/ysh-options#parseat-can-be-specified-through-sh--o

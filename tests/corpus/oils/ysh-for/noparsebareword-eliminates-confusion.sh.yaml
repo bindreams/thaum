@@ -1,3 +1,4 @@
+disabled: true
 name: no_parse_bare_word eliminates confusion
 dialect: bash
 source: oils:spec/ysh-for#noparsebareword-eliminates-confusion

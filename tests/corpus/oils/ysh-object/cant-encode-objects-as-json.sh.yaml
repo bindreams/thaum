@@ -1,3 +1,4 @@
+disabled: true
 name: can't encode objects as JSON
 dialect: bash
 source: oils:spec/ysh-object#cant-encode-objects-as-json

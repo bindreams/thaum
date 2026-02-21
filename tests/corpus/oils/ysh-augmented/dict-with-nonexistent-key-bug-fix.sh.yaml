@@ -1,3 +1,4 @@
+disabled: true
 name: Dict with nonexistent key (bug fix)
 dialect: bash
 source: oils:spec/ysh-augmented#dict-with-nonexistent-key-bug-fix

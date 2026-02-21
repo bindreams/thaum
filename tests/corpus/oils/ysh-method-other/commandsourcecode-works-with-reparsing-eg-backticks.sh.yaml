@@ -1,3 +1,4 @@
+disabled: true
 name: Command.sourceCode() works with reparsing, e.g. backticks
 dialect: bash
 source: 

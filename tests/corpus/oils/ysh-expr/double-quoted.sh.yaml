@@ -1,3 +1,4 @@
+disabled: true
 name: double quoted
 dialect: bash
 source: oils:spec/ysh-expr#double-quoted

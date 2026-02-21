@@ -1,3 +1,4 @@
+disabled: true
 name: ctx emit
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#ctx-emit

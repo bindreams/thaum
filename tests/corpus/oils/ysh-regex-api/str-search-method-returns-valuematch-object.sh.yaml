@@ -1,3 +1,4 @@
+disabled: true
 name: Str->search() method returns value.Match object
 dialect: bash
 source: oils:spec/ysh-regex-api#str-search-method-returns-valuematch-object

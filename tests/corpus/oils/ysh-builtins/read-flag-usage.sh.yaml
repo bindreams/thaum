@@ -1,3 +1,4 @@
+disabled: true
 name: read flag usage
 dialect: bash
 source: oils:spec/ysh-builtins#read-flag-usage

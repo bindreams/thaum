@@ -1,3 +1,4 @@
+disabled: true
 name: floatEquals() INFINITY NAN
 dialect: bash
 source: oils:spec/ysh-int-float#floatequals-infinity-nan

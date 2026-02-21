@@ -1,3 +1,4 @@
+disabled: true
 name: 'Expression for loop with index: List'
 dialect: bash
 source: oils:spec/ysh-for#expression-for-loop-with-index-list

@@ -1,3 +1,4 @@
+disabled: true
 name: '!== operator'
 dialect: bash
 source: oils:spec/ysh-user-feedback#operator

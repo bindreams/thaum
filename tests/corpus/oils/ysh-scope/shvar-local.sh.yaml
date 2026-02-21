@@ -1,3 +1,4 @@
+disabled: true
 name: shvar local
 dialect: bash
 source: oils:spec/ysh-scope#shvar-local

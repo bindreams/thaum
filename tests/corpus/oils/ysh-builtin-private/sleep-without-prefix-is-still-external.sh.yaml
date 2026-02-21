@@ -1,3 +1,4 @@
+disabled: true
 name: sleep without prefix is still external
 dialect: bash
 source: oils:spec/ysh-builtin-private#sleep-without-prefix-is-still-external

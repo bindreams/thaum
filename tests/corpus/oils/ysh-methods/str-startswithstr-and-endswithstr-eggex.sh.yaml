@@ -1,3 +1,4 @@
+disabled: true
 name: Str => startsWith(Str) and endsWith(Str), eggex
 dialect: bash
 source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex

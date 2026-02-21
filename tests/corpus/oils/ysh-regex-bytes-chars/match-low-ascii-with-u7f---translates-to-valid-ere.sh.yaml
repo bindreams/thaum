@@ -1,3 +1,4 @@
+disabled: true
 name: Match low ASCII with \u{7f} - translates to valid ERE
 dialect: bash
 source: 

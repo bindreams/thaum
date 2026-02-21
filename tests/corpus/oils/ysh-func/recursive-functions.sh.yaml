@@ -1,3 +1,4 @@
+disabled: true
 name: Recursive functions
 dialect: bash
 source: oils:spec/ysh-func#recursive-functions

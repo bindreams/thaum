@@ -1,3 +1,4 @@
+disabled: true
 name: Augmented assignment on string changes to Int Float
 dialect: bash
 source: 

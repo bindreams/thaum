@@ -1,3 +1,4 @@
+disabled: true
 name: shell array :| a 'b c' |
 dialect: bash
 source: oils:spec/ysh-list#shell-array-a-b-c

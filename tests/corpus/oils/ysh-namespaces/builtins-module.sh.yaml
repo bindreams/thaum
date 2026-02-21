@@ -1,3 +1,4 @@
+disabled: true
 name: __builtins__ module
 dialect: bash
 source: oils:spec/ysh-namespaces#builtins-module

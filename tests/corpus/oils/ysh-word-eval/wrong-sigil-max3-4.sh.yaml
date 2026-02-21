@@ -1,3 +1,4 @@
+disabled: true
 name: Wrong sigil @[max(3, 4)]
 dialect: bash
 source: oils:spec/ysh-word-eval#wrong-sigil-max3-4

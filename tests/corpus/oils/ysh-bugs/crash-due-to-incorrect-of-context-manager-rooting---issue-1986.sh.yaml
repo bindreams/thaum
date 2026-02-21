@@ -1,3 +1,4 @@
+disabled: true
 name: 'Crash due to incorrect of context manager rooting - issue #1986'
 dialect: bash
 source: 

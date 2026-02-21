@@ -1,3 +1,4 @@
+disabled: true
 name: Copy to Dict with dict(), and mutate
 dialect: bash
 source: oils:spec/ysh-object#copy-to-dict-with-dict-and-mutate

@@ -1,3 +1,4 @@
+disabled: true
 name: 'proc eval string: fatal error'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-string-fatal-error

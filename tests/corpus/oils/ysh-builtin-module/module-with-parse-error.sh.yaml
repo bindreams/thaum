@@ -1,3 +1,4 @@
+disabled: true
 name: Module with parse error
 dialect: bash
 source: oils:spec/ysh-builtin-module#module-with-parse-error

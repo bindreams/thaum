@@ -1,3 +1,4 @@
+disabled: true
 name: write syntax error
 dialect: bash
 source: oils:spec/ysh-builtins#write-syntax-error

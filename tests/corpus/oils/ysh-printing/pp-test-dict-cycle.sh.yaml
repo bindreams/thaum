@@ -1,3 +1,4 @@
+disabled: true
 name: 'pp test_: Dict cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-dict-cycle

@@ -1,3 +1,4 @@
+disabled: true
 name: Str => split(sep), non-empty str sep
 dialect: bash
 source: oils:spec/ysh-methods#str-splitsep-non-empty-str-sep

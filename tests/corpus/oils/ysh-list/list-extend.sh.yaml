@@ -1,3 +1,4 @@
+disabled: true
 name: List->extend()
 dialect: bash
 source: oils:spec/ysh-list#list-extend

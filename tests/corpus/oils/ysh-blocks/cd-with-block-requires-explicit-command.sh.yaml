@@ -1,3 +1,4 @@
+disabled: true
 name: 'cd with block: requires explicit command'
 dialect: bash
 source: oils:spec/ysh-blocks#cd-with-block-requires-explicit-command

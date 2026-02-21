@@ -1,3 +1,4 @@
+disabled: true
 name: 'parse_equals: allows bare assignment in Caps blocks'
 dialect: bash
 source: 

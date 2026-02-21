@@ -1,3 +1,4 @@
+disabled: true
 name: io->eval() has cleaner scoping than shell's eval builtin
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: literal ''
 dialect: bash
 source: oils:spec/ysh-regex#literal

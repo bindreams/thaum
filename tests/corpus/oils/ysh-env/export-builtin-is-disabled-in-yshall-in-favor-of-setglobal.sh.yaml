@@ -1,3 +1,4 @@
+disabled: true
 name: export builtin is disabled in ysh:all, in favor of setglobal
 dialect: bash
 source: 

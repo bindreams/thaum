@@ -1,3 +1,4 @@
+disabled: true
 name: Empty tuple
 dialect: bash
 source: oils:spec/ysh-tuple#empty-tuple

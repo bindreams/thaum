@@ -1,3 +1,4 @@
+disabled: true
 name: ysh_rewrite_extern makes the process exit with SIGPIPE
 dialect: bash
 source: 

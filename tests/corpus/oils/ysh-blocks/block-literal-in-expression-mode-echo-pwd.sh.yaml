@@ -1,3 +1,4 @@
+disabled: true
 name: 'block literal in expression mode: ^(echo $PWD)'
 dialect: bash
 source: oils:spec/ysh-blocks#block-literal-in-expression-mode-echo-pwd

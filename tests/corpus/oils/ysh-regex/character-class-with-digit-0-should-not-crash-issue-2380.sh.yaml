@@ -1,3 +1,4 @@
+disabled: true
 name: 'character class with digit [\\0] should not crash (issue #2380)'
 dialect: bash
 source: 

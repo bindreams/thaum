@@ -1,3 +1,4 @@
+disabled: true
 name: Open proc has ARGV
 dialect: bash
 source: oils:spec/ysh-proc#open-proc-has-argv

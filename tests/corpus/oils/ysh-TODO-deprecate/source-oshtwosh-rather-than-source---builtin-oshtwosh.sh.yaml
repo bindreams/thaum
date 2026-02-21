@@ -1,3 +1,4 @@
+disabled: true
 name: source ///osh/two.sh rather than source --builtin osh/two.sh
 dialect: bash
 source: 

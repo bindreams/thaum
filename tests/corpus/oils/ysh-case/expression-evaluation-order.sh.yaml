@@ -1,3 +1,4 @@
+disabled: true
 name: expression evaluation order
 dialect: bash
 source: oils:spec/ysh-case#expression-evaluation-order

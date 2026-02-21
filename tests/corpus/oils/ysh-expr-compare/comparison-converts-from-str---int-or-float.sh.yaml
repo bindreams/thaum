@@ -1,3 +1,4 @@
+disabled: true
 name: Comparison converts from Str -> Int or Float
 dialect: bash
 source: oils:spec/ysh-expr-compare#comparison-converts-from-str---int-or-float

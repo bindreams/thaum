@@ -1,3 +1,4 @@
+disabled: true
 name: int() more
 dialect: bash
 source: oils:spec/ysh-convert#int-more

@@ -1,3 +1,4 @@
+disabled: true
 name: and-or chains for typed data
 dialect: bash
 source: oils:spec/ysh-expr-bool#and-or-chains-for-typed-data

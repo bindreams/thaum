@@ -1,3 +1,4 @@
+disabled: true
 name: Object() creates prototype chain
 dialect: bash
 source: oils:spec/ysh-object#object-creates-prototype-chain

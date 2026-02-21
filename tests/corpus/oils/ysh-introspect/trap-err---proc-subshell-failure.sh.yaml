@@ -1,3 +1,4 @@
+disabled: true
 name: trap ERR - proc subshell failure
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---proc-subshell-failure

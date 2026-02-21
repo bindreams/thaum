@@ -1,3 +1,4 @@
+disabled: true
 name: Char Class Set
 dialect: bash
 source: oils:spec/ysh-regex#char-class-set

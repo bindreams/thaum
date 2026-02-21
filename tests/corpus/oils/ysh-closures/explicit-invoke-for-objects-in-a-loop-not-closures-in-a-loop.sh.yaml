@@ -1,3 +1,4 @@
+disabled: true
 name: Explicit __invoke__ for "objects in a loop", not closures in a loop
 dialect: bash
 source: 

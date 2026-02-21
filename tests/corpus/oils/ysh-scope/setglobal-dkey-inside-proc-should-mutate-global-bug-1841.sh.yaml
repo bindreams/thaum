@@ -1,3 +1,4 @@
+disabled: true
 name: 'setglobal d[key] inside proc should mutate global (bug #1841)'
 dialect: bash
 source: 

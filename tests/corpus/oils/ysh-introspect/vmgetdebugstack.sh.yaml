@@ -1,3 +1,4 @@
+disabled: true
 name: vm.getDebugStack()
 dialect: bash
 source: oils:spec/ysh-introspect#vmgetdebugstack

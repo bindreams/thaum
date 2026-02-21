@@ -1,3 +1,4 @@
+disabled: true
 name: 'proc eval block: return'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-block-return

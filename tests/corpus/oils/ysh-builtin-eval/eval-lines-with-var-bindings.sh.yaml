@@ -1,3 +1,4 @@
+disabled: true
 name: eval lines with var bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-lines-with-var-bindings

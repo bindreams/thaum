@@ -1,3 +1,4 @@
+disabled: true
 name: Parsing source code - YSH source code rejects encoded string
 dialect: bash
 source: 

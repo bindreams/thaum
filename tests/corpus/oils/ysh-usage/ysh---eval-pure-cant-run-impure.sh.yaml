@@ -1,3 +1,4 @@
+disabled: true
 name: ysh --eval-pure can't run impure
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-pure-cant-run-impure

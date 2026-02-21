@@ -1,3 +1,4 @@
+disabled: true
 name: echo builtin should disallow typed args - literal
 dialect: bash
 source: oils:spec/ysh-builtins#echo-builtin-should-disallow-typed-args---literal

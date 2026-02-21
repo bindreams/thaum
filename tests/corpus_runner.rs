@@ -14,6 +14,29 @@ static DOCKER_AVAILABLE: AtomicBool = AtomicBool::new(false);
 // Test spec schema
 // ---------------------------------------------------------------------------
 
+/// Supports `disabled: true` or `disabled: { reason: "..." }`. Default: false.
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum Disabled {
+    Bool(bool),
+    WithReason { reason: String },
+}
+
+impl Default for Disabled {
+    fn default() -> Self {
+        Disabled::Bool(false)
+    }
+}
+
+impl Disabled {
+    fn is_disabled(&self) -> bool {
+        match self {
+            Disabled::Bool(b) => *b,
+            Disabled::WithReason { .. } => true,
+        }
+    }
+}
+
 #[derive(Deserialize)]
 struct TestSpec {
     name: String,
@@ -21,6 +44,9 @@ struct TestSpec {
     tags: Vec<String>,
     dialect: String,
     source: Option<String>,
+
+    #[serde(default)]
+    disabled: Disabled,
 
     #[serde(rename = "is-valid", default = "default_true")]
     is_valid: bool,
@@ -385,8 +411,10 @@ fn main() {
 
             let test_name = parsed.spec.name.clone();
             let display_name = format!("{} ({})", rel, test_name);
+            let disabled = parsed.spec.disabled.is_disabled();
 
-            Some(Trial::test(display_name, move || run_test(&parsed)))
+            Some(Trial::test(display_name, move || run_test(&parsed))
+                .with_ignored_flag(disabled))
         })
         .collect();
 

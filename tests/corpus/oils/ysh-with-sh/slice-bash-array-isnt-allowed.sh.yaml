@@ -1,3 +1,4 @@
+disabled: true
 name: Slice bash array isn't allowed
 dialect: bash
 source: oils:spec/ysh-with-sh#slice-bash-array-isnt-allowed

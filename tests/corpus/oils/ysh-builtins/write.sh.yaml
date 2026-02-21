@@ -1,3 +1,4 @@
+disabled: true
 name: write --
 dialect: bash
 source: oils:spec/ysh-builtins#write

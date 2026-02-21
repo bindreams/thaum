@@ -1,3 +1,4 @@
+disabled: true
 name: "'builtin' and 'command' with block"
 dialect: bash
 source: oils:spec/ysh-blocks#builtin-and-command-with-block

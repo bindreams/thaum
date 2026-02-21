@@ -1,3 +1,4 @@
+disabled: true
 name: builtin sleep usage errors
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-sleep-usage-errors

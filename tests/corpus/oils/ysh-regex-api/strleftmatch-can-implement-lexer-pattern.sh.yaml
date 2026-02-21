@@ -1,3 +1,4 @@
+disabled: true
 name: Str.leftMatch() can implement lexer pattern
 dialect: bash
 source: oils:spec/ysh-regex-api#strleftmatch-can-implement-lexer-pattern

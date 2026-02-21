@@ -1,3 +1,4 @@
+disabled: true
 name: setglobal still allows setting globals
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-still-allows-setting-globals

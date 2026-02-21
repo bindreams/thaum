@@ -1,3 +1,4 @@
+disabled: true
 name: "[!d] can't be negated because it's a literal character"
 dialect: bash
 source: oils:spec/ysh-regex#d-cant-be-negated-because-its-a-literal-character

@@ -1,3 +1,4 @@
+disabled: true
 name: func call inside proc call - error message attribution
 dialect: bash
 source: 

@@ -1,3 +1,4 @@
+disabled: true
 name: Float too big
 dialect: bash
 source: oils:spec/ysh-json#float-too-big

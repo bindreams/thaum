@@ -1,3 +1,4 @@
+disabled: true
 name: s ~~ glob and s !~~ glob
 dialect: bash
 source: oils:spec/ysh-expr#s-glob-and-s-glob

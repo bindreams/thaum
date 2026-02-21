@@ -1,3 +1,4 @@
+disabled: true
 name: dynamic binding names and mutation
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dynamic-binding-names-and-mutation

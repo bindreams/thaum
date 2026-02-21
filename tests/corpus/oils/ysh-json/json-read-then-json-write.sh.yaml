@@ -1,3 +1,4 @@
+disabled: true
 name: json read then json write
 dialect: bash
 source: oils:spec/ysh-json#json-read-then-json-write

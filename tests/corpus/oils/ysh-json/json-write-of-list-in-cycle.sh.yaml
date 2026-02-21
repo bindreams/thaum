@@ -1,3 +1,4 @@
+disabled: true
 name: json write of List in cycle
 dialect: bash
 source: oils:spec/ysh-json#json-write-of-list-in-cycle

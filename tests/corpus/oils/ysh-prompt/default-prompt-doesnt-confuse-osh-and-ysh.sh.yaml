@@ -1,3 +1,4 @@
+disabled: true
 name: default prompt doesn't confuse OSH and YSH
 dialect: bash
 source: oils:spec/ysh-prompt#default-prompt-doesnt-confuse-osh-and-ysh

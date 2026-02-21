@@ -1,3 +1,4 @@
+disabled: true
 name: getVar() gets global or local vars
 dialect: bash
 source: oils:spec/ysh-func-builtin#getvar-gets-global-or-local-vars

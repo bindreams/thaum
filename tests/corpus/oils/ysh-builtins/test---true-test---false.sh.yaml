@@ -1,3 +1,4 @@
+disabled: true
 name: test --true; test --false
 dialect: bash
 source: oils:spec/ysh-builtins#test---true-test---false

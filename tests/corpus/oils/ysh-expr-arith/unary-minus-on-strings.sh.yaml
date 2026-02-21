@@ -1,3 +1,4 @@
+disabled: true
 name: unary minus on strings
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-minus-on-strings

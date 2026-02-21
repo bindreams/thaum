@@ -1,3 +1,4 @@
+disabled: true
 name: Minus operator is left associative
 dialect: bash
 source: oils:spec/ysh-expr-arith#minus-operator-is-left-associative

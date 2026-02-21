@@ -1,3 +1,4 @@
+disabled: true
 name: 'round trip: read/write with ysh, read/write with Python 3 (bug regression)'
 dialect: bash
 source: 

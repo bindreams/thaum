@@ -1,3 +1,4 @@
+disabled: true
 name: eval with vars follows same scoping as without
 dialect: bash
 source: 

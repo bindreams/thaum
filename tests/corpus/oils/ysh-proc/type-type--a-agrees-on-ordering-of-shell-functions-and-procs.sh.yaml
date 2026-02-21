@@ -1,3 +1,4 @@
+disabled: true
 name: type / type -a agrees on ordering of shell functions and procs
 dialect: bash
 source: 

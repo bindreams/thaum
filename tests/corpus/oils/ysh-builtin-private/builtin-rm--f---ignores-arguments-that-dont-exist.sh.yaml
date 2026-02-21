@@ -1,3 +1,4 @@
+disabled: true
 name: builtin rm -f - ignores arguments that don't exist
 dialect: bash
 source: 

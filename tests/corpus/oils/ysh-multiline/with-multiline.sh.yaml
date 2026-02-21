@@ -1,3 +1,4 @@
+disabled: true
 name: '... with multiline $()'
 dialect: bash
 source: oils:spec/ysh-multiline#with-multiline

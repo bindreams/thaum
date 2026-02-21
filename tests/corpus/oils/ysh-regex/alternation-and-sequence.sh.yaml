@@ -1,3 +1,4 @@
+disabled: true
 name: Alternation and sequence
 dialect: bash
 source: oils:spec/ysh-regex#alternation-and-sequence

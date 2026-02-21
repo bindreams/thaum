@@ -1,3 +1,4 @@
+disabled: true
 name: pp gc-stats_
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-gc-stats

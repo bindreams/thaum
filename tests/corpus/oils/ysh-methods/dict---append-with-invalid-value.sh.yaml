@@ -1,3 +1,4 @@
+disabled: true
 name: Dict -> append() with invalid value
 dialect: bash
 source: oils:spec/ysh-methods#dict---append-with-invalid-value

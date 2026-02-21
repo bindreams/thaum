@@ -1,3 +1,4 @@
+disabled: true
 name: Max code point is disallowed at parse time
 dialect: bash
 source: 

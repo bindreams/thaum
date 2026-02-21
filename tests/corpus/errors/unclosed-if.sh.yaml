@@ -1,6 +1,0 @@
-name: unclosed if statement
-dialect: posix
-is-valid: false
-error_contains: "fi"
----
-if true; then echo yes

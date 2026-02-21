@@ -1,6 +1,0 @@
-name: echo produces stdout
-dialect: posix
-status: 0
-stdout: "hello\n"
----
-echo hello

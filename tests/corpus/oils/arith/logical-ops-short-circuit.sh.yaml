@@ -1,0 +1,14 @@
+name: Logical Ops Short Circuit
+dialect: bash
+source: oils:spec/arith#logical-ops-short-circuit
+stdout: "11\n33\n33\n55\n"
+---
+x=11
+(( 1 || (x = 22) ))
+echo $x
+(( 0 || (x = 33) ))
+echo $x
+(( 0 && (x = 44) ))
+echo $x
+(( 1 && (x = 55) ))
+echo $x

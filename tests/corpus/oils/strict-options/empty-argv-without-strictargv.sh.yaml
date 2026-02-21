@@ -1,0 +1,28 @@
+name: empty argv WITHOUT strict_argv
+dialect: bash
+source: oils:spec/strict-options#empty-argv-without-strictargv
+stdout: "status=0\nVarSub\nCommandSub\nVarSub FAILED\nCommandSub FAILED\n"
+---
+x=''
+$x
+echo status=$?
+
+if $x; then
+  echo VarSub
+fi
+
+if $(echo foo >/dev/null); then
+  echo CommandSub
+fi
+
+if "$x"; then
+  echo VarSub
+else
+  echo VarSub FAILED
+fi
+
+if "$(echo foo >/dev/null)"; then
+  echo CommandSub
+else
+  echo CommandSub FAILED
+fi

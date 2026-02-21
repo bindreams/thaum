@@ -1,0 +1,15 @@
+name: json read passed invalid args
+dialect: bash
+source: oils:spec/ysh-json#json-read-passed-invalid-args
+stdout: "status=1\nstatus=2\nstatus=2\n"
+---
+
+# EOF
+json read
+echo status=$?
+
+json read 'z z'
+echo status=$?
+
+json read a b c
+echo status=$?

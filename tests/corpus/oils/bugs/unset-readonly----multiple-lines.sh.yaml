@@ -1,0 +1,7 @@
+name: unset readonly -- multiple lines
+dialect: bash
+source: oils:spec/bugs#unset-readonly----multiple-lines
+---
+readonly x=1
+unset x
+echo hi

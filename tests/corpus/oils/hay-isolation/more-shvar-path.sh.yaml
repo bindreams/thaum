@@ -1,0 +1,21 @@
+name: More shvar PATH=''
+dialect: bash
+source: oils:spec/hay-isolation#more-shvar-path
+stdout: "status=127\nstatus=127\n_status 127\n"
+---
+shopt --set parse_brace command_sub_errexit parse_proc parse_ysh_expr_sub
+
+shvar PATH='' {
+  ( cp -v file /tmp >&2 )
+  echo status=$?
+
+  forkwait {
+    cp -v file /tmp >&2
+  }
+  echo status=$?
+
+  try {
+    true $(cp -v file /tmp >&2)
+  }
+  echo _status $[_error.code]
+}

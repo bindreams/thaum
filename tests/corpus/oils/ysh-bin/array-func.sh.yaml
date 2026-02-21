@@ -1,0 +1,6 @@
+name: Array func
+dialect: bash
+source: oils:spec/ysh-bin#array-func
+stdout: "foo\nbar\n"
+---
+write @[split('foo bar')]

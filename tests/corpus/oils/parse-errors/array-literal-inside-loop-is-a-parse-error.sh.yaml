@@ -1,0 +1,13 @@
+name: array literal inside loop is a parse error
+dialect: bash
+source: oils:spec/parse-errors#array-literal-inside-loop-is-a-parse-error
+status: 2
+stdout: ''
+---
+f() {
+  for x in a=(); do
+    echo x=$x
+  done
+  echo done
+}
+f

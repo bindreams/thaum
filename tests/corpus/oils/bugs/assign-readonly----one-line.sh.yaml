@@ -1,0 +1,7 @@
+name: assign readonly -- one line
+dialect: bash
+source: oils:spec/bugs#assign-readonly----one-line
+status: 1
+stdout: "\n"
+---
+readonly x=1; x=2; echo hi

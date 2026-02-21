@@ -1,0 +1,24 @@
+name: printf -v a[i] respects dynamic_scope
+dialect: bash
+source: oils:spec/ysh-scope#printf--v-ai-respects-dynamicscope
+stdout: "a[1]=42\na[1]=dynamic-scope\na[1]=\n---\na[1]=42\na[1]=42\na[1]=\n"
+---
+set -o errexit
+
+set-item() {
+  printf -v 'a[1]' "%s" dynamic-scope
+}
+demo() {
+  local -a a=(41 42 43)
+  echo "a[1]=${a[1]}"
+  set-item
+  echo "a[1]=${a[1]}"
+}
+demo
+echo "a[1]=${a[1]}"
+
+echo ---
+
+shopt --unset dynamic_scope  # should NOT affect read
+demo
+echo "a[1]=${a[1]}"

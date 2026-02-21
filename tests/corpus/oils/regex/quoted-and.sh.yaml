@@ -1,0 +1,30 @@
+name: Quoted { and +
+dialect: bash
+source: oils:spec/regex#quoted-and
+stdout: "yes {\nyes +\nyes *\nyes ?\nyes ^\nyes $\nyes (\nyes )\nyes |\nyes \\\n---\n\
+  yes .\nno .\n---\na 0\n- 1\nb 0\nz 0\nstatus=0\n"
+---
+[[ { =~ "{" ]] && echo 'yes {'
+[[ + =~ "+" ]] && echo 'yes +'
+[[ * =~ "*" ]] && echo 'yes *'
+[[ ? =~ "?" ]] && echo 'yes ?'
+[[ ^ =~ "^" ]] && echo 'yes ^'
+[[ $ =~ "$" ]] && echo 'yes $'
+[[ '(' =~ '(' ]] && echo 'yes ('
+[[ ')' =~ ')' ]] && echo 'yes )'
+[[ '|' =~ '|' ]] && echo 'yes |'
+[[ '\' =~ '\' ]] && echo 'yes \'
+echo ---
+
+[[ . =~ "." ]] && echo 'yes .'
+[[ z =~ "." ]] || echo 'no .'
+echo ---
+
+# This rule is weird but all shells agree.  I would expect that the - gets
+# escaped?  It's an operator?  but it behaves like a-z.
+[[ a =~ ["a-z"] ]]; echo "a $?"
+[[ - =~ ["a-z"] ]]; echo "- $?"
+[[ b =~ ['a-z'] ]]; echo "b $?"
+[[ z =~ ['a-z'] ]]; echo "z $?"
+
+echo status=$?

@@ -1,0 +1,9 @@
+name: list() from Dict
+dialect: bash
+source: oils:spec/ysh-convert#list-from-dict
+stdout: "a\nfoo\n"
+---
+shopt -s ysh:upgrade
+
+var a = list({'a': 1, 'foo': 'bar'})
+write @a

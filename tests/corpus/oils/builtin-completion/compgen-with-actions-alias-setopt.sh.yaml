@@ -1,0 +1,9 @@
+name: 'compgen with actions: alias, setopt'
+dialect: bash
+source: oils:spec/builtin-completion#compgen-with-actions-alias-setopt
+stdout: "v_alias\nv_alias2\nverbose\nvi\n"
+---
+alias v_alias='ls'
+alias v_alias2='ls'
+alias a1='ls'
+compgen -A alias -A setopt v

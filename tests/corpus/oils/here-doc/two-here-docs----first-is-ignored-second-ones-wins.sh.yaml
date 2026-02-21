@@ -1,0 +1,10 @@
+name: Two here docs -- first is ignored; second ones wins!
+dialect: bash
+source: oils:spec/here-doc#two-here-docs----first-is-ignored-second-ones-wins
+stdout: "there\n"
+---
+<<EOF1 cat <<EOF2
+hello
+EOF1
+there
+EOF2

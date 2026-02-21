@@ -1,0 +1,23 @@
+name: Are source or use builtins allowed?
+dialect: bash
+source: oils:spec/ysh-purity#are-source-or-use-builtins-allowed
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+# Problem: they cna "steal" information with directory traversal attacks?
+# maybe only allow them in the same dirs
+#
+# Or maybe have a $PATH - $OILS_LIB_PATH
+# and it can only be set by the caller, via command line flag?
+#
+# ysh --oils-path dir1:dir2 --eval
+#
+# use foo.ysh  # relative to the path
+
+var cmd = ^(
+  source foo.ysh
+  use foo.ysh
+)
+
+call eval (cmd)

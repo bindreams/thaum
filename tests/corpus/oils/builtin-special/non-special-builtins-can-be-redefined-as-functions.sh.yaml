@@ -1,0 +1,12 @@
+name: Non-special builtins CAN be redefined as functions
+dialect: bash
+source: 
+  oils:spec/builtin-special#non-special-builtins-can-be-redefined-as-functions
+stdout: "true func\nstatus=0\n"
+---
+test -n "$BASH_VERSION" && set -o posix
+true() {
+  echo 'true func'
+}
+true hi
+echo status=$?

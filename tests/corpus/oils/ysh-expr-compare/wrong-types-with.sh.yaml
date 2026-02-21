@@ -1,0 +1,19 @@
+name: Wrong Types with ~==
+dialect: bash
+source: oils:spec/ysh-expr-compare#wrong-types-with
+status: 1
+stdout: "one\n"
+---
+shopt -s ysh:all
+
+# The LHS side should be a string
+
+echo one
+if (['1'] ~== ['1']) {
+  echo bad
+}
+echo two
+
+if (3 ~== 3) {
+  echo bad
+}

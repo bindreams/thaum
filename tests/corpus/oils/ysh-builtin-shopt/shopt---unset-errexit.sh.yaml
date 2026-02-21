@@ -1,0 +1,18 @@
+name: shopt --unset errexit { }
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt---unset-errexit
+status: 1
+stdout: "one\ntwo\nthree\n"
+---
+shopt --set oil:all
+
+echo one
+
+shopt --unset errexit {
+  echo two
+  false
+  echo three
+}
+
+false
+echo 'should not get here'

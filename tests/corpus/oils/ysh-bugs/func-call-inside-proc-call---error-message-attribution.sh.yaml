@@ -1,0 +1,25 @@
+name: func call inside proc call - error message attribution
+dialect: bash
+source: 
+  oils:spec/ysh-bugs#func-call-inside-proc-call---error-message-attribution
+stdout: "\n"
+---
+
+try 2> foo {
+  $[ENV.SH] -c '
+func ident(x) {
+  return (x)
+}
+
+proc p (; x) {
+  echo $x
+}
+
+# BUG: it points to ( in ident(
+#      should point to ( in eval (
+
+eval (ident([1,2,3]))
+'
+}
+
+cat foo

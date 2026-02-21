@@ -1,0 +1,11 @@
+name: Dynamic alias definition
+dialect: bash
+source: oils:spec/alias#dynamic-alias-definition
+stdout: "X\n"
+---
+shopt -s expand_aliases  # bash requires this
+x=x
+name='echo_alias_'
+val='=echo'
+alias "$name$val"
+echo_alias_ X

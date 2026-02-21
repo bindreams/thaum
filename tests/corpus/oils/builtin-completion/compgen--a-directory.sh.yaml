@@ -1,0 +1,7 @@
+name: compgen -A directory
+dialect: bash
+source: oils:spec/builtin-completion#compgen--a-directory
+stdout: "client\ncore\ncpp\n"
+---
+cd $REPO_ROOT
+compgen -A directory c | sort

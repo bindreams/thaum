@@ -1,0 +1,18 @@
+name: Range
+dialect: bash
+source: oils:spec/ysh-printing#range
+stdout: "(Range 1 ..< 100)\n(Dict)  {k: (Range 1 ..< 100)}\n\n<Range>\n(Dict)   {\"\
+  k\":<Range>}\n"
+---
+var x = 1..<100
+
+pp value (x)
+
+# TODO: show type here, like (Range 1 ..< 100)
+
+pp value ({k: x})
+
+echo
+
+pp test_ (x)
+pp test_ ({k: x})

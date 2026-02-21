@@ -1,0 +1,8 @@
+name: Slice with arithmetic
+dialect: bash
+source: oils:spec/array#slice-with-arithmetic
+stdout: "['2', '3']\n"
+---
+a=(1 2 3)
+i=5
+argv.py "${a[@]:i-4:2}"

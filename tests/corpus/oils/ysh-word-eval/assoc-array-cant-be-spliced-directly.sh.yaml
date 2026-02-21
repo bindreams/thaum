@@ -1,0 +1,19 @@
+name: Assoc array can't be spliced directly
+dialect: bash
+source: oils:spec/ysh-word-eval#assoc-array-cant-be-spliced-directly
+status: 3
+stdout: "bar\neggs\n"
+---
+
+shopt -s ysh:upgrade
+declare -A A=([foo]=bar [spam]=eggs)
+
+# Bash behavior is to splice values
+write -- "${A[@]}"
+
+write -- @A
+echo 'should not get here'
+
+# These should eventually work
+#write -- @[A->keys()]
+#write -- @[A->values()]

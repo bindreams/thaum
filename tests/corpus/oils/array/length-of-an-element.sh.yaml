@@ -1,0 +1,7 @@
+name: Length of an element
+dialect: bash
+source: oils:spec/array#length-of-an-element
+stdout: "3\n"
+---
+a=(1 '2 3')
+echo "${#a[1]}"

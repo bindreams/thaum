@@ -1,0 +1,14 @@
+name: ulimit too many args
+dialect: bash
+source: oils:spec/builtin-process#ulimit-too-many-args
+stdout: "pass\n"
+---
+
+ulimit 1 2
+if test $? -ne 0; then
+  echo pass
+else
+  echo fail
+fi
+
+#ulimit -f

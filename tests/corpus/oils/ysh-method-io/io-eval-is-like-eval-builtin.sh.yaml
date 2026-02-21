@@ -1,0 +1,11 @@
+name: io->eval() is like eval builtin
+dialect: bash
+source: oils:spec/ysh-method-io#io-eval-is-like-eval-builtin
+stdout: "one\ntwo\nstatus=null\n"
+---
+
+var c = ^(echo one; echo two)
+var status = io->eval(c)
+
+# doesn't return anything
+echo status=$status

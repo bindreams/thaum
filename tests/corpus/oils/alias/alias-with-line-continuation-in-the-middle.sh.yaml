@@ -1,0 +1,14 @@
+name: alias with line continuation in the middle
+dialect: bash
+source: oils:spec/alias#alias-with-line-continuation-in-the-middle
+stdout: "ONE TWO ONE TWO THREE two one\n"
+---
+shopt -s expand_aliases
+alias e_='echo '
+alias one='ONE '
+alias two='TWO '
+alias three='THREE'  # no trailing space
+e_ one \
+  two one \
+  two three two \
+  one

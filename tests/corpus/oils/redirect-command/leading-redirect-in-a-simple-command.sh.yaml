@@ -1,0 +1,7 @@
+name: Leading redirect in a simple command
+dialect: bash
+source: oils:spec/redirect-command#leading-redirect-in-a-simple-command
+stdout: "hello\n"
+---
+echo hello >$TMP/hello.txt  # temporary fix
+<$TMP/hello.txt cat

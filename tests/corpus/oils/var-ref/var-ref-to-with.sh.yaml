@@ -1,0 +1,8 @@
+name: var ref to $@ with @
+dialect: bash
+source: oils:spec/var-ref#var-ref-to-with
+stdout: "ref=one two\n"
+---
+set -- one two
+ref='@'
+echo ref=${!ref}

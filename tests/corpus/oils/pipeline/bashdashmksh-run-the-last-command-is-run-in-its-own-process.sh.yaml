@@ -1,0 +1,8 @@
+name: bash/dash/mksh run the last command is run in its own process
+dialect: bash
+source: 
+  oils:spec/pipeline#bashdashmksh-run-the-last-command-is-run-in-its-own-process
+stdout: "line=hi\n"
+---
+echo hi | read line
+echo "line=$line"

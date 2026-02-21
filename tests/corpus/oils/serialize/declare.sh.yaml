@@ -1,0 +1,11 @@
+name: declare
+dialect: bash
+source: oils:spec/serialize#declare
+stdout: "zz=$'one\\ntwo'\ndeclare -- zz=$'one\\ntwo'\n"
+---
+case $SH in ash|zsh) return ;; esac  # zsh doesn't make much sense
+
+zz=$'one\ntwo'
+
+typeset | grep zz
+typeset -p zz

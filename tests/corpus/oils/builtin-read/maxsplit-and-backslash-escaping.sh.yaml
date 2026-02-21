@@ -1,0 +1,8 @@
+name: max_split and backslash escaping
+dialect: bash
+source: oils:spec/builtin-read#maxsplit-and-backslash-escaping
+stdout: "['Aa', 'b  a b']\n['Aa', 'b', ' a b']\n['Aa', 'b', ' a b', '']\n"
+---
+echo 'Aa b \ a\ b' | (read a b; argv.py "$a" "$b")
+echo 'Aa b \ a\ b' | (read a b c; argv.py "$a" "$b" "$c")
+echo 'Aa b \ a\ b' | (read a b c d; argv.py "$a" "$b" "$c" "$d")

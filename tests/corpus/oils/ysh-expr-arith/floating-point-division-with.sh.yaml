@@ -1,0 +1,9 @@
+name: Floating Point Division with /
+dialect: bash
+source: oils:spec/ysh-expr-arith#floating-point-division-with
+stdout: "20.0\n"
+---
+
+var i = '1.0' / '0.05'
+
+echo $i

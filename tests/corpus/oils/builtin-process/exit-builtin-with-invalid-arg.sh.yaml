@@ -1,0 +1,7 @@
+name: Exit builtin with invalid arg
+dialect: bash
+source: oils:spec/builtin-process#exit-builtin-with-invalid-arg
+status: 1
+---
+exit invalid
+# Rationale: runtime errors are 1

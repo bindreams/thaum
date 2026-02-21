@@ -1,0 +1,8 @@
+name: Word splitting
+dialect: bash
+source: oils:spec/word-split#word-splitting
+stdout: "['1', '23 4']\n"
+---
+a="1 2"
+b="3 4"
+argv.py $a"$b"

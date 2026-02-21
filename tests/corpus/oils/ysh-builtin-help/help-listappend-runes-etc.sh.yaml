@@ -1,0 +1,24 @@
+name: help List/append, runes, etc.
+dialect: bash
+source: oils:spec/ysh-builtin-help#help-listappend-runes-etc
+stdout: "status=0\nstatus=0\nstatus=0\n"
+---
+
+shopt --set ysh:upgrade
+
+proc assert-lines {
+  var num_lines = $(@ARGV | wc -l)
+  #echo "lines = $num_lines"
+  if (num_lines < 2) {
+    error "only got $num_lines lines"
+  }
+}
+
+assert-lines help List/append
+echo status=$?
+
+assert-lines help cmd/append
+echo status=$?
+
+assert-lines help runes
+echo status=$?

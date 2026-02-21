@@ -1,0 +1,12 @@
+name: Augmented assignment doesn't work with multiple LHS
+dialect: bash
+source: 
+  oils:spec/ysh-augmented#augmented-assignment-doesnt-work-with-multiple-lhs
+status: 2
+stdout: "\n"
+---
+
+var x = 3
+var y = 4
+setvar x, y += 2
+echo $x $y

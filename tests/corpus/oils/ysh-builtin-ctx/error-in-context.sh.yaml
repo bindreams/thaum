@@ -1,0 +1,13 @@
+name: error in context
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#error-in-context
+stdout: "status=100\n"
+---
+var a = {}
+try {
+  ctx push (a) {
+    error "Error from inside a context" (code=100)
+  }
+}
+echo status=$[_error.code]
+exit 0

@@ -1,0 +1,20 @@
+name: proc and shell function
+dialect: bash
+source: oils:spec/ysh-xtrace#proc-and-shell-function
+stdout: ''
+stderr: "> proc shfunc 1\n  . builtin ':' 1\n< proc shfunc\n> proc p 2\n  . builtin
+  ':' 2\n< proc p\n"
+---
+shopt --set ysh:upgrade
+set -x
+
+shfunc() {
+  : $1
+}
+
+proc p (x) {
+  : $x
+}
+
+shfunc 1
+p 2

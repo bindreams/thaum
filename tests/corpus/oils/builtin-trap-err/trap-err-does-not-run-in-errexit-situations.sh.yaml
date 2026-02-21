@@ -1,0 +1,28 @@
+name: trap ERR does not run in errexit situations
+dialect: bash
+source: oils:spec/builtin-trap-err#trap-err-does-not-run-in-errexit-situations
+stdout: "until\nline=16\nline=20\nline=20\nline=20\nok\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+if false; then
+  echo if
+fi
+
+while false; do
+  echo while
+done
+
+until false; do
+  echo until
+  break
+done
+
+false || false || false
+
+false && false && false
+
+false; false; false
+
+echo ok

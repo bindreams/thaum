@@ -1,0 +1,24 @@
+name: Multiple func calls
+dialect: bash
+source: oils:spec/ysh-func#multiple-func-calls
+stdout: "2\n3\n2\n-2\n"
+---
+
+func inc(x) {
+  # increment
+
+  return (x + 1)
+}
+
+func dec(x) {
+  # decrement
+
+  return (x - 1)
+}
+
+echo $[inc(1)]
+echo $[inc(inc(1))]
+echo $[dec(inc(inc(1)))]
+
+var y = dec(dec(1))
+echo $[dec(y)]

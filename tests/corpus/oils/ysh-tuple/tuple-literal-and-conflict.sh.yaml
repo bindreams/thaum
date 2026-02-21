@@ -1,0 +1,6 @@
+name: tuple literal and (( conflict
+dialect: bash
+source: oils:spec/ysh-tuple#tuple-literal-and-conflict
+stdout: "yes\n"
+---
+if ((0,0) < (0,1)) { echo yes }

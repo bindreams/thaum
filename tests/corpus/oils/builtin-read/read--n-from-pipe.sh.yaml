@@ -1,0 +1,11 @@
+name: read -n from pipe
+dialect: bash
+source: oils:spec/builtin-read#read--n-from-pipe
+status: 0
+stdout: "reply=abc\n"
+---
+case $SH in dash|ash|zsh) exit ;; esac
+
+echo abcxyz | { read -n 3; echo reply=$REPLY; }
+
+# zsh appears to hang with -k

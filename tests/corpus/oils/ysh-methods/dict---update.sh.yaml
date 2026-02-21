@@ -1,0 +1,11 @@
+name: Dict -> update()
+dialect: bash
+source: oils:spec/ysh-methods#dict---update
+stdout: "\n"
+---
+var d = {a: 2, b: 3}
+var alias = d
+var other = {a: 42}
+call d->update(other)
+assert [{a: 42, b: 3} === d]
+assert [{a: 42, b: 3} === alias]

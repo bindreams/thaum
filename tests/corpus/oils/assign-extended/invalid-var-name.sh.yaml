@@ -1,0 +1,6 @@
+name: invalid var name
+dialect: bash
+source: oils:spec/assign-extended#invalid-var-name
+status: 1
+---
+typeset foo/bar

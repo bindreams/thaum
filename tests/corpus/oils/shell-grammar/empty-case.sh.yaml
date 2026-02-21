@@ -1,0 +1,6 @@
+name: Empty case
+dialect: bash
+source: oils:spec/shell-grammar#empty-case
+---
+case word_a in
+esac

@@ -1,0 +1,11 @@
+name: / operator with single quoted arg (causes syntax error in regex in OSH, 
+  reported by Crestwave)
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#operator-with-single-quoted-arg-causes-syntax-error-in-regex-in-osh-reported-by-crestwave
+status: 0
+stdout: "no plus or minus ''''\nno plus or minus ''''\n"
+---
+var="++--''++--''"
+echo no plus or minus "${var//[+-]}"
+echo no plus or minus "${var//['+-']}"

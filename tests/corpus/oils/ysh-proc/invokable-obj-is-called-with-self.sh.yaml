@@ -1,0 +1,15 @@
+name: invokable Obj is called with self
+dialect: bash
+source: oils:spec/ysh-proc#invokable-obj-is-called-with-self
+stdout: "sum = 8\n"
+---
+shopt --set ysh:upgrade
+
+proc boundProc(; self) {
+  echo "sum = $[self.x + self.y]"
+}
+
+var methods = Object(null, {__invoke__: boundProc})
+var invokable = Object(methods, {x: 3, y: 5})
+
+invokable

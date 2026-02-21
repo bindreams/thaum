@@ -1,0 +1,8 @@
+name: empty case statement
+dialect: bash
+source: oils:spec/ysh-case#empty-case-statement
+status: 0
+stdout: "\n"
+---
+const x = ""
+case (x) { }

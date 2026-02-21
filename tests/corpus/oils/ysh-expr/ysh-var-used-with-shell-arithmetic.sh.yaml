@@ -1,0 +1,12 @@
+name: YSH var used with shell arithmetic
+dialect: bash
+source: oils:spec/ysh-expr#ysh-var-used-with-shell-arithmetic
+stdout: "lt=1\ngt=0\nlt=1\ngt=0\n"
+---
+var w = "3"
+echo lt=$(( w < 4 ))
+echo gt=$(( w > 4 ))
+
+var z = 3
+echo lt=$(( z < 4 ))
+echo gt=$(( z > 4 ))

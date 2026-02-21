@@ -1,0 +1,6 @@
+name: Str => trimEnd(), too many args
+dialect: bash
+source: oils:spec/ysh-methods#str-trimend-too-many-args
+status: 3
+---
+= 'mystr' => trimEnd('extra', 'args')

@@ -1,0 +1,27 @@
+name: \ in unquoted substitutions does not match a backslash
+dialect: bash
+source: oils:spec/glob#in-unquoted-substitutions-does-not-match-a-backslash
+stdout: "['x/*\\\\*.txt']\n[\"x/test.ifs.'.txt\"]\n['x/test.ifs.a.txt']\n['x/test.ifs.\\\
+  \\b.txt']\n"
+---
+mkdir x
+touch \
+  x/test.ifs.\\.txt \
+  x/test.ifs.\'.txt \
+  x/test.ifs.a.txt \
+  x/test.ifs.\\b.txt
+
+v="*\\*.txt"
+argv.py x/$v
+
+v="*\'.txt"
+argv.py x/$v
+
+v='*\a.txt'
+argv.py x/$v
+
+v='*\b.txt'
+argv.py x/$v
+
+
+# 3 shells treat \ in unquoted substitution $v as literal \

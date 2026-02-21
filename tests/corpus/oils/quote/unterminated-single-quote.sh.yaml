@@ -1,0 +1,6 @@
+name: Unterminated single quote
+dialect: bash
+source: oils:spec/quote#unterminated-single-quote
+status: 2
+---
+

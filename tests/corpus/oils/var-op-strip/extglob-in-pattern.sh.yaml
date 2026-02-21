@@ -1,0 +1,14 @@
+name: extglob in pattern
+dialect: bash
+source: oils:spec/var-op-strip#extglob-in-pattern
+stdout: "1 foo\n2\n3\n4\n"
+---
+case $SH in dash|zsh|ash) exit ;; esac
+
+shopt -s extglob
+
+x='foo()' 
+echo 1 ${x%*(foo|bar)'()'}
+echo 2 ${x%%*(foo|bar)'()'}
+echo 3 ${x#*(foo|bar)'()'}
+echo 4 ${x##*(foo|bar)'()'}

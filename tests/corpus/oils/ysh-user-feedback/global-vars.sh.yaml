@@ -1,0 +1,14 @@
+name: global vars
+dialect: bash
+source: oils:spec/ysh-user-feedback#global-vars
+status: 1
+stdout: "\n"
+---
+builtin set -u
+
+main() {
+  source $[ENV.REPO_ROOT]/spec/testdata/global-lib.sh
+}
+
+main
+test_func

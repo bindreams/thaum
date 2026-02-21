@@ -1,0 +1,7 @@
+name: '{abc}<<< - http://landley.net/notes-2019.html#09-12-2019'
+dialect: bash
+source: oils:spec/toysh#abc---httplandleynetnotes-2019html09-12-2019
+stdout: "\nwalrus\n"
+---
+{ echo; } {abc}<<< walrus
+cat <&$abc

@@ -1,0 +1,11 @@
+name: Varadic arguments, too few args
+dialect: bash
+source: oils:spec/ysh-func#varadic-arguments-too-few-args
+status: 3
+stdout: "\n"
+---
+func f(a, b, ...args) {
+  = [a, b, args]
+}
+
+call f(1)

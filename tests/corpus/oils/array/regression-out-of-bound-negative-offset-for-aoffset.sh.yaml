@@ -1,0 +1,15 @@
+name: 'Regression: Out-of-bound negative offset for ${a[@]:offset}'
+dialect: bash
+source: oils:spec/array#regression-out-of-bound-negative-offset-for-aoffset
+stdout: "a=(1 2 3 4)\nbegin=-1 -> (4)\nbegin=-2 -> (3 4)\nbegin=-3 -> (2 3 4)\nbegin=-4
+  -> (1 2 3 4)\nbegin=-5 -> ()\n"
+---
+case $SH in mksh) exit ;; esac
+
+a=(1 2 3 4)
+echo "a=(${a[*]})"
+echo "begin=-1 -> (${a[*]: -1})"
+echo "begin=-2 -> (${a[*]: -2})"
+echo "begin=-3 -> (${a[*]: -3})"
+echo "begin=-4 -> (${a[*]: -4})"
+echo "begin=-5 -> (${a[*]: -5})"

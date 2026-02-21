@@ -1,0 +1,21 @@
+name: builtin declare a=(x y) is allowed
+dialect: bash
+source: oils:spec/builtin-meta-assign#builtin-declare-ax-y-is-allowed
+stdout: "declare -a a=(x y)\ndeclare -a a=(x y)\ndeclare -a a=(x y)\n"
+---
+case $SH in dash|zsh|mksh|ash) exit ;; esac
+
+$SH -c 'declare a=(x y); declare -p a'
+if test $? -ne 0; then
+  echo 'fail'
+fi
+
+$SH -c 'builtin declare a=(x y); declare -p a'
+if test $? -ne 0; then
+  echo 'fail'
+fi
+
+$SH -c 'builtin declare -a a=(x y); declare -p a'
+if test $? -ne 0; then
+  echo 'fail'
+fi

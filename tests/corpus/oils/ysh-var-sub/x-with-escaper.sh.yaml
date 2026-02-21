@@ -1,0 +1,15 @@
+name: $[x] with _ESCAPER
+dialect: bash
+source: oils:spec/ysh-var-sub#x-with-escaper
+stdout: "code echo hi 2&gt;&amp;1\n"
+---
+shopt --set oil:upgrade
+
+x='echo hi 2>&1'
+
+shvar _ESCAPER=html {
+  echo "code $[x]"
+}
+
+# No _ESCAPER: fatal error
+echo "code $[x]"

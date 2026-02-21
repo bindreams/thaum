@@ -1,0 +1,10 @@
+name: strip all
+dialect: bash
+source: oils:spec/var-op-strip#strip-all
+stdout: "['']\n['']\n['']\n['']\n"
+---
+x=abc
+argv.py "${x#abc}"
+argv.py "${x##abc}"
+argv.py "${x%abc}"
+argv.py "${x%%abc}"

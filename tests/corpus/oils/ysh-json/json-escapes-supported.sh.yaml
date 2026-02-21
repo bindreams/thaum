@@ -1,0 +1,16 @@
+name: JSON \/ escapes supported
+dialect: bash
+source: oils:spec/ysh-json#json-escapes-supported
+stdout: "/\nreply=/\nreply=/\n"
+---
+
+msg='"\/"'
+
+echo "$msg" | python3 -c 'import json, sys; print(json.load(sys.stdin))'
+
+echo "$msg" | json read
+echo reply=$_reply
+
+j8="b'\\/'"
+echo "$msg" | json read
+echo reply=$_reply

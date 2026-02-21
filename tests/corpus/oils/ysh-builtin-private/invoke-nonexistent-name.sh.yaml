@@ -1,0 +1,15 @@
+name: invoke nonexistent name
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke-nonexistent-name
+stdout: "status=2\nstatus=127\nstatus=127\n"
+---
+case $SH in bash) exit ;; esac
+
+invoke zz
+echo status=$?
+
+invoke --builtin zz
+echo status=$?
+
+invoke --builtin -- zz
+echo status=$?

@@ -1,0 +1,27 @@
+name: parse_brace case
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-case
+stdout: "python\nshell\npython\nshell\n"
+---
+shopt -s ysh:upgrade
+
+var files = :| foo.py 'foo test.sh' |
+for name in (files) {
+  case $name in
+    *.py)
+      echo python
+      ;;
+    *.sh)
+      echo shell
+      ;;
+  esac
+}
+
+for name in @files {
+  case (name) {
+  *.py {
+    echo python
+  }
+  *.sh { echo shell }
+  }
+}

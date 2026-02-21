@@ -1,0 +1,11 @@
+name: '! in if'
+dialect: bash
+source: oils:spec/pipeline#in-if
+status: 0
+stdout: "hi\nFALSE\n"
+---
+if ! echo hi; then
+  echo TRUE
+else
+  echo FALSE
+fi

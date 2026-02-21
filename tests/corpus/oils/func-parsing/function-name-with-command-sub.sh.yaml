@@ -1,0 +1,6 @@
+name: Function name with command sub
+dialect: bash
+source: oils:spec/func-parsing#function-name-with-command-sub
+status: 2
+---
+foo-$(echo hi)() { ls ; }

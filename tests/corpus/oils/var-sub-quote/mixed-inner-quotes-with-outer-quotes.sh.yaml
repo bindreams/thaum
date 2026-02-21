@@ -1,0 +1,6 @@
+name: Mixed inner quotes with outer quotes
+dialect: bash
+source: oils:spec/var-sub-quote#mixed-inner-quotes-with-outer-quotes
+stdout: "['a b c']\n"
+---
+argv.py "${Unset:-"a b" c}"

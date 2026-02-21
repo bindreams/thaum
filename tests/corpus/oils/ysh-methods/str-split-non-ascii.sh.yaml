@@ -1,0 +1,7 @@
+name: Str => split(), non-ascii
+dialect: bash
+source: oils:spec/ysh-methods#str-split-non-ascii
+stdout: "(List)   [\"🌞\",\"🌞\",\"🌞\"]\n(List)   [\"🌞\",\"🌞\",\"🌞\"]\n"
+---
+pp test_ ('🌞🌝🌞🌝🌞'.split('🌝'))
+pp test_ ('🌞🌝🌞🌝🌞'.split(/ '🌝' /))

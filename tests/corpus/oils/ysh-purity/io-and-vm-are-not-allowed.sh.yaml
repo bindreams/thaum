@@ -1,0 +1,15 @@
+name: io and vm are not allowed
+dialect: bash
+source: oils:spec/ysh-purity#io-and-vm-are-not-allowed
+stdout: "\n"
+---
+
+var cmd = ^(
+  = vm.getFrame(-1)
+  = vm.id({})
+
+  = io.stdin
+)
+
+call io->eval(cmd)
+call eval (cmd)

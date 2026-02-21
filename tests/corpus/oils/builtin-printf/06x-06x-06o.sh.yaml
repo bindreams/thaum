@@ -1,0 +1,8 @@
+name: '%06x %06X %06o'
+dialect: bash
+source: oils:spec/builtin-printf#06x-06x-06o
+stdout: "[00002a]\n[00002A]\n[000052]\n"
+---
+printf '[%06x]\n' 42
+printf '[%06X]\n' 42
+printf '[%06o]\n' 42

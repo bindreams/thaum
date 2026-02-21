@@ -1,0 +1,10 @@
+name: set without args and assoc array variables (not in OSH)
+dialect: bash
+source: 
+  oils:spec/sh-options#set-without-args-and-assoc-array-variables-not-in-osh
+stdout: "__assoc=([a]=\"b\" [\"k e y\"]=\"v a l\" )\n"
+---
+typeset -A __assoc
+__assoc['k e y']='v a l'
+__assoc[a]=b
+set | grep '^__'

@@ -1,0 +1,45 @@
+name: More fragments like a[  a[5  a[5 +  a[5 + 3]
+dialect: bash
+source: oils:spec/array-assign#more-fragments-like-a-a5-a5-a5-3
+stdout: "a[ status=127\na[5 status=127\na[5 + status=127\na[5 + 3] status=127\na[5
+  + 3]= status=0\na[5 + 3]+ status=127\na[5 + 3]+= status=0\n"
+---
+
+for name in 'a[' 'a[5'; do
+  echo "echo hi from $name: \$# args: \$@" > "$name"
+  chmod +x "$name"
+done
+
+# syntax error in bash
+$SH -c 'a['
+echo "a[ status=$?"
+
+$SH -c 'a[5'
+echo "a[5 status=$?"
+
+# 1 arg +
+$SH -c 'a[5 +'
+echo "a[5 + status=$?"
+
+# 2 args
+$SH -c 'a[5 + 3]'
+echo "a[5 + 3] status=$?"
+
+$SH -c 'a[5 + 3]='
+echo "a[5 + 3]= status=$?"
+
+$SH -c 'a[5 + 3]+'
+echo "a[5 + 3]+ status=$?"
+
+$SH -c 'a[5 + 3]+='
+echo "a[5 + 3]+= status=$?"
+
+# mksh doesn't issue extra parse errors
+# and it doesn't turn a[5 + 3] and a[5 + 3]+ into commands!
+
+
+
+# in zsh, everything becomes "bad pattern"
+
+
+# ash behavior is consistent

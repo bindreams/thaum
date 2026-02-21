@@ -1,0 +1,11 @@
+name: here doc inside alias
+dialect: bash
+source: oils:spec/alias#here-doc-inside-alias
+stdout: "hi\n"
+---
+shopt -s expand_aliases
+alias c='cat <<EOF
+$(echo hi)
+EOF
+'
+c

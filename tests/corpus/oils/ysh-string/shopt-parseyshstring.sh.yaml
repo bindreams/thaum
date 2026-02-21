@@ -1,0 +1,16 @@
+name: shopt parse_ysh_string
+dialect: bash
+source: oils:spec/ysh-string#shopt-parseyshstring
+stdout: "\\\nr\n\nend\nunset\nr\\\n"
+---
+
+# Ignored prefix
+echo r'\'
+
+# space
+write r '' end
+
+# Now it's a regular r
+shopt --unset parse_ysh_string
+shopt --unset no_parse_word_join
+write unset r'\'

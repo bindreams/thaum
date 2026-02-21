@@ -1,0 +1,22 @@
+name: Here doc
+dialect: bash
+source: oils:spec/ysh-xtrace#here-doc
+stdout: "2\n3\n"
+stderr: ". builtin ':' begin\n| command 12345: tac\n; process 12345: status 0\n. builtin
+  set '+x'\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+set -x
+
+{
+  : begin
+  tac <<EOF
+3
+2
+EOF
+
+  set +x
+} 2>err.txt
+
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt >&2

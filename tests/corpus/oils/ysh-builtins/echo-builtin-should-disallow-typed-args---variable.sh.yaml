@@ -1,0 +1,12 @@
+name: echo builtin should disallow typed args - variable
+dialect: bash
+source: 
+  oils:spec/ysh-builtins#echo-builtin-should-disallow-typed-args---variable
+status: 2
+stdout: "\n"
+---
+shopt -s ysh:all
+#shopt -p simple_echo
+
+var x = 43
+echo (x)

@@ -1,0 +1,57 @@
+name: shvar IFS=x { myproc } rather than IFS=x myproc - no dynamic scope
+dialect: bash
+source: 
+  oils:spec/ysh-scope#shvar-ifsx-myproc-rather-than-ifsx-myproc---no-dynamic-scope
+stdout: ":\n 20 09 0a 0a\nIFS= z\n\nshellfunc IFS= z\n['x', 'x', 'x']\n\nshellfunc
+  IFS= x\n['', 'z', 'z', 'z']\n\nmyproc IFS= z\n['x', 'x', 'x']\n\nmyproc IFS= x\n\
+  ['', 'z', 'z', 'z']\n"
+---
+
+# Note: osh/split.py uses dynamic scope to look up IFS
+# TODO: Should use LANG example to demonstrate
+
+#shopt --set ysh:upgrade  # this would disable word splitting
+
+shopt --set parse_proc
+shopt --set parse_brace
+#shopt --set env_obj
+
+s='xzx zxz'
+
+shellfunc() {
+  echo shellfunc IFS="$IFS"
+  argv.py $s
+}
+
+proc myproc() {
+  echo myproc IFS="$IFS"
+  argv.py $s
+}
+
+IFS=: $REPO_ROOT/spec/bin/printenv.py IFS
+
+# default value
+echo "$IFS" | od -A n -t x1
+
+IFS=' z'
+echo IFS="$IFS"
+echo
+
+shellfunc
+echo
+
+IFS=' x' shellfunc
+echo
+
+# Problem: $IFS in procs only finds GLOBAL values, so we get IFS=' z' rather than IFS=' x'.
+# But when actually splitting, $IFS is a 'shvar' which respects DYNAMIC scope.
+#
+# Can use shvarGet('IFS') instead
+
+IFS=' x' myproc
+echo
+
+# YSH solution to the problem
+shvar IFS=' x' {
+  myproc
+}

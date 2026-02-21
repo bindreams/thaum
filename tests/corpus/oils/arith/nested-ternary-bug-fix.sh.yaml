@@ -1,0 +1,6 @@
+name: nested ternary (bug fix)
+dialect: bash
+source: oils:spec/arith#nested-ternary-bug-fix
+stdout: "3\n"
+---
+echo $((1?2?3:4:5))

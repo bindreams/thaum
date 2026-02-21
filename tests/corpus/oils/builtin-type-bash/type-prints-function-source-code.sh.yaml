@@ -1,0 +1,11 @@
+name: type prints function source code
+dialect: bash
+source: oils:spec/builtin-type-bash#type-prints-function-source-code
+stdout: "f is a function\nf () \n{ \n    echo\n}\n\nf is a function\nf () \n{ \n \
+  \   echo\n}\n"
+---
+f () { echo; }
+type -a f
+echo
+
+type f

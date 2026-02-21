@@ -1,0 +1,11 @@
+name: can't encode objects as JSON
+dialect: bash
+source: oils:spec/ysh-object#cant-encode-objects-as-json
+status: 1
+stdout: "\n"
+---
+
+var Rect = Object(null, {})
+
+json write (Rect)
+echo 'nope'

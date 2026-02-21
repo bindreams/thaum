@@ -1,0 +1,6 @@
+name: incomplete hex escape
+dialect: bash
+source: oils:spec/builtin-echo#incomplete-hex-escape
+stdout: " a b c d 006\n"
+---
+echo -en 'abcd\x6' | od -A n -c | sed 's/ \+/ /g'

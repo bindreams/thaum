@@ -1,0 +1,39 @@
+name: Scope of Variables Inside Hay Blocks
+dialect: bash
+source: oils:spec/hay#scope-of-variables-inside-hay-blocks
+stdout: "location = https://example.com/downloads/foo.tar.gz\nbackup = https://archive.example.com/downloads/foo.tar.gz\n\
+  deps location https://example.com/downloads/spam.tar.gz\ndeps backup https://archive.example.com/downloads/spam.tar.xz\n\
+  AFTER downloads/foo.tar.gz\n"
+---
+
+shopt --set ysh:all
+
+hay define package
+hay define deps/package
+
+hay eval :result {
+
+  const URL_PATH = 'downloads/foo.tar.gz'
+
+  package foo {
+    echo "location = https://example.com/$URL_PATH"
+    echo "backup = https://archive.example.com/$URL_PATH"
+  }
+
+  # Note: PushTemp() happens here
+  deps spam {
+    # OVERRIDE
+    const URL_PATH = 'downloads/spam.tar.gz'
+
+    const URL2 = 'downloads/spam.tar.xz'
+
+    package foo {
+      # this is a global
+      echo "deps location https://example.com/$URL_PATH"
+      echo "deps backup https://archive.example.com/$URL2"
+    }
+  }
+
+  echo "AFTER $URL_PATH"
+
+}

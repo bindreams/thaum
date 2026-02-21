@@ -1,0 +1,10 @@
+name: Append to associative array value A['x']+='suffix'
+dialect: bash
+source: oils:spec/array-assoc#append-to-associative-array-value-axsuffix
+stdout: "['foobarbar']\n"
+---
+declare -A A
+A['x']='foo'
+A['x']+='bar'
+A['x']+='bar'
+argv.py "${A["x"]}"

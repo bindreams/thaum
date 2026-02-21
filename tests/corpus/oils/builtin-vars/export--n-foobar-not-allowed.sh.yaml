@@ -1,0 +1,9 @@
+name: export -n foo=bar not allowed
+dialect: bash
+source: oils:spec/builtin-vars#export--n-foobar-not-allowed
+stdout: "status=2\nold\n"
+---
+foo=old
+export -n foo=new
+echo status=$?
+echo $foo

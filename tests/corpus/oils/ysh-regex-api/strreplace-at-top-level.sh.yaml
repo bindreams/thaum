@@ -1,0 +1,22 @@
+name: Str.replace() at top level
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplace-at-top-level
+stdout: "<Expr>\nreplace   my[x st t x]r\nmyreplace my[x st t x]r\n"
+---
+shopt --set ysh:upgrade
+
+var s = 'mystr'
+var pat = / 's' <capture dot> /
+var template = ^"[$x $0 $1 $x]"
+pp test_ (template)
+
+var x = 'x'
+
+var new = s.replace(pat, template)
+echo 'replace  ' $new
+
+func myreplace(s, template) {
+  return (s.replace(pat, template))
+}
+
+echo myreplace $[myreplace(s, template)]

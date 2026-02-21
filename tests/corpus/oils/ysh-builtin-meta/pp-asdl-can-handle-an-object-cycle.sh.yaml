@@ -1,0 +1,14 @@
+name: pp asdl_ can handle an object cycle
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-asdl-can-handle-an-object-cycle
+stdout: "{\"cycle\":\ncycle ...\n"
+---
+
+shopt -s ysh:upgrade
+
+var d = {}
+setvar d.cycle = d
+
+pp test_ (d) | fgrep -o '{"cycle":'
+
+pp asdl_ (d) | fgrep -o 'cycle ...'

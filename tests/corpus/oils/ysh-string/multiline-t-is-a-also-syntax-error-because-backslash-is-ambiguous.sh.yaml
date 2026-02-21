@@ -1,0 +1,8 @@
+name: Multiline ''' \t ''' is a also syntax error because backslash is ambiguous
+dialect: bash
+source: 
+  oils:spec/ysh-string#multiline-t-is-a-also-syntax-error-because-backslash-is-ambiguous
+status: 2
+stdout: ''
+---
+var y = ''' \t '''

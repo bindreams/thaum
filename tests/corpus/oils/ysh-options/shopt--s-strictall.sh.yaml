@@ -1,0 +1,13 @@
+name: shopt -s strict:all
+dialect: bash
+source: oils:spec/ysh-options#shopt--s-strictall
+stdout: "shopt -s strict_arg_parse\nshopt -s strict_argv\nshopt -s strict_arith\n\
+  shopt -s strict_array\nshopt -s strict_control_flow\nshopt -s strict_env_binding\n\
+  shopt -s strict_errexit\nshopt -s strict_glob\nshopt -s strict_nameref\nshopt -s
+  strict_parse_equals\nshopt -s strict_parse_slice\nshopt -s strict_tilde\nshopt -s
+  strict_word_eval\n"
+---
+shopt -s strict:all
+# normal option names
+shopt -o -p | grep -- ' -o ' | grep -v hashall
+shopt -p strict:all

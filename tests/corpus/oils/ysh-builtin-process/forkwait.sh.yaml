@@ -1,0 +1,19 @@
+name: forkwait
+dialect: bash
+source: oils:spec/ysh-builtin-process#forkwait
+stdout: "hi\nstatus=42\nok\n"
+---
+shopt --set oil:upgrade
+shopt --unset errexit
+
+old=$PWD
+
+forkwait {
+  cd /
+  echo hi
+  exit 42
+}
+echo status=$?
+if test "$old" = "$PWD"; then
+  echo ok
+fi

@@ -1,0 +1,9 @@
+name: set -a exports variables
+dialect: bash
+source: oils:spec/builtin-set#set--a-exports-variables
+stdout: "bar\nqux\n"
+---
+set -a
+FOO=bar
+BAZ=qux
+printenv.py FOO BAZ

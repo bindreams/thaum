@@ -1,0 +1,9 @@
+name: Implicit raw string '\t\n' is a syntax error because backslash is 
+  ambiguous
+dialect: bash
+source: 
+  oils:spec/ysh-string#implicit-raw-string-tn-is-a-syntax-error-because-backslash-is-ambiguous
+status: 2
+stdout: ''
+---
+var x = ' \t\n '

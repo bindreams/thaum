@@ -1,0 +1,6 @@
+name: compgen -A builtin
+dialect: bash
+source: oils:spec/builtin-completion#compgen--a-builtin
+stdout: "getopts\n"
+---
+compgen -A builtin g

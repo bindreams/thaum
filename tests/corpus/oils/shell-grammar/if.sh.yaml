@@ -1,0 +1,10 @@
+name: If
+dialect: bash
+source: oils:spec/shell-grammar#if
+---
+if echo
+then
+  echo
+else
+  echo
+fi

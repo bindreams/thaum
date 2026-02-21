@@ -1,0 +1,15 @@
+name: List insert()
+dialect: bash
+source: oils:spec/ysh-list#list-insert
+stdout: "pass\n"
+---
+shopt -s ysh:all
+
+var l = :| foo bar |
+call l->insert(0, "baz")
+assert [ :| baz foo bar | === l ]
+
+call l->insert(2, "zzz")
+assert [ :| baz foo zzz bar | === l ]
+
+echo pass

@@ -1,0 +1,8 @@
+name: is 'command' prefix and array allowed?  OSH is smarter
+dialect: bash
+source: 
+  oils:spec/assign-deferred#is-command-prefix-and-array-allowed-osh-is-smarter
+stdout: "len=3\n"
+---
+command typeset a=(1 2 3)
+echo len=${#a[@]}

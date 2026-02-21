@@ -1,0 +1,16 @@
+name: Impact of errors on var declaration
+dialect: bash
+source: oils:spec/ysh-builtin-error#impact-of-errors-on-var-declaration
+status: 1
+stdout: "\n"
+---
+func alwaysError() {
+  error "it's an error" (status=100)
+}
+
+try {
+  var mylist = [1 + 2, alwaysError()]
+
+  echo this will never be printed
+}
+= mylist  # undefined! status becomes 1

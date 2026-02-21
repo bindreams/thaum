@@ -1,0 +1,14 @@
+name: '[[ ]]'
+dialect: bash
+source: oils:spec/xtrace#unnamed
+stdout: ''
+stderr: "+ dir=/\n+ [[ -d $dir ]]\n+ (( a = 42 ))\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+set -x
+
+dir=/
+if [[ -d $dir ]]; then
+  (( a = 42 ))
+fi

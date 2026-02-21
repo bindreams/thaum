@@ -1,0 +1,12 @@
+name: hash with args
+dialect: bash
+source: oils:spec/command#hash-with-args
+stdout: "status=0\n/whoami\nstatus=1\n"
+---
+hash whoami
+echo status=$?
+hash | grep -o /whoami  # prints it twice
+hash _nonexistent_
+echo status=$?
+
+# mksh doesn't fail

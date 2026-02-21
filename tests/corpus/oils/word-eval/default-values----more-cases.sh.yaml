@@ -1,0 +1,6 @@
+name: Default values -- more cases
+dialect: bash
+source: oils:spec/word-eval#default-values----more-cases
+stdout: "['hi', 'a b', 'c d', 'e f', \"'g h'\"]\n"
+---
+argv.py ${undef:-hi} ${undef:-'a b'} "${undef:-c d}" "${un:-"e f"}" "${un:-'g h'}"

@@ -1,0 +1,6 @@
+name: Str => startsWith(), no args
+dialect: bash
+source: oils:spec/ysh-methods#str-startswith-no-args
+status: 3
+---
+= 'abc' => startsWith()

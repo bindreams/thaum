@@ -1,0 +1,31 @@
+name: 'with parseCommand() then io->eval(cmd, vars={out_dict: {}})'
+dialect: bash
+source: oils:spec/ysh-proc-meta#with-parsecommand-then-io-evalcmd-varsoutdict
+stdout: "prefix a\nprefix b\n"
+---
+
+# This could take the place of evalToDict()?  But evalToDict() is useful in
+# Hay?
+
+func genProcs() {
+  var vars = {out_dict: {}}
+  for param in a b {
+    var s = """
+    proc echo_$param(prefix) {
+      echo \$prefix $param
+    }
+    setvar out_dict.echo_$param = echo_$param
+    """
+    var cmd = parseCommand(s)
+    call io->eval(cmd, vars=vars)
+  }
+  return (vars.out_dict)
+}
+
+var procs = genProcs()
+
+var my_echo_a = procs.echo_a
+var my_echo_b = procs.echo_b
+
+my_echo_a prefix
+my_echo_b prefix

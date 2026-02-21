@@ -1,0 +1,56 @@
+name: Dict (&d) and setvar
+dialect: bash
+source: oils:spec/ysh-builtin-eval#dict-d-and-setvar
+stdout: "Dict proc global outer=xx\ninside Dict outer=xx\n(Dict)   {\"outer2\":\"\
+  outer2\",\"not_declared\":\"yy\"}\nafter Dict outer=zz\n\nDict proc global outer=zz\n\
+  (Dict)   {\"p\":99}\n[p] after Dict outer=p-outer-mutated\nafter p outer=zz\n"
+---
+
+proc Dict ( ; out; ; block) {
+  echo "Dict proc global outer=$outer"
+  var d = io->eval(block, to_dict=true)
+
+  #pp frame_vars_
+
+  #echo "Dict outer2=$outer2"
+  call out->setValue(d)
+}
+
+var outer = 'xx'
+
+Dict (&d) {
+  # new variable in the front frame
+  outer2 = 'outer2'
+
+  echo "inside Dict outer=$outer"
+  setvar outer = 'zz'
+
+  setvar not_declared = 'yy'
+
+  #echo 'inside Dict block'
+  #pp frame_vars_
+}
+
+pp test_ (d)
+echo "after Dict outer=$outer"
+
+echo
+
+
+# Now do the same thing inside a proc
+
+proc p {
+  var outer = 'p-outer'
+
+  Dict (&d) {
+    p = 99
+    setvar outer = 'p-outer-mutated'
+  }
+
+  pp test_ (d)
+  echo "[p] after Dict outer=$outer"
+}
+
+p
+
+echo "after p outer=$outer"

@@ -1,0 +1,10 @@
+name: 'Right Brace as argument (similar to #702)'
+dialect: bash
+source: oils:spec/var-sub-quote#right-brace-as-argument-similar-to-702
+stdout: "}\n}\n''}\n}\n"
+---
+
+echo "${var-}}"
+echo "${var-\}}"
+echo "${var-'}'}"
+echo "${var-"}"}"

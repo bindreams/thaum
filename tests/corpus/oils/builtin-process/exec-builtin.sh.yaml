@@ -1,0 +1,6 @@
+name: exec builtin
+dialect: bash
+source: oils:spec/builtin-process#exec-builtin
+stdout: "hi\n"
+---
+exec echo hi

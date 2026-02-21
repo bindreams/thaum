@@ -1,0 +1,25 @@
+name: Complex Cycles
+dialect: bash
+source: oils:spec/ysh-printing#complex-cycles
+stdout: "(Dict)\n{\n    nothing: null,\n    simple_cycle: [[[...]]],\n    tricky_cycle:
+  [{...}],\n    dag: [[1, 2, [...]], [1, 2, [...]]],\n    key_alpha: {omega: {alpha:
+  {...}}},\n    key_omega: {alpha: {omega: {...}}}\n}\n"
+---
+var dict = {}
+setvar dict["nothing"] = null
+var simple_cycle = [["dummy"]]
+setvar simple_cycle[0][0] = simple_cycle
+setvar dict["simple_cycle"] = simple_cycle
+var tricky_cycle = ["dummy"]
+setvar tricky_cycle[0] = dict
+setvar dict["tricky_cycle"] = tricky_cycle
+var dag = [1, 2, "dummy"]
+setvar dag[2] = dag
+setvar dict["dag"] = [dag, dag]
+var alpha = {}
+var omega = {}
+setvar alpha["omega"] = omega
+setvar omega["alpha"] = alpha
+setvar dict["key_alpha"] = alpha
+setvar dict["key_omega"] = omega
+= dict

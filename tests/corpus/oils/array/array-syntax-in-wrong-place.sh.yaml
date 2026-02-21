@@ -1,0 +1,6 @@
+name: Array syntax in wrong place
+dialect: bash
+source: oils:spec/array#array-syntax-in-wrong-place
+status: 1
+---
+ls foo=(1 2)

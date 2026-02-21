@@ -1,0 +1,13 @@
+name: -n attribute on array is hard error, not a warning
+dialect: bash
+source: oils:spec/nameref#n-attribute-on-array-is-hard-error-not-a-warning
+status: 1
+stdout: "hi\n"
+---
+x=X
+typeset -n ref #=x
+echo hi
+
+# bash prints warning: REMOVES the nameref attribute here!
+ref=(x y)
+echo ref=$ref

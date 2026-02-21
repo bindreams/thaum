@@ -1,0 +1,15 @@
+name: Multiple digits like [25] are invalid
+dialect: bash
+source: oils:spec/ysh-regex#multiple-digits-like-25-are-invalid
+status: 2
+stdout: "[25]\n[25]\n"
+---
+
+# synonyms
+var pat = /[2 5]/
+echo $pat
+var pat = /[2 '5']/
+echo $pat
+
+var pat = /[25]/
+echo $pat

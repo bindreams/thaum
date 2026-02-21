@@ -1,0 +1,33 @@
+name: IFS=x and '' and $@ (#3)
+dialect: bash
+source: oils:spec/word-split#ifsx-and-and-3
+stdout: "[]\n[]\n[]\n[]\n[]\n"
+---
+setopt SH_WORD_SPLIT  # for zsh
+
+IFS=x
+set -- "" "" "" "" ""
+
+argv.py $*
+set -- $*
+argv.py $*
+set -- $*
+argv.py $*
+set -- $*
+argv.py $*
+set -- $*
+argv.py $*
+
+
+
+['', '', '']
+['']
+[]
+[]
+[]
+
+['', '', '', '', '']
+['', '', '', '', '']
+['', '', '', '', '']
+['', '', '', '', '']
+['', '', '', '', '']

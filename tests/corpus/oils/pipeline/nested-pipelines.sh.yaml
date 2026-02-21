@@ -1,0 +1,7 @@
+name: Nested pipelines
+dialect: bash
+source: oils:spec/pipeline#nested-pipelines
+stdout: "1\n2\n3\n10\n"
+---
+{ sleep 0.1 | seq 3; } | cat
+{ sleep 0.1 | seq 10; } | { cat | cat; } | wc -l

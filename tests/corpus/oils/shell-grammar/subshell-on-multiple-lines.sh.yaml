@@ -1,0 +1,8 @@
+name: Subshell on multiple lines
+dialect: bash
+source: oils:spec/shell-grammar#subshell-on-multiple-lines
+---
+(echo
+echo
+echo
+)

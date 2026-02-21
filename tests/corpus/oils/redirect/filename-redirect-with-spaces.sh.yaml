@@ -1,0 +1,9 @@
+name: Filename redirect with spaces
+dialect: bash
+source: oils:spec/redirect#filename-redirect-with-spaces
+stdout: "two\n"
+---
+# This time 1 *is* a descriptor, not a word.  If you add a space between 1 and
+# >, it doesn't work.
+echo two 1> $TMP/file-redir1.txt
+cat $TMP/file-redir1.txt

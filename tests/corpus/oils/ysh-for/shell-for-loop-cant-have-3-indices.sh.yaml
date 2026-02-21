@@ -1,0 +1,8 @@
+name: Shell for loop can't have 3 indices
+dialect: bash
+source: oils:spec/ysh-for#shell-for-loop-cant-have-3-indices
+status: 2
+---
+for i, bad, bad in a b c {
+  echo $i $item
+}

@@ -1,0 +1,8 @@
+name: set -a exports declare variables
+dialect: bash
+source: oils:spec/builtin-set#set--a-exports-declare-variables
+stdout: "zzz\n"
+---
+set -a
+declare ZZZ=zzz
+printenv.py ZZZ

@@ -1,0 +1,8 @@
+name: trap --ignore removes hooks (like trap -)
+dialect: bash
+source: oils:spec/ysh-builtin-trap#trap---ignore-removes-hooks-like-trap
+stdout: "done\n"
+---
+
+trap --ignore EXIT
+echo done

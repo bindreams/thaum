@@ -1,0 +1,7 @@
+name: If subshell true WITH OUTPUT is different
+dialect: bash
+source: oils:spec/exit-status#if-subshell-true-with-output-is-different
+status: 0
+stdout: "FALSE\n"
+---
+if `sh -c 'echo X; true'`; then echo TRUE; else echo FALSE; fi

@@ -1,0 +1,11 @@
+name: set -a exports local variables
+dialect: bash
+source: oils:spec/builtin-set#set--a-exports-local-variables
+stdout: "zzz\n"
+---
+set -a
+f() {
+  local ZZZ=zzz
+  printenv.py ZZZ
+}
+f

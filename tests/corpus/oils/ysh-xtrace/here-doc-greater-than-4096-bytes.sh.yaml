@@ -1,0 +1,19 @@
+name: Here doc greater than 4096 bytes
+dialect: bash
+source: oils:spec/ysh-xtrace#here-doc-greater-than-4096-bytes
+stdout: "2002 big-here.sh\n2000\n"
+stderr: "| here doc 12345\n| command 12345: wc -l\n; process 12345: status 0\n; process
+  12345: status 0\n"
+---
+
+{
+  echo 'wc -l <<EOF'
+  seq 2000
+  echo 'EOF'
+} > big-here.sh
+
+wc -l big-here.sh
+
+$SH -o ysh:upgrade -x big-here.sh 2>err.txt
+
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt >&2

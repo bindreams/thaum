@@ -1,0 +1,8 @@
+name: glob within array yields separate elements
+dialect: bash
+source: oils:spec/array#glob-within-array-yields-separate-elements
+stdout: "['y.Y', 'yy.Y']\n"
+---
+touch y.Y yy.Y
+a=(*.Y)
+argv.py "${a[@]}"

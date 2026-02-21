@@ -1,0 +1,17 @@
+name: cd builtin respects ENV.HOME, not HOME
+dialect: bash
+source: oils:spec/ysh-namespaces#cd-builtin-respects-envhome-not-home
+stdout: "code=1\n\ncode=0\n/tmp\n"
+---
+
+try { cd }
+echo code=$[_error.code]
+echo
+
+setglobal ENV.HOME = '/tmp'
+
+# Now it's respected
+try { cd }
+echo code=$[_error.code]
+
+pwd

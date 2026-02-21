@@ -1,0 +1,11 @@
+name: trap EXIT calling exit
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit-calling-exit
+status: 42
+stdout: "cleanup [x y z]\n"
+---
+cleanup() {
+  echo "cleanup [$@]"
+  exit 42
+}
+trap 'cleanup x y z' EXIT

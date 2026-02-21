@@ -1,0 +1,17 @@
+name: for loop parsing - http://landley.net/notes.html#04-03-2020
+dialect: bash
+source: 
+  oils:spec/toysh-posix#for-loop-parsing---httplandleynetnoteshtml04-03-2020
+stdout: "one\ntwo\nthree\n0\ncannot-parse\n"
+---
+
+$SH -c '
+for i
+in one two three
+do echo $i;
+done
+'
+echo $?
+
+$SH -c 'for i; in one two three; do echo $i; done'
+test $? -ne 0 && echo cannot-parse

@@ -1,0 +1,37 @@
+name: "4 x 3 table: (default IFS, IFS='', IFS=zx) x ( $* \"$*\" $@ \"$@\" )"
+dialect: bash
+source: oils:spec/word-split#4-x-3-table-default-ifs-ifs-ifszx-x
+stdout: "['  $*  ', 'a', 'b', 'c']\n[' \"$*\" ', 'a b c ']\n['  $@  ', 'a', 'b', 'c']\n\
+  [' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n[' \"$*\" ', 'a bc']\n['\
+  \  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n\
+  [' \"$*\" ', 'a bzcz']\n['  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n"
+---
+
+setopt SH_WORD_SPLIT  # for zsh
+
+set -- 'a b' c ''
+
+# default IFS
+argv.py '  $*  '  $*
+argv.py ' "$*" ' "$*"
+argv.py '  $@  '  $@
+argv.py ' "$@" ' "$@"
+echo
+
+IFS=''
+argv.py '  $*  '  $*
+argv.py ' "$*" ' "$*"
+argv.py '  $@  '  $@
+argv.py ' "$@" ' "$@"
+echo
+
+IFS=zx
+argv.py '  $*  '  $*
+argv.py ' "$*" ' "$*"
+argv.py '  $@  '  $@
+argv.py ' "$@" ' "$@"
+
+
+# zsh disagrees on
+# - $@ with default IFS an
+# - $@ with IFS=zx

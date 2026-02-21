@@ -1,0 +1,44 @@
+name: setglobal a[i] - i can be local or global
+dialect: bash
+source: oils:spec/ysh-scope#setglobal-ai---i-can-be-local-or-global
+stdout: "(List)   [0,11]\n(Dict)   {\"k\":0,\"n\":11}\n\n(List)   [22,11]\n(Dict)\
+  \   {\"k\":22,\"n\":11}\n"
+---
+shopt -s ysh:upgrade
+
+var mylist = [0, 1]
+var mydict = {k: 0, n: 1}
+
+var i = 0
+var key = 'k'
+
+proc mutate1 {
+  var mylist = []  # IGNORED
+  var mydict = {}  # IGNORED
+
+  var i = 1
+  var key = 'n'
+
+  setglobal mylist[i] = 11
+  setglobal mydict[key] = 11
+}
+
+# Same thing without locals
+proc mutate2 {
+  var mylist = []  # IGNORED
+  var mydict = {}  # IGNORED
+
+  setglobal mylist[i] = 22
+  setglobal mydict[key] = 22
+}
+
+mutate1
+
+pp test_ (mylist)
+pp test_ (mydict)
+echo
+
+mutate2
+
+pp test_ (mylist)
+pp test_ (mydict)

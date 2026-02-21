@@ -1,0 +1,7 @@
+name: compgen -A file
+dialect: bash
+source: oils:spec/builtin-completion#compgen--a-file
+stdout: "oils-version.txt\nopy\nosh\n"
+---
+cd $REPO_ROOT
+compgen -A file o | sort

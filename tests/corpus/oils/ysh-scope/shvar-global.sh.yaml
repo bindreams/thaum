@@ -1,0 +1,42 @@
+name: shvar global
+dialect: bash
+source: oils:spec/ysh-scope#shvar-global
+stdout: "_ESCAPER=\n_DIALECT=\nblock _ESCAPER=html\nblock _DIALECT=ninja\n_ESCAPER=\n\
+  _DIALECT=\n___\n_ESCAPER=foo\n_DIALECT=bar\nblock _ESCAPER=html\nblock _DIALECT=ninja\n\
+  nested _ESCAPER=nested\nnested _DIALECT=ninja\n_ESCAPER=foo\n_DIALECT=bar\n"
+---
+shopt --set ysh:upgrade
+shopt --unset nounset
+
+echo _ESCAPER=$_ESCAPER
+echo _DIALECT=$_DIALECT
+
+shvar _ESCAPER=html _DIALECT=ninja {
+  echo block _ESCAPER=$_ESCAPER
+  echo block _DIALECT=$_DIALECT
+}
+
+echo _ESCAPER=$_ESCAPER
+echo _DIALECT=$_DIALECT
+
+# Now set them
+_ESCAPER=foo
+_DIALECT=bar
+
+echo ___
+
+echo _ESCAPER=$_ESCAPER
+echo _DIALECT=$_DIALECT
+
+shvar _ESCAPER=html _DIALECT=ninja {
+  echo block _ESCAPER=$_ESCAPER
+  echo block _DIALECT=$_DIALECT
+
+  shvar _ESCAPER=nested {
+    echo nested _ESCAPER=$_ESCAPER
+    echo nested _DIALECT=$_DIALECT
+  }
+}
+
+echo _ESCAPER=$_ESCAPER
+echo _DIALECT=$_DIALECT

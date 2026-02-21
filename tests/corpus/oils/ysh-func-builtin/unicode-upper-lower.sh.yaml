@@ -1,0 +1,21 @@
+name: Unicode upper() lower()
+dialect: bash
+source: oils:spec/ysh-func-builtin#unicode-upper-lower
+stdout: "ÀÈ\náé\n"
+---
+
+# Adapted from spec/var-op-bash
+
+# https://www.utf8-chartable.de/unicode-utf8-table.pl
+
+var x = u'\u{C0}\u{C8}'  # upper grave
+var y = u'\u{E1}\u{E9}'  # lower acute
+
+echo $x
+echo $y
+echo
+
+echo $[x => upper()]
+echo $[x => lower()]
+echo $[y => upper()]
+echo $[y => lower()]

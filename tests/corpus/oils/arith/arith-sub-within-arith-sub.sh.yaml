@@ -1,0 +1,7 @@
+name: Arith sub within arith sub
+dialect: bash
+source: oils:spec/arith#arith-sub-within-arith-sub
+stdout: "10\n"
+---
+# This is unnecessary but works in all shells.
+echo $((1 + $((2 + 3)) + 4))

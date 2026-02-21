@@ -1,0 +1,11 @@
+name: errexit with if and { }
+dialect: bash
+source: oils:spec/errexit#errexit-with-if-and
+status: 0
+stdout: "one\ntwo\nthree\nfour\n"
+---
+set -o errexit
+if { echo one; false; echo two; }; then
+  echo three
+fi
+echo four

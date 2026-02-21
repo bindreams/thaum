@@ -1,0 +1,8 @@
+name: Retrieve index that is a variable
+dialect: bash
+source: oils:spec/array#retrieve-index-that-is-a-variable
+stdout: "['2 3']\n"
+---
+a=(1 '2 3')
+i=1
+argv.py "${a[$i]}"

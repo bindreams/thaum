@@ -1,0 +1,12 @@
+name: Hay node with exression block arg now allowed - Node (; ; ^(var x = 1))
+dialect: bash
+source: 
+  oils:spec/hay-meta#hay-node-with-exression-block-arg-now-allowed---node-var-x-1
+status: 1
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Foo
+
+Foo (; ; ^(echo hi))

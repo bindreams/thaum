@@ -1,0 +1,9 @@
+name: Wrong sigil with $range() is runtime error
+dialect: bash
+source: oils:spec/ysh-word-eval#wrong-sigil-with-range-is-runtime-error
+status: 3
+stdout: "\n"
+---
+shopt -s ysh:upgrade
+echo $[10 ..< 15]
+echo 'should not get here'

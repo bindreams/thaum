@@ -1,0 +1,7 @@
+name: Pass too many typed args
+dialect: bash
+source: oils:spec/ysh-blocks#pass-too-many-typed-args
+status: 3
+---
+
+cd /tmp (1, 2)

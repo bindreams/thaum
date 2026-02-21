@@ -1,0 +1,10 @@
+name: kill pid and job at once
+dialect: bash
+source: oils:spec/builtin-kill#kill-pid-and-job-at-once
+stdout: "0\n## BUG dash STDOUT:\n1\n"
+---
+sleep 0.1 &
+pid=$!
+sleep 0.1 &
+kill %2 $pid
+echo $?

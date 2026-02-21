@@ -1,0 +1,20 @@
+name: can't convert NAN, INFINITY to integer
+dialect: bash
+source: oils:spec/ysh-int-float#cant-convert-nan-infinity-to-integer
+stdout: "code 3\ncode 3\n"
+---
+shopt --set ysh:upgrade
+
+#echo $[int(NAN)]
+try {
+  echo $[int(NAN)]
+}
+echo code $[_error.code]
+#pp test_ (_error)
+
+#echo $[int(-INFINITY)]
+try {
+  echo $[int(-INFINITY)]
+}
+echo code $[_error.code]
+#pp test_ (_error)

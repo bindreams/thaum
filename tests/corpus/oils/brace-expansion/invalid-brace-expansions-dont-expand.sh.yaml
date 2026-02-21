@@ -1,0 +1,8 @@
+name: Invalid brace expansions don't expand
+dialect: bash
+source: oils:spec/brace-expansion#invalid-brace-expansions-dont-expand
+stdout: "{1.3}\n{1...3}\n{1__3}\n"
+---
+echo {1.3}
+echo {1...3}
+echo {1__3}

@@ -1,0 +1,13 @@
+name: 'parse_brace: for-in loop'
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-for-in-loop
+stdout: "one\ntwo\nthree\nsh syntax\nfour\n"
+---
+shopt -s oil:upgrade
+for x in one two {
+  echo $x
+}
+for x in three { echo $x }
+
+echo 'sh syntax'
+for x in four; do echo $x; done

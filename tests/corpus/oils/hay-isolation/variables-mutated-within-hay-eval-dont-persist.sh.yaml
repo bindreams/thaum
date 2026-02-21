@@ -1,0 +1,18 @@
+name: variables mutated within hay eval don't persist
+dialect: bash
+source: oils:spec/hay-isolation#variables-mutated-within-hay-eval-dont-persist
+stdout: "x = 42\n"
+---
+shopt --set parse_brace
+
+hay define Package
+
+setvar x = 42
+
+hay eval :result {
+  Package foo
+
+  setvar x = 1
+}
+
+echo "x = $x"

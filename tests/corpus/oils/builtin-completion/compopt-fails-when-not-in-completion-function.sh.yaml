@@ -1,0 +1,8 @@
+name: compopt fails when not in completion function
+dialect: bash
+source: 
+  oils:spec/builtin-completion#compopt-fails-when-not-in-completion-function
+status: 1
+---
+# NOTE: Have to be executing a completion function
+compopt -o filenames +o nospace

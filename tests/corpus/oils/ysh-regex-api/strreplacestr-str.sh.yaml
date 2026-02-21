@@ -1,0 +1,14 @@
+name: Str.replace(Str, Str)
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplacestr-str
+stdout: "AbcA\naBca\nabca\na\nnewanewbnewcnewanew\n"
+---
+shopt --set ysh:all
+
+var mystr = 'abca'
+write $[mystr.replace('a', 'A')]  # Two matches
+write $[mystr.replace('b', 'B')]  # One match
+write $[mystr.replace('x', 'y')]  # No matches
+
+write $[mystr.replace('abc', '')]  # Empty substitution
+write $[mystr.replace('', 'new')]  # Empty substring

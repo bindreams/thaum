@@ -1,0 +1,9 @@
+name: invalid JSON
+dialect: bash
+source: oils:spec/ysh-json#invalid-json
+status: 1
+stdout: "pipeline status = 1\n"
+---
+echo '{' | json read (&y)
+echo pipeline status = $?
+pp test_ (y)

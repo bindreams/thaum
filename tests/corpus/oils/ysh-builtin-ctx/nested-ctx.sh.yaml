@@ -1,0 +1,15 @@
+name: nested ctx
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#nested-ctx
+stdout: "{\n  \"from\": \"a\"\n}\n{\n  \"from\": \"b\"\n}\n"
+---
+var a = {}
+var b = {}
+ctx push (a) {
+  ctx set (from="a")
+  ctx push (b) {
+    ctx set (from="b")
+  }
+}
+json write (a)
+json write (b)

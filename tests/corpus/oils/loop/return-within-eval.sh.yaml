@@ -1,0 +1,11 @@
+name: return within eval
+dialect: bash
+source: oils:spec/loop#return-within-eval
+stdout: "one\n"
+---
+f() {
+  echo one
+  eval 'return'
+  echo two
+}
+f

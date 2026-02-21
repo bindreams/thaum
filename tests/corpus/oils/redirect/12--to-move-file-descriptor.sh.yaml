@@ -1,0 +1,12 @@
+name: 1>&2- to move file descriptor
+dialect: bash
+source: oils:spec/redirect#12--to-move-file-descriptor
+stdout: "hello5\nworld6\n"
+---
+exec 5> "$TMP/f.txt"
+echo hello5 >&5
+exec 6>&5-
+echo world5 >&5
+echo world6 >&6
+exec 6>&-
+cat "$TMP/f.txt"

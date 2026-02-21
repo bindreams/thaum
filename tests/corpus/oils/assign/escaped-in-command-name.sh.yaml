@@ -1,0 +1,7 @@
+name: Escaped = in command name
+dialect: bash
+source: oils:spec/assign#escaped-in-command-name
+stdout: "HI\n"
+---
+# foo=bar is in the 'spec/bin' dir.
+foo\=bar

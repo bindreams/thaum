@@ -1,0 +1,13 @@
+name: implicit for loop
+dialect: bash
+source: oils:spec/loop#implicit-for-loop
+stdout: "1\n2\n3\nfinished=3\n"
+---
+# This is like "for i in $@".
+fun() {
+  for i; do
+    echo $i
+  done
+  echo "finished=$i"
+}
+fun 1 2 3

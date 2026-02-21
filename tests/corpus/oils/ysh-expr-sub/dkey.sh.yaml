@@ -1,0 +1,8 @@
+name: $[d['key']]
+dialect: bash
+source: oils:spec/ysh-expr-sub#dkey
+stdout: "42\n"
+---
+var d = {}
+setvar d['key'] = 42
+echo $[d['key']]

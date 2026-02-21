@@ -1,0 +1,13 @@
+name: 'set -o errtrace: trap ERR with &'
+dialect: bash
+source: oils:spec/builtin-trap-err#set--o-errtrace-trap-err-with
+stdout: "line=8\nasync\n"
+---
+case $SH in mksh) exit ;; esac
+
+set -o errtrace
+trap 'echo line=$LINENO' ERR
+
+false & wait
+
+{ false; echo async; } & wait

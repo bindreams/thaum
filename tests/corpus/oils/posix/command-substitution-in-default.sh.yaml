@@ -1,0 +1,6 @@
+name: Command substitution in default
+dialect: bash
+source: oils:spec/posix#command-substitution-in-default
+stdout: "/bin\n"
+---
+echo ${x:-$(ls -d /bin)}

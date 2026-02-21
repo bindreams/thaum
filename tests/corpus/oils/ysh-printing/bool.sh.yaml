@@ -1,0 +1,7 @@
+name: Bool
+dialect: bash
+source: oils:spec/ysh-printing#bool
+stdout: "(Bool)  true\n(Bool)  false\n"
+---
+=       true
+=       false

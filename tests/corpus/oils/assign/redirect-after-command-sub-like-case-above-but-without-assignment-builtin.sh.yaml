@@ -1,0 +1,9 @@
+name: redirect after command sub (like case above but without assignment 
+  builtin)
+dialect: bash
+source: 
+  oils:spec/assign#redirect-after-command-sub-like-case-above-but-without-assignment-builtin
+stdout: "stdout=STDOUT\n"
+stderr: "STDERR\n"
+---
+echo stdout=$(stdout_stderr.py) 2>/dev/null

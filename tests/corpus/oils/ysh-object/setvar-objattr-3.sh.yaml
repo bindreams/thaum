@@ -1,0 +1,21 @@
+name: setvar obj['attr'] = 3 ?
+dialect: bash
+source: oils:spec/ysh-object#setvar-objattr-3
+status: 3
+stdout: "\n"
+---
+
+var rect = Object(null, {x: 3, y: 4})
+
+setvar rect['x'] = 99
+
+pp test_ (rect)
+
+# The reason this is allowed is because setvar does EvalLhsExpr(), which
+# handles:
+#
+# - y_lhs.SubScript -> y_lvalue.Container
+# - y_lhs.Attribute -> y_lvalue.Container
+#
+# So that means obj['x'] is allowed too?
+# We could possible add y_lvalue.Container(is_subscript)

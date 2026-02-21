@@ -1,0 +1,29 @@
+name: test -v with arrays
+dialect: bash
+source: oils:spec/assign-dialects#test--v-with-arrays
+stdout: "a=1\na[0]=1\n\na=0\na[0]=0\n\na[1]=1\na[x]=0\n\n"
+---
+
+typeset -a a
+
+test -v a
+echo a=$?
+test -v 'a[0]'
+echo "a[0]=$?"
+echo
+
+a[0]=1
+
+test -v a
+echo a=$?
+test -v 'a[0]'
+echo "a[0]=$?"
+echo
+
+test -v 'a[1]'
+echo "a[1]=$?"
+
+# stupid rule about undefined 'x'
+test -v 'a[x]'
+echo "a[x]=$?"
+echo

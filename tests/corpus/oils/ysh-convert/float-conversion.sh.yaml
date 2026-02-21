@@ -1,0 +1,10 @@
+name: float() conversion
+dialect: bash
+source: oils:spec/ysh-convert#float-conversion
+stdout: "1234.0\n1.234\n2.345\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo "$[float(1234)]"
+echo "$[float('1.234')]"
+echo "$[float(2.345)]"

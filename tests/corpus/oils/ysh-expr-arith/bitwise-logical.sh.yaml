@@ -1,0 +1,13 @@
+name: Bitwise logical
+dialect: bash
+source: oils:spec/ysh-expr-arith#bitwise-logical
+stdout: "1\n7\n6\n-8\n"
+---
+var a = 0b0101 & 0b0011
+echo $a
+var b = 0b0101 | 0b0011
+echo $b
+var c = 0b0101 ^ 0b0011
+echo $c
+var d = ~b
+echo $d

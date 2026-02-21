@@ -1,0 +1,9 @@
+name: set -eu (flag parsing)
+dialect: bash
+source: oils:spec/builtin-set#set--eu-flag-parsing
+status: 1
+stdout: ''
+---
+set -eu 
+echo "[$unset]"
+echo status=$?

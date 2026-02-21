@@ -1,0 +1,19 @@
+name: eval with vars follows same scoping as without
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#eval-with-vars-follows-same-scoping-as-without
+stdout: "baz\nbaz\nfoo\nfoo\n"
+---
+
+proc local-scope {
+  var myVar = "foo"
+  call io->eval(^(echo $myVar), vars={ someOtherVar: "bar" })
+  call io->eval(^(echo $myVar))
+}
+
+# In global scope
+var myVar = "baz"
+call io->eval(^(echo $myVar), vars={ someOtherVar: "bar" })
+call io->eval (^(echo $myVar))
+
+local-scope

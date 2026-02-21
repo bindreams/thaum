@@ -1,0 +1,12 @@
+name: temp assignment x=~ env
+dialect: bash
+source: oils:spec/tilde#temp-assignment-x-env
+stdout: "xx=/home/bar\nxx=/root:/home/bar:/home/bar\n"
+---
+
+HOME=/home/bar
+
+xx=~ env | grep xx=
+
+# Does it respect the colon rule too?
+xx=~root:~:~ env | grep xx=

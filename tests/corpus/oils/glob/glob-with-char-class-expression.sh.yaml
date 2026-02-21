@@ -1,0 +1,8 @@
+name: glob with char class expression
+dialect: bash
+source: oils:spec/glob#glob-with-char-class-expression
+stdout: "_tmp/e.E _tmp/foo.-\n"
+---
+# note: mksh doesn't support [[:punct:]] ?
+touch _tmp/e.E _tmp/foo.-
+echo _tmp/*.[[:punct:]E]

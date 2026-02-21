@@ -1,0 +1,22 @@
+name: hay eval with shopt -s ysh:all
+dialect: bash
+source: oils:spec/hay#hay-eval-with-shopt--s-yshall
+stdout: "foo bar\n"
+---
+shopt --set parse_brace parse_equals parse_proc
+
+hay define Package
+
+const x = 'foo bar'
+
+hay eval :result {
+  Package foo {
+    # set -e should be active!
+    #false
+
+    version = '1.0'
+
+    # simple_word_eval should be active!
+    write -- $x
+  }
+}

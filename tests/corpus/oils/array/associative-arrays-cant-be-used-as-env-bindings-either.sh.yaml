@@ -1,0 +1,7 @@
+name: Associative arrays can't be used as env bindings either
+dialect: bash
+source: oils:spec/array#associative-arrays-cant-be-used-as-env-bindings-either
+status: 2
+stdout: ''
+---
+A=a B=([k]=v) printenv.py A B

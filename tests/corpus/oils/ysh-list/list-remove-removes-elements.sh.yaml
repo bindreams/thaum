@@ -1,0 +1,17 @@
+name: List remove() removes elements
+dialect: bash
+source: oils:spec/ysh-list#list-remove-removes-elements
+stdout: "pass\n"
+---
+shopt -s ysh:all
+
+var l = list(1..=3)
+call l->remove(2)
+assert [ [1, 3] === l ]
+
+# first instance only
+var l = :|foo bar baz foo foo|
+call l->remove("foo")
+assert [ :|bar baz foo foo| === l ]
+
+echo pass

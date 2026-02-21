@@ -1,0 +1,19 @@
+name: circular dict - TODO 2023-06 REGRESS
+dialect: bash
+source: oils:spec/ysh-assign#circular-dict---todo-2023-06-regress
+stdout: "(OrderedDict)   <'name': 'foo'>\n(OrderedDict)   <'name': 123>\n(OrderedDict)\
+  \   <'name': 'mystr'>\n(OrderedDict)   <'name': ...>\n"
+---
+var d = {name: 'foo'}
+pp test_ (d)
+
+setvar d['name'] = 123
+pp test_ (d)
+
+setvar d['name'] = 'mystr'
+pp test_ (d)
+
+setvar d['name'] = d
+pp test_ (d)
+
+# This used to print ...

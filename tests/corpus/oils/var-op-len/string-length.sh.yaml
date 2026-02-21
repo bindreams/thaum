@@ -1,0 +1,7 @@
+name: String length
+dialect: bash
+source: oils:spec/var-op-len#string-length
+stdout: "3\n"
+---
+v=foo
+echo ${#v}

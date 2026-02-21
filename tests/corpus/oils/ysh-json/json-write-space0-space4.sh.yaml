@@ -1,0 +1,12 @@
+name: json write space=0, space=4
+dialect: bash
+source: oils:spec/ysh-json#json-write-space0-space4
+stdout: "{\"name\":\"bob\",\"age\":30}\n{\n    \"name\": \"bob\",\n    \"age\": 30\n\
+  }\n"
+---
+shopt --set parse_proc
+
+var mydict = {name: "bob", age: 30}
+
+json write (mydict, space=0)
+json write (mydict, space=4)

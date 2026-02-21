@@ -1,0 +1,7 @@
+name: user can inspect __modules__ cache
+dialect: bash
+source: oils:spec/ysh-builtin-module#user-can-inspect-modules-cache
+stdout: "\n"
+---
+
+echo 'TODO: Dict view of realpath() string -> Obj instance'

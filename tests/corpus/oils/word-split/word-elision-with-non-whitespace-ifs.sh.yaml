@@ -1,0 +1,13 @@
+name: Word elision with non-whitespace IFS
+dialect: bash
+source: oils:spec/word-split#word-elision-with-non-whitespace-ifs
+stdout: "['']\n[' ']\n[]\n"
+---
+# Treated differently than the default IFS.  What is the rule here?
+IFS='_'
+char='_'
+space=' '
+empty=''
+argv.py $char
+argv.py $space
+argv.py $empty

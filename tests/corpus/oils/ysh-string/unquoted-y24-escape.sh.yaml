@@ -1,0 +1,14 @@
+name: Unquoted \y24 escape
+dialect: bash
+source: oils:spec/ysh-string#unquoted-y24-escape
+stdout: "foo $\n36\nfoo @\nfoo A\n"
+---
+
+var x = 'foo ' ++ \y24
+echo $x
+
+var y = 0x24
+echo $y
+
+echo foo $[\y40]
+echo "foo $[\y41]"

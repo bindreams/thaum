@@ -1,0 +1,21 @@
+name: Eggex (reference type)
+dialect: bash
+source: oils:spec/ysh-printing#eggex-reference-type
+stdout: "<Eggex 0x--->\n(Dict)  {k: <Eggex 0x--->}\n\n<Eggex>\n(Dict)   {\"k\":<Eggex>}\n"
+---
+var pat = /d+/
+
+remove-addr() {
+  sed 's/0x[0-9a-f]\+/0x---/'
+}
+
+pp value (pat) | remove-addr
+
+pp value ({k: pat}) | remove-addr
+
+# TODO: change this
+
+echo
+
+pp test_ (pat)
+pp test_ ({k: pat})

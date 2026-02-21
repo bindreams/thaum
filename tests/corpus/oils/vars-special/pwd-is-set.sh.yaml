@@ -1,0 +1,8 @@
+name: $PWD is set
+dialect: bash
+source: oils:spec/vars-special#pwd-is-set
+stdout: "status=0\n"
+---
+# Just test that it has a slash for now.
+echo $PWD | grep -q /
+echo status=$?

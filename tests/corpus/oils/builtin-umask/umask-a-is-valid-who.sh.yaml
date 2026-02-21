@@ -1,0 +1,17 @@
+name: umask a is valid who
+dialect: bash
+source: oils:spec/builtin-umask#umask-a-is-valid-who
+status: 0
+stdout: "000\n120\n564\n"
+---
+umask 0732
+umask a=rwx
+umask | tail -c 4
+
+umask 0124
+umask a+r
+umask | tail -c 4
+
+umask 0124
+umask a-r
+umask | tail -c 4

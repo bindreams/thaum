@@ -1,0 +1,9 @@
+name: trap EXIT with explicit exit
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit-with-explicit-exit
+status: 42
+stdout: "IN TRAP\nFOO\n"
+---
+trap 'echo IN TRAP; echo $stdout' EXIT 
+stdout=FOO
+exit 42

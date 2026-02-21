@@ -1,0 +1,12 @@
+name: Empty expression (( ))  $(( ))
+dialect: bash
+source: oils:spec/arith-context#empty-expression
+stdout: "status=1\n0\n"
+---
+
+(( ))
+echo status=$?
+
+echo $(( ))
+
+#echo $[]

@@ -1,0 +1,15 @@
+name: 'Max code point: json, json8, = keyword, pp test_'
+dialect: bash
+source: oils:spec/ysh-unicode#max-code-point-json-json8-keyword-pp-test
+stdout: "\"􏿿\"\n\"􏿿\"\n(Str)   '􏿿'\n(Str)   \"􏿿\"\n"
+---
+
+var max = u'\u{10ffff}'
+
+json write (max)
+json8 write (max)
+
+= max
+pp test_ (max)
+
+#echo "var x = u'"$max"'; = x" | $SH

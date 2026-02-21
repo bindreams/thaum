@@ -1,0 +1,13 @@
+name: Anonymous function expression not implemented (Tea)
+dialect: bash
+source: oils:spec/ysh-reserved#anonymous-function-expression-not-implemented-tea
+status: 2
+stdout: "\n"
+---
+
+# Note: this results in a expr.Lambda node.  But it's not parsed.
+
+const f = func(x) {
+  myfunc(x)
+  return x + 1
+}

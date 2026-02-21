@@ -1,0 +1,38 @@
+name: read and "\ "
+dialect: bash
+source: oils:spec/builtin-read#read-and
+stdout: "-- xs... --\n['', '']\n['', ' ']\n['', '  ']\n['', '   ']\n-- xe... --\n\
+  ['', ' ']\n['', '  ']\n['', '   ']\n['', ' ']\n['', ' ']\n['', ' ']\n"
+---
+
+IFS='x '
+check() { echo "$1" | (read a b; argv.py "$a" "$b"); }
+
+echo '-- xs... --'
+check 'x '
+check 'x \ '
+check 'x \ \ '
+check 'x \ \ \ '
+echo '-- xe... --'
+check 'x\ '
+check 'x\ \ '
+check 'x\ \ \ '
+check 'x\  '
+check 'x\  '
+check 'x\    '
+
+# check 'xx\ '
+# check 'xx\ '
+
+-- xs... --
+['', '']
+['', '']
+['', '']
+['', '']
+-- xe... --
+['', '']
+['', '']
+['', '']
+['', '']
+['', '']
+['', '']

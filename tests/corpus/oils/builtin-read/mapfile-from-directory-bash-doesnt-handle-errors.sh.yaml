@@ -1,0 +1,10 @@
+name: mapfile from directory (bash doesn't handle errors)
+dialect: bash
+source: oils:spec/builtin-read#mapfile-from-directory-bash-doesnt-handle-errors
+stdout: "status=1\n"
+---
+case $SH in dash|ash|mksh|zsh) return ;; esac  # not implemented
+
+mkdir -p dir
+mapfile $x < ./dir
+echo status=$?

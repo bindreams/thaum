@@ -1,0 +1,9 @@
+name: source ///osh/two.sh rather than source --builtin osh/two.sh
+dialect: bash
+source: 
+  oils:spec/ysh-TODO-deprecate#source-oshtwosh-rather-than-source---builtin-oshtwosh
+stdout: "status=0\n"
+---
+
+source --builtin osh/two.sh
+echo status=$?

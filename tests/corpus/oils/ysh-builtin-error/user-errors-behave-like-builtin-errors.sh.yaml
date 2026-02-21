@@ -1,0 +1,19 @@
+name: User errors behave like builtin errors
+dialect: bash
+source: oils:spec/ysh-builtin-error#user-errors-behave-like-builtin-errors
+status: 3
+stdout: "status=3\n"
+---
+func divide(a, b) {
+  if (b === 0) {
+    error 'divide by zero' (code=3)
+  }
+
+  return (a / b)
+}
+
+# errors can be caught with try
+try { = divide(42, 0) }
+echo status=$[_error.code]
+
+= divide(42, 0)

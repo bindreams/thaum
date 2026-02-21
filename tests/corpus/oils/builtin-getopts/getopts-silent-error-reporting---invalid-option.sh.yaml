@@ -1,0 +1,12 @@
+name: getopts silent error reporting - invalid option
+dialect: bash
+source: 
+  oils:spec/builtin-getopts#getopts-silent-error-reporting---invalid-option
+status: 0
+stdout: "status=0 opt=? OPTARG=Z\n"
+stderr: "\n"
+---
+# Leading : in optspec enables silent mode: OPTARG=option char, no error msg
+set -- -Z
+getopts ':a:' opt 2>&1
+echo "status=$? opt=$opt OPTARG=$OPTARG"

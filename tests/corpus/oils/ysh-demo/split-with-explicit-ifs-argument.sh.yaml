@@ -1,0 +1,14 @@
+name: split with explicit IFS argument
+dialect: bash
+source: oils:spec/ysh-demo#split-with-explicit-ifs-argument
+stdout: "1 one\n--\n2 two\n"
+---
+shopt -s ysh:upgrade
+
+# demonstrate that -- is not special to 'write'
+output=$(echo '1 one'; echo --; echo '2 two')
+
+# TODO: accept named arg IFS=
+for x in @[split(output, $'\n')]; do
+  write -- $x
+done

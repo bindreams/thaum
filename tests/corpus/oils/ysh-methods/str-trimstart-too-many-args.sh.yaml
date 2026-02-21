@@ -1,0 +1,6 @@
+name: Str => trimStart(), too many args
+dialect: bash
+source: oils:spec/ysh-methods#str-trimstart-too-many-args
+status: 3
+---
+= 'mystr' => trimStart('extra', 'args')

@@ -1,0 +1,25 @@
+name: 'Unrecoverable: divide by zero in case'
+dialect: bash
+source: oils:spec/fatal-errors#unrecoverable-divide-by-zero-in-case
+stdout: "outside=1\n---\noutside=1\n"
+---
+
+$SH -c '
+case $(( 42 / 0 )) in
+  (*) echo hi ;;
+esac
+echo inside=$?
+'
+echo outside=$?
+
+echo ---
+
+$SH -c '
+case foo in
+  ( $(( 42 / 0 )) )
+    echo hi
+    ;;
+esac
+echo inside=$?
+'
+echo outside=$?

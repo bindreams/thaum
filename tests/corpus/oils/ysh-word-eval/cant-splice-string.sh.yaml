@@ -1,0 +1,9 @@
+name: Can't splice string
+dialect: bash
+source: oils:spec/ysh-word-eval#cant-splice-string
+status: 3
+stdout: ''
+---
+shopt -s ysh:upgrade
+var mystr = 'abc'
+argv.py @mystr

@@ -1,0 +1,12 @@
+name: Wrong sigil @[max(3, 4)]
+dialect: bash
+source: oils:spec/ysh-word-eval#wrong-sigil-max3-4
+status: 3
+stdout: "\n"
+---
+shopt -s ysh:upgrade
+
+source $LIB_YSH/math.ysh
+
+write @[max(3, 4)]
+echo 'should not get here'

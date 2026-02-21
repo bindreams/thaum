@@ -1,0 +1,8 @@
+name: space before ( in array initialization
+dialect: bash
+source: oils:spec/array#space-before-in-array-initialization
+status: 2
+---
+# NOTE: mksh accepts this, but bash doesn't
+a= (1 '2 3')
+echo $a

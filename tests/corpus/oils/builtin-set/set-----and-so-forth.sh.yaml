@@ -1,0 +1,21 @@
+name: set - - and so forth
+dialect: bash
+source: oils:spec/builtin-set#set-----and-so-forth
+stdout: "a b\na b\na b\n-\n--\n"
+---
+set a b
+echo "$@"
+
+set - a b
+echo "$@"
+
+set -- a b
+echo "$@"
+
+set - -
+echo "$@"
+
+set -- --
+echo "$@"
+
+# note: zsh is different, and yash is totally different

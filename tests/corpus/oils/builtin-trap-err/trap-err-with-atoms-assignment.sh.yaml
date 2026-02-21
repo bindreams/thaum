@@ -1,0 +1,14 @@
+name: 'trap ERR with "atoms": assignment (( [['
+dialect: bash
+source: oils:spec/builtin-trap-err#trap-err-with-atoms-assignment
+stdout: "line=3\nline=5\nline=7\nok\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+x=$(false)
+
+[[ a == b ]]
+
+(( 0 ))
+echo ok

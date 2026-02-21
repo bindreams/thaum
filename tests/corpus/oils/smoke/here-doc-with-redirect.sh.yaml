@@ -1,0 +1,10 @@
+name: Here doc with redirect
+dialect: bash
+source: oils:spec/smoke#here-doc-with-redirect
+stdout: "8 smoke1.txt\n"
+---
+cat <<EOF >smoke1.txt
+one
+two
+EOF
+wc -c smoke1.txt

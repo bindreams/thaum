@@ -1,0 +1,15 @@
+name: HISTSIZE shrinks the in-memory history when changed
+dialect: bash
+source: 
+  oils:spec/builtin-history#histsize-shrinks-the-in-memory-history-when-changed
+stdout: "10\n5\n"
+---
+
+cd $TMP
+printf "cmd %s\n" {1..10} > tmp
+HISTFILE=tmp
+history -c
+history -r
+history | wc -l
+HISTSIZE=5
+history | wc -l

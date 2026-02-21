@@ -1,0 +1,9 @@
+name: write  -e not supported
+dialect: bash
+source: oils:spec/ysh-builtins#write--e-not-supported
+status: 2
+stdout: ''
+---
+shopt -s ysh:all
+write -e foo
+write status=$?

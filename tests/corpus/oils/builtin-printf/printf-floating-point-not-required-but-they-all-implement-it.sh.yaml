@@ -1,0 +1,12 @@
+name: printf floating point (not required, but they all implement it)
+dialect: bash
+source: 
+  oils:spec/builtin-printf#printf-floating-point-not-required-but-they-all-implement-it
+stdout: "[3.141590]\n[3.14]\n[    3.14]\n[3.14    ]\n[3.141590]\n[3.140000]\n"
+---
+printf '[%f]\n' 3.14159
+printf '[%.2f]\n' 3.14159
+printf '[%8.2f]\n' 3.14159
+printf '[%-8.2f]\n' 3.14159
+printf '[%-f]\n' 3.14159
+printf '[%-f]\n' 3.14

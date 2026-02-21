@@ -1,0 +1,16 @@
+name: File redirect to $var with glob char
+dialect: bash
+source: oils:spec/redirect-multi#file-redirect-to-var-with-glob-char
+status: 1
+stdout: "status=0\n==> two-bar <==\nhi\n"
+---
+
+touch two-bar
+
+star='*'
+
+# This gets glob-expanded, as it does outside redirects
+echo hi > two-$star
+echo status=$?
+
+head two-bar two-\*

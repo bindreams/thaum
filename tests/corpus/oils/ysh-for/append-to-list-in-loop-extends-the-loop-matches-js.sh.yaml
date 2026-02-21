@@ -1,0 +1,15 @@
+name: Append to List in loop extends the loop (matches JS)
+dialect: bash
+source: oils:spec/ysh-for#append-to-list-in-loop-extends-the-loop-matches-js
+stdout: "1\n2\n3\n99\n"
+---
+
+# see demo/survey-loop
+
+var mylist = [1,2,3]
+for x in (mylist) {
+  if (x === 2) {
+    call mylist->append(99)
+  }
+  echo $x
+}

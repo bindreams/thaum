@@ -1,0 +1,10 @@
+name: expression evaluation shortcuts
+dialect: bash
+source: oils:spec/ysh-case#expression-evaluation-shortcuts
+status: 0
+stdout: "no error\n"
+---
+var x = 123
+case (x) {
+  (x) | (y) { echo no error }
+}

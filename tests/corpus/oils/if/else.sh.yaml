@@ -1,0 +1,10 @@
+name: else
+dialect: bash
+source: oils:spec/if#else
+stdout: "else\n"
+---
+if false; then
+  echo if
+else
+  echo else
+fi

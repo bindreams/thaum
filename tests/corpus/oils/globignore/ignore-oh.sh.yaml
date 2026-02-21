@@ -1,0 +1,8 @@
+name: Ignore *.o:*.h
+dialect: bash
+source: oils:spec/globignore#ignore-oh
+stdout: "hello hello.c\n"
+---
+touch {hello.c,hello.h,hello.o,hello}
+GLOBIGNORE=*.o:*.h
+echo hello*

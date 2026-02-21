@@ -1,0 +1,9 @@
+name: echo builtin should disallow typed args - variable
+dialect: bash
+source: 
+  oils:spec/builtin-echo#echo-builtin-should-disallow-typed-args---variable
+status: 2
+stdout: "\n"
+---
+var x = 43
+echo (x)

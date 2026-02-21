@@ -1,0 +1,8 @@
+name: Export a variable before defining it
+dialect: bash
+source: oils:spec/builtin-vars#export-a-variable-before-defining-it
+stdout: "u\n"
+---
+export U
+U=u
+printenv.py U

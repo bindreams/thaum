@@ -1,0 +1,9 @@
+name: Here doc line continuation
+dialect: bash
+source: oils:spec/here-doc#here-doc-line-continuation
+stdout: "one\ntwo\n"
+---
+cat <<EOF \
+; echo two
+one
+EOF

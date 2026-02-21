@@ -1,0 +1,9 @@
+name: TODO
+dialect: bash
+source: oils:spec/word-split#todo
+---
+empty=""
+space=" "
+AB="A B"
+X="X"
+Yspaces=" Y "

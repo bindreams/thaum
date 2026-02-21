@@ -1,0 +1,9 @@
+name: read (&x) is usage error
+dialect: bash
+source: oils:spec/ysh-builtins#read-x-is-usage-error
+stdout: "status=2\n"
+---
+
+var x = null  # allow no initialization
+echo hello | read (&x)
+echo status=$?

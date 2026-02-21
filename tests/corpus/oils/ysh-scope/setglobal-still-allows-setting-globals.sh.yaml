@@ -1,0 +1,17 @@
+name: setglobal still allows setting globals
+dialect: bash
+source: oils:spec/ysh-scope#setglobal-still-allows-setting-globals
+stdout: "g=p new_global=p\n"
+---
+shopt --set parse_proc
+
+proc p {
+  setglobal new_global = 'p'
+  setglobal g = 'p'
+}
+
+var g = 'G'
+
+p
+
+echo g=$g new_global=$new_global

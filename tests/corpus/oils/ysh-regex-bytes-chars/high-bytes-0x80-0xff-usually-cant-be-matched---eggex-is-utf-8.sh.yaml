@@ -1,0 +1,17 @@
+name: High bytes 0x80 0xff usually can't be matched - Eggex is UTF-8
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#high-bytes-0x80-0xff-usually-cant-be-matched---eggex-is-utf-8
+status: 1
+stdout: "(Bool)   true\n(Bool)   false\n"
+---
+shopt -s ysh:all
+
+# ascii works
+pp test_ (b'\y7f' ~ / [\x7f] /)
+pp test_ (b'\y7e' ~ / [\x7f] /)
+
+= str( / [\y80]/ )
+
+#pp test_ (b'\y80' ~ / [\y80] /)
+#pp test_ (b'\yff' ~ / [\yff] /)

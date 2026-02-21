@@ -1,0 +1,9 @@
+name: compgen -A builtin doesn't find private builtins
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-private#compgen--a-builtin-doesnt-find-private-builtins
+stdout: "status=1\n"
+---
+
+compgen -A builtin slee
+echo status=$?

@@ -1,0 +1,21 @@
+name: Append object onto Array
+dialect: bash
+source: oils:spec/ysh-user-feedback#append-object-onto-array
+stdout: "[\n  {\n    \"1\": \"Test 1\"\n  },\n  {\n    \"2\": \"Test 2\"\n  }\n]\n"
+---
+var e = []
+
+# %() is also acceptable, but we prefer Python-like [] for objects.
+# %() is more for an array of strings
+# var e = %()
+
+for i in @(seq 2) {
+  var o = {}
+  setvar o[i] = "Test $i"
+
+  # push builtin is only for strings
+
+  call e->append(o)
+}
+
+json write (e)

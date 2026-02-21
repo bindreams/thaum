@@ -1,0 +1,14 @@
+name: Str => startsWith(Str) and endsWith(Str), eggex
+dialect: bash
+source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex
+status: 0
+stdout: "false false\ntrue true\ntrue true\nfalse false\ntrue true\nfalse false\n"
+---
+func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
+
+call test('abc', / d+ /)
+call test('abc', / [ a b c ] /)
+call test('abc', / 'abc' /)
+call test('cba', / d+ /)
+call test('cba', / [ a b c ] /)
+call test('cba', / 'abc' /)

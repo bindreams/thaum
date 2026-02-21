@@ -1,0 +1,18 @@
+name: setvar mylist[99] out of range
+dialect: bash
+source: oils:spec/ysh-assign#setvar-mylist99-out-of-range
+stdout: "3\n3\n4 5 6\n"
+---
+shopt -s ysh:all
+var mylist = [4,5,6]
+try {
+  setvar mylist[99] = 42
+}
+echo $[_error.code]
+
+try {
+  setvar mylist[-99] = 42
+}
+echo $[_error.code]
+
+write --sep ' ' @mylist

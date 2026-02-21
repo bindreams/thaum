@@ -1,0 +1,17 @@
+name: no_xtrace_osh UNSET, and xtrace_rich set
+dialect: bash
+source: oils:spec/ysh-xtrace#noxtraceosh-unset-and-xtracerich-set
+stdout: "\n"
+stderr: "| command 12345: env 'false'\n; process 12345: status 1\n. builtin set '+x'\n"
+---
+shopt --set ysh:upgrade 
+shopt --unset no_xtrace_osh
+shopt --unset errexit
+set -x
+
+{
+  env false
+  set +x
+} 2>err.txt
+
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt >&2

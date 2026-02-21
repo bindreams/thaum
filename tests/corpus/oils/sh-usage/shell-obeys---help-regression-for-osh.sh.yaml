@@ -1,0 +1,9 @@
+name: shell obeys --help (regression for OSH)
+dialect: bash
+source: oils:spec/sh-usage#shell-obeys---help-regression-for-osh
+stdout: "yes\n"
+---
+n=$($SH --help | wc -l)
+if test $n -gt 0; then
+  echo yes
+fi

@@ -1,0 +1,19 @@
+name: Augmented assignment on string changes to Int Float
+dialect: bash
+source: 
+  oils:spec/ysh-augmented#augmented-assignment-on-string-changes-to-int-float
+stdout: "(Str)   \"42\"\n(Int)   46\n(Int)   55\n(Float)   10.5\n"
+---
+
+var x = '42'
+pp test_ (x)
+
+setvar x += 4 * 1
+pp test_ (x)
+
+setvar x += '9'
+pp test_ (x)
+
+setvar x = '42'
+setvar x /= 4
+pp test_ (x)

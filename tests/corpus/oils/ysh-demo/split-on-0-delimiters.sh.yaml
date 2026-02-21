@@ -1,0 +1,14 @@
+name: split on \0 delimiters
+dialect: bash
+source: oils:spec/ysh-demo#split-on-0-delimiters
+stdout: "1 one\n2 two\n"
+---
+shopt -s ysh:upgrade
+
+write --end '' -- b'1 one\y002 two\y00' | read --all (&output)
+
+#json8 write (split(output, b'\y00'))
+
+for x in @[split(output, b'\y00')]; do
+  write -- $x
+done

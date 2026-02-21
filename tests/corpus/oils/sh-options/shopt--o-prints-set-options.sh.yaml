@@ -1,0 +1,12 @@
+name: shopt -o prints 'set' options
+dialect: bash
+source: oils:spec/sh-options#shopt--o-prints-set-options
+---
+case $SH in dash|mksh) exit ;; esac
+
+shopt -o | egrep -o 'errexit|noglob|nounset'
+echo --
+errexit
+noglob
+nounset
+--

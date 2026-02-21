@@ -1,0 +1,9 @@
+name: '[k1]=v1 (BashAssoc)'
+dialect: bash
+source: oils:spec/array-literal#k1v1-bashassoc
+stdout: "v1\nv2\n"
+---
+declare -A a
+a=([k1]=v1 [k2]=v2)
+echo ${a["k1"]}
+echo ${a["k2"]}

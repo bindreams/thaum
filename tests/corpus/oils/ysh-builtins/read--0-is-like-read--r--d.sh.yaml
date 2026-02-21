@@ -1,0 +1,16 @@
+name: read -0 is like read -r -d ''
+dialect: bash
+source: oils:spec/ysh-builtins#read--0-is-like-read--r--d
+stdout: "[./a\\b\\c\\d]\n[./a\\b\\c\\d]\n"
+---
+set -o errexit
+
+mkdir -p read0
+cd read0
+touch a\\b\\c\\d
+
+find . -type f -a -print0 | read -r -d '' name
+echo "[$name]"
+
+find . -type f -a -print0 | read -0
+echo "[$REPLY]"

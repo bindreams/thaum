@@ -1,0 +1,18 @@
+name: dict() does shallow copy
+dialect: bash
+source: oils:spec/ysh-convert#dict-does-shallow-copy
+stdout: "true\nfalse\ntrue\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var d = {'a': 1}
+var d2 = d
+setvar d2['b'] = 2
+echo $['b' in d] # d2 should be an alias for d
+
+var d3 = dict(d)
+setvar d3['c'] = 3
+
+# d3 should NOT be an alias
+echo $['c' in d]
+echo $['c' in d3]

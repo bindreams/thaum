@@ -1,0 +1,9 @@
+name: write --j8
+dialect: bash
+source: oils:spec/ysh-builtins#write---j8
+stdout: "\"μ\"\n\"x\"\nb'\\yfe\\yff'\n\"y\"\n"
+---
+shopt --set ysh:upgrade
+
+write --j8 u'\u{3bc}' x
+write --j8 b'\yfe\yff' y

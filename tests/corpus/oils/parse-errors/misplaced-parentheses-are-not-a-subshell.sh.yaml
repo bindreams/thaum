@@ -1,0 +1,6 @@
+name: misplaced parentheses are not a subshell
+dialect: bash
+source: oils:spec/parse-errors#misplaced-parentheses-are-not-a-subshell
+status: 2
+---
+echo a(b)

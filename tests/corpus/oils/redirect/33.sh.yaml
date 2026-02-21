@@ -1,0 +1,7 @@
+name: ': 3>&3-'
+dialect: bash
+source: oils:spec/redirect#33
+stdout: "hello\n"
+---
+: 3>&3-
+echo hello

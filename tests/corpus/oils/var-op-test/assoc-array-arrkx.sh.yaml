@@ -1,0 +1,11 @@
+name: assoc array ${arr["k"]=x}
+dialect: bash
+source: oils:spec/var-op-test#assoc-array-arrkx
+stdout: "0\n1\n"
+---
+# note: this also works in zsh
+
+declare -A arr=()
+echo ${#arr[@]}
+: ${arr['k']=x}
+echo ${#arr[@]}

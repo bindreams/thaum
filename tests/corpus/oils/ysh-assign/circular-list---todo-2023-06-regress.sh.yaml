@@ -1,0 +1,9 @@
+name: circular list - TODO 2023-06 REGRESS
+dialect: bash
+source: oils:spec/ysh-assign#circular-list---todo-2023-06-regress
+stdout: "(List)   [1, 2, 3]\n(List)   [[...], 2, 3]\n"
+---
+var L = [1,2,3]
+= L
+#setvar L[0] = L
+#= L

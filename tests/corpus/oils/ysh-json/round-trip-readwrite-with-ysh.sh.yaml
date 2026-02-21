@@ -1,0 +1,13 @@
+name: 'round trip: read/write with ysh'
+dialect: bash
+source: oils:spec/ysh-json#round-trip-readwrite-with-ysh
+stdout: "diff=0\n"
+---
+
+var file = "$REPO_ROOT/spec/testdata/bug.json"
+#cat $file
+cat $file | json read (&cfg)
+json write (cfg) > ysh-json
+
+diff -u $file ysh-json
+echo diff=$?

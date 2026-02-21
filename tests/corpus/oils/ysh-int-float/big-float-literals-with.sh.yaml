@@ -1,0 +1,14 @@
+name: Big float Literals with _
+dialect: bash
+source: oils:spec/ysh-int-float#big-float-literals-with
+stdout: "42000.0005\n420000.005\n4200.00005\n"
+---
+shopt --set parse_ysh_expr_sub
+
+# C++ issue: we currently print with snprintf %g
+# Pars
+
+echo $[42_000.000_500]
+
+echo $[42_000.000_500e1]
+echo $[42_000.000_500e-1]

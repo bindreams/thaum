@@ -1,0 +1,10 @@
+name: for loop with invalid identifier
+dialect: bash
+source: oils:spec/loop#for-loop-with-invalid-identifier
+status: 2
+stdout: ''
+---
+# should be compile time error, but runtime error is OK too
+for - in a b c; do
+  echo hi
+done

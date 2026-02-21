@@ -1,0 +1,12 @@
+name: noclobber on <>
+dialect: bash
+source: oils:spec/sh-options#noclobber-on
+stdout: "f.o\n"
+---
+set -C
+echo foo >| $TMP/no-clobber
+exec 3<> $TMP/no-clobber
+read -n 1 <&3
+echo -n . >&3
+exec 3>&-
+cat $TMP/no-clobber

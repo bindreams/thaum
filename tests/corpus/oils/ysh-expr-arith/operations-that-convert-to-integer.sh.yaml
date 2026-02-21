@@ -1,0 +1,24 @@
+name: 'Operations That Convert to Integer: // % **'
+dialect: bash
+source: oils:spec/ysh-expr-arith#operations-that-convert-to-integer
+stdout: "2\n1\n25\n_status 3\n_status 3\n"
+---
+shopt -s parse_brace parse_ysh_expr_sub
+
+var m = ' 5 ' // 2
+
+var n = ' 5 ' %  2
+
+var p = ' 5 ' ** 2
+
+write -- $m $n $p
+
+try {
+  var z = 'a' // 3
+}
+echo _status $[_error.code]
+
+try {
+  var z = 'z' % 3
+}
+echo _status $[_error.code]

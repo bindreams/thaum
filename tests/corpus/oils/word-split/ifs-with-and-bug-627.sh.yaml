@@ -1,0 +1,11 @@
+name: "IFS='' with $@ and $* (bug #627)"
+dialect: bash
+source: oils:spec/word-split#ifs-with-and-bug-627
+stdout: "['at', 'a', 'b c']\n['star', 'a', 'b c']\n"
+---
+set -- a 'b c'
+IFS=''
+argv.py at $@
+argv.py star $*
+
+# zsh agrees

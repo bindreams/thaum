@@ -1,0 +1,14 @@
+name: case syntax, one line
+dialect: bash
+source: oils:spec/ysh-case#case-syntax-one-line
+status: 0
+stdout: "C++\nheader.h\n"
+---
+const x = "header.h"
+case (x) {
+  *.h | *.cc { echo C++ }
+  *.py       { echo Python }
+}
+
+# not recommended, but it works
+case (x) { header.h { echo header.h } * { echo other } }

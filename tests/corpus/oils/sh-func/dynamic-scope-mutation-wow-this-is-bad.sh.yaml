@@ -1,0 +1,16 @@
+name: Dynamic Scope Mutation (wow this is bad)
+dialect: bash
+source: oils:spec/sh-func#dynamic-scope-mutation-wow-this-is-bad
+stdout: "g_var=g_var\ng_var=f_mutation\ng_var=\n"
+---
+f() {
+  g_var=f_mutation
+}
+g() {
+  local g_var=g_var
+  echo "g_var=$g_var"
+  f
+  echo "g_var=$g_var"
+}
+g
+echo g_var=$g_var

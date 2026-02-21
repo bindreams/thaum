@@ -1,0 +1,10 @@
+name: parse_at
+dialect: bash
+source: oils:spec/ysh-options#parseat
+stdout: "['@words']\n['a', 'b c']\n"
+---
+words=(a 'b c')
+argv.py @words
+
+shopt -s parse_at
+argv.py @words

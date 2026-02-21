@@ -1,0 +1,15 @@
+name: command sub with inherit_errexit and command_sub_errexit
+dialect: bash
+source: 
+  oils:spec/errexit-osh#command-sub-with-inheriterrexit-and-commandsuberrexit
+status: 1
+stdout: "zero\n"
+---
+set -o errexit
+
+# bash implements inherit_errexit, but it's not as strict as OSH.
+shopt -s inherit_errexit || true
+shopt -s command_sub_errexit || true
+echo zero
+echo $(echo one; false; echo two)  # bash/ash keep going
+echo parent status=$?

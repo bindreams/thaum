@@ -1,0 +1,17 @@
+name: Numeric signal out of range - OSH may send it anyway
+dialect: bash
+source: 
+  oils:spec/builtin-kill#numeric-signal-out-of-range---osh-may-send-it-anyway
+stdout: "kill=1\nwait=0\n"
+---
+
+sleep 0.1 &
+
+# OSH doesn't validate this, but that could be useful for non-portable signals,
+# which we don't have a name for.
+
+kill -s 9999 %%
+echo kill=$?
+
+wait
+echo wait=$?

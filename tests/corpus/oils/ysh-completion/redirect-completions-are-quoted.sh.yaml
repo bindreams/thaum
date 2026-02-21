@@ -1,0 +1,9 @@
+name: redirect completions are quoted
+dialect: bash
+source: oils:spec/ysh-completion#redirect-completions-are-quoted
+stdout: "\"echo hi > can\\\\'t\\\\ touch\\\\ this\"\n"
+---
+
+touch "can't touch this"
+
+compexport -c 'echo hi > c'

@@ -1,0 +1,12 @@
+name: Named Capture Decays Without Name
+dialect: bash
+source: oils:spec/ysh-regex-api#named-capture-decays-without-name
+stdout: "([[:digit:]]+)\nyes\n"
+---
+shopt -s ysh:all
+var pat = /<capture d+ as month>/
+echo $pat
+
+if ('123' ~ pat) {
+  echo yes
+}

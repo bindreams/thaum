@@ -1,0 +1,12 @@
+name: builtin sleep usage errors
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-sleep-usage-errors
+stdout: "status=2\nstatus=2\n"
+---
+case $SH in bash) exit ;; esac
+
+builtin sleep 0.5s
+echo status=$?
+
+builtin sleep 0.1 extra
+echo status=$?

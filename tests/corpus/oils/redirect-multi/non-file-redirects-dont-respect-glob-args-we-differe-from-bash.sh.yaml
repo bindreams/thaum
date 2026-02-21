@@ -1,0 +1,17 @@
+name: Non-file redirects don't respect glob args (we differe from bash)
+dialect: bash
+source: 
+  oils:spec/redirect-multi#non-file-redirects-dont-respect-glob-args-we-differe-from-bash
+status: 0
+stdout: "stdout\n"
+---
+
+touch 10
+
+exec 10>&1  # open stdout as descriptor 10
+
+# Does this go to stdout?  ONLY bash respects it, not zsh
+echo should-not-be-on-stdout >& 1*
+
+echo stdout
+echo stderr >&2

@@ -1,0 +1,9 @@
+name: Alias is respected inside eval
+dialect: bash
+source: oils:spec/alias#alias-is-respected-inside-eval
+stdout: "hello inside\nhello outside\n"
+---
+shopt -s expand_aliases
+eval "alias sayhi='echo hello'
+sayhi inside"
+sayhi outside

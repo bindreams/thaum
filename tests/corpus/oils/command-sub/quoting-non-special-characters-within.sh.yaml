@@ -1,0 +1,9 @@
+name: Quoting non-special characters within ``
+dialect: bash
+source: oils:spec/command-sub#quoting-non-special-characters-within
+stdout: "[1 z]\n[2 z]\n[3 \\z]\n[4 \\z]\n"
+---
+echo [1 `echo \z]`
+echo [2 `echo \\z]`
+echo [3 `echo \\\z]`
+echo [4 `echo \\\\z]`

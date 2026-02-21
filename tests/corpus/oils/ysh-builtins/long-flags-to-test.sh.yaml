@@ -1,0 +1,22 @@
+name: long flags to test
+dialect: bash
+source: oils:spec/ysh-builtins#long-flags-to-test
+stdout: "status=0\nstatus=0\nstatus=0\nstatus=1\nstatus=2\n"
+---
+# no options necessary!
+
+test --dir /
+echo status=$?
+
+touch foo
+test --file foo
+echo status=$?
+
+test --exists /
+echo status=$?
+
+test --symlink foo
+echo status=$?
+
+test --typo foo
+echo status=$?

@@ -1,0 +1,13 @@
+name: Can't splice eggex with different flags
+dialect: bash
+source: oils:spec/ysh-regex-api#cant-splice-eggex-with-different-flags
+status: 1
+stdout: "\n"
+---
+shopt -s ysh:upgrade
+
+var pat = / 'abc' ; i /
+var pat2 = / @pat 'def' ; reg_icase /  # this is allowed
+
+var pat3 = / @pat 'def' /
+= pat3

@@ -1,0 +1,28 @@
+name: place->setValue()
+dialect: bash
+source: oils:spec/ysh-place#place-setvalue
+stdout: "f x=f\nfillPlace x=fillPlace\np x=zzz\nglobal x=global\n"
+---
+
+func f(place) {
+  var x = 'f'
+  call place->setValue('zzz')
+  echo "f x=$x"
+}
+
+func fillPlace(place) {
+  var x = 'fillPlace'
+  call f(place)
+  echo "fillPlace x=$x"
+}
+
+proc p {
+  var x = 'hi'
+  call fillPlace(&x)
+  echo "p x=$x"
+}
+
+x=global
+
+p
+echo "global x=$x"

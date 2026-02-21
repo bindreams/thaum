@@ -1,0 +1,7 @@
+name: Slicing of string with constants
+dialect: bash
+source: oils:spec/arith-context#slicing-of-string-with-constants
+stdout: "abcd abcd b\n"
+---
+s='abcd'
+echo ${s:0} ${s:0:4} ${s:1:1}

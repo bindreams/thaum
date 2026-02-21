@@ -1,0 +1,7 @@
+name: compgen -f on invalid  dir
+dialect: bash
+source: oils:spec/builtin-completion#compgen--f-on-invalid-dir
+status: 1
+stdout: ''
+---
+compgen -f /non-existing-dir/

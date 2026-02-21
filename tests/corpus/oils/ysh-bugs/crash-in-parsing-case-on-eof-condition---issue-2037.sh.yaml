@@ -1,0 +1,12 @@
+name: 'Crash in parsing case on EOF condition - issue #2037'
+dialect: bash
+source: oils:spec/ysh-bugs#crash-in-parsing-case-on-eof-condition---issue-2037
+status: 2
+stdout: "\n"
+---
+
+var WEIGHT = ${1:-}
+case (WEIGHT) {
+  "-" { echo "got nothing" }
+  (else) { echo $WEIGHT
+}

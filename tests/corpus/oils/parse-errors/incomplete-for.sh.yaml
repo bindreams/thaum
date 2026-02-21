@@ -1,0 +1,8 @@
+name: Incomplete for
+dialect: bash
+source: oils:spec/parse-errors#incomplete-for
+status: 2
+stdout: ''
+---
+echo hi; for
+echo status=$?

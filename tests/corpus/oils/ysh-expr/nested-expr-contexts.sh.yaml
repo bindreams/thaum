@@ -1,0 +1,26 @@
+name: nested expr contexts
+dialect: bash
+source: oils:spec/ysh-expr#nested-expr-contexts
+stdout: "len 3\n"
+---
+var s = "123"
+
+shopt --set parse_ysh_expr_sub
+# lex_mode_e.ShCommand -> Expr -> ShCommand -> Expr
+var x = $(echo $'len\n' $[len(s)])
+echo $x
+
+
+# TODO:
+# - test keyword args
+# - test splatting *args, **kwargs
+# - Multiline parsing
+#
+# var x = max(
+#   1+2,
+#   3+4,
+# )
+# echo $x $max(
+#   1+2,
+#   3+4,
+# )

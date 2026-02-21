@@ -1,0 +1,9 @@
+name: Filenames with spaces
+dialect: bash
+source: oils:spec/extglob-files#filenames-with-spaces
+stdout: "['eg5/a bcd', 'eg5/a bde']\n"
+---
+shopt -s extglob
+mkdir -p eg5
+touch eg5/'a b'{cd,de,ef}
+argv.py eg5/'a '@(bcd|bde|zzz)

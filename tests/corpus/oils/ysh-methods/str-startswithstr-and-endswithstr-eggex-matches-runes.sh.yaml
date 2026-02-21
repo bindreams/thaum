@@ -1,0 +1,13 @@
+name: Str => startsWith(Str) and endsWith(Str), eggex matches runes
+dialect: bash
+source: 
+  oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex-matches-runes
+status: 0
+stdout: "true true\ntrue true\nfalse false\nfalse false\n"
+---
+func test(s, p) { echo $[s.startsWith(p)] $[s.endsWith(p)] }
+
+call test(u'\u{03a3}', / dot /)
+call test(u'\u{03a3}', / ![z] /)
+call test(b'\yce', / dot /)
+call test(b'\yce', / ![z] /)

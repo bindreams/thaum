@@ -1,0 +1,11 @@
+name: eval with vars bindings
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-with-vars-bindings
+stdout: "(Str)   \"abc\"\n(Str)   \"123\"\n(Str)   \"abc\"\n"
+---
+var myVar = "abc"
+call io->eval(^(pp test_ (myVar)))
+call io->eval(^(pp test_ (myVar)), vars={ 'myVar': '123' })
+
+# eval doesn't modify it's environment
+call io->eval(^(pp test_ (myVar)))

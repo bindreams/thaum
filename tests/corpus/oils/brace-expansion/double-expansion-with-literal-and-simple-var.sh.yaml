@@ -1,0 +1,7 @@
+name: double expansion with literal and simple var
+dialect: bash
+source: oils:spec/brace-expansion#double-expansion-with-literal-and-simple-var
+stdout: "_A_c _A_d b_c b_d\n"
+---
+a=A
+echo {_$a,b}_{c,d}

@@ -1,0 +1,18 @@
+name: 'TODO: all options as a table'
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#todo-all-options-as-a-table
+stdout: "\n"
+---
+
+shopt --table
+
+# This is unlike shopt -p because
+
+# 1) It shows ALL options, not just 'shopt' options
+# 2) It shows it in QTT format?
+
+# opt_name Str   value Bool
+# errexit        true
+# nounset        false
+#
+# Could also be T and F?  JSON is more obvious

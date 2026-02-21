@@ -1,0 +1,21 @@
+name: evalHay() usage
+dialect: bash
+source: oils:spec/hay#evalhay-usage
+stdout: "status 3\nstatus 3\nstatus 3\n"
+---
+shopt -s parse_brace parse_ysh_expr_sub
+
+try {
+  var d = evalHay()
+}
+echo status $[_error.code]
+
+try {
+  var d = evalHay(3)
+}
+echo status $[_error.code]
+
+try {
+  var d = evalHay(^(echo hi), 5)
+}
+echo status $[_error.code]

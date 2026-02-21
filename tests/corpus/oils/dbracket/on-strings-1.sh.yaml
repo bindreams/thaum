@@ -1,0 +1,8 @@
+name: '!= on strings'
+dialect: bash
+source: oils:spec/dbracket#on-strings
+stdout: "true\nfalse\n"
+---
+# NOTE: b!=a does NOT work
+[[ b != a ]] && echo true
+[[ a != a ]] || echo false

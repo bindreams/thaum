@@ -1,0 +1,6 @@
+name: type -p builtin -> not a file
+dialect: bash
+source: oils:spec/builtin-type-bash#type--p-builtin---not-a-file
+stdout: "\n"
+---
+type -p cd type builtin command

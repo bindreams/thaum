@@ -1,0 +1,8 @@
+name: $PPID
+dialect: bash
+source: oils:spec/vars-special#ppid
+status: 0
+---
+echo $PPID | egrep '[0-9]+'
+
+# NOTE: There is also $BASHPID

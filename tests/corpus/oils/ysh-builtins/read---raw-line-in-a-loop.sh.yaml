@@ -1,0 +1,16 @@
+name: read --raw-line in a loop
+dialect: bash
+source: oils:spec/ysh-builtins#read---raw-line-in-a-loop
+stdout: "(Str)   \"\"\n(Str)   \"a\"\n(Str)   \"b\"\n(Str)   \"\"\n\n(Str)   \"a\"\
+  \n(Str)   \"\"\n(Str)   \"b\"\n"
+---
+
+write --end '' $'\na\nb\n\n' | while read --raw-line; do
+  pp test_ (_reply)
+done
+
+echo
+
+write --end '' $'a\n\nb' | while read --raw-line; do
+  pp test_ (_reply)
+done

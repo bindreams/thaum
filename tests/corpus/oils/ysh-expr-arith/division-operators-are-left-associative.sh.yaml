@@ -1,0 +1,17 @@
+name: Division operators are left associative
+dialect: bash
+source: oils:spec/ysh-expr-arith#division-operators-are-left-associative
+stdout: "a=1.25 b=1.25\na=1 b=1\na=2 b=2\n"
+---
+
+var a = 10 / 4 / 2
+var b = 10 / 4 / 2
+echo a=$a b=$b
+
+var a = 9 // 3 // 3
+var b = (9 // 3) // 3
+echo a=$a b=$b
+
+var a = 11 % 6 % 3
+var b = (11 % 6) % 3
+echo a=$a b=$b

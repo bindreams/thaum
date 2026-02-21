@@ -1,0 +1,10 @@
+name: "@() can't have any tokens after it"
+dialect: bash
+source: oils:spec/ysh-command-sub#cant-have-any-tokens-after-it
+status: 2
+stdout: "1\n2\n"
+---
+shopt -s oil:upgrade
+
+write -- @(seq 2)
+write -- @(seq 3)x

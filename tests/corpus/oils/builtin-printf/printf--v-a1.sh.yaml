@@ -1,0 +1,9 @@
+name: printf -v a[1]
+dialect: bash
+source: oils:spec/builtin-printf#printf--v-a1
+stdout: "status=0\n['a', 'foo', 'c']\n"
+---
+a=(a b c)
+printf -v 'a[1]' %s 'foo'
+echo status=$?
+argv.py "${a[@]}"

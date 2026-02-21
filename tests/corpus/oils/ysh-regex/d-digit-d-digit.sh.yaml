@@ -1,0 +1,22 @@
+name: d+  digit+  !d+  !digit+
+dialect: bash
+source: oils:spec/ysh-regex#d-digit-d-digit
+stdout: "[[:digit:]]+\nyes\nno\n[[:digit:]]+\n[^[:digit:]]+\n[^[:digit:]]+\n"
+---
+shopt -s ysh:all
+
+var pat = ''
+
+setvar pat = /d+/
+echo $pat
+if ('42' ~ pat) { echo yes }
+
+var empty = ''
+if (empty ~ pat) { echo yes } else { echo no }
+
+setvar pat = /digit+/
+echo $pat
+setvar pat = /!d+/
+echo $pat
+setvar pat = /!digit+/
+echo $pat

@@ -1,0 +1,7 @@
+name: Regression for 'printf x y'
+dialect: bash
+source: oils:spec/builtin-printf#regression-for-printf-x-y
+stdout: "xz\n"
+---
+printf x y
+printf '%s\n' z

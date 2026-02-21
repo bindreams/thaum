@@ -1,0 +1,15 @@
+name: SHELLOPTS bug with ysh:ugprade
+dialect: bash
+source: oils:spec/osh-bugs#shellopts-bug-with-yshugprade
+stdout: "1\na\nb\n.\n..\n2\n"
+---
+
+cd $REPO_ROOT/spec/testdata/bug-shellopts
+
+#shopt -p no_init_globals
+
+$SH -o ysh:upgrade ./top-level.ysh
+
+#echo ---
+#$SH -e -c 'echo SHELLOPTS=$SHELLOPTS'
+#$SH -e -o ysh:upgrade -c 'echo SHELLOPTS=$SHELLOPTS'

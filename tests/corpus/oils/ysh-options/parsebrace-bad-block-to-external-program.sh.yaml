@@ -1,0 +1,10 @@
+name: 'parse_brace: bad block to external program'
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-bad-block-to-external-program
+status: 1
+stdout: ''
+---
+shopt -s oil:upgrade
+# This is a fatal programming error.  It's unlike passing an extra arg?
+ls { echo 'bad block' }
+echo status=$?

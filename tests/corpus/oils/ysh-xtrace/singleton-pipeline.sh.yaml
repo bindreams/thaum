@@ -1,0 +1,15 @@
+name: singleton pipeline
+dialect: bash
+source: oils:spec/ysh-xtrace#singleton-pipeline
+stdout: ''
+stderr: ". builtin ':' begin\n. builtin 'false'\n. builtin ':' end\n"
+---
+
+# Hm extra tracing
+
+shopt --set ysh:upgrade
+set -x
+
+: begin
+! false
+: end

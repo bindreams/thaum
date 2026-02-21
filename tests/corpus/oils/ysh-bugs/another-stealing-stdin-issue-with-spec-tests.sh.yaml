@@ -1,0 +1,18 @@
+name: Another "stealing stdin" issue with spec tests
+dialect: bash
+source: oils:spec/ysh-bugs#another-stealing-stdin-issue-with-spec-tests
+stdout: "(Str)   \"1\"\n(Str)   \"2\"\n(Str)   \"3\"\n(Str)   \"4\"\n(Str)   \"5\"\
+  \n"
+---
+
+proc where2(; pred) {
+  for line in (io.stdin) {
+    pp test_ (line)
+  }
+}
+
+seq 5 | where2 [_line ~== 2 or _line ~== 4]
+
+#{ echo 1; echo 2; } | where2 [_line ~== 2 or _line ~== 4]
+
+# empty lines here get put on stdin

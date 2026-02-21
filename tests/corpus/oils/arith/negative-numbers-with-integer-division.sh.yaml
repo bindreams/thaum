@@ -1,0 +1,28 @@
+name: Negative numbers with integer division /
+dialect: bash
+source: oils:spec/arith#negative-numbers-with-integer-division
+stdout: "3\n-3\n-3\n3\n---\n6\n-6\n-6\n6\n"
+---
+
+echo $(( 10 / 3))
+echo $((-10 / 3))
+echo $(( 10 / -3))
+echo $((-10 / -3))
+
+echo ---
+
+a=20
+: $(( a /= 3 ))
+echo $a
+
+a=-20
+: $(( a /= 3 ))
+echo $a
+
+a=20
+: $(( a /= -3 ))
+echo $a
+
+a=-20
+: $(( a /= -3 ))
+echo $a

@@ -1,0 +1,11 @@
+name: < file in pipeline and subshell doesn't work
+dialect: bash
+source: oils:spec/redirect-command#file-in-pipeline-and-subshell-doesnt-work
+stdout: "end\n"
+---
+echo FOO > file2
+
+# This only happens in command subs, which is weird
+< file2 | tr A-Z a-z
+( < file2 )
+echo end

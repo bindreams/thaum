@@ -1,0 +1,6 @@
+name: = to pretty print
+dialect: bash
+source: oils:spec/ysh-keywords#to-pretty-print
+stdout: "(Int)   7\n"
+---
+= 1 + 2 * 3

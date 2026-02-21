@@ -1,0 +1,14 @@
+name: shopt -s simple_echo
+dialect: bash
+source: oils:spec/ysh-options#shopt--s-simpleecho
+stdout: "one two\n\none   two\none two\n-e one   two\n-n one   two\n"
+---
+foo='one   two'
+echo $foo   # bad split then join
+shopt -s simple_echo
+echo
+echo "$foo"  # good
+echo $foo
+
+echo -e "$foo"  # -e isn't special!
+echo -n "$foo"  # -n isn't special!

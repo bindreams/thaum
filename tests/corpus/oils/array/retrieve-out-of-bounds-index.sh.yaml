@@ -1,0 +1,7 @@
+name: Retrieve out of bounds index
+dialect: bash
+source: oils:spec/array#retrieve-out-of-bounds-index
+stdout: "['']\n"
+---
+a=(1 '2 3')
+argv.py "${a[3]}"

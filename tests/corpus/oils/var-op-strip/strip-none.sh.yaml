@@ -1,0 +1,10 @@
+name: strip none
+dialect: bash
+source: oils:spec/var-op-strip#strip-none
+stdout: "['abc']\n['abc']\n['abc']\n['abc']\n"
+---
+x=abc
+argv.py "${x#}"
+argv.py "${x##}"
+argv.py "${x%}"
+argv.py "${x%%}"

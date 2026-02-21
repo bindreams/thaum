@@ -1,0 +1,22 @@
+name: split command sub @() in command mode
+dialect: bash
+source: oils:spec/ysh-command-sub#split-command-sub-in-command-mode
+stdout: "1\n2\n3\n--\n['a', 'b', '', 'c']\n--\n1\n2\n3\n--\n['axbxxc']\n"
+---
+
+shopt -s parse_at
+write -- @(seq 3)
+
+echo --
+IFS=x
+x=axbxxc
+argv.py $x
+
+# This construct behaves the same with simple_word_eval on
+# Not affected by IFS
+echo --
+shopt -s simple_word_eval
+write -- @(seq 3)
+
+echo --
+argv.py @(echo $x)

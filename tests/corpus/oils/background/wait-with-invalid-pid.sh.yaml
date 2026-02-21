@@ -1,0 +1,6 @@
+name: wait with invalid PID
+dialect: bash
+source: oils:spec/background#wait-with-invalid-pid
+status: 127
+---
+wait 12345678

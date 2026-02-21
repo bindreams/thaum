@@ -1,0 +1,10 @@
+name: shopt -s failglob in loop context
+dialect: bash
+source: oils:spec/glob-bash#shopt--s-failglob-in-loop-context
+stdout: "*.ZZ\nstatus=0\nstatus=1\n"
+---
+for x in *.ZZ; do echo $x; done
+echo status=$?
+shopt -s failglob
+for x in *.ZZ; do echo $x; done
+echo status=$?

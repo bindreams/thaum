@@ -1,0 +1,7 @@
+name: fc errors out on too many args with strict_arg_parse
+dialect: bash
+source: oils:spec/builtin-fc#fc-errors-out-on-too-many-args-with-strictargparse
+stdout: "too many args!\n"
+---
+shopt -s strict_arg_parse || true
+fc -l 0 1 2 || echo too many args!

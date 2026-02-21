@@ -1,0 +1,7 @@
+name: expansion with simple var
+dialect: bash
+source: oils:spec/brace-expansion#expansion-with-simple-var
+stdout: "-A- -b-\n"
+---
+a=A
+echo -{$a,b}-

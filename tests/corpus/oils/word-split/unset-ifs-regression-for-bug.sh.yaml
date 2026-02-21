@@ -1,0 +1,8 @@
+name: Unset IFS (regression for bug)
+dialect: bash
+source: oils:spec/word-split#unset-ifs-regression-for-bug
+stdout: "[a b c]\n"
+---
+set a b c
+unset IFS
+echo ["$*"]

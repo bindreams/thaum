@@ -1,0 +1,15 @@
+name: s[0] with string abc
+dialect: bash
+source: oils:spec/arith#s0-with-string-abc
+stdout: "abc 0 0\nstatus=0\n\nstatus=1\n\n"
+---
+case $SH in dash) exit ;; esac
+
+s='abc'
+echo abc $(( s[0] )) $(( s[1] ))
+echo status=$?
+echo
+
+(( s[0] ))
+echo status=$?
+echo

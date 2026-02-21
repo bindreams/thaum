@@ -1,0 +1,19 @@
+name: printf %b with truncated octal escapes
+dialect: bash
+source: oils:spec/builtin-printf#printf-b-with-truncated-octal-escapes
+stdout: "-8\n-8\n\n 07\n 07\n 07\n 07\n"
+---
+
+# 8 is not a valid octal digit
+
+printf '%b\n' '\558'
+printf '%b\n' '\0558'
+echo
+
+show_bytes() {
+  od -A n -t x1
+}
+printf '%b' '\7' | show_bytes
+printf '%b' '\07' | show_bytes
+printf '%b' '\007' | show_bytes
+printf '%b' '\0007' | show_bytes

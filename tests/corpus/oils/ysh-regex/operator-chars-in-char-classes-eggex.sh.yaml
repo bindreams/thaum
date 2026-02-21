@@ -1,0 +1,32 @@
+name: Operator chars in char classes (eggex)
+dialect: bash
+source: oils:spec/ysh-regex#operator-chars-in-char-classes-eggex
+stdout: "hyphen\nbackslash\nright bracket\nleft bracket\nperiod\ncaret\nno way to
+  have [^]\n"
+---
+shopt --set ysh:upgrade
+
+var pat = / ['-'] /
+#echo PAT=$pat
+if ('-' ~ pat) { echo hyphen }
+if (b'\\' ~ pat) { echo FAIL }
+
+var pat = / [ \\ ] /
+[[ '\' =~ $pat ]] && echo backslash
+[[ '-' =~ $pat ]] && echo FAIL
+
+var pat = / [ ']' ] /
+[[ ']' =~ $pat ]] && echo 'right bracket'
+[[ '[' =~ $pat ]] && echo FAIL
+
+var pat = / [ '[' ] /
+[[ '[' =~ $pat ]] && echo 'left bracket'
+[[ ']' =~ $pat ]] && echo FAIL
+
+var pat = / [ '.' ] /
+[[ '.' =~ $pat ]] && echo period
+[[ '\' =~ $pat ]] && echo FAIL
+
+var pat = / [ \\ '^' ] /
+[[ '^' =~ $pat ]] && echo caret
+[[ '\' =~ $pat ]] && echo 'no way to have [^]'

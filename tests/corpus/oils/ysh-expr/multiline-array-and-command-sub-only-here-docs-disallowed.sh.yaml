@@ -1,0 +1,21 @@
+name: multiline array and command sub (only here docs disallowed)
+dialect: bash
+source: 
+  oils:spec/ysh-expr#multiline-array-and-command-sub-only-here-docs-disallowed
+stdout: "array=3\ncomsub=6\n"
+---
+var array = %(
+  one
+  two
+  three
+)
+
+shopt --set parse_ysh_expr_sub
+
+echo array=$[len(array)]
+
+var comsub = $(
+echo hi
+echo bye
+)
+echo comsub=$[len(comsub)]

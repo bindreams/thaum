@@ -1,0 +1,20 @@
+name: 'Empty expression in ${a[@]: : }'
+dialect: bash
+source: oils:spec/arith-context#empty-expression-in-a
+stdout: "slice a b c d e f\nstatus=0\n\nslice\nstatus=0\n\nslice\nstatus=0\n"
+---
+
+a=(a b c d e f)
+
+# space required here -- see spec/var-op-slice
+echo slice ${a[@]: }
+echo status=$?
+echo
+
+echo slice ${a[@]: : }
+echo status=$?
+echo
+
+# zsh doesn't accept this
+echo slice ${a[@]:: }
+echo status=$?

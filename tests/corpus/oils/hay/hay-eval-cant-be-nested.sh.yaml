@@ -1,0 +1,14 @@
+name: hay eval can't be nested
+dialect: bash
+source: oils:spec/hay#hay-eval-cant-be-nested
+status: 127
+stdout: "foo\n"
+---
+shopt --set parse_brace
+
+hay eval :foo {
+  echo foo
+  hay eval :bar {
+    echo bar
+  }
+}

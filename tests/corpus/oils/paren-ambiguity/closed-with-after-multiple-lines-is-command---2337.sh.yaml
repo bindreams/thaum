@@ -1,0 +1,13 @@
+name: '(( closed with ) ) after multiple lines is command - #2337'
+dialect: bash
+source: 
+  oils:spec/paren-ambiguity#closed-with-after-multiple-lines-is-command---2337
+stdout: "1\n2\n3\n"
+---
+
+(( echo 1
+echo 2
+(( x ))
+: $(( x ))
+echo 3
+) )

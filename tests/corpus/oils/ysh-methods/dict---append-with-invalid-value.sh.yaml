@@ -1,0 +1,7 @@
+name: Dict -> append() with invalid value
+dialect: bash
+source: oils:spec/ysh-methods#dict---append-with-invalid-value
+status: 3
+---
+var d = {k: 'foo'}
+call d->append('k', 'bar')

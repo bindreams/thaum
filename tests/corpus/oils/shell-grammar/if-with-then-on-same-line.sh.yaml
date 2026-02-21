@@ -1,0 +1,9 @@
+name: If with then on same line
+dialect: bash
+source: oils:spec/shell-grammar#if-with-then-on-same-line
+---
+if echo; then
+  echo
+else
+  echo
+fi

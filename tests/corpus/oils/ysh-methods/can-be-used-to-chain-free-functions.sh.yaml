@@ -1,0 +1,14 @@
+name: => can be used to chain free functions
+dialect: bash
+source: oils:spec/ysh-methods#can-be-used-to-chain-free-functions
+stdout: "K1/K2\nK1/K2\n"
+---
+
+func dictfunc() {
+  return ({k1: 'spam', k2: 'eggs'})
+}
+
+echo $[list(dictfunc()) => join('/') => upper()]
+
+# This is nicer and more consistent
+echo $[dictfunc() => list() => join('/') => upper()]

@@ -1,0 +1,10 @@
+name: 'trap -p is like trap: it prints the handlers and full signal names'
+dialect: bash
+source: 
+  oils:spec/builtin-trap#trap--p-is-like-trap-it-prints-the-handlers-and-full-signal-names
+stdout: "trap -- 'echo EXIT' EXIT\ntrap -- 'echo INT' SIGINT\nEXIT\n"
+---
+case $SH in dash) exit ;; esac
+trap "echo INT" INT
+trap "echo EXIT" EXIT
+trap -p

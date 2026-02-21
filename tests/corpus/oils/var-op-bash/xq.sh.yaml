@@ -1,0 +1,8 @@
+name: ${x@Q}
+dialect: bash
+source: oils:spec/var-op-bash#xq
+stdout: "OK\n"
+---
+x="FOO'BAR spam\"eggs"
+eval "new=${x@Q}"
+test "$x" = "$new" && echo OK

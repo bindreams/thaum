@@ -1,0 +1,7 @@
+name: test -c
+dialect: bash
+source: oils:spec/builtin-bracket#test--c
+stdout: "status=0\n"
+---
+test -c /dev/zero
+echo status=$?

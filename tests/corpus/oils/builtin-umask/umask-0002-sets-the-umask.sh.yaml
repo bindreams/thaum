@@ -1,0 +1,14 @@
+name: "'umask 0002' sets the umask"
+dialect: bash
+source: oils:spec/builtin-umask#umask-0002-sets-the-umask
+status: 0
+stdout: "664\n644\n"
+stderr: ''
+---
+umask 0002
+echo one > $TMP/umask-one
+
+umask 0022
+echo two > $TMP/umask-two
+
+stat -c '%a' $TMP/umask-one $TMP/umask-two

@@ -1,0 +1,12 @@
+name: 'mapfile (store position): -O start'
+dialect: bash
+source: oils:spec/builtin-bash#mapfile-store-position--o-start
+stdout: "n=5\n[x]\n[y]\n[a0]\n[a1]\n[a2]\n"
+---
+type mapfile >/dev/null 2>&1 || exit 0
+printf '%s\n' a{0..2} | {
+  arr=(x y z)
+  mapfile -O 2 -t arr
+  echo "n=${#arr[@]}"
+  printf '[%s]\n' "${arr[@]}"
+}

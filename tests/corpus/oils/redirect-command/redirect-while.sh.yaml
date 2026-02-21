@@ -1,0 +1,11 @@
+name: redirect while
+dialect: bash
+source: oils:spec/redirect-command#redirect-while
+stdout: "while-body\n"
+---
+while true; do
+  echo while-body
+  break
+done > out
+
+cat out

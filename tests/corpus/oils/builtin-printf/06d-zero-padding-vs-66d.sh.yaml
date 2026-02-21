@@ -1,0 +1,10 @@
+name: '%06d zero padding vs. %6.6d'
+dialect: bash
+source: oils:spec/builtin-printf#06d-zero-padding-vs-66d
+stdout: "[000042]\n[-00042]\n--\n[000042]\n[-000042]\n"
+---
+printf '[%06d]\n' 42
+printf '[%06d]\n' -42  # 6 TOTAL
+echo --
+printf '[%6.6d]\n' 42
+printf '[%6.6d]\n' -42  # 6 + 1 for the - sign!!!

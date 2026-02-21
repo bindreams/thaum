@@ -1,0 +1,40 @@
+name: Array indirect expansion with suffix operators
+dialect: bash
+source: oils:spec/var-ref#array-indirect-expansion-with-suffix-operators
+stdout: "==== v1 ====\n['lue']\n['al']\n['value']\n['set']\n['value']\nv1=value\n\
+  ==== v2 ====\n['']\n['']\n['empty']\n['']\n['assign']\nv2=assign\n==== a1 ====\n\
+  ['']\n['']\n['empty']\n['']\n['assign']\n['assign']\n==== a2[0] ====\n['ement']\n\
+  ['le']\n['element']\n['set']\n['element']\n['element']\n==== a3[@] ====\n['3']\n\
+  ['2', '3']\n['1', '2', '3']\n['set']\n['1', '2', '3']\n['1', '2', '3']\n"
+---
+
+declare -A ref=(['dummy']=v1)
+function test-suffixes {
+  echo "==== $1 ===="
+  ref['dummy']=$1
+  argv.py "${!ref[@]:2}"
+  argv.py "${!ref[@]:1:2}"
+  argv.py "${!ref[@]:-empty}"
+  argv.py "${!ref[@]:+set}"
+  argv.py "${!ref[@]:=assign}"
+}
+
+v1=value
+test-suffixes v1
+echo "v1=$v1"
+
+v2=
+test-suffixes v2
+echo "v2=$v2"
+
+a1=()
+test-suffixes a1
+argv.py "${a1[@]}"
+
+a2=(element)
+test-suffixes 'a2[0]'
+argv.py "${a2[@]}"
+
+a3=(1 2 3)
+test-suffixes 'a3[@]'
+argv.py "${a3[@]}"

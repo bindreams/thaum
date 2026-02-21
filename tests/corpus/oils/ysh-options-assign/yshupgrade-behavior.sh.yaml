@@ -1,0 +1,18 @@
+name: ysh:upgrade behavior
+dialect: bash
+source: oils:spec/ysh-options-assign#yshupgrade-behavior
+status: 2
+stdout: "status=0\nx=1\n"
+---
+shopt --set ysh:upgrade
+
+# allow errors
+set +o errexit +o nounset
+
+x=1
+echo status=$?
+echo x=$x
+
+y = 2
+echo status=$?
+echo y=$y

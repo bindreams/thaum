@@ -1,0 +1,12 @@
+name: test -v with strings
+dialect: bash
+source: oils:spec/assign-dialects#test--v-with-strings
+stdout: "str=1\nstr=0\n"
+---
+test -v str
+echo str=$?
+
+str=x
+
+test -v str
+echo str=$?

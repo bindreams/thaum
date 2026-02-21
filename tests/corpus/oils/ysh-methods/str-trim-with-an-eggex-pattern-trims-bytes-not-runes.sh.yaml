@@ -1,0 +1,14 @@
+name: Str => trim*() with an eggex pattern trims bytes not runes
+dialect: bash
+source: 
+  oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-bytes-not-runes
+status: 0
+stdout: "\"\", \"\", \"\"\n\"\", \"\", \"\"\nb'\\yce', b'\\yce', b'\\yce'\nb'\\yce',
+  b'\\yce', b'\\yce'\n"
+---
+func test(s, p) { write --sep ', ' --j8 $[s.trimStart(p)] $[s.trimEnd(p)] $[s.trim(p)] }
+
+call test(u'\u{03a3}', / dot /)
+call test(u'\u{03a3}', / ![z] /)
+call test(b'\yce', / dot /)
+call test(b'\yce', / ![z] /)

@@ -1,0 +1,13 @@
+name: K and V are variables in (( array[K] = V ))
+dialect: bash
+source: oils:spec/assign-dialects#k-and-v-are-variables-in-arrayk-v
+stdout: "array[5]=42\nkeys = 5\nvalues = 42\n"
+---
+K=5
+V=42
+typeset -a array
+(( array[K] = V ))
+
+echo array[5]=${array[5]}
+echo keys = ${!array[@]}
+echo values = ${array[@]}

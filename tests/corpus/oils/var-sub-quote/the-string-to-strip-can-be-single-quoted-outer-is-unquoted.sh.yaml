@@ -1,0 +1,8 @@
+name: The string to strip can be single quoted, outer is unquoted
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#the-string-to-strip-can-be-single-quoted-outer-is-unquoted
+stdout: "['a', 'b', 'a', 'b', 'c', 'd']\n"
+---
+foo='a b c d'
+argv.py ${foo%'c d'} ${foo%'c  d'}

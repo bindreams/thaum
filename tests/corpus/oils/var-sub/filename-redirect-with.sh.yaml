@@ -1,0 +1,14 @@
+name: Filename redirect with "$@"
+dialect: bash
+source: oils:spec/var-sub#filename-redirect-with
+status: 1
+---
+# bash - ambiguous redirect -- yeah I want this error
+#   - But I want it at PARSE time?  So is there a special DollarAtPart?
+#     MultipleArgsPart?
+# mksh - tries to create '_tmp/var-sub1 _tmp/var-sub2'
+# dash - tries to create '_tmp/var-sub1 _tmp/var-sub2'
+fun() {
+  echo hi > "$@"
+}
+fun _tmp/var-sub1 _tmp/var-sub2

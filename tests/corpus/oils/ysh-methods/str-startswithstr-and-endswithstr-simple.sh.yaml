@@ -1,0 +1,16 @@
+name: Str => startsWith(Str) and endsWith(Str), simple
+dialect: bash
+source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-simple
+status: 0
+stdout: "true true\ntrue true\ntrue false\nfalse false\nfalse true\nfalse false\n\
+  false false\n"
+---
+func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
+
+call test('', '')
+call test('abc', '')
+call test('abc', 'a')
+call test('abc', 'b')
+call test('abc', 'c')
+call test('abc', 'z')
+call test('', 'abc')

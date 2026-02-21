@@ -1,0 +1,9 @@
+name: echo -e with 4 digit unicode escape
+dialect: bash
+source: oils:spec/builtin-echo#echo--e-with-4-digit-unicode-escape
+stdout: "abcdef\n"
+---
+flags='-e'
+case $SH in dash) flags='' ;; esac
+
+echo $flags 'abcd\u0065f'

@@ -1,0 +1,10 @@
+name: myvar=typeset (another form of dynamic assignment)
+dialect: bash
+source: 
+  oils:spec/assign-extended#myvartypeset-another-form-of-dynamic-assignment
+stdout: "a\n"
+---
+myvar=typeset
+x='a b'
+$myvar x=$x
+echo $x

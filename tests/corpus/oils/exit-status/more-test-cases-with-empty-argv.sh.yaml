@@ -1,0 +1,14 @@
+name: More test cases with empty argv
+dialect: bash
+source: oils:spec/exit-status#more-test-cases-with-empty-argv
+stdout: "status=0\nstatus=42\nstatus=43\n"
+---
+
+true $(false)
+echo status=$?
+
+$(exit 42)
+echo status=$?
+
+$(exit 42) $(exit 43)
+echo status=$?

@@ -1,0 +1,18 @@
+name: ${#s} and len(s)
+dialect: bash
+source: oils:spec/ysh-unicode#s-and-lens
+stdout: "farmer scalars = 4\nfacepalm scalars = 5\nfarmer len = 15\nfacepalm len =
+  17\n"
+---
+shopt --set parse_ysh_expr_sub
+
+source $REPO_ROOT/spec/testdata/unicode.sh
+
+# bash agrees
+echo "farmer scalars =" ${#farmer}
+
+echo "facepalm scalars =" ${#facepalm}
+
+echo "farmer len =" $[len(farmer)]
+
+echo "facepalm len =" $[len(facepalm)]

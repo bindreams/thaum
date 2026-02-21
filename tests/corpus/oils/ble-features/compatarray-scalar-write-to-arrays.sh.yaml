@@ -1,0 +1,14 @@
+name: '[compat_array] scalar write to arrays'
+dialect: bash
+source: oils:spec/ble-features#compatarray-scalar-write-to-arrays
+stdout: "['2', '0', '0']\n"
+---
+case ${SH##*/} in
+(dash|ash) exit 1;; # dash/ash does not have arrays
+(osh) shopt -s compat_array;;
+(zsh) setopt KSH_ARRAYS;;
+esac
+
+a=(1 0 0)
+: $(( a++ ))
+argv.py "${a[@]}"

@@ -1,0 +1,27 @@
+name: type(x)
+dialect: bash
+source: oils:spec/ysh-builtins#typex
+stdout: "Int\nStr\nBool\nFloat\nList\nDict\nNull\nFunc\nBuiltinFunc\nBoundFunc\nBoundFunc\n\
+  Range\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo $[type(1234)]
+echo $[type('foo')]
+echo $[type(false)]
+echo $[type(1.234)]
+echo $[type([])]
+echo $[type({})]
+echo $[type(null)]
+
+shopt --set ysh:upgrade
+
+func f() {
+  return (42)
+}
+
+echo $[type(f)]
+echo $[type(len)]
+echo $[type('foo'=>startsWith)]
+echo $[type('foo'=>join)]  # Type error happens later
+echo $[type(1..<3)]

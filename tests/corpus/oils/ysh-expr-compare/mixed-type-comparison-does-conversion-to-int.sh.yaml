@@ -1,0 +1,23 @@
+name: Mixed Type Comparison does conversion to Int
+dialect: bash
+source: oils:spec/ysh-expr-compare#mixed-type-comparison-does-conversion-to-int
+stdout: "<\n<=\n>\n>=\n"
+---
+shopt -s ysh:upgrade
+
+if (2 < '11') {
+  echo '<'
+}
+if (2 <= '2') {
+  echo '<='
+}
+if (11 > '2') {
+  echo '>'
+}
+if (5 >= '5') {
+  echo '>='
+}
+
+if (2 < '1') {
+  echo no
+}

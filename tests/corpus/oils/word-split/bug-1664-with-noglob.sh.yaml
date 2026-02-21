@@ -1,0 +1,26 @@
+name: 'Bug #1664, \\ with noglob'
+dialect: bash
+source: oils:spec/word-split#bug-1664-with-noglob
+stdout: "['[\\\\]_']\n['[\\\\]_']\nnoglob\n['[\\\\]_']\n['[\\\\]_']\n"
+---
+
+# Note that we're not changing IFS
+
+argv.py [\\]_
+argv.py "[\\]_"
+
+# TODO: no difference observed here, go back to original bug
+
+#argv.py [\\_
+#argv.py "[\\_"
+
+echo noglob
+
+# repeat cases with -f, noglob
+set -f
+
+argv.py [\\]_
+argv.py "[\\]_"
+
+#argv.py [\\_
+#argv.py "[\\_"

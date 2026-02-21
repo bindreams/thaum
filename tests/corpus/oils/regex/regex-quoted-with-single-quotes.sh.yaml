@@ -1,0 +1,8 @@
+name: Regex quoted with single quotes
+dialect: bash
+source: oils:spec/regex#regex-quoted-with-single-quotes
+status: 1
+stdout: ''
+---
+# bash doesn't like the quotes
+[[ 'a b' =~ '^(a b)$' ]] && echo true

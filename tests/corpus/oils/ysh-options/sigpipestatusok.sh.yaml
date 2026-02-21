@@ -1,0 +1,33 @@
+name: sigpipe_status_ok
+dialect: bash
+source: oils:spec/ysh-options#sigpipestatusok
+stdout: "y\n141 0\n141 141\ny\n0 0\n0 141\nbackground\nstatus=0 pipestatus=0 141\n"
+---
+
+status_141() {
+  return 141
+}
+
+yes | head -n 1
+echo ${PIPESTATUS[@]}
+
+# DUMMY
+yes | status_141
+echo ${PIPESTATUS[@]}
+
+shopt --set oil:upgrade  # sigpipe_status_ok
+shopt --unset errexit
+
+yes | head -n 1
+echo ${PIPESTATUS[@]}
+
+# Conveniently, the last 141 isn't changed to 0, because it's run in the
+# CURRENT process.
+
+yes | status_141
+echo ${PIPESTATUS[@]}
+
+echo background
+false | status_141 &
+wait
+echo status=$? pipestatus=${PIPESTATUS[@]}

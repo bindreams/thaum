@@ -1,0 +1,24 @@
+name: 'parse_paren: if statement'
+dialect: bash
+source: oils:spec/ysh-options#parseparen-if-statement
+stdout: "less\nless\nother\n"
+---
+shopt -s oil:upgrade
+var x = 1
+if (x < 42) {
+  echo less
+}
+
+if (x < 0) {
+  echo negative
+} elif (x < 42) {
+  echo less
+}
+
+if (x < 0) {
+  echo negative
+} elif (x < 1) {
+  echo less
+} else {
+  echo other
+}

@@ -1,0 +1,18 @@
+name: Locations when sourcing
+dialect: bash
+source: oils:spec/introspect#locations-when-sourcing
+stdout: "F\nG\nSTACK:spec/testdata/bash-source-pushtemp.sh:g:3\nSTACK:spec/testdata/bash-source-pushtemp.sh:f:19\n\
+  STACK:spec/testdata/bash-source-pushtemp.sh:source:2\n"
+---
+
+cd $REPO_ROOT
+
+# like above test case, but we source
+
+# bash location doesn't make sense:
+# - It says 'source' happens at line 1 of bash-source-pushtemp.  Well I think
+# - It really happens at line 2 of '-c' !    I guess that's to line up
+#   with the 'main' frame
+
+$SH -c 'true;
+source spec/testdata/bash-source-pushtemp.sh'

@@ -1,0 +1,10 @@
+name: trap --ignore with uncatchable STOP signal
+dialect: bash
+source: oils:spec/ysh-builtin-trap#trap---ignore-with-uncatchable-stop-signal
+status: 2
+stdout: "\n"
+---
+
+# YSH is stricter and returns an error, which triggers errexit
+trap --ignore STOP
+echo done

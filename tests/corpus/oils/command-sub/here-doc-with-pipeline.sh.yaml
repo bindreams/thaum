@@ -1,0 +1,9 @@
+name: Here doc with pipeline
+dialect: bash
+source: oils:spec/command-sub#here-doc-with-pipeline
+stdout: twoXoneX
+---
+<<EOF tac | tr '\n' 'X'
+one
+two
+EOF

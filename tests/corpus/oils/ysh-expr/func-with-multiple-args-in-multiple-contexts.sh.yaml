@@ -1,0 +1,11 @@
+name: Func with multiple args in multiple contexts
+dialect: bash
+source: oils:spec/ysh-expr#func-with-multiple-args-in-multiple-contexts
+stdout: "7 7\n"
+---
+shopt --set ysh:upgrade  # needed for math.ysh
+
+source $LIB_YSH/math.ysh
+
+var x = max(1+2, 3+4)
+echo $x $[max(1+2, 3+4)]

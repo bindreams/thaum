@@ -1,0 +1,24 @@
+name: 'character class with digit [\\0] should not crash (issue #2380)'
+dialect: bash
+source: 
+  oils:spec/ysh-regex#character-class-with-digit-0-should-not-crash-issue-2380
+stdout: "pattern: [0\\\\]\n(Bool)   true\n(Bool)   false\n(Bool)   true\n---\n[0-9]\n\
+  (Bool)   true\n(Bool)   false\n"
+---
+shopt -s ysh:all
+
+var pat = /[\\0]/
+echo "pattern: $pat"
+
+# Test matching  
+pp test_ ('0' ~ pat)
+pp test_ ('1' ~ pat)
+pp test_ (b'\\' ~ pat)
+
+echo ---
+
+# Also test other digits in character class
+var digits = /[0-9]/
+echo $digits
+pp test_ ('5' ~ digits)
+pp test_ ('x' ~ digits)

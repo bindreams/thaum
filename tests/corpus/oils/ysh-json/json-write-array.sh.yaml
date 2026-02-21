@@ -1,0 +1,7 @@
+name: json write ARRAY
+dialect: bash
+source: oils:spec/ysh-json#json-write-array
+stdout: "[\n  \"foo.cc\",\n  \"foo.h\"\n]\n[\"foo.cc\",\"foo.h\"]\n"
+---
+json write (:|foo.cc foo.h|)
+json write (['foo.cc', 'foo.h'], space=0)

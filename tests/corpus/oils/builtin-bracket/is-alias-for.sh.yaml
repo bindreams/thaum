@@ -1,0 +1,8 @@
+name: == is alias for =
+dialect: bash
+source: oils:spec/builtin-bracket#is-alias-for
+---
+[ a = a ] && echo true
+[ a == a ] && echo true
+true
+true

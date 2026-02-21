@@ -1,0 +1,11 @@
+name: Trailing Comma in Param list
+dialect: bash
+source: oils:spec/ysh-expr#trailing-comma-in-param-list
+stdout: "7 7\n"
+---
+shopt --set ysh:upgrade  # needed for math.ysh
+
+source $LIB_YSH/math.ysh
+
+var x = max(1+2, 3+4,)
+echo $x $[max(1+2, 3+4,)]

@@ -1,0 +1,34 @@
+name: a ++ b for string/list concatenation
+dialect: bash
+source: oils:spec/ysh-expr#a-b-for-stringlist-concatenation
+stdout: "string abcde\nlist len=3\n---\nStr Int 3\nList Int 3\nInt Str 3\n"
+---
+shopt -s parse_brace parse_ysh_expr_sub
+
+var i = 'abc'
+var j = 'de'
+var k = i ++ j
+echo string $k
+
+
+var a = [1, 2]
+var b = [3]
+var c = a ++ b
+echo list len=$[len(c)]
+
+echo ---
+
+try {
+  = 'ab' ++ 3
+}
+echo Str Int $[_error.code]
+
+try {
+  = [1, 2] ++ 3
+}
+echo List Int $[_error.code]
+
+try {
+  = 3 ++ 'ab'
+}
+echo Int Str $[_error.code]

@@ -1,0 +1,27 @@
+name: value.BashArray internal representation - Assoc (ordering is a problem)
+dialect: bash
+source: 
+  oils:spec/array-compat#valuebasharray-internal-representation---assoc-ordering-is-a-problem
+stdout: "declare -A A=([k]=\"v\" )\n['keys', 'k']\n['values', 'v']\n"
+---
+
+case $SH in mksh) exit ;; esac
+
+declare -A A=([k]=v)
+declare -A | grep A=
+
+argv.py keys "${!A[@]}"
+argv.py values "${A[@]}"
+
+exit
+
+# Huh this actually works, we don't support it
+# Hm the order here is all messed up, in bash 5.2
+A+=([k2]=v2 [0]=foo [9]=9 [9999]=9999)
+declare -A | grep A=
+
+A+=-append
+declare -A | grep A=
+
+argv.py keys "${!A[@]}"
+argv.py values "${A[@]}"

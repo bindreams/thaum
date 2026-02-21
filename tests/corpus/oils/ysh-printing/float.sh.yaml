@@ -1,0 +1,6 @@
+name: Float
+dialect: bash
+source: oils:spec/ysh-printing#float
+stdout: "(Float) -0.0\n"
+---
+= -0.00

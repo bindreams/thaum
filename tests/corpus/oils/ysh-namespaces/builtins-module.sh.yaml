@@ -1,0 +1,16 @@
+name: __builtins__ module
+dialect: bash
+source: oils:spec/ysh-namespaces#builtins-module
+stdout: "\n"
+---
+
+var b = len(propView(__builtins__))
+
+# more than 30 builtins
+assert [b > 30]
+
+var mylist = :| a b |
+
+setvar len = 4  # overwrite
+setvar len = __builtins__.len(mylist)
+assert [2 === len]

@@ -1,0 +1,7 @@
+name: subshell
+dialect: bash
+source: oils:spec/smoke#subshell
+status: 0
+stdout: "1\n2\n"
+---
+(echo 1; echo 2)

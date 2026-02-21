@@ -1,0 +1,10 @@
+name: strip unquoted and quoted [a]
+dialect: bash
+source: oils:spec/var-op-strip#strip-unquoted-and-quoted-a
+stdout: "[a]foo[]\nfoo[]\n[a]foo[]\nfoo[]\n"
+---
+var='[a]foo[]'
+echo ${var#[a]}
+echo ${var#"[a]"}
+echo "${var#[a]}"
+echo "${var#"[a]"}"

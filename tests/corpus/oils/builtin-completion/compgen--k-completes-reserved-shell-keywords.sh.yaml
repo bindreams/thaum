@@ -1,0 +1,10 @@
+name: compgen -k completes reserved shell keywords
+dialect: bash
+source: 
+  oils:spec/builtin-completion#compgen--k-completes-reserved-shell-keywords
+stdout: "do\ndone\nstatus=0\nelif\nelse\nstatus=0\n"
+---
+compgen -k do | sort
+echo status=$?
+compgen -k el | sort
+echo status=$?

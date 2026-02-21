@@ -1,0 +1,19 @@
+name: 'top level: var can be redefined by var/const'
+dialect: bash
+source: oils:spec/ysh-assign#top-level-var-can-be-redefined-by-varconst
+status: 1
+stdout: "x=global\nx=local\nx=g2\nx=now-const\n"
+---
+var x = "global"
+echo x=$x
+f() {
+  var x = "local"
+  echo x=$x
+}
+f
+var x = "g2"
+echo x=$x
+const x = 'now-const'
+echo x=$x
+const x = 'oops'
+echo x=$x

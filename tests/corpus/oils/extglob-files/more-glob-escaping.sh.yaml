@@ -1,0 +1,13 @@
+name: More glob escaping
+dialect: bash
+source: oils:spec/extglob-files#more-glob-escaping
+stdout: "['_*', '_?', '_[:]']\n['_*', '_?', '_[:]']\n"
+---
+shopt -s extglob
+mkdir -p eg7
+cd eg7
+touch '_[:]' '_*' '_?'
+argv.py @('_[:]'|'_*'|'_?')
+argv.py @(nested|'_?'|@('_[:]'|'_*'))
+
+# mksh sorts them differently

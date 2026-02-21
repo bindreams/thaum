@@ -1,0 +1,8 @@
+name: YSH allows unquoted foo\ bar too
+dialect: bash
+source: oils:spec/quote#ysh-allows-unquoted-foo-bar-too
+stdout: "foo bar\n"
+---
+shopt -s ysh:all
+touch foo\ bar
+ls foo\ bar

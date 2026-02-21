@@ -1,0 +1,17 @@
+name: shopt -s no_dash_glob
+dialect: bash
+source: oils:spec/ysh-options#shopt--s-nodashglob
+stdout: "['-v', 'file']\n['file']\n['-v', 'file']\n"
+---
+mkdir globdir
+cd globdir
+
+touch -- file -v
+
+argv.py *
+
+shopt -s ysh:upgrade  # turns OFF no_dash_glob
+argv.py *
+
+shopt -u no_dash_glob  # turn it ON
+argv.py *

@@ -1,0 +1,15 @@
+name: json8 write bytes vs unicode string
+dialect: bash
+source: oils:spec/ysh-json#json8-write-bytes-vs-unicode-string
+stdout: "\"mu μ \\u0001 \\\" \\\\ \\b\\f\\n\\r\\t\"\n\"\\u0001\\u001f\"\nb'\\yff'\n"
+---
+
+u=$'mu \u03bc \x01 \" \\ \b\f\n\r\t'
+u2=$'\x01\x1f'  # this is a valid unicode string
+
+b=$'\xff'  # this isn't valid unicode
+
+json8 write (u)
+json8 write (u2)
+
+json8 write (b)

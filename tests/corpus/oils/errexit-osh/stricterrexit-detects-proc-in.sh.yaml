@@ -1,0 +1,25 @@
+name: strict_errexit detects proc in && || !
+dialect: bash
+source: oils:spec/errexit-osh#stricterrexit-detects-proc-in
+status: 1
+stdout: "\n"
+---
+set -o errexit
+shopt -s strict_errexit || true
+
+myfunc() {
+  echo 'failing'
+  false
+  echo 'should not get here'
+}
+
+if true && ! myfunc; then
+  echo B
+fi
+
+if ! myfunc; then
+  echo A
+fi
+
+
+# POSIX shell behavior:

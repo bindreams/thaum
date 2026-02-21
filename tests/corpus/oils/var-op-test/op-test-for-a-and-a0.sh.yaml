@@ -1,0 +1,25 @@
+name: op-test for ${a} and ${a[0]}
+dialect: bash
+source: oils:spec/var-op-test#op-test-for-a-and-a0
+stdout: "a   : 'no-colon' 'with-colon'\na[0]: 'no-colon' 'with-colon'\na   : '' 'with-colon'\n\
+  a[0]: '' 'with-colon'\na   : '' 'with-colon'\na[0]: '' 'with-colon'\na   : '' 'with-colon'\n\
+  a[0]: '' 'with-colon'\n"
+---
+case $SH in dash) exit ;; esac
+
+test-hyphen() {
+  echo "a   : '${a-no-colon}' '${a:-with-colon}'"
+  echo "a[0]: '${a[0]-no-colon}' '${a[0]:-with-colon}'"
+}
+
+a=()
+test-hyphen
+a=("")
+test-hyphen
+a=("" "")
+test-hyphen
+IFS=
+test-hyphen
+
+
+# Zsh's ${a} and ${a[@]} implement something different from the other shells'.

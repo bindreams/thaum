@@ -1,0 +1,8 @@
+name: match is anchored
+dialect: bash
+source: oils:spec/extglob-match#match-is-anchored
+stdout: "FALSE\nFALSE\nTRUE\n"
+---
+[[ foo_ == @(foo) ]] || echo FALSE
+[[ _foo == @(foo) ]] || echo FALSE
+[[ foo == @(foo) ]] && echo TRUE

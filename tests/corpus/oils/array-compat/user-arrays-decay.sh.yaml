@@ -1,0 +1,13 @@
+name: User arrays decay
+dialect: bash
+source: oils:spec/array-compat#user-arrays-decay
+stdout: "['x', 'y', 'z']\n['x y z']\n['x', 'YYY', 'z']\n"
+---
+declare -a a b
+a=(x y z)
+b="${a[@]}"  # this collapses to a string
+c=("${a[@]}")  # this preserves the array
+c[1]=YYY  # mutate a copy -- doesn't affect the original
+argv.py "${a[@]}"
+argv.py "${b}"
+argv.py "${c[@]}"

@@ -1,0 +1,12 @@
+name: $_ with word splitting
+dialect: bash
+source: oils:spec/vars-special#with-word-splitting
+stdout: "spaces\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+setopt shwordsplit  # for ZSH
+
+x='with spaces'
+: $x
+echo $_

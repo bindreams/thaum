@@ -1,0 +1,14 @@
+name: tilde expansion in [[
+dialect: bash
+source: oils:spec/dbracket#tilde-expansion-in
+stdout: "status=0\nstatus=0\nstatus=1\n"
+---
+HOME=/home/bob
+[[ ~ == /home/bob ]]
+echo status=$?
+
+[[ ~ == */bob ]]
+echo status=$?
+
+[[ ~ == */z ]]
+echo status=$?

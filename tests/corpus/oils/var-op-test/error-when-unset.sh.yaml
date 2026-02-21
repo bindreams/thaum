@@ -1,0 +1,8 @@
+name: Error when unset
+dialect: bash
+source: oils:spec/var-op-test#error-when-unset
+status: 1
+stdout: ''
+---
+echo ${unset?is empty}
+echo should not get here

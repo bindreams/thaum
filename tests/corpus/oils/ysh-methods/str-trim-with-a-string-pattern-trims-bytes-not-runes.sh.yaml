@@ -1,0 +1,12 @@
+name: Str => trim*() with a string pattern trims bytes not runes
+dialect: bash
+source: 
+  oils:spec/ysh-methods#str-trim-with-a-string-pattern-trims-bytes-not-runes
+status: 0
+stdout: "\"\", \"\", \"\"\nb'\\ya3', \"Σ\", b'\\ya3'\n\"Σ\", b'\\yce', b'\\yce'\n"
+---
+func test(s, p) { write --sep ', ' --j8 $[s => trimStart(p)] $[s => trimEnd(p)] $[s => trim(p)] }
+
+call test(b'\yce\ya3', u'\u{03a3}')
+call test(b'\yce\ya3', b'\yce')
+call test(b'\yce\ya3', b'\ya3')

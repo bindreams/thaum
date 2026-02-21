@@ -1,0 +1,18 @@
+name: Augmented assignment of Dict
+dialect: bash
+source: oils:spec/ysh-augmented#augmented-assignment-of-dict
+stdout: "43.5\n45.0\n48.0\n"
+---
+
+shopt -s parse_ysh_expr_sub
+
+var d = {x: 42}
+
+setvar d['x'] += 1.5
+echo $[d.x]
+
+setvar d.x += '1.5'
+echo $[d.x]
+
+setvar d.x += '3'
+echo $[d.x]

@@ -1,0 +1,6 @@
+name: append without typed arg
+dialect: bash
+source: oils:spec/ysh-builtins#append-without-typed-arg
+status: 3
+---
+append a b

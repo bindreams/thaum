@@ -1,0 +1,8 @@
+name: type -a -> executable not in PATH
+dialect: bash
+source: oils:spec/builtin-type-bash#type--a---executable-not-in-path
+status: 1
+---
+touch _tmp/executable
+chmod +x _tmp/executable
+type -a executable

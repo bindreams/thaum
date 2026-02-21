@@ -1,0 +1,37 @@
+name: redir
+dialect: bash
+source: oils:spec/ysh-builtins#redir
+stdout: "proc\nbuiltin\n---\nbuiltin\nproc\n---\n3\n"
+---
+shopt --set parse_brace parse_proc
+
+proc p {
+  echo 'proc'
+}
+
+redir >out.txt {
+  p
+  echo 'builtin'
+}
+
+cat out.txt
+
+echo ---
+
+redir <out.txt {
+  tac
+}
+
+# Awkward bash syntax, but we'll live with it
+redir {left}>left.txt {right}>right.txt {
+  echo 1 >& $left
+  echo 1 >& $right
+
+  echo 2 >& $left
+  echo 2 >& $right
+
+  echo 3 >& $left
+}
+
+echo ---
+comm -23 left.txt right.txt

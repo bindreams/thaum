@@ -1,0 +1,11 @@
+name: here doc stripping tabs
+dialect: bash
+source: oils:spec/here-doc#here-doc-stripping-tabs
+stdout: "1\n2\n3  # 2 tabs are both stripped\n  4  # spaces are preserved\n"
+---
+cat <<-EOF
+	1
+	2
+		3  # 2 tabs are both stripped
+  4  # spaces are preserved
+	EOF

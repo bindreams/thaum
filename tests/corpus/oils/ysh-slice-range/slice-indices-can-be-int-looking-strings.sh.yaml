@@ -1,0 +1,25 @@
+name: Slice indices can be int-looking strings
+dialect: bash
+source: oils:spec/ysh-slice-range#slice-indices-can-be-int-looking-strings
+status: 3
+stdout: "(List)   [3,4,5]\n(List)   [5,6]\n(List)   [3,4]\n(List)   [5,6]\n(List)\
+  \   [3,4]\n"
+---
+
+var a = list(0..<10)
+#pp test_ (a)
+
+pp test_ (a['3': '6'])
+
+var i = '5'
+
+pp test_ (a[i : 7])
+pp test_ (a[3 : i])
+
+var i = '-5'
+
+pp test_ (a[i : -3])
+pp test_ (a[-7 : i])
+
+# Not allowed
+pp test_ (a['a' : 'z'])

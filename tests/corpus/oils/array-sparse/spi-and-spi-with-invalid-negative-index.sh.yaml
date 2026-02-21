@@ -1,0 +1,13 @@
+name: ((sp[i])) and ((sp[i]++)) with invalid negative index
+dialect: bash
+source: oils:spec/array-sparse#spi-and-spi-with-invalid-negative-index
+stdout: "0\n"
+stderr: "  echo $((a[-10]))\n           ^\n[ stdin ]:6: Index -10 out of bounds for
+  array of length 9\n"
+---
+case $SH in mksh) exit ;; esac
+
+a=({1..9})
+unset -v 'a[2]' 'a[3]' 'a[7]'
+
+echo $((a[-10]))

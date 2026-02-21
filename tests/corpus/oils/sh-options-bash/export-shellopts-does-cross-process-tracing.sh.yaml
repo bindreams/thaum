@@ -1,0 +1,12 @@
+name: export SHELLOPTS does cross-process tracing
+dialect: bash
+source: oils:spec/sh-options-bash#export-shellopts-does-cross-process-tracing
+stdout: "+ echo 1\n1\nsh -c 'echo 2'\n+ echo 2\n2\n"
+---
+
+$SH -c '
+export SHELLOPTS
+set -x
+echo 1
+$SH -c "echo 2"
+' 2>&1 | sed 's/.*sh /sh /g'

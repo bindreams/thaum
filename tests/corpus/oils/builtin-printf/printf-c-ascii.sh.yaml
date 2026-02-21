@@ -1,0 +1,9 @@
+name: printf %c ASCII
+dialect: bash
+source: oils:spec/builtin-printf#printf-c-ascii
+stdout: "a\nA\nAZ\n"
+---
+
+printf '%c\n' a
+printf '%c\n' ABC
+printf '%cZ\n' ABC

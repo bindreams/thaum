@@ -1,0 +1,17 @@
+name: json read then json write
+dialect: bash
+source: oils:spec/ysh-json#json-read-then-json-write
+stdout: "{\n  \"name\": \"bob\",\n  \"age\": 42,\n  \"ok\": true\n}\n{\n  \"name\"\
+  : \"bob\",\n  \"age\": 42,\n  \"ok\": true\n}\n{\n  \"name\": {},\n  \"age\": {},\n\
+  \  \"x\": -1,\n  \"y\": 0\n}\n"
+---
+
+# BUG with space before true
+echo '{"name": "bob", "age": 42, "ok": true}' | json read
+json write (_reply)
+
+echo '{"name": "bob", "age": 42, "ok":true}' | json read
+json write (_reply)
+
+echo '{"name": {}, "age": {}, "x":-1, "y": -0}' | json read
+json write (_reply)

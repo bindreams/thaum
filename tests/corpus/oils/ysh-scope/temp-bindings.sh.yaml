@@ -1,0 +1,18 @@
+name: Temp Bindings
+dialect: bash
+source: oils:spec/ysh-scope#temp-bindings
+stdout: "myfunc FOO=bar\nmyproc FOO=\ninline FOO=\nbar\n"
+---
+shopt --set parse_proc
+
+myfunc() {
+  echo myfunc FOO=$FOO
+}
+proc myproc() {
+  echo myproc FOO=$FOO
+}
+
+FOO=bar myfunc
+FOO=bar myproc
+FOO=bar echo inline FOO=$FOO
+FOO=bar printenv.py FOO

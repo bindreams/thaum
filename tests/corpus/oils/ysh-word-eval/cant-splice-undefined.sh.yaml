@@ -1,0 +1,9 @@
+name: Can't splice undefined
+dialect: bash
+source: oils:spec/ysh-word-eval#cant-splice-undefined
+status: 3
+stdout: ''
+---
+shopt -s ysh:upgrade
+argv.py @undefined
+echo done

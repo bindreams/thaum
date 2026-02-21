@@ -1,0 +1,11 @@
+name: echo @f (x) with space is runtime error
+dialect: bash
+source: oils:spec/ysh-word-eval#echo-f-x-with-space-is-runtime-error
+status: 3
+stdout: "\n"
+---
+shopt -s ysh:upgrade
+
+source $LIB_YSH/math.ysh
+
+echo @identity (['foo', 'bar'])

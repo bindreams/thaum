@@ -1,0 +1,18 @@
+name: strict_errexit and assignment builtins (local, export, readonly ...)
+dialect: bash
+source: 
+  oils:spec/errexit-osh#stricterrexit-and-assignment-builtins-local-export-readonly
+status: 1
+stdout: "\n"
+---
+set -o errexit
+shopt -s strict_errexit || true
+#shopt -s command_sub_errexit || true
+
+f() {
+  local x=$(echo hi; false)
+  echo x=$x
+}
+
+eval 'f'
+echo ---

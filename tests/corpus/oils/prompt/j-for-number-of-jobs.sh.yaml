@@ -1,0 +1,16 @@
+name: \j for number of jobs
+dialect: bash
+source: oils:spec/prompt#j-for-number-of-jobs
+stdout: "matched=0\nmatched=0\nsleep 5\nmatched=0\n"
+---
+set -m # enable job control
+PS1='foo \j bar'
+echo "${PS1@P}" | egrep -q 'foo 0 bar'
+echo matched=$?
+sleep 5 &
+echo "${PS1@P}" | egrep -q 'foo 1 bar'
+echo matched=$?
+kill %%
+fg
+echo "${PS1@P}" | egrep -q 'foo 0 bar'
+echo matched=$?

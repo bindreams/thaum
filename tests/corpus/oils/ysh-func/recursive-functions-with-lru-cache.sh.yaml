@@ -1,0 +1,55 @@
+name: Recursive functions with LRU Cache
+dialect: bash
+source: oils:spec/ysh-func#recursive-functions-with-lru-cache
+stdout: "hit: 1\nhit: 2\nhit: 3\nhit: 4\nhit: 5\nhit: 6\nhit: 7\nhit: 8\n55\n[\n \
+  \ [\n    7,\n    13\n  ],\n  [\n    9,\n    34\n  ],\n  [\n    8,\n    21\n  ],\n\
+  \  [\n    10,\n    55\n  ]\n]\n"
+---
+source $LIB_YSH/list.ysh
+
+var cache = []
+var maxSize = 4
+
+func remove(l, i) {
+  for i in (i ..< len(l) - 1) {
+    setvar l[i] = l[i + 1]
+  }
+
+  call l->pop() # remove duplicate last element
+}
+
+func fib(n) {
+  var i = len(cache) - 1
+  var j = 0;
+  while (i >= 0) {
+    var item = cache[i]
+
+    if (item[0] === n) {
+      call remove(cache, i)
+      call cache->append(item)
+
+      echo hit: $n
+      return (item[1])
+    }
+
+    setvar i = i - 1
+    setvar j += 1
+  }
+
+  var result = 0
+  if (n < 2) {
+    setvar result = n
+  } else {
+    setvar result = fib(n - 1) + fib(n - 2)
+  }
+
+  if (len(cache) >= maxSize) {
+    call remove(cache, 0)
+  }
+  call cache->append([n, result])
+
+  return (result)
+}
+
+json write (fib(10))
+json write (cache)

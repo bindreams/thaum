@@ -1,0 +1,14 @@
+name: List insert() overflow
+dialect: bash
+source: oils:spec/ysh-list#list-insert-overflow
+stdout: "pass\n"
+---
+shopt -s ysh:all
+
+var l = :| foo bar baz |
+call l->insert(123, "yyy")
+call l->insert(123, "zzz")
+
+assert [ :| foo bar baz yyy zzz | === l ]
+
+echo pass

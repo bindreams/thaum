@@ -1,0 +1,14 @@
+name: status code is available
+dialect: bash
+source: oils:spec/process-sub#status-code-is-available
+stdout: "1\n2\n1\n2\n3\nstatus 2 3\ndone\n"
+---
+
+shopt --set parse_at
+
+cat <(seq 2; exit 2) <(seq 3; exit 3)
+
+case $SH in bash*|zsh) exit ;; esac
+
+echo status @_process_sub_status
+echo done

@@ -1,0 +1,9 @@
+name: Apply vectorized operations on ${a[*]}
+dialect: bash
+source: oils:spec/array-compat#apply-vectorized-operations-on-a
+stdout: "['x- y-y z-']\n"
+---
+a=('-x-' 'y-y' '-z-')
+
+# This does the prefix stripping FIRST, and then it joins.
+argv.py "${a[*]#-}"

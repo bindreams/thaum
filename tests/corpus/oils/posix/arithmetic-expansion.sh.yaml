@@ -1,0 +1,11 @@
+name: Arithmetic expansion
+dialect: bash
+source: oils:spec/posix#arithmetic-expansion
+stdout: "3\n2\n1\n"
+---
+x=3
+while [ $x -gt 0 ]
+do
+  echo $x
+  x=$(($x-1))
+done

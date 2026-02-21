@@ -1,0 +1,22 @@
+name: Looks like octal, but digit is too big
+dialect: bash
+source: oils:spec/builtin-bracket#looks-like-octal-but-digit-is-too-big
+status: 1
+stdout: "\n"
+---
+
+# arithmetic has octal conversion
+echo $(( 083 ))
+echo status=$?
+
+echo $(( -083 ))
+echo status=$?
+
+echo
+
+# Bracket does NOT have octal conversion!  That is annoying.
+[ 083 -eq 83 ]
+echo status=$?
+
+[ -083 -eq -83 ]
+echo status=$?

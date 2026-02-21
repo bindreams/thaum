@@ -1,0 +1,13 @@
+name: Str => startsWith(Str) and endsWith(Str), matches bytes not runes
+dialect: bash
+source: 
+  oils:spec/ysh-methods#str-startswithstr-and-endswithstr-matches-bytes-not-runes
+status: 0
+stdout: "true true\ntrue false\nfalse true\ntrue true\n"
+---
+func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
+
+call test(b'\yce\ya3', u'\u{03a3}')
+call test(b'\yce\ya3', b'\yce')
+call test(b'\yce\ya3', b'\ya3')
+call test(b'\yce', b'\yce')

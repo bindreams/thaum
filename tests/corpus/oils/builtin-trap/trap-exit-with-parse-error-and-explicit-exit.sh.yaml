@@ -1,0 +1,8 @@
+name: trap EXIT with PARSE error and explicit exit
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit-with-parse-error-and-explicit-exit
+status: 0
+stdout: "FAILED\n"
+---
+trap 'echo FAILED; exit 0' EXIT
+for

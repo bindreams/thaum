@@ -1,0 +1,6 @@
+name: '"\e" as arg'
+dialect: bash
+source: oils:spec/var-op-test#e-as-arg
+stdout: "\\e\n"
+---
+echo "${undef-\e}"

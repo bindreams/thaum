@@ -1,0 +1,9 @@
+name: 'command sub: last command fails but keeps going and exit code is 0'
+dialect: bash
+source: 
+  oils:spec/errexit-osh#command-sub-last-command-fails-but-keeps-going-and-exit-code-is-0
+stdout: "one\nstatus=0\n"
+---
+set -o errexit
+echo $(echo one; false)  # we lost the exit code
+echo status=$?

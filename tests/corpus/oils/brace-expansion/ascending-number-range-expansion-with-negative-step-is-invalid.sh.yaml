@@ -1,0 +1,8 @@
+name: Ascending number range expansion with negative step is invalid
+dialect: bash
+source: 
+  oils:spec/brace-expansion#ascending-number-range-expansion-with-negative-step-is-invalid
+status: 2
+stdout: ''
+---
+echo -{1..8..-3}-

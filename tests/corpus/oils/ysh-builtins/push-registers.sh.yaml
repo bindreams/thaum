@@ -1,0 +1,29 @@
+name: push-registers
+dialect: bash
+source: oils:spec/ysh-builtins#push-registers
+stdout: "status=43\nbar bar\nstatus=42\nfoo foo\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+
+status_code() {
+  return $1
+}
+
+[[ foo =~ (.*) ]]
+
+status_code 42
+push-registers {
+  status_code 43
+  echo status=$?
+
+  [[ bar =~ (.*) ]]
+  echo ${BASH_REMATCH[@]}
+}
+# WEIRD SEMANTIC TO REVISIT: push-registers is "SILENT" as far as exit code
+# This is for the headless shell, but hasn't been tested.
+# Better method: maybe we should provide a way of SETTING $?
+
+echo status=$?
+
+echo ${BASH_REMATCH[@]}

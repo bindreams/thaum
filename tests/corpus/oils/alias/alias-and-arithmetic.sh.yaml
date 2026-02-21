@@ -1,0 +1,8 @@
+name: Alias and arithmetic
+dialect: bash
+source: oils:spec/alias#alias-and-arithmetic
+stdout: "['3']\n"
+---
+shopt -s expand_aliases
+alias a=argv.py
+a $((1 + 2))

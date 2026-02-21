@@ -1,0 +1,21 @@
+name: trap DEBUG case
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-case
+stdout: "  [6]\n  [8]\n  [10]\npython\n  [16]\nok\n"
+---
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+name=foo.py
+
+case $name in 
+  *.py)
+    echo python
+    ;;
+  *.sh)
+    echo shell
+    ;;
+esac
+echo ok

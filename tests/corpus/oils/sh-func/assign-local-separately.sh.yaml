@@ -1,0 +1,12 @@
+name: Assign local separately
+dialect: bash
+source: oils:spec/sh-func#assign-local-separately
+status: 0
+stdout: "[new-value]\n"
+---
+f() {
+  local f
+  f='new-value'
+  echo "[$f]"
+}
+f

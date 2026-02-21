@@ -1,0 +1,13 @@
+name: invoke --proc doesn't run shell functions
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke---proc-doesnt-run-shell-functions
+stdout: "status=127\n"
+---
+case $SH in bash) exit ;; esac
+
+true() {
+  echo sh-func true
+}
+
+invoke --proc true
+echo status=$?

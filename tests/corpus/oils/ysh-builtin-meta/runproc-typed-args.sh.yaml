@@ -1,0 +1,38 @@
+name: runproc typed args
+dialect: bash
+source: oils:spec/ysh-builtin-meta#runproc-typed-args
+stdout: "hi from p\n\nty\n(Str)   \"a\"\n(Int)   42\n(Int)   99\nCommand\n\nty\n(Str)\
+  \   \"a\"\n(Int)   42\n(Int)   99\nCommand\n\nty\n(Str)   \"a\"\n(Int)   42\n(Int)\
+  \   99\nCommand\n"
+---
+shopt --set parse_brace parse_proc parse_ysh_expr_sub
+
+proc p {
+  echo 'hi from p'
+}
+
+# The block is ignored for now
+runproc p { 
+  echo myblock 
+}
+echo
+
+proc ty (w; t; n; block) {
+  echo 'ty'
+  pp test_ (w)
+  pp test_ (t)
+  pp test_ (n)
+  echo $[type(block)]
+}
+
+ty a (42; n=99; ^(echo ty))
+echo
+
+runproc ty a (42; n=99; ^(echo ty))
+echo
+
+runproc ty a (42; n=99) {
+  echo 'ty gets literal'
+}
+
+# TODO: Command vs. Block vs. Literal Block should be unified

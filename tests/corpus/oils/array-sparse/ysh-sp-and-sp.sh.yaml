@@ -1,0 +1,13 @@
+name: (YSH) @[sp] and @sp
+dialect: bash
+source: oils:spec/array-sparse#ysh-sp-and-sp
+stdout: "['0', '3', '5']\n['0', '3', '5']\n"
+---
+case $SH in bash|mksh) exit ;; esac
+
+a=({0..5})
+unset -v 'a[1]' 'a[2]' 'a[4]'
+
+shopt -s parse_at
+argv.py @[a]
+argv.py @a

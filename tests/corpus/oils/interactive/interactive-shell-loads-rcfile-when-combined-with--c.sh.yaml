@@ -1,0 +1,11 @@
+name: interactive shell loads rcfile (when combined with -c)
+dialect: bash
+source: 
+  oils:spec/interactive#interactive-shell-loads-rcfile-when-combined-with--c
+stdout: "1\nRCFILE\n2\n"
+---
+$SH -c 'echo 1'
+cat >$TMP/rcfile <<EOF
+echo RCFILE
+EOF
+$SH --rcfile $TMP/rcfile -i -c 'echo 2'

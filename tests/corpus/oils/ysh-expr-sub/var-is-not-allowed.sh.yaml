@@ -1,0 +1,8 @@
+name: $[$var] is not allowed
+dialect: bash
+source: oils:spec/ysh-expr-sub#var-is-not-allowed
+status: 2
+---
+var=1
+echo $[$var+2]
+echo status=$?

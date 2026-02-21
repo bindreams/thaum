@@ -1,0 +1,19 @@
+name: === on float not allowed
+dialect: bash
+source: oils:spec/ysh-expr-compare#on-float-not-allowed
+stdout: "status=3\nstatus=3\n"
+---
+
+$SH -c '
+shopt -s ysh:upgrade
+pp test_ (1.0 === 2.0)
+echo ok
+'
+echo status=$?
+
+$SH -c '
+shopt -s ysh:upgrade
+pp test_ (42 === 3.0)
+echo ok
+'
+echo status=$?

@@ -1,0 +1,10 @@
+name: static assignment doesn't split
+dialect: bash
+source: oils:spec/assign#static-assignment-doesnt-split
+stdout: "['a b c', 'a b c', 'a b c']\n"
+---
+words='a b c'
+export ex=$words
+glo=$words
+readonly ro=$words
+argv.py "$ex" "$glo" "$ro"

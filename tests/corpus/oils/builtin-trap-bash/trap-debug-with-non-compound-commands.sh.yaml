@@ -1,0 +1,25 @@
+name: trap DEBUG with non-compound commands
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-with-non-compound-commands
+stdout: "  [8]\na\n  [9]\nb\n  [9]\nc\n  [11]\nd\n  [11]\ne\n  [12]\nf\n  [14]\n \
+  \ [15]\n  [17]\n  [19]\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+echo a
+echo b; echo c
+
+echo d && echo e
+echo f || echo g
+
+(( h = 42 ))
+[[ j == j ]]
+
+var=value
+
+readonly r=value

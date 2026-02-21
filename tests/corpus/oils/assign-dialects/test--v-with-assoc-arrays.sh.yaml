@@ -1,0 +1,29 @@
+name: test -v with assoc arrays
+dialect: bash
+source: oils:spec/assign-dialects#test--v-with-assoc-arrays
+stdout: "A=1\nA[0]=1\n\nA=0\nA[0]=0\n\nA[1]=1\nA[x]=1\n\n"
+---
+
+typeset -A A
+
+test -v A
+echo A=$?
+test -v 'A[0]'
+echo "A[0]=$?"
+echo
+
+A['0']=x
+
+test -v A
+echo A=$?
+test -v 'A[0]'
+echo "A[0]=$?"
+echo
+
+test -v 'A[1]'
+echo "A[1]=$?"
+
+# stupid rule about undefined 'x'
+test -v 'A[x]'
+echo "A[x]=$?"
+echo

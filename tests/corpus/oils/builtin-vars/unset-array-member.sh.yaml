@@ -1,0 +1,9 @@
+name: Unset array member
+dialect: bash
+source: oils:spec/builtin-vars#unset-array-member
+stdout: "status=0\nx z len=2\n"
+---
+a=(x y z)
+unset 'a[1]'
+echo status=$?
+echo "${a[@]}" len="${#a[@]}"

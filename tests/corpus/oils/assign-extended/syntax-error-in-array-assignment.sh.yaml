@@ -1,0 +1,8 @@
+name: syntax error in array assignment
+dialect: bash
+source: oils:spec/assign-extended#syntax-error-in-array-assignment
+status: 2
+stdout: ''
+---
+a=x b[0+]=y c=z
+echo $a $b $c

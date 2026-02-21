@@ -1,0 +1,28 @@
+name: set - leading single dash is ignored, turns off xtrace verbose (#2364)
+dialect: bash
+source: 
+  oils:spec/builtin-set#set---leading-single-dash-is-ignored-turns-off-xtrace-verbose-2364
+stdout: "verbose-on\nxtrace-on\n\na b c\n\nx - y z\n"
+---
+
+show_options() {
+  case $- in
+    *v*) echo verbose-on ;;
+  esac
+  case $- in
+    *x*) echo xtrace-on ;;
+  esac
+}
+
+set -x -v
+show_options
+echo
+
+set - a b c
+echo "$@"
+show_options
+echo
+
+# dash that's not leading is not special
+set x - y z
+echo "$@"

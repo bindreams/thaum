@@ -1,0 +1,14 @@
+name: --tool cat-em
+dialect: bash
+source: oils:spec/ysh-dev#tool-cat-em
+stdout: "status=1\nstatus=0\nstatus=1\n"
+---
+
+$SH --tool cat-em zzZZ
+echo status=$?
+
+$SH --tool cat-em stdlib/ysh/math.ysh > /dev/null
+echo status=$?
+
+$SH --tool cat-em zzZZ stdlib/ysh/math.ysh > /dev/null
+echo status=$?

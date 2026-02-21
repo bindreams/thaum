@@ -1,0 +1,25 @@
+name: eval string with 'break continue return error'
+dialect: bash
+source: 
+  oils:spec/builtin-eval-source#eval-string-with-break-continue-return-error
+status: 1
+stdout: "--- break\n1\nend func\n--- continue\n1\n2\nend func\n--- return\n1\n---
+  false\n1\n"
+---
+
+set -e
+
+sh_func_that_evals() {
+  local code_str=$1
+  for i in 1 2; do
+    echo $i
+    eval "$code_str"
+  done
+  echo 'end func'
+}
+
+for code_str in break continue return false; do
+  echo "--- $code_str"
+  sh_func_that_evals "$code_str"
+done
+echo status=$?

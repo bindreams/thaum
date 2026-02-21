@@ -1,0 +1,15 @@
+name: unalias -a
+dialect: bash
+source: oils:spec/alias#unalias--a
+stdout: "2\nstatus=0\n"
+---
+
+alias foo=bar
+alias spam=eggs
+
+alias | egrep 'foo|spam' | wc -l
+
+unalias -a
+
+alias
+echo status=$?

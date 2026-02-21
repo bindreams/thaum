@@ -1,0 +1,8 @@
+name: ${mystr[@]} and ${mystr[*]} are no-ops
+dialect: bash
+source: oils:spec/array#mystr-and-mystr-are-no-ops
+stdout: "abc\nabc\n"
+---
+s='abc'
+echo ${s[@]}
+echo ${s[*]}

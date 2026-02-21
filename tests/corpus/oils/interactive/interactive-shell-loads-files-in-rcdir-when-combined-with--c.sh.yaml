@@ -1,0 +1,27 @@
+name: interactive shell loads files in rcdir (when combined with -c)
+dialect: bash
+source: 
+  oils:spec/interactive#interactive-shell-loads-files-in-rcdir-when-combined-with--c
+stdout: "A\nrcdir 1\nrcdir 2\nB\nrcfile first\nrcdir 1\nrcdir 2\nC\n"
+---
+
+$SH -c 'echo A'
+
+cat >$TMP/rcfile <<EOF
+echo 'rcfile first'
+EOF
+
+mkdir -p $TMP/rcdir
+
+cat >$TMP/rcdir/file1 <<EOF
+echo rcdir 1
+EOF
+
+cat >$TMP/rcdir/file2 <<EOF
+echo rcdir 2
+EOF
+
+# --rcdir only
+$SH --rcdir $TMP/rcdir -i -c 'echo B'
+
+$SH --rcfile $TMP/rcfile --rcdir $TMP/rcdir -i -c 'echo C'

@@ -1,0 +1,21 @@
+name: weird flag parsing -oo errexit noglob
+dialect: bash
+source: oils:spec/sh-usage#weird-flag-parsing--oo-errexit-noglob
+stdout: "e\nf\ne\nf\n"
+---
+
+prog='
+case $- in
+  *e*) echo e ;;
+esac
+
+case $- in
+  *f*) echo f ;;
+esac
+'
+
+# normal way
+$SH -o errexit -o noglob -c "$prog"
+
+# odd way
+$SH -oo errexit noglob -c "$prog"

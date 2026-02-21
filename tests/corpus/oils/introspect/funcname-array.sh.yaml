@@ -1,0 +1,16 @@
+name: ${FUNCNAME[@]} array
+dialect: bash
+source: oils:spec/introspect#funcname-array
+---
+g() {
+  argv.py "${FUNCNAME[@]}"
+}
+f() {
+  argv.py "${FUNCNAME[@]}"
+  g
+  argv.py "${FUNCNAME[@]}"
+}
+f
+['f']
+['g', 'f']
+['f']

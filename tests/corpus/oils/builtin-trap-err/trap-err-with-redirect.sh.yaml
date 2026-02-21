@@ -1,0 +1,17 @@
+name: trap ERR with redirect
+dialect: bash
+source: oils:spec/builtin-trap-err#trap-err-with-redirect
+stdout: "line=3\nline=7\nok\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+false
+
+{ false 
+  true
+} > /zz  # error
+echo ok
+
+
+# doesn't update line for redirect

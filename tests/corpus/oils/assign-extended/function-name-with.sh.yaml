@@ -1,0 +1,8 @@
+name: function name with /
+dialect: bash
+source: oils:spec/assign-extended#function-name-with
+stdout: "ble/foo\nstatus=0\n"
+---
+ble/foo() { echo hi; }
+declare -F ble/foo
+echo status=$?

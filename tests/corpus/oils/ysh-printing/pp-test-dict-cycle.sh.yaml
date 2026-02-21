@@ -1,0 +1,25 @@
+name: 'pp test_: Dict cycle'
+dialect: bash
+source: oils:spec/ysh-printing#pp-test-dict-cycle
+stdout: "(Dict)   {\"z\":99}\n(List)   [{\"z\":99},{\"z\":99}]\n\n(Dict)   {\"k\"\
+  :42,\"cycle\":{...}}\n(List)   [{\"k\":42,\"cycle\":{...}},{\"k\":42,\"cycle\":{...}}]\n"
+---
+
+var no_cycle = {z: 99}
+pp test_ (no_cycle)
+
+var two = [no_cycle, no_cycle]
+pp test_ (two)
+
+#pp value (two)
+
+echo
+
+var d = {k: 42}
+setvar d.cycle = d
+pp test_ (d)
+#pp value (d)
+
+var two = [d, d]
+pp test_ (two)
+#pp value (two)

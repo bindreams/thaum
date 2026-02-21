@@ -1,0 +1,14 @@
+name: sleep without prefix is still external
+dialect: bash
+source: oils:spec/ysh-builtin-private#sleep-without-prefix-is-still-external
+stdout: "ok\nstatus=0\n"
+---
+
+# should not work
+builtin sleep --version
+if test "$?" != '0'; then
+  echo ok
+fi
+
+sleep --version | head -n 1 >& 2
+echo status=$?

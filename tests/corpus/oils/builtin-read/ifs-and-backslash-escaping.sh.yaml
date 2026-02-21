@@ -1,0 +1,10 @@
+name: IFS='\ ' and backslash escaping
+dialect: bash
+source: oils:spec/builtin-read#ifs-and-backslash-escaping
+stdout: "['hello world', 'test']\n['hello world  test', '']\n"
+---
+IFS='\ '
+echo "hello\ world  test" | (read a b; argv.py "$a" "$b")
+IFS='\'
+echo "hello\ world  test" | (read a b; argv.py "$a" "$b")
+# In mksh/zsh, IFS='\' is stronger than backslash escaping

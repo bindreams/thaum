@@ -1,0 +1,11 @@
+name: myarray[1]+=s - Append to element
+dialect: bash
+source: oils:spec/append#myarray1s---append-to-element
+status: 0
+stdout: "['x', 'yz']\n"
+---
+# They treat this as implicit index 0.  We disallow this on the LHS, so we will
+# also disallow it on the RHS.
+a=(x y )
+a[1]+=z
+argv.py "${a[@]}"

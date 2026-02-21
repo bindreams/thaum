@@ -1,0 +1,14 @@
+name: compgen -k shows Oils keywords too
+dialect: bash
+source: oils:spec/builtin-completion#compgen--k-shows-oils-keywords-too
+stdout: "=\ncall\nconst\nfunc\nproc\nsetglobal\nsetvar\ntyped\nvar\n--\n"
+---
+
+# YSH has a superset of keywords:
+# const var
+# setvar setglobal
+# proc func typed
+# call =   # hm = is not here
+
+compgen -k | sort | egrep '^(const|var|setvar|setglobal|proc|func|typed|call|=)$'
+echo --

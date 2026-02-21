@@ -1,0 +1,28 @@
+name: read --raw-line, --all, --num-bytes preserve NUL bytes
+dialect: bash
+source: 
+  oils:spec/ysh-nul-bytes#read---raw-line---all---num-bytes-preserve-nul-bytes
+stdout: "len=3\n 2e 00 2e\nlen=3\n 2e 00 2e\nlen=3\n 2e 00 2e\n"
+---
+
+proc raw-line {
+  read --raw-line (&s)
+  echo len=${#s}
+  write --end '' $s | od -A n -t x1
+}
+
+proc all {
+  read --all (&s)
+  echo len=${#s}
+  write --end '' $s | od -A n -t x1
+}
+
+proc num-bytes {
+  read --num-bytes 3 (&s)
+  echo len=${#s}
+  write --end '' $s | od -A n -t x1
+}
+
+printf '.\000.' | raw-line
+printf '.\000.' | all
+printf '.\000.' | num-bytes

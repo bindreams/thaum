@@ -1,0 +1,10 @@
+name: ${!a[1]} is named ref in bash
+dialect: bash
+source: oils:spec/array#a1-is-named-ref-in-bash
+status: 0
+stdout: "['bar']\n"
+---
+# mksh ignores it
+foo=bar
+a=('1 2' foo '2 3')
+argv.py "${!a[1]}"

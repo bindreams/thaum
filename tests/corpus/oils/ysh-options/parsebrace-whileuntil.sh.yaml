@@ -1,0 +1,14 @@
+name: 'parse_brace: while/until'
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-whileuntil
+stdout: "one\ntwo\nsh syntax\nthree\n"
+---
+shopt -s oil:upgrade
+while true {
+  echo one
+  break
+}
+while true { echo two; break }
+
+echo 'sh syntax'
+while true; do echo three; break; done

@@ -1,0 +1,12 @@
+name: ${s+foo} and ${s:+foo} when set -u
+dialect: bash
+source: oils:spec/var-op-test#sfoo-and-sfoo-when-set--u
+stdout: "v=foo\nv=foo\nv=\nv=\n"
+---
+set -u
+v=v
+echo v=${v:+foo}
+echo v=${v+foo}
+unset v
+echo v=${v:+foo}
+echo v=${v+foo}

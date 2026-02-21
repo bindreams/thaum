@@ -1,0 +1,7 @@
+name: echo builtin should disallow typed args - literal
+dialect: bash
+source: oils:spec/builtin-echo#echo-builtin-should-disallow-typed-args---literal
+status: 2
+stdout: "\n"
+---
+echo (42)

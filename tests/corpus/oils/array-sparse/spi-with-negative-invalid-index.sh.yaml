@@ -1,0 +1,20 @@
+name: ${sp[i]} with negative invalid index
+dialect: bash
+source: oils:spec/array-sparse#spi-with-negative-invalid-index
+stdout: "sp[-10]: ''.\nsp[-11]: ''.\nsp[-19]: ''.\n"
+stderr: "  echo \"sp[-10]: '${sp[-10]}'.\"\n                    ^~\n[ stdin ]:8: Index
+  -10 out of bounds for array of length 9\n  echo \"sp[-11]: '${sp[-11]}'.\"\n   \
+  \                 ^~\n[ stdin ]:9: Index -11 out of bounds for array of length 9\n\
+  \  echo \"sp[-19]: '${sp[-19]}'.\"\n                    ^~\n[ stdin ]:10: Index
+  -19 out of bounds for array of length 9\n"
+---
+case $SH in mksh) exit ;; esac
+
+sp=({1..9})
+unset -v 'sp[2]'
+unset -v 'sp[3]'
+unset -v 'sp[7]'
+
+echo "sp[-10]: '${sp[-10]}'."
+echo "sp[-11]: '${sp[-11]}'."
+echo "sp[-19]: '${sp[-19]}'."

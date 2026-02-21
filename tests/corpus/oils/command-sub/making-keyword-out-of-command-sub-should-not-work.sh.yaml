@@ -1,0 +1,8 @@
+name: Making keyword out of command sub should NOT work
+dialect: bash
+source: oils:spec/command-sub#making-keyword-out-of-command-sub-should-not-work
+status: 2
+stdout: ''
+---
+$(echo f)$(echo or) i in a b c; do echo $i; done
+echo status=$?

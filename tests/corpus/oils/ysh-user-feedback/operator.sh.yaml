@@ -1,0 +1,19 @@
+name: '!== operator'
+dialect: bash
+source: oils:spec/ysh-user-feedback#operator
+stdout: "not equal\n"
+---
+var a = 'bar'
+
+if (a !== 'foo') {
+  echo 'not equal'
+}
+
+if (a !== 'bar') {
+  echo 'should not get here'
+}
+
+# NOTE: a !== foo is idiomatic)
+if ("$a" !== 'bar') {
+  echo 'should not get here'
+}

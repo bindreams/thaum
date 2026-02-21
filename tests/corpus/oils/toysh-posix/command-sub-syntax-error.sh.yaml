@@ -1,0 +1,12 @@
+name: Command Sub Syntax Error
+dialect: bash
+source: oils:spec/toysh-posix#command-sub-syntax-error
+status: 2
+stdout: ''
+---
+# http://landley.net/notes.html#28-01-2020
+
+echo $(if true)
+echo $?
+echo $(false)
+echo $?

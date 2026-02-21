@@ -1,0 +1,31 @@
+name: Temp bindings can use locals in the same frame,(don't introduce new frame)
+dialect: bash
+source: 
+  oils:spec/ysh-env#temp-bindings-can-use-locals-in-the-same-framedont-introduce-new-frame
+stdout: "shfunc x=zzz FOO=\nshfunc x=zzz FOO=zzz\n\nysh x=zzz FOO= ENV.FOO=null\n\
+  ysh x=zzz FOO= ENV.FOO=zzz\nysh x=zzz FOO= ENV.FOO=zzz\n"
+---
+
+# OSH: FOO can use x, but FOO is also bound
+shfunc() {
+  local x='zzz'
+  # There is no FOO here, because the argument to echo is evaluated first
+  FOO=$x echo      "shfunc x=$x FOO=${FOO:-}"
+  FOO=$x eval 'echo shfunc x=$x FOO=$FOO'
+}
+
+shfunc
+echo
+
+shopt --set ysh:upgrade
+
+# YSH: FOO can use x, but FOO is also bound
+proc p {
+  var x = 'zzz'
+  # There is no ENV.FOO here, because the argument to echo is evaluated first
+  FOO=$x echo         "ysh x=$x FOO=${FOO:-} ENV.FOO=$[get(ENV, 'FOO')]"
+  FOO=$x eval    'echo ysh x=$x FOO=${FOO:-} ENV.FOO=$[get(ENV, "FOO")]'
+  FOO=$x redir { echo "ysh x=$x FOO=${FOO:-} ENV.FOO=$[get(ENV, 'FOO')]" }
+}
+
+p

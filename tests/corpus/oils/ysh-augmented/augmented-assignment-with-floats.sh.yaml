@@ -1,0 +1,16 @@
+name: Augmented assignment with floats
+dialect: bash
+source: oils:spec/ysh-augmented#augmented-assignment-with-floats
+stdout: "43.5\n45.0\n48.0\n"
+---
+
+var x = 42
+
+setvar x += 1.5
+echo $x
+
+setvar x += '1.5'
+echo $x
+
+setvar x += '3'
+echo $x

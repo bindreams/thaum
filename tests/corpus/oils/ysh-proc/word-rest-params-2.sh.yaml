@@ -1,0 +1,12 @@
+name: word rest params 2
+dialect: bash
+source: oils:spec/ysh-proc#word-rest-params-2
+stdout: "a\nb c\n"
+---
+shopt --set ysh:all
+
+proc f(first, ...rest) {  # @ means "the rest of the arguments"
+  write --sep ' ' -- $first
+  write --sep ' ' -- @rest        # @ means "splice this array"
+}
+f a b c

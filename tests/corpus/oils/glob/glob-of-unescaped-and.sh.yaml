@@ -1,0 +1,9 @@
+name: Glob of unescaped [[] and []]
+dialect: bash
+source: oils:spec/glob#glob-of-unescaped-and
+stdout: "[ ]\n[ ]\n"
+---
+touch $TMP/[ $TMP/]
+cd $TMP
+echo [\[z] [\]z]  # the right way to do it
+echo [[z] []z]    # also accepted

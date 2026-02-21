@@ -1,0 +1,11 @@
+name: single quoted -- implicit and explicit raw
+dialect: bash
+source: oils:spec/ysh-string#single-quoted----implicit-and-explicit-raw
+stdout: "foo bar\nfoo bar\n\\t\\n\n"
+---
+var x = 'foo bar'
+echo $x
+setvar x = r'foo bar'  # Same string
+echo $x
+setvar x = r'\t\n'  # This is raw
+echo $x

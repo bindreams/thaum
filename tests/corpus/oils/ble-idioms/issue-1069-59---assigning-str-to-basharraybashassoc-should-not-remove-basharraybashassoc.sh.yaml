@@ -1,0 +1,16 @@
+name: 'Issue #1069 [59] - Assigning Str to BashArray/BashAssoc should not remove BashArray/BashAssoc'
+dialect: bash
+source: 
+  oils:spec/ble-idioms#issue-1069-59---assigning-str-to-basharraybashassoc-should-not-remove-basharraybashassoc
+stdout: "declare -a a=([0]=\"99\" [1]=\"2\" [2]=\"3\")\ndeclare -A A=([0]=\"99\" [k]=\"\
+  v\" )\n"
+---
+case $SH in zsh|ash) exit ;; esac
+
+a=(1 2 3)
+a=99
+typeset -p a
+
+typeset -A A=([k]=v)
+A=99
+typeset -p A

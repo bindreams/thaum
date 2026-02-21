@@ -1,0 +1,8 @@
+name: Iterating over io.stdin multiple times (#2356)
+dialect: bash
+source: oils:spec/ysh-bugs#iterating-over-iostdin-multiple-times-2356
+stdout: "0: a\n0: c\n1: d\n"
+---
+
+echo u'a\nb' | for i, line in (io.stdin) { echo $i: $line; break }
+echo u'c\nd' | for i, line in (io.stdin) { echo $i: $line }

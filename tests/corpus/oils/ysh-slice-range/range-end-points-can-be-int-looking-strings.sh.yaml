@@ -1,0 +1,22 @@
+name: Range end points can be int-looking Strings
+dialect: bash
+source: oils:spec/ysh-slice-range#range-end-points-can-be-int-looking-strings
+status: 3
+stdout: "(List)   [3,4,5]\n(List)   [5,6]\n(List)   [3,4]\n(List)   [-5,-4]\n(List)\
+  \   [-7,-6]\n"
+---
+
+pp test_ (list('3' ..< '6'))
+
+var i = '5'
+
+pp test_ (list(i ..< 7))
+pp test_ (list(3 ..< i))
+
+var i = '-5'
+
+pp test_ (list(i ..< -3))
+pp test_ (list(-7 ..< i))
+
+# Not allowed
+pp test_ ('a' ..< 'z')

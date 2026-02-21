@@ -1,0 +1,21 @@
+name: NUL bytes with test -f
+dialect: bash
+source: oils:spec/nul-bytes#nul-bytes-with-test--f
+stdout: "status=1\nstatus=0\nstatus=0\nstatus=1\n"
+---
+
+case $SH in dash) exit ;; esac
+
+
+test -f $'\0'
+echo status=$?
+
+touch foo
+test -f $'foo\0'
+echo status=$?
+
+test -f $'foo\0bar'
+echo status=$?
+
+test -f $'foobar'
+echo status=$?

@@ -1,0 +1,10 @@
+name: result of ArithSub -- assoc[0] decay
+dialect: bash
+source: oils:spec/arith#result-of-arithsub----assoc0-decay
+status: 0
+stdout: "declared\n0\n"
+---
+declare -A A=(['foo']=bar ['spam']=eggs)
+echo declared
+b=$(( A ))
+echo $b

@@ -1,0 +1,21 @@
+name: Mutate List entries, a[42] a['42'] allowed
+dialect: bash
+source: oils:spec/ysh-list#mutate-list-entries-a42-a42-allowed
+status: 3
+stdout: "(List)   [\"2\",1,\"4\"]\n(List)   [\"2\",1,9]\n(List)   [\"2\",1,99]\n"
+---
+
+var a = :| 2 3 4 |
+
+setvar a[1] = 1
+pp test_ (a)
+
+setvar a['2'] += 5
+pp test_ (a)
+
+# Can be int-looking string
+setvar a['2'] = 99
+pp test_ (a)
+
+# Not allowed
+setvar a['zz'] = 101

@@ -1,0 +1,27 @@
+name: Param binding semantics
+dialect: bash
+source: oils:spec/ysh-func#param-binding-semantics
+stdout: "(Str)   \"foo\"\n(Null)   null\n(Str)   \"foo\"\n(List)   [\"a\",\"b\",\"\
+  c\"]\n(Null)   null\n(List)   [\"z\",\"b\",\"c\"]\n"
+---
+# value
+var x = 'foo'
+
+func f(x) {
+  setvar x = 'bar'
+}
+
+pp test_ (x)
+pp test_ (f(x))
+pp test_ (x)
+
+# reference
+var y = ['a', 'b', 'c']
+
+func g(y) {
+  setvar y[0] = 'z'
+}
+
+pp test_ (y)
+pp test_ (g(y))
+pp test_ (y)

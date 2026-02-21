@@ -1,0 +1,30 @@
+name: Type objects Bool, Int, Float, etc.
+dialect: bash
+source: oils:spec/ysh-builtin-meta#type-objects-bool-int-float-etc
+stdout: "(Obj)   (\"name\":\"Bool\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"\
+  name\":\"Int\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\":\"Float\")
+  --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\":\"Str\") --> (\"__index__\"\
+  :<BuiltinFunc>)\n(Obj)   (\"name\":\"List\") --> (\"__index__\":<BuiltinFunc>)\n\
+  (Obj)   (\"name\":\"Dict\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\"\
+  :\"Obj\",\"new\":<BuiltinFunc>) --> (\"__index__\":<BuiltinFunc>)\n\n(Bool)   true\n\
+  (Bool)   true\n"
+---
+
+pp test_ (Bool)
+pp test_ (Int)
+pp test_ (Float)
+pp test_ (Str)
+
+pp test_ (List)
+pp test_ (Dict)
+pp test_ (Obj)
+echo
+
+var b = Bool
+
+pp test_ (b is Bool)
+
+# Objects don't have equality, only identity
+#pp test_ (b === Bool)
+
+pp test_ (vm.id(b) === vm.id(Bool))

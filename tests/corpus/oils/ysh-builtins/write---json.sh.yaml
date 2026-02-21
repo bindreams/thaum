@@ -1,0 +1,9 @@
+name: write --json
+dialect: bash
+source: oils:spec/ysh-builtins#write---json
+stdout: "\"μ\"\n\"x\"\n\"��\"\n\"y\"\n"
+---
+shopt --set ysh:upgrade
+
+write --json u'\u{3bc}' x
+write --json b'\yfe\yff' y

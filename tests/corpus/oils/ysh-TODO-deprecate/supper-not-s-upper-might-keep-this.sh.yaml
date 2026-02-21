@@ -1,0 +1,9 @@
+name: s.upper(), not s => upper() (might keep this)
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#supper-not-s-upper-might-keep-this
+stdout: "FOO\n"
+---
+
+shopt --set parse_ysh_expr_sub
+
+echo $['foo' => upper()]

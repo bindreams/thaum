@@ -1,0 +1,11 @@
+name: trap EXIT return status ignored
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit-return-status-ignored
+status: 0
+stdout: "cleanup [x y z]\n"
+---
+cleanup() {
+  echo "cleanup [$@]"
+  return 42
+}
+trap 'cleanup x y z' EXIT

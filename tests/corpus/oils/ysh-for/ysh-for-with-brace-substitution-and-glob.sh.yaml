@@ -1,0 +1,10 @@
+name: YSH for with brace substitution and glob
+dialect: bash
+source: oils:spec/ysh-for#ysh-for-with-brace-substitution-and-glob
+stdout: "0 bar.py\n1 foo.py\n2 README.md\n3 foo.md\n"
+---
+
+touch {foo,bar}.py
+for i, file in *.py {README,foo}.md {
+  echo "$i $file"
+}

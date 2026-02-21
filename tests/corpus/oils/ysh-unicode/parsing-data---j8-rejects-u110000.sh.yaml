@@ -1,0 +1,10 @@
+name: Parsing data - J8 rejects \u{110000}
+dialect: bash
+source: oils:spec/ysh-unicode#parsing-data---j8-rejects-u110000
+stdout: "status=1\n"
+---
+
+json8 read <<EOF
+u'\u{110000}'
+EOF
+echo status=$?

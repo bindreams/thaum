@@ -1,0 +1,12 @@
+name: While loop with empty lines
+dialect: bash
+source: oils:spec/shell-grammar#while-loop-with-empty-lines
+---
+while ! echo word_a
+do
+
+  echo word_b
+
+  echo word_c
+
+done

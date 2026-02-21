@@ -1,0 +1,10 @@
+name: four args
+dialect: bash
+source: oils:spec/builtin-bracket#four-args
+---
+[ ! foo = foo ]
+echo status=$?
+[ \( -z foo \) ]
+echo status=$?
+status=1
+status=1

@@ -1,0 +1,8 @@
+name: Dependent export setting
+dialect: bash
+source: oils:spec/builtin-vars#dependent-export-setting
+stdout: "v=None\n"
+---
+# FOO is not respected here either.
+export FOO=foo v=$(printenv.py FOO)
+echo "v=$v"

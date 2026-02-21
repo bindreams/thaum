@@ -1,0 +1,13 @@
+name: 'local: last command fails and also keeps going'
+dialect: bash
+source: oils:spec/errexit-osh#local-last-command-fails-and-also-keeps-going
+stdout: "good\nstatus=0\none\n"
+---
+set -o errexit
+f() {
+  echo good
+  local x=$(echo one; false)
+  echo status=$?
+  echo $x
+}
+f

@@ -1,0 +1,12 @@
+name: echo $x for various types
+dialect: bash
+source: oils:spec/ysh-word-eval#echo-x-for-various-types
+stdout: "true\n42\n3.14\n"
+---
+const mybool = true
+const myint = 42
+const myfloat = 3.14
+
+echo $mybool
+echo $myint
+echo $myfloat

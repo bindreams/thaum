@@ -1,0 +1,9 @@
+name: Word joining
+dialect: bash
+source: oils:spec/word-eval#word-joining
+stdout: "['1', '2a1', 'a2_x', 'y', 'z']\n"
+---
+set -- x y z
+s1='1 2'
+array=(a1 a2)
+argv.py $s1"${array[@]}"_"$@"

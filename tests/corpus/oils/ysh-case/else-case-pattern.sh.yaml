@@ -1,0 +1,11 @@
+name: else case pattern
+dialect: bash
+source: oils:spec/ysh-case#else-case-pattern
+status: 0
+stdout: "else matches all\n"
+---
+var x = 123
+case (x) {
+  (else) { echo else matches all }
+  (123) { echo unreachable }
+}

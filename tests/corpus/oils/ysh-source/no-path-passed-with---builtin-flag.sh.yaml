@@ -1,0 +1,9 @@
+name: no path passed with --builtin flag
+dialect: bash
+source: oils:spec/ysh-source#no-path-passed-with---builtin-flag
+status: 2
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+source --builtin

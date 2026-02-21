@@ -1,0 +1,7 @@
+name: '[[ empty string is false'
+dialect: bash
+source: oils:spec/dbracket#empty-string-is-false
+stdout: "true\nfalse\n"
+---
+[[ 'a' ]] && echo true
+[[ ''  ]] || echo false

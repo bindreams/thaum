@@ -1,0 +1,10 @@
+name: 'Regression: ${a[@]@Q} crash with `a[0]=x a[2]=y`'
+dialect: bash
+source: oils:spec/array#regression-aq-crash-with-a0x-a2y
+stdout: "quoted = (x y)\n"
+---
+case $SH in mksh) exit ;; esac
+
+a[0]=x
+a[2]=y
+echo "quoted = (${a[@]@Q})"

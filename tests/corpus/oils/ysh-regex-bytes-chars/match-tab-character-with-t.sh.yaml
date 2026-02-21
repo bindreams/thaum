@@ -1,0 +1,12 @@
+name: Match tab character with [\t]
+dialect: bash
+source: oils:spec/ysh-regex-bytes-chars#match-tab-character-with-t
+stdout: "(Str)   \"(a[\\t]b)\"\n   a   a  \\t   b   b  \\n\n"
+---
+shopt -s ysh:all
+
+var pat = / ('a' [\t] 'b') /
+pp test_ (str(pat))
+
+var lines = :| b'aa\tbb' b'cc\tdd' |
+write @lines | egrep $pat | od -A n -t c 

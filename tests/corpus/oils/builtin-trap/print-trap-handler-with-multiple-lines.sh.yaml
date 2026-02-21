@@ -1,0 +1,10 @@
+name: print trap handler with multiple lines
+dialect: bash
+source: oils:spec/builtin-trap#print-trap-handler-with-multiple-lines
+stdout: "trap -- 'echo 1\necho 2\necho 3' SIGINT\n"
+---
+trap 'echo 1
+echo 2
+echo 3' INT
+
+trap

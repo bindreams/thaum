@@ -1,0 +1,23 @@
+name: hay reset
+dialect: bash
+source: oils:spec/hay#hay-reset
+status: 127
+stdout: "package 0\nreset 0\n"
+---
+shopt --set parse_brace
+
+hay define package
+
+hay eval :a {
+  package foo
+  echo "package $?"
+}
+
+hay reset  # no more names
+
+echo "reset $?"
+
+hay eval :b {
+  package foo
+  echo "package $?"
+}

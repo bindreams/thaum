@@ -1,0 +1,8 @@
+name: Functions can redefine vars
+dialect: bash
+source: oils:spec/ysh-func#functions-can-redefine-vars
+stdout: "<Func>\n"
+---
+var f = 0
+func f() { return (1) }
+pp test_ (f)

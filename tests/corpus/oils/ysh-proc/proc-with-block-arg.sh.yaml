@@ -1,0 +1,31 @@
+name: Proc with block arg
+dialect: bash
+source: oils:spec/ysh-proc#proc-with-block-arg
+stdout: "f word a b\nFFF\ng word a b\ng rest c d\nGGG\n"
+---
+shopt --set ysh:upgrade
+
+# TODO: Test more of this
+proc f(x, y ; ; ; block) {
+  echo f word $x $y
+
+  if (block) {
+    call io->eval(block)
+  }
+}
+f a b { echo FFF }
+
+# With varargs and block
+shopt --set parse_proc
+
+proc g(x, y, ...rest ; ; ; block) {
+  echo g word $x $y
+  echo g rest @rest
+
+  if (block) {
+    call io->eval(block)
+  }
+}
+g a b c d {
+  echo GGG
+}

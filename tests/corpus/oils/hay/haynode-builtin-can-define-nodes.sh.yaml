@@ -1,0 +1,39 @@
+name: haynode builtin can define nodes
+dialect: bash
+source: oils:spec/hay#haynode-builtin-can-define-nodes
+stdout: "level 0 children\n1\nlevel 1 children\n2\nlevel 0 children\n2\n"
+---
+shopt --set parse_paren parse_brace parse_equals parse_proc parse_ysh_expr_sub
+
+# It prints JSON by default?  What about the code blocks?
+# Or should there be a --json flag?
+
+hay eval :result {
+
+  # note that 'const' is required because haynode isn't capitalized
+  haynode parent alice {
+    const age = '50'
+    
+    haynode child bob {
+      # TODO: Is 'const' being created in the old ENCLOSING frame?  Not the new
+      # ENCLOSED one?
+      const age = '10'
+    }
+
+    haynode child carol {
+      const age = '20'
+    }
+
+    const other = 'str'
+  }
+}
+
+#= result
+write -- 'level 0 children' $[len(result['children'])]
+write -- 'level 1 children' $[len(result['children'][0]['children'])]
+
+hay eval :result {
+  haynode parent foo
+  haynode parent bar
+}
+write -- 'level 0 children' $[len(result['children'])]

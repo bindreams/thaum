@@ -1,0 +1,6 @@
+name: case
+dialect: bash
+source: oils:spec/command-sub#case
+stdout: "letter\n"
+---
+foo=a; case $foo in [0-9]) echo number;; [a-z]) echo letter ;; esac

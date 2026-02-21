@@ -1,0 +1,16 @@
+name: declare -p arr
+dialect: bash
+source: oils:spec/assign-extended#declare--p-arr
+stdout: "declare -a test_arr1=()\ndeclare -a test_arr2=()\ndeclare -A test_arr3=()\n\
+  declare -a test_arr4=(1 2 3)\ndeclare -a test_arr5=(1 2 3)\ndeclare -A test_arr6=(['a']=1
+  ['b']=2 ['c']=3)\ndeclare -a test_arr7=([3]=foo)\n"
+---
+test_arr1=()
+declare -a test_arr2=()
+declare -A test_arr3=()
+test_arr4=(1 2 3)
+declare -a test_arr5=(1 2 3)
+declare -A test_arr6=(['a']=1 ['b']=2 ['c']=3)
+test_arr7=()
+test_arr7[3]=foo
+declare -p test_arr{1..7}

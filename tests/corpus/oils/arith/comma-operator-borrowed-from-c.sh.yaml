@@ -1,0 +1,8 @@
+name: Comma operator (borrowed from C)
+dialect: bash
+source: oils:spec/arith#comma-operator-borrowed-from-c
+stdout: "3\n"
+---
+a=1
+b=2
+echo $((a,(b+1)))

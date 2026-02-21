@@ -1,0 +1,8 @@
+name: Exit out of function
+dialect: bash
+source: oils:spec/builtin-process#exit-out-of-function
+status: 3
+---
+f() { exit 3; }
+f
+exit 4

@@ -1,0 +1,7 @@
+name: Replacement with special chars (bug fix)
+dialect: bash
+source: oils:spec/var-op-patsub#replacement-with-special-chars-bug-fix
+stdout: "?x\n"
+---
+v=xx
+echo ${v/x/"?"}

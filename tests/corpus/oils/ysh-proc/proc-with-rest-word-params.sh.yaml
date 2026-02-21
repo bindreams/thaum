@@ -1,0 +1,20 @@
+name: Proc with ... "rest" word params
+dialect: bash
+source: oils:spec/ysh-proc#proc-with-rest-word-params
+stdout: "names:\na\nb\nc\nstatus=0\n"
+---
+
+# TODO: opts goes with this
+# var opt = grep_opts.parse(ARGV)
+#
+# func(**opt)  # Assumes keyword args match?
+# parse :grep_opts :opt @ARGV
+
+shopt -s ysh:all
+
+proc f(...names) {
+  write names: @names
+}
+# this gets called with 3 args then?
+f a b c
+echo status=$?

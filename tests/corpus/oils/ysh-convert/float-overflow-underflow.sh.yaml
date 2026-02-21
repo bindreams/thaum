@@ -1,0 +1,13 @@
+name: float() overflow / underflow
+dialect: bash
+source: oils:spec/ysh-convert#float-overflow-underflow
+stdout: "1.2\n3.4\ninf\n-inf\n"
+---
+
+var a = float("1.2")
+var b = float("3.4")
+
+var c = float("42.1e500")
+var d = float("-42.1e500")
+
+write $a $b $c $d

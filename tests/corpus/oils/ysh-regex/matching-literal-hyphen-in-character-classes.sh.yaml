@@ -1,0 +1,11 @@
+name: Matching literal hyphen in character classes
+dialect: bash
+source: oils:spec/ysh-regex#matching-literal-hyphen-in-character-classes
+stdout: "pat=[ab-]\nc-d\nab\n"
+---
+shopt -s ysh:all
+
+var literal = '-'
+var pat = / [ 'a' 'b' @literal ] /
+write pat=$pat
+write 'c-d' 'ab' 'cd' | grep $pat

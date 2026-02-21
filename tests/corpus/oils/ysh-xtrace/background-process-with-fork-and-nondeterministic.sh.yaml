@@ -1,0 +1,30 @@
+name: Background process with fork and & (nondeterministic)
+dialect: bash
+source: oils:spec/ysh-xtrace#background-process-with-fork-and-nondeterministic
+stdout: ''
+stderr: "  . 12345 exec sleep 0.1\n  . 12345 exec sleep 0.1\n  ; process 12345: status
+  0\n  ; process 12345: status 0\n. builtin fork\n. builtin set '+x'\n. builtin shopt
+  -s 'ysh:upgrade'\n< wait\n< wait\n> wait\n> wait\n| fork 12345\n| fork 12345\n"
+---
+shopt --set ysh:upgrade
+set -x
+
+{
+  sleep 0.1 &
+  wait
+
+  shopt -s ysh:upgrade
+
+  fork {
+    sleep 0.1
+  }
+  wait
+  set +x
+} 2>err.txt
+
+# SORT for determinism
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt |
+  LC_ALL=C sort >&2
+
+
+# others: redirects?

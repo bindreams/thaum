@@ -1,0 +1,14 @@
+name: 'local: middle command fails and keeps going'
+dialect: bash
+source: oils:spec/errexit-osh#local-middle-command-fails-and-keeps-going
+stdout: "good\nstatus=0\none two\n"
+---
+set -o errexit
+f() {
+  echo good
+  local x=$(echo one; false; echo two)
+  echo status=$?
+  echo $x
+}
+f
+# for dash and mksh, the INNER shell aborts, but the outer one keeps going!

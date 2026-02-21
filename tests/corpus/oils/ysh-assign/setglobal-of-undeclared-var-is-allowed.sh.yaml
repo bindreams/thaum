@@ -1,0 +1,12 @@
+name: setglobal of undeclared var is allowed
+dialect: bash
+source: oils:spec/ysh-assign#setglobal-of-undeclared-var-is-allowed
+stdout: "x=XX\nx=xx\n"
+---
+var x = 'XX'
+echo x=$x
+setglobal x = 'xx'
+echo x=$x
+
+# fatal error
+setglobal y = 'YY'

@@ -1,0 +1,23 @@
+name: ${!array_ref:-set} and ${!array_ref:=assign}
+dialect: bash
+source: oils:spec/var-ref#arrayref-set-and-arrayrefassign
+stdout: "==== check ====\n['', '', '']\n['', '', '']\n==== assign ====\n['', '', '']\n\
+  ['', '', '']\n['', '', '']\n['', '', '']\n"
+---
+
+ref='a[@]'
+a=('' '' '')
+
+echo "==== check ===="
+
+argv.py "${!ref:-set}"
+argv.py "${a[@]:-set}"
+
+echo "==== assign ===="
+
+argv.py "${!ref:=assign}"
+argv.py "${!ref}"
+a=('' '' '') # revert the state in case it is modified
+
+argv.py "${a[@]:=assign}"
+argv.py "${a[@]}"

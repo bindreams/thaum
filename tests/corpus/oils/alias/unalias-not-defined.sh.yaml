@@ -1,0 +1,8 @@
+name: unalias not defined
+dialect: bash
+source: oils:spec/alias#unalias-not-defined
+stdout: "status=1\n"
+---
+alias e=echo ll='ls -l'
+unalias e nonexistentZ ll
+echo status=$?

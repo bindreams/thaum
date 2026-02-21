@@ -1,0 +1,9 @@
+name: Case with empty clauses
+dialect: bash
+source: oils:spec/shell-grammar#case-with-empty-clauses
+---
+case word_a in
+  word_b)
+    ;;
+  word_c)
+esac

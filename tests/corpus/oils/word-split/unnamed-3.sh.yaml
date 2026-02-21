@@ -1,0 +1,7 @@
+name: '"$@"'
+dialect: bash
+source: oils:spec/word-split#unnamed
+stdout: "['-a 1', 'b 2', 'c 3-']\n"
+---
+fun() { argv.py "-$@-"; }
+fun "a 1" "b 2" "c 3"

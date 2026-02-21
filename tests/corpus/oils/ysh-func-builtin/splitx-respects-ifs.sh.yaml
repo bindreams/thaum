@@ -1,0 +1,8 @@
+name: '@[split(x)] respects IFS'
+dialect: bash
+source: oils:spec/ysh-func-builtin#splitx-respects-ifs
+stdout: "['one', 'two', 'three']\n"
+---
+setvar IFS = ":"
+var x = "one:two:three"
+argv.py @[split(x)]

@@ -1,0 +1,7 @@
+name: 'regression: 0 step disallowed'
+dialect: bash
+source: oils:spec/brace-expansion#regression-0-step-disallowed
+status: 2
+stdout: ''
+---
+echo -{1..4..0}-

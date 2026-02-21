@@ -1,0 +1,49 @@
+name: Nested temp bindings
+dialect: bash
+source: oils:spec/ysh-env#nested-temp-bindings
+stdout: "> f1 AA=a\n  f2 AA=aaaa BB=bb\nAA=aaaa\nBB=bb\n< f1 AA=a\n\n> p1 AA=a\n \
+  \ p2 AA=aaaa BB=bb\nAA=aaaa\nBB=bb\n< p1 AA=a\n\n> p1 AA=a\n  p2 AA=aaaa BB=bb\n\
+  AA=aaaa\nBB=bb\n< p1 AA=a\n"
+---
+
+f2() {
+  echo "  f2 AA=$AA BB=$BB"
+  env | egrep 'AA|BB'
+}
+
+f1() {
+  echo "> f1 AA=$AA"
+  AA=aaaa BB=bb f2
+  echo "< f1 AA=$AA"
+}
+
+AA=a f1
+
+#
+# Now with ysh:upgrade
+#
+
+shopt --set ysh:upgrade
+echo
+
+proc p2 {
+  echo "  p2 AA=$[get(ENV, 'AA')] BB=$[get(ENV, 'BB')]"
+  env | egrep 'AA|BB'
+}
+
+proc p1 {
+  echo "> p1 AA=$[get(ENV, 'AA')]"
+  AA=aaaa BB=bb p2
+  echo "< p1 AA=$[get(ENV, 'AA')]"
+}
+
+AA=a p1
+
+#
+# Now with ysh:all
+#
+
+shopt --set ysh:all
+echo
+
+AA=a p1

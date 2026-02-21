@@ -1,0 +1,13 @@
+name: Single array with :-
+dialect: bash
+source: oils:spec/array#single-array-with
+stdout: "['none', 'x', 'none']\n"
+---
+
+# 2024-06 - bash 5.2 and mksh now match, bash 4.4 differed.
+# Could change OSH
+# zsh agrees with OSH, but it fails most test cases
+# 2025-01 We changed OSH.
+
+single=('')
+argv.py ${single[@]:-none} x "${single[@]:-none}"

@@ -1,0 +1,28 @@
+name: subshell
+dialect: bash
+source: oils:spec/ysh-xtrace#subshell
+stdout: ''
+stderr: "    . 12345 builtin ':' p\n  + 12345 exit 3\n  . 12345 builtin ':' 1\n  <
+  12345 proc p\n  > 12345 proc p\n. builtin ':' begin\n. builtin set '+x'\n; process
+  12345: status 3\n| forkwait 12345\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+set -x
+
+proc p {
+  : p
+}
+
+{
+  : begin
+  ( 
+    : 1
+    p
+    exit 3
+  )
+  set +x
+} 2>err.txt
+
+# Hack: sort for determinism
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt | LANG=C sort >&2

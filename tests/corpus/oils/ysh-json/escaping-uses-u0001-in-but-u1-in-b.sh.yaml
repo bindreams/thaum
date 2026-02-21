@@ -1,0 +1,11 @@
+name: Escaping uses \u0001 in "", but \u{1} in b''
+dialect: bash
+source: oils:spec/ysh-json#escaping-uses-u0001-in-but-u1-in-b
+stdout: "\"\\u0001\"\nb'\\u{1}\\yff\\u{1f}'\n"
+---
+
+s1=$'\x01'
+s2=$'\x01\xff\x1f'  # byte string
+
+json8 write (s1)
+json8 write (s2)

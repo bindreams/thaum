@@ -1,0 +1,15 @@
+name: Can print type of List with pp
+dialect: bash
+source: oils:spec/ysh-list#can-print-type-of-list-with-pp
+stdout: "(List)   [\"true\"]\n(List)   []\n"
+---
+
+var b = :|true|  # this is a string
+pp test_ (b)
+
+# = b
+
+var empty = :||
+pp test_ (empty)
+
+# = empty

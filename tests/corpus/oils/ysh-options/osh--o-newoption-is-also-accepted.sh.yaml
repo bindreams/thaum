@@ -1,0 +1,19 @@
+name: osh -o new_option is also accepted
+dialect: bash
+source: oils:spec/ysh-options#osh--o-newoption-is-also-accepted
+stdout: "nullglob\n0 flag nullglob\nupgrade\n0 flag oil:upgrade\n2 set builtin nullglob\n\
+  2 set builtin oil:upgrade\n"
+---
+
+$SH -o nullglob -c 'echo nullglob'
+echo $? flag nullglob
+
+$SH -o oil:upgrade -c 'proc p { echo upgrade }; p'
+echo $? flag oil:upgrade
+
+# Should disallow these
+
+set -o nullglob
+echo $? set builtin nullglob
+set -o oil:upgrade
+echo $? set builtin oil:upgrade

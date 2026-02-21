@@ -1,0 +1,15 @@
+name: command -v with multiple names
+dialect: bash
+source: oils:spec/builtin-meta#command--v-with-multiple-names
+stdout: "echo\nmyfunc\nfor\nstatus=1\n## BUG bash STDOUT:\necho\nmyfunc\nfor\nstatus=0\n\
+  ## BUG-2 dash/ash STDOUT: \necho\nstatus=0\n## OK mksh STDOUT: \necho\nmyfunc\n\
+  status=1\n"
+---
+# ALL FOUR SHELLS behave differently here!
+#
+# bash chooses to swallow the error!  We agree with zsh if ANY word lookup
+# fails, then the whole thing fails.
+
+myfunc() { echo x; }
+command -v echo myfunc ZZZ for
+echo status=$?

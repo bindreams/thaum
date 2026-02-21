@@ -1,0 +1,14 @@
+name: kill -n 9 specifies the signal number
+dialect: bash
+source: oils:spec/builtin-kill#kill--n-9-specifies-the-signal-number
+stdout: "kill=0\nwait=137\n"
+---
+#case $SH in mksh|dash) exit ;; esac
+
+sleep 0.1 &
+pid=$!
+kill -n 9 $pid
+echo kill=$?
+
+wait $pid
+echo wait=$?

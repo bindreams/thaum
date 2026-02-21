@@ -1,0 +1,9 @@
+name: errexit aborts early on pipeline
+dialect: bash
+source: oils:spec/errexit#errexit-aborts-early-on-pipeline
+status: 1
+stdout: ''
+---
+set -o errexit
+echo hi | grep nonexistent
+echo two

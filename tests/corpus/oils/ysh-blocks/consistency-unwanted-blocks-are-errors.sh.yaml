@@ -1,0 +1,28 @@
+name: 'Consistency: Unwanted Blocks Are Errors'
+dialect: bash
+source: oils:spec/ysh-blocks#consistency-unwanted-blocks-are-errors
+stdout: "true 2\nfalse 2\necho block 2\necho args 2\ncommand echo 2\nbuiltin echo
+  2\npushd 2\n"
+---
+shopt --set parse_brace
+
+true { echo BAD }
+echo true $?
+
+false ( 42, 43 )
+echo false $?
+
+echo { echo BAD }
+echo echo block $?
+
+echo ( 42, 43 )
+echo echo args $?
+
+command echo 'command block' { echo BAD }
+echo command echo $?
+
+builtin echo 'builtin block' { echo BAD }
+echo builtin echo $?
+
+pushd $TMP { echo BAD }
+echo pushd $?

@@ -1,0 +1,17 @@
+name: invoke --show does proper quoting
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke---show-does-proper-quoting
+stdout: " ff 0a 7a 0a\n%.qtt8  name        kind        detail\n        bad-alias \
+  \  alias       b'echo \\yff\\necho z'\n"
+---
+case $SH in bash) exit ;; esac
+
+alias $'bad-alias=echo \xff\necho z'
+
+bad-alias | od -A n -t x1
+
+# sed hack for test framework bug
+invoke --show bad-alias | sed 's/#.qtt8/%.qtt8/'
+
+#alias $'bad=hi\xffname=echo hi'
+#$'bad\xffname'

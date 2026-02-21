@@ -1,0 +1,6 @@
+name: echo keyword
+dialect: bash
+source: oils:spec/bugs#echo-keyword
+stdout: "done\n"
+---
+echo done

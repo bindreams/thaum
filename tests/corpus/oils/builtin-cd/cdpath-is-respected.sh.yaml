@@ -1,0 +1,16 @@
+name: CDPATH is respected
+dialect: bash
+source: oils:spec/builtin-cd#cdpath-is-respected
+stdout: "/tmp/spam/foo\nstatus=0\n/tmp/spam/foo\n"
+---
+
+mkdir -p /tmp/spam/foo /tmp/eggs/foo
+
+CDPATH='/tmp/spam:/tmp/eggs'
+
+cd foo
+echo status=$?
+pwd
+
+
+# doesn't print the dir

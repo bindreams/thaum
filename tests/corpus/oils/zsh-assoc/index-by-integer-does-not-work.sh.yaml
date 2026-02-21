@@ -1,0 +1,8 @@
+name: index by integer does not work
+dialect: bash
+source: oils:spec/zsh-assoc#index-by-integer-does-not-work
+stdout: "['']\n"
+---
+typeset -A assoc
+assoc=(k1 v1 k2 v2 k3 v3)
+argv.py "${assoc[1]}"

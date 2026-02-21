@@ -1,0 +1,19 @@
+name: myproc.docString()
+dialect: bash
+source: oils:spec/ysh-proc-meta#myprocdocstring
+stdout: "(Str)   \"YSH-style proc\"\n(Null)   null\n(Str)   \"doc ' comment with \\\
+  \" quotes\"\n(Null)   null\n"
+---
+
+source $[ENV.REPO_ROOT]/spec/testdata/doc-comments.sh
+
+pp test_ (myproc.docComment())
+pp test_ (getVar('proc-none').docComment())
+
+var f = get(__sh_function__, 'f')
+pp test_ (f.docComment())
+
+var g = get(__sh_function__, 'g')
+pp test_ (g.docComment())
+
+#pp proc

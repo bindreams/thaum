@@ -1,0 +1,6 @@
+name: fc ignores too many args
+dialect: bash
+source: oils:spec/builtin-fc#fc-ignores-too-many-args
+status: 0
+---
+fc -l 0 1 2 || echo too many args!

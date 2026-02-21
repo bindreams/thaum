@@ -1,0 +1,12 @@
+name: BashAssoc a+=()
+dialect: bash
+source: oils:spec/array-assoc#bashassoc-a
+stdout: "apple is red\norange is orange\nlemon is yellow\nbanana is yellow\n"
+---
+
+declare -A a=([apple]=red [orange]=orange)
+a+=([lemon]=yellow [banana]=yellow)
+echo "apple is ${a['apple']}"
+echo "orange is ${a['orange']}"
+echo "lemon is ${a['lemon']}"
+echo "banana is ${a['banana']}"

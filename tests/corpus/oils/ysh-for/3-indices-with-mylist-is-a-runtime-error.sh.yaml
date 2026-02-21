@@ -1,0 +1,8 @@
+name: 3 indices with (mylist) is a runtime error
+dialect: bash
+source: oils:spec/ysh-for#3-indices-with-mylist-is-a-runtime-error
+status: 2
+---
+for i, item bad in (['foo', 'bar']) {
+  echo "$i $item $bad"
+}

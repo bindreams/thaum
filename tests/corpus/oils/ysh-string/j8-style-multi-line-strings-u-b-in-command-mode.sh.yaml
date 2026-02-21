@@ -1,0 +1,19 @@
+name: J8-style multi-line strings u''' b''' in command mode
+dialect: bash
+source: oils:spec/ysh-string#j8-style-multi-line-strings-u-b-in-command-mode
+stdout: "--\na\n--\n--\nb\n--\n"
+---
+
+write --end '' -- u'''
+  --
+  \u{61}
+  --
+  '''
+write --end '' -- b'''
+--
+\y62
+--
+'''
+
+# Should be illegal?
+#echo u'hello \u03bc'

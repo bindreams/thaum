@@ -1,0 +1,9 @@
+name: xtrace
+dialect: bash
+source: oils:spec/serialize#xtrace
+stdout: "one\ntwo\n"
+stderr: "+ echo $'one\\ntwo'\n"
+---
+zz=$'one\ntwo'
+set -x
+echo "$zz"

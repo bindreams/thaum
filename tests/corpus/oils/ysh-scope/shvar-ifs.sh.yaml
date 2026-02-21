@@ -1,0 +1,19 @@
+name: shvar IFS
+dialect: bash
+source: oils:spec/ysh-scope#shvar-ifs
+stdout: " 20 09 0a 0a\ninside IFS=w\nmylocal=x\n 20 09 0a 0a\n"
+---
+shopt --set ysh:upgrade
+
+proc myproc() {
+  echo "$IFS" | od -A n -t x1
+
+  local mylocal=x
+  shvar IFS=w {
+    echo inside IFS="$IFS"
+    echo mylocal="$mylocal"  # I do NOT want a new scope!
+  }
+  echo "$IFS" | od -A n -t x1
+}
+
+myproc

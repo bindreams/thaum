@@ -1,0 +1,8 @@
+name: Postincrement
+dialect: bash
+source: oils:spec/arith#postincrement
+stdout: "4\n5\n"
+---
+a=4
+echo $((a++))
+echo $a

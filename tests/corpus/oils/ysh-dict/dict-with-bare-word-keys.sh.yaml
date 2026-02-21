@@ -1,0 +1,13 @@
+name: dict with 'bare word' keys
+dialect: bash
+source: oils:spec/ysh-dict#dict-with-bare-word-keys
+stdout: "len=0\nlen=1\nlen=2\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var d0 = {}
+echo len=$[len(d0)]
+var d1 = {name: "hello"}
+echo len=$[len(d1)]
+var d2 = {name: "hello", other: 2}
+echo len=$[len(d2)]

@@ -1,0 +1,17 @@
+name: Multiple spreads
+dialect: bash
+source: oils:spec/ysh-func#multiple-spreads
+stdout: "(List)   [1,2,3,1,2,3]\n(Dict)   {\"m\":\"spam\",\"n\":\"no\",\"p\":5,\"\
+  q\":6}\n"
+---
+
+func f(...pos; ...named) {
+  pp test_ (pos)
+  pp test_ (named)
+}
+
+var a = [1,2,3]
+var d = {m: 'spam', n: 'no'}
+var e = {p: 5, q: 6}
+
+call f(...a, ...a; ...d, ...e)

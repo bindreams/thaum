@@ -1,0 +1,7 @@
+name: Remove shortest glob prefix
+dialect: bash
+source: oils:spec/var-op-strip#remove-shortest-glob-prefix
+stdout: "bccdd\n"
+---
+v=aabbccdd
+echo ${v#*b}

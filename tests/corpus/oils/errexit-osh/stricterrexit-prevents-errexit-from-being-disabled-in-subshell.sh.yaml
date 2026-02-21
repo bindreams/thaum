@@ -1,0 +1,15 @@
+name: strict_errexit prevents errexit from being disabled in subshell
+dialect: bash
+source: 
+  oils:spec/errexit-osh#stricterrexit-prevents-errexit-from-being-disabled-in-subshell
+status: 1
+stdout: "foo\nbar\n"
+---
+set -o errexit
+shopt -s inherit_errexit || true
+
+# false failure is NOT respected either way
+( echo foo; false; echo bar; ) || echo "failed"
+
+shopt -s strict_errexit || true
+( echo foo; false; echo bar; ) || echo "failed"

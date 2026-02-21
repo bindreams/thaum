@@ -1,0 +1,23 @@
+name: setglobal a[i] += and d.key +=
+dialect: bash
+source: oils:spec/ysh-scope#setglobal-ai-and-dkey
+stdout: "(List)   [5]\n(Dict)   {\"k\":5}\n"
+---
+shopt -s ysh:upgrade
+
+var mylist = [0]
+var mydict = {k: 0}
+
+proc mutate {
+  # these locals are ignored
+  var mylist = []
+  var mydict = {}
+
+  setglobal mylist[0] += 5
+  setglobal mydict['k'] += 5
+}
+
+mutate
+
+pp test_ (mylist)
+pp test_ (mydict)

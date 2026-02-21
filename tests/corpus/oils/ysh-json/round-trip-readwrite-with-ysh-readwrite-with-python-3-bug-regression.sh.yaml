@@ -1,0 +1,18 @@
+name: 'round trip: read/write with ysh, read/write with Python 3 (bug regression)'
+dialect: bash
+source: 
+  oils:spec/ysh-json#round-trip-readwrite-with-ysh-readwrite-with-python-3-bug-regression
+stdout: "diff=0\n"
+---
+
+var file = "$REPO_ROOT/spec/testdata/bug.json"
+#cat $file
+cat $file | json read (&cfg)
+json write (cfg) > ysh-json
+
+cat ysh-json | python3 -c \
+  'import json, sys; obj = json.load(sys.stdin); json.dump(obj, sys.stdout, indent=2); print()' \
+  > py-json
+
+diff -u $file py-json
+echo diff=$?

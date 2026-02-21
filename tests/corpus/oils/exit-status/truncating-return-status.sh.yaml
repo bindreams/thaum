@@ -1,0 +1,24 @@
+name: Truncating 'return' status
+dialect: bash
+source: oils:spec/exit-status#truncating-return-status
+stdout: "status=255\nstatus=0\nstatus=1\n===\nstatus=255\nstatus=254\n"
+---
+f() { return 255; }; f
+echo status=$?
+
+f() { return 256; }; f
+echo status=$?
+
+f() { return 257; }; f
+echo status=$?
+
+echo ===
+
+f() { return -1; }; f
+echo status=$?
+
+f() { return -2; }; f
+echo status=$?
+
+
+# dash aborts on bad exit code

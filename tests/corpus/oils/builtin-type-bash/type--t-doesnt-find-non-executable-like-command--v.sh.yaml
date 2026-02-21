@@ -1,0 +1,10 @@
+name: type -t doesn't find non-executable (like command -v)
+dialect: bash
+source: 
+  oils:spec/builtin-type-bash#type--t-doesnt-find-non-executable-like-command--v
+status: 1
+stdout: "\n"
+---
+PATH="$TMP:$PATH"
+touch $TMP/non-executable
+type -t non-executable

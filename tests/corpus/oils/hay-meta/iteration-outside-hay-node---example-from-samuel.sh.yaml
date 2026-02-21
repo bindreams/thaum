@@ -1,0 +1,54 @@
+name: Iteration outside Hay node - example from Samuel
+dialect: bash
+source: oils:spec/hay-meta#iteration-outside-hay-node---example-from-samuel
+stdout: "status=0\n"
+---
+
+shopt --set ysh:all
+
+hay define task
+
+# BUG with hay eval!
+hay eval :result {
+  var all_hellos = [ "You", "lovely", "people", "Chuck Norris" ]
+  for hello in (all_hellos) {
+    task "Say $hello" {
+      var extend = "Say Hello"
+      var overrides = {
+        WORD: hello
+      }
+    }
+  }
+}
+
+json write (result) | jq '.children[].attrs' > actual.txt
+
+#json write (_hay()) | jq '.children[].attrs' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "extend": "Say Hello",
+  "overrides": {
+    "WORD": "You"
+  }
+}
+{
+  "extend": "Say Hello",
+  "overrides": {
+    "WORD": "lovely"
+  }
+}
+{
+  "extend": "Say Hello",
+  "overrides": {
+    "WORD": "people"
+  }
+}
+{
+  "extend": "Say Hello",
+  "overrides": {
+    "WORD": "Chuck Norris"
+  }
+}
+EOF
+echo status=$?

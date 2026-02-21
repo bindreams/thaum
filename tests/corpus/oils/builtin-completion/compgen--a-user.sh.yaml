@@ -1,0 +1,7 @@
+name: compgen -A user
+dialect: bash
+source: oils:spec/builtin-completion#compgen--a-user
+status: 0
+---
+# no assertion because this isn't hermetic
+compgen -A user

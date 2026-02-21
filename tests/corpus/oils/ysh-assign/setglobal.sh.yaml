@@ -1,0 +1,14 @@
+name: setglobal
+dialect: bash
+source: oils:spec/ysh-assign#setglobal
+stdout: "x=global\nx=local\nx=mutated\n"
+---
+f() {
+  var x = 'local'
+  echo x=$x
+  setglobal x = 'mutated'
+}
+var x = 'global'
+echo x=$x
+f
+echo x=$x

@@ -1,0 +1,12 @@
+name: Nested here docs which are indented
+dialect: bash
+source: oils:spec/here-doc#nested-here-docs-which-are-indented
+stdout: "outside\ninside\n"
+---
+cat <<- EOF
+	outside
+	$(cat <<- INSIDE
+		inside
+INSIDE
+)
+EOF

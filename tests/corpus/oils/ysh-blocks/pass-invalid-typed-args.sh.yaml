@@ -1,0 +1,7 @@
+name: Pass invalid typed args
+dialect: bash
+source: oils:spec/ysh-blocks#pass-invalid-typed-args
+status: 3
+---
+
+cd /tmp (42)  # should be a block

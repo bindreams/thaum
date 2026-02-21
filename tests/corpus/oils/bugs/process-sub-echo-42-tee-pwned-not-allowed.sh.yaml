@@ -1,0 +1,21 @@
+name: process sub <(echo 42 | tee PWNED) not allowed
+dialect: bash
+source: oils:spec/bugs#process-sub-echo-42-tee-pwned-not-allowed
+status: 1
+stdout: ''
+---
+
+rm -f PWNED
+
+x='a[<(echo 42 | tee PWNED)]=1'
+echo $(( x ))
+
+if test -f PWNED; then
+  cat PWNED
+else
+  echo NOPE
+fi
+
+
+
+# bash keeps going

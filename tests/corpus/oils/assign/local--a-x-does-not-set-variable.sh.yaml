@@ -1,0 +1,11 @@
+name: "'local -a x' does not set variable"
+dialect: bash
+source: oils:spec/assign#local--a-x-does-not-set-variable
+status: 1
+---
+set -o nounset
+f() {
+  local -a x
+  echo $x
+}
+f

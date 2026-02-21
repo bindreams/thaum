@@ -1,0 +1,13 @@
+name: Combine ERR trap and USR1 trap
+dialect: bash
+source: oils:spec/builtin-trap-bash#combine-err-trap-and-usr1-trap
+stdout: "1 err\n1 usr1\nafter=0\n"
+---
+
+case $SH in dash|mksh|ash) exit ;; esac
+
+trap 'false; echo $LINENO usr1' USR1
+trap 'false; echo $LINENO err' ERR
+
+sh -c "kill -USR1 $$"
+echo after=$?

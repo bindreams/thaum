@@ -1,0 +1,18 @@
+name: Match low ASCII with [\x01]
+dialect: bash
+source: oils:spec/ysh-regex-bytes-chars#match-low-ascii-with-x01
+stdout: "(Bool)   true\n\n(Bool)   true\n(Bool)   false\n"
+---
+shopt -s ysh:all
+
+pp test_ ('a' ~ / [a] /)
+echo
+
+pp test_ (b'\y01' ~ / [\x01] /)
+pp test_ (b'\y02' ~ / [\x01] /)
+
+# \y01 isn't accepted, because we punt \x01 translation to ERE ...
+#pp test_ (b'\y02' ~ / [\y01] /)
+
+# we print this as \u{1}
+# = str( / [\x01] / )

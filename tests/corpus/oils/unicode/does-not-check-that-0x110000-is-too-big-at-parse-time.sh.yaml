@@ -1,0 +1,11 @@
+name: $'' does NOT check that 0x110000 is too big at parse time
+dialect: bash
+source: oils:spec/unicode#does-not-check-that-0x110000-is-too-big-at-parse-time
+stdout: "'\\xf4\\x90\\x80\\x80'\n"
+---
+
+py-repr() {
+  python2 -c 'import sys; print repr(sys.argv[1])'  "$@"
+}
+
+py-repr $'\U00110000'

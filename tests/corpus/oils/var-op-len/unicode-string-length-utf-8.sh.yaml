@@ -1,0 +1,7 @@
+name: Unicode string length (UTF-8)
+dialect: bash
+source: oils:spec/var-op-len#unicode-string-length-utf-8
+stdout: "3\n"
+---
+v=$'_\u03bc_'
+echo ${#v}

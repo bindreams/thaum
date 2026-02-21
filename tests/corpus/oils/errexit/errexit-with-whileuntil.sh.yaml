@@ -1,0 +1,14 @@
+name: errexit with while/until
+dialect: bash
+source: oils:spec/errexit#errexit-with-whileuntil
+status: 0
+stdout: "ok\n"
+---
+set -o errexit
+while false; do
+  echo ok
+done
+until false; do
+  echo ok  # do this once then exit loop
+  break
+done

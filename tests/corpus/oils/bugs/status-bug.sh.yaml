@@ -1,0 +1,13 @@
+name: (( status bug
+dialect: bash
+source: oils:spec/bugs#status-bug
+stdout: "status=0\nyes\n"
+---
+case $SH in dash|ash) exit ;; esac
+
+# from Koiche on Zulip
+
+(( 1 << 32 ))
+echo status=$?
+
+(( 1 << 32 )) && echo yes

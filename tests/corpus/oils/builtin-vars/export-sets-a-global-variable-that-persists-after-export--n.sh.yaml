@@ -1,0 +1,16 @@
+name: Export sets a global variable that persists after export -n
+dialect: bash
+source: 
+  oils:spec/builtin-vars#export-sets-a-global-variable-that-persists-after-export--n
+---
+f() { export GLOBAL=X; }
+f
+echo $GLOBAL
+printenv.py GLOBAL
+export -n GLOBAL
+echo $GLOBAL
+printenv.py GLOBAL
+X
+X
+X
+None

@@ -1,0 +1,19 @@
+name: evalExpr() is a pure function
+dialect: bash
+source: oils:spec/ysh-purity#evalexpr-is-a-pure-function
+stdout: "pure=43\nimpure code=5\nimpure=45\n"
+---
+shopt --set ysh:upgrade
+
+var x = 42
+var pure = ^[x + 1]
+echo pure=$[evalExpr(pure)]
+
+var impure = ^[x + $(echo 3)]
+try {
+  echo impure code=$[evalExpr(impure)]
+}
+echo impure code=$[_error.code]
+
+# Can run impure code after pure code
+echo impure=$[io->evalExpr(impure)]

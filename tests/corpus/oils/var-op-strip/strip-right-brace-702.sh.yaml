@@ -1,0 +1,14 @@
+name: Strip Right Brace (#702)
+dialect: bash
+source: oils:spec/var-op-strip#strip-right-brace-702
+stdout: "1 $foo\n2 \n10 }}\n11 \n12 \n13 \n"
+---
+var='$foo'
+echo 1 "${var#$foo}"
+echo 2 "${var#\$foo}"
+
+var='}'
+echo 10 "${var#}}"
+echo 11 "${var#\}}"
+echo 12 "${var#'}'}"
+echo 13 "${var#"}"}"

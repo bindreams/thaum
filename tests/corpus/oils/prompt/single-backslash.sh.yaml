@@ -1,0 +1,7 @@
+name: Single backslash
+dialect: bash
+source: oils:spec/prompt#single-backslash
+stdout: "\\\n"
+---
+PS1='\'
+echo "${PS1@P}"

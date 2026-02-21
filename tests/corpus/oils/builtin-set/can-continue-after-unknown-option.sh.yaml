@@ -1,0 +1,13 @@
+name: can continue after unknown option
+dialect: bash
+source: oils:spec/builtin-set#can-continue-after-unknown-option
+status: 0
+stdout: "hello\n"
+---
+#
+# TODO: this is the posix special builtin logic?
+# dash and mksh make this a fatal error no matter what.
+
+set -o errexit
+set -o STRICT || true # unknown option
+echo hello

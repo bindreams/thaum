@@ -1,0 +1,8 @@
+name: associative array and brace expansion
+dialect: bash
+source: oils:spec/array-assoc#associative-array-and-brace-expansion
+stdout: "v\n-{a,b}-\n"
+---
+declare -A A=([k1]=v [k2]=-{a,b}-)
+echo ${A["k1"]}
+echo ${A["k2"]}

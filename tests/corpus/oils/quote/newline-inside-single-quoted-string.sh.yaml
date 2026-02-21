@@ -1,0 +1,7 @@
+name: newline inside single-quoted string
+dialect: bash
+source: oils:spec/quote#newline-inside-single-quoted-string
+stdout: "newline\ninside single-quoted string\n"
+---
+echo 'newline
+inside single-quoted string'

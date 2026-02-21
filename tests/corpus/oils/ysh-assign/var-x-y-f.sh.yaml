@@ -1,0 +1,20 @@
+name: var x, y = f()
+dialect: bash
+source: oils:spec/ysh-assign#var-x-y-f
+stdout: "x=1 y=2\na=3 b=4\n"
+---
+
+# The syntax consistent with JavaScript would be
+# var x = 1, y = 2;
+
+var x, y = 1, 2
+echo "x=$x y=$y"
+
+func f() {
+  # this syntax would be nice, but is illegal
+  # return (3, 4)
+  return ([3, 4])
+}
+
+var a, b = f()
+echo "a=$a b=$b"

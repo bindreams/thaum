@@ -1,0 +1,10 @@
+name: 'Allowed: [[ = ]] and [[ == ]]'
+dialect: bash
+source: oils:spec/bool-parse#allowed-and
+stdout: "status=0\nstatus=0\n"
+---
+
+[[ = ]]
+echo status=$?
+[[ == ]]
+echo status=$?

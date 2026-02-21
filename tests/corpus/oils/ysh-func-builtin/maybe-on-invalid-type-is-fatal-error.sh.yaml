@@ -1,0 +1,11 @@
+name: maybe() on invalid type is fatal error
+dialect: bash
+source: oils:spec/ysh-func-builtin#maybe-on-invalid-type-is-fatal-error
+status: 3
+stdout: "\n"
+---
+
+# not allowed
+setvar marray = :||
+argv.py a @[maybe(marray)] b
+echo done

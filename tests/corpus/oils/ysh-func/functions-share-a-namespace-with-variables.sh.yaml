@@ -1,0 +1,11 @@
+name: Functions share a namespace with variables
+dialect: bash
+source: oils:spec/ysh-func#functions-share-a-namespace-with-variables
+stdout: "g(2) -> 4\n"
+---
+func f(x) {
+  return (x * x)
+}
+
+var g = f
+echo "g(2) -> $[g(2)]"

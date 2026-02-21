@@ -1,0 +1,12 @@
+name: NaN is encoded as null, like JavaScript
+dialect: bash
+source: oils:spec/ysh-json#nan-is-encoded-as-null-like-javascript
+stdout: "(Float)   NAN\nnull\nnull\n"
+---
+shopt --set parse_ysh_expr_sub
+
+pp test_ (NAN)
+
+json write (NAN)
+
+echo $[toJson(NAN)]

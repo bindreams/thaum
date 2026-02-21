@@ -1,0 +1,6 @@
+name: Constants in base 36
+dialect: bash
+source: oils:spec/arith#constants-in-base-36
+stdout: "10-35\n"
+---
+echo $((36#a))-$((36#z))

@@ -1,0 +1,10 @@
+name: Loops over bogus ranges terminate
+dialect: bash
+source: oils:spec/ysh-slice-range#loops-over-bogus-ranges-terminate
+stdout: "\n"
+---
+# Regression test for bug found during dev. Loops over backwards ranges should
+# terminate immediately.
+for i in (5..<1) {
+    echo $[i]
+}

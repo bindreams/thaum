@@ -1,0 +1,7 @@
+name: Line continuation inside double quotes
+dialect: bash
+source: oils:spec/quote#line-continuation-inside-double-quotes
+stdout: "foo$\n"
+---
+echo "foo\
+$"

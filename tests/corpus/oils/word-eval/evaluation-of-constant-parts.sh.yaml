@@ -1,0 +1,6 @@
+name: Evaluation of constant parts
+dialect: bash
+source: oils:spec/word-eval#evaluation-of-constant-parts
+stdout: "['bare', 'sq']\n"
+---
+argv.py bare 'sq'

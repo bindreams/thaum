@@ -1,0 +1,8 @@
+name: continue at top level is NOT an error
+dialect: bash
+source: oils:spec/strict-options#continue-at-top-level-is-not-an-error
+stdout: "status=0\n"
+---
+# NOTE: bash and mksh both print warnings, but don't exit with an error.
+continue
+echo status=$?

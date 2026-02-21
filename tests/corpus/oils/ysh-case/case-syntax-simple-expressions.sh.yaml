@@ -1,0 +1,11 @@
+name: case syntax, simple expressions
+dialect: bash
+source: oils:spec/ysh-case#case-syntax-simple-expressions
+status: 0
+stdout: "three\n"
+---
+const x = 3
+case (x) {
+  (3) { echo three }
+  (4) { echo four }
+}

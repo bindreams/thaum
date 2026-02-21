@@ -1,0 +1,9 @@
+name: IFS='x ' incomplete backslash
+dialect: bash
+source: oils:spec/builtin-read#ifsx-incomplete-backslash
+stdout: "['a b']\n['a', 'b']\n['a', 'ax  x    hello']\n"
+---
+echo ' a b \' | (read a; argv.py "$a")
+echo ' a b \' | (read a b; argv.py "$a" "$b")
+IFS='x '
+echo $'a ax  x    \\\nhello' | (read a b; argv.py "$a" "$b")

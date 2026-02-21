@@ -1,0 +1,6 @@
+name: _this_dir in sourced module
+dialect: bash
+source: oils:spec/ysh-special-vars#thisdir-in-sourced-module
+stdout: "hi from this_dir.ysh\n$_this_dir = REPLACED/oils/spec/testdata/module\n"
+---
+source $[ENV.REPO_ROOT]/spec/testdata/module/this_dir.ysh

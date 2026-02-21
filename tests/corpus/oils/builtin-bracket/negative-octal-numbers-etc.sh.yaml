@@ -1,0 +1,21 @@
+name: negative octal numbers, etc.
+dialect: bash
+source: oils:spec/builtin-bracket#negative-octal-numbers-etc
+stdout: "zero=0\noctal=1\nhex=2\nbaseN=2\n"
+---
+
+# zero
+[ -0 -eq 0 ]
+echo zero=$?
+
+# octal numbers can be negative
+[ -0123 -eq -83 ]
+echo octal=$?
+
+# hex doesn't have negative numbers?
+[ -0xff -eq -255 ]
+echo hex=$?
+
+# base N doesn't either
+[ -64#a -eq -10 ]
+echo baseN=$?

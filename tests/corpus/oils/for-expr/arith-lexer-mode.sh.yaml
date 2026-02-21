@@ -1,0 +1,12 @@
+name: Arith lexer mode
+dialect: bash
+source: oils:spec/for-expr#arith-lexer-mode
+stdout: "3\n4\n3\n4\n3\n4\n3\n4\n"
+---
+
+# bash is lenient; zsh disagrees
+
+for ((i = '3';  i < '5';  ++i)); do echo $i; done
+for ((i = "3";  i < "5";  ++i)); do echo $i; done
+for ((i = $'3'; i < $'5'; ++i)); do echo $i; done
+for ((i = $"3"; i < $"5"; ++i)); do echo $i; done

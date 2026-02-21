@@ -1,0 +1,10 @@
+name: var ref to $1 and $2 with 1 and 2
+dialect: bash
+source: oils:spec/var-ref#var-ref-to-1-and-2-with-1-and-2
+stdout: "ref1=one\nref2=two\n"
+---
+set -- one two
+ref1='1'
+echo ref1=${!ref1}
+ref2='2'
+echo ref2=${!ref2}

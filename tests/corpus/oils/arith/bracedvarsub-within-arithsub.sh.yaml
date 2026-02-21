@@ -1,0 +1,6 @@
+name: BracedVarSub within ArithSub
+dialect: bash
+source: oils:spec/arith#bracedvarsub-within-arithsub
+stdout: "6\n"
+---
+echo $((${j:-5} + 1))

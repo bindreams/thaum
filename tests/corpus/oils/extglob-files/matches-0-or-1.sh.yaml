@@ -1,0 +1,11 @@
+name: ?() matches 0 or 1
+dialect: bash
+source: oils:spec/extglob-files#matches-0-or-1
+stdout: "foo. foo.cc foo.h\n"
+---
+shopt -s extglob
+mkdir -p 1
+cd 1
+touch {foo,bar}.cc {foo,bar,baz}.h foo. foo.hh
+ext=cc
+echo foo.?($ext|h)

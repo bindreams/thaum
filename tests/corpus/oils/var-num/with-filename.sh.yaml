@@ -1,0 +1,9 @@
+name: $@ with filename
+dialect: bash
+source: oils:spec/var-num#with-filename
+stdout: "a b c\n"
+---
+s=dollar0
+echo 'echo $@' > $s
+chmod +x $s
+$SH $s a b c

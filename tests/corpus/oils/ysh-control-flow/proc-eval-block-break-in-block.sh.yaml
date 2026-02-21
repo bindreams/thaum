@@ -1,0 +1,26 @@
+name: 'proc eval block: break in block'
+dialect: bash
+source: oils:spec/ysh-control-flow#proc-eval-block-break-in-block
+status: 1
+stdout: "one\n1\n"
+---
+shopt -s ysh:all
+
+proc proc-that-runs-block (; ; ; b) {
+  call io->eval(b)
+}
+
+f() {
+  proc-that-runs-block {
+    echo one
+    for i in 1 2; do
+      echo $i
+      break  # break out of loop
+    done
+
+    break  # break out of block isn't valid
+    echo two
+  }
+  echo end func
+}
+f

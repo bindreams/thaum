@@ -1,0 +1,12 @@
+name: xtrace with variables in PS4
+dialect: bash
+source: oils:spec/xtrace#xtrace-with-variables-in-ps4
+stdout: "one\ntwo\n"
+stderr: "+:x=1\n+1:echo one\n+1:x=2\n+2:echo two\n"
+---
+PS4='+$x:'
+set -o xtrace
+x=1
+echo one
+x=2
+echo two

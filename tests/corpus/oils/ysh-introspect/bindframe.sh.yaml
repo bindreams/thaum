@@ -1,0 +1,14 @@
+name: bindFrame()
+dialect: bash
+source: oils:spec/ysh-introspect#bindframe
+stdout: "\n"
+---
+
+var frag = ^(echo $i)
+
+# TODO: should be fragment
+pp test_ (frag)
+
+var cmd = bindFrame(frag, vm.getFrame(0))
+
+pp test_ (cmd)

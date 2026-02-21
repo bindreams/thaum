@@ -1,0 +1,9 @@
+name: ysh respects PS1
+dialect: bash
+source: oils:spec/ysh-prompt#ysh-respects-ps1
+stdout: "hi\n^D\n"
+stderr: 'ysh myprompt$ ysh myprompt$ '
+---
+
+setglobal ENV.PS1 = r'myprompt\$ '
+echo 'echo hi' | $[ENV.SH] -i

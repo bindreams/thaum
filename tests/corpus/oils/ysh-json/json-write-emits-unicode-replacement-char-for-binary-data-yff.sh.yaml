@@ -1,0 +1,13 @@
+name: json write emits Unicode replacement char for binary data \yff
+dialect: bash
+source: 
+  oils:spec/ysh-json#json-write-emits-unicode-replacement-char-for-binary-data-yff
+stdout: "[\n  3,\n  \"foo\",\n  \"-��---�=\"\n]\n"
+---
+
+json write ([3, "foo", $'-\xff\xfe---\xfd=']) > tmp.txt
+
+# Round trip it for good measure
+json read < tmp.txt
+
+json write (_reply)

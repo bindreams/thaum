@@ -1,0 +1,20 @@
+name: more tilde expansion
+dialect: bash
+source: oils:spec/dbracket#more-tilde-expansion
+stdout: "status=0\nstatus=1\nunary=1\nstatus=0\nfnmatch=0\nfnmatch=0\n"
+---
+[[ ~ ]]
+echo status=$?
+HOME=''
+[[ ~ ]]
+echo status=$?
+[[ -n ~ ]]
+echo unary=$?
+
+[[ ~ == ~ ]]
+echo status=$?
+
+[[ $HOME == ~ ]]
+echo fnmatch=$?
+[[ ~ == $HOME ]]
+echo fnmatch=$?

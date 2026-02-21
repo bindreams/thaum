@@ -1,0 +1,6 @@
+name: Command sub
+dialect: bash
+source: oils:spec/shell-grammar#command-sub
+---
+#echo $(echo word_a; echo word_b;)
+echo

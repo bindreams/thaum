@@ -1,0 +1,10 @@
+name: declare and glob
+dialect: bash
+source: oils:spec/assign#declare-and-glob
+stdout: "['*']\n"
+---
+cd $TMP
+touch foo=a foo=b
+typeset foo=*
+argv.py "$foo"
+unset foo

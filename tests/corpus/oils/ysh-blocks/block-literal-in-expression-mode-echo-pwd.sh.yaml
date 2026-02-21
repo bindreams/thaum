@@ -1,0 +1,12 @@
+name: 'block literal in expression mode: ^(echo $PWD)'
+dialect: bash
+source: oils:spec/ysh-blocks#block-literal-in-expression-mode-echo-pwd
+stdout: "1\none\ntwo\n"
+---
+shopt -s ysh:all
+
+const myblock = ^(echo $PWD | wc -l)
+call io->eval(myblock)
+
+const b2 = ^(echo one; echo two)
+call io->eval(b2)

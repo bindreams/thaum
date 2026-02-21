@@ -1,0 +1,20 @@
+name: Iterate over command sub output with split()
+dialect: bash
+source: oils:spec/ysh-demo#iterate-over-command-sub-output-with-split
+stdout: "1\none\n2\ntwo\n___\n1 one\n2 two\n"
+---
+shopt -s ysh:upgrade
+
+output=$(echo '1 one'; echo '2 two')
+
+for x in @[split(output)]; do
+  write -- $x
+done
+
+echo ___
+
+# Now change IFS.  split() is affected.
+IFS=$'\n'
+for x in @[split(output)]; do
+  write -- $x
+done

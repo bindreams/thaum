@@ -1,0 +1,7 @@
+name: SHELLOPTS reflects flags like sh -x
+dialect: bash
+source: oils:spec/sh-options-bash#shellopts-reflects-flags-like-sh--x
+stdout: "xtrace\n"
+---
+
+$SH -x -c 'echo $SHELLOPTS' | grep -o xtrace

@@ -1,0 +1,8 @@
+name: errexit and brace group { }
+dialect: bash
+source: oils:spec/errexit#errexit-and-brace-group
+stdout: "status=1\n"
+---
+set -o errexit
+{ test no = yes && echo hi; }
+echo status=$?

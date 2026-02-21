@@ -1,0 +1,6 @@
+name: Hex constant with capital X
+dialect: bash
+source: oils:spec/arith#hex-constant-with-capital-x
+stdout: "170\n"
+---
+echo $(( 0XAA ))

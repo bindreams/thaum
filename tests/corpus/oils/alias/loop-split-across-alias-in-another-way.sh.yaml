@@ -1,0 +1,8 @@
+name: Loop split across alias in another way
+dialect: bash
+source: oils:spec/alias#loop-split-across-alias-in-another-way
+stdout: "1\n2\n3\n"
+---
+shopt -s expand_aliases
+alias e_='for i in 1 2 3; do echo '
+e_ $i; done

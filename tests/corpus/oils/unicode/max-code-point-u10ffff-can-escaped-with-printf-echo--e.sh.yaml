@@ -1,0 +1,19 @@
+name: Max code point U+10ffff can escaped with $''  printf  echo -e
+dialect: bash
+source: oils:spec/unicode#max-code-point-u10ffff-can-escaped-with-printf-echo--e
+stdout: "'\\xf4\\x8f\\xbf\\xbf'\n'\\xf4\\x8f\\xbf\\xbf'\n'\\xf4\\x8f\\xbf\\xbf'\n"
+---
+
+case $SH in dash|ash) exit ;; esac
+
+py-repr() {
+  python2 -c 'import sys; print repr(sys.argv[1])'  "$@"
+}
+
+py-repr $'\U0010ffff'
+py-repr $(echo -e '\U0010ffff')
+py-repr $(printf '\U0010ffff')
+
+
+
+# Unicode replacement char 

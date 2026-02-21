@@ -1,0 +1,14 @@
+name: strict_errexit without errexit proc
+dialect: bash
+source: oils:spec/errexit-osh#stricterrexit-without-errexit-proc
+status: 1
+stdout: "myproc\n"
+---
+myproc() {
+  echo myproc
+}
+myproc || true
+
+# This should be a no-op I guess
+shopt -s strict_errexit || true
+myproc || true

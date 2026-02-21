@@ -1,0 +1,17 @@
+name: fc -l lists history commands
+dialect: bash
+source: oils:spec/builtin-fc#fc--l-lists-history-commands
+stdout: "1\t history -r\n2\t echo 1\n3\t echo 2\n4\t echo 3\n^D\n"
+---
+printf "echo %s\n" {1..3} > tmp
+
+echo '
+HISTFILE=tmp
+history -c
+history -r
+
+fc -l
+' | $SH --norc -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

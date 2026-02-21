@@ -1,0 +1,10 @@
+name: expression evaluation order
+dialect: bash
+source: oils:spec/ysh-case#expression-evaluation-order
+status: 1
+stdout: "\n"
+---
+var x = 123
+case (x) {
+  (y) | (x) { echo no error }
+}

@@ -1,0 +1,36 @@
+name: Userland max
+dialect: bash
+source: oils:spec/ysh-func#userland-max
+status: 10
+stdout: "(Int)   6\n(Int)   7\n"
+---
+func mymax (...args) {
+  if (len(args) === 0) {
+    error 'Requires 1 arg'
+  } elif (len(args) === 1) {
+    # TODO: assert List
+    var mylist = args[0]
+    var max = mylist[0]
+
+    for item in (mylist) {
+      if (item > max) {
+        setvar max = item
+      }
+    }
+
+    return (max)
+  } elif (len(args) === 2) {
+    if (args[0] >= args[1]) {
+      return (args[0])
+    } else {
+      return (args[1])
+    }
+  } else {
+    # max(1, 2, 3) doesn't work in YSH, but does in Python
+    error 'too many'
+  }
+}
+
+= mymax(5,6)  # => 6
+= mymax([5,6,7])  # => 7
+= mymax(5,6,7,8)  # error

@@ -1,0 +1,13 @@
+name: Redirect on assignment (enabled 7/2019)
+dialect: bash
+source: oils:spec/command-parsing#redirect-on-assignment-enabled-72019
+status: 0
+stdout: "REDIRECTED\n"
+---
+f() {
+  # NOTE: local treated like a special builtin!
+  local E=env > _tmp/r.txt
+}
+rm -f _tmp/r.txt
+f
+test -f _tmp/r.txt && echo REDIRECTED

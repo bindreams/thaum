@@ -1,0 +1,30 @@
+name: JSON func on top of proc
+dialect: bash
+source: oils:spec/ysh-funcs-external#json-func-on-top-of-proc
+stdout: "TODO\nresult = 3\n"
+---
+
+proc myadd {
+  json read (&args)
+
+  # convenient!
+  redir >&2 {
+    = args
+  }
+
+  json write (args[0] + args[1])
+}
+
+echo '[1, 2]' | myadd | json read (&result)
+
+# TODO:
+# Rewrite this as:
+#
+# var result = myadd(1,2)
+#
+# Is that possible?  I think functions can live in their own namespace?
+# Or you can have expr.Func() with all the metadata?
+# Problem with 'source mytool.hay' is that it can define funcs ANYWHERE
+# you might need a namespace like extern::mytool::myfunc()
+
+echo "result = $result"

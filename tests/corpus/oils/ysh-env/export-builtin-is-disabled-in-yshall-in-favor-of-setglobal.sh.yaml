@@ -1,0 +1,17 @@
+name: export builtin is disabled in ysh:all, in favor of setglobal
+dialect: bash
+source: 
+  oils:spec/ysh-env#export-builtin-is-disabled-in-yshall-in-favor-of-setglobal
+status: 1
+stdout: "ZZ=setglobal\n"
+---
+shopt -s ysh:all
+
+setglobal ENV.ZZ = 'setglobal'
+
+# execute POSIX shell
+sh -c 'echo ZZ=$ZZ'
+
+export ZZ='export'  # fails
+
+sh -c 'echo ZZ=$ZZ'  # not reached

@@ -1,0 +1,7 @@
+name: '! is not a command'
+dialect: bash
+source: oils:spec/pipeline#is-not-a-command
+status: 127
+---
+v='!'
+$v echo hi

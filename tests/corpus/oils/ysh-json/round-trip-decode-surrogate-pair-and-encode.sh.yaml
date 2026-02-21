@@ -1,0 +1,26 @@
+name: 'round trip: decode surrogate pair and encode'
+dialect: bash
+source: oils:spec/ysh-json#round-trip-decode-surrogate-pair-and-encode
+stdout: "\"🤦\"\n\"🤦\"\n\"\\u0001\\u0002\"\n\"ĀāĂ\"\n"
+---
+
+var j = r'"\ud83e\udd26"'
+echo $j | json read (&c1)
+
+json write (c1)
+
+var j = r'"\uD83E\uDD26"'
+echo $j | json read (&c2)
+
+json write (c2)
+
+# Not a surrogate pair
+var j = r'"\u0001\u0002"' 
+echo $j | json read (&c3)
+
+json write (c3)
+
+var j = r'"\u0100\u0101\u0102"' 
+echo $j | json read (&c4)
+
+json write (c4)

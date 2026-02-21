@@ -1,0 +1,8 @@
+name: 'More regression for #1523'
+dialect: bash
+source: oils:spec/builtin-getopts#more-regression-for-1523
+status: 1
+stdout: "opt:a\nopt:b\nopt:c arg:def\nerr:?\nerr:?\nerr:?\n"
+---
+
+$SH $REPO_ROOT/spec/testdata/getopts-1523.sh -abcdef -xyz

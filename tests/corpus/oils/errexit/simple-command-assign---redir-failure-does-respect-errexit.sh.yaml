@@ -1,0 +1,27 @@
+name: simple command / assign - redir failure DOES respect errexit
+dialect: bash
+source: 
+  oils:spec/errexit#simple-command-assign---redir-failure-does-respect-errexit
+stdout: "status=1\nstatus=1\nstatus=1\n"
+---
+
+$SH -c '
+set -o errexit
+true > /
+echo builtin status=$?
+'
+echo status=$?
+
+$SH -c '
+set -o errexit
+/bin/true > /
+echo extern status=$?
+'
+echo status=$?
+
+$SH -c '
+set -o errexit
+assign=foo > /
+echo assign status=$?
+'
+echo status=$?

@@ -1,0 +1,6 @@
+name: Str => endsWith(), no args
+dialect: bash
+source: oils:spec/ysh-methods#str-endswith-no-args
+status: 3
+---
+= 'abc' => endsWith()

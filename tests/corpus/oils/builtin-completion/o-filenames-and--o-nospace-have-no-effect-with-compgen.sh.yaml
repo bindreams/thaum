@@ -1,0 +1,8 @@
+name: -o filenames and -o nospace have no effect with compgen
+dialect: bash
+source: 
+  oils:spec/builtin-completion#o-filenames-and--o-nospace-have-no-effect-with-compgen
+stdout: "bin\nbuild\n"
+---
+# they are POSTPROCESSING.
+compgen -o filenames -o nospace -W 'bin build'

@@ -1,0 +1,6 @@
+name: Source with arguments
+dialect: bash
+source: oils:spec/builtin-eval-source#source-with-arguments
+stdout: "show-argv: foo bar\n"
+---
+. $REPO_ROOT/spec/testdata/show-argv.sh foo bar  # dash doesn't have source

@@ -1,0 +1,18 @@
+name: noclobber off
+dialect: bash
+source: oils:spec/sh-options#noclobber-off
+stdout: "status=0\nstatus=0\nstatus=0\nfoo\n"
+---
+set -o errexit
+
+echo foo > can-clobber
+echo status=$?
+set +C
+
+echo foo > can-clobber
+echo status=$?
+set +o noclobber
+
+echo foo > can-clobber
+echo status=$?
+cat can-clobber

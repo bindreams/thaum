@@ -1,0 +1,24 @@
+name: Bit shift by negative number is not allowed
+dialect: bash
+source: oils:spec/ysh-expr-arith#bit-shift-by-negative-number-is-not-allowed
+stdout: "(Int)   2\n(Int)   1\nfailed 3\n\n(Int)   4\n(Int)   8\n(Int)   16\nfailed
+  3\n"
+---
+
+shopt -s ysh:upgrade
+
+pp test_ (1 << 1)
+pp test_ (1 << 0)
+try {
+  pp test_ (1 << -1)
+}
+echo failed $[_error.code]
+echo
+
+pp test_ (16 >> 2)
+pp test_ (16 >> 1)
+pp test_ (16 >> 0)
+try {
+  pp test_ (16 >> -1)
+}
+echo failed $[_error.code]

@@ -1,0 +1,8 @@
+name: Quoted filename redirect with spaces
+dialect: bash
+source: oils:spec/redirect#quoted-filename-redirect-with-spaces
+stdout: "two 1\n"
+---
+# POSIX makes node of this
+echo two \1 > $TMP/file-redir2.txt
+cat $TMP/file-redir2.txt

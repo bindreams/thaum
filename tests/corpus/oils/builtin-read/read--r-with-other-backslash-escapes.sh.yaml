@@ -1,0 +1,10 @@
+name: read -r with other backslash escapes
+dialect: bash
+source: oils:spec/builtin-read#read--r-with-other-backslash-escapes
+stdout: "['one twox65three', 'one\\\\ two\\\\x65three']\n"
+---
+echo 'one\ two\x65three' > $TMP/readr.txt
+read escaped < $TMP/readr.txt
+read -r raw < $TMP/readr.txt
+argv.py "$escaped" "$raw"
+# mksh respects the hex escapes here, but other shells don't!

@@ -1,0 +1,7 @@
+name: -a
+dialect: bash
+source: oils:spec/blog2#a
+stdout: "status=0\n"
+---
+[ -a ]
+echo status=$?

@@ -1,0 +1,10 @@
+name: lookup with ${a[0]} -- "0" is a string
+dialect: bash
+source: oils:spec/array-assoc#lookup-with-a0----0-is-a-string
+stdout: "0 a 1 b 2 c\n"
+---
+declare -A a
+a["0"]=a
+a["1"]=b
+a["2"]=c
+echo 0 "${a[0]}" 1 "${a[1]}" 2 "${a[2]}"

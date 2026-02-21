@@ -1,0 +1,8 @@
+name: Redirect after here doc
+dialect: bash
+source: oils:spec/here-doc#redirect-after-here-doc
+stderr: "out\n"
+---
+cat <<EOF 1>&2
+out
+EOF

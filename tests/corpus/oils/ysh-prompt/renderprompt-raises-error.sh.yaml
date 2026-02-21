@@ -1,0 +1,16 @@
+name: renderPrompt() raises error
+dialect: bash
+source: oils:spec/ysh-prompt#renderprompt-raises-error
+stdout: "hi\n^D\n"
+stderr: '<Runtime error: oops><Runtime error: oops>'
+---
+
+setglobal ENV.PS1 = r'myprompt\$ '
+
+cat >yshrc <<'EOF'
+func renderPrompt(io) {
+  error 'oops'
+}
+EOF
+
+echo 'echo hi' | $[ENV.SH] -i --rcfile yshrc

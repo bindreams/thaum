@@ -1,0 +1,14 @@
+name: ${x//~homedir/}
+dialect: bash
+source: oils:spec/var-op-patsub#xhomedir
+stdout: "z/git/oilshell\nz/git/oilshell\n"
+---
+
+path=~/git/oilshell
+
+# ~ expansion occurs
+#echo path=$path
+
+echo ${path//~/z}
+
+echo ${path/~/z}

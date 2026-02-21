@@ -1,0 +1,9 @@
+name: Ignore *
+dialect: bash
+source: oils:spec/globignore#ignore
+stdout: "*\n"
+---
+# This pattern appears in public repositories
+touch {1.txt,2.log,3.md}
+GLOBIGNORE=*
+echo *

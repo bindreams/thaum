@@ -1,0 +1,9 @@
+name: json read uses $_reply var
+dialect: bash
+source: oils:spec/ysh-json#json-read-uses-reply-var
+stdout: "true\n"
+---
+
+# space before true
+echo ' true' | json read
+json write (_reply)

@@ -1,0 +1,25 @@
+name: eval() is a pure function
+dialect: bash
+source: oils:spec/ysh-purity#eval-is-a-pure-function
+stdout: "(Dict)   {\"a\":1,\"b\":2}\nimpure code=5\n3\n"
+---
+shopt --set ysh:upgrade
+
+var pure = ^(
+  const a = 1
+  const b = 2
+)
+
+var d = eval(pure, to_dict=true)
+pp test_ (d)
+
+var impure = ^(seq 3 | wc -l)
+
+try {
+  call eval(impure)
+}
+#= _error
+echo impure code=$[_error.code]
+
+# Can run impure code after pure code
+call io->eval(impure)

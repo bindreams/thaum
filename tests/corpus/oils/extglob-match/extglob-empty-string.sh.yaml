@@ -1,0 +1,8 @@
+name: extglob empty string
+dialect: bash
+source: oils:spec/extglob-match#extglob-empty-string
+stdout: "FALSE\nTRUE\n"
+---
+shopt -s extglob
+[[ '' == @(foo|bar) ]] || echo FALSE
+[[ '' == @(foo||bar) ]] && echo TRUE

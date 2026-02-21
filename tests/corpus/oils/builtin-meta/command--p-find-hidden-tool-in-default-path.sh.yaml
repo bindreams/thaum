@@ -1,0 +1,7 @@
+name: command -p (find hidden tool in default path)
+dialect: bash
+source: oils:spec/builtin-meta#command--p-find-hidden-tool-in-default-path
+status: 0
+---
+export PATH=''
+command -p ls

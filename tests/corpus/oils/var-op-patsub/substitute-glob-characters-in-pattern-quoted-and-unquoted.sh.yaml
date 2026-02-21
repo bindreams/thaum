@@ -1,0 +1,14 @@
+name: Substitute glob characters in pattern, quoted and unquoted
+dialect: bash
+source: 
+  oils:spec/var-op-patsub#substitute-glob-characters-in-pattern-quoted-and-unquoted
+stdout: "a-b\n-\n"
+---
+
+# INFINITE LOOP in ash!
+case $SH in ash) exit ;; esac
+
+g='*'
+v='a*b'
+echo ${v//"$g"/-}
+echo ${v//$g/-}

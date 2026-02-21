@@ -1,0 +1,13 @@
+name: Negative out-of-bound index with a[i]=v (1/2)
+dialect: bash
+source: oils:spec/array-sparse#negative-out-of-bound-index-with-aiv-12
+status: 1
+stdout: "\n"
+stderr: "  sp1[-11]=E\n  ^~~~\n[ stdin ]:4: fatal: Index -11 is out of bounds for
+  array of length 10\n"
+---
+case $SH in mksh) exit ;; esac
+
+sp1[9]=x
+sp1[-11]=E
+declare -p sp1

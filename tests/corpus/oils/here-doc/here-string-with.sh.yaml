@@ -1,0 +1,6 @@
+name: Here string with $
+dialect: bash
+source: oils:spec/here-doc#here-string-with
+stdout: "one\ntwo\n\n"
+---
+cat <<< $'one\ntwo\n'

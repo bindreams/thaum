@@ -1,0 +1,23 @@
+name: Errors within multiple functions
+dialect: bash
+source: oils:spec/ysh-builtin-error#errors-within-multiple-functions
+status: 10
+stdout: "\n"
+---
+func inverse(x) {
+  if (x === 0) {
+    error '0 does not have an inverse'  # default status is 1
+  }
+
+  return (1 / x)
+}
+
+func invertList(list) {
+  var result = []
+  for item in (list) {
+    call result->append(inverse(item))
+  }
+  return (result)
+}
+
+= invertList([1, 2, 0])

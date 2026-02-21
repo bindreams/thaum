@@ -1,0 +1,7 @@
+name: Var substitution with braces, quoted
+dialect: bash
+source: oils:spec/quote#var-substitution-with-braces-quoted
+stdout: "foobar\n"
+---
+FOO=bar
+echo "foo${FOO}"

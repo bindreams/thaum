@@ -1,0 +1,14 @@
+name: $[len(x)] inside strings
+dialect: bash
+source: oils:spec/ysh-expr#lenx-inside-strings
+stdout: "-3-\n"
+---
+var s = "abc"
+
+shopt --set parse_ysh_expr_sub
+
+echo -$[len(s)]-
+
+# This already has a meaning ...
+#echo "-$len(x)-"
+#echo "-${len}(x)-"

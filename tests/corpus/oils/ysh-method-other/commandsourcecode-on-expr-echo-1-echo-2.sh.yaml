@@ -1,0 +1,19 @@
+name: 'Command.sourceCode() on Expr: ^(echo 1; echo 2)'
+dialect: bash
+source: oils:spec/ysh-method-other#commandsourcecode-on-expr-echo-1-echo-2
+stdout: "<Command>\n"
+---
+
+var cmd = ^(echo 1; echo 2; false)
+
+var src = cmd.sourceCode()
+
+assert [null === src]
+
+# Test passing it
+proc p ( ; ; ; block) {
+  pp test_ (block)
+  assert [null === block.sourceCode()]
+}
+
+p ( ; ; cmd)

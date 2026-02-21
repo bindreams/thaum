@@ -1,0 +1,29 @@
+name: hay names at top level
+dialect: bash
+source: oils:spec/hay#hay-names-at-top-level
+stdout: "status=0\n1 one\nstatus=0\n1 two\nstatus=0\n1 three\n"
+---
+shopt --set parse_brace parse_at parse_ysh_expr_sub
+shopt --unset errexit
+
+hay define Package
+
+Package one
+echo status=$?
+
+setvar args = _hay()['children'][0]['args']
+write --sep ' ' $[len(_hay()['children'])] @args
+
+hay eval :result {
+  Package two
+  echo status=$?
+}
+
+setvar args = result['children'][0]['args']
+write --sep ' ' $[len(result['children'])] @args
+
+Package three
+echo status=$?
+
+setvar args = _hay()['children'][0]['args']
+write --sep ' ' $[len(_hay()['children'])] $[_hay()['children'][0]['args'][0]]

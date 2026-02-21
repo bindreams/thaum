@@ -1,0 +1,30 @@
+name: io->eval with in_captured_frame=true can express cd builtin in different 
+  module
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#io-eval-with-incapturedframetrue-can-express-cd-builtin-in-different-module
+stdout: "j = 43\n"
+---
+
+echo >lib.ysh '''
+const __provide__ = :| my-cd |
+
+proc my-cd (new_dir; ; ; block) {
+  pushd $new_dir >/dev/null
+
+  call io->eval(block, in_captured_frame=true)
+
+  popd >/dev/null
+}
+'''
+
+use ./lib.ysh
+
+var i = 42
+lib my-cd /tmp {
+  #echo $PWD
+  #var my_pwd = PWD
+  var j = i + 1
+}
+#echo "my_pwd=$my_pwd"
+echo "j = $j"

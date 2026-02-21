@@ -1,0 +1,12 @@
+name: \yff can't appear in u'' code strings (expr)
+dialect: bash
+source: oils:spec/ysh-json#yff-cant-appear-in-u-code-strings-expr
+status: 2
+stdout: " fe\n"
+---
+
+var x = b'\yfe' 
+write -n -- $x | od -A n -t x1
+
+var x = u'\yfe' 
+write -n -- $x | od -A n -t x1

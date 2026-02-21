@@ -1,0 +1,6 @@
+name: Str => endsWith(), too many args
+dialect: bash
+source: oils:spec/ysh-methods#str-endswith-too-many-args
+status: 3
+---
+= 'abc' => endsWith('extra', 'arg')

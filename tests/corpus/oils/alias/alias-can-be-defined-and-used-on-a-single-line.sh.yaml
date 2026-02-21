@@ -1,0 +1,8 @@
+name: Alias can be defined and used on a single line
+dialect: bash
+source: oils:spec/alias#alias-can-be-defined-and-used-on-a-single-line
+stdout: "hello other line\n"
+---
+shopt -s expand_aliases
+alias sayhi='echo hello'; sayhi same line
+sayhi other line

@@ -1,0 +1,10 @@
+name: Alternation and sequence
+dialect: bash
+source: oils:spec/ysh-regex#alternation-and-sequence
+stdout: "[[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*\n[[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*\n"
+---
+var pat = ''
+setvar pat = /s d+ | w*/
+echo $pat
+setvar pat = /s d+ or w*/
+echo $pat

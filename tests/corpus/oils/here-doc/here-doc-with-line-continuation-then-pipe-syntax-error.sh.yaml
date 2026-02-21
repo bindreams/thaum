@@ -1,0 +1,12 @@
+name: Here doc with line continuation, then pipe.  Syntax error.
+dialect: bash
+source: 
+  oils:spec/here-doc#here-doc-with-line-continuation-then-pipe-syntax-error
+status: 2
+---
+cat <<EOF \
+1
+2
+3
+EOF
+| tac

@@ -1,0 +1,10 @@
+name: Background process doesn't affect parent
+dialect: bash
+source: oils:spec/background#background-process-doesnt-affect-parent
+stdout: "1\n1\n2\n\n"
+---
+echo ${foo=1}
+echo $foo
+echo ${bar=2} &
+wait
+echo $bar  # bar is NOT SET in the parent process

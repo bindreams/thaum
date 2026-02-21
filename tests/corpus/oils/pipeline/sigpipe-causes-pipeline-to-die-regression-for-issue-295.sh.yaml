@@ -1,0 +1,10 @@
+name: 'SIGPIPE causes pipeline to die (regression for issue #295)'
+dialect: bash
+source: 
+  oils:spec/pipeline#sigpipe-causes-pipeline-to-die-regression-for-issue-295
+stdout: "141 0\n"
+---
+cat /dev/urandom | sleep 0.1
+echo ${PIPESTATUS[@]}
+
+# hm bash gives '1 0' which seems wrong

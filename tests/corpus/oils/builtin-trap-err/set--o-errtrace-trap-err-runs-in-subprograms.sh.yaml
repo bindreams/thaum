@@ -1,0 +1,19 @@
+name: 'set -o errtrace: trap ERR runs in subprograms'
+dialect: bash
+source: oils:spec/builtin-trap-err#set--o-errtrace-trap-err-runs-in-subprograms
+stdout: "line=6\nsubshell\nline=10\nok\n"
+---
+case $SH in mksh) exit ;; esac
+
+set -o errtrace
+trap 'echo line=$LINENO' ERR
+
+( false; echo subshell )
+
+x=$( false; echo command sub )
+
+false
+echo ok
+
+
+# ash doesn't reject errtrace, but doesn't implement it

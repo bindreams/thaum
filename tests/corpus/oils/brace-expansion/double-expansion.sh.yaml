@@ -1,0 +1,6 @@
+name: double expansion
+dialect: bash
+source: oils:spec/brace-expansion#double-expansion
+stdout: "a_c a_d b_c b_d\n"
+---
+echo {a,b}_{c,d}

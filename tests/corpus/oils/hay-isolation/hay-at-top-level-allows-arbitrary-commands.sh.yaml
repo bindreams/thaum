@@ -1,0 +1,29 @@
+name: hay at top level allows arbitrary commands
+dialect: bash
+source: oils:spec/hay-isolation#hay-at-top-level-allows-arbitrary-commands
+status: 127
+stdout: "3\n4\ninside\n"
+---
+shopt --set parse_brace
+
+hay define Package
+
+Package $(seq 2) {
+  seq 3 4
+}
+
+json write (_hay()) | jq '.children[0].args' > actual.txt
+
+diff -u - actual.txt <<EOF
+[
+  "1",
+  "2"
+]
+EOF
+
+hay eval :result {
+  echo inside
+  Package $(seq 2) {
+    seq 3 4
+  }
+}

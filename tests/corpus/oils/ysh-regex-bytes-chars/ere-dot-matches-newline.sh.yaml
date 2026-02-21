@@ -1,0 +1,9 @@
+name: "ERE: 'dot' matches newline"
+dialect: bash
+source: oils:spec/ysh-regex-bytes-chars#ere-dot-matches-newline
+stdout: "(Bool)  true\n(Bool)  true\n(Bool)  false\n"
+---
+
+= 'z' ~ /dot/
+= b'\n' ~ /dot/
+= '' ~ /dot/

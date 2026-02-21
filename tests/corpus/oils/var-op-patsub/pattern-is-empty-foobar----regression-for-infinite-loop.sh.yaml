@@ -1,0 +1,13 @@
+name: Pattern is empty $foo$bar -- regression for infinite loop
+dialect: bash
+source: 
+  oils:spec/var-op-patsub#pattern-is-empty-foobar----regression-for-infinite-loop
+stdout: "-foo-\n"
+---
+
+x=-foo-
+
+echo ${x//$foo$bar/bar}
+
+
+# feels like memory unsafety in ZSH

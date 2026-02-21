@@ -1,0 +1,7 @@
+name: $[f(x)]
+dialect: bash
+source: oils:spec/ysh-expr-sub#fx
+stdout: "3\n"
+---
+var a = %(a b c)
+echo $[len(a)]

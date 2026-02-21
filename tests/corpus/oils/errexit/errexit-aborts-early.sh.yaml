@@ -1,0 +1,9 @@
+name: errexit aborts early
+dialect: bash
+source: oils:spec/errexit#errexit-aborts-early
+status: 1
+stdout: ''
+---
+set -o errexit
+false
+echo done

@@ -1,0 +1,10 @@
+name: source looks in PATH for files
+dialect: bash
+source: oils:spec/builtin-eval-source#source-looks-in-path-for-files
+stdout: "hi\n"
+---
+mkdir -p dir
+echo "echo hi" > dir/cmd
+PATH="dir:$PATH"
+. cmd
+rm dir/cmd

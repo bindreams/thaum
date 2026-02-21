@@ -1,0 +1,8 @@
+name: exit within eval (regression)
+dialect: bash
+source: oils:spec/builtin-eval-source#exit-within-eval-regression
+status: 42
+stdout: ''
+---
+eval 'exit 42'
+echo 'should not get here'

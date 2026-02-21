@@ -1,0 +1,16 @@
+name: Str.replace(Eggex, Expr), scopes
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplaceeggex-expr-scopes
+stdout: "Hello 123 (surprise!)\nHello 123\nHello 123, 456\n"
+---
+shopt --set ysh:all
+
+var mystr = '123'
+
+var anotherVar = 'surprise!'
+write $[mystr.replace(/ <capture d+> /, ^"Hello $1 ($anotherVar)")]
+
+var globalName = '456'
+write $[mystr.replace(/ <capture d+ as globalName> /, ^"Hello $globalName")]
+
+write $[mystr.replace(/ <capture d+ as localName> /, ^"Hello $localName, $globalName")]

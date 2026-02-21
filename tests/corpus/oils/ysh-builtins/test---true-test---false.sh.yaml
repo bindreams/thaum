@@ -1,0 +1,22 @@
+name: test --true; test --false
+dialect: bash
+source: oils:spec/ysh-builtins#test---true-test---false
+stdout: "(Bool)   true\ntrue=0\nfalse=1\n\n(Bool)   false\ntrue=1\nfalse=0\n\n(Str)\
+  \   \"\"\ntrue=1\nfalse=1\n\n(Str)   \"other\"\ntrue=1\nfalse=1\n\n"
+---
+shopt --set ysh:upgrade
+
+for expr in (true, false, '', 'other') {
+  pp test_ (expr)
+
+  try {
+    test --true $[expr]
+  }
+  echo true=$[_error.code]
+
+  try {
+    test --false $[expr]
+  }
+  echo false=$[_error.code]
+  echo
+}

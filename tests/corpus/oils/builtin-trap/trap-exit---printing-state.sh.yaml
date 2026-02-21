@@ -1,0 +1,16 @@
+name: trap '' EXIT - printing state
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit---printing-state
+stdout: "trap -- 'echo exit' EXIT\n\ntrap -- '' EXIT\n\ntrap -- '# comment' EXIT\n"
+---
+
+trap 'echo exit' EXIT
+trap
+echo
+
+trap '' EXIT
+trap
+echo
+
+trap '# comment' EXIT
+trap

@@ -1,0 +1,13 @@
+name: PS4 is scoped
+dialect: bash
+source: oils:spec/xtrace#ps4-is-scoped
+stderr: "+ echo one\n+ f\n+ local 'PS4=- '\n- echo func\n+ echo two\n"
+---
+set -x
+echo one
+f() { 
+  local PS4='- '
+  echo func;
+}
+f
+echo two

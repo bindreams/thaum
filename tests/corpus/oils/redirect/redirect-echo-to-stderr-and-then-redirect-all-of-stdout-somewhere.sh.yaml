@@ -1,0 +1,9 @@
+name: Redirect echo to stderr, and then redirect all of stdout somewhere.
+dialect: bash
+source: 
+  oils:spec/redirect#redirect-echo-to-stderr-and-then-redirect-all-of-stdout-somewhere
+stdout: "10\n"
+stderr: "foo52\n"
+---
+{ echo foo52 1>&2; echo 012345789; } > $TMP/block-stdout.txt
+cat $TMP/block-stdout.txt |  wc -c 

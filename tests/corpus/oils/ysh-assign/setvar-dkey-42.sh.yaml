@@ -1,0 +1,16 @@
+name: setvar d.key = 42
+dialect: bash
+source: oils:spec/ysh-assign#setvar-dkey-42
+stdout: "f3=43\nf2=42\n"
+---
+shopt -s ysh:all
+
+var d = {}
+setvar d['f2'] = 42
+setvar d.f3 = 43
+
+# Use the opposite thing to retrieve
+var f3 = d['f3']
+var f2 = d.f2
+echo f3=$f3
+echo f2=$f2

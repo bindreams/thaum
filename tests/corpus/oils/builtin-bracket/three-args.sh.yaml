@@ -1,0 +1,19 @@
+name: three args
+dialect: bash
+source: oils:spec/builtin-bracket#three-args
+---
+[ foo = '' ]
+echo status=$?
+[ foo -a '' ]
+echo status=$?
+[ foo -o '' ]
+echo status=$?
+[ ! -z foo ]
+echo status=$?
+[ \( foo \) ]
+echo status=$?
+status=1
+status=1
+status=0
+status=0
+status=0

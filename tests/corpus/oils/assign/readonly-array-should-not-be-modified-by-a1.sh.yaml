@@ -1,0 +1,13 @@
+name: readonly array should not be modified by a+=(1)
+dialect: bash
+source: oils:spec/assign#readonly-array-should-not-be-modified-by-a1
+stdout: "['1', '2', '3']\n['1', '2', '3']\n"
+---
+case $SH in dash) exit 99 ;; esac # dash/mksh does not support associative arrays
+
+a=(1 2 3)
+readonly -a a
+eval 'a+=(4)'
+argv.py "${a[@]}"
+eval 'declare -n r=a; r+=(4)'
+argv.py "${a[@]}"

@@ -1,0 +1,15 @@
+name: Attribute / Data Blocks (package-manager)
+dialect: bash
+source: oils:spec/hay#attribute-data-blocks-package-manager
+stdout: "level 0 children\n3\nlevel 1 children\n0\n"
+---
+shopt --set parse_proc parse_ysh_expr_sub
+
+const path = "$REPO_ROOT/spec/testdata/config/package-manager.oil"
+
+const block = parseHay(path)
+
+hay define Package
+const d = evalHay(block)
+write 'level 0 children' $[len(d['children'])]
+write 'level 1 children' $[len(d['children'][1]['children'])]

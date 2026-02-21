@@ -1,0 +1,17 @@
+name: ${ echo hi }  without semi-colon
+dialect: bash
+source: oils:spec/command-sub-ksh#echo-hi-without-semi-colon
+status: 127
+stdout: "[no-semi]\n[no-space]\n"
+---
+
+x=${ echo no-semi }
+echo "[$x]"
+
+x=${ echo no-space}
+echo "[$x]"
+
+# damn I wanted to take this over!  mksh executes it!
+x=${ ~/ysh-tilde-sub }
+
+# echo ${ ~/ysh-tilde-sub }

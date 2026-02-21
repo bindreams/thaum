@@ -1,0 +1,7 @@
+name: Redirect to ''
+dialect: bash
+source: oils:spec/redirect-multi#redirect-to
+stdout: "status=1\n"
+---
+echo hi > ''
+echo status=$?

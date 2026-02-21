@@ -1,0 +1,20 @@
+name: Var substitution with newlines (#2492)
+dialect: bash
+source: oils:spec/var-sub-quote#var-substitution-with-newlines-2492
+stdout: "a b\na\nb\nc d\nc\nd\ne f\ne\nf\n"
+---
+echo "${var-a \
+b}"
+echo "${var-a
+b}"
+
+echo "${var:-c \
+d}"
+echo "${var:-c
+d}"
+
+var=set
+echo "${var:+e \
+f}"
+echo "${var:+e
+f}"

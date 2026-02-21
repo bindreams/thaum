@@ -1,0 +1,13 @@
+name: Empty init and cond
+dialect: bash
+source: oils:spec/for-expr#empty-init-and-cond
+status: 0
+stdout: "1\n2\n3\n"
+---
+i=1
+for ((  ; ;  i++ )); do
+  if test $i = 4; then
+    break
+  fi
+  echo $i
+done

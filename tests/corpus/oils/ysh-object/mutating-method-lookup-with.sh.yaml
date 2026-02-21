@@ -1,0 +1,16 @@
+name: Mutating method lookup with ->
+dialect: bash
+source: oils:spec/ysh-object#mutating-method-lookup-with
+stdout: "5\n8\n"
+---
+
+func inc(self, n) {
+  setvar self.i += n
+}
+var Counter_methods = Object(null, {'M/inc': inc})
+
+var c = Object(Counter_methods, {i: 5})
+
+echo $[c.i]
+call c->inc(3)
+echo $[c.i]

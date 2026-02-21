@@ -1,0 +1,22 @@
+name: trap DEBUG with 'return'
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-with-return
+status: 0
+stdout: "  [7]\nstatus=0\n  [8]\nA\n  [9]\nstatus=0\n  [10]\nB\n  [11]\nstatus=0\n"
+---
+
+debuglog() {
+  echo "  [$@]"
+}
+
+trap 'debuglog $LINENO; return 42' DEBUG
+
+echo status=$?
+echo A
+echo status=$?
+echo B
+echo status=$?
+
+
+
+# OSH doesn't ignore this

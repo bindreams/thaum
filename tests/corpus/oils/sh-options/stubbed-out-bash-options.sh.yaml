@@ -1,0 +1,10 @@
+name: stubbed out bash options
+dialect: bash
+source: oils:spec/sh-options#stubbed-out-bash-options
+stdout: "2\n0\n0\n0\n"
+---
+shopt -s ignore_shopt_not_impl
+for name in foo autocd cdable_vars checkwinsize; do
+  shopt -s $name
+  echo $?
+done

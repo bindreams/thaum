@@ -1,0 +1,11 @@
+name: Simple Cycles
+dialect: bash
+source: oils:spec/ysh-printing#simple-cycles
+stdout: "(List)  ['one', 'two', [...]]\n(Dict)  {dead_end: null, live_end: {...}}\n"
+---
+var cyclic_array = ["one", "two", "three"]
+setvar cyclic_array[2] = cyclic_array
+var cyclic_dict = {"dead_end": null}
+setvar cyclic_dict["live_end"] = cyclic_dict
+= cyclic_array
+= cyclic_dict

@@ -1,0 +1,7 @@
+name: $$ looks like a PID
+dialect: bash
+source: oils:spec/vars-special#looks-like-a-pid
+stdout: "status=0\n"
+---
+echo $$ | egrep -q '[0-9]+'  # Test that it has decimal digits
+echo status=$?

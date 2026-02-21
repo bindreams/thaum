@@ -1,0 +1,15 @@
+name: trap ERR not active in shell functions in (bash behavior)
+dialect: bash
+source: 
+  oils:spec/builtin-trap-err#trap-err-not-active-in-shell-functions-in-bash-behavior
+stdout: "\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+f() {
+  false 
+  true
+}
+
+f

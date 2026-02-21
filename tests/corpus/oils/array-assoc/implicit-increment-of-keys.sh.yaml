@@ -1,0 +1,8 @@
+name: Implicit increment of keys
+dialect: bash
+source: oils:spec/array-assoc#implicit-increment-of-keys
+stdout: "['30', '31', '40', '41']\n['a', 'b', 'x', 'y']\n"
+---
+declare -a arr=( [30]=a b [40]=x y)
+argv.py "${!arr[@]}"
+argv.py "${arr[@]}"

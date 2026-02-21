@@ -1,0 +1,29 @@
+name: set -o errtrace - trap ERR runs in shell functions
+dialect: bash
+source: 
+  oils:spec/builtin-trap-err#set--o-errtrace---trap-err-runs-in-shell-functions
+stdout: "err\nnow with errtrace\nerr\nerr\nerr\nok\n"
+---
+
+trap 'echo err' ERR
+
+passing() {
+  false  # line 4
+  true
+}
+
+failing() {
+  true
+  false
+}
+
+passing
+failing
+
+set -o errtrace
+
+echo 'now with errtrace'
+passing
+failing
+
+echo ok

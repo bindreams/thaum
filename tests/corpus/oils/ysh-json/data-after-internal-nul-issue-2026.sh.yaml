@@ -1,0 +1,27 @@
+name: 'Data after internal NUL (issue #2026)'
+dialect: bash
+source: oils:spec/ysh-json#data-after-internal-nul-issue-2026
+stdout: "status=4\nstatus=4\nstatus=1\nstatus=1\n"
+---
+
+$SH <<'EOF'
+pp test_ (fromJson(b'123\y00abc'))
+EOF
+echo status=$?
+
+$SH <<'EOF'
+pp test_ (fromJson(b'123\y01abc'))
+EOF
+echo status=$?
+
+$SH <<'EOF'
+shopt --set ysh:upgrade  # b'' syntax
+json read <<< b'123\y00abc'
+EOF
+echo status=$?
+
+$SH <<'EOF'
+shopt --set ysh:upgrade  # b'' syntax
+json read <<< b'123\y01abc'
+EOF
+echo status=$?

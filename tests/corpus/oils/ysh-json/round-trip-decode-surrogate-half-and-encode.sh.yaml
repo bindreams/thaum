@@ -1,0 +1,21 @@
+name: 'round trip: decode surrogate half and encode'
+dialect: bash
+source: oils:spec/ysh-json#round-trip-decode-surrogate-half-and-encode
+stdout: "\"\\ud83e\"\n(Str)   b'\\yed\\ya0\\ybe'\njson \"\\ud83e\"\njson8 b'\\yed\\\
+  ya0\\ybe'\n\n\"\\udd26\"\n(Str)   b'\\yed\\yb4\\ya6'\njson \"\\udd26\"\njson8 b'\\\
+  yed\\yb4\\ya6'\n\n"
+---
+
+shopt -s ysh:upgrade
+
+for j in '"\ud83e"' '"\udd26"' {
+  var s = fromJson(j)
+  write -- "$j"
+  pp test_ (s)
+
+  write -n 'json ';  json write (s)
+
+  write -n 'json8 '; json8 write (s)
+
+  echo
+}

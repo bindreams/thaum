@@ -1,0 +1,6 @@
+name: FOO=foo echo [foo]
+dialect: bash
+source: oils:spec/assign#foofoo-echo-foo
+stdout: "[]\n"
+---
+FOO=foo echo "[$foo]"

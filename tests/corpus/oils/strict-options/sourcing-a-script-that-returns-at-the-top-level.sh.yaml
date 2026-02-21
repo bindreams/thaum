@@ -1,0 +1,9 @@
+name: Sourcing a script that returns at the top level
+dialect: bash
+source: oils:spec/strict-options#sourcing-a-script-that-returns-at-the-top-level
+stdout: "one\nreturn-helper.sh\n42\ntwo\n"
+---
+echo one
+. $REPO_ROOT/spec/testdata/return-helper.sh
+echo $?
+echo two

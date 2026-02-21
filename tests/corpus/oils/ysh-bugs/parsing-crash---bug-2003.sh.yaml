@@ -1,0 +1,13 @@
+name: 'Parsing crash - bug #2003'
+dialect: bash
+source: oils:spec/ysh-bugs#parsing-crash---bug-2003
+stdout: "status=2\nstatus=2\n"
+---
+
+set +o errexit
+
+$[ENV.SH] -c 'proc y (;x) { return = x }'
+echo status=$?
+
+$[ENV.SH] -c 'func y (;x) { return = x }'
+echo status=$?

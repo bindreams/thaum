@@ -1,0 +1,36 @@
+name: crash dump with source
+dialect: bash
+source: oils:spec/ysh-dev#crash-dump-with-source
+stdout: "crash status=1\nfound crash dump\n"
+---
+# TODO: The failure is not propagated through 'source'.  Failure only happens
+# on 'errexit'.
+#rm -f $TMP/*.json
+OILS_CRASH_DUMP_DIR=$TMP $SH -c "
+set -o errexit
+source $REPO_ROOT/spec/testdata/crash.sh
+"
+echo crash status=$?
+
+# Now try to parse crash dumps
+set -o xtrace
+set -o errexit
+
+# Enumerate crash dumps
+ok=0
+for dump in $TMP/*.json; do
+  # Workaround for test issue: release binaries leave empty files because they
+  # don't have the json module.
+  if test -s $dump; then  # non-empty
+    python2 -m json.tool $dump > /dev/null
+    echo "OK $dump" >&2
+    (( ++ok ))
+  fi
+done
+
+if test $ok -ge 1; then  # make sure we parsed at least once crash dump
+  echo 'found crash dump'
+fi
+
+
+# NOTE: strict_arith has one case in arith.test.sh), strict_word-eval has a case in var-op-other.

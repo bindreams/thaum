@@ -1,0 +1,24 @@
+name: mixing assignment builtins and YSH assignment
+dialect: bash
+source: oils:spec/ysh-assign#mixing-assignment-builtins-and-ysh-assignment
+stdout: "x=2\nstatus=0\nstatus=1\n"
+---
+shopt --set ysh:all parse_equals
+shopt --unset no_osh_builtins
+
+proc local-var {
+  local x=1
+  var x = 2
+  echo x=$x
+}
+
+proc readonly-var {
+  readonly x=1
+  var x = 2
+  echo x=$x
+}
+
+try { eval 'local-var' }
+echo status=$[_error.code]
+try { eval 'readonly-var' }
+echo status=$[_error.code]

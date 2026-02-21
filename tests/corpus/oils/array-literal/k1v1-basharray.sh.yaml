@@ -1,0 +1,12 @@
+name: '[k1]=v1 (BashArray)'
+dialect: bash
+source: oils:spec/array-literal#k1v1-basharray
+stdout: "v2\nv2\n"
+---
+# Note: This and next tests have originally been in "spec/assign.test.sh" and
+# compared the behavior of OSH's BashAssoc and Bash's indexed array.  After
+# supporting "arr=([index]=value)" for indexed arrays, the test was adjusted
+# and copied here. See also the corresponding tests in "spec/assign.test.sh"
+a=([k1]=v1 [k2]=v2)
+echo ${a["k1"]}
+echo ${a["k2"]}

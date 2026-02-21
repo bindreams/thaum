@@ -1,0 +1,11 @@
+name: or BashArray, or BashAssoc
+dialect: bash
+source: oils:spec/ysh-expr-bool#or-basharray-or-bashassoc
+stdout: "{\"type\":\"BashArray\",\"data\":{\"0\":\"1\",\"1\":\"2\",\"2\":\"3\"}}\n\
+  {\"type\":\"BashAssoc\",\"data\":{\"k\":\"v\"}}\n"
+---
+declare -a array=(1 2 3)
+pp test_ (array or 'yy')
+
+declare -A assoc=([k]=v)
+pp test_ (assoc or 'zz')

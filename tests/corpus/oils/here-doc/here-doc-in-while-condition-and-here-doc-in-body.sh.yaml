@@ -1,0 +1,12 @@
+name: Here doc in while condition and here doc in body
+dialect: bash
+source: oils:spec/here-doc#here-doc-in-while-condition-and-here-doc-in-body
+stdout: "1\n2\n3\n"
+---
+while cat <<E1 && cat <<E2; do cat <<E3; break; done
+1
+E1
+2
+E2
+3
+E3

@@ -1,0 +1,10 @@
+name: split command sub @() in expression mode
+dialect: bash
+source: oils:spec/ysh-command-sub#split-command-sub-in-expression-mode
+stdout: "1\n2\n3\n"
+---
+shopt --set parse_proc parse_at
+
+var x = @(seq 3)
+
+write -- @x

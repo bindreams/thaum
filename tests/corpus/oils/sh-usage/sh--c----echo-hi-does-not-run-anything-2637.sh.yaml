@@ -1,0 +1,33 @@
+name: sh -c -- 'echo hi' does not run anything (#2637)
+dialect: bash
+source: oils:spec/sh-usage#sh--c----echo-hi-does-not-run-anything-2637
+stdout: "z failed\n\nthree failed\n\ntwo\ntwo=0\n\none\none=0\n\nzero=0\n\naa\naa=0\n"
+---
+
+$SH -c -z 'echo z'
+if test $? -ne 0; then
+  echo 'z failed'
+fi
+echo
+
+$SH -c --- 'echo three'
+if test $? -ne 0; then
+  echo three failed
+fi
+echo
+
+$SH -c -- 'echo two'
+echo two=$?
+echo
+
+$SH -c - 'echo one'
+echo one=$?
+echo
+
+$SH -c '' 'echo zero'
+echo zero=$?
+echo
+
+# odd
+$SH -c 'echo aa' 'echo bb'
+echo aa=$?

@@ -1,0 +1,7 @@
+name: double expansion with escaped literals
+dialect: bash
+source: oils:spec/brace-expansion#double-expansion-with-escaped-literals
+stdout: "-$- -[- -]-\n"
+---
+a=A
+echo -{\$,\[,\]}-

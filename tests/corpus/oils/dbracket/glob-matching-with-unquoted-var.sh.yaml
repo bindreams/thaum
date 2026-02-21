@@ -1,0 +1,8 @@
+name: '[[ glob matching with unquoted var'
+dialect: bash
+source: oils:spec/dbracket#glob-matching-with-unquoted-var
+stdout: "true\nfalse\n"
+---
+pat=*.py
+[[ foo.py == $pat ]] && echo true
+[[ foo.p  == $pat ]] || echo false

@@ -1,0 +1,6 @@
+name: \0
+dialect: bash
+source: oils:spec/builtin-echo#0
+stdout: "ab\0cd\n"
+---
+echo -e 'ab\0cd'

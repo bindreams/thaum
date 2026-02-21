@@ -1,0 +1,16 @@
+name: simple_eval_builtin
+dialect: bash
+source: oils:spec/strict-options#simpleevalbuiltin
+stdout: "status=0\none\nstatus=0\ntwo\nstatus=0\n---\nstatus=2\nstatus=2\ntwo\nstatus=0\n\
+  ---\n"
+---
+for i in 1 2; do
+  eval  # zero args
+  echo status=$?
+  eval echo one
+  echo status=$?
+  eval 'echo two'
+  echo status=$?
+  shopt -s simple_eval_builtin
+  echo ---
+done

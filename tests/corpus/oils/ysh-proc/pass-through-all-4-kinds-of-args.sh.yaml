@@ -1,0 +1,41 @@
+name: Pass through all 4 kinds of args
+dialect: bash
+source: oils:spec/ysh-proc#pass-through-all-4-kinds-of-args
+status: 1
+stdout: "(List)   [\"a\",\"b\"]\n(List)   [\"c\",\"d\"]\n(Dict)   {\"n\":99}\nCommand\n\
+  \n(List)   [\"a\",\"b\"]\n(List)   [\"c\",\"d\"]\n(Dict)   {\"n\":99}\nCommand\n\
+  \n"
+---
+
+shopt --set ysh:upgrade
+
+proc p2 (...words; ...typed; ...named; block) {
+  pp test_ (words)
+  pp test_ (typed)
+  pp test_ (named)
+  #pp test_ (block)
+  # To avoid <Block 0x??> - could change pp test_
+  echo $[type(block)]
+}
+
+proc p1 (...words; ...typed; ...named; block) {
+  p2 @words (...typed; ...named; block)
+}
+
+p2 a b ('c', 'd', n=99) {
+  echo literal
+}
+echo
+
+# Same thing
+var block = ^(echo expression)
+
+# Note: you need the second explicit ;
+
+p2 a b ('c', 'd'; n=99; block)
+echo
+
+# what happens when you do this?
+p2 a b ('c', 'd'; n=99; block) {
+  echo duplicate
+}

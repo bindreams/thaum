@@ -1,0 +1,16 @@
+name: bytecode
+dialect: bash
+source: oils:spec/ysh-bytecode#bytecode
+stdout: "\n"
+---
+
+func __b__hi(n) {
+  var x = n + 1
+  var y = n + 2
+
+  setvar y = x + y
+
+  = y
+}
+
+call __b__hi(42)

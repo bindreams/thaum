@@ -1,0 +1,37 @@
+name: with evalToDict()
+dialect: bash
+source: oils:spec/ysh-proc-meta#with-evaltodict
+stdout: "prefix a\nprefix b\n"
+---
+
+func genProcs() {
+  var result = {}
+  for param in a b {
+    var s = """
+    # This is defined locally
+    proc echo_$param(prefix) {
+      echo \$prefix $param
+    }
+    if false {
+      = echo_$param
+      var a = 42
+      pp frame_vars_
+    }
+    """
+    var cmd = parseCommand(s)
+
+    var d = io->evalToDict(cmd)
+
+    # accumulate
+    setvar result["echo_$param"] = d["echo_$param"]
+  }
+  return (result)
+}
+
+var procs = genProcs()
+
+var my_echo_a = procs.echo_a
+var my_echo_b = procs.echo_b
+
+my_echo_a prefix
+my_echo_b prefix

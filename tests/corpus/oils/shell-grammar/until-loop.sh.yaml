@@ -1,0 +1,9 @@
+name: Until loop
+dialect: bash
+source: oils:spec/shell-grammar#until-loop
+---
+until echo word_a
+do
+  echo word_b
+  echo word_c
+done

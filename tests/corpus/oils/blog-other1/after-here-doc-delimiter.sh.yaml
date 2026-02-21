@@ -1,0 +1,9 @@
+name: '` after here doc delimiter'
+dialect: bash
+source: oils:spec/blog-other1#after-here-doc-delimiter
+stdout: "hello world\n"
+---
+foo=`cat <<EOM
+hello world
+EOM`
+echo "$foo"

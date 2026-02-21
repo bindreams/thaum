@@ -1,0 +1,19 @@
+name: Here doc in while loop split up more
+dialect: bash
+source: oils:spec/here-doc#here-doc-in-while-loop-split-up-more
+stdout: "1\n2\n3\n"
+---
+while cat <<E1
+1
+E1
+
+cat <<E2
+2
+E2
+
+do
+  cat <<E3
+3
+E3
+  break
+done

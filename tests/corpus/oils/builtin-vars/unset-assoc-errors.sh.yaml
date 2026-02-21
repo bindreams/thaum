@@ -1,0 +1,11 @@
+name: unset assoc errors
+dialect: bash
+source: oils:spec/builtin-vars#unset-assoc-errors
+stdout: "status=0\n"
+---
+
+case $SH in dash|mksh) return ;; esac
+
+declare -A assoc=(['key']=value)
+unset 'assoc["nonexistent"]'
+echo status=$?

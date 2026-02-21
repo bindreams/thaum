@@ -1,0 +1,18 @@
+name: str.findLast()
+dialect: bash
+source: oils:spec/ysh-string#strfindlast
+status: 0
+---
+var mystr = 'abcaz'
+assert [-1 === 'абаба'.findLast('a')] # different alphabet
+assert [4 === 'ababa'.findLast('a')]
+assert [3 === 'ababa'.findLast('b')]
+assert [6 === 'абаба'.findLast('б')]
+assert [-1 === 'абаба'.findLast('б', start=3, end=6)]
+assert [2 === 'абаба'.findLast('б', start=2, end=6)]
+assert [6 ==='абаба'.findLast('б', start=2, end=8)]
+assert [10 === 'абаба'.findLast('')]
+assert [8 === 'абаба'.findLast('', start=2, end=8)]
+assert [-1 === 'abc'.findLast('', start=7, end=8)]
+# test negative indices
+assert [3 === mystr.findLast('a', start=-3, end=-1)]

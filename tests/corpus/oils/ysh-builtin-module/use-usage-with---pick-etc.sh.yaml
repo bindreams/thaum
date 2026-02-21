@@ -1,0 +1,23 @@
+name: use usage with --pick etc.
+dialect: bash
+source: oils:spec/ysh-builtin-module#use-usage-with---pick-etc
+stdout: "bad-flag=2\nall-provided=2\nall-for-testing=2\n\nno-picked=2\npicked=0\n"
+---
+#shopt --set ysh:upgrade
+
+use foo --bad-flag
+echo bad-flag=$?
+
+use foo --all-provided zz
+echo all-provided=$?
+
+use foo --all-for-testing zz
+echo all-for-testing=$?
+
+echo
+
+use $REPO_ROOT/spec/testdata/module2/cycle1.ysh --pick
+echo no-picked=$?
+
+use $REPO_ROOT/spec/testdata/module2/cycle1.ysh --pick c1 c1
+echo picked=$?

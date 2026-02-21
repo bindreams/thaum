@@ -1,0 +1,53 @@
+name: invoke --show with many types
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke---show-with-many-types
+stdout: "%.qtt8  name        kind        detail\n        my-name     alias       b'echo
+  my μ \\yff alias'\n        my-name     proc        -\n        my-name     sh-func\
+  \     -\n        myobj       proc        invokable\n        eval        builtin\
+  \     special\n        cd          builtin     -\n        zzz         -        \
+  \   -\n"
+---
+case $SH in bash) exit ;; esac
+
+shopt --unset no_osh_builtins  # for alias
+
+# TODO: CRASH bug!
+# use ///osh/bash-strict.sh
+
+my-name() { echo sh-func; }
+
+alias my-name=$'echo my \u03bc \xff alias'
+
+mkdir -p dir
+echo 'echo hi' > dir/my-name
+chmod +x dir/my-name
+
+# BUG:
+# 1. we start with OSH, and initialize $PATH
+# 2. then we mutate $PATH
+# 3. shopt --set ysh:all
+# 4. now we look at ENV.PATH, which isn't changed
+PATH=$PWD/dir:$PATH
+#echo $PATH
+
+if false; then
+  command -v my-name
+  echo
+  type -a my-name  #bash-strict
+  echo
+fi
+
+shopt --set ysh:all
+
+proc my-name { echo proc }
+
+proc myInvoke { echo hi }
+var methods = Obj.new({__invoke__: myInvoke})
+var myobj = Obj.new({}, methods)
+
+if false {
+  type -a my-name  #bash-strict
+  echo
+}
+
+invoke --show my-name myobj eval cd zzz | sed 's/#.qtt8/%.qtt8/'

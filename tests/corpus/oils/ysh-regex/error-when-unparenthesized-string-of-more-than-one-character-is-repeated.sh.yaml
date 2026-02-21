@@ -1,0 +1,19 @@
+name: Error when unparenthesized string of more than one character is repeated
+dialect: bash
+source: 
+  oils:spec/ysh-regex#error-when-unparenthesized-string-of-more-than-one-character-is-repeated
+status: 1
+stdout: ''
+---
+shopt -s ysh:all
+
+var literal = 'foo'
+var pat = null
+
+setvar pat = / %start @literal+ %end /
+echo $pat
+setvar pat = / %start (@literal)+ %end /
+echo $pat
+
+if ('foofoo' ~ pat) { echo yes }
+if ('foof' !~ pat) { echo no }

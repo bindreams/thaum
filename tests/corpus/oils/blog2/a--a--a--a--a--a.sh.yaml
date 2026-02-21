@@ -1,0 +1,7 @@
+name: -a -a -a -a -a -a
+dialect: bash
+source: oils:spec/blog2#a--a--a--a--a--a
+stdout: "status=1\n"
+---
+[ -a -a -a -a -a -a ]
+echo status=$?

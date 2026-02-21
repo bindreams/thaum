@@ -1,0 +1,8 @@
+name: IFS empty doesn't do splitting
+dialect: bash
+source: oils:spec/word-split#ifs-empty-doesnt-do-splitting
+stdout: "[' a b\\tc']\n"
+---
+IFS=''
+x=$(python2 -c 'print(" a b\tc\n")')
+argv.py $x

@@ -1,0 +1,21 @@
+name: kill -l 10 TERM translates between names and numbers
+dialect: bash
+source: 
+  oils:spec/builtin-kill#kill--l-10-term-translates-between-names-and-numbers
+stdout: "USR1\nSEGV\nUSR2\nstatus=0\n\n10\n11\n12\nstatus=0\n\nUSR1\n11\nUSR2\nstatus=0\n\
+  \n## N-I dash/mksh STDOUT:\n"
+---
+case $SH in mksh|dash) exit ;; esac
+
+builtin kill -l 10 11 12
+echo status=$?
+echo
+
+builtin kill -l SIGUSR1 SIGSEGV USR2
+echo status=$?
+echo
+
+# mixed kind
+builtin kill -l 10 SIGSEGV 12
+echo status=$?
+echo

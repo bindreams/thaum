@@ -1,0 +1,10 @@
+name: parseCommand with syntax error
+dialect: bash
+source: oils:spec/ysh-builtin-eval#parsecommand-with-syntax-error
+stdout: "(Dict)   {\"code\":3,\"message\":\"Syntax error in parseCommand()\"}\n"
+---
+
+try {
+  var cmd = parseCommand('echo >')
+}
+pp test_ (_error)

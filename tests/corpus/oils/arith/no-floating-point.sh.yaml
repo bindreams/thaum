@@ -1,0 +1,6 @@
+name: No floating point
+dialect: bash
+source: oils:spec/arith#no-floating-point
+status: 2
+---
+echo $((1 + 2.3))

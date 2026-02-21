@@ -1,0 +1,11 @@
+name: Unquoted \u{3bc} escape
+dialect: bash
+source: oils:spec/ysh-string#unquoted-u3bc-escape
+stdout: "mu μ\nmu μ\nmu μ\n"
+---
+
+var x = 'mu ' ++ \u{3bc}
+echo $x
+
+echo mu $[\u{3bc}]
+echo "mu $[\u{3bc}]"

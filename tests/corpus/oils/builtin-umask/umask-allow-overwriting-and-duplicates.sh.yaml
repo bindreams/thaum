@@ -1,0 +1,9 @@
+name: umask allow overwriting and duplicates
+dialect: bash
+source: oils:spec/builtin-umask#umask-allow-overwriting-and-duplicates
+status: 0
+stdout: "701\n"
+---
+umask 0111
+umask u=rwx,u=rw,u=r,u=,g=rwx
+umask | tail -c 4

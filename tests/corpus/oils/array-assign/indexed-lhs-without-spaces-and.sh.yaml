@@ -1,0 +1,16 @@
+name: Indexed LHS without spaces, and +=
+dialect: bash
+source: oils:spec/array-assign#indexed-lhs-without-spaces-and
+stdout: "status=0\n['x']\n['x', 'y']\n['x', 'yz']\n"
+---
+a[1]=x
+echo status=$?
+argv.py "${a[@]}"
+
+a[0+2]=y
+#a[2|3]=y  # zsh doesn't allow this
+argv.py "${a[@]}"
+
+# += does appending
+a[0+2]+=z
+argv.py "${a[@]}"

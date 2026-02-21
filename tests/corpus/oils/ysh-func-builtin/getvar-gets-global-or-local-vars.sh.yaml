@@ -1,0 +1,29 @@
+name: getVar() gets global or local vars
+dialect: bash
+source: oils:spec/ysh-func-builtin#getvar-gets-global-or-local-vars
+stdout: "g=global\nmylocal=43\nmylocal=43\nnot_global_or_local=null\n"
+---
+
+# compare with shvarGet(), which does dynamic scope
+
+proc my-proc {
+  var mylocal = 43
+
+  echo g=$[getVar('g')]
+  echo mylocal=$[getVar('mylocal')]
+
+  # the whole purpose is dynamic variable names / dynamic binding
+  var prefix = 'my'
+  echo mylocal=$[getVar(prefix ++ 'local')]
+
+  echo not_global_or_local=$[getVar('not_global_or_local')]
+}
+
+proc main {
+  var not_global_or_local = 42
+  my-proc
+}
+
+var g = 'global'
+
+main

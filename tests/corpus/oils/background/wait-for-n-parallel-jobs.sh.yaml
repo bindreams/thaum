@@ -1,0 +1,13 @@
+name: wait for N parallel jobs
+dialect: bash
+source: oils:spec/background#wait-for-n-parallel-jobs
+stdout: "status=0\n"
+---
+
+for i in 3 2 1; do
+  { sleep 0.0$i; exit $i; } &
+done
+wait
+
+# status is lost
+echo status=$?

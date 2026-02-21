@@ -1,0 +1,45 @@
+name: -o default is an "else action", when zero are shown
+dialect: bash
+source: oils:spec/ysh-completion#o-default-is-an-else-action-when-zero-are-shown
+stdout: "TODO\ngit\n"
+---
+
+touch file1 file2
+
+echo '-- nothing registered'
+compexport -c 'GIT '
+
+__git() {
+  #argv.py "$@"
+  COMPREPLY=(foo bar)
+}
+
+complete -F __git GIT
+
+echo '-- func'
+compexport -c 'GIT '
+
+complete -F __git -o default GIT
+echo '-- func default'
+compexport -c 'GIT '
+
+__git() {
+  # don't show anything
+  true
+}
+
+# have to RE-REGISTER after defining function!  Hm
+complete -F __git -o default GIT
+
+echo '-- empty func default'
+compexport -c 'GIT '
+
+# Is the order reversed?
+# Does GNU readline always sort them?
+
+
+# TODO:
+# --begin --end  
+# --table ?  For mulitiple completions
+# compatible with -C ?
+# --trace - show debug_f tracing on stderr?  Would be very nice!

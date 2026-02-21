@@ -1,0 +1,17 @@
+name: Attr block with duplicate names
+dialect: bash
+source: oils:spec/hay#attr-block-with-duplicate-names
+status: 1
+stdout: "\n"
+---
+
+shopt --set ysh:upgrade
+
+hay define Package
+
+Package cpython {
+  version = '3.11'
+  version = '3.12'
+}
+
+= _hay()

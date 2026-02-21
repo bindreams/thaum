@@ -1,0 +1,7 @@
+name: '! with ||'
+dialect: bash
+source: oils:spec/pipeline#with
+status: 0
+stdout: "hi\nFAILED\n"
+---
+! echo hi || echo FAILED

@@ -1,0 +1,15 @@
+name: Recursive functions
+dialect: bash
+source: oils:spec/ysh-func#recursive-functions
+stdout: "55\n"
+---
+func fib(n) {
+  # TODO: add assert n > 0
+  if (n < 2) {
+    return (n)
+  }
+
+  return (fib(n - 1) + fib(n - 2))
+}
+
+json write (fib(10))

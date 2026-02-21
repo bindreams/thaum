@@ -1,0 +1,10 @@
+name: Empty for loop is allowed
+dialect: bash
+source: oils:spec/posix#empty-for-loop-is-allowed
+stdout: ''
+---
+set -- a b
+for x in; do
+  echo hi
+  echo $x
+done

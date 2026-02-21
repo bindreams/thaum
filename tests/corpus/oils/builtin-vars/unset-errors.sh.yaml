@@ -1,0 +1,14 @@
+name: Unset errors
+dialect: bash
+source: oils:spec/builtin-vars#unset-errors
+stdout: "status=0\nstatus=0\nstatus=0\n"
+---
+unset undef
+echo status=$?
+
+a=(x y z)
+unset 'a[99]'  # out of range
+echo status=$?
+
+unset 'not_array[99]'  # not an array
+echo status=$?

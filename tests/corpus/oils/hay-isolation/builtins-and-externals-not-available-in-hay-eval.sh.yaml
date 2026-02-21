@@ -1,0 +1,25 @@
+name: builtins and externals not available in hay eval
+dialect: bash
+source: oils:spec/hay-isolation#builtins-and-externals-not-available-in-hay-eval
+stdout: "status 127\nstatus 127\n"
+---
+shopt --set parse_brace parse_ysh_expr_sub
+shopt --unset errexit
+
+hay define Package
+
+try {
+  hay eval :result {
+    Package foo {
+      /bin/ls
+    }
+  }
+}
+echo "status $[_error.code]"
+
+try {
+  hay eval :result {
+    cd /tmp
+  }
+}
+echo "status $[_error.code]"

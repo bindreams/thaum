@@ -1,0 +1,8 @@
+name: Use shell var in YSH expression
+dialect: bash
+source: oils:spec/ysh-expr#use-shell-var-in-ysh-expression
+stdout: "3\n"
+---
+x='abc'
+var length = len(x)  # length in BYTES, unlike ${#x}
+echo $length

@@ -1,0 +1,8 @@
+name: 'error: append used like env prefix'
+dialect: bash
+source: oils:spec/append#error-append-used-like-env-prefix
+status: 2
+---
+# This should be an error in other shells but it's not.
+A=a
+A+=a printenv.py A

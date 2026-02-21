@@ -1,0 +1,17 @@
+name: shopt -p
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt--p
+stdout: "shopt -u errexit\nshopt -u nullglob\n--\nshopt -u strict_arg_parse\nshopt
+  -u strict_argv\nshopt -u strict_arith\n--\nshopt -s strict_arg_parse\nshopt -s strict_argv\n\
+  shopt -s strict_arith\n"
+---
+
+shopt -p errexit
+shopt -p nullglob
+
+echo --
+shopt -p strict:all | head -n 3
+
+echo --
+shopt --set strict:all
+shopt -p strict:all | head -n 3

@@ -1,0 +1,8 @@
+name: Append string to string
+dialect: bash
+source: oils:spec/append#append-string-to-string
+stdout: "abcd\n"
+---
+s='abc'
+s+=d
+echo $s

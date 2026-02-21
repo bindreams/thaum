@@ -1,0 +1,11 @@
+name: undef[0] with nounset
+dialect: bash
+source: oils:spec/arith#undef0-with-nounset
+status: 1
+stdout: "\n"
+---
+case $SH in dash) exit ;; esac
+
+set -o nounset
+echo UNSET $(( undef[0] ))
+echo status=$?

@@ -1,0 +1,14 @@
+name: proc returning invalid string
+dialect: bash
+source: oils:spec/ysh-proc#proc-returning-invalid-string
+status: 1
+stdout: "\n"
+---
+shopt --set parse_proc
+
+# this should print an error message
+proc f {
+  var s = 'not an integer status'
+  return $s
+}
+f

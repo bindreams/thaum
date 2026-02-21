@@ -1,0 +1,7 @@
+name: unary - applied to bool is not allowed
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary---applied-to-bool-is-not-allowed
+status: 3
+stdout: "\n"
+---
+= ~false

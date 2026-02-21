@@ -1,0 +1,9 @@
+name: automatically creating arrays WITHOUT strict_array
+dialect: bash
+source: 
+  oils:spec/strict-options#automatically-creating-arrays-without-strictarray
+stdout: "['x', 'y']\n"
+---
+undef[2]=x
+undef[3]=y
+argv.py "${undef[@]}"

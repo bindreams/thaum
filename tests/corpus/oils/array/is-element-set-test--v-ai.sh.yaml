@@ -1,0 +1,18 @@
+name: Is element set?  test -v a[i]
+dialect: bash
+source: oils:spec/array#is-element-set-test--v-ai
+stdout: "set=0\nempty=0\nunset=1\n"
+---
+
+# note: modern versions of zsh implement this
+
+array=(1 2 3 '')
+
+test -v 'array[1]'
+echo set=$?
+
+test -v 'array[3]'
+echo empty=$?
+
+test -v 'array[4]'
+echo unset=$?

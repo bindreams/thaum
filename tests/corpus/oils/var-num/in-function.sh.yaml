@@ -1,0 +1,9 @@
+name: In function
+dialect: bash
+source: oils:spec/var-num#in-function
+stdout: "a b\n"
+---
+myfunc() {
+  echo $1 ${2}
+}
+myfunc a b c d

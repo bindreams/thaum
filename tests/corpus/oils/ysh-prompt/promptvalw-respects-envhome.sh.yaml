@@ -1,0 +1,15 @@
+name: promptVal('w') respects ENV.HOME
+dialect: bash
+source: oils:spec/ysh-prompt#promptvalw-respects-envhome
+stdout: "\n"
+---
+
+# ENV not set in spec tests
+var x = io.promptVal('w')
+assert [x.startsWith('/')]
+
+# now set it
+setglobal ENV.HOME = '/home'
+
+var x = io.promptVal('w')
+assert [x.startsWith('~')]

@@ -1,0 +1,25 @@
+name: Extra data after valid JSON
+dialect: bash
+source: oils:spec/ysh-json#extra-data-after-valid-json
+stdout: "num space 0\nobj space 0\nnum comment 0\nobj comment 0\nnum bracket 1\nobj
+  bracket 1\n"
+---
+
+# Trailing space is OK
+echo '42  ' | json read
+echo num space $?
+
+echo '{}  ' | json read
+echo obj space $?
+
+echo '42 # comment' | json8 read
+echo num comment $?
+
+echo '{}   # comment ' | json8 read
+echo obj comment $?
+
+echo '42]' | json read
+echo num bracket $?
+
+echo '{}]' | json read
+echo obj bracket $?

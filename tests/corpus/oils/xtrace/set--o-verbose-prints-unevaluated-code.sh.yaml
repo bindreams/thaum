@@ -1,0 +1,11 @@
+name: set -o verbose prints unevaluated code
+dialect: bash
+source: oils:spec/xtrace#set--o-verbose-prints-unevaluated-code
+stdout: "foo\nbar\n## STDERR:\nx=foo\ny=bar\necho $x\necho $(echo $y)\n## OK bash
+  STDERR:\nx=foo\ny=bar\necho $x\necho $(echo $y)\n"
+---
+set -o verbose
+x=foo
+y=bar
+echo $x
+echo $(echo $y)

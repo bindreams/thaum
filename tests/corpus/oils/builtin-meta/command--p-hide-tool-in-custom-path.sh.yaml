@@ -1,0 +1,10 @@
+name: command -p (hide tool in custom path)
+dialect: bash
+source: oils:spec/builtin-meta#command--p-hide-tool-in-custom-path
+status: 127
+---
+mkdir -p $TMP/bin
+echo "echo hello" > $TMP/bin/hello
+chmod +x $TMP/bin/hello
+export PATH=$TMP/bin
+command -p hello

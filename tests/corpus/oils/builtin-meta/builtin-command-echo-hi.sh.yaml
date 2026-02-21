@@ -1,0 +1,7 @@
+name: builtin command echo hi
+dialect: bash
+source: oils:spec/builtin-meta#builtin-command-echo-hi
+status: 0
+stdout: "hi\n"
+---
+builtin command echo hi

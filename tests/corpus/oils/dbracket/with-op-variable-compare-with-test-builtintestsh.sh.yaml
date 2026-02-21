@@ -1,0 +1,9 @@
+name: '[[ with op variable (compare with test-builtin.test.sh)'
+dialect: bash
+source: oils:spec/dbracket#with-op-variable-compare-with-test-builtintestsh
+status: 2
+---
+# Parse error -- parsed BEFORE evaluation of vars
+op='=='
+[[ a $op a ]] && echo true
+[[ a $op b ]] || echo false

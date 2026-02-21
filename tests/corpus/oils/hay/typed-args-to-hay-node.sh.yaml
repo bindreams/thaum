@@ -1,0 +1,19 @@
+name: Typed Args to Hay Node
+dialect: bash
+source: oils:spec/hay#typed-args-to-hay-node
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define when
+
+# Hm I get 'too many typed args'
+# Ah this is because of 'haynode'
+# 'haynode' could silently pass through blocks and typed args?
+
+when NAME [x > 0] { 
+  const version = '1.0'
+  const other = 'str'
+}
+
+= _hay()

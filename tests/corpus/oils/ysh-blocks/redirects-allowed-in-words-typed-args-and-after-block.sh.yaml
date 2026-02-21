@@ -1,0 +1,24 @@
+name: redirects allowed in words, typed args, and after block
+dialect: bash
+source: 
+  oils:spec/ysh-blocks#redirects-allowed-in-words-typed-args-and-after-block
+stdout: "1 /tmp\n2 /tmp\n3 /tmp\n4 /tmp\n"
+---
+shopt -s ysh:upgrade
+
+rm -f out
+touch out
+
+cd /tmp >>out {
+  echo 1 $PWD
+}
+
+cd /tmp >>out (; ; ^(echo 2 $PWD))
+
+cd /tmp (; ; ^(echo 3 $PWD)) >>out
+
+cd /tmp {
+  echo 4 $PWD
+} >> out
+
+cat out

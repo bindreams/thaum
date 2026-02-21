@@ -1,0 +1,13 @@
+name: s ~~ glob and s !~~ glob
+dialect: bash
+source: oils:spec/ysh-expr#s-glob-and-s-glob
+stdout: "yes\nno\n"
+---
+shopt -s ysh:all
+
+if ('foo.py' ~~ '*.py') {
+  echo yes
+}
+if ('foo.py' !~~ '*.sh') {
+  echo no
+}

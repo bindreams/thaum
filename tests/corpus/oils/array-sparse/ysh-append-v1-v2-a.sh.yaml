@@ -1,0 +1,11 @@
+name: (YSH) append v1 v2... (a)
+dialect: bash
+source: oils:spec/array-sparse#ysh-append-v1-v2-a
+stdout: "(BashArray [0]='1' [2]='3' [3]='x' [4]='y' [5]='z')\n"
+---
+case $SH in bash|mksh) exit ;; esac
+
+a=(1 2 3)
+unset -v 'a[1]'
+append 'x' 'y' 'z' (a)
+= a

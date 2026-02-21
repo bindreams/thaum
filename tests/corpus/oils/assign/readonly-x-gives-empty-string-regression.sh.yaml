@@ -1,0 +1,7 @@
+name: readonly x= gives empty string (regression)
+dialect: bash
+source: oils:spec/assign#readonly-x-gives-empty-string-regression
+stdout: "['']\n"
+---
+readonly x=
+argv.py "$x"

@@ -1,0 +1,18 @@
+name: pp proc
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-proc
+stdout: "proc_name\tdoc_comment\nf\t\"doc ' comment with \\\" quotes\"\ng\t\"\"\n\
+  myproc\t\"YSH-style proc\"\nproc-none\t\"\"\nshfunc-none\t\"\"\n\"true\"\t\"Special
+  quoting rule\"\n---\nproc_name\tdoc_comment\nf\t\"doc ' comment with \\\" quotes\"\
+  \n"
+---
+shopt --set ysh:upgrade
+
+# This has to be a separate file because sh_spec.py strips comments!
+. $REPO_ROOT/spec/testdata/doc-comments.sh
+
+pp proc
+echo ---
+
+# print one
+pp proc f

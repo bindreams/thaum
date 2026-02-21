@@ -1,0 +1,11 @@
+name: strict_errexit allows singleton pipeline
+dialect: bash
+source: oils:spec/errexit-osh#stricterrexit-allows-singleton-pipeline
+stdout: "yes\n"
+---
+set -o errexit
+shopt -s strict_errexit || true
+
+if ! false; then
+  echo yes
+fi

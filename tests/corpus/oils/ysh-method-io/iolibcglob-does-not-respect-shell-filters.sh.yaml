@@ -1,0 +1,17 @@
+name: io.libcGlob() does not respect shell filters
+dialect: bash
+source: oils:spec/ysh-method-io#iolibcglob-does-not-respect-shell-filters
+stdout: "(List)   [\"-foo.txt\",\"foo.txt\"]\n(List)   [\"-foo.txt\",\"foo.txt\"]\n\
+  (List)   [\"-foo.txt\",\"foo.txt\"]\n"
+---
+touch -- .gitignore -foo.txt foo.txt
+
+pp test_ (io.libcGlob('*'))
+
+# NO effect
+shopt -s dotglob
+shopt --unset no_dash_glob
+pp test_ (io.libcGlob('*'))
+
+GLOBIGNORE='*.md'
+pp test_ (io.libcGlob('*'))

@@ -1,0 +1,15 @@
+name: zsh var sub is rejected at runtime
+dialect: bash
+source: oils:spec/zsh-idioms#zsh-var-sub-is-rejected-at-runtime
+stdout: "status=1\nstatus=1\nstatus=1\n"
+---
+
+eval 'echo z ${(m)foo} z'
+echo status=$?
+
+eval 'echo ${x:-${(m)foo}}'
+echo status=$?
+
+# double quoted
+eval 'echo "${(m)foo}"'
+echo status=$?

@@ -1,0 +1,10 @@
+name: xtrace a+=()
+dialect: bash
+source: oils:spec/array-sparse#xtrace-a
+stderr: "+ sp1+=(2)\n"
+---
+#case $SH in mksh) exit ;; esac
+
+sp1=(1)
+set -x
+sp1+=(2)

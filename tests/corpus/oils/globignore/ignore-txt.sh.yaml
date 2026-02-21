@@ -1,0 +1,10 @@
+name: Ignore *.txt
+dialect: bash
+source: oils:spec/globignore#ignore-txt
+stdout: "one.md foo/two.md foo/two.txt\n"
+---
+touch one.md one.txt
+mkdir -p foo
+touch foo/{two.md,two.txt}
+GLOBIGNORE=*.txt
+echo *.* foo/*.*

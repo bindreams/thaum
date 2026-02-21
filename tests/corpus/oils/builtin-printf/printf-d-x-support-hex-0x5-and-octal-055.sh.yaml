@@ -1,0 +1,26 @@
+name: printf %d %X support hex 0x5 and octal 055
+dialect: bash
+source: oils:spec/builtin-printf#printf-d-x-support-hex-0x5-and-octal-055
+stdout: "hex\n85\n55\nhex CAPS\n85\n55\noctal 3\n45\n2D\noctal 4\n45\n2D\noctal 5\n\
+  45\n2D\n"
+---
+
+echo hex
+printf '%d\n' 0x55
+printf '%X\n' 0x55
+
+echo hex CAPS
+printf '%d\n' 0X55
+printf '%X\n' 0X55
+
+echo octal 3
+printf '%d\n' 055
+printf '%X\n' 055
+
+echo octal 4
+printf '%d\n' 0055
+printf '%X\n' 0055
+
+echo octal 5
+printf '%d\n' 00055
+printf '%X\n' 00055

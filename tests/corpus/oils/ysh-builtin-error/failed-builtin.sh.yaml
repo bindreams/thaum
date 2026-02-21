@@ -1,0 +1,32 @@
+name: failed builtin
+dialect: bash
+source: oils:spec/ysh-builtin-error#failed-builtin
+stdout: "hi\nok 1\nok 2\n"
+---
+
+try {
+  echo hi
+}
+if failed {
+  echo 'should not get here'
+} else {
+  echo 'ok 1'
+}
+
+try {
+  #test -n ''
+
+  # Hm json read sets the regular error
+  # Should we raise error.Structured?
+  #json read <<< '{'
+
+  var x = fromJson('{')
+
+  # Hm the error is in a SUBPROCESS HERE
+  #echo '{' | json read
+}
+if failed {
+  echo 'ok 2'
+} else {
+  echo 'should not get here'
+}

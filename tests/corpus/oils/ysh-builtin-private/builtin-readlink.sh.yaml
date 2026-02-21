@@ -1,0 +1,13 @@
+name: builtin readlink
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-readlink
+stdout: "\n"
+---
+case $SH in bash) exit ;; esac
+
+echo TODO
+
+# turn this into a builtin
+# does that mean any builtin can be externalized?
+# - [ aka test is a good candiate
+# - we have stubs from true/false

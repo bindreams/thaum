@@ -1,0 +1,6 @@
+name: wait with jobspec syntax %nonexistent
+dialect: bash
+source: oils:spec/background#wait-with-jobspec-syntax-nonexistent
+status: 127
+---
+wait %nonexistent

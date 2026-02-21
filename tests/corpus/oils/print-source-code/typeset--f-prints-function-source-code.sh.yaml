@@ -1,0 +1,10 @@
+name: typeset -f prints function source code
+dialect: bash
+source: oils:spec/print-source-code#typeset--f-prints-function-source-code
+stdout: "serialized\n"
+---
+: prefix; myfunc() { echo serialized; }
+
+code=$(typeset -f myfunc)
+
+$SH -c "$code; myfunc"

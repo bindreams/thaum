@@ -1,0 +1,6 @@
+name: expansion with mixed quotes
+dialect: bash
+source: oils:spec/brace-expansion#expansion-with-mixed-quotes
+stdout: "-Xb- -cd-\n"
+---
+echo -{\X"b",'cd'}-

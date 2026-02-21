@@ -1,0 +1,17 @@
+name: bind -q
+dialect: bash
+source: oils:spec/builtin-bind#bind--q
+stdout: "status=1\nvi-subst is not bound to any keys.\nstatus=1\nyank can be invoked
+  via \"\\C-y\".\nstatus=0\n"
+---
+
+bind -q zz-bad
+echo status=$?
+
+# bash prints message to stdout
+
+bind -q vi-subst
+echo status=$?
+
+bind -q yank
+echo status=$?

@@ -1,0 +1,12 @@
+name: trap ERR and if statement
+dialect: bash
+source: oils:spec/builtin-trap-err#trap-err-and-if-statement
+stdout: "\n"
+---
+
+if test -f /nope; then echo file exists; fi
+
+trap 'echo err' ERR
+#trap 'echo line=$LINENO' ERR
+
+if test -f /nope; then echo file exists; fi

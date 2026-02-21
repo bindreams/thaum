@@ -1,0 +1,14 @@
+name: \(\) in pattern (regression)
+dialect: bash
+source: oils:spec/dbracket#in-pattern-regression
+stdout: "match1\nmatch2\nmatch1\nmatch2\n"
+---
+if [[ 'foo()' == *\(\) ]]; then echo match1; fi
+if [[ 'foo()' == *'()' ]]; then echo match2; fi
+if [[ 'foo()' == '*()' ]]; then echo match3; fi
+
+shopt -s extglob
+
+if [[ 'foo()' == *\(\) ]]; then echo match1; fi
+if [[ 'foo()' == *'()' ]]; then echo match2; fi
+if [[ 'foo()' == '*()' ]]; then echo match3; fi

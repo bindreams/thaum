@@ -1,0 +1,14 @@
+name: 'Bug: Nix idiom with closing ) next to pattern'
+dialect: bash
+source: oils:spec/regex#bug-nix-idiom-with-closing-next-to-pattern
+stdout: "one\ntwo\n"
+---
+
+if [[ ! (" ${params[*]} " =~ " -shared " || " ${params[*]} " =~ " -static ") ]]; then
+  echo one
+fi
+
+# Reduced idiom
+if [[ (foo =~ foo) ]]; then
+  echo two
+fi

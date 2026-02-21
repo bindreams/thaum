@@ -1,0 +1,6 @@
+name: read with smooshed args
+dialect: bash
+source: oils:spec/builtin-read#read-with-smooshed-args
+stdout: "var=h\n"
+---
+echo hi | { read -rn1 var; echo var=$var; }

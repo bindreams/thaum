@@ -1,0 +1,9 @@
+name: SIGINT and INT are aliases
+dialect: bash
+source: oils:spec/builtin-trap#sigint-and-int-are-aliases
+stdout: "0\n0\n"
+---
+trap - SIGINT
+echo $?
+trap - INT
+echo $?

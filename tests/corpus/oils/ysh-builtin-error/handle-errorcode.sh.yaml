@@ -1,0 +1,25 @@
+name: Handle _error.code
+dialect: bash
+source: oils:spec/ysh-builtin-error#handle-errorcode
+stdout: "PASS\nCASE PASS\n"
+---
+
+proc failing {
+  error 'failed' (code=99)
+}
+
+try {
+  failing
+}
+if (_error.code === 99) {
+  echo PASS
+}
+
+try {
+  failing
+}
+case (_error.code) {
+  (0)    { echo success }
+  (1)    { echo one }
+  (else) { echo CASE PASS }
+}

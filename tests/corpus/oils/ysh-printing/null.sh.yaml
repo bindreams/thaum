@@ -1,0 +1,6 @@
+name: 'Null'
+dialect: bash
+source: oils:spec/ysh-printing#null
+stdout: "(Null)  null\n"
+---
+= null

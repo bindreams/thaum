@@ -1,0 +1,15 @@
+name: Negative index with a[i]=v
+dialect: bash
+source: oils:spec/array-sparse#negative-index-with-aiv
+stdout: "declare -a sp1=([9]=x)\ndeclare -a sp1=([0]=D [2]=C [6]=B [9]=A)\n"
+---
+case $SH in mksh) exit ;; esac
+
+sp1[9]=x
+typeset -p sp1 | sed 's/"//g'
+
+sp1[-1]=A
+sp1[-4]=B
+sp1[-8]=C
+sp1[-10]=D
+typeset -p sp1 | sed 's/"//g'

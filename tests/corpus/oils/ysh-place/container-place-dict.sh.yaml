@@ -1,0 +1,15 @@
+name: Container Place (Dict)
+dialect: bash
+source: oils:spec/ysh-place#container-place-dict
+stdout: "\n"
+---
+
+var d = {key: 'hi'}
+
+echo zzz | read --all (&d.key)
+
+# I guess this works
+echo newkey | read --all (&d.newkey)
+
+echo key=$[d.key]
+echo key=$[d.newkey]

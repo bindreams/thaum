@@ -1,0 +1,9 @@
+name: Error when empty
+dialect: bash
+source: oils:spec/var-op-test#error-when-empty
+status: 1
+stdout: ''
+---
+empty=''
+echo ${empty:?'is em'pty}  # test eval of error
+echo should not get here

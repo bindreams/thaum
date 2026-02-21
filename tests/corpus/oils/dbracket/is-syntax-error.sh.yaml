@@ -1,0 +1,8 @@
+name: '[[ ]] is syntax error'
+dialect: bash
+source: oils:spec/dbracket#is-syntax-error
+status: 2
+stdout: ''
+---
+[[ ]]
+echo status=$?

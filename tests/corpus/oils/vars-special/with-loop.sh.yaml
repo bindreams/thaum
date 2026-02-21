@@ -1,0 +1,15 @@
+name: $_ with loop
+dialect: bash
+source: oils:spec/vars-special#with-loop
+stdout: "init\nbegin=init\nprev=begin=init\nprev=prev=begin=init\nprev=prev=prev=begin=init\n"
+---
+
+case $SH in dash|mksh) exit ;; esac
+
+# zsh resets it when in a loop
+
+echo init
+echo begin=$_
+for x in 1 2 3; do
+  echo prev=$_
+done

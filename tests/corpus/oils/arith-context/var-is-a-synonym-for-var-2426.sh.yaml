@@ -1,0 +1,7 @@
+name: $[$var is a synonym for $(($var (#2426)
+dialect: bash
+source: oils:spec/arith-context#var-is-a-synonym-for-var-2426
+stdout: "3\n"
+---
+var=1
+echo $[$var+2]

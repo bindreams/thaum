@@ -1,0 +1,58 @@
+name: Int constants bigger than 64 bits
+dialect: bash
+source: oils:spec/ysh-expr-arith#int-constants-bigger-than-64-bits
+stdout: "(Int)   1111\ndec=0\ndec=2\n(Int)   3\nbin=0\nbin=2\n(Int)   63\noct=0\n\
+  oct=2\n(Int)   255\nhex=0\nhex=2\n"
+---
+
+# Decimal
+$SH -c '
+var x = 1111
+pp test_ (x)
+'
+echo dec=$?
+
+$SH -c '
+var x = 1111_2222_3333_4444_5555_6666
+pp test_ (x)
+'
+echo dec=$?
+
+# Binary
+$SH -c '
+var x = 0b11
+pp test_ (x)
+'
+echo bin=$?
+
+$SH -c '
+var x = 0b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111
+pp test_ (x)
+'
+echo bin=$?
+
+# Octal
+$SH -c '
+var x = 0o77
+pp test_ (x)
+'
+echo oct=$?
+
+$SH -c '
+var x = 0o1111_2222_3333_4444_5555_6666
+pp test_ (x)
+'
+echo oct=$?
+
+# Hex
+$SH -c '
+var x = 0xff
+pp test_ (x)
+'
+echo hex=$?
+
+$SH -c '
+var x = 0xaaaa_bbbb_cccc_dddd_eeee_ffff
+pp test_ (x)
+'
+echo hex=$?

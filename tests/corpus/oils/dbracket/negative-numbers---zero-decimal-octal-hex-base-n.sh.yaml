@@ -1,0 +1,16 @@
+name: negative numbers - zero, decimal, octal, hex, base N
+dialect: bash
+source: oils:spec/dbracket#negative-numbers---zero-decimal-octal-hex-base-n
+stdout: "zero=0\ndecimal=0\noctal=0\nhex=0\nbaseN=0\n"
+---
+
+[[ -0 -eq 0 ]]; echo zero=$?
+
+[[ -42 -eq -42 ]]; echo decimal=$?
+
+# note: mksh doesn't do octal conversion
+[[ -0123 -eq -83 ]]; echo octal=$?
+
+[[ -0xff -eq -255 ]]; echo hex=$?
+
+[[ -64#a -eq -10 ]]; echo baseN=$?

@@ -1,0 +1,16 @@
+name: Str => split(), usage errors
+dialect: bash
+source: oils:spec/ysh-methods#str-split-usage-errors
+stdout: "status=3\nstatus=3\nstatus=3\nstatus=3\n(List)   [\"\",\"\"]\nstatus=0\n"
+---
+try { pp test_ ('abc'.split(''))             } # Sep cannot be ""
+echo status=$[_error.code]
+try { pp test_ ('abc'.split())               } # Sep must be present
+echo status=$[_error.code]
+try { pp test_ (b'\y00a\y01'.split(/ 'a' /)) } # Cannot split by eggex when str has NUL-byte
+echo status=$[_error.code]
+try { pp test_ (b'abc'.split(/ space* /))    } # Eggex cannot accept empty string
+echo status=$[_error.code]
+try { pp test_ (b'abc'.split(/ dot* /))      } # But in some cases the input doesn't cause an
+                                               # infinite loop, so we actually allow it!
+echo status=$[_error.code]

@@ -1,0 +1,25 @@
+name: read scope
+dialect: bash
+source: oils:spec/ysh-scope#read-scope
+stdout: "x_before=42\nx_after=dynamic-scope\nx=\n---\nx_before=42\nx_after=42\nx=\n"
+---
+set -o errexit
+
+read-x() {
+  echo dynamic-scope | read x
+}
+demo() {
+  local x=42
+  echo x_before=$x
+  read-x
+  echo x_after=$x
+}
+demo
+echo x=$x
+
+echo ---
+
+# Now 'read x' creates a local variable
+shopt --unset dynamic_scope
+demo
+echo x=$x

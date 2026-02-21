@@ -1,0 +1,28 @@
+name: Float Division
+dialect: bash
+source: oils:spec/ysh-expr-arith#float-division
+stdout: "(Float)   2.5\n(Float)   -2.5\n(Float)   -2.5\n(Float)   2.5\n---\n(Float)\
+  \   4.5\n(Float)   -4.5\n(Float)   -4.5\n(Float)   4.5\n"
+---
+pp test_ (5/2)
+pp test_ (-5/2)
+pp test_ (5/-2)
+pp test_ (-5/-2)
+
+echo ---
+
+var x = 9
+setvar x /= 2
+pp test_ (x)
+
+var x = -9
+setvar x /= 2
+pp test_ (x)
+
+var x = 9
+setvar x /= -2
+pp test_ (x)
+
+var x = -9
+setvar x /= -2
+pp test_ (x)

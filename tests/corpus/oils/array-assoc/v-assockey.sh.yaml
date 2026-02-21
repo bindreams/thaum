@@ -1,0 +1,50 @@
+name: '[[ -v assoc[key] ]]'
+dialect: bash
+source: oils:spec/array-assoc#v-assockey
+stdout: "no quotes\nempty=0\nk=0\nnonexistent=1\n\nquotes\nempty=0\nk=0\nnonexistent=1\n\
+  \nvars\nempty=0\nk=0\nnonexistent=1\n"
+---
+
+typeset -A assoc
+assoc=([empty]='' [k]=v)
+
+echo 'no quotes'
+
+[[ -v assoc[empty] ]]
+echo empty=$?
+
+[[ -v assoc[k] ]]
+echo k=$?
+
+[[ -v assoc[nonexistent] ]]
+echo nonexistent=$?
+
+echo
+
+# Now with quotes
+echo 'quotes'
+
+[[ -v assoc["empty"] ]]
+echo empty=$?
+
+[[ -v assoc['k'] ]]
+echo k=$?
+
+[[ -v assoc['nonexistent'] ]]
+echo nonexistent=$?
+
+echo
+
+echo 'vars'
+
+key=empty
+[[ -v assoc[$key] ]]
+echo empty=$?
+
+key=k
+[[ -v assoc[$key] ]]
+echo k=$?
+
+key=nonexistent
+[[ -v assoc[$key] ]]
+echo nonexistent=$?

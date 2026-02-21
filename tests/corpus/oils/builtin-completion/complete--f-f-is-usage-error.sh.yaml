@@ -1,0 +1,15 @@
+name: complete -F f is usage error
+dialect: bash
+source: oils:spec/builtin-completion#complete--f-f-is-usage-error
+stdout: "status=0\nstatus=2\n"
+---
+
+#complete -F f cmd
+
+# Alias for complete -p
+complete > /dev/null  # ignore OSH output for now
+echo status=$?
+
+# But this is an error
+complete -F f
+echo status=$?

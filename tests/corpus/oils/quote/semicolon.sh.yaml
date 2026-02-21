@@ -1,0 +1,10 @@
+name: Semicolon
+dialect: bash
+source: oils:spec/quote#semicolon
+stdout: "separated\nby semi-colon\n"
+---
+echo separated; echo by semi-colon
+
+#
+# TODO: Variable substitution operators.
+#

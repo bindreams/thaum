@@ -1,0 +1,12 @@
+name: OSH behavior
+dialect: bash
+source: oils:spec/ysh-options-assign#osh-behavior
+stdout: "status=0\nx=1\nstatus=127\ny=\n"
+---
+x=1
+echo status=$?
+echo x=$x
+
+y = 2
+echo status=$?
+echo y=$y

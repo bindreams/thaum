@@ -1,0 +1,10 @@
+name: Negative numbers with %
+dialect: bash
+source: oils:spec/arith#negative-numbers-with
+stdout: "1\n-1\n1\n-1\n"
+---
+
+echo $(( 10 % 3))
+echo $((-10 % 3))
+echo $(( 10 % -3))
+echo $((-10 % -3))

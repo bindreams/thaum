@@ -1,0 +1,12 @@
+name: var a, b  does implicit null init
+dialect: bash
+source: oils:spec/ysh-assign#var-a-b-does-implicit-null-init
+stdout: "null null null null null\n"
+---
+
+var x
+var a, b
+
+var c: Int, d: Int
+
+echo $x $a $b $c $d

@@ -1,0 +1,10 @@
+name: Mixed case char expansion is invalid
+dialect: bash
+source: oils:spec/brace-expansion#mixed-case-char-expansion-is-invalid
+status: 2
+stdout: ''
+---
+case $SH in *zsh) echo BUG; exit ;; esac
+echo -{z..A}-
+echo -{z..A..2}-
+# This is exposed a weird bash bug!!!

@@ -1,0 +1,11 @@
+name: use foo.ysh --pick a b
+dialect: bash
+source: oils:spec/ysh-builtin-module#use-fooysh---pick-a-b
+stdout: "(Int)   3\n(Int)   2\n"
+---
+
+use $REPO_ROOT/spec/testdata/module2/builtins.ysh --pick mylen mylen2
+
+pp test_ (mylen([3,4,5]))
+
+pp test_ (mylen2([4,5]))

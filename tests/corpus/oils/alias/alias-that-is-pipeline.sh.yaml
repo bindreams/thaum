@@ -1,0 +1,8 @@
+name: Alias that is pipeline
+dialect: bash
+source: oils:spec/alias#alias-that-is-pipeline
+stdout: "3\n"
+---
+shopt -s expand_aliases
+alias t1='echo hi|wc -c'
+t1

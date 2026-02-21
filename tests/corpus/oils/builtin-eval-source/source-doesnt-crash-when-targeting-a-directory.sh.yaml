@@ -1,0 +1,10 @@
+name: source doesn't crash when targeting a directory
+dialect: bash
+source: 
+  oils:spec/builtin-eval-source#source-doesnt-crash-when-targeting-a-directory
+stdout: "status=1\n"
+---
+cd $TMP
+mkdir -p dir
+. ./dir/
+echo status=$?

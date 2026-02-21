@@ -1,0 +1,18 @@
+name: fc -lnr lists history commands without numbers in reverse order
+dialect: bash
+source: 
+  oils:spec/builtin-fc#fc--lnr-lists-history-commands-without-numbers-in-reverse-order
+stdout: "\t echo 3\n\t echo 2\n\t echo 1\n\t history -r\n^D\n"
+---
+printf "echo %s\n" {1..3} > tmp
+
+echo '
+HISTFILE=tmp
+history -c
+history -r
+
+fc -lnr
+' | $SH --norc -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

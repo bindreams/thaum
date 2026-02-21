@@ -1,0 +1,7 @@
+name: Shifting too far
+dialect: bash
+source: oils:spec/builtin-misc#shifting-too-far
+status: 1
+---
+set -- 1
+shift 2

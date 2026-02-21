@@ -1,0 +1,13 @@
+name: BashAssoc ${a[@]@Q}
+dialect: bash
+source: oils:spec/array-assoc#bashassoc-aq
+stdout: "[$'\\'\\'' '\"' '()<>&|' '[]*?']\n[$'\\'\\'' '\"' '()<>&|' '[]*?']\n"
+---
+
+declare -A a=()
+a['symbol1']=\'\'
+a['symbol2']='"'
+a['symbol3']='()<>&|'
+a['symbol4']='[]*?'
+echo "[${a[@]@Q}]"
+echo "[${a[*]@Q}]"

@@ -1,0 +1,16 @@
+name: read --raw-line
+dialect: bash
+source: oils:spec/ysh-builtins#read---raw-line
+stdout: "reply=hi\nlen=2\npass\n"
+---
+
+shopt --set parse_ysh_expr_sub
+
+echo hi | read --raw-line
+echo "reply=$_reply"
+echo len=$[len(_reply)]
+
+echo hi | read -r
+if test "$REPLY" = "$_reply"; then
+  echo pass
+fi

@@ -1,0 +1,8 @@
+name: Syntax error after expansion
+dialect: bash
+source: oils:spec/alias#syntax-error-after-expansion
+status: 2
+---
+shopt -s expand_aliases  # bash requires this
+alias e_=';; oops'
+e_ x

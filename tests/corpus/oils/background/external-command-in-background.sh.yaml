@@ -1,0 +1,7 @@
+name: External command in background
+dialect: bash
+source: oils:spec/background#external-command-in-background
+stdout: ''
+---
+sleep 0.01 &
+wait

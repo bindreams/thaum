@@ -1,0 +1,10 @@
+name: Using an array itself as the index on RHS
+dialect: bash
+source: oils:spec/array#using-an-array-itself-as-the-index-on-rhs
+status: 0
+stdout: "2\n"
+---
+shopt -u strict_arith
+a=(1 2 3)
+(( x = a[a] ))
+echo $x

@@ -1,0 +1,10 @@
+name: '%() array literal'
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#array-literal
+stdout: "one two\n"
+---
+
+shopt --set parse_at
+
+var x = %(one two)
+echo @x

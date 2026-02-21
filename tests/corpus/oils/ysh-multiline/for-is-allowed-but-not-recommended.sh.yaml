@@ -1,0 +1,21 @@
+name: "'... for' is allowed, but NOT recommended"
+dialect: bash
+source: oils:spec/ysh-multiline#for-is-allowed-but-not-recommended
+stdout: "foo\nbar\nfoo\nbar\n"
+---
+... for x in foo bar; do echo $x; done
+    ;
+
+... for x in foo bar; do
+      echo $x;
+    done
+    ;
+
+return
+
+# This style gets messed up because of translation, but that is EXPECTED.
+... for x in foo bar
+    do
+      echo $x;
+    done
+    ;

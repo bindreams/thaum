@@ -1,0 +1,14 @@
+name: Globbing not allowed
+dialect: bash
+source: oils:spec/ysh-purity#globbing-not-allowed
+stdout: "\n"
+---
+
+# TODO: should be @[io.glob('*.txt')]
+# That is a bit verbose
+var cmd = ^(
+  echo *.txt
+)
+
+call io->eval(cmd)
+call eval(cmd)

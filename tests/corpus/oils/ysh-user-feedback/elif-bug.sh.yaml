@@ -1,0 +1,14 @@
+name: elif bug
+dialect: bash
+source: oils:spec/ysh-user-feedback#elif-bug
+stdout: "A\n"
+---
+if (true) {
+  echo A
+} elif (true) {
+  echo B
+} elif (true) {
+  echo C
+} else {
+  echo else
+}

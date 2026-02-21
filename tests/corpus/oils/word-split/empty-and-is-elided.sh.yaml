@@ -1,0 +1,7 @@
+name: empty $@ and $* is elided
+dialect: bash
+source: oils:spec/word-split#empty-and-is-elided
+stdout: "['1', '2']\n"
+---
+fun() { argv.py 1 $@ $* 2; }
+fun

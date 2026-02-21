@@ -1,0 +1,14 @@
+name: write --
+dialect: bash
+source: oils:spec/ysh-builtins#write
+status: 2
+stdout: "\n--\ndone\n"
+---
+shopt -s ysh:all
+write --
+# This is annoying
+write -- --
+write done
+
+# this is a syntax error!  Doh.
+write ---

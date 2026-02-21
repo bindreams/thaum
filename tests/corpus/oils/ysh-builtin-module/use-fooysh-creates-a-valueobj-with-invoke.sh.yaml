@@ -1,0 +1,14 @@
+name: use foo.ysh creates a value.Obj with __invoke__
+dialect: bash
+source: oils:spec/ysh-builtin-module#use-fooysh-creates-a-valueobj-with-invoke
+stdout: "caller_no_leak = null\nlog hello\ndie hello there\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/util.ysh
+
+# This is a value.Obj
+#pp test_ (util)
+
+util log 'hello'
+util die 'hello there'

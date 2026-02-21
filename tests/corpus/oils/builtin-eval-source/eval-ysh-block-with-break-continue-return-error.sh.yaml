@@ -1,0 +1,33 @@
+name: eval YSH block with 'break continue return error'
+dialect: bash
+source: 
+  oils:spec/builtin-eval-source#eval-ysh-block-with-break-continue-return-error
+status: 1
+stdout: "--- break\n1\nend func\n--- continue\n1\n2\nend func\n--- return\n1\n---
+  false\n1\n"
+---
+case $SH in dash|bash*|mksh|zsh) exit ;; esac
+
+shopt -s ysh:all
+
+proc proc_that_evals(; ; ;b) {
+  for i in 1 2; do
+    echo $i
+    call io->eval(b)
+  done
+  echo 'end func'
+}
+
+var cases = [
+  ['break', ^(break)],
+  ['continue', ^(continue)],
+  ['return', ^(return)],
+  ['false', ^(false)],
+]
+
+for test_case in (cases) {
+  var code_str, block = test_case
+  echo "--- $code_str"
+  proc_that_evals (; ; block)
+}
+echo status=$?

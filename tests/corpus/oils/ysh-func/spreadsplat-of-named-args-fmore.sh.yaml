@@ -1,0 +1,15 @@
+name: 'Spread/splat of named args: f(...more)'
+dialect: bash
+source: oils:spec/ysh-func#spreadsplat-of-named-args-fmore
+stdout: "9 10\n3 4\n"
+---
+
+func f(; x, y) {
+  echo "$x $y"
+}
+
+call f(; x=9, y=10)
+
+var args = {x: 3, y: 4}
+
+call f(; ...args)

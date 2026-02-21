@@ -1,0 +1,9 @@
+name: Proc-style return in a func is error
+dialect: bash
+source: oils:spec/ysh-func#proc-style-return-in-a-func-is-error
+status: 2
+stdout: "\n"
+---
+func t() { return 0 }
+
+= t()

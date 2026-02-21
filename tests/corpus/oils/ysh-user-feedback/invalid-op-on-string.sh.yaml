@@ -1,0 +1,15 @@
+name: Invalid op on string
+dialect: bash
+source: oils:spec/ysh-user-feedback#invalid-op-on-string
+status: 3
+stdout: "email\n"
+---
+shopt -s ysh:all
+
+var clients = {'email': 'foo', 'e2': 'bar'}
+for c in (clients) {
+  echo $c
+  # A user tickled this.  I think this should make the whole 'const' line fail
+  # with code 1 or 2?
+  const e = c.email
+}

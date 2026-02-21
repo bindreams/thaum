@@ -1,0 +1,24 @@
+name: Two kinds of tilde expansion
+dialect: bash
+source: oils:spec/brace-expansion#two-kinds-of-tilde-expansion
+stdout: "/home/bob/src /root\n-- /home/bob/src\n-- /root\n== /home/bob/src\n== /root\n"
+---
+
+HOME=/home/bob
+
+# Command
+echo ~{/src,root}
+
+# Loop
+
+for x in ~{/src,root}; do
+  echo -- $x
+done
+
+# Array
+
+a=(~{/src,root})
+
+for y in "${a[@]}"; do
+  echo "== $y"
+done

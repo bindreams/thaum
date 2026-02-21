@@ -1,0 +1,10 @@
+name: ENV works in different modules
+dialect: bash
+source: oils:spec/ysh-env#env-works-in-different-modules
+stdout: "env.ysh\nOSH ok\n"
+---
+shopt -s ysh:upgrade
+
+setglobal ENV.PS4 = '%%% '
+
+use $[ENV.REPO_ROOT]/spec/testdata/module2/env.ysh

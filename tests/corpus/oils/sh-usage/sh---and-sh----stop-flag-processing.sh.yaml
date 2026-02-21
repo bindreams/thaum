@@ -1,0 +1,21 @@
+name: sh - and sh -- stop flag processing
+dialect: bash
+source: oils:spec/sh-usage#sh---and-sh----stop-flag-processing
+stdout: "foo\n-\nfoo\n"
+stderr: "echo foo\n+ echo foo\n-\necho foo\n+ echo foo\n"
+---
+case $SH in zsh) exit ;; esac
+
+echo 'echo foo' > foo.sh
+
+$SH -x -v -- foo.sh
+
+echo -  
+echo - >& 2
+
+$SH -x -v - foo.sh
+
+
+# I think it turns off -x -v with -
+
+# set -o verbose not implemented for now

@@ -1,0 +1,6 @@
+name: echo =word is allowed
+dialect: bash
+source: oils:spec/parse-errors#echo-word-is-allowed
+stdout: "=word\n"
+---
+echo =word

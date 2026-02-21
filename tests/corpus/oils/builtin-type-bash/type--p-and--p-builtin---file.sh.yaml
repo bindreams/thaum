@@ -1,0 +1,12 @@
+name: type -p and -P builtin -> file
+dialect: bash
+source: oils:spec/builtin-type-bash#type--p-and--p-builtin---file
+stdout: "/tmp/mv\n/tmp/tar\n/tmp/grep\n--\n/tmp/mv\n/tmp/tar\n/tmp/grep\n"
+---
+touch /tmp/{mv,tar,grep}
+chmod +x /tmp/{mv,tar,grep}
+PATH=/tmp:$PATH
+
+type -p mv tar grep
+echo --
+type -P mv tar grep

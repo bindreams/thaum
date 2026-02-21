@@ -1,0 +1,7 @@
+name: '|&'
+dialect: bash
+source: oils:spec/pipeline#unnamed
+status: 0
+stdout: "STDERR\nSTDOUT\n"
+---
+stdout_stderr.py |& cat

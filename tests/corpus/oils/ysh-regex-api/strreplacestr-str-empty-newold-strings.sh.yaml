@@ -1,0 +1,12 @@
+name: Str.replace(Str, Str), empty new/old strings
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplacestr-str-empty-newold-strings
+stdout: "a\nnewanewbnewcnewanew\nnewabca\nnewanewbnewcnewanew\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var mystr = 'abca'
+write $[mystr.replace('abc', '')]            # Empty substitution
+write $[mystr.replace('', 'new')]            # Empty substring
+write $[mystr.replace('', 'new', count=1)]   # Empty substring, count != -1
+write $[mystr.replace('', 'new', count=10)]  # Empty substring, count too large

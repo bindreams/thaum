@@ -1,0 +1,11 @@
+name: '%10.5(strftime format)T'
+dialect: bash
+source: oils:spec/builtin-printf#105strftime-formatt
+stdout: "[     2019-]\n[     2019-]\nstatus=0\n"
+---
+# The result depends on timezone
+export TZ=Asia/Tokyo
+printf '[%10.5(%Y-%m-%d)T]\n' 1557978599
+export TZ=US/Eastern
+printf '[%10.5(%Y-%m-%d)T]\n' 1557978599
+echo status=$?

@@ -1,0 +1,8 @@
+name: Remove const suffix is vectorized on user array
+dialect: bash
+source: oils:spec/var-op-strip#remove-const-suffix-is-vectorized-on-user-array
+status: 0
+stdout: "['1', '2', '3']\n"
+---
+a=(1a 2a 3a)
+argv.py ${a[@]%a}

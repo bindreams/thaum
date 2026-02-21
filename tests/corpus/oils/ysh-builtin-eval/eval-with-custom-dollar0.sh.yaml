@@ -1,0 +1,7 @@
+name: eval with custom dollar0
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-with-custom-dollar0
+stdout: "my arg0\n"
+---
+var b = ^(write $0)
+call io->eval(b, dollar0="my arg0")

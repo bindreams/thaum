@@ -1,0 +1,10 @@
+name: Tilde expansion within for loop
+dialect: bash
+source: oils:spec/loop#tilde-expansion-within-for-loop
+---
+HOME=/home/bob
+for name in ~/src ~/git; do
+  echo $name
+done
+/home/bob/src
+/home/bob/git

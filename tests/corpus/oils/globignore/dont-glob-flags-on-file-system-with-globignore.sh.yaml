@@ -1,0 +1,10 @@
+name: Don't glob flags on file system with GLOBIGNORE
+dialect: bash
+source: oils:spec/globignore#dont-glob-flags-on-file-system-with-globignore
+status: 0
+stdout: "-* hello zzzz?\n"
+---
+touch _tmp/-n _tmp/zzzzz
+cd _tmp
+GLOBIGNORE=-*:zzzzz  # colon-separated pattern list
+echo -* hello zzzz?

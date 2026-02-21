@@ -1,0 +1,10 @@
+name: ${undef:-~}
+dialect: bash
+source: oils:spec/tilde#undef
+stdout: "/home/bar\n/home/bar/z\n~\n~\n"
+---
+HOME=/home/bar
+echo ${undef:-~}
+echo ${HOME:+~/z}
+echo "${undef:-~}"
+echo ${undef:-"~"}

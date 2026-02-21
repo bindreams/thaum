@@ -1,0 +1,7 @@
+name: YSH shows options correctly (bug fix)
+dialect: bash
+source: oils:spec/ysh-usage#ysh-shows-options-correctly-bug-fix
+stdout: "set -o errexit\nset -o pipefail\n"
+---
+
+$[ENV.SH] -o | egrep 'errexit|pipefail'

@@ -1,0 +1,26 @@
+name: More test --true --false
+dialect: bash
+source: oils:spec/ysh-builtins#more-test---true---false
+stdout: "dict=1\ndict=0\n\nAndOr\n"
+---
+shopt --set ysh:upgrade
+
+var d = {}
+
+try {
+  test --true $[bool(d)]
+}
+echo dict=$[_error.code]
+
+setvar d.key = 'val'
+
+try {
+  test --true $[bool(d)]
+}
+echo dict=$[_error.code]
+
+echo
+
+if test --true $[bool(d)] && ! test -f / {
+  echo AndOr
+}

@@ -1,0 +1,18 @@
+name: ulimit of 2**32, 2**31 (int overflow)
+dialect: bash
+source: oils:spec/builtin-process#ulimit-of-232-231-int-overflow
+stdout: "one unlimited\ntwo 4294967296\nthree 2147483648\n"
+---
+
+echo -n 'one '; ulimit -f
+
+
+ulimit -f $(( 1 << 32 ))
+
+echo -n 'two '; ulimit -f
+
+
+# mksh fails because it overflows signed int, turning into negative number
+ulimit -f $(( 1 << 31 ))
+
+echo -n 'three '; ulimit -f

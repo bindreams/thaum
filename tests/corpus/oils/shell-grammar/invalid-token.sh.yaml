@@ -1,0 +1,7 @@
+name: Invalid token
+dialect: bash
+source: oils:spec/shell-grammar#invalid-token
+status: 99
+---
+invalid
+# TODO: change these to qualifiers!

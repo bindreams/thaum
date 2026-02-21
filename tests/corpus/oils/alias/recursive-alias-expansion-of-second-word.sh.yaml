@@ -1,0 +1,10 @@
+name: Recursive alias expansion of SECOND word
+dialect: bash
+source: oils:spec/alias#recursive-alias-expansion-of-second-word
+stdout: "one TWO hello world\n"
+---
+shopt -s expand_aliases  # bash requires this
+alias one='ONE '
+alias two='TWO '
+alias e_='echo one '
+e_ two hello world

@@ -1,0 +1,18 @@
+name: printf / echo -e do NOT check max code point at runtime
+dialect: bash
+source: oils:spec/unicode#printf-echo--e-do-not-check-max-code-point-at-runtime
+stdout: "status=0\n'\\xf4\\x90\\x80\\x80'\nstatus=0\n'\\xf4\\x90\\x80\\x80'\n"
+---
+case $SH in mksh) exit ;; esac
+
+py-repr() {
+  python2 -c 'import sys; print repr(sys.argv[1])'  "$@"
+}
+
+e="$(echo -e '\U00110000')"
+echo status=$?
+py-repr "$e"
+
+p="$(printf '\U00110000')"
+echo status=$?
+py-repr "$p"

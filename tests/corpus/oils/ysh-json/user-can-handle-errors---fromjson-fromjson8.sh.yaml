@@ -1,0 +1,30 @@
+name: User can handle errors - fromJson() fromJson8()
+dialect: bash
+source: oils:spec/ysh-json#user-can-handle-errors---fromjson-fromjson8
+status: 4
+stdout: "status=4\ndecode error Expected Id.J8_RBracket\nstatus=4\ndecode error Expected
+  Id.J8_RBracket\npositions 1 - 2\n"
+---
+shopt -s ysh:upgrade
+
+var message ='[42,1.5,null,true,"hi"'
+
+try {
+  var obj = fromJson(message)
+}
+echo status=$[_error.code]
+echo "decode error $[_error.message]" | egrep -o '.*Expected.*RBracket'
+
+try {
+  var obj = fromJson8(message)
+}
+echo status=$[_error.code]
+echo "decode error $[_error.message]" | egrep -o '.*Expected.*RBracket'
+
+try {
+  var obj = fromJson('[+]')
+}
+echo "positions $[_error.start_pos] - $[_error.end_pos]"
+
+# This makes the interpreter fail with a message
+var obj = fromJson(message)

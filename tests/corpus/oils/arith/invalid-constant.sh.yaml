@@ -1,0 +1,17 @@
+name: Invalid constant
+dialect: bash
+source: oils:spec/arith#invalid-constant
+status: 1
+stdout: "0\nstatus=0\nstatus=1\n"
+---
+
+echo $((a + x42))
+echo status=$?
+
+# weird asymmetry -- the above is a syntax error, but this isn't
+$SH -c 'echo $((a + 42x))'
+echo status=$?
+
+# regression
+echo $((a + 42x))
+echo status=$?

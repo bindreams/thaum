@@ -1,0 +1,22 @@
+name: Obj API
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#obj-api
+stdout: "(Obj)   (\"x\":4)\n0\n(Dict)   {\"x\":4}\n0\n(Null)   null\n0\n"
+---
+shopt --set ysh:upgrade
+
+try {
+  var obj = Object(null, {x: 4})
+  pp test_ (obj)
+}
+echo $[_error.code]
+
+try {
+  pp test_ (propView(obj))
+}
+echo $[_error.code]
+
+try {
+  pp test_ (prototype(obj))
+}
+echo $[_error.code]

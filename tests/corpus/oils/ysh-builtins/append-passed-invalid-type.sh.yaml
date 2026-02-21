@@ -1,0 +1,8 @@
+name: append passed invalid type
+dialect: bash
+source: oils:spec/ysh-builtins#append-passed-invalid-type
+status: 3
+---
+s=''
+append a b (s)
+echo status=$?

@@ -1,0 +1,21 @@
+name: shvar builtin syntax
+dialect: bash
+source: oils:spec/ysh-scope#shvar-builtin-syntax
+stdout: "status=2\nstatus=2\nstatus=2\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+
+# no block
+shvar
+echo status=$?
+
+shvar {  # no arg
+  true
+}
+echo status=$?
+
+shvar foo {  # should be name=value
+  true
+}
+echo status=$?

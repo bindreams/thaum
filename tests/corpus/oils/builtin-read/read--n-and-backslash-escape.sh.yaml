@@ -1,0 +1,9 @@
+name: read -n and backslash escape
+dialect: bash
+source: oils:spec/builtin-read#read--n-and-backslash-escape
+stdout: "['abcde']\n['a    ']\n"
+---
+case $SH in zsh) exit 99;; esac  # read -n not implemented
+
+echo 'a\b\c\d\e\f' | (read -n 5; argv.py "$REPLY")
+echo 'a\ \ \ \ \ ' | (read -n 5; argv.py "$REPLY")

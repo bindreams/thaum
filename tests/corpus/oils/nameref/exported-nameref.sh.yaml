@@ -1,0 +1,13 @@
+name: exported nameref
+dialect: bash
+source: oils:spec/nameref#exported-nameref
+stdout: "None\nx\n---\nfoo\nx\n"
+---
+x=foo
+typeset -n -x ref=x
+
+# hm bash ignores it but mksh doesn't.  maybe disallow it.
+printenv.py x ref
+echo ---
+export x
+printenv.py x ref

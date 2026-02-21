@@ -1,0 +1,17 @@
+name: renderPrompt() has wrong signature
+dialect: bash
+source: oils:spec/ysh-prompt#renderprompt-has-wrong-signature
+stdout: "hi\n^D\n"
+stderr: "<Runtime error: Func 'renderPrompt' takes no positional args, but got 1><Runtime
+  error: Func 'renderPrompt' takes no positional args, but got 1>"
+---
+
+setglobal ENV.PS1 = r'myprompt\$ '
+
+cat >yshrc <<'EOF'
+func renderPrompt() {
+  error 'oops'
+}
+EOF
+
+echo 'echo hi' | $[ENV.SH] -i --rcfile yshrc

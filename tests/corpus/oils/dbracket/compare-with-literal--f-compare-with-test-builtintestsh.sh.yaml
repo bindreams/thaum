@@ -1,0 +1,9 @@
+name: '[[ compare with literal -f (compare with test-builtin.test.sh)'
+dialect: bash
+source: 
+  oils:spec/dbracket#compare-with-literal--f-compare-with-test-builtintestsh
+stdout: "true\ntrue\n"
+---
+var=-f
+[[ $var == -f ]] && echo true
+[[ '-f' == $var ]] && echo true

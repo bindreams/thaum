@@ -1,0 +1,16 @@
+name: case word + redirect order
+dialect: bash
+source: oils:spec/redir-order#case-word-redirect-order
+stdout: "other\n"
+---
+
+echo hello > OSCFLAGS
+case `cat OSCFLAGS` in
+  hello)
+    echo hello
+    ;;
+  *)
+    echo other
+    ;;
+esac > OSCFLAGS
+cat OSCFLAGS

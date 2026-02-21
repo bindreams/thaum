@@ -1,0 +1,11 @@
+name: printf %6.4s does both truncation and padding
+dialect: bash
+source: oils:spec/builtin-printf#printf-64s-does-both-truncation-and-padding
+stdout: "[   foo]\n[   foo]\n[foo   ]\n[spam-eggs]\n[  spam]\n[spam  ]\n"
+---
+printf '[%6s]\n' foo
+printf '[%6.4s]\n' foo
+printf '[%-6.4s]\n' foo
+printf '[%6s]\n' spam-eggs
+printf '[%6.4s]\n' spam-eggs
+printf '[%-6.4s]\n' spam-eggs

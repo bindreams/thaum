@@ -1,0 +1,9 @@
+name: '[ compare with literal -f'
+dialect: bash
+source: oils:spec/builtin-bracket#compare-with-literal--f
+stdout: "true\ntrue\n"
+---
+# Hm this is the same
+var=-f
+[ $var = -f ] && echo true
+[ '-f' = $var ] && echo true

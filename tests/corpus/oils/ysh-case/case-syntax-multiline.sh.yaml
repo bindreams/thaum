@@ -1,0 +1,17 @@
+name: case syntax, multiline
+dialect: bash
+source: oils:spec/ysh-case#case-syntax-multiline
+status: 0
+stdout: "Python\n"
+---
+const x = "hello.py"
+case (x) {
+  *.h | *.cc {
+    echo C++
+    echo 2; echo 3
+  }
+  *.py {
+    echo \
+      Python
+  }
+}

@@ -1,0 +1,13 @@
+name: block arg as typed expression
+dialect: bash
+source: oils:spec/ysh-blocks#block-arg-as-typed-expression
+stdout: "/tmp\n/tmp\n"
+---
+
+shopt -s oil:all
+
+# literal
+cd /tmp (; ; ^(echo $PWD))
+
+const myblock = ^(echo $PWD)
+cd /tmp (; ; myblock)

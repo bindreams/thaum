@@ -1,0 +1,16 @@
+name: "one arg: [ x ] where x is one of '=' '!' '(' ']'"
+dialect: bash
+source: oils:spec/builtin-bracket#one-arg-x-where-x-is-one-of
+---
+[ = ]
+echo status=$?
+[ ] ]
+echo status=$?
+[ '!' ]
+echo status=$?
+[ '(' ]
+echo status=$?
+status=0
+status=0
+status=0
+status=0

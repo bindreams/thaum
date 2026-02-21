@@ -1,0 +1,49 @@
+name: Approximate equality of Str x {Str, Int, Bool} with ~==
+dialect: bash
+source: 
+  oils:spec/ysh-expr-compare#approximate-equality-of-str-x-str-int-bool-with
+stdout: "Str-Str\nStr-Int\nStr-Negative\nStr-Underscore\nStr-Bool\nbool matrix\n"
+---
+shopt -s ysh:all
+
+# Note: for now there's no !~== operator.  Use:   not (a ~== b)
+
+if (' foo ' ~== 'foo') {
+  echo Str-Str
+}
+if (' BAD ' ~== 'foo') {
+  echo FAIL
+}
+
+if ('3 ' ~== 3) {
+  echo Str-Int
+}
+
+if ('-3 ' ~== -3) {
+  echo Str-Negative
+}
+
+if ('-3_456' ~== -3456) {
+  echo Str-Underscore
+}
+
+if ('4 ' ~== '3') {
+  echo FAIL
+}
+
+if (' true ' ~== true) {
+  echo Str-Bool
+}
+if (' true ' ~== false) {
+  echo FAIL
+}
+
+const matrix = [
+  ' TRue ' ~== true,  # case insentiive
+  ' FALse ' ~== false,
+]
+
+# = matrix
+if (matrix === [true, true]) {
+  echo 'bool matrix'
+}

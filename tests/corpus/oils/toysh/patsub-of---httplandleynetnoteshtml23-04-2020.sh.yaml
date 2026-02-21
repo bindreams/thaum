@@ -1,0 +1,6 @@
+name: patsub of $* - http://landley.net/notes.html#23-04-2020
+dialect: bash
+source: oils:spec/toysh#patsub-of---httplandleynetnoteshtml23-04-2020
+stdout: "a b c d\n"
+---
+chicken() { echo ${*/b c/ghi}; }; chicken a b c d

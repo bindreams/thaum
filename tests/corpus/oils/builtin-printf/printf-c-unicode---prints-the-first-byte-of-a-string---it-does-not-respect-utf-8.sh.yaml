@@ -1,0 +1,19 @@
+name: printf %c unicode - prints the first BYTE of a string - it does not 
+  respect UTF-8
+dialect: bash
+source: 
+  oils:spec/builtin-printf#printf-c-unicode---prints-the-first-byte-of-a-string---it-does-not-respect-utf-8
+stdout: "[μμ]\n ce\n"
+---
+
+# TODO: in YSH, this should be deprecated
+case $SH in dash|ash) exit ;; esac
+
+show_bytes() {
+  od -A n -t x1
+}
+twomu=$'\u03bc\u03bc'
+printf '[%s]\n' "$twomu"
+
+# Hm this cuts off a UTF-8 character?
+printf '%c' "$twomu" | show_bytes

@@ -1,0 +1,6 @@
+name: echo -e with whitespace C escapes
+dialect: bash
+source: oils:spec/builtin-echo#echo--e-with-whitespace-c-escapes
+stdout: "\n\r\t\v\n"
+---
+echo -e '\n\r\t\v'

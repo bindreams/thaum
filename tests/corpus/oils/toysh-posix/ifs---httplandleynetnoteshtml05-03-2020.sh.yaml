@@ -1,0 +1,14 @@
+name: IFS - http://landley.net/notes.html#05-03-2020
+dialect: bash
+source: oils:spec/toysh-posix#ifs---httplandleynetnoteshtml05-03-2020
+stdout: "=one=\n=abc=\n=d f=\n=ghi=\n---\n=one=\n==\n=two=\n"
+---
+case $SH in zsh) exit ;; esac
+
+IFS=x
+chicken() { for i in "$@"; do echo =$i=; done;}
+chicken one abc dxf ghi
+
+echo ---
+myfunc() { "$SH" -c 'IFS=x; for i in $@; do echo =$i=; done' blah "$@"; }
+myfunc one "" two

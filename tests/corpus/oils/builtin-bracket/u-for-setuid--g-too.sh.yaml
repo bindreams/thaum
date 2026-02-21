@@ -1,0 +1,21 @@
+name: -u for setuid, -g too
+dialect: bash
+source: oils:spec/builtin-bracket#u-for-setuid--g-too
+stdout: "status=0\nstatus=1\nstatus=1\nstatus=0\n"
+---
+
+touch $TMP/setuid $TMP/setgid
+chmod u+s $TMP/setuid
+chmod g+s $TMP/setgid
+
+test -u $TMP/setuid
+echo status=$?
+
+test -u $TMP/setgid
+echo status=$?
+
+test -g $TMP/setuid
+echo status=$?
+
+test -g $TMP/setgid
+echo status=$?

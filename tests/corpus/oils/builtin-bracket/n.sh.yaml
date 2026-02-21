@@ -1,0 +1,7 @@
+name: -n
+dialect: bash
+source: oils:spec/builtin-bracket#n
+stdout: "true\nfalse\n"
+---
+test -n 'a'  && echo true
+test -n ''   || echo false

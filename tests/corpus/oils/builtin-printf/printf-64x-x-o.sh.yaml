@@ -1,0 +1,17 @@
+name: printf %6.4x X o
+dialect: bash
+source: oils:spec/builtin-printf#printf-64x-x-o
+stdout: "[  002a]\n[002a]\n[    2a]\n--\n[  002A]\n[002A]\n[    2A]\n--\n[  0052]\n\
+  [0052]\n[    52]\n"
+---
+printf '[%6.4x]\n' 42
+printf '[%.4x]\n' 42
+printf '[%6.x]\n' 42
+echo --
+printf '[%6.4X]\n' 42
+printf '[%.4X]\n' 42
+printf '[%6.X]\n' 42
+echo --
+printf '[%6.4o]\n' 42
+printf '[%.4o]\n' 42
+printf '[%6.o]\n' 42

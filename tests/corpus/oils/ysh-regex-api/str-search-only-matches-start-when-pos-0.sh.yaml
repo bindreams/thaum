@@ -1,0 +1,27 @@
+name: Str->search() only matches %start ^ when pos == 0
+dialect: bash
+source: oils:spec/ysh-regex-api#str-search-only-matches-start-when-pos-0
+stdout: "pat=^([[:digit:]]+)-\n12-\npat=([[:digit:]]+)-\n12-\n34-\n"
+---
+
+shopt -s ysh:upgrade
+
+var anchored = / %start <capture d+> '-' /
+var free = / <capture d+> '-' /
+
+var s = '12-34-'
+
+for pat in ([anchored, free]) {
+  echo "pat=$pat"
+
+  var pos = 0
+  while (true) {
+    var m = s.search(pat, pos=pos)
+    if (not m) {
+      break
+    }
+    echo $[m.group(0)]
+    setvar pos = m.end(0)
+  }
+
+}

@@ -1,0 +1,10 @@
+name: Parse errors for compgen -W and complete -W
+dialect: bash
+source: oils:spec/builtin-completion#parse-errors-for-compgen--w-and-complete--w
+stdout: "status=2\nstatus=2\n"
+---
+# bash doesn't detect as many errors because it lacks static parsing.
+compgen -W '${'
+echo status=$?
+complete -W '${' foo
+echo status=$?

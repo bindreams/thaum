@@ -1,0 +1,7 @@
+name: Env value doesn't persist
+dialect: bash
+source: oils:spec/assign#env-value-doesnt-persist
+stdout: "foo\n--\n"
+---
+FOO=foo printenv.py FOO
+echo -$FOO-

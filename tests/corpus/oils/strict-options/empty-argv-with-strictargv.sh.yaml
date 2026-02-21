@@ -1,0 +1,11 @@
+name: empty argv WITH strict_argv
+dialect: bash
+source: oils:spec/strict-options#empty-argv-with-strictargv
+status: 1
+stdout: "empty\n"
+---
+shopt -s strict_argv || true
+echo empty
+x=''
+$x
+echo status=$?

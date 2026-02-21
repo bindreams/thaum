@@ -1,0 +1,11 @@
+name: within braces, globstar works when there is a comma
+dialect: bash
+source: oils:spec/globstar#within-braces-globstar-works-when-there-is-a-comma
+stdout: "c/subdir/leaf.md\n"
+---
+shopt -s globstar
+
+mkdir -p c/subdir
+touch c/subdir/leaf.md
+
+echo {**/*.*,} | sort | sed 's/[[:space:]]*$//'

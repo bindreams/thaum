@@ -1,0 +1,16 @@
+name: 'cd builtin: return in block'
+dialect: bash
+source: oils:spec/ysh-control-flow#cd-builtin-return-in-block
+stdout: "one\n"
+---
+shopt -s ysh:all
+f() {
+  cd / {
+    echo one
+    return
+    echo two
+  }
+  # not reached, because we're turning out of f
+  echo 'end func'
+}
+f

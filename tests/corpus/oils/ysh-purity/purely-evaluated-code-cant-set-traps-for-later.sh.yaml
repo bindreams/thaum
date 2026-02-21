@@ -1,0 +1,14 @@
+name: Purely-evaluated code can't set traps for later
+dialect: bash
+source: oils:spec/ysh-purity#purely-evaluated-code-cant-set-traps-for-later
+stdout: "\n"
+---
+
+# this follows from 'no builtins', but probably good to test
+
+var cmd = ^(
+  trap 'echo INT' INT
+)
+
+call io->eval(cmd)
+call eval(cmd)

@@ -1,0 +1,12 @@
+name: expression literals, lazy evaluation
+dialect: bash
+source: oils:spec/ysh-expr#expression-literals-lazy-evaluation
+stdout: "result=1\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var x = 0
+var e = ^[x]
+
+setvar x = 1
+echo result=$[io->evalExpr(e)]

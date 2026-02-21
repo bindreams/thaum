@@ -1,0 +1,9 @@
+name: $(< $file) yields the contents of the file
+dialect: bash
+source: oils:spec/redirect-command#file-yields-the-contents-of-the-file
+stdout: "['2\\n3']\n"
+---
+
+seq 2 3 > myfile
+foo=$(< myfile)
+argv.py "$foo"

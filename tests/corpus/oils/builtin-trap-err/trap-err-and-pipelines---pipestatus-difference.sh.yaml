@@ -1,0 +1,36 @@
+name: trap ERR and pipelines - PIPESTATUS difference
+dialect: bash
+source: 
+  oils:spec/builtin-trap-err#trap-err-and-pipelines---pipestatus-difference
+stdout: "A\nerr [] status=1 [1]\nB\nerr [] status=1 [0 1]\nerr [] status=1 [0 1 0]\n\
+  ok\n"
+---
+case $SH in ash) exit ;; esac
+
+err() {
+  echo "err [$@] status=$? [${PIPESTATUS[@]}]"
+}
+trap 'err' ERR 
+
+echo A
+
+false
+
+# succeeds
+echo B | grep B
+
+# fails
+echo C | grep zzz
+
+echo D | grep zzz | cat
+
+set -o pipefail
+echo E | grep zzz | cat
+
+trap - ERR  # disable trap
+
+echo F | grep zz
+echo ok
+
+
+# we don't set PIPESTATUS unless we get a pipeline

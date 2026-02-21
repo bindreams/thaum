@@ -1,0 +1,11 @@
+name: NIL8 token in JSON / JSON8
+dialect: bash
+source: oils:spec/ysh-json#nil8-token-in-json-json8
+stdout: "status=1\nstatus=1\n"
+---
+
+echo "(" | json read
+echo status=$?
+
+echo ")" | json8 read
+echo status=$?

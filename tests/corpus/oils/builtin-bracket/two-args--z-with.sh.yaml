@@ -1,0 +1,16 @@
+name: 'two args: -z with = ! ( ]'
+dialect: bash
+source: oils:spec/builtin-bracket#two-args--z-with
+---
+[ -z = ]
+echo status=$?
+[ -z ] ]
+echo status=$?
+[ -z '!' ]
+echo status=$?
+[ -z '(' ]
+echo status=$?
+status=1
+status=1
+status=1
+status=1

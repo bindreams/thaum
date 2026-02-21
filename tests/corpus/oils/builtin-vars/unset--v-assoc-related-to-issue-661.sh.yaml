@@ -1,0 +1,19 @@
+name: 'unset -v assoc (related to issue #661)'
+dialect: bash
+source: oils:spec/builtin-vars#unset--v-assoc-related-to-issue-661
+stdout: "1\nkeys=1],a[1\nvals=foo\n0\nkeys=\nvals=\n"
+---
+
+case $SH in dash|mksh|zsh) return ;; esac
+
+declare -A dict=()
+key=1],a[1
+dict["$key"]=foo
+echo ${#dict[@]}
+echo keys=${!dict[@]}
+echo vals=${dict[@]}
+
+unset -v 'dict["$key"]'
+echo ${#dict[@]}
+echo keys=${!dict[@]}
+echo vals=${dict[@]}

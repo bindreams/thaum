@@ -1,0 +1,11 @@
+name: array over multiple lines
+dialect: bash
+source: oils:spec/array#array-over-multiple-lines
+status: 0
+stdout: "['1', '2 3']\n"
+---
+a=(
+1
+'2 3'
+)
+argv.py "${a[@]}"

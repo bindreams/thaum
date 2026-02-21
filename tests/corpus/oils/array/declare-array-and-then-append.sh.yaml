@@ -1,0 +1,9 @@
+name: declare array and then append
+dialect: bash
+source: oils:spec/array#declare-array-and-then-append
+stdout: "['a', 'b', 'c']\n"
+---
+declare -a array
+array+=(a)
+array+=(b c)
+argv.py "${array[@]}"

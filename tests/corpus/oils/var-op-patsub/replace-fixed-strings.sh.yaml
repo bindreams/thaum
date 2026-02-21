@@ -1,0 +1,7 @@
+name: Replace fixed strings
+dialect: bash
+source: oils:spec/var-op-patsub#replace-fixed-strings
+stdout: "yy_xx yy_yy yy_xx xx_yy\n"
+---
+s=xx_xx
+echo ${s/xx/yy} ${s//xx/yy} ${s/#xx/yy} ${s/%xx/yy}

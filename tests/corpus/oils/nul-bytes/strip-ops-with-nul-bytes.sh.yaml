@@ -1,0 +1,31 @@
+name: 'Strip ops # ## % %% with NUL bytes'
+dialect: bash
+source: oils:spec/nul-bytes#strip-ops-with-nul-bytes
+stdout: "len=1\n 2e\n---\nlen=0\nlen=0\nlen=0\nlen=0\n"
+---
+
+show_bytes() {
+  echo -n "$1" | od -A n -t x1
+}
+
+s=$(printf '\000.\000')
+echo len=${#s}
+show_bytes "$s"
+
+echo ---
+
+t=${s#?}
+echo len=${#t}
+show_bytes "$t"
+
+t=${s##?}
+echo len=${#t}
+show_bytes "$t"
+
+t=${s%?}
+echo len=${#t}
+show_bytes "$t"
+
+t=${s%%?}
+echo len=${#t}
+show_bytes "$t"

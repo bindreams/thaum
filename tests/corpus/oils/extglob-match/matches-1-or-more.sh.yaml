@@ -1,0 +1,7 @@
+name: + matches 1 or more
+dialect: bash
+source: oils:spec/extglob-match#matches-1-or-more
+stdout: "TRUE\nFALSE\n"
+---
+[[ --helphelp == --+(help|verbose) ]] && echo TRUE
+[[ -- == --+(help|verbose) ]] || echo FALSE

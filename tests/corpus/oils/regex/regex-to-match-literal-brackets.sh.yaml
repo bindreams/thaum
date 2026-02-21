@@ -1,0 +1,13 @@
+name: Regex to match literal brackets []
+dialect: bash
+source: oils:spec/regex#regex-to-match-literal-brackets
+stdout: "true\ntrue\n"
+---
+
+# bash-completion relies on this, so we're making it match bash.
+# zsh understandably differs.
+[[ '[]' =~ \[\] ]] && echo true
+
+# Another way to write this.
+pat='\[\]'
+[[ '[]' =~ $pat ]] && echo true

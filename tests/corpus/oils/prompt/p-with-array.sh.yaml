@@ -1,0 +1,11 @@
+name: '@P with array'
+dialect: bash
+source: oils:spec/prompt#p-with-array
+stdout: "a b c\nstatus=0\na b c\nstatus=0\nx\nstatus=0\n"
+---
+$SH -c 'echo ${@@P}' dummy a b c
+echo status=$?
+$SH -c 'echo ${*@P}' dummy a b c
+echo status=$?
+$SH -c 'a=(x y); echo ${a@P}' dummy a b c
+echo status=$?

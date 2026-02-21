@@ -1,0 +1,8 @@
+name: $"" is a synonym for ""
+dialect: bash
+source: oils:spec/quote#is-a-synonym-for
+stdout: "foo\nfoo x\n"
+---
+echo $"foo"
+x=x
+echo $"foo $x"

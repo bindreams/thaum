@@ -1,0 +1,10 @@
+name: 'echo foo >&100 (OSH regression: does not fail with invalid fd 100)'
+dialect: bash
+source: 
+  oils:spec/redirect#echo-foo-100-osh-regression-does-not-fail-with-invalid-fd-100
+status: 1
+stdout: ''
+---
+# oil 0.8.pre4 does not fail with non-existent fd 100.
+fd=100
+echo foo53 >&$fd

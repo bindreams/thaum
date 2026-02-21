@@ -1,0 +1,33 @@
+name: 4 x 3 table - with for loop
+dialect: bash
+source: oils:spec/word-split#4-x-3-table---with-for-loop
+stdout: "  $*   -a- -b- -c-\n \"$*\"  -a b c -\n  $@   -a- -b- -c-\n \"$@\"  -a b-
+  -c- --\n\n  $*   -a b- -c-\n \"$*\"  -a bc-\n  $@   -a b- -c-\n \"$@\"  -a b- -c-
+  --\n\n  $*   -a b- -c-\n \"$*\"  -a b c -\n  $@   -a b- -c-\n \"$@\"  -a b- -c-
+  --\n"
+---
+case $SH in yash) exit ;; esac  # no echo -n
+
+setopt SH_WORD_SPLIT  # for zsh
+
+set -- 'a b' c ''
+
+# default IFS
+echo -n '  $*  ';  for i in  $*;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$*" ';  for i in "$*"; do echo -n ' '; echo -n -$i-; done; echo
+echo -n '  $@  ';  for i in  $@;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$@" ';  for i in "$@"; do echo -n ' '; echo -n -$i-; done; echo
+echo
+
+IFS=''
+echo -n '  $*  ';  for i in  $*;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$*" ';  for i in "$*"; do echo -n ' '; echo -n -$i-; done; echo
+echo -n '  $@  ';  for i in  $@;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$@" ';  for i in "$@"; do echo -n ' '; echo -n -$i-; done; echo
+echo
+
+IFS=zx
+echo -n '  $*  ';  for i in  $*;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$*" ';  for i in "$*"; do echo -n ' '; echo -n -$i-; done; echo
+echo -n '  $@  ';  for i in  $@;  do echo -n ' '; echo -n -$i-; done; echo
+echo -n ' "$@" ';  for i in "$@"; do echo -n ' '; echo -n -$i-; done; echo

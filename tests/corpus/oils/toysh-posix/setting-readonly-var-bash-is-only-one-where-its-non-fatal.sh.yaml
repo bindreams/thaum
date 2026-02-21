@@ -1,0 +1,12 @@
+name: setting readonly var (bash is only one where it's non-fatal)
+dialect: bash
+source: 
+  oils:spec/toysh-posix#setting-readonly-var-bash-is-only-one-where-its-non-fatal
+status: 2
+stdout: ''
+---
+# https://landley.net/notes-2020.html#20-06-2020
+
+readonly abc=123
+abc=def
+echo status=$?

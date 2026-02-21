@@ -1,0 +1,19 @@
+name: fc -l lists history commands with default page size
+dialect: bash
+source: oils:spec/builtin-fc#fc--l-lists-history-commands-with-default-page-size
+stdout: "2\t echo 1\n3\t echo 2\n4\t echo 3\n5\t echo 4\n6\t echo 5\n7\t echo 6\n\
+  8\t echo 7\n9\t echo 8\n10\t echo 9\n11\t echo 10\n12\t echo 11\n13\t echo 12\n\
+  14\t echo 13\n15\t echo 14\n16\t echo 15\n17\t echo 16\n^D\n"
+---
+printf "echo %s\n" {1..16} > tmp
+
+echo '
+HISTFILE=tmp
+history -c
+history -r
+
+fc -l
+' | $SH --norc -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

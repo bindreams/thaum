@@ -1,0 +1,15 @@
+name: List insert() negative
+dialect: bash
+source: oils:spec/ysh-list#list-insert-negative
+stdout: "pass\n"
+---
+shopt -s ysh:all
+
+var l = :| foo bar |
+call l->insert(-1, "yyy")
+assert [ :| foo yyy bar | === l ]
+
+call l->insert(-3, "zzz")
+assert [ :| zzz foo yyy bar | === l ]
+
+echo pass

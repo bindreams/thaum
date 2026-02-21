@@ -1,0 +1,7 @@
+name: exit with no args
+dialect: bash
+source: oils:spec/sh-usage#exit-with-no-args
+status: 1
+---
+false
+exit

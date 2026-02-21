@@ -1,0 +1,23 @@
+name: 'Code Blocks: parseHay() then shvar _DIALECT= { evalHay() }'
+dialect: bash
+source: oils:spec/hay#code-blocks-parsehay-then-shvar-dialect-evalhay
+stdout: "level 0 children\n2\n---\nchild 0\nTASK\ncpp\n---\nchild 1\nTASK\npublish-html\n\
+  ---\n"
+---
+shopt --set parse_brace parse_proc parse_ysh_expr_sub
+
+hay define TASK
+
+const config_path = "$REPO_ROOT/spec/testdata/config/ci.oil"
+const block = parseHay(config_path)
+
+shvar _DIALECT=sourcehut {
+  const d = evalHay(block)
+}
+
+const children = d['children']
+write 'level 0 children' $[len(children)] ---
+
+# TODO: Do we need @[] for array expression sub?
+write 'child 0' $[children[0].type] $[join(children[0].args)] ---
+write 'child 1' $[children[1].type] $[join(children[1].args)] ---

@@ -1,0 +1,23 @@
+name: block in Dict (&d) { ... } can read from outer scope
+dialect: bash
+source: oils:spec/ysh-builtin-eval#block-in-dict-d-can-read-from-outer-scope
+stdout: "(Dict)   {\"y\":43}\n"
+---
+
+proc Dict ( ; out; ; block) {
+  var d = io->eval(block, to_dict=true)
+  call out->setValue(d)
+}
+
+func f() {
+  var x = 42
+
+  Dict (&d) {
+    y = x + 1  # x is from outer scope
+  }
+  return (d)
+}
+
+var mydict = f()
+
+pp test_ (mydict)

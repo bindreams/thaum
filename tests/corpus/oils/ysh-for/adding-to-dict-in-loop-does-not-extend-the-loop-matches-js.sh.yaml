@@ -1,0 +1,16 @@
+name: Adding to Dict in loop does NOT extend the loop (matches JS)
+dialect: bash
+source: 
+  oils:spec/ysh-for#adding-to-dict-in-loop-does-not-extend-the-loop-matches-js
+stdout: "1\n2\n3\n"
+---
+
+# see demo/survey-loop
+
+var mydict = {"1": null, "2": null, "3": null}
+for x in (mydict) {
+  if (x === "2") {
+    setvar mydict["99"] = null
+  }
+  echo $x
+}

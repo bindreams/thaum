@@ -1,0 +1,19 @@
+name: io.glob() respects shell filters
+dialect: bash
+source: oils:spec/ysh-method-io#ioglob-respects-shell-filters
+stdout: "(List)   [\"foo.md\",\"foo.txt\"]\n(List)   [\"-foo.txt\",\".gitignore\"\
+  ,\"foo.md\",\"foo.txt\"]\n(List)   [\"-foo.txt\",\".gitignore\",\"foo.txt\"]\n"
+---
+touch -- .gitignore -foo.txt foo.txt foo.md
+
+#GLOBIGNORE='*.md'
+
+pp test_ (io.glob('*'))
+
+shopt -s dotglob
+shopt --unset no_dash_glob
+pp test_ (io.glob('*'))
+
+# This meandes dotglob, no_dash_glob
+GLOBIGNORE='*.md'
+pp test_ (io.glob('*'))

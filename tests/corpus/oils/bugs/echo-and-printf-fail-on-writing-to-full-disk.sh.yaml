@@ -1,0 +1,13 @@
+name: "'echo' and printf fail on writing to full disk"
+dialect: bash
+source: oils:spec/bugs#echo-and-printf-fail-on-writing-to-full-disk
+stdout: "status=1\nstatus=1\n"
+---
+
+# Inspired by https://blog.sunfishcode.online/bugs-in-hello-world/
+
+echo hi > /dev/full
+echo status=$?
+
+printf '%s\n' hi > /dev/full
+echo status=$?

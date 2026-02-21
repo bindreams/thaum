@@ -1,0 +1,11 @@
+name: case semantics, no match
+dialect: bash
+source: oils:spec/ysh-case#case-semantics-no-match
+status: 0
+stdout: "\n"
+---
+const x = 2
+case (x) {
+  (3) { echo three }
+  (4) { echo four }
+}

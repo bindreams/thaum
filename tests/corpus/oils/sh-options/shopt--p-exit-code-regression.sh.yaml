@@ -1,0 +1,9 @@
+name: shopt -p exit code (regression)
+dialect: bash
+source: oils:spec/sh-options#shopt--p-exit-code-regression
+stdout: "status=0\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+shopt -p > /dev/null
+echo status=$?

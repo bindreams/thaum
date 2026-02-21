@@ -1,0 +1,10 @@
+name: 'error: typeset myarray+=s'
+dialect: bash
+source: oils:spec/append#error-typeset-myarrays
+status: 1
+stdout: "['x', 'y']\n"
+---
+typeset a=(x y)
+argv.py "${a[@]}"
+typeset a+=s
+argv.py "${a[@]}"

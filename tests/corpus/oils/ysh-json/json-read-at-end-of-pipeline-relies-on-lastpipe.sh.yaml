@@ -1,0 +1,8 @@
+name: json read at end of pipeline (relies on lastpipe)
+dialect: bash
+source: oils:spec/ysh-json#json-read-at-end-of-pipeline-relies-on-lastpipe
+stdout: "y = (Cell exported:F readonly:F nameref:F val:(value.Dict d:{age (value.Int
+  i:43)}))\n"
+---
+echo '{"age": 43}' | json read (&y)
+pp cell_ y

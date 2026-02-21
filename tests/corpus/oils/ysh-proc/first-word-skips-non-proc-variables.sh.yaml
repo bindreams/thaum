@@ -1,0 +1,17 @@
+name: first word skips non-proc variables
+dialect: bash
+source: oils:spec/ysh-proc#first-word-skips-non-proc-variables
+stdout: "sh-func grep\n"
+---
+shopt -s ysh:upgrade
+
+grep() {
+  echo 'sh-func grep'
+}
+
+var grep = 'variable grep'
+
+grep
+
+# We first find `var grep`, but it's a Str not a Proc, so we skip it and then
+# find `function grep`.

@@ -1,0 +1,17 @@
+name: Which shells allow special builtins to be redefined?
+dialect: bash
+source: 
+  oils:spec/builtin-special#which-shells-allow-special-builtins-to-be-redefined
+status: 0
+stdout: "hi\n"
+---
+eval() {
+  echo 'eval func' "$@"
+}
+eval 'echo hi'
+
+# we allow redefinition, but the definition is NOT used!
+
+# we PREVENT redefinition
+
+# should not allow redefinition

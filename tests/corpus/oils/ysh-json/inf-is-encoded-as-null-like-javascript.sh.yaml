@@ -1,0 +1,39 @@
+name: Inf is encoded as null, like JavaScript
+dialect: bash
+source: oils:spec/ysh-json#inf-is-encoded-as-null-like-javascript
+stdout: "(Float)   INFINITY\n(Float)   -INFINITY\n--\nnull\nerror=0\nnull\nerror=0\n\
+  --\nnull\nnull\n"
+---
+
+# WRONG LOCATION!  Gah
+#var x = fromJson(repeat('123', 20))
+
+shopt --set ysh:upgrade
+
+source $LIB_YSH/list.ysh
+
+# Create inf
+var big = repeat('12345678', 100) ++ '.0'
+#pp test_ (s)
+var inf = fromJson(big)
+var neg_inf = fromJson('-' ++ big)
+
+# Can be printed
+pp test_ (inf)
+pp test_ (neg_inf)
+echo --
+
+# Can't be serialized
+try {
+  json write (inf)
+}
+echo error=$[_error.code]
+
+try {
+  json write (neg_inf)
+}
+echo error=$[_error.code]
+
+echo --
+echo $[toJson(inf)]
+echo $[toJson(neg_inf)]

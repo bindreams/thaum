@@ -1,0 +1,30 @@
+name: case with extglob
+dialect: bash
+source: oils:spec/extglob-match#case-with-extglob
+stdout: "A\nA\nU\nB\nC\nD\n"
+---
+shopt -s extglob
+for word in --help --verbose --unmatched -- -zxzx -; do
+  case $word in
+    --@(help|verbose) )
+      echo A
+      continue
+      ;;
+    ( --?(b|c) )
+      echo B
+      continue
+      ;;
+    ( -+(x|z) )
+      echo C
+      continue
+      ;;
+    ( -*(x|z) )
+      echo D
+      continue
+      ;;
+    *)
+      echo U
+      continue
+      ;;
+  esac
+done

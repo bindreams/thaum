@@ -1,0 +1,11 @@
+name: array ref with strict_array
+dialect: bash
+source: oils:spec/var-ref#array-ref-with-strictarray
+status: 1
+stdout: ''
+---
+shopt -s strict_array
+
+declare -a array=(ale bean)
+ref='array'
+echo ${!ref}

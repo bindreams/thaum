@@ -1,0 +1,23 @@
+name: assert on expression that fails
+dialect: bash
+source: oils:spec/ysh-builtin-error#assert-on-expression-that-fails
+stdout: "code 3\n\ncode 1\n\n"
+---
+
+try {
+  $[ENV.SH] -c '
+  assert [NAN === 1/0]  # not true
+  echo unreachable
+  '
+}
+echo code $[_error.code]
+echo
+
+try {
+  $[ENV.SH] -c '
+  assert ["oof" === $(false)]
+  echo unreachable
+  '
+}
+echo code $[_error.code]
+echo

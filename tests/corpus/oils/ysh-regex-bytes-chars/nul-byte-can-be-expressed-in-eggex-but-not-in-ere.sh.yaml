@@ -1,0 +1,27 @@
+name: NUL byte can be expressed in Eggex, but not in ERE
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#nul-byte-can-be-expressed-in-eggex-but-not-in-ere
+stdout: "(Bool)   true\nstatus=1\n(Bool)   true\nstatus=1\n(Bool)   true\nstatus=1\n"
+---
+
+$SH <<'EOF'
+pp test_ (b'\y01' ~ / [\y01] /)
+pp test_ (b'\y00' ~ / [\y00] /)
+EOF
+echo status=$?
+
+$SH <<'EOF'
+pp test_ (b'\y01' ~ / [\u{1}] /)
+pp test_ (b'\y00' ~ / [\u{0}] /)
+EOF
+echo status=$?
+
+
+# legacy synonym
+
+$SH <<'EOF'
+pp test_ (b'\y01' ~ / [\x01] /)
+pp test_ (b'\y00' ~ / [\x00] /)
+EOF
+echo status=$?

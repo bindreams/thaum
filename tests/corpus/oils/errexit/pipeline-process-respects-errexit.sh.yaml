@@ -1,0 +1,16 @@
+name: pipeline process respects errexit
+dialect: bash
+source: oils:spec/errexit#pipeline-process-respects-errexit
+status: 1
+stdout: "one\n[three]\n"
+---
+set -o errexit
+# It is respected here.
+{ echo one; false; echo two; } | cat
+
+# Also respected here.
+{ echo three; echo four; } | while read line; do
+  echo "[$line]"
+  false
+done
+echo four

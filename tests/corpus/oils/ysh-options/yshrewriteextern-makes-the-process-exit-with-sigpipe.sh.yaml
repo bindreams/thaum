@@ -1,0 +1,10 @@
+name: ysh_rewrite_extern makes the process exit with SIGPIPE
+dialect: bash
+source: 
+  oils:spec/ysh-options#yshrewriteextern-makes-the-process-exit-with-sigpipe
+stdout: "141\n"
+---
+shopt --set ysh_rewrite_extern
+
+((/usr/bin/cat </dev/zero; echo $? >&7) | true) 7>&1
+((cat </dev/zero; echo $? >&7) | true) 7>&1

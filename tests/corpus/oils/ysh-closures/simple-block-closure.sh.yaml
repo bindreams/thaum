@@ -1,0 +1,21 @@
+name: Simple Block Closure
+dialect: bash
+source: oils:spec/ysh-closures#simple-block-closure
+stdout: "43\n"
+---
+shopt --set ysh:upgrade
+
+shopt --set ysh:upgrade
+
+proc my-expr (; ; ; block) {
+  call io->eval(block)
+}
+
+proc p {
+  var i = 42
+  my-expr {
+    echo $[i + 1]
+  }
+}
+
+p

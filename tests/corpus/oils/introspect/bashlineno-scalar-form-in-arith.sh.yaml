@@ -1,0 +1,9 @@
+name: $((BASH_LINENO)) (scalar form in arith)
+dialect: bash
+source: oils:spec/introspect#bashlineno-scalar-form-in-arith
+stdout: "4\n"
+---
+check() {
+  echo $((BASH_LINENO))
+}
+check

@@ -1,0 +1,6 @@
+name: Regex quoted with \ -- preferred in bash
+dialect: bash
+source: oils:spec/regex#regex-quoted-with----preferred-in-bash
+stdout: "true\n"
+---
+[[ 'a b' =~ ^(a\ b)$ ]] && echo true

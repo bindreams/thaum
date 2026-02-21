@@ -1,0 +1,19 @@
+name: '% operator is remainder'
+dialect: bash
+source: oils:spec/ysh-expr-arith#operator-is-remainder
+stdout: "(Int)   2\n(Int)   -2\n(Int)   1\n(Int)   -1\n"
+---
+pp test_ ( 5 % 3)
+pp test_ (-5 % 3)
+
+# negative divisor illegal (tested in test/ysh-runtime-errors.sh)
+#pp test_ ( 5 % -3)
+#pp test_ (-5 % -3)
+
+var z = 10
+setvar z %= 3
+pp test_ (z)
+
+var z = -10
+setvar z %= 3
+pp test_ (z)

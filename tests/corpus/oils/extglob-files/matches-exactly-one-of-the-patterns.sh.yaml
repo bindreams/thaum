@@ -1,0 +1,10 @@
+name: '@() matches exactly one of the patterns'
+dialect: bash
+source: oils:spec/extglob-files#matches-exactly-one-of-the-patterns
+stdout: "bar.cc bar.h baz.h foo.cc foo.h\n"
+---
+shopt -s extglob
+mkdir -p 0
+cd 0
+touch {foo,bar}.cc {foo,bar,baz}.h
+echo @(*.cc|*.h)

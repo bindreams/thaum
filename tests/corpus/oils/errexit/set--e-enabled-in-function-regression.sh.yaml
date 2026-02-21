@@ -1,0 +1,18 @@
+name: set -e enabled in function (regression)
+dialect: bash
+source: oils:spec/errexit#set--e-enabled-in-function-regression
+stdout: "should be executed\nshould be executed\n"
+---
+foo() {
+  set -e
+  false
+  echo "should be executed"
+}
+#foo && true
+#foo || true
+
+if foo; then
+  true
+fi
+
+echo "should be executed"

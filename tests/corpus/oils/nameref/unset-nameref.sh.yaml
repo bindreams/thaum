@@ -1,0 +1,13 @@
+name: unset nameref
+dialect: bash
+source: oils:spec/nameref#unset-nameref
+stdout: "ref=X\nref=\nx=\n"
+---
+x=X
+typeset -n ref=x
+echo ref=$ref
+
+# this works
+unset ref
+echo ref=$ref
+echo x=$x

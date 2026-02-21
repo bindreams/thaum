@@ -1,0 +1,25 @@
+name: process sub (nondeterministic)
+dialect: bash
+source: oils:spec/ysh-xtrace#process-sub-nondeterministic
+stdout: "4\n3\n1\n"
+stderr: "  . 12345 builtin echo 1\n  . 12345 exec seq 3 4\n. builtin ':' begin\n.
+  builtin set '+x'\n; process 12345: status 0\n; process 12345: status 0\n; process
+  12345: status 0\n| command 12345: tac /dev/fd/N /dev/fd/N\n| proc sub 12345\n| proc
+  sub 12345\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+set -x
+
+# we wait() for them all at the end
+
+{
+  : begin
+  tac <(seq 3 4) <(echo 1)
+  set +x
+} 2>err.txt
+
+# SORT for determinism
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g; s|/fd/.|/fd/N|g' err.txt |
+  LC_ALL=C sort >&2
+#cat err.txt >&2

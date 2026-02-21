@@ -1,0 +1,9 @@
+name: 'error: s+=(my array)'
+dialect: bash
+source: oils:spec/append#error-smy-array
+status: 0
+stdout: "['abc', 'd', 'e', 'f']\n"
+---
+s='abc'
+s+=(d e f)
+argv.py "${s[@]}"

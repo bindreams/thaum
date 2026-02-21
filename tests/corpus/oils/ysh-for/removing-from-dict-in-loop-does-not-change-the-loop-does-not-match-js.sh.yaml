@@ -1,0 +1,17 @@
+name: Removing from Dict in loop does NOT change the loop (does NOT match JS)
+dialect: bash
+source: 
+  oils:spec/ysh-for#removing-from-dict-in-loop-does-not-change-the-loop-does-not-match-js
+stdout: "1\n2\n3\n4\n"
+---
+
+# see demo/survey-loop
+
+var mydict = {"1": null, "2": null, "3": null, "4": null}
+for x in (mydict) {
+  if (x === "2") {
+    call mydict->erase("1")
+    call mydict->erase("3")
+  }
+  echo $x
+}

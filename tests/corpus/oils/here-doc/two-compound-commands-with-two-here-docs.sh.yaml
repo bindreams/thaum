@@ -1,0 +1,12 @@
+name: Two compound commands with two here docs
+dialect: bash
+source: oils:spec/here-doc#two-compound-commands-with-two-here-docs
+stdout: "X 1\nX 2\n==\nY 3\nY 4\n"
+---
+while read line; do echo X $line; done <<EOF; echo ==;  while read line; do echo Y $line; done <<EOF2
+1
+2
+EOF
+3
+4
+EOF2

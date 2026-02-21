@@ -1,0 +1,10 @@
+name: and-or chains
+dialect: bash
+source: oils:spec/smoke#and-or-chains
+stdout: "1\n2\n4\n--\nA\nB\nC\nD\n"
+---
+echo 1 && echo 2 || echo 3 && echo 4
+echo --
+false || echo A
+false || false || echo B
+false || false || echo C && echo D || echo E

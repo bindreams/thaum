@@ -1,0 +1,7 @@
+name: "[[ at runtime doesn't work"
+dialect: bash
+source: oils:spec/dbracket#at-runtime-doesnt-work
+status: 127
+---
+dbracket=[[
+$dbracket foo == foo ]]

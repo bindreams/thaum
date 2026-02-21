@@ -1,0 +1,18 @@
+name: simple_word_eval and glob
+dialect: bash
+source: oils:spec/ysh-options#simplewordeval-and-glob
+stdout: "1.ff\n2.ff\n1.ff 2.ff\n1.ff 2.ff\n"
+---
+shopt -s simple_word_eval
+
+# rm -v -f *.ff
+touch 1.ff 2.ff
+
+for i in *.ff; do
+  echo $i
+done
+
+array=(*.ff)
+echo "${array[@]}"
+
+echo *.ff

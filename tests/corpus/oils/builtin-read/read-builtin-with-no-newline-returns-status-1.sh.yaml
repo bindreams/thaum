@@ -1,0 +1,11 @@
+name: read builtin with no newline returns status 1
+dialect: bash
+source: oils:spec/builtin-read#read-builtin-with-no-newline-returns-status-1
+status: 0
+stdout: "status=1\nZZZ\n"
+---
+
+# This is odd because the variable is populated successfully.  OSH/YSH might
+# need a separate put reading feature that doesn't use IFS.
+
+echo -n ZZZ | { read x; echo status=$?; echo $x; }

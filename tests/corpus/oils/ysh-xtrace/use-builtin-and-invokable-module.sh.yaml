@@ -1,0 +1,25 @@
+name: use builtin and invokable module
+dialect: bash
+source: oils:spec/ysh-xtrace#use-builtin-and-invokable-module
+stdout: "[for-xtrace]\ncounter = 5\n\n[for-xtrace]\ncounter = 5\ncounter = 6\n"
+stderr: "> source for-xtrace.ysh\n  . builtin echo '[for-xtrace]'\n  > proc increment\n\
+  \    . builtin echo 'counter = 5'\n  < proc increment\n< source for-xtrace.ysh\n\
+  . builtin echo\n> use for-xtrace.ysh\n  . builtin echo '[for-xtrace]'\n  > proc
+  increment\n    . builtin echo 'counter = 5'\n  < proc increment\n< use for-xtrace.ysh\n\
+  > module-invoke for-xtrace increment foo bar\n  . builtin echo 'counter = 6'\n<
+  module-invoke for-xtrace\n"
+---
+shopt --set ysh:upgrade
+
+# make the trace deterministic
+cp $REPO_ROOT/spec/testdata/module2/for-xtrace.ysh .
+
+set -x
+
+source for-xtrace.ysh
+echo
+
+# problem with PS4 here
+use for-xtrace.ysh # --all-provided
+
+for-xtrace increment foo bar

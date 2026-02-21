@@ -1,0 +1,8 @@
+name: exec builtin with here doc
+dialect: bash
+source: oils:spec/builtin-process#exec-builtin-with-here-doc
+stdout: "x=one\ny=two\nDONE\n"
+---
+# This has in a separate file because both code and data can be read from
+# stdin.
+$SH $REPO_ROOT/spec/bin/builtins-exec-here-doc-helper.sh

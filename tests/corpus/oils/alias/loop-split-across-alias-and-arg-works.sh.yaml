@@ -1,0 +1,8 @@
+name: Loop split across alias and arg works
+dialect: bash
+source: oils:spec/alias#loop-split-across-alias-and-arg-works
+stdout: "1\n2\n3\n"
+---
+shopt -s expand_aliases  # bash requires this
+alias e_='for i in 1 2 3; do echo $i;'
+e_ done

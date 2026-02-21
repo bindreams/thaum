@@ -1,0 +1,7 @@
+name: Pipeline - http://landley.net/notes-2019.html#16-12-2019
+dialect: bash
+source: oils:spec/toysh-posix#pipeline---httplandleynetnotes-2019html16-12-2019
+stdout: "hello\n-@hello@-\n"
+---
+echo hello | { read i; echo $i;} | { read i; echo $i;} | cat
+echo hello | while read i; do echo -=$i=- | sed s/=/@/g ; done | cat

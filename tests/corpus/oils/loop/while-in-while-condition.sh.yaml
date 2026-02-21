@@ -1,0 +1,11 @@
+name: while in while condition
+dialect: bash
+source: oils:spec/loop#while-in-while-condition
+stdout: "cond\nbody\n"
+---
+# This is a consequence of the grammar
+while while true; do echo cond; break; done
+do
+  echo body
+  break
+done

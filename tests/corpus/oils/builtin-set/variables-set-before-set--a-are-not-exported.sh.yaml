@@ -1,0 +1,9 @@
+name: variables set before set -a are not exported
+dialect: bash
+source: oils:spec/builtin-set#variables-set-before-set--a-are-not-exported
+stdout: "None\nafter_value\n"
+---
+BEFORE=before_value
+set -a
+AFTER=after_value
+printenv.py BEFORE AFTER

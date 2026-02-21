@@ -1,0 +1,8 @@
+name: Negative slice length
+dialect: bash
+source: oils:spec/array#negative-slice-length
+status: 1
+stdout: ''
+---
+a=(1 2 3 4 5)
+argv.py "${a[@]: 1: -3}"

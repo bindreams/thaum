@@ -1,0 +1,12 @@
+name: 'Multiple words: outer double quotes, inner single quotes'
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#multiple-words-outer-double-quotes-inner-single-quotes
+stdout: "[\"'a b c'\"]\n"
+---
+# WEIRD ONE.
+#
+# I think I should just disallow any word with single quotes inside double
+# quotes.
+var='a b c'
+argv.py "${Unset:-'$var'}"

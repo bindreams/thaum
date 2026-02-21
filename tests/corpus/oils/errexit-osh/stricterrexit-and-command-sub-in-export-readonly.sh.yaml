@@ -1,0 +1,13 @@
+name: strict_errexit and command sub in export / readonly
+dialect: bash
+source: oils:spec/errexit-osh#stricterrexit-and-command-sub-in-export-readonly
+stdout: "a\nstatus=1\na\nstatus=1\na\nb\nstatus=0\n"
+---
+case $SH in dash|bash|mksh|ash) exit ;; esac
+
+$SH -o errexit -O strict_errexit -c 'echo a; export x=$(might-fail); echo b'
+echo status=$?
+$SH -o errexit -O strict_errexit -c 'echo a; readonly x=$(might-fail); echo b'
+echo status=$?
+$SH -o errexit -O strict_errexit -c 'echo a; x=$(true); echo b'
+echo status=$?

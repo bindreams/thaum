@@ -1,0 +1,18 @@
+name: JSON string can have unescaped ' and J8 string can have unescaped "
+dialect: bash
+source: 
+  oils:spec/ysh-json#json-string-can-have-unescaped-and-j8-string-can-have-unescaped
+stdout: "(Str)   \"'\"\n(Str)   \"\\\"\"\n"
+---
+
+json read <<EOF
+"'"
+EOF
+
+pp test_ (_reply)
+
+json8 read <<EOF
+u'"'
+EOF
+
+pp test_ (_reply)

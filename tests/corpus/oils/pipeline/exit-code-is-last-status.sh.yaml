@@ -1,0 +1,6 @@
+name: Exit code is last status
+dialect: bash
+source: oils:spec/pipeline#exit-code-is-last-status
+status: 1
+---
+echo a | egrep '[0-9]+'

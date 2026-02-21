@@ -1,0 +1,10 @@
+name: printf invalid format
+dialect: bash
+source: oils:spec/builtin-printf#printf-invalid-format
+stdout: "status=1\nstatus=1\n"
+---
+printf '%z' 42
+echo status=$?
+printf '%-z' 42
+echo status=$?
+# osh emits parse errors

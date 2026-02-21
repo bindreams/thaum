@@ -1,0 +1,16 @@
+name: Block can be passed literally, or as expression in third arg group
+dialect: bash
+source: 
+  oils:spec/ysh-proc#block-can-be-passed-literally-or-as-expression-in-third-arg-group
+stdout: "literal\nexpression\n"
+---
+shopt --set ysh:upgrade
+
+proc p ( ; ; ; block) {
+  call io->eval(block)
+}
+
+p { echo literal }
+
+var block = ^(echo expression)
+p (; ; block)

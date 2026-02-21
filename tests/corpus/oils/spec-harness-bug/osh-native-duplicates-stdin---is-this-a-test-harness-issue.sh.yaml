@@ -1,0 +1,8 @@
+name: osh-native duplicates stdin - is this a test harness issue?
+dialect: bash
+source: 
+  oils:spec/spec-harness-bug#osh-native-duplicates-stdin---is-this-a-test-harness-issue
+stdout: "sh\n"
+---
+
+echo $0 | grep -o sh

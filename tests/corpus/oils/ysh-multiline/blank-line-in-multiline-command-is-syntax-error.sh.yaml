@@ -1,0 +1,15 @@
+name: Blank line in multiline command is syntax error
+dialect: bash
+source: oils:spec/ysh-multiline#blank-line-in-multiline-command-is-syntax-error
+status: 2
+stdout: "comment is OK\n"
+---
+... echo comment
+    # comment
+    is OK
+    ;
+
+... echo blank line
+
+    is not OK
+    ;

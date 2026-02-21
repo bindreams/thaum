@@ -1,0 +1,14 @@
+name: ${!OPTIND} (used by bash completion
+dialect: bash
+source: oils:spec/var-ref#optind-used-by-bash-completion
+stdout: "a\nx\ny\n"
+---
+set -- a b c
+echo ${!OPTIND}
+f() {
+  local OPTIND=1
+  echo ${!OPTIND}
+  local OPTIND=2
+  echo ${!OPTIND}
+}
+f x y z

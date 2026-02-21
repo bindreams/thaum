@@ -1,0 +1,10 @@
+name: '[[ regex matching'
+dialect: bash
+source: oils:spec/nocasematch-match#regex-matching
+stdout: "0\n0\n0\n0\n"
+---
+shopt -s nocasematch
+[[ a =~ A ]]; echo $?
+[[ A =~ a ]]; echo $?
+[[ a =~ [A] ]]; echo $?
+[[ A =~ [a] ]]; echo $?

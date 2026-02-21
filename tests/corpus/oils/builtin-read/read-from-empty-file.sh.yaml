@@ -1,0 +1,13 @@
+name: read from empty file
+dialect: bash
+source: oils:spec/builtin-read#read-from-empty-file
+status: 0
+stdout: "['status=1', '']\n['status=1', '']\n"
+---
+echo -n '' > $TMP/empty.txt
+read x < $TMP/empty.txt
+argv.py "status=$?" "$x"
+
+# No variable name, behaves the same
+read < $TMP/empty.txt
+argv.py "status=$?" "$REPLY"

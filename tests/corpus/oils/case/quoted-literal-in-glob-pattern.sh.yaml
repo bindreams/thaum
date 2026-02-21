@@ -1,0 +1,10 @@
+name: Quoted literal in glob pattern
+dialect: bash
+source: oils:spec/case#quoted-literal-in-glob-pattern
+stdout: "match\n"
+---
+x='[ab].py'
+pat='[ab].py'
+case "$x" in
+  "$pat") echo match ;;
+esac

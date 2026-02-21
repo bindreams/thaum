@@ -1,0 +1,7 @@
+name: Var substitution
+dialect: bash
+source: oils:spec/quote#var-substitution
+stdout: "==bar==\n"
+---
+FOO=bar
+echo "==$FOO=="

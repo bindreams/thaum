@@ -1,0 +1,7 @@
+name: Source nonexistent
+dialect: bash
+source: oils:spec/builtin-eval-source#source-nonexistent
+stdout: "status=1\n"
+---
+source /nonexistent/path
+echo status=$?

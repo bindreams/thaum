@@ -1,0 +1,8 @@
+name: no context, set
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#no-context-set
+status: 3
+stdout: "\n"
+---
+ctx set (bad=true)
+echo status=$[_error.code]

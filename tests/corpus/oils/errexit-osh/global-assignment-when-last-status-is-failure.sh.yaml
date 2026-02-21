@@ -1,0 +1,11 @@
+name: global assignment when last status is failure
+dialect: bash
+source: oils:spec/errexit-osh#global-assignment-when-last-status-is-failure
+stdout: "status=0\n"
+---
+# this is a bug I introduced
+set -o errexit
+x=$(false) || true   # from abuild
+[ -n "$APORTSDIR" ] && true
+BUILDDIR=${_BUILDDIR-$BUILDDIR}
+echo status=$?

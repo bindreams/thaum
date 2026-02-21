@@ -1,0 +1,15 @@
+name: read --raw-line --j8
+dialect: bash
+source: oils:spec/ysh-builtins#read---raw-line---j8
+stdout: "foo\n"
+---
+
+# TODO: is this similar to @() ?  It reads j8 lines?
+#
+# But using a function is better?
+#
+# var x = fromJ8Line(_reply)
+# var x = fromJson(_reply)  # this is https://jsonlines.org
+
+echo $'u\'foo\'' | read --raw-line --j8
+write -- "$_reply"

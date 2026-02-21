@@ -1,0 +1,18 @@
+name: shSplit() respects IFS
+dialect: bash
+source: oils:spec/ysh-func-builtin#shsplit-respects-ifs
+stdout: "['aa', 'a', 'bb', 'b']\n[' ', '', ' ', ' bb b   ']\n[' aa a ', '', ' ', '\
+  \   ']\n"
+---
+
+var s = ' aa a bb b   '
+
+argv.py @[shSplit(s)]
+
+setvar IFS = 'a'
+
+argv.py @[shSplit(s)]
+
+setvar IFS = 'b'
+
+argv.py @[shSplit(s)]

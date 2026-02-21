@@ -1,0 +1,16 @@
+name: 'proc eval block: fatal error'
+dialect: bash
+source: oils:spec/ysh-control-flow#proc-eval-block-fatal-error
+status: 1
+stdout: "one\n"
+---
+shopt -s ysh:all
+
+proc proc-that-runs-block (; ; ; b) {
+  call io->eval(b)
+}
+proc-that-runs-block {
+  echo one
+  false
+  echo two
+}

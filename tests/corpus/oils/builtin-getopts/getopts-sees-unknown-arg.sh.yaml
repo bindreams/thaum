@@ -1,0 +1,8 @@
+name: getopts sees unknown arg
+dialect: bash
+source: oils:spec/builtin-getopts#getopts-sees-unknown-arg
+stdout: "status=0 opt=? OPTARG=\n"
+---
+set -- -Z
+getopts 'a:' opt
+echo "status=$? opt=$opt OPTARG=$OPTARG"

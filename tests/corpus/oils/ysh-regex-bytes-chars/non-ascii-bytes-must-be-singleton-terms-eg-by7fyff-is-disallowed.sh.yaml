@@ -1,0 +1,10 @@
+name: non-ASCII bytes must be singleton terms, e.g. b'\y7f\yff' is disallowed
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#non-ascii-bytes-must-be-singleton-terms-eg-by7fyff-is-disallowed
+status: 1
+stdout: ''
+---
+var bytes = b'\y7f\yff'
+var pat = / [ @bytes ] /
+echo $pat

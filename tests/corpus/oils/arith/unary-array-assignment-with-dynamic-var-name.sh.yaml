@@ -1,0 +1,9 @@
+name: unary array assignment with dynamic var name
+dialect: bash
+source: oils:spec/arith#unary-array-assignment-with-dynamic-var-name
+stdout: "42\nxbar[5]=43\n"
+---
+foo=bar
+xbar[5]=42
+echo $(( x$foo[5]++ ))
+echo 'xbar[5]='${xbar[5]}

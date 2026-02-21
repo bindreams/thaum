@@ -1,0 +1,9 @@
+name: is-main with -c and stdin
+dialect: bash
+source: oils:spec/ysh-builtin-module#is-main-with--c-and-stdin
+stdout: "-c\nstatus=0\nstdin\nstatus=0\n"
+---
+
+$SH -c 'echo -c; is-main; echo status=$?'
+
+echo 'echo stdin; is-main; echo status=$?' | $SH

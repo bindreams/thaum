@@ -1,0 +1,7 @@
+name: compexport
+dialect: bash
+source: oils:spec/ysh-completion#compexport
+stdout: "\"haynode \"\n\"hay \"\n"
+---
+
+compexport -c 'hay'

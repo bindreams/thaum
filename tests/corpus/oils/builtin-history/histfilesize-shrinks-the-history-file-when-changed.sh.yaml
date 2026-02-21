@@ -1,0 +1,12 @@
+name: HISTFILESIZE shrinks the history file when changed
+dialect: bash
+source: 
+  oils:spec/builtin-history#histfilesize-shrinks-the-history-file-when-changed
+stdout: "5\n"
+---
+
+cd $TMP
+printf "cmd %s\n" {1..10} > tmp
+HISTFILE=tmp
+HISTFILESIZE=5
+cat tmp | wc -l

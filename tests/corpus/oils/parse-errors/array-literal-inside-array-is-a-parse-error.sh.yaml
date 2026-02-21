@@ -1,0 +1,8 @@
+name: array literal inside array is a parse error
+dialect: bash
+source: oils:spec/parse-errors#array-literal-inside-array-is-a-parse-error
+status: 2
+stdout: ''
+---
+a=( inside=() )
+echo len=${#a[@]}

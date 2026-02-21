@@ -1,0 +1,16 @@
+name: printf negative integer overflow
+dialect: bash
+source: oils:spec/builtin-printf#printf-negative-integer-overflow
+stdout: "status=1\nstatus=1\n\nstatus=1\nstatus=1\n\n"
+---
+
+# %i seems like a synonym for %d
+
+for fmt in '%u\n' '%d\n'; do
+
+  printf "$fmt" '-18446744073709551615'
+  echo status=$?
+  printf "$fmt" '-18446744073709551616'
+  echo status=$?
+  echo
+done

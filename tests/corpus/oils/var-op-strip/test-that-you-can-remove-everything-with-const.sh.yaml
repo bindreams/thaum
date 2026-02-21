@@ -1,0 +1,9 @@
+name: Test that you can remove everything with const
+dialect: bash
+source: oils:spec/var-op-strip#test-that-you-can-remove-everything-with-const
+stdout: "['', '', '', '']\n['abcd', 'abcd', 'abcd', 'abcd']\n"
+---
+s='abcd'
+argv.py "${s%%abcd}" "${s%abcd}" "${s#abcd}" "${s##abcd}"
+# failure case:
+argv.py "${s%%abcde}" "${s%abcde}" "${s#abcde}" "${s##abcde}"

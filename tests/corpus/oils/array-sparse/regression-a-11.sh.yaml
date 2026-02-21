@@ -1,0 +1,11 @@
+name: 'Regression: a[-1]=1'
+dialect: bash
+source: oils:spec/array-sparse#regression-a-11
+status: 1
+stdout: "\n"
+stderr: "  a[-1]=1\n  ^~\n[ stdin ]:3: fatal: Index -1 is out of bounds for array
+  of length 0\n"
+---
+case $SH in mksh) exit 99 ;; esac
+
+a[-1]=1

@@ -1,0 +1,13 @@
+name: -n attribute before it has a value
+dialect: bash
+source: oils:spec/nameref#n-attribute-before-it-has-a-value
+stdout: "ref=\nref=XX\n"
+---
+typeset -n ref
+
+echo ref=$ref
+
+# Now that it's a string, it still has the -n attribute
+x=XX
+ref=x
+echo ref=$ref

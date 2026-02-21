@@ -1,0 +1,7 @@
+name: Add one to var
+dialect: bash
+source: oils:spec/arith#add-one-to-var
+stdout: "2\n"
+---
+i=1
+echo $(($i+1))

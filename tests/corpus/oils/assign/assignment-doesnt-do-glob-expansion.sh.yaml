@@ -1,0 +1,8 @@
+name: Assignment doesn't do glob expansion
+dialect: bash
+source: oils:spec/assign#assignment-doesnt-do-glob-expansion
+stdout: "['_tmp/*.Z']\n"
+---
+touch _tmp/z.Z _tmp/zz.Z
+a=_tmp/*.Z
+argv.py "$a"

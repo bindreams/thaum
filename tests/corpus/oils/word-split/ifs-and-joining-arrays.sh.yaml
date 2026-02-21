@@ -1,0 +1,11 @@
+name: IFS and joining arrays
+dialect: bash
+source: oils:spec/word-split#ifs-and-joining-arrays
+stdout: "['x', 'y z']\n['x', 'y z']\n['x:y z']\n['x', 'y z']\n"
+---
+IFS=:
+set -- x 'y z'
+argv.py "$@"
+argv.py $@
+argv.py "$*"
+argv.py $*

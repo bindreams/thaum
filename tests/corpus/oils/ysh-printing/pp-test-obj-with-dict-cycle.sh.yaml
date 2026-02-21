@@ -1,0 +1,32 @@
+name: 'pp test_: Obj with dict cycle'
+dialect: bash
+source: oils:spec/ysh-printing#pp-test-obj-with-dict-cycle
+stdout: "(Obj)   (\"z\":99) --> (\"__foo__\":null)\n(List)   [(\"z\":99) --> (\"__foo__\"\
+  :null),(\"z\":99) --> (\"__foo__\":null)]\n\n(Obj)   (\"k\":42,\"cycle\":{\"k\"\
+  :42,\"cycle\":{...}})\n(List)   [(\"k\":42,\"cycle\":{\"k\":42,\"cycle\":{...}}),(\"\
+  k\":42,\"cycle\":{\"k\":42,\"cycle\":{...}})]\n"
+---
+
+var methods = Object(null, {__foo__: null})
+var no_cycle = Object(methods, {z: 99})
+pp test_ (no_cycle)
+
+var two = [no_cycle, no_cycle]
+pp test_ (two)
+
+echo
+
+var d = {k: 42}
+setvar d.cycle = d
+
+# This cycle detection doesn't quite work
+# Because we're only considering the object itself
+
+var o = Object(null, d)
+pp test_ (o)
+
+var two = [o, o]
+pp test_ (two)
+
+#var o2 = Object(o, {z: 99})
+#pp test_ (o2)

@@ -1,0 +1,17 @@
+name: declare -f exit code indicates function existence
+dialect: bash
+source: 
+  oils:spec/assign-extended#declare--f-exit-code-indicates-function-existence
+stdout: "1\n1\n0\n"
+---
+func2=x  # var names are NOT found
+declare -f myfunc func2
+echo $?
+
+myfunc() { echo myfunc; }
+declare -f myfunc func2 > /dev/null
+echo $?
+
+func2() { echo func2; }
+declare -f myfunc func2 > /dev/null
+echo $?

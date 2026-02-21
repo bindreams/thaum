@@ -1,0 +1,10 @@
+name: Chain of namerefs
+dialect: bash
+source: oils:spec/nameref#chain-of-namerefs
+stdout: "ref_to_ref=foo\nref=foo\n"
+---
+x=foo
+typeset -n ref=x
+typeset -n ref_to_ref=ref
+echo ref_to_ref=$ref_to_ref
+echo ref=$ref

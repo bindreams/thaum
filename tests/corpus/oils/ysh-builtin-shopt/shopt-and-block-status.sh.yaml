@@ -1,0 +1,12 @@
+name: shopt and block status
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt-and-block-status
+stdout: "status=0\n"
+---
+shopt --set oil:all
+
+shopt --unset errexit {
+  false
+}
+# this is still 0, even though last command was 1
+echo status=$?

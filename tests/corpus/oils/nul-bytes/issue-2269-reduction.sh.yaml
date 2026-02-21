@@ -1,0 +1,29 @@
+name: Issue 2269 Reduction
+dialect: bash
+source: oils:spec/nul-bytes#issue-2269-reduction
+stdout: "len=1\n 78\nlen=0\n---\nlen=2\n 01 78\nlen=1\n 78\n"
+---
+
+show_bytes() {
+  echo -n "$1" | od -A n -t x1
+}
+
+s=$(printf '\000x')
+echo len=${#s}
+show_bytes "$s"
+
+# strip one char from the front
+s=${s#?}
+echo len=${#s}
+show_bytes "$s"
+
+echo ---
+
+s=$(printf '\001x')
+echo len=${#s}
+show_bytes "$s"
+
+# strip one char from the front
+s=${s#?}
+echo len=${#s}
+show_bytes "$s"

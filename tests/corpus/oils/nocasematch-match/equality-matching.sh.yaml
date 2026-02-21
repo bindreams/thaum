@@ -1,0 +1,10 @@
+name: '[[ equality matching'
+dialect: bash
+source: oils:spec/nocasematch-match#equality-matching
+stdout: "0\n0\n0\n0\n"
+---
+shopt -s nocasematch
+[[ a == A ]]; echo $?
+[[ A == a ]]; echo $?
+[[ A == [a] ]]; echo $?
+[[ a == [A] ]]; echo $?

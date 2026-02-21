@@ -1,0 +1,11 @@
+name: crash dump
+dialect: bash
+source: oils:spec/array-sparse#crash-dump
+stdout: "{\n  \"val\": {\n    \"type\": \"BashArray\",\n    \"data\": {\n      \"\
+  0\": \"0\",\n      \"1\": \"1\",\n      \"3\": \"3\"\n    }\n  }\n}\n"
+---
+case $SH in bash|mksh) exit ;; esac
+
+OILS_CRASH_DUMP_DIR=$TMP $SH -ec 'a=({0..3}); unset -v "a[2]"; false'
+json read (&crash_dump) < $TMP/*.json
+json write (crash_dump.var_stack[0].a)

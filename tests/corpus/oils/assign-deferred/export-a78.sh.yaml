@@ -1,0 +1,9 @@
+name: export a[7]=8
+dialect: bash
+source: oils:spec/assign-deferred#export-a78
+stdout: "status=1\n[]\nNone\n"
+---
+export a[7]=8
+echo status=$?
+argv.py "${!a[@]}" "${a[@]}"
+printenv.py a

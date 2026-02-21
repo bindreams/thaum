@@ -1,0 +1,20 @@
+name: ${x/^} regression
+dialect: bash
+source: oils:spec/var-op-patsub#x-regression
+stdout: "abc\nabc\n^^\n^^^\n!!!\n!!\nb!c\na^c\n"
+---
+x=abc
+echo ${x/^}
+echo ${x/!}
+
+y=^^^
+echo ${y/^}
+echo ${y/!}
+
+z=!!!
+echo ${z/^}
+echo ${z/!}
+
+s=a^b!c
+echo ${s/a^}
+echo ${s/b!}

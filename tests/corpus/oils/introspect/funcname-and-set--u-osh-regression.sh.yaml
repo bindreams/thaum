@@ -1,0 +1,8 @@
+name: ${FUNCNAME} and "set -u" (OSH regression)
+dialect: bash
+source: oils:spec/introspect#funcname-and-set--u-osh-regression
+status: 1
+stdout: ''
+---
+set -u
+argv.py "$FUNCNAME"

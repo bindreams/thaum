@@ -1,0 +1,11 @@
+name: \r at end of line is not special
+dialect: bash
+source: oils:spec/whitespace#r-at-end-of-line-is-not-special
+stdout: "['-\\r']\n"
+---
+
+# hm I wonder if Windows ports have rules for this?
+
+cr=$(python2 -c 'print "argv.py -\r"')
+
+$SH -c "$cr"

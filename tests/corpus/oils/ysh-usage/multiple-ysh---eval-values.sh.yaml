@@ -1,0 +1,28 @@
+name: Multiple ysh --eval values
+dialect: bash
+source: oils:spec/ysh-usage#multiple-ysh---eval-values
+status: 1
+stdout: "1\n2\nflag -c\n---\n1\n2\n3\n"
+---
+
+echo 'echo 1' > one.ysh
+echo 'echo 2' > two.ysh
+echo 'echo 3' > three.ysh
+echo 'echo 4; ( FAIL' > four.ysh
+
+#$[ENV.SH] -c 'echo flag -c'
+
+... $[ENV.SH]
+  --eval one.ysh
+  --eval two.ysh
+  -c 'echo flag -c'
+  ;
+echo ---
+
+... $[ENV.SH]
+  --eval one.ysh
+  --eval two.ysh
+  --eval three.ysh
+  --eval four.ysh
+  -c 'echo flag -c'
+  ;

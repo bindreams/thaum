@@ -1,0 +1,10 @@
+name: filenames are completed
+dialect: bash
+source: oils:spec/ysh-completion#filenames-are-completed
+stdout: "\nTODO: Is the order reversed?  I guess this is file system order, which
+  is\nnondeterministic.  YSH can sort them\n\necho baz \necho bar \n"
+---
+
+touch foo bar baz
+
+compexport -c $'echo ba'

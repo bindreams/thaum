@@ -1,0 +1,7 @@
+name: Bad var sub
+dialect: bash
+source: oils:spec/var-sub#bad-var-sub
+status: 2
+stdout: ''
+---
+echo ${a&}

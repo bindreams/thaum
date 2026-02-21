@@ -1,0 +1,8 @@
+name: Bad var ref 2
+dialect: bash
+source: oils:spec/var-ref#bad-var-ref-2
+stdout: "status=1\n"
+---
+b='/'  # really bad
+echo ref ${!b}
+echo status=$?

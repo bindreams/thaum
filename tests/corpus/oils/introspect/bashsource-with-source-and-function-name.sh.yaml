@@ -1,0 +1,12 @@
+name: ${BASH_SOURCE[@]} with source and function name
+dialect: bash
+source: oils:spec/introspect#bashsource-with-source-and-function-name
+---
+cd $REPO_ROOT
+
+argv.py "${BASH_SOURCE[@]}"
+source spec/testdata/bash-source-simple.sh
+f
+[]
+['spec/testdata/bash-source-simple.sh']
+['spec/testdata/bash-source-simple.sh']

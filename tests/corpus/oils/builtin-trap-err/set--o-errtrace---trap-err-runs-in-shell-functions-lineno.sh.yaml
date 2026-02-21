@@ -1,0 +1,29 @@
+name: set -o errtrace - trap ERR runs in shell functions (LINENO)
+dialect: bash
+source: 
+  oils:spec/builtin-trap-err#set--o-errtrace---trap-err-runs-in-shell-functions-lineno
+stdout: "line=14\nnow with errtrace\nline=4\nline=10\nline=20\nok\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+passing() {
+  false  # line 4
+  true
+}
+
+failing() {
+  true
+  false
+}
+
+passing
+failing
+
+set -o errtrace
+
+echo 'now with errtrace'
+passing
+failing
+
+echo ok

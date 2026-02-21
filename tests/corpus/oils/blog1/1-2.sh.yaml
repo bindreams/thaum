@@ -1,0 +1,9 @@
+name: ${#1#'###'}
+dialect: bash
+source: oils:spec/blog1#1
+status: 2
+stdout: ''
+---
+set -- '####'
+echo ${#1#'###'}
+# dash and zsh accept; mksh/bash/osh don't.

@@ -1,0 +1,8 @@
+name: --debug-file
+dialect: bash
+source: oils:spec/ysh-usage#debug-file
+stdout: "yes\n"
+---
+var TMP = ENV.TMP
+$[ENV.SH] --debug-file $TMP/debug.txt -c 'true'
+grep 'Oils started with' $TMP/debug.txt >/dev/null && echo yes

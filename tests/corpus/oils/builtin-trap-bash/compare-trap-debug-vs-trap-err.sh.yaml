@@ -1,0 +1,31 @@
+name: Compare trap DEBUG vs. trap ERR
+dialect: bash
+source: oils:spec/builtin-trap-bash#compare-trap-debug-vs-trap-err
+stdout: "dbg 3\ndbg 3\ndbg 3\ndbg 5\ndbg 5\ndbg 5\ndbg 7\ndbg 9\nerr 14\nerr 16\n\
+  ok\n"
+---
+
+# Pipelines and AndOr are problematic
+
+# THREE each
+trap 'echo dbg $LINENO' DEBUG
+
+false | false | false
+
+false || false || false
+
+! true
+
+trap - DEBUG
+
+
+# ONE EACH
+trap 'echo err $LINENO' ERR
+
+false | false | false
+
+false || false || false
+
+! true  # not run
+
+echo ok

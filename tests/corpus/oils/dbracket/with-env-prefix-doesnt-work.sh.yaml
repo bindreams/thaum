@@ -1,0 +1,6 @@
+name: "[[ with env prefix doesn't work"
+dialect: bash
+source: oils:spec/dbracket#with-env-prefix-doesnt-work
+status: 127
+---
+FOO=bar [[ foo == foo ]]

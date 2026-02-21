@@ -1,0 +1,10 @@
+name: array ref
+dialect: bash
+source: oils:spec/var-ref#array-ref
+status: 0
+stdout: "ale\n"
+---
+
+declare -a array=(ale bean)
+ref='array[0]'
+echo ${!ref}

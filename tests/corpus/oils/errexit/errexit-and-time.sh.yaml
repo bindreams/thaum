@@ -1,0 +1,8 @@
+name: errexit and time { }
+dialect: bash
+source: oils:spec/errexit#errexit-and-time
+status: 1
+---
+set -o errexit
+time false
+echo status=$?

@@ -1,0 +1,14 @@
+name: json round trip (regression)
+dialect: bash
+source: oils:spec/ysh-json#json-round-trip-regression
+stdout: "(Dict)   {\"short\":\"-v\",\"long\":\"--verbose\",\"type\":null,\"default\"\
+  :\"\",\"help\":\"Enable verbose logging\"}\n"
+---
+
+var d = {
+  short: '-v', long: '--verbose', type: null, default: '', help: 'Enable verbose logging'
+}
+
+json write (d) | json read
+
+pp test_ (_reply)

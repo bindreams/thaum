@@ -1,0 +1,8 @@
+name: read --all from directory is an error (EISDIR)
+dialect: bash
+source: oils:spec/ysh-builtins#read---all-from-directory-is-an-error-eisdir
+stdout: "status=1\n"
+---
+mkdir -p ./dir
+read --all < ./dir
+echo status=$?

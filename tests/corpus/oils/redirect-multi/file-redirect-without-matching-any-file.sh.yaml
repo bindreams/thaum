@@ -1,0 +1,10 @@
+name: File redirect without matching any file
+dialect: bash
+source: oils:spec/redirect-multi#file-redirect-without-matching-any-file
+stdout: "status=0\nzz-*-xx\n"
+---
+
+echo hi > zz-*-xx
+echo status=$?
+
+echo zz*

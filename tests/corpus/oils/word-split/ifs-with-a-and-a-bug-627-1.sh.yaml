@@ -1,0 +1,11 @@
+name: "IFS='' with ${!a[@]} and ${!a[*]} (bug #627)"
+dialect: bash
+source: oils:spec/word-split#ifs-with-a-and-a-bug-627
+stdout: "['at', '0', '1', '2']\n['star', '0', '1', '2']\n"
+---
+case $SH in dash | mksh | ash | yash) exit 0 ;; esac
+
+IFS=''
+a=(v1 v2 v3)
+argv.py at ${!a[@]}
+argv.py star ${!a[*]}

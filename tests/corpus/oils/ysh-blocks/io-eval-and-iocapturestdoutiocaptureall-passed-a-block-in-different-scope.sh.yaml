@@ -1,0 +1,32 @@
+name: io->eval() and io.captureStdout()/io.captureAll() passed a block in 
+  different scope
+dialect: bash
+source: 
+  oils:spec/ysh-blocks#io-eval-and-iocapturestdoutiocaptureall-passed-a-block-in-different-scope
+stdout: "i = 42\ni = 42\n(Dict)   {\"x\":\"x\"}\nstdout i = 42\nstdout i = 42\n\n"
+---
+shopt --set ysh:upgrade
+
+proc my-cd (; b) {
+  call io->eval(b)
+
+  var d = io->evalToDict(b)
+
+  pp test_ (d)
+
+  # Yup, this is a problem
+  var s = io.captureStdout(b)
+  echo "stdout $s"
+
+  setvar s = io.captureAll(b)
+  echo "stdout $[s.stdout]" # Adds a newline
+}
+
+proc p {
+  var i = 42
+  var b = ^(var x = 'x'; echo "i = $i")
+
+  my-cd (b)
+}
+
+p

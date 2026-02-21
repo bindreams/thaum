@@ -1,0 +1,21 @@
+name: Global and local ARGV, like "$@"
+dialect: bash
+source: oils:spec/ysh-proc#global-and-local-argv-like
+stdout: "[]\n[]\n['a b', 'c']\n[]\n['1', '2 3']\n[]\n"
+---
+
+$SH -o ysh:upgrade -c '
+argv.py "$@"
+argv.py @ARGV
+#argv.py "${ARGV[@]}"  # not useful, but it works!
+
+set -- "a b" c
+argv.py "$@"
+argv.py @ARGV  # separate from the argv stack
+
+f() {
+  argv.py "$@"
+  argv.py @ARGV  # separate from the argv stack
+}
+f 1 "2 3"
+'

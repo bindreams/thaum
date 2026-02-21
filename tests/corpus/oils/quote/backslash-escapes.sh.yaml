@@ -1,0 +1,6 @@
+name: Backslash escapes
+dialect: bash
+source: oils:spec/quote#backslash-escapes
+stdout: "$ | a b c d \\\n"
+---
+echo \$ \| \a \b \c \d \\

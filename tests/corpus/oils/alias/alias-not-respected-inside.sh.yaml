@@ -1,0 +1,9 @@
+name: Alias not respected inside $()
+dialect: bash
+source: oils:spec/alias#alias-not-respected-inside
+status: 127
+---
+# This could be parsed correctly, but it is only defined in a child process.
+shopt -s expand_aliases
+echo $(alias sayhi='echo hello')
+sayhi

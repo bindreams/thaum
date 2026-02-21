@@ -1,0 +1,11 @@
+name: More Smooshing 2
+dialect: bash
+source: oils:spec/builtin-getopts#more-smooshing-2
+stdout: "OPTIND=1 opt=a OPTARG=\nOPTIND=1 opt=b OPTARG=\nOPTIND=2 opt=c OPTARG=10\n"
+---
+getopts "abc:" opt -abc10
+echo OPTIND=$OPTIND opt=$opt OPTARG=$OPTARG
+getopts "abc:" opt -abc10
+echo OPTIND=$OPTIND opt=$opt OPTARG=$OPTARG
+getopts "abc:" opt -abc10
+echo OPTIND=$OPTIND opt=$opt OPTARG=$OPTARG

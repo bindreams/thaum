@@ -1,0 +1,10 @@
+name: Singleton ranges
+dialect: bash
+source: oils:spec/brace-expansion#singleton-ranges
+stdout: "1-\n-9-\n-9-\n-9-\na-\n"
+---
+echo {1..1}-
+echo {-9..-9}-
+echo {-9..-9..3}-
+echo {-9..-9..-3}-
+echo {a..a}-

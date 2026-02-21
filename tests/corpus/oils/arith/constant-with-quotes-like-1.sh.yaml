@@ -1,0 +1,8 @@
+name: Constant with quotes like '1'
+dialect: bash
+source: oils:spec/arith#constant-with-quotes-like-1
+status: 0
+---
+# NOTE: Compare with [[.  That is a COMMAND level expression, while this is a
+# WORD level expression.
+echo $(('1' + 2))

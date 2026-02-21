@@ -1,0 +1,24 @@
+name: Process subs, subshells not allowed with eval()
+dialect: bash
+source: oils:spec/ysh-purity#process-subs-subshells-not-allowed-with-eval
+stdout: "1\n2\ncode=5 message=Process subs aren't allowed in pure mode (OILS-ERR-204)\n\
+  \nsubshell\ncode=5 message=Subshells aren't allowed in pure mode (OILS-ERR-204)\n"
+---
+shopt --set ysh:upgrade
+
+var cmd = ^( cat <(echo 1) <(echo 2) )
+call io->eval(cmd)
+
+try {
+  call eval(cmd)
+}
+echo code=$[_error.code] message=$[_error.message]
+echo
+
+var cmd = ^(( echo subshell ) )
+call io->eval(cmd)
+
+try {
+  call eval(cmd)
+}
+echo code=$[_error.code] message=$[_error.message]

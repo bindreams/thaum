@@ -1,0 +1,25 @@
+name: 'proc with IFS= read -r line - dynamic scope - issue #2012'
+dialect: bash
+source: 
+  oils:spec/ysh-bugs#proc-with-ifs-read--r-line---dynamic-scope---issue-2012
+stdout: "zz\nyy\n"
+---
+
+# 2024-10 - FIXED by the new Env Obj!  Because in YSH, 'line' is NOT created in
+# TEMP stack frame - we use the ENCLOSED frame, and it fixes it.
+
+proc p {
+	read -r line
+  write $line
+}
+
+proc p-ifs {
+	IFS= read -r line
+  write $line
+}
+
+#set -x
+
+echo zz | p
+
+echo yy | p-ifs

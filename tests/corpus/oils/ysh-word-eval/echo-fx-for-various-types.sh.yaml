@@ -1,0 +1,18 @@
+name: echo $[f(x)] for various types
+dialect: bash
+source: oils:spec/ysh-word-eval#echo-fx-for-various-types
+stdout: "bool true\nint 2\nfloat 3.14\nstr identity\n---\nbool expr true\nbool splice
+  true\n"
+---
+shopt --set ysh:upgrade
+
+source $LIB_YSH/math.ysh
+
+echo bool $[identity(true)]
+echo int $[len(['a', 'b'])]
+echo float $[abs(-3.14)]  # FIXME: this causes issues with float vs. int comparison
+echo str $[identity('identity')]
+
+echo ---
+echo bool expr $[true]
+echo bool splice @[identity([true])]

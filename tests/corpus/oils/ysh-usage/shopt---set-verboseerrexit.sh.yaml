@@ -1,0 +1,17 @@
+name: shopt --set verbose_errexit
+dialect: bash
+source: oils:spec/ysh-usage#shopt---set-verboseerrexit
+stdout: " 3 on.txt\n 0 off.txt\n 3 total\n"
+---
+
+try {
+  $[ENV.SH] -c '/bin/false' 2>on.txt
+}
+
+try {
+  $[ENV.SH] +o verbose_errexit -c '/bin/false' 2>off.txt
+}
+
+wc -l on.txt off.txt
+#echo
+#cat on.txt off.txt

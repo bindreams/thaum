@@ -1,0 +1,9 @@
+name: Typed return in a proc is error
+dialect: bash
+source: oils:spec/ysh-func#typed-return-in-a-proc-is-error
+status: 2
+stdout: "\n"
+---
+proc t() { return (0) }
+
+= t()

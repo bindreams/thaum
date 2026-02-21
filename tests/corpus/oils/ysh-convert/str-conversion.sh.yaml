@@ -1,0 +1,21 @@
+name: str() conversion
+dialect: bash
+source: oils:spec/ysh-convert#str-conversion
+status: 3
+stdout: "1234\n1.234\nfoo\n\ntrue\nnull\n[[:digit:]]+\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo $[str(1234)]
+echo $[str(1.234)]
+echo $[str('foo')]
+
+echo
+
+# Added with Stringify()
+
+echo $[str(true)]
+echo $[str(null)]
+echo $[str(/d+/)]
+
+echo $[str([1,2,3])]

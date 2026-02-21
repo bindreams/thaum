@@ -1,0 +1,10 @@
+name: type -a -> file
+dialect: bash
+source: oils:spec/builtin-type-bash#type--a---file
+stdout: "date is /bin/date\ndate is _tmp/date\n"
+---
+touch _tmp/date
+chmod +x _tmp/date
+PATH=/bin:_tmp  # control output
+
+type -a date

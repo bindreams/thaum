@@ -1,0 +1,7 @@
+name: printf %6.s and %0.s
+dialect: bash
+source: oils:spec/builtin-printf#printf-6s-and-0s
+stdout: "[      ]\n[]\n"
+---
+printf '[%6.s]\n' foo
+printf '[%0.s]\n' foo

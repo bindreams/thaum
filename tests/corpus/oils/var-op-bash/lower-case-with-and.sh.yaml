@@ -1,0 +1,10 @@
+name: Lower Case with , and ,,
+dialect: bash
+source: oils:spec/var-op-bash#lower-case-with-and
+stdout: "aBC DEF\nabc def\nempty=\nempty=\n"
+---
+x='ABC DEF'
+echo ${x,}
+echo ${x,,}
+echo empty=${empty,}
+echo empty=${empty,,}

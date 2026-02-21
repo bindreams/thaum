@@ -1,0 +1,14 @@
+name: builtin usage
+dialect: bash
+source: oils:spec/builtin-meta#builtin-usage
+stdout: "status=0\nstatus=0\nstatus=1\n"
+---
+ 
+builtin
+echo status=$?
+
+builtin --
+echo status=$?
+
+builtin -- false
+echo status=$?

@@ -1,0 +1,18 @@
+name: sh -c with multiple -- args
+dialect: bash
+source: oils:spec/sh-usage#sh--c-with-multiple----args
+stdout: "status=127\nstatus=127\nz failed\n"
+---
+
+# variant of above case
+
+$SH -c -- -- 'echo two'
+echo status=$?
+
+$SH -c -- -- -- 'echo two'
+echo status=$?
+
+$SH -c -z 'echo z'
+if test $? -ne 0; then
+  echo 'z failed'
+fi

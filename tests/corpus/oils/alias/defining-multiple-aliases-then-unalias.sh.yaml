@@ -1,0 +1,16 @@
+name: defining multiple aliases, then unalias
+dialect: bash
+source: oils:spec/alias#defining-multiple-aliases-then-unalias
+stdout: "status=0\nx X\ny Y\nstatus=0\nundefined\nundefined\n"
+---
+shopt -s expand_aliases  # bash requires this
+x=x
+y=y
+alias echo-x='echo $x' echo-y='echo $y'
+echo status=$?
+echo-x X
+echo-y Y
+unalias echo-x echo-y
+echo status=$?
+echo-x X || echo undefined
+echo-y Y || echo undefined

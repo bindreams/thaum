@@ -1,0 +1,11 @@
+name: Exponentiation with **
+dialect: bash
+source: oils:spec/ysh-expr-arith#exponentiation-with
+status: 3
+stdout: "8\n"
+---
+var x = 2**3
+echo $x
+
+var y = 2.0 ** 3.0  # NOT SUPPORTED
+echo 'should not get here'

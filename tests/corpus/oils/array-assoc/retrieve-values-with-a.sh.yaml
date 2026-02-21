@@ -1,0 +1,13 @@
+name: retrieve values with ${A[@]}
+dialect: bash
+source: oils:spec/array-assoc#retrieve-values-with-a
+stdout: "b\nbar\nc\n"
+---
+declare -A A
+var='x'
+A["$var"]=b
+A['foo']=bar
+A['a+1']=c
+for val in "${A[@]}"; do
+  echo $val
+done | sort

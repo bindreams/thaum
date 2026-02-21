@@ -1,0 +1,6 @@
+name: Literal $
+dialect: bash
+source: oils:spec/quote#literal
+stdout: "$\n"
+---
+echo $

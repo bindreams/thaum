@@ -1,0 +1,7 @@
+name: IFS 2 - copied into spec/word-split
+dialect: bash
+source: oils:spec/toysh-posix#ifs-2---copied-into-specword-split
+stdout: "=x=\n=abc=\n=def=\n==\n"
+---
+# this one appears different between osh and bash
+A="   abc   def   "; for i in ""x""$A""; do echo =$i=; done

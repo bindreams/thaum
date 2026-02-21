@@ -1,0 +1,20 @@
+name: String length with incomplete utf-8
+dialect: bash
+source: oils:spec/var-op-len#string-length-with-incomplete-utf-8
+stdout: "0\n1\n2\n-1\n3\n4\n-1\n-1\n5\n6\n-1\n-1\n-1\n7\n[ stdin ]:3: warning: UTF-8
+  decode: Truncated bytes at offset 2 in string of 3 bytes\n[ stdin ]:3: warning:
+  UTF-8 decode: Truncated bytes at offset 5 in string of 6 bytes\n[ stdin ]:3: warning:
+  UTF-8 decode: Truncated bytes at offset 5 in string of 7 bytes\n[ stdin ]:3: warning:
+  UTF-8 decode: Truncated bytes at offset 9 in string of 10 bytes\n[ stdin ]:3: warning:
+  UTF-8 decode: Truncated bytes at offset 9 in string of 11 bytes\n[ stdin ]:3: warning:
+  UTF-8 decode: Truncated bytes at offset 9 in string of 12 bytes\n"
+---
+for num_bytes in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do
+  s=$(head -c $num_bytes $REPO_ROOT/spec/testdata/utf8-chars.txt)
+  echo ${#s}
+done 2> $TMP/err.txt
+
+grep 'warning:' $TMP/err.txt
+true  # exit 0
+
+# zsh behavior actually matches bash!

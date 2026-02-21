@@ -1,0 +1,17 @@
+name: Remove multiple handlers with trap -
+dialect: bash
+source: oils:spec/builtin-trap#remove-multiple-handlers-with-trap
+stdout: "---\nok\n"
+---
+trap "echo int" INT
+trap "echo e" EXIT
+trap - int 0 3
+trap
+
+echo ---
+trap "echo int" INT
+trap "echo e" EXIT
+trap - int 0 -99
+if test $? -ne 0; then
+  echo ok
+fi

@@ -1,0 +1,16 @@
+name: Regex to match literals . ^ $ etc.
+dialect: bash
+source: oils:spec/regex#regex-to-match-literals-etc
+stdout: "false\ntrue\nfalse\ntrue\nfalse\ntrue\nfalse\ntrue\n"
+---
+[[ 'x' =~ \. ]] || echo false
+[[ '.' =~ \. ]] && echo true
+
+[[ 'xx' =~ \^\$ ]] || echo false
+[[ '^$' =~ \^\$ ]] && echo true
+
+[[ 'xxx' =~ \+\*\? ]] || echo false
+[[ '*+?' =~ \*\+\? ]] && echo true
+
+[[ 'xx' =~ \{\} ]] || echo false
+[[ '{}' =~ \{\} ]] && echo true

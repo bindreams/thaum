@@ -1,0 +1,8 @@
+name: double quoted
+dialect: bash
+source: oils:spec/ysh-expr#double-quoted
+stdout: "-bar-bar-default-\n"
+---
+var foo = "bar"
+var x = "-$foo-${foo}-${undef:-default}-"
+echo $x

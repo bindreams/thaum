@@ -1,0 +1,22 @@
+name: '[bash_unset] local-unset / dynamic-unset for tempenv'
+dialect: bash
+source: oils:spec/ble-features#bashunset-local-unset-dynamic-unset-for-tempenv
+stdout: "# always-cell-unset, bash-unset\n#   local-unset   = cell-unset\n#   dynamic-unset
+  = cell-unset\n[global,tempenv,(unset)] v: global\n[global,tempenv,(unlocal)] v:
+  global\n"
+---
+unlocal() { unset -v "$1"; }
+
+f1() {
+  unset v
+  echo "[$1,(unset)] v: ${v-(unset)}"
+}
+v=global
+v=tempenv f1 'global,tempenv'
+
+f1() {
+  unlocal v
+  echo "[$1,(unlocal)] v: ${v-(unset)}"
+}
+v=global
+v=tempenv f1 'global,tempenv'

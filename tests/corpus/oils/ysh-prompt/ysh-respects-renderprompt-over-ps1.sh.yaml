@@ -1,0 +1,20 @@
+name: ysh respects renderPrompt() over PS1
+dialect: bash
+source: oils:spec/ysh-prompt#ysh-respects-renderprompt-over-ps1
+stdout: "hi\n^D\n"
+stderr: 'hi$ hi$ '
+---
+
+setglobal ENV.PS1 = r'myprompt\$ '
+
+cat >yshrc <<'EOF'
+func renderPrompt(io) {
+  var parts = []
+  call parts->append('hi')
+  call parts->append(io.promptVal('$'))
+  call parts->append(' ')
+  return (join(parts))
+}
+EOF
+
+echo 'echo hi' | $[ENV.SH] -i --rcfile yshrc

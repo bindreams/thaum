@@ -1,0 +1,17 @@
+name: Invalid String is an error
+dialect: bash
+source: oils:spec/ysh-expr-compare#invalid-string-is-an-error
+status: 3
+stdout: "\n"
+---
+shopt -s ysh:upgrade
+
+try {
+  = '3' < 'bar'
+}
+echo code=$[_error.code]
+
+try {
+  = '3' < '123_4'
+}
+echo code=$[_error.code]

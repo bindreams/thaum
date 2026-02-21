@@ -1,0 +1,8 @@
+name: Char ranges with steps of the wrong sign
+dialect: bash
+source: oils:spec/brace-expansion#char-ranges-with-steps-of-the-wrong-sign
+status: 2
+stdout: ''
+---
+echo -{a..e..-2}-
+echo -{e..a..2}-

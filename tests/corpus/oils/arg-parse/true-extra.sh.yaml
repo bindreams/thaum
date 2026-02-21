@@ -1,0 +1,6 @@
+name: true extra
+dialect: bash
+source: oils:spec/arg-parse#true-extra
+stdout: "\n"
+---
+true extra

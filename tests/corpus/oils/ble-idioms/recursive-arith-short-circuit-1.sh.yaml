@@ -1,0 +1,9 @@
+name: 'recursive arith: short circuit ?:'
+dialect: bash
+source: oils:spec/ble-idioms#recursive-arith-short-circuit
+stdout: "123:123\n321:321\n"
+---
+# Note: "busybox sh" behaves strangely.
+y=a=123 n=a=321
+echo $((1?(y):(n))):$((a))
+echo $((0?(y):(n))):$((a))

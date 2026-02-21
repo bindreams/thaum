@@ -1,0 +1,8 @@
+name: Augmented assignment
+dialect: bash
+source: oils:spec/arith#augmented-assignment
+stdout: "5\n5\n"
+---
+a=4
+echo $((a+=1))
+echo $a

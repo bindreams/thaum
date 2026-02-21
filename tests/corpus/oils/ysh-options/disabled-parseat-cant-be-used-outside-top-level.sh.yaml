@@ -1,0 +1,16 @@
+name: "DISABLED: parse_at can't be used outside top level"
+dialect: bash
+source: oils:spec/ysh-options#disabled-parseat-cant-be-used-outside-top-level
+status: 1
+stdout: ''
+---
+
+# shopt -u expand_aliases conflicted with ble.sh, and it was also broken for
+# proc/func
+
+f() {
+  shopt -s parse_at
+  echo status=$?
+}
+f
+echo 'should not get here'

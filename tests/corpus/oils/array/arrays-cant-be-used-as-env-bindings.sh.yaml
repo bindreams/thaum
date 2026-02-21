@@ -1,0 +1,8 @@
+name: Arrays can't be used as env bindings
+dialect: bash
+source: oils:spec/array#arrays-cant-be-used-as-env-bindings
+status: 2
+stdout: ''
+---
+# Hm bash it treats it as a string!
+A=a B=(b b) printenv.py A B

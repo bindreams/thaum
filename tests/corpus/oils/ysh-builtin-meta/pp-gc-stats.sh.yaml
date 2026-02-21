@@ -1,0 +1,7 @@
+name: pp gc-stats_
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-gc-stats
+stdout: "\n"
+---
+
+pp gc-stats_

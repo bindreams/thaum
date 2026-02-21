@@ -1,0 +1,30 @@
+name: Proc Inside Block
+dialect: bash
+source: oils:spec/hay-meta#proc-inside-block
+stdout: "p\np\n"
+---
+shopt --set ysh:all
+
+hay define rule  # lower case allowed
+
+proc p(name; out) {
+  echo 'p'
+  call out->setValue(name)
+}
+
+rule hello {
+  var eggs = ''
+  var bar = ''
+
+  p spam (&eggs)
+  p foo (&bar)
+}
+
+json write (_hay()) | jq '.children[0].attrs' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "eggs": "spam",
+  "bar": "foo"
+}
+EOF

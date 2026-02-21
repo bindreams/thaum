@@ -1,0 +1,10 @@
+name: Prefix env on control flow
+dialect: bash
+source: oils:spec/command-parsing#prefix-env-on-control-flow
+status: 0
+stdout: "a\n"
+---
+for x in a b c; do
+  echo $x
+  E=env break
+done

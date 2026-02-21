@@ -1,0 +1,14 @@
+name: eggex as case arm
+dialect: bash
+source: oils:spec/ysh-case#eggex-as-case-arm
+stdout: "C++\n"
+---
+const x = "main.cc"
+case (x) {
+  / dot* '.py' / {
+    echo Python
+  }
+  / dot* ('.cc' | '.h') / {
+   echo C++
+  }
+}

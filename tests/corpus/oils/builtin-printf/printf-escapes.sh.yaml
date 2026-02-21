@@ -1,0 +1,6 @@
+name: printf % escapes
+dialect: bash
+source: oils:spec/builtin-printf#printf-escapes
+stdout: "[%]\n"
+---
+printf '[%%]\n'

@@ -1,0 +1,8 @@
+name: no splitting when IFS is empty
+dialect: bash
+source: oils:spec/word-split#no-splitting-when-ifs-is-empty
+stdout: "['a b']\n"
+---
+IFS=""
+foo="a b"
+argv.py $foo

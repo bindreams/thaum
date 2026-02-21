@@ -1,0 +1,10 @@
+name: bad help topic
+dialect: bash
+source: oils:spec/builtin-bash#bad-help-topic
+---
+help ZZZ 2>$TMP/err.txt
+echo "help=$?"
+cat $TMP/err.txt | grep -i 'no help topics' >/dev/null
+echo "grep=$?"
+help=1
+grep=0

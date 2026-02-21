@@ -1,0 +1,12 @@
+name: bad arg to break
+dialect: bash
+source: oils:spec/loop#bad-arg-to-break
+status: 1
+stdout: "hi\n"
+---
+x=oops
+while true; do 
+  echo hi
+  break $x
+  sleep 0.1
+done

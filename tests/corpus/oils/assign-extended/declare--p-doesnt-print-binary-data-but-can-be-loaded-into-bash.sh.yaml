@@ -1,0 +1,34 @@
+name: declare -p doesn't print binary data, but can be loaded into bash
+dialect: bash
+source: 
+  oils:spec/assign-extended#declare--p-doesnt-print-binary-data-but-can-be-loaded-into-bash
+stdout: "declare -- s1=foo\ndeclare -- s2='foo bar'\ndeclare -- s3=$'\\u001f'\ndeclare
+  -- s4=$'\\xfe\\xff'\ndeclare -a a=(foo 'foo bar' $'\\u001f' $'\\xfe\\xff')\ndeclare
+  -A A=([$'\\u001f']=$'\\xfe\\xff' ['foo']='foo bar')\n---\nfoo foo bar\n 1f 20 fe
+  ff\nbash=0\n"
+---
+
+# bash prints binary data!
+case $SH in bash*|mksh) exit ;; esac
+
+unquoted='foo'
+sq='foo bar'
+bash1=$'\x1f'  # ASCII control char
+bash2=$'\xfe\xff'  # Invalid UTF-8
+
+s1=$unquoted
+s2=$sq
+s3=$bash1
+s4=$bash2
+
+declare -a a=("$unquoted" "$sq" "$bash1" "$bash2")
+declare -A A=(["$unquoted"]="$sq" ["$bash1"]="$bash2")
+
+#echo lengths ${#s1} ${#s2} ${#s3} ${#s4} ${#a[@]} ${#A[@]}
+
+declare -p s1 s2 s3 s4 a A | tee tmp.bash
+
+echo ---
+
+bash -c 'source tmp.bash; echo "$s1 $s2"; echo -n "$s3" "$s4" | od -A n -t x1'
+echo bash=$?

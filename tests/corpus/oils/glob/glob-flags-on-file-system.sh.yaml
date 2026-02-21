@@ -1,0 +1,8 @@
+name: Glob flags on file system
+dialect: bash
+source: oils:spec/glob#glob-flags-on-file-system
+stdout: hello zzzzz
+---
+touch _tmp/-n _tmp/zzzzz
+cd _tmp
+echo -* hello zzzz?

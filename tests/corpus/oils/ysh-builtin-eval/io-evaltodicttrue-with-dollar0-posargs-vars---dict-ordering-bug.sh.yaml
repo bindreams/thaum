@@ -1,0 +1,32 @@
+name: io->eval(to_dict=true) with dollar0, pos_args, vars - dict ordering bug
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-dollar0-posargs-vars---dict-ordering-bug
+stdout: "{\n  \"foo\": \"global\",\n  \"z\": \"zero\",\n  \"one\": \"a\",\n  \"two\"\
+  : \"b\",\n  \"three\": \"+c\",\n  \"x\": \"X\",\n  \"y\": \"_Y\"\n}\n"
+---
+
+# TODO: mycpp/gc_dict.h should preserve insertion order, in the presence of
+# deletions, like CPython
+
+proc Dict ( ; out; ; block) {
+  var d = io->eval(block, dollar0='zero', pos_args=:|a b c|,
+                   vars={X: 'X', _Y: '_Y'}, to_dict=true)
+  call out->setValue(d)
+}
+
+var global = 'global'
+
+Dict (&d) {
+  foo = global
+  z = $0
+  one = $1
+  two = ${2}
+  three = "+$3"
+  # Note: X does NOT appear in the output, ctx_Eval makes it work.
+  x = X
+  y = _Y
+}
+
+json write (d)
+#pp test_ (d)

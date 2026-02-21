@@ -1,0 +1,20 @@
+name: flag -n and +n
+dialect: bash
+source: oils:spec/nameref#flag--n-and-n
+stdout: "ref=x\nref=foo\nref=bar\nref=x\n"
+---
+x=foo
+
+ref=x
+
+echo ref=$ref
+
+typeset -n ref
+echo ref=$ref
+
+# mutate underlying var
+x=bar
+echo ref=$ref
+
+typeset +n ref
+echo ref=$ref

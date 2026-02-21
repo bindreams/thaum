@@ -1,0 +1,38 @@
+name: invokable Obj must be have prototype containing __invoke__ of value.Proc -
+  type -t
+dialect: bash
+source: 
+  oils:spec/ysh-object#invokable-obj-must-be-have-prototype-containing-invoke-of-valueproc---type--t
+stdout: "(List)   [\"a\",{\"x\":5,\"y\":6}]\n\nproc\n\nno prototype\nno __invoke__
+  method in prototype\n__invoke__ of wrong type\n"
+---
+
+proc p (w; self) {
+  pp test_ ([w, self])
+}
+p a ({x: 5, y: 6})
+echo
+
+var methods = Object(null, {__invoke__: p})
+
+var o1 = Object(methods, {})
+type -t o1
+echo
+
+# errors
+
+var o2 = Object(null, {})
+if ! type -t o2 {
+  echo 'no prototype'
+}
+
+var o3 = Object(Object(null, {}), {})
+if ! type -t o3 {
+  echo 'no __invoke__ method in prototype'
+}
+
+var bad_methods = Object(null, {__invoke__: 42})
+var o4 = Object(bad_methods, {})
+if ! type -t o4 {
+  echo '__invoke__ of wrong type'
+}

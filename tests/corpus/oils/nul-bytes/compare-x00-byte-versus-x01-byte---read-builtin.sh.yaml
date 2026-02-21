@@ -1,0 +1,19 @@
+name: Compare \x00 byte versus \x01 byte - read builtin
+dialect: bash
+source: oils:spec/nul-bytes#compare-x00-byte-versus-x01-byte---read-builtin
+stdout: "len=3\n 2e 01 2e\nlen=2\n 2e 2e\nlen=0\n"
+---
+
+# Hm same odd behavior
+
+show_string() {
+  read s
+  echo len=${#s}
+  echo -n "$s" | od -A n -t x1
+}
+
+printf '.\001.' | show_string
+
+printf '.\000.' | show_string
+
+printf '\000' | show_string

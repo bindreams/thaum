@@ -1,0 +1,8 @@
+name: declare -a
+dialect: bash
+source: oils:spec/assign-extended#declare--a
+stdout: "['x', 'y', 'z']\n"
+---
+# nixpkgs setup.sh uses this (issue #26)
+declare -a array=(x y z)
+argv.py "${array[@]}"

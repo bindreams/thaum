@@ -1,0 +1,8 @@
+name: export -n undefined is ignored
+dialect: bash
+source: oils:spec/builtin-vars#export--n-undefined-is-ignored
+stdout: "status=0\n"
+---
+set -o errexit
+export -n undef
+echo status=$?

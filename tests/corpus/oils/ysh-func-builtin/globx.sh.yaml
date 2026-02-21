@@ -1,0 +1,17 @@
+name: '@[glob(x)]'
+dialect: bash
+source: oils:spec/ysh-func-builtin#globx
+stdout: "A\nB\n___\na.z\nb.z\n___\n-.z\na.z\nb.z\n"
+---
+
+# empty glob
+write -- A @[glob('__nope__')] B
+echo ___
+
+touch -- a.z b.z -.z
+write -- @[glob('?.z')]
+echo ___
+
+# add it back
+shopt --unset no_dash_glob
+write -- @[glob('?.z')]

@@ -1,0 +1,9 @@
+name: json write Dict
+dialect: bash
+source: oils:spec/ysh-json#json-write-dict
+stdout: "{\n  \"k\": \"v\",\n  \"k2\": [\n    4,\n    5\n  ]\n}\n[\n  {\n    \"k\"\
+  : \"v\",\n    \"k2\": \"v2\"\n  },\n  {}\n]\n"
+---
+json write ({k: 'v', k2: [4, 5]})
+
+json write ([{k: 'v', k2: 'v2'}, {}])

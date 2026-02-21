@@ -1,0 +1,8 @@
+name: expression literals, evaluation failure
+dialect: bash
+source: oils:spec/ysh-expr#expression-literals-evaluation-failure
+status: 3
+stdout: "\n"
+---
+var e = ^[1 / 0]
+call io->evalExpr(e)

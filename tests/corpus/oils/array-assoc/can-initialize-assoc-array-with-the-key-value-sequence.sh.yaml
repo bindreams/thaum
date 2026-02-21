@@ -1,0 +1,11 @@
+name: Can initialize assoc array with the "(key value ...)" sequence
+dialect: bash
+source: 
+  oils:spec/array-assoc#can-initialize-assoc-array-with-the-key-value-sequence
+stdout: "status=0\ndeclare -A A=(['1']=2 ['3']='')\n"
+---
+declare -A A=(1 2 3)
+echo status=$?
+declare -p A
+
+# bash-4.4 prints warnings to stderr but gives no indication of the problem

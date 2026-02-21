@@ -1,0 +1,21 @@
+name: 'proc eval block: return'
+dialect: bash
+source: oils:spec/ysh-control-flow#proc-eval-block-return
+stdout: "one\nend func\n"
+---
+shopt -s ysh:all
+
+proc proc-that-runs-block (; ; ; b) {
+  call io->eval(b)
+}
+
+f() {
+  proc-that-runs-block {
+    echo one
+    return
+    echo two
+  }
+  # this is reached because we're returning of proc-that-runs-block
+  echo 'end func'
+}
+f

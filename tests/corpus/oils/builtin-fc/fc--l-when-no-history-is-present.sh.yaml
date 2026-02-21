@@ -1,0 +1,6 @@
+name: fc -l when no history is present
+dialect: bash
+source: oils:spec/builtin-fc#fc--l-when-no-history-is-present
+status: 0
+---
+fc -l

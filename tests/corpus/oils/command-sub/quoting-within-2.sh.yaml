@@ -1,0 +1,9 @@
+name: Quoting \ within ``
+dialect: bash
+source: oils:spec/command-sub#quoting-within
+stdout: "[1 ]\n[2 ]\n[3 \\]\n"
+---
+# You need FOUR backslashes to make a literal \.
+echo [1 `echo \ `]
+echo [2 `echo \\ `]
+echo [3 `echo \\\\ `]

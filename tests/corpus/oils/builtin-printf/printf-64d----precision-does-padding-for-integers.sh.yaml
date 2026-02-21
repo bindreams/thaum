@@ -1,0 +1,13 @@
+name: printf %6.4d -- "precision" does padding for integers
+dialect: bash
+source: 
+  oils:spec/builtin-printf#printf-64d----precision-does-padding-for-integers
+stdout: "[  0042]\n[0042]\n[    42]\n--\n[ -0042]\n[-0042]\n[   -42]\n"
+---
+printf '[%6.4d]\n' 42
+printf '[%.4d]\n' 42
+printf '[%6.d]\n' 42
+echo --
+printf '[%6.4d]\n' -42
+printf '[%.4d]\n' -42
+printf '[%6.d]\n' -42

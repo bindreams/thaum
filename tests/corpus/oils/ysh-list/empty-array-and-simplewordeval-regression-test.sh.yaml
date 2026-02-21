@@ -1,0 +1,9 @@
+name: empty array and simple_word_eval (regression test)
+dialect: bash
+source: oils:spec/ysh-list#empty-array-and-simplewordeval-regression-test
+stdout: "len=0\n['/', '/']\n"
+---
+shopt -s parse_at simple_word_eval
+var empty = :| |
+echo len=$[len(empty)]
+argv.py / @empty /

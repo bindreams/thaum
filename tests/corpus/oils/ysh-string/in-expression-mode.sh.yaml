@@ -1,0 +1,30 @@
+name: "''' in Expression Mode"
+dialect: bash
+source: oils:spec/ysh-string#in-expression-mode
+stdout: "[two = $two '\nthree = $three ''\n \\u{61}\n]\n[two = $two '\nthree = $three
+  ''\n a\n]\n[two = $two '\nthree = $three ''\n a a\n]\n"
+---
+
+var two = 2
+var three = 2
+
+var x = r''' 
+  two = $two '
+  three = $three ''
+   \u{61}
+  '''
+echo "[$x]"
+
+var x = u''' 
+  two = $two '
+  three = $three ''
+   \u{61}
+  '''
+echo "[$x]"
+
+var x = b''' 
+  two = $two '
+  three = $three ''
+   \u{61} \y61
+  '''
+echo "[$x]"

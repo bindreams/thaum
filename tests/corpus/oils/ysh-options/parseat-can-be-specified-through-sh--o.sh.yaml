@@ -1,0 +1,7 @@
+name: parse_at can be specified through sh -O
+dialect: bash
+source: oils:spec/ysh-options#parseat-can-be-specified-through-sh--o
+stdout: "['@words']\n['a', 'b c']\n"
+---
+$SH +O parse_at -c 'words=(a "b c"); argv.py @words'
+$SH -O parse_at -c 'words=(a "b c"); argv.py @words'

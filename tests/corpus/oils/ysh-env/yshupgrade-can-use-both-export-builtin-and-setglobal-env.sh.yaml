@@ -1,0 +1,16 @@
+name: ysh:upgrade can use both export builtin and setglobal ENV
+dialect: bash
+source: 
+  oils:spec/ysh-env#yshupgrade-can-use-both-export-builtin-and-setglobal-env
+stdout: "ZZ=export\nZZ=setglobal\n"
+---
+shopt -s ysh:upgrade
+
+export ZZ='export'  # fails
+
+sh -c 'echo ZZ=$ZZ'  # not reached
+
+setglobal ENV.ZZ = 'setglobal'  # this takes precedence
+
+# execute POSIX shell
+sh -c 'echo ZZ=$ZZ'

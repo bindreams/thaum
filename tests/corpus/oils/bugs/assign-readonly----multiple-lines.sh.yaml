@@ -1,0 +1,9 @@
+name: assign readonly -- multiple lines
+dialect: bash
+source: oils:spec/bugs#assign-readonly----multiple-lines
+status: 1
+stdout: "\n"
+---
+readonly x=1
+x=2
+echo hi

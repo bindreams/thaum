@@ -1,0 +1,13 @@
+name: Usage of builtins
+dialect: bash
+source: oils:spec/alias#usage-of-builtins
+status: 127
+stdout: "status=0\nx\n"
+---
+shopt -s expand_aliases || true
+alias -- foo=echo
+echo status=$?
+foo x
+unalias -- foo
+foo x
+# dash doesn't accept --

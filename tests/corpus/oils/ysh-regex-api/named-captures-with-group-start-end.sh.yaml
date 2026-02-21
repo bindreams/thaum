@@ -1,0 +1,17 @@
+name: Named captures with _group() _start() _end()
+dialect: bash
+source: oils:spec/ysh-regex-api#named-captures-with-group-start-end
+status: 3
+stdout: "['2020', '08']\n3 7\n8 10\n"
+---
+shopt -s ysh:all
+
+var x = 'zz 2020-08-20'
+
+if (x ~ /<capture d+ as year> '-' <capture d+ as month>/) {
+  argv.py $[_group('year')] $[_group('month')]
+  echo $[_start('year')] $[_end('year')]
+  echo $[_start('month')] $[_end('month')]
+}
+
+argv.py $[_group('oops')]

@@ -1,0 +1,13 @@
+name: List->clear()
+dialect: bash
+source: oils:spec/ysh-methods#list-clear
+stdout: "(List)   []\n(List)   []\n"
+---
+var empty = []
+var items = [1, 2, 3]
+
+call empty->clear()
+call items->clear()
+
+pp test_ (empty)
+pp test_ (items)

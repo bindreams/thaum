@@ -1,0 +1,12 @@
+name: 'cd builtin: fatal error in block'
+dialect: bash
+source: oils:spec/ysh-control-flow#cd-builtin-fatal-error-in-block
+status: 1
+stdout: "one\n"
+---
+shopt -s ysh:all
+cd / {
+  echo one
+  false
+  echo two
+}

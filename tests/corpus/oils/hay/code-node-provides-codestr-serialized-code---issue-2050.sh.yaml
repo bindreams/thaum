@@ -1,0 +1,23 @@
+name: 'CODE node provides code_str, serialized code - issue #2050'
+dialect: bash
+source: oils:spec/hay#code-node-provides-codestr-serialized-code---issue-2050
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Package
+hay define Package/INSTALL
+
+Package {
+  name = "osh"
+  INSTALL {
+    #echo hi
+
+    # The block causes a bug?  Nesting?
+    cd dist {
+      ./install
+    }
+  }
+}
+
+= _hay()

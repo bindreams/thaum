@@ -1,0 +1,34 @@
+name: mini-parseArgs
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#mini-parseargs
+stdout: "{\n  \"flag\": [\n    {\n      \"short_name\": \"-t\",\n      \"long_name\"\
+  : \"--tsv\",\n      \"type\": \"Bool\",\n      \"help\": \"Output as a TSV\"\n \
+  \   },\n    {\n      \"short_name\": \"-r\",\n      \"long_name\": \"--recursive\"\
+  ,\n      \"type\": \"Bool\",\n      \"help\": \"Recurse into the given directory\"\
+  \n    },\n    {\n      \"short_name\": \"-N\",\n      \"long_name\": \"--count\"\
+  ,\n      \"type\": \"Int\",\n      \"help\": \"Process no more than N files\"\n\
+  \    }\n  ],\n  \"arg\": [\n    {\n      \"name\": \"path\"\n    }\n  ]\n}\n"
+---
+proc parser (; place ; ; block_def) {
+  var p = {}
+  ctx push (p; ; block_def)
+  call place->setValue(p)
+}
+
+var Bool = "Bool"
+var Int = "Int"
+proc flag (short_name, long_name; type; help) {
+  ctx emit flag ({short_name, long_name, type, help})
+}
+
+proc arg (name) {
+  ctx emit arg ({name})
+}
+
+parser (&spec) {
+  flag -t --tsv (Bool, help='Output as a TSV')
+  flag -r --recursive (Bool, help='Recurse into the given directory')
+  flag -N --count (Int, help='Process no more than N files')
+  arg path
+}
+json write (spec)

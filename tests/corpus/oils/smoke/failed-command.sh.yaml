@@ -1,0 +1,6 @@
+name: failed command
+dialect: bash
+source: oils:spec/smoke#failed-command
+status: 2
+---
+ls /nonexistent-zzZZ

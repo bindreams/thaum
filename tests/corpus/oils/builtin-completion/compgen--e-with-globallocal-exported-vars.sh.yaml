@@ -1,0 +1,12 @@
+name: compgen -e with global/local exported vars
+dialect: bash
+source: oils:spec/builtin-completion#compgen--e-with-globallocal-exported-vars
+stdout: "v1_global\nv2_local\n"
+---
+export v1_global=0
+f() {
+  local v2_local=0
+  export v2_local
+  compgen -e v
+}
+f

@@ -1,0 +1,34 @@
+name: Exact equality with === and !==
+dialect: bash
+source: oils:spec/ysh-expr-compare#exact-equality-with-and
+stdout: "ok\nok\nok\nok\n"
+---
+shopt -s ysh:all
+
+if (3 === 3) {
+  echo 'ok'
+}
+if (3 === '3') {
+  echo 'FAIL'
+}
+
+if (3 !== 3) {
+  echo 'FAIL'
+}
+if (3 !== '3') {
+  echo 'ok'
+}
+
+# dicts
+var d1 = {'a': 1, 'b': 2}
+var d2 = {'a': 1, 'b': 2}
+var d3 = {'a': 1, 'b': 3}
+if (d1 === d2) {
+  echo 'ok'
+}
+if (d1 === d3) {
+  echo 'FAIL'
+}
+if (d1 !== d3) {
+  echo 'ok'
+}

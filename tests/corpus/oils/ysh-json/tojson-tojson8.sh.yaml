@@ -1,0 +1,23 @@
+name: toJson() toJson8()
+dialect: bash
+source: oils:spec/ysh-json#tojson-tojson8
+stdout: "[42,1.5,null,true,\"hi\",\"�\"]\n[42,1.5,null,true,\"hi\",b'\\yf0']\n[3,4]\n\
+  [3,4]\n[\n  3,\n  4\n]\n[\n  3,\n  4\n]\n[3,4]\n[3,4]\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var obj = [42, 1.5, null, true, "hi", b'\yf0']
+
+echo $[toJson(obj)]
+echo $[toJson8(obj)]
+
+var obj2 = [3, 4]
+echo $[toJson(obj2, space=0)]  # same as the default
+echo $[toJson8(obj2, space=0)]
+
+echo $[toJson(obj2, space=2)]
+echo $[toJson8(obj2, space=2)]
+
+# fully specify this behavior
+echo $[toJson(obj2, space=-2)]
+echo $[toJson8(obj2, space=-2)]

@@ -1,0 +1,18 @@
+name: chdir is a synonym for cd - busybox ash
+dialect: bash
+source: oils:spec/builtin-cd#chdir-is-a-synonym-for-cd---busybox-ash
+stdout: "/tmp\n"
+---
+
+chdir /tmp
+
+if test $? -ne 0; then
+  echo fail
+  exit
+fi
+
+pwd
+
+# It's the same with no args, but mksh fails because of $HOME
+#chdir
+#echo status=$?

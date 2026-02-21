@@ -1,0 +1,8 @@
+name: 'Multiple words: outer double quotes, inner single quotes'
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#multiple-words-outer-double-quotes-inner-single-quotes
+stdout: "[\"'a b c'\"]\n"
+---
+argv.py "${Unset:-'a b c'}"
+# WEIRD ONE.

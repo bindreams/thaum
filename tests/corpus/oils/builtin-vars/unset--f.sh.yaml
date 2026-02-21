@@ -1,0 +1,14 @@
+name: Unset -f
+dialect: bash
+source: oils:spec/builtin-vars#unset--f
+---
+foo() {
+  echo "function foo"
+}
+foo=bar
+unset -f foo
+echo foo=$foo
+foo
+echo status=$?
+foo=bar
+status=127

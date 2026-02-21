@@ -1,0 +1,9 @@
+name: '[[ ]] with redirect'
+dialect: bash
+source: oils:spec/dbracket#with-redirect
+stdout: "0\n--\nSTDERR\n"
+---
+[[ $(stdout_stderr.py) == STDOUT ]] 2>$TMP/x.txt
+echo $?
+echo --
+cat $TMP/x.txt

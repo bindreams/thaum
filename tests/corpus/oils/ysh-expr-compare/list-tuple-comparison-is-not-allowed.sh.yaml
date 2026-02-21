@@ -1,0 +1,16 @@
+name: List / "Tuple" comparison is not allowed
+dialect: bash
+source: oils:spec/ysh-expr-compare#list-tuple-comparison-is-not-allowed
+status: 3
+stdout: "\n"
+---
+
+shopt -s ysh:upgrade
+
+var t1 = 3, 0
+var t2 = 4, 0
+var t3 = 3, 1
+
+if (t2 > t1) { echo yes1 }
+if (t3 > t1) { echo yes2 }
+if ( (0,0) > t1) { echo yes3 }

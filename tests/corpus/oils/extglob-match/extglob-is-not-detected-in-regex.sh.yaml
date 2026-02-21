@@ -1,0 +1,7 @@
+name: extglob is not detected in regex!
+dialect: bash
+source: oils:spec/extglob-match#extglob-is-not-detected-in-regex
+stdout: "FALSE\n"
+---
+shopt -s extglob
+[[ foo =~ ^@(foo|bar)$ ]] || echo FALSE

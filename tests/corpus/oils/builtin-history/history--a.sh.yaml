@@ -1,0 +1,23 @@
+name: history -a
+dialect: bash
+source: oils:spec/builtin-history#history--a
+stdout: "1\nHISTFILE=tmp\necho 1\nhistory -a\n2\nHISTFILE=tmp\necho 1\nhistory -a\n\
+  ^D\n"
+---
+rm -f tmp
+
+echo '
+history -c
+
+HISTFILE=tmp
+echo 1
+history -a
+cat tmp
+
+echo 2
+
+cat tmp
+' | $SH -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

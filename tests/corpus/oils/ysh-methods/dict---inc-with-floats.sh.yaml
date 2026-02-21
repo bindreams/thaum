@@ -1,0 +1,24 @@
+name: Dict -> inc() with floats
+dialect: bash
+source: oils:spec/ysh-methods#dict---inc-with-floats
+status: 3
+stdout: "(Dict)   {\"a\":4.5}\n(Dict)   {\"a\":8.0}\n(Dict)   {\"a\":8.0,\"b\":3.5}\n\
+  (Dict)   {\"a\":8.0,\"b\":5.5}\n(Dict)   {\"a\":8.0,\"b\":5.5,\"c\":1}\n(Dict) \
+  \  {\"a\":8.0,\"b\":5.5,\"c\":4.0}\n"
+---
+var histogram = {a: 2.5}
+call histogram->inc('a', 2)
+pp test_ (histogram)
+call histogram->inc('a', 3.5)
+pp test_ (histogram)
+call histogram->inc('b', 3.5)
+pp test_ (histogram)
+call histogram->inc('b', 2)
+pp test_ (histogram)
+call histogram->inc('c', 1)
+pp test_ (histogram)
+call histogram->inc('c', 3.0)
+pp test_ (histogram)
+
+var d = {k: 'foo'}
+call d->inc('k', 42.14)

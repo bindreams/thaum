@@ -1,0 +1,25 @@
+name: Basic help message
+dialect: bash
+source: oils:spec/ysh-stdlib-args#basic-help-message
+stdout: "usage: program-name [-h] [-v] src dst\n\nReference Implementation\n\npositional
+  arguments:\n src\n dst\n\noptions:\n -h, --help           show this help message
+  and exit\n -v, --verbose        Verbose\n"
+---
+
+source $LIB_YSH/args.ysh
+
+parser (&spec) {
+  # TODO: implement description, prog and help message
+  description '''
+     Reference Implementation
+  '''
+  prog "program-name"
+
+  arg -v --verbose (Bool, help = "Verbose")
+  arg src
+  arg dst
+}
+var argv = ['-h', 'src', 'dst']
+
+# Help
+var args = parseArgs(spec, argv)

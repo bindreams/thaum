@@ -1,0 +1,8 @@
+name: smoke test for stream.ysh and table.ysh
+dialect: bash
+source: oils:spec/ysh-stdlib#smoke-test-for-streamysh-and-tableysh
+status: 0
+---
+
+source $LIB_YSH/stream.ysh
+source $LIB_YSH/table.ysh

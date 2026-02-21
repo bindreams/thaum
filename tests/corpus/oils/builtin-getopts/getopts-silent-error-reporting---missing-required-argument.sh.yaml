@@ -1,0 +1,12 @@
+name: getopts silent error reporting - missing required argument
+dialect: bash
+source: 
+  oils:spec/builtin-getopts#getopts-silent-error-reporting---missing-required-argument
+status: 0
+stdout: "status=0 opt=: OPTARG=a\n"
+stderr: "\n"
+---
+# Silent mode returns ':' and sets OPTARG to option char
+set -- -a
+getopts ':a:' opt 2>&1
+echo "status=$? opt=$opt OPTARG=$OPTARG"

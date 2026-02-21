@@ -1,0 +1,19 @@
+name: 'proc static check: variable changed by setvar must be declared'
+dialect: bash
+source: 
+  oils:spec/ysh-assign#proc-static-check-variable-changed-by-setvar-must-be-declared
+status: 2
+stdout: "\n"
+---
+shopt -s ysh:all
+
+var x = 1
+f() {
+  # setting global is OK
+  setglobal x = 'XX'
+  echo x=$x
+
+  # local NOT DECLARED
+  setvar x = 'YY'
+  echo y=$y
+}

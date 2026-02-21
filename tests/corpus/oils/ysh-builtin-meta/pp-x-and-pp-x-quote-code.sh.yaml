@@ -1,0 +1,12 @@
+name: pp (x) and pp [x] quote code
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-x-and-pp-x-quote-code
+stdout: "\n  pp (42)\n     ^\n[ stdin ]:1: (Int)   42\n\n  pp [42] | sed 's/0x[a-f0-9]\\\
+  +/[replaced]/'\n     ^\n[ stdin ]:5: <Expr [replaced]>\n"
+---
+
+pp (42)
+
+shopt --set ysh:upgrade
+
+pp [42] | sed 's/0x[a-f0-9]\+/[replaced]/'

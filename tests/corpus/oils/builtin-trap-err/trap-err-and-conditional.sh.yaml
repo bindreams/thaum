@@ -1,0 +1,13 @@
+name: trap ERR and || conditional
+dialect: bash
+source: oils:spec/builtin-trap-err#trap-err-and-conditional
+stdout: "line=3\nok\nok\n"
+---
+
+trap 'echo line=$LINENO' ERR
+
+false || false || false
+echo ok
+
+false && false
+echo ok

@@ -1,0 +1,9 @@
+name: Cannot take length of substring slice
+dialect: bash
+source: oils:spec/var-op-slice#cannot-take-length-of-substring-slice
+status: 1
+---
+# These are runtime errors, but we could make them parse time errors.
+v=abcde
+echo ${#v:1:3}
+# zsh actually implements this!

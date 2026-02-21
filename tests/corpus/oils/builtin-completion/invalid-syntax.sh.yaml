@@ -1,0 +1,7 @@
+name: Invalid syntax
+dialect: bash
+source: oils:spec/builtin-completion#invalid-syntax
+stdout: "status=2\n"
+---
+compgen -A foo
+echo status=$?

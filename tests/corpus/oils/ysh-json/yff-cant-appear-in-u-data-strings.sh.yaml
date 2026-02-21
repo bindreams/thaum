@@ -1,0 +1,18 @@
+name: \yff can't appear in u'' data strings
+dialect: bash
+source: oils:spec/ysh-json#yff-cant-appear-in-u-data-strings
+status: 1
+stdout: "(Str)   b'\\yfe'\n"
+---
+
+#shopt -s ysh:upgrade
+
+json8 read (&b) <<'EOF'
+b'\yfe'
+EOF
+pp test_ (b)
+
+json8 read (&u) <<'EOF'
+u'\yfe'
+EOF
+pp test_ (u)  # undefined

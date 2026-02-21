@@ -1,0 +1,16 @@
+name: Dynamic parsing of LHS a[$code]=value
+dialect: bash
+source: oils:spec/array#dynamic-parsing-of-lhs-acodevalue
+stdout: "['one', 'two']\nx=1\ny=2\n"
+---
+
+declare -a array
+array[x=1]='one'
+
+code='y=2'
+#code='1+2'  # doesn't work either
+array[$code]='two'
+
+argv.py "${array[@]}"
+echo x=$x
+echo y=$y

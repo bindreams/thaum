@@ -1,0 +1,23 @@
+name: Posix and Perl class in class literals
+dialect: bash
+source: oils:spec/ysh-regex#posix-and-perl-class-in-class-literals
+stdout: "[[:space:]z]\n[[:digit:]z]\n"
+---
+shopt -s ysh:all
+
+var pat = null
+
+setvar pat = / [ space 'z' ] /
+echo $pat
+#setvar pat = / [ ~space 'z' ] /
+#echo $pat
+
+# PROBLEM: can't negate individual POSIX classes.  They would have to be a Perl
+# class to be \D or \S.
+# [[:space:]z] negates the whole thing!
+# [^[:space:]]
+
+setvar pat = / [ digit 'z' ] /
+echo $pat
+#setvar pat = / [ ~digit 'z' ] /
+#echo $pat

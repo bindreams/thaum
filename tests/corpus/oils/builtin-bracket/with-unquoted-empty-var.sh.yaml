@@ -1,0 +1,7 @@
+name: '[ with unquoted empty var'
+dialect: bash
+source: oils:spec/builtin-bracket#with-unquoted-empty-var
+status: 2
+---
+empty=''
+[ $empty = '' ] && echo true

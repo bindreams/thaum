@@ -1,0 +1,19 @@
+name: Regex in a loop depending on var
+dialect: bash
+source: oils:spec/ysh-regex-api#regex-in-a-loop-depending-on-var
+stdout: "line foo\nmatched foo\nline bar\nmatched bar\n"
+---
+
+shopt --set ysh:all
+
+var lines = ['foo', 'bar']
+for line in (lines) {
+  write "line $line"
+
+  # = / $line /
+
+if ("x$line" ~ / dot @line /) {
+  #if (line ~ / $line /) {
+    write "matched $line"
+  }
+}

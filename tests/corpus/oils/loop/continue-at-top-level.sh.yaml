@@ -1,0 +1,12 @@
+name: continue at top level
+dialect: bash
+source: oils:spec/loop#continue-at-top-level
+status: 0
+stdout: "one\ntwo\n"
+---
+if true; then
+  echo one
+  continue
+  echo two
+fi
+# zsh behaves like strict_control_flow!

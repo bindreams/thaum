@@ -1,0 +1,18 @@
+name: shopt -s strict:all
+dialect: bash
+source: oils:spec/sh-options#shopt--s-strictall
+stdout: "shopt -u strict_arg_parse\nshopt -u strict_argv\n-\nshopt -s strict_arg_parse\n\
+  shopt -s strict_argv\n-\nshopt -s strict_arg_parse\nshopt -u strict_argv\n-\n"
+---
+n=2
+
+show-strict() {
+  shopt -p | grep 'strict_' | head -n $n
+  echo -
+}
+
+show-strict
+shopt -s strict:all
+show-strict
+shopt -u strict_argv
+show-strict

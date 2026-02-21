@@ -1,0 +1,7 @@
+name: trap accepts/ignores --
+dialect: bash
+source: oils:spec/builtin-trap#trap-acceptsignores
+stdout: "ok\nhi\n"
+---
+trap -- 'echo hi' EXIT
+echo ok

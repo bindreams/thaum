@@ -1,0 +1,12 @@
+name: +=
+dialect: bash
+source: oils:spec/array-sparse#unnamed
+stdout: "declare -a sp1=([10]=a [20]=b [99]=c)\ndeclare -a sp1=([10]=a [20]=b [99]=c
+  [100]=1 [101]=2 [102]=3)\n"
+---
+sp1[10]=a
+sp1[20]=b
+sp1[99]=c
+typeset -p sp1 | sed 's/"//g'
+sp1+=(1 2 3)
+typeset -p sp1 | sed 's/"//g'

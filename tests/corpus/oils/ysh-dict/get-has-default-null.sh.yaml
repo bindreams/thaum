@@ -1,0 +1,9 @@
+name: get() has default null
+dialect: bash
+source: oils:spec/ysh-dict#get-has-default-null
+stdout: "(Null)   null\n"
+---
+
+var d = {a: 42}
+
+pp test_ (get(d, 'b'))

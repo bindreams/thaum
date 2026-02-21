@@ -1,0 +1,64 @@
+name: Dict (&d) { ... } converts frame to dict
+dialect: bash
+source: oils:spec/ysh-builtin-eval#dict-d-converts-frame-to-dict
+stdout: "(Dict)   {\"bare\":42,\"k\":\"k-block-mutated\",\"k3\":\"k3\"}\n(Dict)  \
+  \ {\"c\":101}\n"
+---
+
+proc Dict ( ; out; ; block) {
+  var d = io->eval(block, to_dict=true)
+  call out->setValue(d)
+}
+
+# it can read f
+
+var myglobal = 'global'
+var k = 'k-shadowed'
+var k2 = 'k2-shadowed'
+
+Dict (&d) {
+  bare = 42
+
+  # uh these find the wrong one
+  # This is like redeclaring the one above, but WITHOUT the static error
+  # HM HM HM
+  var k = 'k-block'
+  setvar k = 'k-block-mutated'
+
+  # Finds the global, so not checked
+  setvar k2 = 'k2-block'
+
+  # This one is allowed
+  setvar k3 = 'k3'
+
+  # do we allow this?
+  setvar myglobal = 'global'
+}
+
+pp test_ (d)
+
+
+# Same problem as Hay test cases!
+const c = 99
+
+Dict (&d2) {
+  const c = 101
+}
+
+pp test_ (d2)
+
+exit
+
+# restored to the shadowed values
+echo k=$k
+echo k2=$k2
+
+proc p {
+  Dict (&d) {
+    var k = 'k-proc'
+    setvar k = 'k-proc-mutated'
+
+    # Not allowed STATICALLY, because o fproc check
+    #setvar k2 = 'k2-proc'  # local, so it's checked
+  }
+}

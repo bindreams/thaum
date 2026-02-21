@@ -1,0 +1,8 @@
+name: Invalid LValue that looks like array
+dialect: bash
+source: oils:spec/arith#invalid-lvalue-that-looks-like-array
+status: 1
+stdout: ''
+---
+(( 1[2] = 3 ))
+echo "status=$?"

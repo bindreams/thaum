@@ -1,0 +1,9 @@
+name: Globbing after splitting
+dialect: bash
+source: oils:spec/word-eval#globbing-after-splitting
+stdout: "['_tmp/foo.hh', '_tmp/bar.gg', '_tmp/foo.gg']\n"
+---
+mkdir -p _tmp
+touch _tmp/foo.gg _tmp/bar.gg _tmp/foo.hh
+pat='_tmp/*.hh _tmp/*.gg'
+argv.py $pat

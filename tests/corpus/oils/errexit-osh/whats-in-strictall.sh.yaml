@@ -1,0 +1,33 @@
+name: What's in strict:all?
+dialect: bash
+source: oils:spec/errexit-osh#whats-in-strictall
+status: 1
+stdout: "\n"
+---
+
+# inherit_errexit, strict_errexit, but not command_sub_errexit!
+# for that you need oil:upgrade!
+
+set -o errexit
+shopt -s strict:all || true
+
+# inherit_errexit is bash compatible, so we have it
+#echo $(date %x)
+
+# command_sub_errexit would hide errors!
+f() {
+  local d=$(date %x)
+}
+f
+
+deploy_func() {
+  echo one
+  false
+  echo two
+}
+
+if ! deploy_func; then
+  echo failed
+fi
+
+echo 'should not get here'

@@ -1,0 +1,30 @@
+name: Turn off external binaries with shvar PATH='' {}
+dialect: bash
+source: oils:spec/hay-isolation#turn-off-external-binaries-with-shvar-path
+stdout: "status=0\nstatus=127\nstatus=127\nstatus=0\n"
+---
+shopt --set parse_brace parse_proc
+
+echo hi > file
+
+# Note: this CACHES the lookup, so shvar has to clear cache when modifying it
+cp -v file /tmp >&2
+echo status=$?
+
+# TODO: implement this, and call it whenever shvar mutates PATH?
+# what about when PATH is mutated?   No leave it out for now.
+
+# hash -r  # clear the cache, no longer necessary
+
+shvar PATH='' {
+  cp -v file /tmp
+  echo status=$?
+
+  # this also doesn't work
+  command cp -v file /tmp
+  echo status=$?
+}
+
+# Now it's available again
+cp -v file /tmp >&2
+echo status=$?

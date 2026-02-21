@@ -1,0 +1,22 @@
+name: '"in" and "not in" on Dicts'
+dialect: bash
+source: oils:spec/ysh-dict#in-and-not-in-on-dicts
+status: 3
+stdout: "true\nfalse\ntrue\n"
+---
+
+var d = {spam: 42, eggs: []}
+
+var b = 'spam' in d
+echo $b
+
+var b = 'zz' in d
+echo $b
+
+var b = 'zz' not in d
+echo $b
+
+var L = [1, 2, 3]
+var b = 3 in L  # not allowed!
+
+echo should not get here

@@ -1,0 +1,8 @@
+name: Negation of digit not allowed
+dialect: bash
+source: oils:spec/ysh-regex#negation-of-digit-not-allowed
+status: 2
+stdout: "\n"
+---
+
+var digits = /[!2]/

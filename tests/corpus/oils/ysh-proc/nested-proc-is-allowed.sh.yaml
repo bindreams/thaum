@@ -1,0 +1,16 @@
+name: Nested proc is allowed
+dialect: bash
+source: oils:spec/ysh-proc#nested-proc-is-allowed
+status: 127
+stdout: "G\n"
+---
+shopt --set parse_proc
+
+proc f {
+  proc g {
+    echo 'G'
+  }
+  g
+}
+f
+g  # g is defined in the local scope of f

@@ -1,0 +1,9 @@
+name: command sub $(echo hi)
+dialect: bash
+source: oils:spec/ysh-expr#command-sub-echo-hi
+stdout: "x=hi y=default\n"
+---
+var x = $(echo hi)
+var y = $(echo '')
+# Make sure we can operate on these values
+echo x=${x:-default} y=${y:-default}

@@ -1,0 +1,8 @@
+name: 'Bug fix: Test that you can remove everything with glob'
+dialect: bash
+source: 
+  oils:spec/var-op-strip#bug-fix-test-that-you-can-remove-everything-with-glob
+stdout: "['', '--x-', '-x--', '']\n"
+---
+s='--x--'
+argv.py "${s%%-*}" "${s%-*}" "${s#*-}" "${s##*-}"

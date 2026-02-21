@@ -1,0 +1,7 @@
+name: '`set` output format - ifupdown-ng'
+dialect: bash
+source: oils:spec/known-differences#set-output-format---ifupdown-ng
+stdout: "FOO=bar\n"
+---
+export FOO=bar
+set | grep bar | head -n 1

@@ -1,0 +1,16 @@
+name: declare -paA
+dialect: bash
+source: oils:spec/assign-extended#declare--paa
+stdout: "[declare -pa]\ndeclare -a test_var6=()\n[declare -pA]\ndeclare -A test_var7=()\n"
+---
+declare -a test_var6=()
+declare -A test_var7=()
+f1() {
+  {
+    echo '[declare -pa]'
+    declare -pa
+    echo '[declare -pA]'
+    declare -pA
+  } | grep -E '^\[|^\b.*test_var.\b'
+}
+f1

@@ -1,0 +1,15 @@
+name: ulimit negative arg
+dialect: bash
+source: oils:spec/builtin-process#ulimit-negative-arg
+stdout: "unlimited\npass\n"
+---
+
+ulimit -f
+
+# an arg
+ulimit -f -- -42
+if test $? -ne 0; then
+  echo pass
+else
+  echo fail
+fi

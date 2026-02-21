@@ -1,0 +1,8 @@
+name: command -V nonexistent
+dialect: bash
+source: oils:spec/builtin-meta#command--v-nonexistent
+stdout: "status=1\nnonexistent: not found\n"
+---
+command -V nonexistent 2>err.txt
+echo status=$?
+fgrep -o 'nonexistent: not found' err.txt || true

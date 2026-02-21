@@ -1,0 +1,15 @@
+name: '[[ + redirect order'
+dialect: bash
+source: oils:spec/redir-order#redirect-order
+stdout: "status=1\nstatus=0\n"
+---
+case $SH in dash|ash) exit ;; esac
+
+echo hello > OSCFLAGS
+
+[[ `cat OSCFLAGS` = hello ]] > OSCFLAGS
+echo status=$?
+
+# it is the empty string!
+[[ `cat OSCFLAGS` = '' ]] > OSCFLAGS
+echo status=$?

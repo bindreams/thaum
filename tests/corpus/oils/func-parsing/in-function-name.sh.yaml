@@ -1,0 +1,8 @@
+name: . in function name
+dialect: bash
+source: oils:spec/func-parsing#in-function-name
+stdout: "func-name.ext\n"
+---
+# bash accepts; dash doesn't
+func-name.ext ( ) { echo func-name.ext; }
+func-name.ext

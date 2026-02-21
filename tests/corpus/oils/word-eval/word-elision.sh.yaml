@@ -1,0 +1,7 @@
+name: Word elision
+dialect: bash
+source: oils:spec/word-eval#word-elision
+stdout: "['-', '']\n"
+---
+s1=''
+argv.py $s1 - "$s1"

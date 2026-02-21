@@ -1,0 +1,8 @@
+name: '[k1]=v1 looking like brace expansions (BashAssoc)'
+dialect: bash
+source: oils:spec/array-literal#k1v1-looking-like-brace-expansions-bashassoc
+stdout: "-{a,b}-\n"
+---
+declare -A a
+a=([k2]=-{a,b}-)
+echo ${a["k2"]}

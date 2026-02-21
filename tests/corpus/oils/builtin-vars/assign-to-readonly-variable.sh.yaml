@@ -1,0 +1,9 @@
+name: assign to readonly variable
+dialect: bash
+source: oils:spec/builtin-vars#assign-to-readonly-variable
+status: 1
+---
+# bash doesn't abort unless errexit!
+readonly foo=bar
+foo=eggs
+echo "status=$?"  # nothing happens

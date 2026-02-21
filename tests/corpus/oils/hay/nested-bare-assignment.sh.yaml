@@ -1,0 +1,22 @@
+name: Nested bare assignment
+dialect: bash
+source: oils:spec/hay#nested-bare-assignment
+stdout: "{\n  \"source\": null,\n  \"children\": [\n    {\n      \"type\": \"Package\"\
+  ,\n      \"args\": [],\n      \"children\": [\n        {\n          \"type\": \"\
+  Deps\",\n          \"args\": [],\n          \"children\": [],\n          \"attrs\"\
+  : {\n            \"x\": 20\n          }\n        }\n      ],\n      \"attrs\": {\n\
+  \        \"x\": 10\n      }\n    }\n  ]\n}\n"
+---
+shopt --set ysh:all
+
+hay define Package/Deps
+
+Package {
+  x = 10
+  Deps {
+    # this is a const
+    x = 20
+  }
+}
+
+json write (_hay())

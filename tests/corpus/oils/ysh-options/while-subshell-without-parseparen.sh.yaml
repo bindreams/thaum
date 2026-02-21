@@ -1,0 +1,9 @@
+name: while subshell without parse_paren
+dialect: bash
+source: oils:spec/ysh-options#while-subshell-without-parseparen
+stdout: "one\ntwo\n"
+---
+while ( echo one ); do
+  echo two
+  break
+done

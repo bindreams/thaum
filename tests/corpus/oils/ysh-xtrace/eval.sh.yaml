@@ -1,0 +1,10 @@
+name: eval
+dialect: bash
+source: oils:spec/ysh-xtrace#eval
+stdout: "1\n2\n"
+stderr: "> eval\n  . builtin echo 1\n  . builtin echo 2\n< eval\n"
+---
+shopt --set ysh:upgrade
+set -x
+
+eval 'echo 1; echo 2'

@@ -1,0 +1,45 @@
+name: 'parse_brace: if accepts blocks'
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-if-accepts-blocks
+stdout: "one\ntwo\nthree\nelse\nelif\none line\n1\n2\nsh syntax\n1\n2\n"
+---
+shopt -s oil:upgrade
+shopt -u errexit  # don't need strict_errexit check!
+
+if test -n foo {
+  echo one
+}
+# harder
+if test -n foo; test -n bar {
+  echo two
+}
+
+# just like POSIX shell!
+if test -n foo;
+
+   test -n bar {
+  echo three
+}
+
+if test -z foo {
+  echo if
+} else {
+  echo else
+}
+
+if test -z foo {
+  echo if
+} elif test -z '' {
+  echo elif
+} else {
+  echo else
+}
+
+echo 'one line'
+if test -z foo { echo if } elif test -z '' { echo 1 }; if test -n foo { echo 2 };
+
+echo 'sh syntax'
+if test -z foo; then echo if; elif test -z ''; then echo 1; fi; if test -n foo { echo 2 };
+
+# NOTE: This is not allowed because it's like a brace group!
+# if test -n foo; { 

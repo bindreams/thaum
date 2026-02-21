@@ -1,0 +1,18 @@
+name: bool() conversion
+dialect: bash
+source: oils:spec/ysh-convert#bool-conversion
+stdout: "true\nfalse\ntrue\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\ntrue\ntrue\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo "$[bool(1234)]"
+echo "$[bool(0)]"
+echo "$[bool('foo')]"
+echo "$[bool(true)]"
+echo "$[bool(1.234)]"
+echo "$[bool([])]"
+echo "$[bool({})]"
+echo "$[bool(null)]"
+echo "$[bool(len)]"
+echo "$[bool('foo'=>startsWith)]"
+echo "$[bool(1..<3)]"

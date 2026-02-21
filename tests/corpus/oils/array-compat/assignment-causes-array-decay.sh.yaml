@@ -1,0 +1,9 @@
+name: Assignment Causes Array Decay
+dialect: bash
+source: oils:spec/array-compat#assignment-causes-array-decay
+stdout: "['[x', 'y', 'z]']\n['[x y z]']\n"
+---
+set -- x y z
+argv.py "[$@]"
+var="[$@]"
+argv.py "$var"

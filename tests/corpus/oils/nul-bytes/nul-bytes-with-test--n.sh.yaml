@@ -1,0 +1,14 @@
+name: NUL bytes with test -n
+dialect: bash
+source: oils:spec/nul-bytes#nul-bytes-with-test--n
+stdout: "status=1\nstatus=1\n"
+---
+
+case $SH in dash) exit ;; esac
+
+# zsh is buggy here, weird
+test -n $''
+echo status=$?
+
+test -n $'\0'
+echo status=$?

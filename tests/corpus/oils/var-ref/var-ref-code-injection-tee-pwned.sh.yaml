@@ -1,0 +1,20 @@
+name: Var Ref Code Injection $(tee PWNED)
+dialect: bash
+source: oils:spec/var-ref#var-ref-code-injection-tee-pwned
+status: 1
+stdout: "\n"
+---
+
+typeset -a a
+a=(42)
+
+x='a[$(echo 0 | tee PWNED)]'
+
+echo ${!x}
+
+if test -f PWNED; then
+  echo PWNED
+  cat PWNED
+else
+  echo NOPE
+fi

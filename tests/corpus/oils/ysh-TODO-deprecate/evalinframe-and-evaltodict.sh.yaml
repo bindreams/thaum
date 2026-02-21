@@ -1,0 +1,12 @@
+name: evalInFrame() and evalToDict()
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#evalinframe-and-evaltodict
+stdout: "hi\nhi\n(Dict)   {}\n"
+---
+
+var cmd = ^(echo hi)
+
+call io->evalInFrame(cmd, vm.getFrame(-1))
+
+var d = io->evalToDict(cmd)
+pp test_ (d)

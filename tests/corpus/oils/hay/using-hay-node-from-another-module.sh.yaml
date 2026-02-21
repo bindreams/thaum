@@ -1,0 +1,13 @@
+name: Using Hay node from another module
+dialect: bash
+source: oils:spec/hay#using-hay-node-from-another-module
+stdout: "{\n  \"version\": \"3.3\"\n}\n"
+---
+shopt --set ysh:all
+
+hay define Package/INSTALL
+
+use $[ENV.REPO_ROOT]/spec/testdata/config/use-hay.ysh
+
+#pp test_ (_hay())
+json write (_hay().children[0].attrs)

@@ -1,0 +1,9 @@
+name: Unset a variable
+dialect: bash
+source: oils:spec/builtin-vars#unset-a-variable
+stdout: "foo=bar\nfoo=\n"
+---
+foo=bar
+echo foo=$foo
+unset foo
+echo foo=$foo

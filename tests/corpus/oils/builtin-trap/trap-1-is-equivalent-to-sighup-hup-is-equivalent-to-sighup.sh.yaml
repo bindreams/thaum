@@ -1,0 +1,15 @@
+name: trap 1 is equivalent to SIGHUP; HUP is equivalent to SIGHUP
+dialect: bash
+source: 
+  oils:spec/builtin-trap#trap-1-is-equivalent-to-sighup-hup-is-equivalent-to-sighup
+status: 0
+stdout: "status=0\nstatus=0\nstatus=0\nstatus=0\n"
+---
+trap 'echo HUP' SIGHUP
+echo status=$?
+trap 'echo HUP' HUP
+echo status=$?
+trap 'echo HUP' 1
+echo status=$?
+trap - HUP
+echo status=$?

@@ -1,0 +1,12 @@
+name: read -u -s
+dialect: bash
+source: oils:spec/builtin-read#read--u--s
+stdout: "reply=hi\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+# file descriptor
+read -s -u 3 3<<EOF
+hi
+EOF
+echo reply=$REPLY

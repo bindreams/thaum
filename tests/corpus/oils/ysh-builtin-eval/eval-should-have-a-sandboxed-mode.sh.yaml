@@ -1,0 +1,29 @@
+name: eval should have a sandboxed mode
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-should-have-a-sandboxed-mode
+status: 1
+stdout: "TODO\n"
+---
+
+proc p (;;; block) {
+  var this = 42
+
+  # like --eval-pure, and like func?
+  with-pure {
+    # Do we still use io->eval?
+    call io->eval(block)
+  }
+
+  # Or maybe we have free functions, like func/eval
+  # There is no with-pure
+  call eval(cmd)
+  var d = eval(cmd, to_dict=true)
+
+  eval-pure --dump d {
+    var d = {}
+  }
+}
+
+p {
+  echo $this
+}

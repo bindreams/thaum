@@ -1,0 +1,23 @@
+name: Str->search() method returns value.Match object
+dialect: bash
+source: oils:spec/ysh-regex-api#str-search-method-returns-valuematch-object
+stdout: "g0 2 6 Hi5-\ng1 2 4 Hi\ng2 4 5 5\n---\ng0 7 12 Bye6-\ng1 7 10 Bye\ng2 10
+  11 6\n"
+---
+
+shopt --set parse_ysh_expr_sub
+
+var s = '= Hi5- Bye6-'
+
+var m = s.search(/ <capture [a-z]+ > <capture d+> '-' ; i /)
+echo "g0 $[m.start(0)] $[m.end(0)] $[m.group(0)]"
+echo "g1 $[m.start(1)] $[m.end(1)] $[m.group(1)]"
+echo "g2 $[m.start(2)] $[m.end(2)] $[m.group(2)]"
+
+echo ---
+
+var pos = m.end(0)  # search from end position
+var m = s.search(/ <capture [a-z]+ > <capture d+> '-' ; i /, pos=pos)
+echo "g0 $[m.start(0)] $[m.end(0)] $[m.group(0)]"
+echo "g1 $[m.start(1)] $[m.end(1)] $[m.group(1)]"
+echo "g2 $[m.start(2)] $[m.end(2)] $[m.group(2)]"

@@ -1,0 +1,12 @@
+name: ': 3>&3 (OSH regression)'
+dialect: bash
+source: oils:spec/redirect#33-osh-regression
+stdout: "hello\n"
+---
+
+# mksh started being flaky on the continuous build and during release.  We
+# don't care!  Related to issue #330.
+case $SH in mksh) exit ;; esac
+
+: 3>&3
+echo hello

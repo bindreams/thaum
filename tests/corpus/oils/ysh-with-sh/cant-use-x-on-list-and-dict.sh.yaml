@@ -1,0 +1,20 @@
+name: Can't use $x on List and Dict
+dialect: bash
+source: oils:spec/ysh-with-sh#cant-use-x-on-list-and-dict
+status: 3
+stdout: "array abc\narray abc\n"
+---
+
+declare -a a=(abc d)
+echo array $a
+echo array ${a[0]}
+
+var L = [1,2,3]
+echo List $L
+
+declare -A A=([k]=v [0]=abc)
+echo Assoc $A
+echo Assoc ${A[0]}
+
+var d = {k: 'v', '0': 'abc'}
+#echo Dict $d

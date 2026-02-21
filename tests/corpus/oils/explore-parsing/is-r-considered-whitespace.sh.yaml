@@ -1,0 +1,8 @@
+name: Is \r considered whitespace?
+dialect: bash
+source: oils:spec/explore-parsing#is-r-considered-whitespace
+status: 127
+stdout: "\n"
+---
+echo -e 'echo\rTEST' > myscript
+$SH myscript

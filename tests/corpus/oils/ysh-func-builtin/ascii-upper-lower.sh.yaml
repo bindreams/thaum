@@ -1,0 +1,17 @@
+name: ASCII upper() lower()
+dialect: bash
+source: oils:spec/ysh-func-builtin#ascii-upper-lower
+stdout: "abc-\nXYZ!\n\nABC-\nabc-\nXYZ!\nxyz!\n"
+---
+
+var x = 'abc-'
+var y = 'XYZ!'
+
+echo $x
+echo $y
+echo
+
+echo $[x => upper()]
+echo $[x => lower()]
+echo $[y => upper()]
+echo $[y => lower()]

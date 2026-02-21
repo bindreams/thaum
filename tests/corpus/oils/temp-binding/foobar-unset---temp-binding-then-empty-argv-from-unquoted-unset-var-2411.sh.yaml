@@ -1,0 +1,9 @@
+name: FOO=bar $unset - temp binding, then empty argv from unquoted unset var 
+  (#2411)
+dialect: bash
+source: 
+  oils:spec/temp-binding#foobar-unset---temp-binding-then-empty-argv-from-unquoted-unset-var-2411
+stdout: "alive!\n"
+---
+foo=alive! $unset
+echo $foo

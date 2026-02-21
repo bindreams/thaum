@@ -1,0 +1,26 @@
+name: Binary operators, with conversions from string
+dialect: bash
+source: oils:spec/ysh-expr-arith#binary-operators-with-conversions-from-string
+stdout: " i  i 3\nsi  i 3\n i si 3\n---\n f  f 1.0\nsf  f 1.0\n f sf 1.0\n---\n i\
+  \  f 6.0\nsi  f 6.0\n i sf 6.0\n---\n f  i 2.5\nsf  i 2.5\n f si 2.5\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo ' i  i' $[1 + 2]
+echo 'si  i' $['1' + 2]
+echo ' i si' $[1 + '2']
+echo ---
+
+echo ' f  f' $[2.5 - 1.5]
+echo 'sf  f' $['2.5' - 1.5]
+echo ' f sf' $[2.5 - '1.5']
+echo ---
+
+echo ' i  f' $[4 * 1.5]
+echo 'si  f' $['4' * 1.5]
+echo ' i sf' $[4 * '1.5']
+echo ---
+
+echo ' f  i' $[5.0 / 2]
+echo 'sf  i' $['5.0' / 2]
+echo ' f si' $[5.0 / '2']

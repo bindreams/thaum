@@ -1,0 +1,16 @@
+name: vm.getDebugStack()
+dialect: bash
+source: oils:spec/ysh-introspect#vmgetdebugstack
+stdout: "1\n2\n"
+---
+
+proc p {
+  echo $[len(vm.getDebugStack())]
+}
+
+proc p2 {
+  p
+}
+
+p
+p2

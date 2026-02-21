@@ -1,0 +1,11 @@
+name: Use local twice
+dialect: bash
+source: oils:spec/builtin-vars#use-local-twice
+stdout: "bar\n"
+---
+f() {
+  local foo=bar
+  local foo
+  echo $foo
+}
+f

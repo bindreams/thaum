@@ -1,0 +1,6 @@
+name: Process sub from external process to stdin
+dialect: bash
+source: oils:spec/process-sub#process-sub-from-external-process-to-stdin
+stdout: "3\n2\n1\n"
+---
+seq 3 > >(tac)

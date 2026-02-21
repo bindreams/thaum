@@ -1,0 +1,7 @@
+name: Empty value (doesn't use EmptyWord?)
+dialect: bash
+source: oils:spec/array-assoc#empty-value-doesnt-use-emptyword
+stdout: "['']\n"
+---
+declare -A A=(["k"]= )
+argv.py "${A["k"]}"

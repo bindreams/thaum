@@ -1,0 +1,16 @@
+name: multiline dict
+dialect: bash
+source: oils:spec/ysh-expr#multiline-dict
+stdout: "mydict=2\n"
+---
+
+# Note: a pair has to be all on one line.  We could relax that but there isn't
+# a strong reason to now.
+
+var mydict = { a:1,
+  b: 2,
+}
+
+shopt --set parse_ysh_expr_sub
+
+echo mydict=$[len(mydict)]

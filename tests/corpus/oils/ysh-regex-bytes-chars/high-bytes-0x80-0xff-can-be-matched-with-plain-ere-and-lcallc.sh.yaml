@@ -1,0 +1,19 @@
+name: High bytes 0x80 0xff can be matched with plain ERE and LC_ALL=C
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#high-bytes-0x80-0xff-can-be-matched-with-plain-ere-and-lcallc
+stdout: "(Bool)   true\n(Bool)   false\n"
+---
+
+export LC_ALL=C
+
+$SH <<'EOF'
+var yes = b'foo \yff'
+var no = b'foo'
+
+# POSIX ERE string
+var ere = b'[\yff]'
+
+pp test_ (yes ~ ere)
+pp test_ (no ~ ere)
+EOF

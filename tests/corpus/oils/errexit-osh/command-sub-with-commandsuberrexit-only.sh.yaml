@@ -1,0 +1,10 @@
+name: command sub with command_sub_errexit only
+dialect: bash
+source: oils:spec/errexit-osh#command-sub-with-commandsuberrexit-only
+stdout: "zero\none two\nparent status=0\n"
+---
+set -o errexit
+shopt -s command_sub_errexit || true
+echo zero
+echo $(echo one; false; echo two)  # bash/ash keep going
+echo parent status=$?

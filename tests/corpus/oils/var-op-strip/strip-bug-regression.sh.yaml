@@ -1,0 +1,10 @@
+name: strip * (bug regression)
+dialect: bash
+source: oils:spec/var-op-strip#strip-bug-regression
+stdout: "['abc']\n['']\n['abc']\n['']\n"
+---
+x=abc
+argv.py "${x#*}"
+argv.py "${x##*}"
+argv.py "${x%*}"
+argv.py "${x%%*}"

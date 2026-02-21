@@ -1,0 +1,36 @@
+name: s ~ regex and s !~ regex
+dialect: bash
+source: oils:spec/ysh-regex-api#s-regex-and-s-regex
+stdout: "matches\n['foo', 'oo']\ndoes not match\n['foo', 'oo']\ngot expected status
+  3\ngot expected status 3\n"
+---
+shopt -s ysh:upgrade
+
+var s = 'foo'
+if (s ~ '.([[:alpha:]]+)') {  # ERE syntax
+  echo matches
+  argv.py $[_group(0)] $[_group(1)]
+}
+if (s !~ '[[:digit:]]+') {
+  echo "does not match"
+  argv.py $[_group(0)] $[_group(1)]
+}
+
+if (s ~ '[[:digit:]]+') {
+  echo "matches"
+}
+# Should be cleared now
+# should this be Undef rather than ''?
+try {
+  var x = _group(0)
+}
+if (_error.code === 3) {
+  echo 'got expected status 3'
+}
+
+try {
+  var y = _group(1)
+}
+if (_error.code === 3) {
+  echo 'got expected status 3'
+}

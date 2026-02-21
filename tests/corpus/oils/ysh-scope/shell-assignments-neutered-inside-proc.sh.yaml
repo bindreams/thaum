@@ -1,0 +1,33 @@
+name: shell assignments 'neutered' inside 'proc'
+dialect: bash
+source: oils:spec/ysh-scope#shell-assignments-neutered-inside-proc
+stdout: "e=E g=G\ne=E g=G\ne=SH g=SH\n"
+---
+shopt --set parse_proc
+
+# They can't mutate globals or anything higher on the stack
+
+proc p {
+  # TODO: declare should be disallowed in YSH, just like shell functions.
+
+  #declare g=PROC
+  #export e=PROC
+  var g = 'PROC'
+  var e = 'PROC'
+}
+
+f() {
+  g=SH
+  export e=SH
+}
+
+e=E
+g=G
+p
+echo e=$e g=$g
+
+p
+echo e=$e g=$g
+
+f
+echo e=$e g=$g

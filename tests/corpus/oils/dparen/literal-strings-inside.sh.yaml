@@ -1,0 +1,10 @@
+name: literal strings inside (( ))
+dialect: bash
+source: oils:spec/dparen#literal-strings-inside
+stdout: "42 0\n"
+---
+declare -A A
+A['x']=42
+(( x = A['x'] ))
+(( A['y'] = 'y' ))  # y is a variable, gets coerced to 0
+echo $x ${A['y']}

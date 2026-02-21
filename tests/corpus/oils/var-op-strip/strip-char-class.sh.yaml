@@ -1,0 +1,7 @@
+name: Strip char class
+dialect: bash
+source: oils:spec/var-op-strip#strip-char-class
+stdout: "ab\n"
+---
+v=abc
+echo ${v%[[:alpha:]]}

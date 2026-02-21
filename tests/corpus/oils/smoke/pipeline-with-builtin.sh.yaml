@@ -1,0 +1,6 @@
+name: pipeline with builtin
+dialect: bash
+source: oils:spec/smoke#pipeline-with-builtin
+stdout: "1\n"
+---
+echo hi | wc -l

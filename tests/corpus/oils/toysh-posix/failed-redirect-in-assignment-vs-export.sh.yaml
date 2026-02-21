@@ -1,0 +1,11 @@
+name: Failed redirect in assignment, vs. export
+dialect: bash
+source: oils:spec/toysh-posix#failed-redirect-in-assignment-vs-export
+stdout: "abc=\nabc=\n"
+---
+
+abc=def > /does/not/exist1
+echo abc=$abc
+
+export abc=def > /does/not/exist2
+echo abc=$abc

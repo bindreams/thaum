@@ -1,0 +1,13 @@
+name: fopen can be spelled redir
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#fopen-can-be-spelled-redir
+stdout: "2\n1\n"
+---
+shopt --set ysh:upgrade
+
+fopen >out {
+  echo 1
+  echo 2
+}
+
+tac out

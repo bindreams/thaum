@@ -1,0 +1,8 @@
+name: If
+dialect: bash
+source: oils:spec/if#if
+stdout: "if\n"
+---
+if true; then
+  echo if
+fi

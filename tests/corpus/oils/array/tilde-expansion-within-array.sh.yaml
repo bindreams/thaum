@@ -1,0 +1,8 @@
+name: Tilde expansion within array
+dialect: bash
+source: oils:spec/array#tilde-expansion-within-array
+stdout: "/home/bob/src /home/bob/git\n"
+---
+HOME=/home/bob
+a=(~/src ~/git)
+echo "${a[@]}"

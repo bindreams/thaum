@@ -1,0 +1,12 @@
+name: '%foo=() is parse error (regression)'
+dialect: bash
+source: oils:spec/parse-errors#foo-is-parse-error-regression
+status: 2
+stdout: ''
+---
+
+# Lit_VarLike and then (, but NOT at the beginning of a word.
+
+f() {
+  %foo=()
+}

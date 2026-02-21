@@ -1,0 +1,15 @@
+name: More levels of double quotes in backticks
+dialect: bash
+source: oils:spec/command-sub#more-levels-of-double-quotes-in-backticks
+stdout: "\\foo\\ -\n\\foo\\ -\n\\\"foo\\\" -\n"
+---
+
+# Shells don't agree here, some of them give you form feeds!
+# There are two levels of processing I don't understand.
+
+#echo BUG
+#exit
+
+echo `echo \\\"foo\\\"` -
+echo `echo \\\\"foo\\\\"` -
+echo `echo \\\\\"foo\\\\\"` -

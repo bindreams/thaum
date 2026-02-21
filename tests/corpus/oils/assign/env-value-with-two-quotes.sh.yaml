@@ -1,0 +1,6 @@
+name: Env value with two quotes
+dialect: bash
+source: oils:spec/assign#env-value-with-two-quotes
+stdout: "fooadjacent\n"
+---
+FOO='foo'"adjacent" printenv.py FOO

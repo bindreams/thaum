@@ -1,0 +1,7 @@
+name: $ is optional
+dialect: bash
+source: oils:spec/arith#is-optional
+stdout: "2\n"
+---
+i=1
+echo $((i+1))

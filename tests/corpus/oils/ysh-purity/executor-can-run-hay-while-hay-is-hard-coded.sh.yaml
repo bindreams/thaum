@@ -1,0 +1,20 @@
+name: 'Executor: can run Hay (while Hay is hard-coded)'
+dialect: bash
+source: oils:spec/ysh-purity#executor-can-run-hay-while-hay-is-hard-coded
+stdout: "{\n  \"version\": \"1.1\"\n}\n"
+---
+
+shopt --set ysh:upgrade
+
+hay define Package/INSTALL
+
+var cmd = ^(
+  Package foo {
+    version = '1.1'
+    INSTALL { echo hi }
+  }
+)
+
+call eval(cmd)
+
+json write (_hay().children[0].attrs)

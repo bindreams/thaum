@@ -1,0 +1,7 @@
+name: typeset -x makes it exported
+dialect: bash
+source: oils:spec/assign-extended#typeset--x-makes-it-exported
+stdout: "lib/\n"
+---
+typeset -rx PYTHONPATH=lib/
+printenv.py PYTHONPATH

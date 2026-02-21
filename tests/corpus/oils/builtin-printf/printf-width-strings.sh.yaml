@@ -1,0 +1,7 @@
+name: printf width strings
+dialect: bash
+source: oils:spec/builtin-printf#printf-width-strings
+stdout: "[  abc]\n[abc  ]\n"
+---
+printf '[%5s]\n' abc
+printf '[%-5s]\n' abc

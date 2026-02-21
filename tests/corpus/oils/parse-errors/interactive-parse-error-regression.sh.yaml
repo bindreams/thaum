@@ -1,0 +1,12 @@
+name: interactive parse error (regression)
+dialect: bash
+source: oils:spec/parse-errors#interactive-parse-error-regression
+status: 2
+---
+flags=''
+case $SH in
+  bash*|*osh)
+    flags='--rcfile /dev/null'
+    ;;
+esac  
+$SH $flags -i -c 'var=)'

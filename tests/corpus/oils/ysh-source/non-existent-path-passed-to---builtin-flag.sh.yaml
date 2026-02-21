@@ -1,0 +1,9 @@
+name: non-existent path passed to --builtin flag
+dialect: bash
+source: oils:spec/ysh-source#non-existent-path-passed-to---builtin-flag
+status: 1
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+source --builtin test/this-file-will-never-exist.ysh

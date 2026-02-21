@@ -1,0 +1,10 @@
+name: Reading $? in PS4
+dialect: bash
+source: oils:spec/xtrace#reading-in-ps4
+stdout: "ok\n"
+stderr: "[last=0] false\n[last=1] echo ok\n"
+---
+PS4='[last=$?] '
+set -x
+false
+echo ok

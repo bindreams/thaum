@@ -1,0 +1,32 @@
+name: eval 'mystring' vs. call io->eval(myblock)
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-mystring-vs-call-io-evalmyblock
+stdout: "plain\nplain=0\nplain\nplain=0\n\none\n(Dict)   {\"code\":1}\none\n(Dict)\
+  \   {\"code\":1}\n"
+---
+
+eval 'echo plain'
+echo plain=$?
+var b = ^(echo plain)
+call io->eval(b)
+echo plain=$?
+
+echo
+
+# This calls main_loop.Batch(), which catches
+# - error.Parse
+# - error.ErrExit
+# - error.FatalRuntime - glob errors, etc.?
+
+try {
+  eval 'echo one; false; echo two'
+}
+pp test_ (_error)
+
+# This calls CommandEvaluator.EvalCommand(), as blocks do
+
+var b = ^(echo one; false; echo two)
+try {
+  call io->eval(b)
+}
+pp test_ (_error)

@@ -1,0 +1,13 @@
+name: BashAssoc can be serialized
+dialect: bash
+source: oils:spec/ysh-json#bashassoc-can-be-serialized
+stdout: "{\n  \"type\": \"BashAssoc\",\n  \"data\": {}\n}\n{\n  \"type\": \"BashAssoc\"\
+  ,\n  \"data\": {\n    \"foo\": \"bar\",\n    \"42\": \"43\"\n  }\n}\n"
+---
+
+declare -A empty_assoc
+
+declare -A assoc=([foo]=bar [42]=43)
+
+json write (empty_assoc)
+json write (assoc)

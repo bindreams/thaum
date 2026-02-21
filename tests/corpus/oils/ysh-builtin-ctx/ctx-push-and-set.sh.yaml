@@ -1,0 +1,11 @@
+name: ctx push and set
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#ctx-push-and-set
+stdout: "{\n  \"key1\": \"value1\",\n  \"key2\": \"value2\"\n}\n"
+---
+var mydict = {}
+ctx push (mydict) {
+  ctx set (key1="value1")
+  ctx set (key2="value2")
+}
+json write (mydict)

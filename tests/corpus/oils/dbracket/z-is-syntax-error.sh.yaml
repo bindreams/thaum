@@ -1,0 +1,7 @@
+name: '[[ -z ]] is syntax error'
+dialect: bash
+source: oils:spec/dbracket#z-is-syntax-error
+status: 2
+---
+[[ -z ]]
+echo status=$?

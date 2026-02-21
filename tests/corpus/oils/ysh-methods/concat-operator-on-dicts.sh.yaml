@@ -1,0 +1,10 @@
+name: concat operator (++) on dicts
+dialect: bash
+source: oils:spec/ysh-methods#concat-operator-on-dicts
+stdout: "\n"
+---
+var d = {a: 2, b: 3}
+var other = {a: 42}
+assert [{a: 42, b: 3} === d ++ other]
+# old dict is untouched - shallow copy was done
+assert [{a: 2, b: 3} === d]

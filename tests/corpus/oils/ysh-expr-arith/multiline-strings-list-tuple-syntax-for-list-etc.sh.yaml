@@ -1,0 +1,30 @@
+name: multiline strings, list, tuple syntax for list, etc.
+dialect: bash
+source: 
+  oils:spec/ysh-expr-arith#multiline-strings-list-tuple-syntax-for-list-etc
+stdout: "dq=6\nsq=6\nmylist=3\nmytuple=3\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var dq = "
+dq
+2
+"
+echo dq=$[len(dq)]
+
+var sq = '
+sq
+2
+'
+echo sq=$[len(sq)]
+
+var mylist = [
+  1,
+  2,
+  3,
+]
+echo mylist=$[len(mylist)]
+
+var mytuple = (1,
+  2, 3)
+echo mytuple=$[len(mytuple)]

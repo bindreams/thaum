@@ -1,0 +1,11 @@
+name: Too many opening [[[ - blocking stack
+dialect: bash
+source: oils:spec/ysh-json#too-many-opening---blocking-stack
+stdout: "\n"
+---
+
+python2 -c 'print("[" * 10000)' | json read
+pp test_ (_reply)
+
+python2 -c 'print("{" * 10000)' | json read
+pp test_ (_reply)

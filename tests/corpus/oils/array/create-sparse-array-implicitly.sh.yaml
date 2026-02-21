@@ -1,0 +1,10 @@
+name: Create sparse array implicitly
+dialect: bash
+source: oils:spec/array#create-sparse-array-implicitly
+stdout: "len=1\n['1']\nunset=\nlen-of-unset=0\n"
+---
+(( a[99]=1 ))
+echo len=${#a[@]}
+argv.py "${a[@]}"
+echo "unset=${a[33]}"
+echo len-of-unset=${#a[33]}

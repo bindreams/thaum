@@ -1,0 +1,9 @@
+name: Exponentiation is right associative
+dialect: bash
+source: oils:spec/ysh-expr-arith#exponentiation-is-right-associative
+stdout: "a=81 b=81\n"
+---
+
+var a = 3 ** 2 ** 2
+var b = 3 ** (2 ** 2)
+echo a=$a b=$b

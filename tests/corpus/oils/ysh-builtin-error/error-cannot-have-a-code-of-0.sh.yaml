@@ -1,0 +1,7 @@
+name: error cannot have a code of 0
+dialect: bash
+source: oils:spec/ysh-builtin-error#error-cannot-have-a-code-of-0
+status: 2
+stdout: "\n"
+---
+error ('error', code=0)

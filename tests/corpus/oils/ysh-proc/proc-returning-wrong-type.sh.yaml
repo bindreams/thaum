@@ -1,0 +1,14 @@
+name: proc returning wrong type
+dialect: bash
+source: oils:spec/ysh-proc#proc-returning-wrong-type
+status: 3
+stdout: "\n"
+---
+shopt --set parse_proc
+
+# this should print an error message
+proc f {
+  var a = %(one two)
+  return $a
+}
+f

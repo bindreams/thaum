@@ -1,0 +1,6 @@
+name: default value can yield multiple words
+dialect: bash
+source: oils:spec/word-split#default-value-can-yield-multiple-words
+stdout: "['1', '2 3', '4 5', '6']\n"
+---
+argv.py 1 ${undefined:-"2 3" "4 5"} 6

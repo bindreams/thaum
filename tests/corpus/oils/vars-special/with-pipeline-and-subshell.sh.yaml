@@ -1,0 +1,18 @@
+name: $_ with pipeline and subshell
+dialect: bash
+source: oils:spec/vars-special#with-pipeline-and-subshell
+stdout: "last=\npipeline=last=\nsubshell=pipeline=last=\ndone=pipeline=last=\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+shopt -s lastpipe
+
+seq 3 | echo last=$_
+
+echo pipeline=$_
+
+( echo subshell=$_ )
+echo done=$_
+
+
+# very weird semantics for zsh!

@@ -1,0 +1,11 @@
+name: read --all
+dialect: bash
+source: oils:spec/ysh-builtins#read---all
+stdout: "[foo\n]\n[bad\n]\n"
+---
+echo foo | read --all
+echo "[$_reply]"
+
+echo bad > tmp.txt
+read --all (&x) < tmp.txt
+echo "[$x]"

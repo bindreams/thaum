@@ -1,0 +1,14 @@
+name: type -P does not find directories (regression)
+dialect: bash
+source: oils:spec/builtin-type-bash#type--p-does-not-find-directories-regression
+stdout: "status=1\n/usr/bin/cat\nstatus=0\n"
+---
+
+mkdir -p _tmp
+PATH="_tmp:$PATH"
+mkdir _tmp/cat
+
+type -P _tmp/cat
+echo status=$?
+type -P cat
+echo status=$?

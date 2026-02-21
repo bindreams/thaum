@@ -1,0 +1,7 @@
+name: other user
+dialect: bash
+source: oils:spec/tilde#other-user
+stdout: "~nonexistent\n"
+---
+echo ~nonexistent
+# zsh doesn't like nonexistent

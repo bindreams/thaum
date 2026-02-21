@@ -1,0 +1,19 @@
+name: parseHay()
+dialect: bash
+source: oils:spec/hay#parsehay
+stdout: "OK\n"
+---
+shopt --set parse_proc
+
+const config_path = "$REPO_ROOT/spec/testdata/config/ci.oil"
+const block = parseHay(config_path)
+
+# Are blocks opaque?
+{
+  = block
+} | wc -l | read n
+
+# Just make sure we got more than one line?
+if test "$n" -eq 1; then
+  echo "OK"
+fi

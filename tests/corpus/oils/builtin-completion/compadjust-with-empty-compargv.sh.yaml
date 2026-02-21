@@ -1,0 +1,10 @@
+name: compadjust with empty COMP_ARGV
+dialect: bash
+source: oils:spec/builtin-completion#compadjust-with-empty-compargv
+stdout: "[]\n"
+---
+case $SH in bash) exit ;; esac
+
+COMP_ARGV=()
+compadjust words
+argv.py "${words[@]}"

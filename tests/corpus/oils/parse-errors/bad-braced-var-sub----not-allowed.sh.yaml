@@ -1,0 +1,6 @@
+name: Bad braced var sub -- not allowed
+dialect: bash
+source: oils:spec/parse-errors#bad-braced-var-sub----not-allowed
+status: 2
+---
+echo ${%}

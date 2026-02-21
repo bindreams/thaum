@@ -1,0 +1,8 @@
+name: file matching
+dialect: bash
+source: oils:spec/nocasematch-match#file-matching
+stdout: "[A] [b]\n"
+---
+shopt -s nocasematch
+touch a B
+echo [A] [b]

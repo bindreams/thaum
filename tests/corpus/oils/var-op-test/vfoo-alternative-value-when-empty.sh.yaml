@@ -1,0 +1,8 @@
+name: ${v:+foo} Alternative value when empty
+dialect: bash
+source: oils:spec/var-op-test#vfoo-alternative-value-when-empty
+stdout: "v is not empty\n"
+---
+v=foo
+empty=''
+echo ${v:+v is not empty} ${empty:+is not empty}

@@ -1,0 +1,8 @@
+name: trap --ignore INT USR1
+dialect: bash
+source: oils:spec/ysh-builtin-trap#trap---ignore-int-usr1
+stdout: "trap -- '' SIGINT\ntrap -- '' SIGUSR1\n"
+---
+
+trap --ignore INT USR1
+trap -p

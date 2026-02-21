@@ -1,0 +1,13 @@
+name: declare -pg var
+dialect: bash
+source: oils:spec/assign-extended#declare--pg-var
+stdout: "declare -- test_var1=global\n"
+---
+test_var1=global
+f1() {
+  local test_var1=local
+  {
+    declare -pg test_var1
+  } | grep -E '^\[|^\b.*test_var.\b'
+}
+f1

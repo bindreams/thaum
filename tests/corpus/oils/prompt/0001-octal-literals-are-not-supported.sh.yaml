@@ -1,0 +1,7 @@
+name: \0001 octal literals are not supported
+dialect: bash
+source: oils:spec/prompt#0001-octal-literals-are-not-supported
+stdout: "[%5]\n"
+---
+PS1='[\0455]'
+echo "${PS1@P}"

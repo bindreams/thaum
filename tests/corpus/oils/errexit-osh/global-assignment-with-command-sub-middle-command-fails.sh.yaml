@@ -1,0 +1,11 @@
+name: 'global assignment with command sub: middle command fails'
+dialect: bash
+source: 
+  oils:spec/errexit-osh#global-assignment-with-command-sub-middle-command-fails
+status: 0
+stdout: "one\ntwo\n"
+---
+set -o errexit
+s=$(echo one; false; echo two;)
+echo "$s"
+# dash and mksh: whole thing aborts!

@@ -1,0 +1,13 @@
+name: Dynamic Scope
+dialect: bash
+source: oils:spec/sh-func#dynamic-scope
+stdout: "g_var\n"
+---
+f() {
+  echo $g_var
+}
+g() {
+  local g_var=g_var
+  f
+}
+g

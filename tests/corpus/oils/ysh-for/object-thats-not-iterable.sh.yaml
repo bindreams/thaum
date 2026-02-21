@@ -1,0 +1,11 @@
+name: Object that's not iterable
+dialect: bash
+source: oils:spec/ysh-for#object-thats-not-iterable
+status: 3
+stdout: "hi\n"
+---
+
+echo hi
+for x in (42) {
+  echo $x
+}

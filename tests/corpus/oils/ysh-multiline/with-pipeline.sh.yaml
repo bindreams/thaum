@@ -1,0 +1,9 @@
+name: '... with pipeline'
+dialect: bash
+source: oils:spec/ysh-multiline#with-pipeline
+stdout: "2\n"
+---
+... { echo one; echo two; }
+  | sort
+  | wc -l
+  ;

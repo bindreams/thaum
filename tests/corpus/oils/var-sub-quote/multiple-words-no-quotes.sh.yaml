@@ -1,0 +1,6 @@
+name: 'Multiple words: no quotes'
+dialect: bash
+source: oils:spec/var-sub-quote#multiple-words-no-quotes
+stdout: "['a', 'b', 'c']\n"
+---
+argv.py ${Unset:-a b c}

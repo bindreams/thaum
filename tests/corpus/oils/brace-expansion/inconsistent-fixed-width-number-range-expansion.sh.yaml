@@ -1,0 +1,8 @@
+name: Inconsistent fixed width number range expansion
+dialect: bash
+source: 
+  oils:spec/brace-expansion#inconsistent-fixed-width-number-range-expansion
+stdout: "-001- -002- -003-\n"
+---
+# zsh uses the first one, bash uses the max width?
+echo -{01..003}-

@@ -1,0 +1,12 @@
+name: lookup by unquoted string doesn't work in OSH because it's a variable
+dialect: bash
+source: 
+  oils:spec/array-assoc#lookup-by-unquoted-string-doesnt-work-in-osh-because-its-a-variable
+status: 1
+stdout: ''
+---
+declare -A a
+a["aa"]=b
+a["foo"]=bar
+a['a+1']=c
+echo "${a[a+1]}"

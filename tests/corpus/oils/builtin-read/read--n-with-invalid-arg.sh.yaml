@@ -1,0 +1,7 @@
+name: read -n with invalid arg
+dialect: bash
+source: oils:spec/builtin-read#read--n-with-invalid-arg
+stdout: "status=2\n"
+---
+read -n not_a_number
+echo status=$?

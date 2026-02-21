@@ -1,0 +1,10 @@
+name: printf + and space flags
+dialect: bash
+source: oils:spec/builtin-printf#printf-and-space-flags
+stdout: "[+42]\n[-42]\n[ 42]\n[-42]\n"
+---
+# I didn't know these existed -- I only knew about - and 0 !
+printf '[%+d]\n' 42
+printf '[%+d]\n' -42
+printf '[% d]\n' 42
+printf '[% d]\n' -42

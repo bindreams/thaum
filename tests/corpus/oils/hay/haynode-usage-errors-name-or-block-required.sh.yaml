@@ -1,0 +1,47 @@
+name: 'haynode: usage errors (name or block required)'
+dialect: bash
+source: oils:spec/hay#haynode-usage-errors-name-or-block-required
+stdout: "haynode attr 2\nLEN 0\nhaynode code 2\nLEN 0\n---\ndefine attr 2\nLEN 0\n\
+  define code 2\nLEN 0\n"
+---
+shopt --set parse_brace parse_equals parse_proc parse_ysh_expr_sub
+
+# should we make it name or block required?
+# license { ... } might be useful?
+
+try {
+  hay eval :result {
+    haynode package
+  }
+}
+echo "haynode attr $[_error.code]"
+var result = _hay()
+echo "LEN $[len(result['children'])]"
+
+# requires block arg
+try {
+  hay eval :result {
+    haynode TASK build
+  }
+}
+echo "haynode code $[_error.code]"
+echo "LEN $[len(result['children'])]"
+
+echo ---
+hay define package TASK
+
+try {
+  hay eval :result {
+    package
+  }
+}
+echo "define attr $[_error.code]"
+echo "LEN $[len(result['children'])]"
+
+try {
+  hay eval :result {
+    TASK build
+  }
+}
+echo "define code $[_error.code]"
+echo "LEN $[len(result['children'])]"

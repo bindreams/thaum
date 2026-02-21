@@ -1,0 +1,12 @@
+name: elif
+dialect: bash
+source: oils:spec/if#elif
+stdout: "elif\n"
+---
+if (( 0 )); then
+  echo if
+elif true; then
+  echo elif
+else
+  echo else
+fi

@@ -1,0 +1,33 @@
+name: Big float constants becomes inf and -inf, tiny become 0.0 and -0.0
+dialect: bash
+source: 
+  oils:spec/ysh-expr-arith#big-float-constants-becomes-inf-and--inf-tiny-become-00-and--00
+stdout: "(Float)   0.12345\nfloat=0\n(Float)   INFINITY\n(Float)   -INFINITY\nfloat=0\n\
+  (Float)   0.0\n(Float)   -0.0\nfloat=0\n"
+---
+
+$SH -c '
+var x = 0.12345
+pp test_ (x)
+'
+echo float=$?
+
+$SH -c '
+# Becomes infinity
+var x = 0.123456789e1234567
+pp test_ (x)
+
+var x = -0.123456789e1234567
+pp test_ (x)
+'
+echo float=$?
+
+$SH -c '
+# Becomes infinity
+var x = 0.123456789e-1234567
+pp test_ (x)
+
+var x = -0.123456789e-1234567
+pp test_ (x)
+'
+echo float=$?

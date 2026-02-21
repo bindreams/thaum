@@ -1,0 +1,23 @@
+name: 'pp test_: List cycle'
+dialect: bash
+source: oils:spec/ysh-printing#pp-test-list-cycle
+stdout: "(List)   [5,6]\n(List)   [[5,6],[5,6]]\n\n(List)   [42,[...]]\n(List)   [[42,[...]],[42,[...]]]\n"
+---
+
+var no_cycle = [5, 6]
+pp test_ (no_cycle)
+
+var two = [no_cycle, no_cycle]
+pp test_ (two)
+#pp value (two)
+
+echo
+
+var L = [42]
+call L->append(L)
+pp test_ (L)
+#pp value (L)
+
+var two = [L, L]
+pp test_ (two)
+#pp value (two)

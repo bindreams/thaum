@@ -1,0 +1,7 @@
+name: Empty case statement
+dialect: bash
+source: oils:spec/posix#empty-case-statement
+stdout: ''
+---
+case foo in
+esac

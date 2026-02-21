@@ -1,0 +1,9 @@
+name: Malformed regex
+dialect: bash
+source: oils:spec/regex#malformed-regex
+status: 2
+stdout: ''
+---
+# Are they trying to PARSE the regex?  Do they feed the buffer directly to
+# regcomp()?
+[[ 'a b' =~ ^)a\ b($ ]] && echo true

@@ -1,0 +1,11 @@
+name: Brace Expansion within Array
+dialect: bash
+source: oils:spec/loop#brace-expansion-within-array
+---
+for i in -{a,b} {c,d}-; do
+  echo $i
+  done
+-a
+-b
+c-
+d-

@@ -1,0 +1,10 @@
+name: Double Quoted
+dialect: bash
+source: oils:spec/ysh-string#double-quoted
+stdout: "Hello World\nHello World\n"
+---
+var name = 'World'
+var g = "Hello $name"
+
+echo "Hello $name"
+echo $g

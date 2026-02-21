@@ -1,0 +1,8 @@
+name: Pattern replacement on unset variable
+dialect: bash
+source: oils:spec/var-op-patsub#pattern-replacement-on-unset-variable
+---
+echo -${v/x/y}-
+echo status=$?
+set -o nounset  # make sure this fails
+echo -${v/x/y}-

@@ -1,0 +1,8 @@
+name: Empty then/fi
+dialect: bash
+source: oils:spec/empty-bodies#empty-thenfi
+stdout: "empty\n"
+---
+if foo; then
+fi
+echo empty

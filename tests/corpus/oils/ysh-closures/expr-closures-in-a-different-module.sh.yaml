@@ -1,0 +1,12 @@
+name: Expr Closures in a different module
+dialect: bash
+source: oils:spec/ysh-closures#expr-closures-in-a-different-module
+stdout: "global!\nglobal local!\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/closure.ysh --pick {local,global}_expr
+
+echo $[io->evalExpr(global_expr)]
+
+echo $[io->evalExpr(local_expr())]

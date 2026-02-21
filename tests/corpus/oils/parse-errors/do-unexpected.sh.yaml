@@ -1,0 +1,7 @@
+name: do unexpected
+dialect: bash
+source: oils:spec/parse-errors#do-unexpected
+status: 2
+stdout: ''
+---
+do echo hi

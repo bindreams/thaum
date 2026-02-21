@@ -1,0 +1,13 @@
+name: pp asdl_
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-asdl
+stdout: "(value.Str s:42)\n(value.Dict d:{foo (value.Str s:42)})\n(value.Stdin)\n"
+---
+
+x=42
+setvar y = {foo: x}
+
+pp asdl_ (x)
+pp asdl_ (y)
+
+pp asdl_ (io.stdin)

@@ -1,0 +1,11 @@
+name: local a[3]=4
+dialect: bash
+source: oils:spec/assign-deferred#local-a34
+stdout: "status=0\n['3', '5', '4', '6']\n"
+---
+f() {
+  local a[3]=4 a[5]=6
+  echo status=$?
+  argv.py "${!a[@]}" "${a[@]}"
+}
+f

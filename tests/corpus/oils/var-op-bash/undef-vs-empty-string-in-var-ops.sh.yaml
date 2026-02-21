@@ -1,0 +1,24 @@
+name: undef vs. empty string in var ops
+dialect: bash
+source: oils:spec/var-op-bash#undef-vs-empty-string-in-var-ops
+stdout: "'x' '' 'x'\n'x' '' 'x'\n'x' '' 'x'\nx='x' empty='' x='x'\nr r\n"
+---
+
+empty=''
+x=x
+
+echo ${x@Q} ${empty@Q} ${undef@Q} ${x@Q}
+
+echo ${x@K} ${empty@K} ${undef@K} ${x@K}
+
+echo ${x@k} ${empty@k} ${undef@k} ${x@k}
+
+echo ${x@A} ${empty@A} ${undef@A} ${x@A}
+
+declare -r x
+echo ${x@a} ${empty@a} ${undef@a} ${x@a}
+
+# x x
+#echo ${x@E} ${empty@E} ${undef@E} ${x@E}
+# x x
+#echo ${x@P} ${empty@P} ${undef@P} ${x@P}

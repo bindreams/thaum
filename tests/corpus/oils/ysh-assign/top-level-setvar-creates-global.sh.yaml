@@ -1,0 +1,9 @@
+name: 'top level: setvar creates global'
+dialect: bash
+source: oils:spec/ysh-assign#top-level-setvar-creates-global
+stdout: "x=global\nx=g2\n"
+---
+setvar x = 'global'
+echo x=$x
+setvar x = 'g2'
+echo x=$x

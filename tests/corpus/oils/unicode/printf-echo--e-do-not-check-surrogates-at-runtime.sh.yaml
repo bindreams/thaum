@@ -1,0 +1,27 @@
+name: printf / echo -e do NOT check surrogates at runtime
+dialect: bash
+source: oils:spec/unicode#printf-echo--e-do-not-check-surrogates-at-runtime
+stdout: "status=0\n'\\xed\\xb0\\x80'\nstatus=0\n'\\xed\\xb0\\x80'\nstatus=0\n'\\xed\\\
+  xb0\\x80'\nstatus=0\n'\\xed\\xb0\\x80'\n"
+---
+case $SH in mksh) exit ;; esac
+
+py-repr() {
+  python2 -c 'import sys; print repr(sys.argv[1])'  "$@"
+}
+
+e="$(echo -e '\udc00')"
+echo status=$?
+py-repr "$e"
+
+e="$(echo -e '\U0000dc00')"
+echo status=$?
+py-repr "$e"
+
+p="$(printf '\udc00')"
+echo status=$?
+py-repr "$p"
+
+p="$(printf '\U0000dc00')"
+echo status=$?
+py-repr "$p"

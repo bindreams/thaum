@@ -1,0 +1,35 @@
+name: '""$A"" - empty string on both sides - derived from spec/toysh-posix #15'
+dialect: bash
+source: 
+  oils:spec/word-split#a---empty-string-on-both-sides---derived-from-spectoysh-posix-15
+stdout: "['abc', 'def']\n['', 'abc', 'def', '']\n['abc', 'def']\n['', 'abc', 'def',
+  '']\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n==\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n\
+  ==\n"
+---
+
+A="   abc   def   "
+
+argv.py $A
+argv.py ""$A""
+
+unset IFS
+
+argv.py $A
+argv.py ""$A""
+
+echo
+
+# Do the same thing in a for loop - this is IDENTICAL behavior
+
+for i in $A; do echo =$i=; done
+echo
+
+for i in ""$A""; do echo =$i=; done
+echo
+
+unset IFS
+
+for i in $A; do echo =$i=; done
+echo
+
+for i in ""$A""; do echo =$i=; done

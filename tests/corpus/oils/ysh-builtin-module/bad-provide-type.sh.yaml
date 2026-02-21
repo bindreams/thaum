@@ -1,0 +1,11 @@
+name: bad provide type
+dialect: bash
+source: oils:spec/ysh-builtin-module#bad-provide-type
+status: 1
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/bad-provide-type.ysh
+
+echo 'should not get here'

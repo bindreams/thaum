@@ -1,0 +1,10 @@
+name: set +a stops exporting
+dialect: bash
+source: oils:spec/builtin-set#set-a-stops-exporting
+stdout: "exported\nNone\n"
+---
+set -a
+FOO=exported
+set +a
+BAR=not_exported
+printenv.py FOO BAR

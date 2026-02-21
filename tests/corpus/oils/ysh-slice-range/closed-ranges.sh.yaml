@@ -1,0 +1,11 @@
+name: Closed ranges
+dialect: bash
+source: oils:spec/ysh-slice-range#closed-ranges
+stdout: "1\n2\n(Range 1 ..< 3)\n"
+---
+
+for x in (1..=2) {
+  echo $x
+}
+
+= 1..=2

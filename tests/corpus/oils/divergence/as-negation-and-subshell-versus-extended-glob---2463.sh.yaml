@@ -1,0 +1,14 @@
+name: '!( as negation and subshell versus extended glob - #2463'
+dialect: bash
+source: 
+  oils:spec/divergence#as-negation-and-subshell-versus-extended-glob---2463
+stdout: "one\ntwo\n"
+---
+
+have_icu_uc=false
+have_icu_i18n=false
+
+if !($have_icu_uc && $have_icu_i18n); then
+  echo one
+fi
+echo two

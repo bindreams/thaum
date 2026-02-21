@@ -1,0 +1,19 @@
+name: noclobber on
+dialect: bash
+source: oils:spec/sh-options#noclobber-on
+stdout: "create=0\noverwrite=1\nforce=0\nforce\n"
+---
+
+rm -f no-clobber
+set -C
+
+echo foo > no-clobber
+echo create=$?
+
+echo overwrite > no-clobber
+echo overwrite=$?
+
+echo force >| no-clobber
+echo force=$?
+
+cat no-clobber

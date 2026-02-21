@@ -1,0 +1,9 @@
+name: Stripping a whole array unquoted
+dialect: bash
+source: oils:spec/array#stripping-a-whole-array-unquoted
+status: 0
+stdout: "['foo', 'sp', 'ace.h', 'bar']\n"
+---
+# Problem: it joins it first.
+files=('foo.c' 'sp ace.h' 'bar.c')
+argv.py ${files[@]%.c}

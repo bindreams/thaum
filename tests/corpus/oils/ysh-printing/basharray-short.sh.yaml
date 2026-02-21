@@ -1,0 +1,26 @@
+name: BashArray, short
+dialect: bash
+source: oils:spec/ysh-printing#basharray-short
+stdout: "(BashArray)\n(BashArray [0]='hello')\n\n(Dict)  {k: (BashArray)}\n(Dict)\
+  \  {k: (BashArray [0]='hello')}\n\n{\"type\":\"BashArray\",\"data\":{}}\n{\"type\"\
+  :\"BashArray\",\"data\":{\"0\":\"hello\"}}\n\n(Dict)   {\"k\":{\"type\":\"BashArray\"\
+  ,\"data\":{}}}\n(Dict)   {\"k\":{\"type\":\"BashArray\",\"data\":{\"0\":\"hello\"\
+  }}}\n"
+---
+declare -a empty=()
+declare -a array_1=(hello)
+
+pp value (empty)
+pp value (array_1)
+echo
+
+pp value ({k: empty})
+pp value ({k: array_1})
+echo
+
+pp test_ (empty)
+pp test_ (array_1)
+echo
+
+pp test_ ({k: empty})
+pp test_ ({k: array_1})

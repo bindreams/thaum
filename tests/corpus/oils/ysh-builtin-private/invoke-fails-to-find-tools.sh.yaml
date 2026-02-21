@@ -1,0 +1,18 @@
+name: invoke fails to find tools
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke-fails-to-find-tools
+stdout: "status=127\nstatus=127\nstatus=127\nstatus=127\n"
+---
+case $SH in bash) exit ;; esac
+
+invoke --builtin ls
+echo status=$?
+
+invoke --sh-func ls
+echo status=$?
+
+invoke --proc ls
+echo status=$?
+
+invoke --extern zzz
+echo status=$?

@@ -1,0 +1,9 @@
+name: errexit for nonexistent command
+dialect: bash
+source: oils:spec/errexit#errexit-for-nonexistent-command
+status: 127
+stdout: ''
+---
+set -o errexit
+nonexistent__ZZ
+echo done

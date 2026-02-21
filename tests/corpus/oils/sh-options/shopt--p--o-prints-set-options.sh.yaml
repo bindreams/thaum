@@ -1,0 +1,20 @@
+name: shopt -p -o prints 'set' options
+dialect: bash
+source: oils:spec/sh-options#shopt--p--o-prints-set-options
+---
+case $SH in dash|mksh) exit ;; esac
+
+shopt -po nounset
+set -o nounset
+shopt -po nounset
+
+echo --
+
+shopt -po | egrep -o 'errexit|noglob|nounset'
+
+set +o nounset
+set -o nounset
+--
+errexit
+noglob
+nounset

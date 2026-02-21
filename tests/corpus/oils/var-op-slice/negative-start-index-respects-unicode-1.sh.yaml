@@ -1,0 +1,7 @@
+name: Negative start index respects unicode
+dialect: bash
+source: oils:spec/var-op-slice#negative-start-index-respects-unicode
+stdout: "cd\n"
+---
+foo=abcd-μ-
+echo ${foo: -5: -3}

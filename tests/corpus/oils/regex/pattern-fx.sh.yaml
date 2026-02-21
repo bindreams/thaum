@@ -1,0 +1,10 @@
+name: pattern @f(x)
+dialect: bash
+source: oils:spec/regex#pattern-fx
+stdout: "status=0\nstatus=1\n"
+---
+shopt -s parse_at
+[[ @fx =~ @f(x) ]]
+echo status=$?
+[[ fx =~ @f(x) ]]
+echo status=$?

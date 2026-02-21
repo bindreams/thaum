@@ -1,0 +1,16 @@
+name: 'bash and mksh: V in (( a[K] = V )) gets coerced to integer'
+dialect: bash
+source: oils:spec/dparen#bash-and-mksh-v-in-ak-v-gets-coerced-to-integer
+stdout: "a[\"key\"]=0\nkeys = 0\nvalues = 0\n"
+---
+shopt -u strict_arith || true
+K=key
+V=value
+typeset -a a
+(( a[K] = V ))
+
+# not there!
+echo a[\"key\"]=${a[$K]}
+
+echo keys = ${!a[@]}
+echo values = ${a[@]}

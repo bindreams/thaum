@@ -1,0 +1,15 @@
+name: eval builtin does not take a literal block - can restore this later
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#eval-builtin-does-not-take-a-literal-block---can-restore-this-later
+status: 2
+stdout: "obj\ncommand literal\n"
+---
+
+var b = ^(echo obj)
+call io->eval (b)
+
+call io->eval (^(echo command literal))
+
+# Doesn't work because it's a positional arg
+eval { echo block }

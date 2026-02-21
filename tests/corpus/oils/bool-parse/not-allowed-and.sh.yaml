@@ -1,0 +1,11 @@
+name: 'Not allowed: [[ ) ]] and [[ ( ]]'
+dialect: bash
+source: oils:spec/bool-parse#not-allowed-and
+status: 2
+stdout: "\n"
+---
+
+[[ ) ]]
+echo status=$?
+[[ ( ]]
+echo status=$?

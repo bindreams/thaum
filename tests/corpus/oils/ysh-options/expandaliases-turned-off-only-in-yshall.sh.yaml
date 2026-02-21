@@ -1,0 +1,15 @@
+name: expand_aliases turned off only in ysh:all
+dialect: bash
+source: oils:spec/ysh-options#expandaliases-turned-off-only-in-yshall
+status: 127
+stdout: "normal\nupgrade\n"
+---
+
+alias e=echo
+e normal
+
+shopt -s ysh:upgrade
+e upgrade
+
+shopt -s ysh:all
+e all

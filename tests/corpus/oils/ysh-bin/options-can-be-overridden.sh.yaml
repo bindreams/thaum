@@ -1,0 +1,7 @@
+name: Options can be overridden
+dialect: bash
+source: oils:spec/ysh-bin#options-can-be-overridden
+stdout: "shopt -s parse_paren\nshopt -u parse_paren\n"
+---
+$[ENV.SH] -c 'shopt | grep parse_paren'
+$[ENV.SH] +O parse_paren -c 'shopt | grep parse_paren'

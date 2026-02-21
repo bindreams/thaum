@@ -1,0 +1,24 @@
+name: Positional captures with _group
+dialect: bash
+source: oils:spec/ysh-regex-api#positional-captures-with-group
+stdout: "['2020-08', '2020', '08']\n['2020-08', '2020', '08']\n['2020-08', '2020',
+  '08']\n"
+---
+shopt -s ysh:upgrade
+
+var x = 'zz 2020-08-20'
+
+if [[ $x =~ ([[:digit:]]+)-([[:digit:]]+) ]] {
+  argv.py "${BASH_REMATCH[@]}"
+}
+
+# THIS IS A NO-OP.  The variable is SHADOWED by the special name.
+# I think that's OK.
+setvar BASH_REMATCH = :| reset |
+
+if (x ~ /<capture d+> '-' <capture d+>/) {
+  argv.py "${BASH_REMATCH[@]}"
+  argv.py $[_group(0)] $[_group(1)] $[_group(2)]
+
+  # TODO: Also test _start() and _end()
+}

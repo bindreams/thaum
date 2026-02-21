@@ -1,0 +1,28 @@
+name: Conditional Outside Block
+dialect: bash
+source: oils:spec/hay-meta#conditional-outside-block
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Rule
+
+const DEBUG = true
+
+if (DEBUG) {
+  Rule two {
+    deps = 'spam'
+  } 
+} else {
+  Rule two {
+    deps = 'bar'
+  } 
+}
+
+json write (_hay()) | jq '.children[0].attrs' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "deps": "spam"
+}
+EOF

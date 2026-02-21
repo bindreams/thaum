@@ -1,0 +1,8 @@
+name: popd returns error on empty directory stack
+dialect: bash
+source: oils:spec/builtin-dirs#popd-returns-error-on-empty-directory-stack
+stdout: "1\ndirectory stack\n"
+---
+message=$(popd 2>&1)
+echo $?
+echo "$message" | grep -o "directory stack"

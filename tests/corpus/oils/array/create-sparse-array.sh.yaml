@@ -1,0 +1,11 @@
+name: Create sparse array
+dialect: bash
+source: oils:spec/array#create-sparse-array
+stdout: "len=1\n['1']\nunset=\nlen-of-unset=0\n"
+---
+a=()
+(( a[99]=1 )) # osh doesn't parse index assignment outside arithmetic yet
+echo len=${#a[@]}
+argv.py "${a[@]}"
+echo "unset=${a[33]}"
+echo len-of-unset=${#a[33]}

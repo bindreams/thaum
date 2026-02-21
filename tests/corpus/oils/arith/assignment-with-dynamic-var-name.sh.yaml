@@ -1,0 +1,8 @@
+name: assignment with dynamic var name
+dialect: bash
+source: oils:spec/arith#assignment-with-dynamic-var-name
+stdout: "42\nxbar=42\n"
+---
+foo=bar
+echo $(( x$foo = 42 ))
+echo xbar=$xbar

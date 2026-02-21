@@ -1,0 +1,10 @@
+name: 'parse_brace: bad block to assignment builtin'
+dialect: bash
+source: oils:spec/ysh-options#parsebrace-bad-block-to-assignment-builtin
+status: 1
+stdout: ''
+---
+shopt -s oil:upgrade
+# This is a fatal programming error.  It's unlike passing an extra arg?
+local x=y { echo 'bad block' }
+echo status=$?

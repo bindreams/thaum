@@ -1,0 +1,9 @@
+name: Break after ) is OK.
+dialect: bash
+source: oils:spec/func-parsing#break-after-is-ok
+stdout: "hi\nin-func\n"
+---
+# newline is always a token in "normal" state.
+echo hi; fun ( )
+{ echo in-func; }
+fun

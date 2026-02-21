@@ -1,0 +1,15 @@
+name: '@a splices into $0'
+dialect: bash
+source: oils:spec/ysh-options#a-splices-into-0
+stdout: "hi\nhi\nhi\nhi\n"
+---
+shopt -s simple_word_eval parse_at
+a=(echo hi)
+"${a[@]}"
+@a
+
+# Bug fix
+shopt -s strict_array
+
+"${a[@]}"
+@a

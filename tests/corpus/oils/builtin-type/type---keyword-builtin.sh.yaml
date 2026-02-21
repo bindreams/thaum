@@ -1,0 +1,7 @@
+name: type -> keyword builtin
+dialect: bash
+source: oils:spec/builtin-type#type---keyword-builtin
+stdout: "while is a shell keyword\ncd is a shell builtin\n"
+---
+
+type while cd

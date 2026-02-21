@@ -1,0 +1,9 @@
+name: osh -O invalid
+dialect: bash
+source: oils:spec/ysh-options#osh--o-invalid
+stdout: "hi\nstatus=0\nstatus=2\n"
+---
+$SH -O errexit -c 'echo hi'
+echo status=$?
+$SH -O invalid -c 'echo hi'
+echo status=$?

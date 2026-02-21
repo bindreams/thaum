@@ -1,0 +1,7 @@
+name: Empty array with :-
+dialect: bash
+source: oils:spec/array-basic#empty-array-with
+stdout: "['not', 'one', 'not one']\n"
+---
+empty=()
+argv.py ${empty[@]:-not one} "${empty[@]:-not one}"

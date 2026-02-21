@@ -1,0 +1,8 @@
+name: Unquoted { is a regex parse error
+dialect: bash
+source: oils:spec/regex#unquoted-is-a-regex-parse-error
+status: 2
+stdout: ''
+---
+[[ { =~ { ]] && echo true
+echo status=$?

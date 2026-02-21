@@ -1,0 +1,12 @@
+name: Array stored in associative array gets converted to string (without 
+  strict_array)
+dialect: bash
+source: 
+  oils:spec/array-assoc#array-stored-in-associative-array-gets-converted-to-string-without-strictarray
+stdout: "['1 2 3']\n"
+---
+
+array=('1 2' 3)
+declare -A d
+d['key']="${array[@]}"
+argv.py "${d['key']}"

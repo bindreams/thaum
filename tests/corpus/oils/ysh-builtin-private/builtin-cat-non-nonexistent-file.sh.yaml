@@ -1,0 +1,14 @@
+name: builtin cat non nonexistent file
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-cat-non-nonexistent-file
+stdout: "FOO\nFOO\nstatus=1\n"
+---
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+echo FOO > foo
+
+$prefix cat foo nonexistent foo
+echo status=$?

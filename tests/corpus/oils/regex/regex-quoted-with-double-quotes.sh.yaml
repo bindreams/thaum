@@ -1,0 +1,8 @@
+name: Regex quoted with double quotes
+dialect: bash
+source: oils:spec/regex#regex-quoted-with-double-quotes
+status: 1
+stdout: ''
+---
+# bash doesn't like the quotes
+[[ 'a b' =~ "^(a b)$" ]] && echo true

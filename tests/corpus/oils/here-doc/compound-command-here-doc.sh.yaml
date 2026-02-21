@@ -1,0 +1,12 @@
+name: Compound command here doc
+dialect: bash
+source: oils:spec/here-doc#compound-command-here-doc
+stdout: "X 1\nX 2\nX 3\n"
+---
+while read line; do
+  echo X $line
+done <<EOF
+1
+2
+3
+EOF

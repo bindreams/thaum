@@ -1,0 +1,8 @@
+name: For loop starts pipeline
+dialect: bash
+source: oils:spec/pipeline#for-loop-starts-pipeline
+stdout: "two\none\n"
+---
+for w in one two; do
+  echo $w
+done | tac

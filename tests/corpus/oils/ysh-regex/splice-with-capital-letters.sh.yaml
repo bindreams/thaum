@@ -1,0 +1,11 @@
+name: splice with capital letters
+dialect: bash
+source: oils:spec/ysh-regex#splice-with-capital-letters
+stdout: "[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+\nyes\nno\n"
+---
+shopt -s ysh:all
+var D = /d+/;
+var ip = / D '.' D '.' D '.' D /
+echo $ip
+if ('0.0.0.0' ~ ip) { echo yes } else { echo no }
+if ('0.0.0' ~ ip) { echo yes } else { echo no }

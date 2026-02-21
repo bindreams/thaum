@@ -1,0 +1,16 @@
+name: json8 round trip
+dialect: bash
+source: oils:spec/ysh-json#json8-round-trip
+stdout: "[42,1.5,null,true,\"hi\",b'\\yff\\yfe\\b\\n\"\"']\n[\n  42,\n  1.5,\n  null,\n\
+  \  true,\n  \"hi\",\n  b'\\yff\\yfe\\b\\n\"\"'\n]\n"
+---
+
+var obj = [42, 1.5, null, true, "hi", b'\yff\yfe\b\n""']
+
+json8 write (obj, space=0) > j
+
+cat j
+
+json8 read < j
+
+json8 write (_reply)

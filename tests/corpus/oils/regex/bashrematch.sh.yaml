@@ -1,0 +1,12 @@
+name: BASH_REMATCH
+dialect: bash
+source: oils:spec/regex#bashrematch
+stdout: "status=0\n['foo123', 'foo', '123']\nstatus=1\n[]\n"
+---
+[[ foo123 =~ ([a-z]+)([0-9]+) ]]
+echo status=$?
+argv.py "${BASH_REMATCH[@]}"
+
+[[ failed =~ ([a-z]+)([0-9]+) ]]
+echo status=$?
+argv.py "${BASH_REMATCH[@]}"  # not cleared!

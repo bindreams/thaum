@@ -1,0 +1,22 @@
+name: Extended glob that doesn't match anything
+dialect: bash
+source: oils:spec/redirect-multi#extended-glob-that-doesnt-match-anything
+stdout: "status=0\nbad_@(*.cc|*.h)\nstatus=1\n"
+---
+shopt -s extglob
+rm bad_*
+
+# They actually write this literal file!  This is what EvalWordToString() does,
+# as opposed to _EvalWordToParts.
+echo foo > bad_@(*.cc|*.h)
+echo status=$?
+
+echo bad_*
+
+shopt -s failglob
+
+# Note: ysh:ugprade doesn't allow extended globs
+# shopt -s ysh:upgrade
+
+echo foo > bad_@(*.cc|*.h)
+echo status=$?

@@ -1,0 +1,6 @@
+name: Inner single quotes
+dialect: bash
+source: oils:spec/var-sub-quote#inner-single-quotes
+stdout: "['b']\n"
+---
+argv.py ${Unset:-'b'}

@@ -1,0 +1,14 @@
+name: assign and glob
+dialect: bash
+source: oils:spec/assign#assign-and-glob
+stdout: "['*']\n['*']\n"
+---
+cd $TMP
+touch foo=a foo=b
+foo=*
+argv.py "$foo"
+unset foo
+
+export foo=*
+argv.py "$foo"
+unset foo

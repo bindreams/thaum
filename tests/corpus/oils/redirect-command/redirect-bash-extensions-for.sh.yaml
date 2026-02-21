@@ -1,0 +1,19 @@
+name: 'redirect bash extensions:   [[  ((  for (('
+dialect: bash
+source: oils:spec/redirect-command#redirect-bash-extensions-for
+stdout: "0 dbracket\n0 dparen\n1 for-expr\n1 total\n"
+---
+
+case $SH in dash|mksh) exit ;; esac
+
+rm -f dbracket dparen for-expr
+
+[[ x = x ]] > dbracket
+
+(( 42 )) > dparen
+
+for ((x = 0; x < 1; ++x)); do
+  echo for-expr
+done > for-expr
+
+wc -l dbracket dparen for-expr

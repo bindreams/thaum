@@ -1,0 +1,17 @@
+name: Repeated String Literal With Single Char
+dialect: bash
+source: oils:spec/ysh-regex#repeated-string-literal-with-single-char
+stdout: "^f+$\n^(f)+$\nyes\nno\n"
+---
+shopt -s ysh:all
+
+var literal = 'f'
+var pat = null
+
+setvar pat = / %start @literal+ %end /
+echo $pat
+setvar pat = / %start (@literal)+ %end /
+echo $pat
+
+if ('fff' ~ pat) { echo yes }
+if ('foo' !~ pat) { echo no }

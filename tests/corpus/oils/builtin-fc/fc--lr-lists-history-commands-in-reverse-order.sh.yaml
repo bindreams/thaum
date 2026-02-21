@@ -1,0 +1,17 @@
+name: fc -lr lists history commands in reverse order
+dialect: bash
+source: oils:spec/builtin-fc#fc--lr-lists-history-commands-in-reverse-order
+stdout: "4\t echo 3\n3\t echo 2\n2\t echo 1\n1\t history -r\n^D\n"
+---
+printf "echo %s\n" {1..3} > tmp
+
+echo '
+HISTFILE=tmp
+history -c
+history -r
+
+fc -lr
+' | $SH --norc -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

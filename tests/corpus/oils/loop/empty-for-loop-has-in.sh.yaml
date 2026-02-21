@@ -1,0 +1,9 @@
+name: empty for loop (has "in")
+dialect: bash
+source: oils:spec/loop#empty-for-loop-has-in
+stdout: "\n"
+---
+set -- 1 2 3
+for i in ; do
+  echo $i
+done

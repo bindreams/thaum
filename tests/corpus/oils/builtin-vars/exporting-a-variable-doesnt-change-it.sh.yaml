@@ -1,0 +1,9 @@
+name: Exporting a variable doesn't change it
+dialect: bash
+source: oils:spec/builtin-vars#exporting-a-variable-doesnt-change-it
+stdout: "not changed\n"
+---
+old=$PATH
+export PATH
+new=$PATH
+test "$old" = "$new" && echo "not changed"

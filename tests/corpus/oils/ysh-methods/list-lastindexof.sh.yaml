@@ -1,0 +1,11 @@
+name: List => lastIndexOf()
+dialect: bash
+source: oils:spec/ysh-methods#list-lastindexof
+stdout: "4\n3\n2\n-1\n"
+---
+var items = ['a', 'b', 'c', 'b', 'a']
+
+json write (items => lastIndexOf('a'))
+json write (items => lastIndexOf('b'))
+json write (items => lastIndexOf('c'))
+json write (items => lastIndexOf('d'))

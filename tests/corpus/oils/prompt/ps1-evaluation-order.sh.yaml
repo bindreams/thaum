@@ -1,0 +1,9 @@
+name: PS1 evaluation order
+dialect: bash
+source: oils:spec/prompt#ps1-evaluation-order
+stdout: "\\h\n"
+---
+x='\'
+y='h'
+PS1='$x$y'
+echo "${PS1@P}"

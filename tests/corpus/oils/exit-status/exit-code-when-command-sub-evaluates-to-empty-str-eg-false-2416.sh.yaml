@@ -1,0 +1,19 @@
+name: Exit code when command sub evaluates to empty str, e.g. `false` (#2416)
+dialect: bash
+source: 
+  oils:spec/exit-status#exit-code-when-command-sub-evaluates-to-empty-str-eg-false-2416
+stdout: "0\n1\n0\n1\n---\n0\n1\n0\n1\n"
+---
+
+# OSH had a bug here
+`true`; echo $?
+`false`; echo $?
+$(true); echo $?
+$(false); echo $?
+echo ---
+
+# OSH and others agree on these
+eval true; echo $?
+eval false; echo $?
+`echo true`; echo $?
+`echo false`; echo $?

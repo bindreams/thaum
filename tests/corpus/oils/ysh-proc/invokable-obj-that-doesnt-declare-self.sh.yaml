@@ -1,0 +1,16 @@
+name: invokable Obj that doesn't declare self
+dialect: bash
+source: oils:spec/ysh-proc#invokable-obj-that-doesnt-declare-self
+status: 3
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+proc boundProc(no_self; ) {
+  echo 'bad'
+}
+
+var methods = Object(null, {__invoke__: boundProc})
+var invokable = Object(methods, {x: 3, y: 5})
+
+invokable no_self

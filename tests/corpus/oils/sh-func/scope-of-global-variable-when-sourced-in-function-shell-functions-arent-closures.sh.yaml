@@ -1,0 +1,30 @@
+name: Scope of global variable when sourced in function (Shell Functions aren't 
+  Closures)
+dialect: bash
+source: 
+  oils:spec/sh-func#scope-of-global-variable-when-sourced-in-function-shell-functions-arent-closures
+status: 1
+stdout: "g = global\n"
+---
+set -u
+
+echo >tmp.sh '
+g="global"
+local L="local"
+
+test_func() {
+  echo "g = $g"
+  echo "L = $L"
+}
+'
+
+main() {
+  # a becomes local here
+  # test_func is defined globally
+  . ./tmp.sh
+}
+
+main
+
+# a is not defined
+test_func

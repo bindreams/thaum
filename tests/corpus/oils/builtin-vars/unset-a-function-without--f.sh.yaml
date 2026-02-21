@@ -1,0 +1,12 @@
+name: Unset a function without -f
+dialect: bash
+source: oils:spec/builtin-vars#unset-a-function-without--f
+status: 127
+stdout: "foo\n"
+---
+f() {
+  echo foo
+}
+f
+unset f
+f

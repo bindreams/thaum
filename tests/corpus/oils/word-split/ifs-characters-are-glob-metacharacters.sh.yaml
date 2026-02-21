@@ -1,0 +1,16 @@
+name: IFS characters are glob metacharacters
+dialect: bash
+source: oils:spec/word-split#ifs-characters-are-glob-metacharacters
+stdout: "['a', 'b', 'c']\n['', 'x', 'y', 'z']\n['', 'x', 'y', 'z']\n"
+---
+IFS='* '
+s='a*b c'
+argv.py $s
+
+IFS='?'
+s='?x?y?z?'
+argv.py $s
+
+IFS='['
+s='[x[y[z['
+argv.py $s

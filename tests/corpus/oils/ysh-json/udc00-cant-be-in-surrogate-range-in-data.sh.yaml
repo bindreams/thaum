@@ -1,0 +1,25 @@
+name: \u{dc00} can't be in surrogate range in data
+dialect: bash
+source: oils:spec/ysh-json#udc00-cant-be-in-surrogate-range-in-data
+stdout: "status=0\nstatus=1\nstatus=1\nstatus=0\n"
+---
+
+json8 read <<'EOF'
+["long string", u'hello \u{d7ff}', "other"]
+EOF
+echo status=$?
+
+json8 read <<'EOF'
+["long string", u'hello \u{d800}', "other"]
+EOF
+echo status=$?
+
+json8 read <<'EOF'
+["long string", u'hello \u{dfff}', "other"]
+EOF
+echo status=$?
+
+json8 read <<'EOF'
+["long string", u'hello \u{e000}', "other"]
+EOF
+echo status=$?

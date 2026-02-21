@@ -1,0 +1,34 @@
+name: floatEquals() INFINITY NAN
+dialect: bash
+source: oils:spec/ysh-int-float#floatequals-infinity-nan
+stdout: "inf\nneg_inf\nnan is not nan\n"
+---
+
+shopt --set ysh:upgrade
+source $LIB_YSH/list.ysh
+
+# Create inf
+var big = repeat('12345678', 100) ++ '.0'
+
+var inf = fromJson(big)
+var neg_inf = fromJson('-' ++ big)
+
+if (floatsEqual(inf, INFINITY)) {
+  echo inf
+}
+
+if (floatsEqual(neg_inf, -INFINITY)) {
+  echo neg_inf
+}
+
+if (floatsEqual(NAN, INFINITY)) {
+  echo bad
+}
+
+if (floatsEqual(NAN, NAN)) {
+  echo bad
+}
+
+if (not floatsEqual(NAN, NAN)) {
+  echo 'nan is not nan'
+}

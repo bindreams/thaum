@@ -1,0 +1,12 @@
+name: non-index forms of element (BashAssoc)
+dialect: bash
+source: oils:spec/array-literal#non-index-forms-of-element-bashassoc
+status: 1
+stdout: "\n"
+---
+declare -A a
+a=([j]=1 2 3 4)
+echo "status=$?"
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+# Bash outputs warning messages and succeeds (exit status 0)

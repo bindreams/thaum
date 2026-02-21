@@ -1,0 +1,9 @@
+name: Extended glob patterns with spaces
+dialect: bash
+source: oils:spec/extglob-files#extended-glob-patterns-with-spaces
+stdout: "['eg4/a b', 'eg4/foo']\n"
+---
+shopt -s extglob
+mkdir -p eg4
+touch eg4/a 'eg4/a b' eg4/foo
+argv.py eg4/@(a b|foo)

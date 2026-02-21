@@ -1,0 +1,8 @@
+name: Fixed width number range expansion
+dialect: bash
+source: oils:spec/brace-expansion#fixed-width-number-range-expansion
+stdout: "-01- -02- -03-\n-09- -10- -11- -12-\n-12- -11- -10- -09- -08- -07-\n"
+---
+echo -{01..03}-
+echo -{09..12}-  # doesn't become -012-, fixed width
+echo -{12..07}-

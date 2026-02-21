@@ -1,0 +1,15 @@
+name: PIPESTATUS is set on simple commands
+dialect: bash
+source: oils:spec/pipeline#pipestatus-is-set-on-simple-commands
+stdout: "pipestatus 1\npipestatus 55 44\npipestatus 0\n"
+---
+case $SH in dash|zsh) exit ;; esac
+
+false
+echo pipestatus ${PIPESTATUS[@]}
+
+exit 55 | (exit 44)
+echo pipestatus ${PIPESTATUS[@]}
+
+true
+echo pipestatus ${PIPESTATUS[@]}

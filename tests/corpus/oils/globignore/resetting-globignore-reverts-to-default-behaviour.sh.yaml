@@ -1,0 +1,10 @@
+name: resetting globignore reverts to default behaviour
+dialect: bash
+source: oils:spec/globignore#resetting-globignore-reverts-to-default-behaviour
+stdout: "*.*\nreset.txt\n"
+---
+touch reset.txt
+GLOBIGNORE=*.txt
+echo *.*
+GLOBIGNORE=
+echo *.*

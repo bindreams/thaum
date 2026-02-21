@@ -1,0 +1,14 @@
+name: File redirect without matching any file, with failglob
+dialect: bash
+source: 
+  oils:spec/redirect-multi#file-redirect-without-matching-any-file-with-failglob
+stdout: "status=1\nstatus=1\n"
+---
+
+shopt -s failglob
+
+echo hi > zz-*-xx
+echo status=$?
+
+echo zz*
+echo status=$?

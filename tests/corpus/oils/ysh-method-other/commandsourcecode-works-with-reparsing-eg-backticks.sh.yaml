@@ -1,0 +1,50 @@
+name: Command.sourceCode() works with reparsing, e.g. backticks
+dialect: bash
+source: 
+  oils:spec/ysh-method-other#commandsourcecode-works-with-reparsing-eg-backticks
+stdout: "(Str)   \"   \\n  echo \\\"greeting `echo backticks`\\\"\\n\"\n(Str)   \"\
+  \   \\n  array_lhs[i++]=y\\n\"\n(Str)   \"   \\n  e foo\\n\"\n(Str)   \"   \\n \
+  \ e2 zzz\\n\"\n"
+---
+
+shopt --unset no_osh_builtins  # allow alias builtin
+
+# TODO: fix this bug - same as Hay bug
+
+proc p ( ; ; ; block) {
+  var src = block.sourceCode()
+
+  pp test_ (src.code_str)
+
+  # Re-parsing messes this up
+  #echo $[src.code_str]
+  #echo
+}
+
+shopt --unset no_parse_backticks
+
+p {
+  echo "greeting `echo backticks`"
+}
+
+shopt --unset no_parse_sh_arith
+
+p {
+  array_lhs[i++]=y
+}
+
+shopt --set expand_aliases
+
+alias e='echo alias'
+
+p {
+  e foo
+}
+
+# alias that combines the problematic features
+alias e2='a[0+2+3]=x; echo `echo bacticks`'
+
+p {
+  e2 zzz
+  #e2 e2 zzz
+}

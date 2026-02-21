@@ -1,0 +1,15 @@
+name: List append()/extend() should return null
+dialect: bash
+source: oils:spec/ysh-list#list-appendextend-should-return-null
+stdout: "pass\n"
+---
+shopt -s ysh:all
+var l = list(1..<3)
+
+var result = l->extend(list(3..<6))
+assert [null === result]
+
+setvar result = l->append(6)
+assert [null === result]
+
+echo pass

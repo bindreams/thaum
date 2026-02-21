@@ -1,0 +1,21 @@
+name: Division by zero
+dialect: bash
+source: oils:spec/ysh-expr-arith#division-by-zero
+stdout: "status / is 3\nstatus // is 3\nstatus % is 3\n"
+---
+shopt -s parse_brace parse_ysh_expr_sub
+
+try {
+  = 42 / 0
+}
+echo "status / is $[_error.code]"
+
+try {
+  = 42 // 0
+}
+echo "status // is $[_error.code]"
+
+try {
+  = 42 % 0
+}
+echo "status % is $[_error.code]"

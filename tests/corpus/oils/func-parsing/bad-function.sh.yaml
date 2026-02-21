@@ -1,0 +1,6 @@
+name: Bad function
+dialect: bash
+source: oils:spec/func-parsing#bad-function
+status: 2
+---
+

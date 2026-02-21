@@ -1,0 +1,14 @@
+name: BashArray, long
+dialect: bash
+source: oils:spec/ysh-printing#basharray-long
+stdout: "(BashArray [0]='world' [2]='*.py')\n(BashArray\n    [0]='Lorem'\n    [1]='ipsum'\n\
+  \    [2]='dolor'\n    [3]='sit'\n    [4]='amet,'\n    [5]='consectetur'\n    [6]='adipiscing'\n\
+  \    [7]='elit,'\n    [8]='sed'\n    [9]='do'\n    [10]='eiusmod.'\n)\n"
+---
+declare -a array_3
+array_3[0]="world"
+array_3[2]=*.py
+declare array_long=(Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+do eiusmod.)
+= array_3
+= array_long

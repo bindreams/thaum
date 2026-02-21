@@ -1,0 +1,6 @@
+name: Invalid shift argument
+dialect: bash
+source: oils:spec/builtin-misc#invalid-shift-argument
+status: 2
+---
+shift ZZZ

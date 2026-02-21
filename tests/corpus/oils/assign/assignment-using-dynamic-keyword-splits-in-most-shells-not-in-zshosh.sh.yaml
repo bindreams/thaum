@@ -1,0 +1,14 @@
+name: assignment using dynamic keyword (splits in most shells, not in zsh/osh)
+dialect: bash
+source: 
+  oils:spec/assign#assignment-using-dynamic-keyword-splits-in-most-shells-not-in-zshosh
+stdout: "['a b c', 'a b c']\n"
+---
+words='a b c'
+e=export
+r=readonly
+$e ex=$words
+$r ro=$words
+argv.py "$ex" "$ro"
+
+# zsh and OSH are smart

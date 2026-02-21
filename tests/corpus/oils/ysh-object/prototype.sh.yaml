@@ -1,0 +1,16 @@
+name: prototype()
+dialect: bash
+source: oils:spec/ysh-object#prototype
+stdout: "(Null)   null\n(Obj)   (\"area\":<Func>)\n"
+---
+
+func Rect_area(this) {
+  return (this.x * this.y)
+}
+
+var Rect = Object(null, {area: Rect_area})
+
+var obj = Object(Rect, {x: 3, y: 4})
+
+pp test_ (prototype(Rect))
+pp test_ (prototype(obj))

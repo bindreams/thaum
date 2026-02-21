@@ -1,0 +1,10 @@
+name: ysh --eval parse error
+dialect: bash
+source: oils:spec/ysh-usage#ysh---eval-parse-error
+status: 1
+stdout: "\n"
+---
+
+echo 'echo zz; ( echo' >bad.ysh
+
+$[ENV.SH] --eval bad.ysh -c 'echo flag -c'

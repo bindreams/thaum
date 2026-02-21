@@ -1,0 +1,14 @@
+name: printf integer
+dialect: bash
+source: oils:spec/builtin-printf#printf-integer
+stdout: "42\n42\n97\n97\n[   42]\n[42   ]\n[00042]\n"
+---
+printf '%d\n' 42
+printf '%i\n' 42  # synonym
+printf '%d\n' \'a # if first character is a quote, use character code
+printf '%d\n' \"a # double quotes work too
+printf '[%5d]\n' 42
+printf '[%-5d]\n' 42
+printf '[%05d]\n' 42
+#printf '[%-05d]\n' 42  # the leading 0 is meaningless
+#[42   ]

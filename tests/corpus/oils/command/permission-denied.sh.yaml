@@ -1,0 +1,7 @@
+name: Permission denied
+dialect: bash
+source: oils:spec/command#permission-denied
+status: 126
+---
+touch $TMP/text-file
+$TMP/text-file

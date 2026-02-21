@@ -1,0 +1,13 @@
+name: '&> redirects stdout and stderr'
+dialect: bash
+source: oils:spec/redirect#redirects-stdout-and-stderr
+stdout: "STDOUT\nSTDERR\n"
+---
+tmp="$(basename $SH)-$$.txt"  # unique name for shell and test case
+#echo $tmp
+
+stdout_stderr.py &> $tmp
+
+# order is indeterminate
+grep STDOUT $tmp
+grep STDERR $tmp

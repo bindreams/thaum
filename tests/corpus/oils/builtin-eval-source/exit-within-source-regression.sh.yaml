@@ -1,0 +1,10 @@
+name: exit within source (regression)
+dialect: bash
+source: oils:spec/builtin-eval-source#exit-within-source-regression
+status: 42
+stdout: ''
+---
+cd $TMP
+echo 'exit 42' > lib.sh
+. ./lib.sh
+echo 'should not get here'

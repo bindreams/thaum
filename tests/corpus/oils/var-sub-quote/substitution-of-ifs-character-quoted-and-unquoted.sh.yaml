@@ -1,0 +1,10 @@
+name: substitution of IFS character, quoted and unquoted
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#substitution-of-ifs-character-quoted-and-unquoted
+stdout: "['']\n[':']\n"
+---
+IFS=:
+s=:
+argv.py $s
+argv.py "$s"

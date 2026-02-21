@@ -1,0 +1,9 @@
+name: Alias that is && || ;
+dialect: bash
+source: oils:spec/alias#alias-that-is
+stdout: "one\ntwo\n1\nfour\n"
+---
+shopt -s expand_aliases
+alias t1='echo one && echo two && echo 3 | wc -l;
+echo four'
+t1

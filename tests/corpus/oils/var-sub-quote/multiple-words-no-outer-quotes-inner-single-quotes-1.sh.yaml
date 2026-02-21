@@ -1,0 +1,8 @@
+name: 'Multiple words: no outer quotes, inner single quotes'
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#multiple-words-no-outer-quotes-inner-single-quotes
+stdout: "['$var']\n"
+---
+var='a b c'
+argv.py ${Unset:-'$var'}

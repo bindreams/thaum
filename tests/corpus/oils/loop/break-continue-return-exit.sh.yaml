@@ -1,0 +1,36 @@
+name: \break \continue \return \exit
+dialect: bash
+source: oils:spec/loop#break-continue-return-exit
+status: 5
+stdout: "- break\n1\n- continue\n1\n3\n- return\n1\n2\nstatus=99\n- exit\n"
+---
+
+echo '- break'
+for i in 1 2 3; do
+  echo $i
+  \break
+done
+
+echo '- continue'
+for i in 1 2 3; do
+  if test $i = 2; then
+    \continue
+  fi
+  echo $i
+done
+
+f() {
+  echo '- return'
+  for i in 1 2 3; do
+    echo $i
+    if test $i = 2; then
+      \return 99
+    fi
+  done
+}
+f
+echo status=$?
+
+echo '- exit'
+\exit 5
+echo 'not executed'

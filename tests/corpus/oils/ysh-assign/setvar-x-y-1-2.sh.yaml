@@ -1,0 +1,20 @@
+name: setvar x, y = 1, 2
+dialect: bash
+source: oils:spec/ysh-assign#setvar-x-y-1-2
+stdout: "x=3 y=4\nx=1 y=9\nx=9 y=1\nx=18 y=27\n"
+---
+
+# Python doesn't allow you to have annotation on each variable!
+# https://www.python.org/dev/peps/pep-0526/#where-annotations-aren-t-allowed
+var x Int = 3
+var y Int = 4
+echo "x=$x y=$y"
+
+setvar x, y = 1, 9
+echo "x=$x y=$y"
+
+setvar y, x = x, y
+echo "x=$x y=$y"
+
+setvar x, y = x*2, x*3
+echo "x=$x y=$y"

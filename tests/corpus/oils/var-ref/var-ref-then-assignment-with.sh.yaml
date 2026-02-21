@@ -1,0 +1,9 @@
+name: Var ref, then assignment with ${ := }
+dialect: bash
+source: oils:spec/var-ref#var-ref-then-assignment-with
+stdout: "foo\nfoo\n"
+---
+z=zz
+zz=
+echo ${!z:=foo}
+echo ${!z:=bar}

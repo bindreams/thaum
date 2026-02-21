@@ -1,0 +1,19 @@
+name: Regex with [ (bug regression)
+dialect: bash
+source: oils:spec/ysh-regex-api#regex-with-bug-regression
+stdout: "sq\nchar class\n"
+---
+shopt --set ysh:all
+
+if ('[' ~ / '[' /) {
+  echo 'sq'
+}
+
+if ('[' ~ / [ '[' ] /) {
+  echo 'char class'
+}
+
+# User-reported string
+if ("a" ~ / s* 'imports' s* '=' s* '[' /) {
+  echo "yes"
+}

@@ -1,0 +1,11 @@
+name: Dict => values()
+dialect: bash
+source: oils:spec/ysh-methods#dict-values
+status: 0
+stdout: "(List)   [\"bonjour\",\"ami\",\"chat\"]\n"
+---
+var en2fr = {}
+setvar en2fr["hello"] = "bonjour"
+setvar en2fr["friend"] = "ami"
+setvar en2fr["cat"] = "chat"
+pp test_ (en2fr => values())

@@ -1,0 +1,9 @@
+name: Var substitution with \n in value
+dialect: bash
+source: oils:spec/var-sub-quote#var-substitution-with-n-in-value
+stdout: "a\\nb\nc\\nd\ne\\nf\n"
+---
+echo "${var-a\nb}"
+echo "${var:-c\nd}"
+var=val
+echo "${var:+e\nf}"

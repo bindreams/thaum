@@ -1,0 +1,15 @@
+name: '... with && and [['
+dialect: bash
+source: oils:spec/ysh-multiline#with-and
+stdout: "one\ntwo\nthree\nfour\nfive\n---\n"
+---
+echo one && false || echo two
+
+... echo three
+ && [[ 0 -eq 0 ]]
+ && echo four
+ && false
+ || echo five
+ ;
+
+echo ---

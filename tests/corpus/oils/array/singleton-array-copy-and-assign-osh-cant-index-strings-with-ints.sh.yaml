@@ -1,0 +1,17 @@
+name: Singleton Array Copy and Assign.  OSH can't index strings with ints
+dialect: bash
+source: 
+  oils:spec/array#singleton-array-copy-and-assign-osh-cant-index-strings-with-ints
+status: 1
+stdout: "4 4\n1 1\n"
+---
+a=( '12 3' )
+b=( "${a[@]}" )
+c="${a[@]}"  # This decays it to a string
+d=${a[*]}  # This decays it to a string
+echo ${#a[0]} ${#b[0]}
+echo ${#a[@]} ${#b[@]}
+
+# osh is intentionally stricter, and these fail.
+echo ${#c[0]} ${#d[0]}
+echo ${#c[@]} ${#d[@]}

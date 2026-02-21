@@ -1,0 +1,21 @@
+name: assoc array and - and +
+dialect: bash
+source: oils:spec/var-op-test#assoc-array-and---and
+stdout: "empty=minus\nempty=\nassoc=v\nassoc=plus\n---\nempty=minus\nempty=\nassoc=v\n\
+  assoc=plus\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+declare -A empty=()
+declare -A assoc=(['k']=v)
+
+echo empty=${empty[@]-minus}
+echo empty=${empty[@]+plus}
+echo assoc=${assoc[@]-minus}
+echo assoc=${assoc[@]+plus}
+
+echo ---
+echo empty=${empty[@]:-minus}
+echo empty=${empty[@]:+plus}
+echo assoc=${assoc[@]:-minus}
+echo assoc=${assoc[@]:+plus}

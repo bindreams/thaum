@@ -1,0 +1,30 @@
+name: printf | head regression (sigpipe_status_ok)
+dialect: bash
+source: oils:spec/ysh-options#printf-head-regression-sigpipestatusok
+stdout: " external on 0 0\n external off 141 0\n builtin on 0 0\n builtin off 141
+  0\nfinished\n"
+---
+
+shopt --set ysh:upgrade
+shopt --unset errexit
+
+bad() {
+  /usr/bin/printf '%65538s\n' foo | head -c 1
+  echo external on @_pipeline_status
+
+  shopt --unset sigpipe_status_ok {
+    /usr/bin/printf '%65538s\n' foo | head -c 1
+  }
+  echo external off @_pipeline_status
+
+  printf '%65538s\n' foo | head -c 1
+  echo builtin on @_pipeline_status
+
+  shopt --unset sigpipe_status_ok {
+    printf '%65538s\n' foo | head -c 1
+  }
+  echo builtin off @_pipeline_status
+}
+
+bad
+echo finished

@@ -1,0 +1,12 @@
+name: named args
+dialect: bash
+source: oils:spec/ysh-func#named-args
+stdout: "x=3\nx=4\n"
+---
+func f(; x=3) {
+  echo x=$x
+}
+
+call f()
+
+call f(x=4)

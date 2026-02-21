@@ -1,0 +1,9 @@
+name: builtin
+dialect: bash
+source: oils:spec/builtin-meta#builtin
+stdout: "hi\n/\n"
+---
+cd () { echo "hi"; }
+cd
+builtin cd / && pwd
+unset -f cd

@@ -1,0 +1,8 @@
+name: dir completions have trailing slash
+dialect: bash
+source: oils:spec/ysh-completion#dir-completions-have-trailing-slash
+stdout: "\"cd can\\\\'t\\\\ touch\\\\ this/\"\n"
+---
+
+mkdir -p "can't touch this"
+compexport -c 'cd ca'

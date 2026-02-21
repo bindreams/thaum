@@ -1,0 +1,17 @@
+name: unset and shell funcs
+dialect: bash
+source: oils:spec/assign-extended#unset-and-shell-funcs
+status: 127
+stdout: "bar\ndeclare -f foo\n"
+---
+foo() {
+  echo bar
+}
+
+foo
+
+declare -F
+unset foo
+declare -F
+
+foo

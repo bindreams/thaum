@@ -1,0 +1,21 @@
+name: str.find()
+dialect: bash
+source: oils:spec/ysh-string#strfind
+status: 0
+---
+
+var mystr = 'abcaz'
+
+assert [1 === mystr.find('b')]
+assert [4 === mystr.find('z')]
+# test with chars taking up two bytes
+assert [2 === 'абаба'.find('б')]
+assert [6 === 'абаба'.find('б', start=3)]
+assert [-1 === 'абаба'.find('б', start=3, end=5)]
+assert [6 === 'абаба'.find('б', start=3, end=8)]
+assert [0 === 'абаба'.find('')]
+assert [2 === 'абаба'.find('', start=2, end=7)]
+assert [-1 === 'абаба'.find('a')] # different alphabet
+assert [-1 === 'abc'.find('', start=7, end=8)]
+# test negative indices
+assert [3 === mystr.find('a', start=-3, end=-1)]

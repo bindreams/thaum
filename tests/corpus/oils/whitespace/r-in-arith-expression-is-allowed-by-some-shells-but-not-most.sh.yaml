@@ -1,0 +1,19 @@
+name: \r in arith expression is allowed by some shells, but not most!
+dialect: bash
+source: 
+  oils:spec/whitespace#r-in-arith-expression-is-allowed-by-some-shells-but-not-most
+stdout: "['3']\nfailed\n"
+---
+
+arith=$(python2 -c 'print "argv.py $(( 1 +\n2))"')
+arith_cr=$(python2 -c 'print "argv.py $(( 1 +\r\n2))"')
+
+$SH -c "$arith"
+if test $? -ne 0; then
+  echo 'failed'
+fi
+
+$SH -c "$arith_cr"
+if test $? -ne 0; then
+  echo 'failed'
+fi

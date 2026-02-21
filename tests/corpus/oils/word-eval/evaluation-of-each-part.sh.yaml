@@ -1,0 +1,10 @@
+name: Evaluation of each part
+dialect: bash
+source: oils:spec/word-eval#evaluation-of-each-part
+stdout: "['bare', 'sq', '/home/bob', 's', '-s-', 'a1', 'a2', '3', 'c', 'c']\n"
+---
+#set -o noglob
+HOME=/home/bob
+str=s
+array=(a1 a2)
+argv.py bare 'sq' ~ $str "-${str}-" "${array[@]}" $((1+2)) $(echo c) `echo c`

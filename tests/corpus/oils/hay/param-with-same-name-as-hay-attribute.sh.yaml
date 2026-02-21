@@ -1,0 +1,23 @@
+name: Param with same name as Hay attribute
+dialect: bash
+source: oils:spec/hay#param-with-same-name-as-hay-attribute
+stdout: "{\n  \"variant\": null,\n  \"port\": 80\n}\n"
+---
+shopt --set ysh:all
+
+# Danilo reported this on Zulip
+
+hay define Service
+
+proc gen-service(; ; variant = null) {
+  Service {
+    variant = variant
+    port = 80
+  }
+}
+
+gen-service 
+gen-service (variant = 'z')
+
+var attrs = _hay().children[0].attrs
+json write (attrs)

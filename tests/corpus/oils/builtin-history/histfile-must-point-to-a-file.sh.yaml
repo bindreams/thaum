@@ -1,0 +1,16 @@
+name: HISTFILE must point to a file
+dialect: bash
+source: oils:spec/builtin-history#histfile-must-point-to-a-file
+stdout: "status=1\n^D\n"
+---
+
+rm -f _tmp/does-not-exist
+
+echo '
+HISTFILE=_tmp/does-not-exist
+history -r
+echo status=$?
+' | $SH -i
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

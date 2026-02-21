@@ -1,0 +1,14 @@
+name: kill -15 kills the process with SIGTERM
+dialect: bash
+source: oils:spec/builtin-kill#kill--15-kills-the-process-with-sigterm
+stdout: "kill=0\nwait=143\n"
+---
+case $SH in mksh) exit ;; esac  # mksh is flaky
+
+sleep 0.1 &
+pid=$!
+kill -15 $pid
+echo kill=$?
+
+wait $pid
+echo wait=$?  # 143 is 128 + SIGTERM

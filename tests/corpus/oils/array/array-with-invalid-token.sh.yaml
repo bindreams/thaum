@@ -1,0 +1,11 @@
+name: array with invalid token
+dialect: bash
+source: oils:spec/array#array-with-invalid-token
+status: 2
+---
+a=(
+1
+&
+'2 3'
+)
+argv.py "${a[@]}"

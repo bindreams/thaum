@@ -1,0 +1,11 @@
+name: Str.replace(Eggex, *), eflags
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplaceeggex-eflags
+stdout: "[1]-[2]-[3]\n[4]-[5]\n[1]-2-3\n4-5\n[1]-2-3\n[4]-5\n"
+---
+shopt --set ysh:all
+
+var mystr = b'1-2-3\n4-5'
+write $[mystr.replace(/ d+ /, ^"[$0]")]
+write $[mystr.replace(/ ^ d+ /, ^"[$0]")]
+write $[mystr.replace(/ ^ d+ ; reg_newline /, ^"[$0]")]

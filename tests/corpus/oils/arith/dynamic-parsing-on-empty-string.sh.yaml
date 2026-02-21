@@ -1,0 +1,10 @@
+name: Dynamic parsing on empty string
+dialect: bash
+source: oils:spec/arith#dynamic-parsing-on-empty-string
+stdout: "0\n0\n"
+---
+a=''
+echo $(( a ))
+
+a2=' '
+echo $(( a2 ))

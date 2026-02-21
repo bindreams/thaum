@@ -1,0 +1,12 @@
+name: Module with runtime error
+dialect: bash
+source: oils:spec/ysh-builtin-module#module-with-runtime-error
+status: 1
+stdout: "runtime-error before\n"
+---
+
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/runtime-error.ysh
+
+echo 'should not get here'

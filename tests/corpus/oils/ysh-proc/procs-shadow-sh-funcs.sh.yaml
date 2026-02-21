@@ -1,0 +1,16 @@
+name: procs shadow sh-funcs
+dialect: bash
+source: oils:spec/ysh-proc#procs-shadow-sh-funcs
+stdout: "proc\n"
+---
+shopt -s ysh:upgrade
+
+f() {
+  echo sh-func
+}
+
+proc f {
+  echo proc
+}
+
+f

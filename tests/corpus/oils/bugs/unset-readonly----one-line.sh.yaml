@@ -1,0 +1,6 @@
+name: unset readonly -- one line
+dialect: bash
+source: oils:spec/bugs#unset-readonly----one-line
+stdout: "hi\n"
+---
+readonly x=1; unset x; echo hi

@@ -1,0 +1,10 @@
+name: Integer constant parsing
+dialect: bash
+source: oils:spec/arith#integer-constant-parsing
+stdout: "298\n10\n511\n8\n6151\n"
+---
+echo $(( 0x12A ))
+echo $(( 0x0A ))
+echo $(( 0777 ))
+echo $(( 0010 ))
+echo $(( 24#ag7 ))

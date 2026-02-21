@@ -1,0 +1,7 @@
+name: pass short options like sh -e
+dialect: bash
+source: oils:spec/sh-options#pass-short-options-like-sh--e
+status: 1
+stdout: ''
+---
+$SH -e -c 'false; echo status=$?'

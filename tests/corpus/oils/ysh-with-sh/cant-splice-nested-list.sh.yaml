@@ -1,0 +1,12 @@
+name: Can't splice nested List
+dialect: bash
+source: oils:spec/ysh-with-sh#cant-splice-nested-list
+status: 3
+stdout: "\n"
+---
+
+shopt --set parse_at
+
+var mylist = ["ls", {name: 42}]
+
+echo @mylist

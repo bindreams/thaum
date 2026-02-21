@@ -1,0 +1,12 @@
+name: "'builtin' and 'command' with block"
+dialect: bash
+source: oils:spec/ysh-blocks#builtin-and-command-with-block
+stdout: "builtin /\ncommand /\n"
+---
+shopt --set oil:upgrade
+builtin cd / {
+  echo "builtin $PWD"
+}
+command cd / {
+  echo "command $PWD"
+}

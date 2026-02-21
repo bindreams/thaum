@@ -1,0 +1,11 @@
+name: Encoded argv uses shell encoding, not J8
+dialect: bash
+source: oils:spec/ysh-xtrace#encoded-argv-uses-shell-encoding-not-j8
+stdout: "one two\n μ\n"
+stderr: ". builtin echo $'one two\\n' 'μ'\n"
+---
+
+shopt --set ysh:upgrade
+set -x
+
+echo $'one two\n' $'\u03bc'

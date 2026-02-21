@@ -1,0 +1,7 @@
+name: Brace group
+dialect: bash
+source: oils:spec/shell-grammar#brace-group
+---
+{ echo
+  echo
+}

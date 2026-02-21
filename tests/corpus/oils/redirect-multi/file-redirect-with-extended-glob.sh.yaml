@@ -1,0 +1,15 @@
+name: File redirect with extended glob
+dialect: bash
+source: oils:spec/redirect-multi#file-redirect-with-extended-glob
+status: 0
+stdout: "status=0\nhi\n"
+---
+
+shopt -s extglob
+
+touch foo-bar
+
+echo hi > @(*-bar|other)
+echo status=$?
+
+cat foo-bar

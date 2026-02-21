@@ -1,0 +1,18 @@
+name: Procs are closures (capture their environment)
+dialect: bash
+source: oils:spec/ysh-proc#procs-are-closures-capture-their-environment
+stdout: "x = 43\n"
+---
+shopt --set ysh:upgrade
+
+func makeProc() {
+  var x = 42
+  proc inner {
+    echo "x = $x"
+  }
+  setvar x += 1
+  return (inner)
+}
+
+const p = makeProc()
+p

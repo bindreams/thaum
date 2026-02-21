@@ -1,0 +1,10 @@
+name: read flag usage
+dialect: bash
+source: oils:spec/ysh-builtins#read-flag-usage
+stdout: "status=2\nstatus=2\n"
+---
+read --lin
+echo status=$?
+
+read --line :var extra
+echo status=$?

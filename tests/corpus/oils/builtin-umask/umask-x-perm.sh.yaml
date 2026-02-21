@@ -1,0 +1,20 @@
+name: umask X perm
+dialect: bash
+source: oils:spec/builtin-umask#umask-x-perm
+status: 0
+stdout: "ret0 = 0\n666\nret1 = 0\n777\nret2 = 0\n246\n"
+---
+umask 0124
+umask a=X
+echo ret0 = $?
+umask | tail -c 4
+
+umask 0246
+umask a=X
+echo ret1 = $?
+umask | tail -c 4
+
+umask 0246
+umask a-X
+echo ret2 = $?
+umask | tail -c 4

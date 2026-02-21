@@ -1,0 +1,9 @@
+name: HISTFILE default value
+dialect: bash
+source: oils:spec/interactive#histfile-default-value
+stdout: "status=0\n"
+---
+
+# it ends with _history
+$SH --norc -i -c 'echo HISTFILE=$HISTFILE' | egrep -q '_history$'
+echo status=$?

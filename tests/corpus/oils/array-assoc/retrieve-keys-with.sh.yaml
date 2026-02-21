@@ -1,0 +1,13 @@
+name: retrieve keys with !
+dialect: bash
+source: oils:spec/array-assoc#retrieve-keys-with
+stdout: "a+1\nfoo\nx\n"
+---
+declare -A a
+var='x'
+a["$var"]=b
+a['foo']=bar
+a['a+1']=c
+for key in "${!a[@]}"; do
+  echo $key
+done | sort

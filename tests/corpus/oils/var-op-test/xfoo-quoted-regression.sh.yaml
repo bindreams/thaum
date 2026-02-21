@@ -1,0 +1,7 @@
+name: '"${x+foo}" quoted (regression)'
+dialect: bash
+source: oils:spec/var-op-test#xfoo-quoted-regression
+stdout: "['', '=', 'set']\n"
+---
+# Python's configure caught this
+argv.py "${with_icc+set}" = set

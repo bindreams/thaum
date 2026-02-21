@@ -1,0 +1,11 @@
+name: unary plus and minus combined
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary-plus-and-minus-combined
+stdout: "-5\n-5\n-3\n"
+---
+
+var a = +-5
+var b = -+5
+var c = +(-3)
+
+write -- $a $b $c

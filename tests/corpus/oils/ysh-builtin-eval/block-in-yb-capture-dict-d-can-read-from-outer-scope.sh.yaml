@@ -1,0 +1,32 @@
+name: block in yb-capture Dict (&d) can read from outer scope
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#block-in-yb-capture-dict-d-can-read-from-outer-scope
+stdout: "(Dict)   {\"status\":0,\"stdout\":\"43\\n\"}\n"
+---
+
+proc yb-capture(; out; ; block) {
+  # capture status and stdout
+
+  var stdout = ''
+  try {
+    { call io->eval(block) } | read --all (&stdout)
+  }
+  var result = {status: _pipeline_status[0], stdout}
+
+  call out->setValue(result)
+}
+
+func f() {
+  var x = 42
+
+  yb-capture (&r) {
+    echo $[x + 1]
+  }
+
+  return (r)
+}
+
+var result = f()
+
+pp test_ (result)

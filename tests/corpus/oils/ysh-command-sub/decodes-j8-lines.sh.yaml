@@ -1,0 +1,33 @@
+name: '@() decodes J8 Lines'
+dialect: bash
+source: oils:spec/ysh-command-sub#decodes-j8-lines
+stdout: "[\n  \"unquoted \\\"\\\" word\",\n  \" json μ \",\n  \" json j prefix μ \"\
+  ,\n  \" j8 u μ \",\n  \" j8 b μ \",\n  \" j8 no prefix μ \"\n]\n"
+---
+
+# syntax errors - TODO: document this in doc/chap-errors
+
+# - syntax error in J8 string (bad escape, no closing quote)
+# - extra text after line
+# - unquoted line isn't valid UTF-8
+
+var b = @(
+  # unquoted: spaces stripped at beginning and end
+  echo '  unquoted "" word  '
+
+  # empty line is ignored
+  echo
+
+  # Not allowed, since unquoted lines should be UTF-8
+  #echo $'binary \xff';
+
+  echo '  " json \u03bc " '
+  echo '  j" json j prefix \u03bc " '
+  echo " u' j8 u \\u{3bc} ' "
+  echo " b' j8 b \\u{3bc} ' "
+
+  # no prefix is like u''
+  echo "  ' j8 no prefix \\u{3bc} ' "
+)
+
+json write (b)

@@ -1,0 +1,11 @@
+name: \yff can't appear in u'' multiline code strings
+dialect: bash
+source: oils:spec/ysh-json#yff-cant-appear-in-u-multiline-code-strings
+status: 2
+stdout: " fc\n"
+---
+
+shopt -s ysh:upgrade
+
+echo -n b'''\yfc''' | od -A n -t x1
+echo -n u'''\yfd''' | od -A n -t x1

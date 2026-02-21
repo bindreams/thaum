@@ -1,0 +1,12 @@
+name: _match() instead of _group()
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#match-instead-of-group
+stdout: "42\n42\n"
+---
+
+shopt --set ysh:upgrade
+
+if ('foo42' ~ / <capture d+> /) {
+  echo $[_match(0)]
+  echo $[_group(0)]
+}

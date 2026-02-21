@@ -1,0 +1,13 @@
+name: Dict literal with string keys
+dialect: bash
+source: oils:spec/ysh-dict#dict-literal-with-string-keys
+stdout: "123\n456\n"
+---
+var d = {'sq': 123}
+var v = d['sq']
+echo $v
+
+var x = "q"
+var d2 = {"d$x": 456}
+var v2 = d2["dq"]
+echo $v2

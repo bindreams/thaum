@@ -1,0 +1,8 @@
+name: glob with escaped - in char class
+dialect: bash
+source: oils:spec/glob#glob-with-escaped---in-char-class
+stdout: "_tmp/c.C _tmp/c.C _tmp/foo.-\n"
+---
+touch _tmp/foo.-
+touch _tmp/c.C
+echo _tmp/*.[C-D] _tmp/*.[C\-D]

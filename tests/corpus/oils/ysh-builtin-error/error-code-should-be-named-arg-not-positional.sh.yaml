@@ -1,0 +1,8 @@
+name: Error code should be named arg, not positional
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-error#error-code-should-be-named-arg-not-positional
+status: 3
+stdout: "\n"
+---
+error msg (100)

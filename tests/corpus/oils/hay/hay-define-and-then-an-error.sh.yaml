@@ -1,0 +1,41 @@
+name: hay define and then an error
+dialect: bash
+source: oils:spec/hay#hay-define-and-then-an-error
+status: 127
+stdout: "user 0\npackage 0\nTASK 0\ninside\nlicense 0\nlicense 0\n"
+---
+shopt --set parse_brace parse_equals parse_proc
+
+hay define Package/License User TASK
+
+hay pp defs > /dev/null
+
+hay eval :result {
+  User bob
+  echo "user $?"
+
+  Package cppunit
+  echo "package $?"
+
+  TASK build {
+    configure
+  }
+  echo "TASK $?"
+
+  Package unzip {
+    version = '1.0'
+
+    License FOO {
+      echo 'inside'
+    }
+    echo "license $?"
+
+    License BAR
+    echo "license $?"
+
+    zz foo
+    echo 'should not get here'
+  }
+}
+
+echo 'ditto'

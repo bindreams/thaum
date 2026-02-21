@@ -1,0 +1,19 @@
+name: ctx emit
+dialect: bash
+source: oils:spec/ysh-builtin-ctx#ctx-emit
+stdout: "{\n  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n    }\n  ]\n}\n{\n\
+  \  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n    },\n    {\n      \"short_name\"\
+  : \"-c\"\n    }\n  ]\n}\n{\n  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n\
+  \    },\n    {\n      \"short_name\": \"-c\"\n    }\n  ]\n}\n"
+---
+var p = {}
+ctx push (p) {
+  ctx emit flag ({short_name: '-v'})
+  # p => {'flag': [{short_name: '-v'}]}
+  json write (p)
+
+  ctx emit flag ({short_name: '-c'})
+  # p => {'flag': [{short_name: '-v'}, {short_name: '-c'}]}
+  json write (p)
+}
+json write (p)

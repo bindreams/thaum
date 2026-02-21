@@ -1,0 +1,15 @@
+name: ${assoc} is like ${assoc[0]}
+dialect: bash
+source: oils:spec/array-assoc#assoc-is-like-assoc0
+stdout: "a=\na=zzz\na=yyy\n"
+---
+declare -A a
+
+a=([aa]=b [foo]=bar ['a+1']=c)
+echo a="${a}"
+
+a=([0]=zzz)
+echo a="${a}"
+
+a=(['0']=yyy)
+echo a="${a}"

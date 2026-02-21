@@ -1,0 +1,8 @@
+name: $LINENO in ((
+dialect: bash
+source: oils:spec/vars-special#lineno-in
+stdout: "one\n2\n"
+---
+echo one
+(( x = LINENO ))
+echo $x

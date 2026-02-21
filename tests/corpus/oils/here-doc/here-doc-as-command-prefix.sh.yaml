@@ -1,0 +1,16 @@
+name: Here doc as command prefix
+dialect: bash
+source: oils:spec/here-doc#here-doc-as-command-prefix
+stdout: "3\n2\n1\n"
+---
+<<EOF tac
+1
+2
+3
+EOF
+
+  # NOTE that you can have redirection AFTER the here doc thing.  And you don't
+  # need a space!  Those are operators.
+  #
+  # POSIX doesn't seem to have this?  They have io_file, which is for
+  # filenames, and io_here, which is here doc.  But about 1>&2 syntax?  Geez.

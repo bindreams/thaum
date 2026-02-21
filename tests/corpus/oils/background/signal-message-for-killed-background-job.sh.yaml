@@ -1,0 +1,14 @@
+name: Signal message for killed background job
+dialect: bash
+source: oils:spec/background#signal-message-for-killed-background-job
+status: 0
+stdout: "status=129\nHangup\n"
+stderr: "\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+sleep 1 &
+kill -HUP $!
+wait $! 2>err.txt
+echo status=$?
+grep -o "Hangup" err.txt

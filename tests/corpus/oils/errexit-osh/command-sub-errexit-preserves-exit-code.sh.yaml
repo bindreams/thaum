@@ -1,0 +1,12 @@
+name: command sub errexit preserves exit code
+dialect: bash
+source: oils:spec/errexit-osh#command-sub-errexit-preserves-exit-code
+status: 42
+stdout: "before\n"
+---
+set -e
+shopt -s command_sub_errexit || true
+
+echo before
+echo $(exit 42)
+echo after

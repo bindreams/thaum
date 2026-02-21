@@ -1,0 +1,12 @@
+name: ${var=x} dynamic scope
+dialect: bash
+source: oils:spec/var-op-test#varx-dynamic-scope
+stdout: "x\nhello=x\nhello=x\n"
+---
+f() { : "${hello:=x}"; echo $hello; }
+f
+echo hello=$hello
+
+f() { hello=x; }
+f
+echo hello=$hello

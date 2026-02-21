@@ -1,0 +1,12 @@
+name: ${var@Q}
+dialect: bash
+source: oils:spec/serialize#varq
+stdout: "$'one\\ntwo μ'\n$'one\\ntwo μ'\n"
+---
+case $SH in zsh|ash) exit ;; esac
+
+zz=$'one\ntwo \u03bc'
+
+# weirdly, quoted and unquoted aren't different
+echo ${zz@Q}
+echo "${zz@Q}"

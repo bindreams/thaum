@@ -1,0 +1,7 @@
+name: wait -n with nothing to wait for
+dialect: bash
+source: oils:spec/background#wait--n-with-nothing-to-wait-for
+status: 127
+---
+# The 127 is STILL overloaded.  Copying bash for now.
+wait -n

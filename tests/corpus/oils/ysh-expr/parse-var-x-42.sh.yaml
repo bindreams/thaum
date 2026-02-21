@@ -1,0 +1,12 @@
+name: Parse { var x = 42 }
+dialect: bash
+source: oils:spec/ysh-expr#parse-var-x-42
+stdout: "x=1\n"
+---
+shopt -s ysh:upgrade
+g() { var x = 42 }
+
+var x = 1
+f() { var x = 42; setvar x = 43 }
+f
+echo x=$x

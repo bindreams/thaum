@@ -1,0 +1,12 @@
+name: List pop()
+dialect: bash
+source: oils:spec/ysh-list#list-pop
+stdout: "pass\n"
+---
+shopt -s ysh:all
+var l = list(1..<5)
+assert [4 === l->pop()]
+assert [3 === l->pop()]
+assert [2 === l->pop()]
+assert [1 === l->pop()]
+echo pass

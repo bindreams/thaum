@@ -1,0 +1,8 @@
+name: $- with -c
+dialect: bash
+source: oils:spec/sh-options#with--c
+status: 0
+stdout: "u\n"
+---
+# dash's behavior seems most sensible here?
+$SH -o nounset -c 'echo $-'

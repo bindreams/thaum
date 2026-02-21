@@ -1,0 +1,9 @@
+name: Too many args
+dialect: bash
+source: oils:spec/ysh-func#too-many-args
+status: 3
+stdout: "\n"
+---
+func f(x) { return (x + 1) }
+
+= f(0, 1)

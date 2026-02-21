@@ -1,0 +1,9 @@
+name: read bash bug
+dialect: bash
+source: oils:spec/builtin-read#read-bash-bug
+stdout: "['', '   ']\n"
+---
+IFS='x '
+echo 'x\  \ ' | (read a b; argv.py "$a" "$b")
+['', '']
+['', ' ']

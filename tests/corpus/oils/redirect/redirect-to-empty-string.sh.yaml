@@ -1,0 +1,12 @@
+name: Redirect to empty string
+dialect: bash
+source: oils:spec/redirect#redirect-to-empty-string
+status: 1
+stdout: "result=1\n"
+---
+f=''
+echo s > "$f"
+echo "result=$?"
+set -o errexit
+echo s > "$f"
+echo DONE

@@ -1,0 +1,7 @@
+name: If empty command
+dialect: bash
+source: oils:spec/exit-status#if-empty-command
+status: 0
+stdout: "FALSE\n"
+---
+if ''; then echo TRUE; else echo FALSE; fi

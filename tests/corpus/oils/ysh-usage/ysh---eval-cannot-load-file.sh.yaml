@@ -1,0 +1,8 @@
+name: ysh --eval cannot load file
+dialect: bash
+source: oils:spec/ysh-usage#ysh---eval-cannot-load-file
+status: 1
+stdout: "\n"
+---
+
+$[ENV.SH] --eval nonexistent.ysh -c 'echo flag -c'

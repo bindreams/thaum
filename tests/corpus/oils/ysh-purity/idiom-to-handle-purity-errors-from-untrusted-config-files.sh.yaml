@@ -1,0 +1,25 @@
+name: Idiom to handle purity errors from untrusted config files
+dialect: bash
+source: 
+  oils:spec/ysh-purity#idiom-to-handle-purity-errors-from-untrusted-config-files
+stdout: "\n"
+---
+
+echo "TODO: what's the idiom?"
+
+# trap PURE ?  Is this like trap ERR?
+# You can handle these errors
+#
+# OILS_CRASH_DUMP_DIR=?
+#
+# Or do you need 2 more flags?
+#
+# --eval-pure-str 'try { source user-config.ysh }'
+# --eval-str
+#
+# That is a bit annoying?
+#
+# --eval      pure:foo.hay
+# --eval-str 'pure:echo hi'
+# --eval      any:foo.hay
+# --eval-str 'any:echo hi'

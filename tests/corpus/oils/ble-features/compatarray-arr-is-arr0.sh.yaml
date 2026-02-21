@@ -1,0 +1,10 @@
+name: '[compat_array] ${arr} is ${arr[0]}'
+dialect: bash
+source: oils:spec/ble-features#compatarray-arr-is-arr0
+stdout: "['foo', 'foo']\n"
+---
+case ${SH##*/} in dash|ash) exit 1 ;; esac # dash/ash does not have arrays
+case ${SH##*/} in osh) shopt -s compat_array ;; esac
+case ${SH##*/} in zsh) setopt KSH_ARRAYS ;; esac
+arr=(foo bar baz)
+argv.py "$arr" "${arr}"

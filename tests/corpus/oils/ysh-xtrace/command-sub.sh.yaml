@@ -1,0 +1,20 @@
+name: command sub
+dialect: bash
+source: oils:spec/ysh-xtrace#command-sub
+stdout: "foo=bar\n"
+stderr: "  . 12345 builtin echo bar\n. builtin echo 'foo=bar'\n. builtin set '+x'\n\
+  ; process 12345: status 0\n| command sub 12345\n"
+---
+shopt --set ysh:upgrade
+set -x
+
+{
+  echo foo=$(echo bar)
+  set +x
+
+} 2>err.txt
+
+# HACK: sort because xtrace output has non-determinism.
+# This is arguably a bug -- see issue #995.
+# The real fix might be to sys.stderr.flush() in few places?
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt | LANG=C sort >&2

@@ -1,0 +1,10 @@
+name: bad var name in local
+dialect: bash
+source: oils:spec/parse-errors#bad-var-name-in-local
+status: 1
+---
+# bash and dash disagree on exit code.
+f() {
+  local FOO-BAR=foo
+}
+f

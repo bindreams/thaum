@@ -1,0 +1,21 @@
+name: "'call' to ignore return value"
+dialect: bash
+source: oils:spec/ysh-keywords#call-to-ignore-return-value
+stdout: "a\nb\nc\n5\n6\n7\n__\n5\n6\n"
+---
+call 1 + 2 * 3
+
+var strs = %(a b)
+call len(strs)
+call strs->append('c')
+write -- @strs
+
+# integer types too
+const L = [5, 6]
+call L->append(7)
+write -- @L
+
+write __
+
+call L->pop()
+write -- @L

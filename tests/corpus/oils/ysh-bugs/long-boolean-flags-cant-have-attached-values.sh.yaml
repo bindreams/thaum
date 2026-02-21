@@ -1,0 +1,22 @@
+name: Long boolean flags can't have attached values
+dialect: bash
+source: oils:spec/ysh-bugs#long-boolean-flags-cant-have-attached-values
+status: 1
+stdout: "\n"
+---
+
+# This currently works, but I think --json and --j8 are enough?
+
+write --json=0 hi
+write --json=F hi
+write --json=False hi
+write --json=false hi
+echo
+
+write --json=1 hi
+write --json=T hi
+write --json=True hi
+write --json=true hi
+
+# typo bug
+write --json=Talse hi

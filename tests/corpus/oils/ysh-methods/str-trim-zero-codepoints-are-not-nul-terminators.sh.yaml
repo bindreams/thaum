@@ -1,0 +1,8 @@
+name: Str => trim*(), zero-codepoints are not NUL-terminators
+dialect: bash
+source: oils:spec/ysh-methods#str-trim-zero-codepoints-are-not-nul-terminators
+stdout: "\"\\u0000\"\n\"\\u0000 \"\n\" \\u0000\"\n"
+---
+json write (b' \y00 ' => trim())
+json write (b' \y00 ' => trimStart())
+json write (b' \y00 ' => trimEnd())

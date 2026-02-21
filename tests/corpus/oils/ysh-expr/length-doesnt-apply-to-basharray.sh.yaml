@@ -1,0 +1,17 @@
+name: Length doesn't apply to BashArray
+dialect: bash
+source: oils:spec/ysh-expr#length-doesnt-apply-to-basharray
+status: 3
+stdout: "shell=5\n"
+---
+x=(a b c)
+x[10]=A
+x[20]=B
+
+# shell style: length is 5
+echo shell=${#x[@]}
+
+shopt --set parse_ysh_expr_sub
+
+# Length could be 20, but we may change the representation to Dict[int, str]
+echo ysh=$[len(x)]

@@ -1,0 +1,9 @@
+name: array decays to string when comparing with [[ a = b ]]
+dialect: bash
+source: oils:spec/array-compat#array-decays-to-string-when-comparing-with-a-b
+stdout: "2 7\nEQUAL\n"
+---
+a=('1 2' '3 4')
+s='1 2 3 4'  # length 2, length 4
+echo ${#a[@]} ${#s}
+[[ "${a[@]}" = "$s" ]] && echo EQUAL

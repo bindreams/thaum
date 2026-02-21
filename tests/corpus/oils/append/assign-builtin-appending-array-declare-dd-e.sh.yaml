@@ -1,0 +1,24 @@
+name: 'assign builtin appending array: declare d+=(d e)'
+dialect: bash
+source: oils:spec/append#assign-builtin-appending-array-declare-dd-e
+stdout: "d e\nd e c l\nr e\nl o\nl o c a\n"
+---
+
+declare d+=(d e)
+echo "${d[@]}"
+declare d+=(c l)
+echo "${d[@]}"
+
+readonly r+=(r e)
+echo "${r[@]}"
+# can't do this again
+
+f() {
+  local l+=(l o)
+  echo "${l[@]}"
+
+  local l+=(c a)
+  echo "${l[@]}"
+}
+
+f

@@ -1,0 +1,21 @@
+name: Str => trim(), unicode whitespace aware
+dialect: bash
+source: oils:spec/ysh-methods#str-trim-unicode-whitespace-aware
+status: 0
+stdout: "YSH\n"
+---
+
+# Supported set of whitespace characters. The full set of Unicode whitespace
+# characters is not supported. See comments in the implementation.
+var spaces = [
+  b'\u{0009}',  # Horizontal tab (\t)
+  b'\u{000A}',  # Newline (\n)
+  b'\u{000B}',  # Vertical tab (\v)
+  b'\u{000C}',  # Form feed (\f)
+  b'\u{000D}',  # Carriage return (\r)
+  b'\u{0020}',  # Normal space
+  b'\u{00A0}',  # No-break space 	<NBSP>
+  b'\u{FEFF}',  # Zero-width no-break space <ZWNBSP>
+] => join('')
+
+echo $["$spaces YSH $spaces" => trim()]

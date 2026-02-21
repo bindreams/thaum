@@ -1,0 +1,6 @@
+name: Match is unanchored at both ends
+dialect: bash
+source: oils:spec/regex#match-is-unanchored-at-both-ends
+stdout: "true\n"
+---
+[[ 'bar' =~ a ]] && echo true

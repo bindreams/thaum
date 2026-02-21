@@ -1,0 +1,16 @@
+name: Long style
+dialect: bash
+source: oils:spec/if#long-style
+stdout: "elif\n"
+---
+if [[ 0 -eq 1 ]]
+then
+  echo if
+  echo if
+elif true
+then
+  echo elif
+else
+  echo else
+  echo else
+fi

@@ -1,0 +1,11 @@
+name: type -a -P gives multiple files
+dialect: bash
+source: oils:spec/builtin-type-bash#type--a--p-gives-multiple-files
+stdout: "_tmp/pwd\n/bin/pwd\n"
+---
+
+touch _tmp/pwd
+chmod +x _tmp/pwd
+PATH="_tmp:/bin"
+
+type -a -P pwd

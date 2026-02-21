@@ -1,0 +1,8 @@
+name: OSH provides an alternative to invalid syntax
+dialect: bash
+source: oils:spec/brace-expansion#osh-provides-an-alternative-to-invalid-syntax
+stdout: "-a{1...3}- -b{1...3}-\n-a- -{1...3}-\na{} b{}\n"
+---
+echo -{a,b}\{1...3\}-
+echo -{a,\{1...3\}}-
+echo {a,b}\{\}

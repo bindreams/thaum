@@ -1,0 +1,13 @@
+name: Append sparse arrays
+dialect: bash
+source: oils:spec/array#append-sparse-arrays
+stdout: "['1', '2', '3']\n['1', '2', '3']\n"
+---
+a=()
+(( a[99]=1 ))
+b=()
+(( b[33]=2 ))
+(( b[66]=3 ))
+a+=( "${b[@]}" )
+argv.py "${a[@]}"
+argv.py "${a[99]}" "${a[100]}" "${a[101]}"

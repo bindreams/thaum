@@ -1,0 +1,20 @@
+name: unset doesn't allow command execution
+dialect: bash
+source: oils:spec/bugs#unset-doesnt-allow-command-execution
+status: 1
+stdout: "len=1\n"
+---
+
+typeset -a a  # for mksh
+a=(42)
+echo len=${#a[@]}
+
+unset -v 'a[$(echo 0 | tee PWNED)]'
+echo len=${#a[@]}
+
+if test -f PWNED; then
+  echo PWNED
+  cat PWNED
+else
+  echo NOPE
+fi

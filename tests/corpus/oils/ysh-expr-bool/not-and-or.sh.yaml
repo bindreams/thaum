@@ -1,0 +1,12 @@
+name: not, and, or
+dialect: bash
+source: oils:spec/ysh-expr-bool#not-and-or
+stdout: "false\nfalse\ntrue\n"
+---
+
+var a = not true
+echo $a
+var b = true and false
+echo $b
+var c = true or false
+echo $c

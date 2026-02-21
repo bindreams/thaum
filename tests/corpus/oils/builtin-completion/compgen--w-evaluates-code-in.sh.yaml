@@ -1,0 +1,7 @@
+name: compgen -W evaluates code in $()
+dialect: bash
+source: oils:spec/builtin-completion#compgen--w-evaluates-code-in
+stdout: "spam\neggs\nham cheese\n"
+---
+IFS=':%'
+compgen -W '$(echo "spam:eggs%ham cheese")'

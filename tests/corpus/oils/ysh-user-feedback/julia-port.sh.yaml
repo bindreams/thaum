@@ -1,0 +1,7 @@
+name: Julia port
+dialect: bash
+source: oils:spec/ysh-user-feedback#julia-port
+stdout: "git\nbranch\n-D\nfoo\nbaz\n___\nfoo\nbaz\n"
+---
+
+$[ENV.SH] $[ENV.REPO_ROOT]/spec/testdata/ysh-user-feedback.sh

@@ -1,0 +1,5 @@
+name: Empty env binding
+dialect: bash
+source: oils:spec/assign#empty-env-binding
+---
+EMPTY= printenv.py EMPTY

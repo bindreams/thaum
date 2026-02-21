@@ -1,0 +1,17 @@
+name: source ///osh/two.sh and $LIB_OSH
+dialect: bash
+source: oils:spec/ysh-builtins#source-oshtwosh-and-libosh
+stdout: "status=0\nstatus=0\nstatus=1\nstatus=1\n"
+---
+
+source ///osh/two.sh
+echo status=$?
+
+source $LIB_OSH/two.sh
+echo status=$?
+
+# errors
+source ///
+echo status=$?
+source ///x
+echo status=$?

@@ -1,0 +1,9 @@
+name: $LINENO in case
+dialect: bash
+source: oils:spec/vars-special#lineno-in-case
+stdout: "got line 1\n"
+---
+case $LINENO in
+  1) echo 'got line 1' ;;
+  *) echo line=$LINENO
+esac

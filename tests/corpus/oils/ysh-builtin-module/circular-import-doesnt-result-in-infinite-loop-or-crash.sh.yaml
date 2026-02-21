@@ -1,0 +1,17 @@
+name: circular import doesn't result in infinite loop, or crash
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-module#circular-import-doesnt-result-in-infinite-loop-or-crash
+stdout: "(Obj)   (\"c1\":\"c1\") --> (\"__invoke__\":<BuiltinProc>)\n(Obj)   (\"c2\"\
+  :\"c2\") --> (\"__invoke__\":<BuiltinProc>)\nhi\n"
+---
+
+use $REPO_ROOT/spec/testdata/module2/cycle1.ysh
+
+# These use each other
+use $REPO_ROOT/spec/testdata/module2/cycle2.ysh
+
+pp test_ (cycle1)
+pp test_ (cycle2)
+
+echo hi

@@ -1,0 +1,16 @@
+name: io->eval() with failing command - caller must handle
+dialect: bash
+source: 
+  oils:spec/ysh-method-io#io-eval-with-failing-command---caller-must-handle
+status: 1
+stdout: "one\n(Dict)   {\"code\":1}\none\n"
+---
+
+var c = ^(echo one; false; echo two)
+
+try {
+  call io->eval(c)
+}
+pp test_ (_error)
+
+call io->eval(c)

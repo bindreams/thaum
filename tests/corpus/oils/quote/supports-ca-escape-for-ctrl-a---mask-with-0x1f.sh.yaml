@@ -1,0 +1,31 @@
+name: $'' supports \cA escape for Ctrl-A - mask with 0x1f
+dialect: bash
+source: oils:spec/quote#supports-ca-escape-for-ctrl-a---mask-with-0x1f
+stdout: " 020 031   -\n  10  19  2d\n\n 001 032\n  01  1a\n\n 001 032\n  01  1a\n\n\
+  \  \\r  \\v 002\n  0d  0b  02\n"
+---
+
+# note: AT&T ksh supports this too
+
+case $SH in dash|ash) exit ;; esac
+
+show_bytes() {
+  # -A n - no file offset
+  od -A n -t c -t x1
+}
+
+# this isn't special
+# mksh doesn't like it
+#echo -n $'\c' | show_bytes
+
+echo -n $'\c0\c9-' | show_bytes
+echo
+
+# control chars are case insensitive
+echo -n $'\ca\cz' | show_bytes
+echo
+
+echo -n $'\cA\cZ' | show_bytes
+echo
+
+echo -n $'\c-\c+\c"' | show_bytes

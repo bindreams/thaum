@@ -1,0 +1,14 @@
+name: "'' means the same thing as u''"
+dialect: bash
+source: oils:spec/ysh-json#means-the-same-thing-as-u
+stdout: "(Str)   \"\"\n(Str)   \"μ\"\nstatus=1\n"
+---
+
+echo "''" | json8 read
+pp test_ (_reply)
+
+echo "'\u{3bc}'" | json8 read
+pp test_ (_reply)
+
+echo "'\yff'" | json8 read
+echo status=$?

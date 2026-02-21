@@ -1,0 +1,12 @@
+name: bind -p -P to print function names and key bindings
+dialect: bash
+source: 
+  oils:spec/builtin-bind#bind--p--p-to-print-function-names-and-key-bindings
+stdout: "% vi-subst (not bound)\n\nvi-subst is not bound to any keys\n"
+---
+
+# silly workaround for spec test format - change # comment to %
+bind -p | grep vi-subst | sed 's/^#/%/'
+echo
+
+bind -P | grep vi-subst

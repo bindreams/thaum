@@ -1,0 +1,29 @@
+name: 'Unrecoverable: divide by zero in conditional word'
+dialect: bash
+source: oils:spec/fatal-errors#unrecoverable-divide-by-zero-in-conditional-word
+stdout: "outside=1\n---\noutside=1\n"
+---
+
+$SH -c '
+if test foo$(( 42 / 0 )) = foo; then
+  echo true
+else
+  echo false
+fi
+echo inside=$?
+'
+echo outside=$?
+
+echo ---
+
+$SH -c '
+if test foo$(( 42 / 0 )) = foo; then
+  echo true
+fi
+echo inside=$?
+'
+echo outside=$?
+
+
+
+# bash makes the command fail

@@ -1,0 +1,14 @@
+name: command -v executable, builtin
+dialect: bash
+source: oils:spec/builtin-meta#command--v-executable-builtin
+stdout: "/grep\n/ls\n\ntrue\neval\n"
+---
+
+#command -v grep ls
+
+command -v grep | egrep -o '/[^/]+$'
+command -v ls | egrep -o '/[^/]+$'
+echo
+
+command -v true
+command -v eval

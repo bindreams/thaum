@@ -1,0 +1,15 @@
+name: Positional args
+dialect: bash
+source: oils:spec/ysh-func#positional-args
+stdout: "pos 1 2\nrest 3 4\n"
+---
+
+func f(x, y, ...rest) {
+  echo "pos $x $y"
+  echo rest @rest
+}
+
+call f(1, 2, 3, 4)
+
+# This is an error
+#call f(1, 2, m=2, n=3)

@@ -1,0 +1,17 @@
+name: Float too big
+dialect: bash
+source: oils:spec/ysh-json#float-too-big
+stdout: "status=0\n(Float)   INFINITY\nstatus=0\n(Float)   -INFINITY\n"
+---
+
+$SH <<'EOF'
+json read <<< '123456789123456789123456789.12345e67890'
+echo status=$?
+pp test_ (_reply)
+EOF
+
+$SH <<'EOF'
+json read <<< '-123456789123456789123456789.12345e67890'
+echo status=$?
+pp test_ (_reply)
+EOF

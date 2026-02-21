@@ -1,0 +1,12 @@
+name: Lazy Evaluation of Alternative
+dialect: bash
+source: oils:spec/var-op-test#lazy-evaluation-of-alternative
+status: 0
+stdout: "x\n0\n0\n1\n"
+---
+i=0
+x=x
+echo ${x:-$((i++))}
+echo $i
+echo ${undefined:-$((i++))}
+echo $i  # i is one because the alternative was only evaluated once

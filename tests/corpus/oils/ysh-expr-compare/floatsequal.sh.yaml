@@ -1,0 +1,10 @@
+name: floatsEqual()
+dialect: bash
+source: oils:spec/ysh-expr-compare#floatsequal
+stdout: "(Bool)   true\n(Bool)   false\n"
+---
+
+var x = 42.0
+pp test_ (floatsEqual(42.0, x))
+
+pp test_ (floatsEqual(42.0, x + 1))

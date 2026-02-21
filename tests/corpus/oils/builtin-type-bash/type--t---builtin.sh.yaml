@@ -1,0 +1,6 @@
+name: type -t -> builtin
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t---builtin
+stdout: "builtin\nbuiltin\nbuiltin\nbuiltin\nbuiltin\nbuiltin\n"
+---
+type -t echo read : [ declare local

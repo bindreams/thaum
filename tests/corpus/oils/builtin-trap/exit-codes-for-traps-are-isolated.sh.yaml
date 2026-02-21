@@ -1,0 +1,14 @@
+name: exit codes for traps are isolated
+dialect: bash
+source: oils:spec/builtin-trap#exit-codes-for-traps-are-isolated
+stdout: "before=0\nUSR1 trap status=0\nafter=0\n"
+---
+
+trap 'echo USR1 trap status=$?; ( exit 42 )' USR1
+
+echo before=$?
+
+# Equivalent to 'kill -USR1 $$' except OSH doesn't have "kill" yet.
+# /bin/kill doesn't exist on Debian unless 'procps' is installed.
+sh -c "kill -USR1 $$"
+echo after=$?

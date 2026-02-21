@@ -1,0 +1,6 @@
+name: incomplete command sub
+dialect: bash
+source: oils:spec/parse-errors#incomplete-command-sub
+status: 2
+---
+$(x

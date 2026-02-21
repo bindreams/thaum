@@ -1,0 +1,8 @@
+name: Exponentiation with **
+dialect: bash
+source: oils:spec/arith#exponentiation-with
+stdout: "1\n3\n9\n"
+---
+echo $(( 3 ** 0 ))
+echo $(( 3 ** 1 ))
+echo $(( 3 ** 2 ))

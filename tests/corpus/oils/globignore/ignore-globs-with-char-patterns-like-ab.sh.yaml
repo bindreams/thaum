@@ -1,0 +1,13 @@
+name: Ignore globs with char patterns like [!ab]
+dialect: bash
+source: oils:spec/globignore#ignore-globs-with-char-patterns-like-ab
+stdout: "A B C D c d\nD a b c d\na b\n"
+---
+rm -rf _tmp
+touch {a,b,c,d,A,B,C,D}
+GLOBIGNORE=*[ab]*
+echo *
+GLOBIGNORE=*[ABC]*
+echo *
+GLOBIGNORE=*[!ab]*
+echo *

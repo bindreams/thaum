@@ -1,0 +1,9 @@
+name: Recursive alias expansion of first word
+dialect: bash
+source: oils:spec/alias#recursive-alias-expansion-of-first-word
+stdout: "__ hello world\n"
+---
+shopt -s expand_aliases  # bash requires this
+alias hi='e_ hello world'
+alias e_='echo __'
+hi   # first hi is expanded to echo hello world; then echo is expanded.  gah.

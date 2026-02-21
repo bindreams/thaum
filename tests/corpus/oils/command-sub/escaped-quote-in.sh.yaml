@@ -1,0 +1,9 @@
+name: Escaped quote in [[ ]]
+dialect: bash
+source: oils:spec/command-sub#escaped-quote-in
+stdout: "123  456\n\"\n"
+---
+file=$TMP/command-sub-dbracket
+#rm -f $file
+echo "123 `[[ $(echo \\" > $file) ]]` 456";
+cat $file

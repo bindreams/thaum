@@ -1,0 +1,7 @@
+name: type -P builtin -> not found
+dialect: bash
+source: oils:spec/builtin-type-bash#type--p-builtin---not-found
+status: 1
+stdout: "\n"
+---
+type -P FOO BAR NOT_FOUND

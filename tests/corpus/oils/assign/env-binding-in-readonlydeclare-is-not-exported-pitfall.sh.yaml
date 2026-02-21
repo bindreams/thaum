@@ -1,0 +1,13 @@
+name: Env binding in readonly/declare is NOT exported!  (pitfall)
+dialect: bash
+source: oils:spec/assign#env-binding-in-readonlydeclare-is-not-exported-pitfall
+stdout: "v=None\nv2=foo\n"
+---
+
+# All shells agree on this, but it's very confusing behavior.
+FOO=foo readonly v=$(printenv.py FOO)
+echo "v=$v"
+
+# bash has probems here:
+FOO=foo readonly v2=$FOO
+echo "v2=$v2"

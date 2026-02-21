@@ -1,0 +1,7 @@
+name: Length of undefined variable with nounset
+dialect: bash
+source: oils:spec/var-op-len#length-of-undefined-variable-with-nounset
+status: 1
+---
+set -o nounset
+echo ${#undef}

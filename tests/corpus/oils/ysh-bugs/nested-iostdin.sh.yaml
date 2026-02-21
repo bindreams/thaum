@@ -1,0 +1,27 @@
+name: Nested io.stdin
+dialect: bash
+source: oils:spec/ysh-bugs#nested-iostdin
+stdout: "x=a\nx=b\nx=a\nx=b\n---\nx=a\nx=b\nx=a\nx=b\n---\nx=a\nx=b\nx=a\nx=b\n"
+---
+
+proc bug {
+  echo '''
+    proc inner {
+      printf 'a\nb\n' | for x in (io.stdin) {
+	echo x=$x
+      }
+    }
+
+    printf 'x\ny\n' | for _ in (io.stdin) {
+      inner
+    }
+    '''
+}
+
+# Changes with invocation style
+
+$[ENV.SH] <(bug)
+echo ---
+$[ENV.SH] -c $(bug)
+echo ---
+bug | $[ENV.SH]

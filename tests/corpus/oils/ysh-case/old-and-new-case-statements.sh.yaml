@@ -1,0 +1,30 @@
+name: old and new case statements
+dialect: bash
+source: oils:spec/ysh-case#old-and-new-case-statements
+stdout: "file\nfile\n--\nother\nother\n--\n"
+---
+
+for flag in -f -x {
+
+  # We can disallow this with shopt --unset parse_old_case, because the new
+  # case statement does everything the old one does
+  #
+  # bin/osh and shopt --set ysh:upgrade let you use both styles, but bin/ysh
+  # only lets you use the new style
+
+  case $flag in
+    -f|-d)
+      echo 'file'
+      ;;
+    *)
+      echo 'other'
+      ;;
+  esac
+
+  case (flag) {
+    -f|-d { echo 'file' }
+    *     { echo 'other' }
+  }
+
+  echo --
+}

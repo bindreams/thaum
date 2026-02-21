@@ -1,0 +1,19 @@
+name: umask sequential actions
+dialect: bash
+source: oils:spec/builtin-umask#umask-sequential-actions
+status: 0
+---
+umask 0124
+umask u+r+w+x
+umask | tail -c 4
+
+umask 0124
+umask a+r+w+x,o-w
+umask | tail -c 4
+
+umask 0124
+umask a+x+wr-r
+umask | tail -c 4
+024
+002
+444

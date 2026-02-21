@@ -1,0 +1,6 @@
+name: empty argv
+dialect: bash
+source: oils:spec/word-split#empty-argv
+stdout: "['1', '2', '3', '', '4', '5']\n"
+---
+argv.py 1 "$@" 2 $@ 3 "$*" 4 $* 5

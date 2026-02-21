@@ -1,0 +1,25 @@
+name: ${undef=a} and shopt --unset dynamic_scope
+dialect: bash
+source: oils:spec/ysh-scope#undefa-and-shopt---unset-dynamicscope
+stdout: "x=\nx=new\nx=\n---\nx=\nx=\nx=\n"
+---
+
+set-x() {
+  : ${x=new}
+}
+demo() {
+  local x
+  echo x=$x
+  set-x
+  echo x=$x
+}
+
+demo
+echo x=$x
+
+echo ---
+
+# Now this IS affected?
+shopt --unset dynamic_scope 
+demo
+echo x=$x

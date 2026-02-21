@@ -1,0 +1,6 @@
+name: Single-quoted
+dialect: bash
+source: oils:spec/quote#single-quoted
+stdout: "single   quoted\n"
+---
+echo 'single   quoted'

@@ -1,0 +1,6 @@
+name: accepts -l flag
+dialect: bash
+source: oils:spec/sh-usage#accepts--l-flag
+status: 0
+---
+$SH -l -c 'exit 0'

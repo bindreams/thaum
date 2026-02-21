@@ -1,0 +1,9 @@
+name: command command -v seq
+dialect: bash
+source: oils:spec/builtin-meta#command-command--v-seq
+stdout: "seq\n"
+---
+seq() {
+  echo 3
+}
+command command -v seq

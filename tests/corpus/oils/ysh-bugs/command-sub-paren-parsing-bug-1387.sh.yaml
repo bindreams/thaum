@@ -1,0 +1,18 @@
+name: Command sub paren parsing bug (#1387)
+dialect: bash
+source: oils:spec/ysh-bugs#command-sub-paren-parsing-bug-1387
+stdout: "true\n3\n125\n13\n"
+---
+
+write $(if (true) { write true })
+
+const a = $(write $[len('foo')])
+echo $a
+
+const b = $(write $[5 ** 3])
+echo $b
+
+const c = $(
+  write $[6 + 7]
+)
+echo $c

@@ -1,0 +1,18 @@
+name: list() does shallow copy
+dialect: bash
+source: oils:spec/ysh-convert#list-does-shallow-copy
+stdout: "2\n2\n3\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var l = [1]
+var l2 = l
+call l2->append(2)
+echo $[len(l)] # d2 should be an alias for d
+
+var l3 = list(l)
+call l3->append(3)
+
+# l3 should NOT be an alias
+echo $[len(l)]
+echo $[len(l3)]

@@ -1,0 +1,12 @@
+name: Float Literals with e-1
+dialect: bash
+source: oils:spec/ysh-int-float#float-literals-with-e-1
+stdout: "ok\n"
+---
+
+shopt -s ysh:upgrade
+# 1+2 2.3
+var x = 1.2 + 23.0e-1  # 3.5
+if (3.4 < x and x < 3.6) {
+  echo ok
+}

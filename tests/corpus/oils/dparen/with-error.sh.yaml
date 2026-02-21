@@ -1,0 +1,9 @@
+name: (( )) with error
+dialect: bash
+source: oils:spec/dparen#with-error
+stdout: "false\ntrue\ntrue\n0\n"
+---
+(( a = 0 )) || echo false
+(( b = 1 )) && echo true
+(( c = -1 )) && echo true
+echo $((a + b + c))

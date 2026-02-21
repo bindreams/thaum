@@ -1,0 +1,11 @@
+name: "[[ a 3< b ]] doesn't work (bug regression)"
+dialect: bash
+source: oils:spec/dbracket#a-3-b-doesnt-work-bug-regression
+status: 2
+---
+[[ a 3< b ]]
+echo status=$?
+[[ a 3> b ]]
+echo status=$?
+
+# Hm these shells use the same redirect trick that OSH used to!

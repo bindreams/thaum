@@ -1,0 +1,24 @@
+name: Functions can be shadowed
+dialect: bash
+source: oils:spec/ysh-func#functions-can-be-shadowed
+stdout: "1 + 2 + 3 = 6\nmysum=6\nmysum=1\n"
+---
+func mysum(items) {
+  var mysum = 0
+  for x in (items) {
+    setvar mysum += x
+  }
+  return (mysum)
+}
+
+echo 1 + 2 + 3 = $[mysum([1, 2, 3])]
+
+func inAnotherScope() {
+  # variable mysum has not yet shadowed func mysum in evaluation
+  var mysum = mysum([1, 2, 3])
+  echo mysum=$mysum
+}
+call inAnotherScope()
+
+var mysum = mysum([0, 1])
+echo mysum=$mysum

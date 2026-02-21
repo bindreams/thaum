@@ -1,0 +1,13 @@
+name: $'' does not check for surrogate range at parse time
+dialect: bash
+source: oils:spec/unicode#does-not-check-for-surrogate-range-at-parse-time
+stdout: "'\\xed\\xb0\\x80'\n'\\xed\\xb0\\x80'\n"
+---
+
+py-repr() {
+  python2 -c 'import sys; print repr(sys.argv[1])'  "$@"
+}
+
+py-repr $'\udc00'
+
+py-repr $'\U0000dc00' 

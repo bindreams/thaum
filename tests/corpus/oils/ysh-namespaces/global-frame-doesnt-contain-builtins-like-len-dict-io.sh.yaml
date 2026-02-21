@@ -1,0 +1,21 @@
+name: global frame doesn't contain builtins like len(), dict(), io
+dialect: bash
+source: 
+  oils:spec/ysh-namespaces#global-frame-doesnt-contain-builtins-like-len-dict-io
+stdout: "(List)   [0,1]\n(List)   [0,1]\n(List)   [0,1]\n"
+---
+
+try {
+  pp frame_vars_ | grep -o len
+}
+pp test_ (_pipeline_status)
+
+try {
+  pp frame_vars_ | grep -o dict
+}
+pp test_ (_pipeline_status)
+
+try {
+  pp frame_vars_ | grep -o -w io
+}
+pp test_ (_pipeline_status)

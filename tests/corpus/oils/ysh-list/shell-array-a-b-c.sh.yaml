@@ -1,0 +1,9 @@
+name: shell array :| a 'b c' |
+dialect: bash
+source: oils:spec/ysh-list#shell-array-a-b-c
+stdout: "['/', 'a', 'b c', '/']\n"
+---
+shopt -s parse_at
+var x = :| a 'b c' |
+var empty = :||
+argv.py / @x @empty /

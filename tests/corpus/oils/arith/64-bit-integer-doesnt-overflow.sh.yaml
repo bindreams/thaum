@@ -1,0 +1,23 @@
+name: 64-bit integer doesn't overflow
+dialect: bash
+source: oils:spec/arith#64-bit-integer-doesnt-overflow
+stdout: "2147483648\n4294967296\n6442450944\nmax positive = 9223372036854775807\n"
+---
+
+a=$(( 1 << 31 ))
+echo $a
+
+b=$(( a + a ))
+echo $b
+
+c=$(( b + a ))
+echo $c
+
+x=$(( 1 << 62 ))
+y=$(( x - 1 ))
+echo "max positive = $(( x + y ))"
+
+#echo "overflow $(( x + x ))"
+
+
+# mksh still uses int!

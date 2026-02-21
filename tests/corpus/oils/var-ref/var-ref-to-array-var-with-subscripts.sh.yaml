@@ -1,0 +1,15 @@
+name: var ref TO array var, with subscripts
+dialect: bash
+source: oils:spec/var-ref#var-ref-to-array-var-with-subscripts
+stdout: "['']\n['x']\n['z']\n['x', 'y', 'z']\n['x y z']\n"
+---
+f() {
+  argv.py "${!1}"
+}
+f 'nonexistent[0]'
+array=(x y z)
+f 'array[0]'
+f 'array[1+1]'
+f 'array[@]'
+f 'array[*]'
+# Also associative arrays.

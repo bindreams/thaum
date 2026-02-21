@@ -1,0 +1,7 @@
+name: Number of elements
+dialect: bash
+source: oils:spec/array#number-of-elements
+stdout: "2 2\n"
+---
+a=(1 '2 3')
+echo "${#a[@]}" ${#a[@]}  # bug fix: also test without quotes

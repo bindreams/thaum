@@ -1,0 +1,9 @@
+name: Array Decay with IFS
+dialect: bash
+source: oils:spec/array-compat#array-decay-with-ifs
+stdout: "['[x y z]']\n"
+---
+IFS=x
+set -- x y z
+var="[$@]"
+argv.py "$var"

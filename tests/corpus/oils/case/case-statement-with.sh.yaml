@@ -1,0 +1,15 @@
+name: Case statement with ;;&
+dialect: bash
+source: oils:spec/case#case-statement-with
+status: 0
+---
+# ;;& keeps testing conditions
+# NOTE: ;& and ;;& are bash 4 only, not on Mac
+case a in
+  a) echo A ;;&
+  *) echo star ;;&
+  *) echo star2 ;;
+esac
+A
+star
+star2

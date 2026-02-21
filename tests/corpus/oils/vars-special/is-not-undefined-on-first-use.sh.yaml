@@ -1,0 +1,12 @@
+name: $_ is not undefined on first use
+dialect: bash
+source: oils:spec/vars-special#is-not-undefined-on-first-use
+stdout: "status=0\n"
+---
+set -e
+
+x=$($SH -u -c 'echo prev=$_')
+echo status=$?
+
+# bash and mksh set $_ to $0 at first; zsh is empty
+#echo "$x"

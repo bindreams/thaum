@@ -1,0 +1,11 @@
+name: No stderr spew when shell is not interactive
+dialect: bash
+source: oils:spec/background#no-stderr-spew-when-shell-is-not-interactive
+stdout: "\n"
+stderr: "\n"
+---
+
+# in interactive shell, this prints 'Process' or 'Pipeline'
+sleep 0.01 &
+sleep 0.01 | cat &
+wait

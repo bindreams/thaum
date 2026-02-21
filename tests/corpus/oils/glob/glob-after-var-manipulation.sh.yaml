@@ -1,0 +1,8 @@
+name: Glob after var manipulation
+dialect: bash
+source: oils:spec/glob#glob-after-var-manipulation
+stdout: "_tmp/*.zzzZ _tmp/bar.zzz _tmp/foo.zzz\n"
+---
+touch _tmp/foo.zzz _tmp/bar.zzz
+g='_tmp/*.zzzZ'
+echo $g ${g%Z}

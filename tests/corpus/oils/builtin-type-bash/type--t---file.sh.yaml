@@ -1,0 +1,7 @@
+name: type -t -> file
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t---file
+---
+type -t find xargs
+file
+file

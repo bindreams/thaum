@@ -1,0 +1,11 @@
+name: Str => split(sep), non-empty str sep
+dialect: bash
+source: oils:spec/ysh-methods#str-splitsep-non-empty-str-sep
+stdout: "(List)   [\"a\",\"b\",\"c\"]\n(List)   [\"\",\"\",\"\"]\n(List)   [\"a\"\
+  ,\"b\",\"c<d\"]\n(List)   [\"a\",\"b\",\"\",\"c\"]\n(List)   []\n"
+---
+pp test_ ('a,b,c'.split(','))
+pp test_ ('aa'.split('a'))
+pp test_ ('a<>b<>c<d'.split('<>'))
+pp test_ ('a;b;;c'.split(';'))
+pp test_ (''.split('foo'))

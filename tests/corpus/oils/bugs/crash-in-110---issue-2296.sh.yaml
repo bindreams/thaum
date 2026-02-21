@@ -1,0 +1,8 @@
+name: 'Crash in {1..10} - issue #2296'
+dialect: bash
+source: oils:spec/bugs#crash-in-110---issue-2296
+status: 127
+stdout: "\n"
+---
+
+{1..10}

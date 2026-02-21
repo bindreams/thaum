@@ -1,0 +1,15 @@
+name: Redirect on control flow (ignored in OSH)
+dialect: bash
+source: oils:spec/command-parsing#redirect-on-control-flow-ignored-in-osh
+status: 0
+stdout: "REDIRECTED\n"
+---
+rm -f _tmp/r.txt
+for x in a b c; do
+  break > _tmp/r.txt
+done
+if test -f _tmp/r.txt; then
+  echo REDIRECTED
+else
+  echo NO
+fi

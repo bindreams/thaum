@@ -1,0 +1,15 @@
+name: Redirect failure is either fatal or can be checked
+dialect: bash
+source: 
+  oils:spec/ysh-cmd-lang#redirect-failure-is-either-fatal-or-can-be-checked
+stdout: "\n"
+---
+
+# TODO: this fails, but there's no way to check it
+#
+# We can have shopt -s redir_errexit in YSH then?
+# Can you catch the error?
+
+{ echo 1; echo 2 } > /
+
+echo status=$?

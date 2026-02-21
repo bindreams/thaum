@@ -1,0 +1,7 @@
+name: ${empty:-}
+dialect: bash
+source: oils:spec/var-sub-quote#empty
+stdout: "[]\n"
+---
+empty=
+argv.py ${empty:-}

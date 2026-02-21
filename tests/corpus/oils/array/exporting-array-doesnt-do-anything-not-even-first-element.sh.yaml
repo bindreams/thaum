@@ -1,0 +1,21 @@
+name: Exporting array doesn't do anything, not even first element
+dialect: bash
+source: 
+  oils:spec/array#exporting-array-doesnt-do-anything-not-even-first-element
+status: 0
+stdout: "mystr\nNone\nNone\n"
+---
+# bash parses, but doesn't execute.
+# mksh gives syntax error -- parses differently with 'export'
+# osh no longer parses this statically.
+
+export PYTHONPATH
+
+PYTHONPATH=mystr  # NOTE: in bash, this doesn't work afterward!
+printenv.py PYTHONPATH
+
+PYTHONPATH=(myarray)
+printenv.py PYTHONPATH
+
+PYTHONPATH=(a b c)
+printenv.py PYTHONPATH

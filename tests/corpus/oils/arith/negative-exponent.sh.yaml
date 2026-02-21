@@ -1,0 +1,8 @@
+name: Negative exponent
+dialect: bash
+source: oils:spec/arith#negative-exponent
+status: 1
+stdout: ''
+---
+# bash explicitly disallows negative exponents!
+echo $(( 2**-1 * 5 ))

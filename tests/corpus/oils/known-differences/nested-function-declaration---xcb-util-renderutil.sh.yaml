@@ -1,0 +1,6 @@
+name: nested function declaration - xcb-util-renderutil
+dialect: bash
+source: 
+  oils:spec/known-differences#nested-function-declaration---xcb-util-renderutil
+---
+f() g() { echo 'hi'; }

@@ -1,0 +1,7 @@
+name: no glob after ~ expansion
+dialect: bash
+source: oils:spec/glob#no-glob-after-expansion
+stdout: "*/*.py\n"
+---
+HOME=*
+echo ~/*.py

@@ -1,0 +1,13 @@
+name: '# operator with single quoted arg (dash/ash and bash/mksh disagree, reported
+  by Crestwave)'
+dialect: bash
+source: 
+  oils:spec/var-sub-quote#operator-with-single-quoted-arg-dashash-and-bashmksh-disagree-reported-by-crestwave
+stdout: "--\n--\n-'a'-\n-'a'-\n"
+---
+var=a
+echo -${var#'a'}-
+echo -"${var#'a'}"-
+var="'a'"
+echo -${var#'a'}-
+echo -"${var#'a'}"-

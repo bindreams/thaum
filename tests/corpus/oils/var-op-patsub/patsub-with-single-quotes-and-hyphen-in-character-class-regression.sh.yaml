@@ -1,0 +1,12 @@
+name: patsub with single quotes and hyphen in character class (regression)
+dialect: bash
+source: 
+  oils:spec/var-op-patsub#patsub-with-single-quotes-and-hyphen-in-character-class-regression
+stdout: "++--.,<>[]\n"
+---
+
+# from Crestwave's bf.bash
+
+program='^++--hello.,world<>[]'
+program=${program//[^'><+-.,[]']} 
+echo $program

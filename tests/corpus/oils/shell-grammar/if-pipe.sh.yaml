@@ -1,0 +1,9 @@
+name: If pipe
+dialect: bash
+source: oils:spec/shell-grammar#if-pipe
+---
+if echo | echo word_b; then
+  echo
+else
+  echo
+fi

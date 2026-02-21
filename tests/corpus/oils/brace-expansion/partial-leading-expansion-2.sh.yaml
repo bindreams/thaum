@@ -1,0 +1,6 @@
+name: partial leading expansion 2
+dialect: bash
+source: oils:spec/brace-expansion#partial-leading-expansion-2
+stdout: "{x}_a {x}_b\n"
+---
+echo {x}_{a,b}

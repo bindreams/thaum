@@ -1,0 +1,9 @@
+name: '} in expansion'
+dialect: bash
+source: oils:spec/brace-expansion#in-expansion
+status: 0
+stdout: "a} b}\n"
+---
+# hm they treat this the SAME.  Leftmost { is matched by first }, and then
+# there is another } as the postfix.
+echo {a,b}}

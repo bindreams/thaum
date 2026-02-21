@@ -1,0 +1,22 @@
+name: builtin cat usage
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-cat-usage
+stdout: "ok\nok\n3\n4\nstatus=0\n"
+---
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+$prefix cat --bad >/dev/null
+if test "$?" != 0; then
+  echo ok
+fi
+
+$prefix cat -z
+if test "$?" != 0; then
+  echo ok
+fi
+
+seq 3 4 | $prefix cat --
+echo status=$?

@@ -1,0 +1,7 @@
+name: Dynamic octal constant
+dialect: bash
+source: oils:spec/arith#dynamic-octal-constant
+stdout: "9\n"
+---
+zero=0
+echo $(( ${zero}11 ))

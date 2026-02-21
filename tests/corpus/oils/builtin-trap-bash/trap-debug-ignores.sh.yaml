@@ -1,0 +1,17 @@
+name: trap DEBUG ignores $?
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-ignores
+stdout: "  [8]\nstatus=0\n  [9]\nA\n  [10]\nstatus=0\n  [11]\nB\n  [12]\nstatus=0\n"
+---
+debuglog() {
+  echo "  [$@]"
+  return 42     # IGNORED FAILURE
+}
+
+trap 'debuglog $LINENO' DEBUG
+
+echo status=$?
+echo A
+echo status=$?
+echo B
+echo status=$?

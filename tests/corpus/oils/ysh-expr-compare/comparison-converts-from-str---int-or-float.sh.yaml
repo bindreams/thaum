@@ -1,0 +1,26 @@
+name: Comparison converts from Str -> Int or Float
+dialect: bash
+source: oils:spec/ysh-expr-compare#comparison-converts-from-str---int-or-float
+stdout: " i  i true\nsi  i true\n i si true\n---\n f  f true\nsf  f true\n f sf true\n\
+  ---\n i  f false\nsi  f false\n i sf false\n---\n f  i true\nsf  i true\n f si true\n"
+---
+shopt --set parse_ysh_expr_sub
+
+echo ' i  i' $[1 < 2]
+echo 'si  i' $['1' < 2]
+echo ' i si' $[1 < '2']
+echo ---
+
+echo ' f  f' $[2.5 > 1.5]
+echo 'sf  f' $['2.5' > 1.5]
+echo ' f sf' $[2.5 > '1.5']
+echo ---
+
+echo ' i  f' $[4 <= 1.5]
+echo 'si  f' $['4' <= 1.5]
+echo ' i sf' $[4 <= '1.5']
+echo ---
+
+echo ' f  i' $[5.0 >= 2]
+echo 'sf  i' $['5.0' >= 2]
+echo ' f si' $[5.0 >= '2']

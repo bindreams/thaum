@@ -1,0 +1,18 @@
+name: assign to invalid ref with strict_nameref
+dialect: bash
+source: oils:spec/nameref#assign-to-invalid-ref-with-strictnameref
+status: 1
+stdout: "ref=1\n"
+---
+case $SH in *bash|*mksh) exit ;; esac
+
+shopt -s strict_nameref
+
+ref=1
+
+echo ref=$ref
+typeset -n ref
+echo ref=$ref
+
+ref=foo
+echo ref=$ref

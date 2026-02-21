@@ -1,0 +1,22 @@
+name: Slices with Multiple Dimensions (for TSV8?)
+dialect: bash
+source: oils:spec/ysh-slice-range#slices-with-multiple-dimensions-for-tsv8
+stdout: "(Str)   'TODO: Table Slicing'\n(Str)   'TODO: Table Slicing'\n"
+---
+
+qtt pretty :mytable <<< '''
+name  age:Int
+alice 42
+bob   31
+carol 20
+'''
+
+# Cut off the first two rows
+var t1 = mytable[2:, :]
+= t1
+
+var t2 = mytable[:2, 3:4]
+= t2
+
+var t3 = mytable[:2, %(name age)]
+= t3

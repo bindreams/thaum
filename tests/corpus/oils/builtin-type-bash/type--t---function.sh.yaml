@@ -1,0 +1,7 @@
+name: type -t -> function
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t---function
+stdout: "function\n"
+---
+f() { echo hi; }
+type -t f

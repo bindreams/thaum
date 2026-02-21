@@ -1,0 +1,7 @@
+name: file with NUL byte
+dialect: bash
+source: oils:spec/bugs#file-with-nul-byte
+stdout: "one echo two\n"
+---
+echo -e 'echo one \0 echo two' > tmp.sh
+$SH tmp.sh

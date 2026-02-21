@@ -1,0 +1,11 @@
+name: case item without ;; is not allowed
+dialect: bash
+source: oils:spec/shell-grammar#case-item-without-is-not-allowed
+status: 99
+---
+case word_a in
+  word_a)
+  word_b)
+    echo
+    ;;
+esac

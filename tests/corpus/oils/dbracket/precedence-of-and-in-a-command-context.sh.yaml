@@ -1,0 +1,12 @@
+name: precedence of && and || in a command context
+dialect: bash
+source: oils:spec/dbracket#precedence-of-and-in-a-command-context
+stdout: "NO precedence\n"
+---
+if test True || test '' && test ''; then
+  echo YES
+else
+  echo "NO precedence"
+fi
+
+# http://tldp.org/LDP/abs/html/testconstructs.html#DBLBRACKETS

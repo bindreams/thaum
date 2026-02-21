@@ -1,0 +1,9 @@
+name: nounset with arithmetic
+dialect: bash
+source: oils:spec/arith#nounset-with-arithmetic
+status: 1
+stdout: ''
+---
+set -o nounset
+x=$(( y + 5 ))
+echo "should not get here: x=${x:-<unset>}"

@@ -1,0 +1,13 @@
+name: dirs -p to print one entry per line
+dialect: bash
+source: oils:spec/builtin-dirs#dirs--p-to-print-one-entry-per-line
+stdout: "--\n/tmp\n/\n--\n/dev\n/tmp\n/\n"
+---
+set -o errexit
+cd /
+pushd /tmp >/dev/null
+echo --
+dirs -p
+pushd /dev >/dev/null
+echo --
+dirs -p

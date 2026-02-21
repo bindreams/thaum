@@ -1,0 +1,30 @@
+name: binding procs in the eval-ed namespace
+dialect: bash
+source: oils:spec/ysh-builtin-eval#binding-procs-in-the-eval-ed-namespace
+stdout: "flag -h --help\narg file\n"
+---
+proc __flag (short, long) {
+  echo "flag $short $long"
+}
+
+proc __arg (name) {
+  echo "arg $name"
+}
+
+proc parser (; spec ;; block) {
+  call io->eval(block, vars={ 'flag': __flag, 'arg': __arg })
+}
+
+parser (&spec) {
+  flag -h --help
+  arg file
+}
+
+# but flag/arg are unavailable outside of `parser`
+# _error.code = 127 is set on "command not found" errors
+
+try { flag }
+if (_error.code !== 127) { error 'expected failure' }
+
+try { arg }
+if (_error.code !== 127) { error 'expected failure' }

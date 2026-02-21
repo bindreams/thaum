@@ -1,0 +1,8 @@
+name: Any for loop can't have 4 indices
+dialect: bash
+source: oils:spec/ysh-for#any-for-loop-cant-have-4-indices
+status: 2
+---
+for a, b, c, d in (['foo']) {
+  echo $i $item
+}

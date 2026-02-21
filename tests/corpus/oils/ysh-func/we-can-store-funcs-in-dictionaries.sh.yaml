@@ -1,0 +1,38 @@
+name: We can store funcs in dictionaries
+dialect: bash
+source: oils:spec/ysh-func#we-can-store-funcs-in-dictionaries
+stdout: "This is a DOG\nWoof\nThis is a CAT\nMeow\n"
+---
+func dog_speak() {
+  echo "Woof"
+}
+
+func dog_type() {
+  return ("DOG")
+}
+
+const Dog = {
+  speak: dog_speak,
+  type: dog_type,
+}
+
+func cat_speak() {
+  echo "Meow"
+}
+
+func cat_type() {
+  return ("CAT")
+}
+
+const Cat = {
+  speak: cat_speak,
+  type: cat_type,
+}
+
+# First class "modules"!
+const animals = [Dog, Cat]
+for animal in (animals) {
+  var type = animal.type()
+  echo This is a $type
+  call animal.speak()
+}

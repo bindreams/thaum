@@ -1,0 +1,14 @@
+name: DebugFrame.toString() running YSH functions
+dialect: bash
+source: oils:spec/ysh-introspect#debugframetostring-running-ysh-functions
+stdout: "  %1 [ -c flag ]:1\n    source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh;
+  call-func\n                                                               ^~~~~~~~~\n\
+  \  %2 MYROOT/spec/testdata/debug-frame-lib.ysh:32\n      var x = myfunc(99)\n  \
+  \                  ^\n  %3 MYROOT/spec/testdata/debug-frame-lib.ysh:28\n      return
+  (identity(myfunc2(42, x+1)))\n                      ^\n  %4 MYROOT/spec/testdata/debug-frame-lib.ysh:23\n\
+  \      print-stack\n      ^~~~~~~~~~~\n142\n"
+---
+
+# functions
+$[ENV.SH] -c 'source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh; call-func' |
+  sed -e "s;$[ENV.REPO_ROOT];MYROOT;g" -e 's;#;%;g'

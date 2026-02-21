@@ -1,0 +1,6 @@
+name: Incomplete Function
+dialect: bash
+source: oils:spec/func-parsing#incomplete-function
+status: 2
+---
+

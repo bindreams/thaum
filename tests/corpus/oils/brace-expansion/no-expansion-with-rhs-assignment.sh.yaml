@@ -1,0 +1,7 @@
+name: no expansion with RHS assignment
+dialect: bash
+source: oils:spec/brace-expansion#no-expansion-with-rhs-assignment
+status: 127
+stdout: ''
+---
+{v,x}=X

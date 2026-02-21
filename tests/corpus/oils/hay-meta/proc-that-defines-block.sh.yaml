@@ -1,0 +1,32 @@
+name: Proc That Defines Block
+dialect: bash
+source: oils:spec/hay-meta#proc-that-defines-block
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Rule
+
+proc myrule(name) {
+  Rule $name {
+    path = "/usr/bin/$name"
+  }
+}
+
+myrule spam
+myrule eggs
+myrule ham
+
+json write (_hay()) | jq '.children[].attrs' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "path": "/usr/bin/spam"
+}
+{
+  "path": "/usr/bin/eggs"
+}
+{
+  "path": "/usr/bin/ham"
+}
+EOF

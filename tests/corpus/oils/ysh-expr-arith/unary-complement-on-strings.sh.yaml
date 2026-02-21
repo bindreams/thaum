@@ -1,0 +1,11 @@
+name: unary ~ complement on strings
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary-complement-on-strings
+status: 3
+stdout: "-1\n-2\n-3\n"
+---
+json write (~0)
+json write (~'1')
+json write (~' 2 ')
+# Not accepted
+json write (~'3.5')

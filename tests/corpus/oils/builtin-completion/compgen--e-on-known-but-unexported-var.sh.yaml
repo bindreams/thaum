@@ -1,0 +1,8 @@
+name: compgen -e on known, but unexported, var
+dialect: bash
+source: oils:spec/builtin-completion#compgen--e-on-known-but-unexported-var
+status: 1
+stdout: ''
+---
+unexported=0
+compgen -e unexported

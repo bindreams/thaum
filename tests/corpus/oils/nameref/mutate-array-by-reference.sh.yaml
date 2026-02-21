@@ -1,0 +1,13 @@
+name: mutate array by reference
+dialect: bash
+source: oils:spec/nameref#mutate-array-by-reference
+stdout: "a ZZZ c d\n"
+---
+set1() {
+  local -n array_name=$1
+  local val=$2
+  array_name[1]=$val
+}
+shadock=(a b c d)
+set1 shadock ZZZ
+echo ${shadock[@]}

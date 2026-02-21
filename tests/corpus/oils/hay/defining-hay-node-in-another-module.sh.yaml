@@ -1,0 +1,17 @@
+name: Defining Hay node in another module
+dialect: bash
+source: oils:spec/hay#defining-hay-node-in-another-module
+stdout: "{\n  \"version\": \"3.3\"\n}\n"
+---
+shopt --set ysh:all
+
+use $[ENV.REPO_ROOT]/spec/testdata/config/define-hay.ysh
+
+Package foo {
+  version = '3.3'
+  INSTALL {
+    echo version=$version
+  }
+}
+
+json write (_hay().children[0].attrs)

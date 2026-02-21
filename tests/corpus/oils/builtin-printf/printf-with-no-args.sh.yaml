@@ -1,0 +1,7 @@
+name: printf with no args
+dialect: bash
+source: oils:spec/builtin-printf#printf-with-no-args
+status: 2
+stdout: ''
+---
+printf

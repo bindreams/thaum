@@ -1,0 +1,22 @@
+name: Extended glob in same word as array
+dialect: bash
+source: oils:spec/extglob-files#extended-glob-in-same-word-as-array
+stdout: "['a b', 'c']\n['star', 'glob', 'a b c.py']\n['star', 'extglob', 'a b c.cc',
+  'a b c.py']\n['at', 'extglob', 'a b', 'cee.cc', 'cee.py']\n"
+---
+shopt -s extglob
+mkdir -p eg10
+cd eg10
+
+touch {'a b c',bee,cee}.{py,cc}
+set -- 'a b' 'c'
+
+argv.py "$@"
+
+# This works!
+argv.py star glob "$*"*.py
+argv.py star extglob "$*"*@(.py|cc)
+
+# Hm this actually still works!  the first two parts are literal.  And then
+# there's something like the simple_word_eval algorithm on the rest.  Gah.
+argv.py at extglob "$@"*@(.py|cc)

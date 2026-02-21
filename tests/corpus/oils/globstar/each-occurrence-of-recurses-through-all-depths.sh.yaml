@@ -1,0 +1,13 @@
+name: each occurrence of ** recurses through all depths
+dialect: bash
+source: oils:spec/globstar#each-occurrence-of-recurses-through-all-depths
+stdout: "c/leaf.md\nc/subdir/leaf.md\nleaf.md\n\nc/leaf.md\nc/subdir/leaf.md\nleaf.md\n"
+---
+shopt -s globstar
+
+mkdir -p c/subdir
+touch {leaf.md,c/leaf.md,c/subdir/leaf.md}
+
+echo **/*.* | tr ' ' '\n' | sort
+echo
+echo **/**/*.* | tr ' ' '\n' | sort

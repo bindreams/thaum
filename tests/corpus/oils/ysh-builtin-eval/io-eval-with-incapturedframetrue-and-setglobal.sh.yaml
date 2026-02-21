@@ -1,0 +1,32 @@
+name: io->eval with in_captured_frame=true and setglobal
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#io-eval-with-incapturedframetrue-and-setglobal
+stdout: "block arg x = main\nmutated = ZZ\n(Str)   \"ZZ\"\n(Str)   \"lib\"\n"
+---
+
+echo >lib.ysh '''
+const __provide__ = :| p x |
+
+var x = "lib"
+
+proc p (;;; block) {
+  call io->eval(block, in_captured_frame=true)
+}
+'''
+
+use ./lib.ysh
+
+var x = 'main'
+
+lib p {
+  echo "block arg x = $x"
+  setglobal x = "ZZ"
+  echo "mutated = $x"
+  var result = 'result'
+}
+#pp test_ (result)
+
+# NOTE: we can modify our own x, but not lib.x!
+pp test_ (x)
+pp test_ (lib.x)

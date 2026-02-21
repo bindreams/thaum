@@ -1,0 +1,12 @@
+name: List remove() does nothing if element does not exist
+dialect: bash
+source: oils:spec/ysh-list#list-remove-does-nothing-if-element-does-not-exist
+stdout: "pass\n"
+---
+shopt -s ysh:all
+
+var l = :| a b c |
+call l->remove("d")
+assert [ :| a b c | === l ]
+
+echo pass

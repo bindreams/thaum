@@ -1,0 +1,8 @@
+name: errexit test && -- from gen-module-init
+dialect: bash
+source: oils:spec/errexit#errexit-test----from-gen-module-init
+stdout: "status=1\n"
+---
+set -o errexit
+test "$mod" = readline && echo "#endif"
+echo status=$?

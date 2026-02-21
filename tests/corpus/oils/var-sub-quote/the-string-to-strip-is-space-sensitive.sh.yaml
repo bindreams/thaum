@@ -1,0 +1,7 @@
+name: The string to strip is space sensitive
+dialect: bash
+source: oils:spec/var-sub-quote#the-string-to-strip-is-space-sensitive
+stdout: "['a b ', 'a b c d']\n"
+---
+foo='a b c d'
+argv.py "${foo%c d}" "${foo%c  d}"

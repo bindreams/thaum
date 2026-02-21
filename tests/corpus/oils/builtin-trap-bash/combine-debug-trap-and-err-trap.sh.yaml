@@ -1,0 +1,13 @@
+name: Combine DEBUG trap and ERR trap
+dialect: bash
+source: oils:spec/builtin-trap-bash#combine-debug-trap-and-err-trap
+stdout: "6 err\n6 debug\n6 debug\n6 debug\n6 err\n7 err\n7 debug\nafter=1\n"
+---
+
+case $SH in dash|mksh|ash) exit ;; esac
+
+trap 'false; echo $LINENO err' ERR
+trap 'false; echo $LINENO debug' DEBUG
+
+false
+echo after=$?

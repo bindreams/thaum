@@ -1,0 +1,10 @@
+name: trap without args prints traps
+dialect: bash
+source: oils:spec/builtin-trap#trap-without-args-prints-traps
+stdout: "status=0\ntrap -- 'echo exit' EXIT\nstatus=0\nexit\n"
+---
+trap 'echo exit' EXIT
+echo status=$?
+
+trap
+echo status=$?

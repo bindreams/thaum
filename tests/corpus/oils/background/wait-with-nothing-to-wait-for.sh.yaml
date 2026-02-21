@@ -1,0 +1,6 @@
+name: wait with nothing to wait for
+dialect: bash
+source: oils:spec/background#wait-with-nothing-to-wait-for
+status: 0
+---
+wait

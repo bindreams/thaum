@@ -1,0 +1,11 @@
+name: Empty array and assignment builtin (regression)
+dialect: bash
+source: oils:spec/ysh-old#empty-array-and-assignment-builtin-regression
+stdout: "z=1\n"
+---
+shopt --unset no_osh_builtins
+
+# Bug happens with shell arrays too
+empty=()
+declare z=1 "${empty[@]}"
+echo z=$z

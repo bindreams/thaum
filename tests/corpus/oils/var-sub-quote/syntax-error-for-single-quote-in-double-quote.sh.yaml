@@ -1,0 +1,8 @@
+name: Syntax error for single quote in double quote
+dialect: bash
+source: oils:spec/var-sub-quote#syntax-error-for-single-quote-in-double-quote
+status: 2
+stdout: ''
+---
+foo="'a b c d'"
+argv.py "${foo%d'}"

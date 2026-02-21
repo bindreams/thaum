@@ -1,0 +1,8 @@
+name: Incomplete while
+dialect: bash
+source: oils:spec/parse-errors#incomplete-while
+status: 2
+stdout: ''
+---
+echo hi; while
+echo status=$?

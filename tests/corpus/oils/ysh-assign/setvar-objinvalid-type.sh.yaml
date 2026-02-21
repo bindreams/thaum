@@ -1,0 +1,24 @@
+name: setvar obj[INVALID TYPE] =
+dialect: bash
+source: oils:spec/ysh-assign#setvar-objinvalid-type
+stdout: "d.key = 5\noutside1=3\nL[0] = 43\noutside2=3\n"
+---
+
+shopt --unset errexit
+
+$[ENV.SH] -c '
+var d = {}
+setvar d["key"] = 5
+echo "d.key = $[d.key]"
+setvar d[42] = 6
+echo "should not get here"
+'
+echo outside1=$?
+
+$[ENV.SH] -c '
+var L = [42]
+setvar L[0] = 43
+echo "L[0] = $[L[0]]"
+setvar L["key"] = 44
+'
+echo outside2=$?

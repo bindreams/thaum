@@ -1,0 +1,11 @@
+name: help topics that print URLs
+dialect: bash
+source: oils:spec/ysh-builtin-help#help-topics-that-print-urls
+stdout: "chap-word-lang.html\nstatus=0\nchap-builtin-cmd.html\nstatus=0\n"
+---
+
+help command-sub | grep -o chap-word-lang.html
+echo status=$?
+
+help read | grep -o chap-builtin-cmd.html
+echo status=$?

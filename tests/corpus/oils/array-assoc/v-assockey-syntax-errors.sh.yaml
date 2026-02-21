@@ -1,0 +1,17 @@
+name: '[[ -v assoc[key] ]] syntax errors'
+dialect: bash
+source: oils:spec/array-assoc#v-assockey-syntax-errors
+stdout: "empty=0\nk=0\ntypo=1\n"
+---
+
+typeset -A assoc
+assoc=([empty]='' [k]=v)
+
+[[ -v assoc[empty] ]]
+echo empty=$?
+
+[[ -v assoc[k] ]]
+echo k=$?
+
+[[ -v assoc[k]z ]]
+echo typo=$?

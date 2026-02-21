@@ -1,0 +1,13 @@
+name: test -s
+dialect: bash
+source: oils:spec/builtin-bracket#test--s
+stdout: "status=1\nstatus=1\nstatus=0\n"
+---
+test -s __nonexistent
+echo status=$?
+touch $TMP/empty
+test -s $TMP/empty
+echo status=$?
+echo nonempty > $TMP/nonempty
+test -s $TMP/nonempty
+echo status=$?

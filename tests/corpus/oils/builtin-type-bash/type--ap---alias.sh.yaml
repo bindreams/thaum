@@ -1,0 +1,8 @@
+name: type -ap -> alias
+dialect: bash
+source: oils:spec/builtin-type-bash#type--ap---alias
+stdout: "\n"
+---
+shopt -s expand_aliases
+alias ll="ls -lha"
+type -ap ll

@@ -1,0 +1,8 @@
+name: define and use alias on a single line
+dialect: bash
+source: oils:spec/alias#define-and-use-alias-on-a-single-line
+stdout: "two\nthree\n"
+---
+shopt -s expand_aliases
+alias e=echo; e one  # this is not alias-expanded because we parse lines at once
+e two; e three

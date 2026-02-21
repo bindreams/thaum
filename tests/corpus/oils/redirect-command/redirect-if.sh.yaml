@@ -1,0 +1,10 @@
+name: redirect if
+dialect: bash
+source: oils:spec/redirect-command#redirect-if
+stdout: "if-body\n"
+---
+if true; then
+  echo if-body
+fi >out
+
+cat out

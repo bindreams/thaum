@@ -1,0 +1,16 @@
+name: trap DEBUG for expr
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-for-expr
+stdout: "  [6]\n  [6]\n  [7]\ni=3\n  [6]\n  [6]\n  [7]\ni=4\n  [6]\n  [6]\n  [10]\n\
+  ok\n"
+---
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+for (( i =3 ; i < 5; ++i )); do
+  echo i=$i
+done
+
+echo ok

@@ -1,0 +1,12 @@
+name: NUL bytes with echo $'\0' (OSH and zsh agree)
+dialect: bash
+source: oils:spec/nul-bytes#nul-bytes-with-echo-0-osh-and-zsh-agree
+stdout: "  \\n\n  0a\n"
+---
+case $SH in dash) exit ;; esac
+show_hex() { od -A n -t c -t x1; }
+
+# OSH agrees with ZSH -- so you have the ability to print NUL bytes without
+# legacy echo -e
+
+echo $'\0' | show_hex

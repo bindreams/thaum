@@ -1,0 +1,14 @@
+name: dirs -l to print in long format, no tilde prefix
+dialect: bash
+source: oils:spec/builtin-dirs#dirs--l-to-print-in-long-format-no-tilde-prefix
+status: 0
+stdout: "~/oil_test /\n/tmp/oil_test /\n"
+---
+# Can't use the OSH test harness for this because
+# /home/<username> may be included in a path.
+cd /
+HOME=/tmp
+mkdir -p $HOME/oil_test
+pushd $HOME/oil_test >/dev/null
+dirs
+dirs -l

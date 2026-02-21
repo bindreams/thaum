@@ -1,0 +1,22 @@
+name: noclobber on &>> >>
+dialect: bash
+source: oils:spec/sh-options#noclobber-on
+stdout: "stdout=0\nagain=0\nfoo\nbar\nboth=0\nagain=0\nbaz\nfoo\n"
+---
+case $SH in dash) echo 'flaky'; exit ;; esac
+
+set -C
+
+rm -f $TMP/no-clobber
+echo foo >> $TMP/no-clobber
+echo stdout=$?
+echo bar >> $TMP/no-clobber
+echo again=$?
+cat $TMP/no-clobber
+
+rm -f $TMP/no-clobber
+echo baz &>> $TMP/no-clobber
+echo both=$?
+echo foo &>> $TMP/no-clobber
+echo again=$?
+cat $TMP/no-clobber

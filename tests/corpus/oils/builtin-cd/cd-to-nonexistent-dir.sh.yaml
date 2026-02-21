@@ -1,0 +1,7 @@
+name: cd to nonexistent dir
+dialect: bash
+source: oils:spec/builtin-cd#cd-to-nonexistent-dir
+stdout: "status=1\n"
+---
+cd /nonexistent/dir
+echo status=$?

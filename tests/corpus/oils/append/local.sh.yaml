@@ -1,0 +1,16 @@
+name: local +=
+dialect: bash
+source: oils:spec/append#local
+stdout: "s=foo\ns=foofoo\n"
+---
+
+f() {
+  local s+=foo
+  echo s=$s
+
+  set -u
+  local s+=foo
+  echo s=$s
+}
+
+f

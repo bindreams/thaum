@@ -1,0 +1,15 @@
+name: Dynamic parsing of RHS ${a[$code]}
+dialect: bash
+source: oils:spec/array#dynamic-parsing-of-rhs-acode
+stdout: "three\nthree\n"
+---
+declare -a array
+array=(zero one two three)
+
+echo ${array[1+2]}
+
+code='1+2'
+echo ${array[$code]}
+
+
+# it still dynamically parses

@@ -1,0 +1,7 @@
+name: return at top level is an error
+dialect: bash
+source: oils:spec/strict-options#return-at-top-level-is-an-error
+stdout: ''
+---
+return
+echo "status=$?"

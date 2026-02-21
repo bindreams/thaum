@@ -1,0 +1,8 @@
+name: oil:upgrade includes inherit_errexit
+dialect: bash
+source: oils:spec/ysh-options#oilupgrade-includes-inheriterrexit
+status: 1
+stdout: ''
+---
+shopt -s oil:upgrade
+echo $(echo one; false; echo two)

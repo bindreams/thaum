@@ -1,0 +1,11 @@
+name: Mutually recursive namerefs detected on WRITE
+dialect: bash
+source: oils:spec/nameref#mutually-recursive-namerefs-detected-on-write
+status: 1
+stdout: "defined 0\n"
+---
+typeset -n ref1=ref2
+typeset -n ref2=ref1  # not detected here
+echo defined $?
+ref1=z  # detected here
+echo mutated $?

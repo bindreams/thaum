@@ -1,0 +1,49 @@
+name: use foo.ysh creates a value.Obj, and it's cached on later invocations
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-module#use-fooysh-creates-a-valueobj-and-its-cached-on-later-invocations
+stdout: "caller_no_leak = null\n(List)   [\"util\",(\"MY_INTEGER\":42,\"log\":<Proc>,\"\
+  die\":<Proc>,\"setvar_noleak\":\"util.ysh\",\"setglobal_noleak\":\"util.ysh\",\"\
+  invokableObj\":(\"x\":3,\"y\":4) --> (\"__invoke__\":<Proc>)) --> (\"__invoke__\"\
+  :<BuiltinProc>)]\n(List)   [\"repeated\",(\"MY_INTEGER\":42,\"log\":<Proc>,\"die\"\
+  :<Proc>,\"setvar_noleak\":\"util.ysh\",\"setglobal_noleak\":\"util.ysh\",\"invokableObj\"\
+  :(\"x\":3,\"y\":4) --> (\"__invoke__\":<Proc>)) --> (\"__invoke__\":<BuiltinProc>)]\n\
+  (List)   [\"symlink\",(\"MY_INTEGER\":42,\"log\":<Proc>,\"die\":<Proc>,\"setvar_noleak\"\
+  :\"util.ysh\",\"setglobal_noleak\":\"util.ysh\",\"invokableObj\":(\"x\":3,\"y\"\
+  :4) --> (\"__invoke__\":<Proc>)) --> (\"__invoke__\":<BuiltinProc>)]\nsetvar_noleak
+  null\nsetglobal_noleak null\n"
+---
+
+shopt --set ysh:upgrade
+
+var caller_no_leak = 42
+
+use $REPO_ROOT/spec/testdata/module2/util.ysh
+
+# This is a value.Obj
+pp test_ (['util', util])
+var id1 = vm.id(util)
+
+var saved_util = util
+
+use $REPO_ROOT/spec/testdata/module2/util.ysh
+pp test_ (['repeated', util])
+var id2 = vm.id(util)
+
+# Create a symlink to test normalization
+
+ln -s $REPO_ROOT/spec/testdata/module2/util.ysh symlink.ysh
+
+use symlink.ysh
+pp test_ (['symlink', symlink])
+var id3 = vm.id(symlink)
+
+#pp test_ ([id1, id2, id3])
+
+# Make sure they are all the same object
+assert [id1 === id2]
+assert [id2 === id3]
+
+# Doesn't leak from util.ysh
+echo "setvar_noleak $[getVar('setvar_noleak')]"
+echo "setglobal_noleak $[getVar('setglobal_noleak')]"

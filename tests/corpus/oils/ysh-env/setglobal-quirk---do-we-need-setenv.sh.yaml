@@ -1,0 +1,20 @@
+name: setglobal quirk - do we need setenv?
+dialect: bash
+source: oils:spec/ysh-env#setglobal-quirk---do-we-need-setenv
+stdout: "(Null)   null\n(Str)   \"perm\"\n"
+---
+shopt --set ysh:all
+
+proc p {
+  # quirk: MOST visible Dict is mutated
+  setglobal ENV.perm = 'perm'
+}  
+
+FOO=bar p
+
+# quirk: that Dict is gone
+# we could add 'setenv' to work around this
+pp test_ (get(ENV, 'perm'))
+
+p
+pp test_ (get(ENV, 'perm'))

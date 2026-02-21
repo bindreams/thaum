@@ -1,0 +1,8 @@
+name: Assignment doesn't do word splitting
+dialect: bash
+source: oils:spec/assign#assignment-doesnt-do-word-splitting
+stdout: "['one two']\n"
+---
+words='one two'
+a=$words
+argv.py "$a"

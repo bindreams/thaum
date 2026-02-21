@@ -1,0 +1,8 @@
+name: ': 9> fdleak (OSH regression)'
+dialect: bash
+source: oils:spec/redirect#9-fdleak-osh-regression
+stdout: ''
+---
+true 9> "$TMP/fd.txt"
+( echo world >&9 )
+cat "$TMP/fd.txt"

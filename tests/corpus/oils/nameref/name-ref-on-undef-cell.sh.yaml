@@ -1,0 +1,15 @@
+name: name ref on Undef cell
+dialect: bash
+source: oils:spec/nameref#name-ref-on-undef-cell
+status: 1
+stdout: "ref=\nnounset\n"
+---
+typeset  -n ref
+
+# This is technically incorrect: an undefined name shouldn't evaluate to empty
+# string.  mksh doesn't allow it.
+echo ref=$ref
+
+echo nounset
+set -o nounset
+echo ref=$ref

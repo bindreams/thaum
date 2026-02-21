@@ -1,0 +1,13 @@
+name: First word like foo$x() and foo$[1+2] (regression)
+dialect: bash
+source: oils:spec/bugs#first-word-like-foox-and-foo12-regression
+status: 2
+stdout: "\n"
+---
+
+# Problem: $x() func call broke this error message
+foo$identity('z')
+
+foo$[1+2]
+
+echo DONE

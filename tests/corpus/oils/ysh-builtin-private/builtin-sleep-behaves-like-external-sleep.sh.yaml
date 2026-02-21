@@ -1,0 +1,49 @@
+name: builtin sleep behaves like external sleep
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-sleep-behaves-like-external-sleep
+stdout: "ok\nok\nok\nok\nstatus=0\nstatus=0\nstatus=0\nstatus=0\n"
+---
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+$prefix sleep
+if test "$?" != 0; then
+  echo ok
+fi
+
+# This is different!  OSH is stricter
+if false; then
+$prefix sleep --
+if test "$?" != 0; then
+  echo ok
+fi
+fi
+
+$prefix sleep -2
+if test "$?" != 0; then
+  echo ok
+fi
+
+$prefix sleep -- -2
+if test "$?" != 0; then
+  echo ok
+fi
+
+$prefix sleep zz
+if test "$?" != 0; then
+  echo ok
+fi
+
+$prefix sleep 0
+echo status=$?
+
+$prefix sleep -- 0
+echo status=$?
+
+$prefix sleep '0.0005'
+echo status=$?
+
+$prefix sleep '+0.0005'
+echo status=$?

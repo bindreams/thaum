@@ -1,0 +1,12 @@
+name: Can all builtin methods with s.upper()
+dialect: bash
+source: oils:spec/ysh-object#can-all-builtin-methods-with-supper
+stdout: "(Str)   \"FOO\"\n(Str)   \"--foo\"\n"
+---
+
+var s = 'foo'
+var x = s.upper()
+var y = "--$[x.lower()]"
+
+pp test_ (x)
+pp test_ (y)

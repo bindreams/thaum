@@ -1,0 +1,7 @@
+name: Empty tuple
+dialect: bash
+source: oils:spec/ysh-tuple#empty-tuple
+stdout: "length=0\n"
+---
+var t = ()
+echo length=$[len(t)]

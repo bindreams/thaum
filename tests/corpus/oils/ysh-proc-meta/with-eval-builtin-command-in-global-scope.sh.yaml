@@ -1,0 +1,18 @@
+name: with eval builtin command, in global scope
+dialect: bash
+source: oils:spec/ysh-proc-meta#with-eval-builtin-command-in-global-scope
+stdout: "prefix a\nprefix b\n"
+---
+
+for param in a b {
+  eval """
+  proc echo_$param(prefix) {
+    echo \$prefix $param
+  }
+  """
+  # We need to "escape" the for loop scope
+  call setVar("echo_$param", getVar("echo_$param"), global=true)
+}
+
+echo_a prefix
+echo_b prefix

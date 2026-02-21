@@ -1,0 +1,15 @@
+name: BashArray can be serialized
+dialect: bash
+source: oils:spec/ysh-json#basharray-can-be-serialized
+stdout: "{\n  \"type\": \"BashArray\",\n  \"data\": {}\n}\n{\n  \"type\": \"BashArray\"\
+  ,\n  \"data\": {\n    \"0\": \"x\",\n    \"1\": \"y\",\n    \"5\": \"z\"\n  }\n\
+  }\n"
+---
+
+declare -a empty_array
+
+declare -a array=(x y)
+array[5]=z
+
+json write (empty_array)
+json write (array)

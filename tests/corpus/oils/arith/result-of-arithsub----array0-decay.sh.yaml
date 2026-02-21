@@ -1,0 +1,10 @@
+name: result of ArithSub -- array[0] decay
+dialect: bash
+source: oils:spec/arith#result-of-arithsub----array0-decay
+status: 0
+stdout: "declared\n4\n"
+---
+a=(4 5 6)
+echo declared
+b=$(( a ))
+echo $b

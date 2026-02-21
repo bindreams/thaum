@@ -1,0 +1,11 @@
+name: compgen -f
+dialect: bash
+source: oils:spec/builtin-completion#compgen--f
+stdout: "one\nthree\ntwo\n--\nthree\ntwo\n"
+---
+mkdir -p $TMP/compgen
+touch $TMP/compgen/{one,two,three}
+cd $TMP/compgen
+compgen -f | sort
+echo --
+compgen -f t | sort

@@ -1,0 +1,9 @@
+name: '>& and <& are the same'
+dialect: bash
+source: oils:spec/redirect#and-are-the-same
+stderr: "one\ntwo\n"
+---
+
+echo one 1>&2
+
+echo two 1<&2

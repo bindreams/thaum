@@ -1,0 +1,12 @@
+name: Closures as default argument
+dialect: bash
+source: oils:spec/ysh-closures#closures-as-default-argument
+stdout: "global expr!\nglobal block!\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/closure.ysh --pick default_{expr,block}
+
+echo $[io->evalExpr(default_expr())]
+
+call io->eval(default_block())

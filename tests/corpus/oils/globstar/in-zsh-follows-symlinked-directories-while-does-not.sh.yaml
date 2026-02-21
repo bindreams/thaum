@@ -1,0 +1,14 @@
+name: in zsh, ***/ follows symlinked directories, while **/ does not
+dialect: bash
+source: oils:spec/globstar#in-zsh-follows-symlinked-directories-while-does-not
+stdout: "directory-2/leaf-2.md\ndirectory-1/symlink/leaf-2.md directory-2/leaf-2.md\n"
+---
+case $SH in bash) exit ;; esac
+
+mkdir directory-1
+mkdir directory-2
+touch directory-2/leaf-2.md
+ln -s -T ../directory-2 directory-1/symlink
+
+echo **/*.* | sort
+echo ***/*.* | sort

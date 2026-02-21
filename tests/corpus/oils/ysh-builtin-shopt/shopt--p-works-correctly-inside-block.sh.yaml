@@ -1,0 +1,11 @@
+name: shopt -p works correctly inside block
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt--p-works-correctly-inside-block
+stdout: "shopt -u inherit_errexit\nshopt -s inherit_errexit\n"
+---
+shopt --set parse_brace
+
+shopt -p | grep inherit_errexit
+shopt --set inherit_errexit {
+  shopt -p | grep inherit_errexit
+}

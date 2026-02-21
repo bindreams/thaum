@@ -1,0 +1,11 @@
+name: J8-style u'' and b'' strings in command mode
+dialect: bash
+source: oils:spec/ysh-string#j8-style-u-and-b-strings-in-command-mode
+stdout: " ce bc\n ff\n"
+---
+
+write --end '' -- u'\u{3bc}' | od -A n -t x1
+write --end '' -- b'\yff' | od -A n -t x1
+
+# TODO: make this be illegal
+# echo u'hello \u03bc'

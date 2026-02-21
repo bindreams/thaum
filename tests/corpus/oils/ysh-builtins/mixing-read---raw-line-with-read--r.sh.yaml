@@ -1,0 +1,8 @@
+name: Mixing read --raw-line with read -r
+dialect: bash
+source: oils:spec/ysh-builtins#mixing-read---raw-line-with-read--r
+stdout: "read -r\nREPLY=1\nREPLY=2\n\nread --raw-line\n_reply=1\n_reply=2\n\nMixed\n\
+  REPLY=1\nREPLY=2\n_reply=3\nREPLY=4\n"
+---
+
+$SH $REPO_ROOT/spec/testdata/ysh-read-0.sh

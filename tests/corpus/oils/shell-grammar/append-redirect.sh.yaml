@@ -1,0 +1,5 @@
+name: Append redirect
+dialect: bash
+source: oils:spec/shell-grammar#append-redirect
+---
+echo >>filename

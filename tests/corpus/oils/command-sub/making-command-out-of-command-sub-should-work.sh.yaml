@@ -1,0 +1,7 @@
+name: Making command out of command sub should work
+dialect: bash
+source: oils:spec/command-sub#making-command-out-of-command-sub-should-work
+stdout: "split builtin\n"
+---
+# Works in bash and dash!
+$(echo ec)$(echo ho) split builtin

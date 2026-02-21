@@ -1,0 +1,14 @@
+name: Closed proc has empty "$@" or ARGV
+dialect: bash
+source: oils:spec/ysh-proc#closed-proc-has-empty-or-argv
+stdout: "params\nx\ny\nz\n['dollar-at', 'a', 'b', 'c']\n['ARGV']\n"
+---
+shopt -s ysh:all
+
+proc foo(d, e, f) { 
+  write params $d $e $f
+  argv.py dollar-at "$@"
+  argv.py ARGV @ARGV
+}
+builtin set -- a b c
+foo x y z

@@ -1,0 +1,10 @@
+name: --builtin flag
+dialect: bash
+source: oils:spec/ysh-source#builtin-flag
+stdout: "2\n"
+---
+shopt --set ysh:upgrade
+
+source $LIB_YSH/math.ysh
+
+json write (max(1, 2))

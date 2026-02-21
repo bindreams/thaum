@@ -1,0 +1,18 @@
+name: Special builtins can't be redefined as shell functions (set -o posix)
+dialect: bash
+source: 
+  oils:spec/builtin-special#special-builtins-cant-be-redefined-as-shell-functions-set--o-posix
+status: 0
+stdout: "hi\nhi\n"
+---
+case $SH in
+  bash) set -o posix ;;
+esac
+
+eval 'echo hi'
+
+eval() {
+  echo 'sh func' "$@"
+}
+
+eval 'echo hi'

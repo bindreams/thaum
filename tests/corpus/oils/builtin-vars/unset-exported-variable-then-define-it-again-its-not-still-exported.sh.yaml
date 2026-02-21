@@ -1,0 +1,14 @@
+name: Unset exported variable, then define it again.  It's NOT still exported.
+dialect: bash
+source: 
+  oils:spec/builtin-vars#unset-exported-variable-then-define-it-again-its-not-still-exported
+stdout: "u\nNone\nnewvalue\nNone\n"
+---
+export U
+U=u
+printenv.py U
+unset U
+printenv.py U
+U=newvalue
+echo $U
+printenv.py U

@@ -1,0 +1,8 @@
+name: "[!d] can't be negated because it's a literal character"
+dialect: bash
+source: oils:spec/ysh-regex#d-cant-be-negated-because-its-a-literal-character
+status: 2
+stdout: ''
+---
+setvar pat = / [ !d 'z' ] /
+echo $pat

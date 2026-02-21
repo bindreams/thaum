@@ -1,0 +1,7 @@
+name: 'Var with multiple words: no quotes'
+dialect: bash
+source: oils:spec/var-sub-quote#var-with-multiple-words-no-quotes
+stdout: "['a', 'b', 'c']\n"
+---
+var='a b c'
+argv.py ${Unset:-$var}

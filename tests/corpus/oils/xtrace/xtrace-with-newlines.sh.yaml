@@ -1,0 +1,10 @@
+name: xtrace with newlines
+dialect: bash
+source: oils:spec/xtrace#xtrace-with-newlines
+stdout: "[\n]\n## STDERR: \n+ echo $'[\\n]'\n"
+---
+# bash and dash trace this badly.  They print literal newlines, which I don't
+# want.
+set -x
+echo $'[\n]'
+# bash has ugly output that spans lines

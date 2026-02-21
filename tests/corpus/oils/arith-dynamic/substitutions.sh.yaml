@@ -1,0 +1,8 @@
+name: Substitutions
+dialect: bash
+source: oils:spec/arith-dynamic#substitutions
+stdout: "7\n7\n"
+---
+x='1 + 2'
+echo $(( $x * 3 ))
+echo $(( "$x" * 3 ))

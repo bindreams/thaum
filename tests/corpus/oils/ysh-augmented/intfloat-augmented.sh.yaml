@@ -1,0 +1,20 @@
+name: Int/Float augmented += -= *= /=
+dialect: bash
+source: oils:spec/ysh-augmented#intfloat-augmented
+stdout: "x=7\nx=30\nx=5.0\n"
+---
+
+var x = 0
+
+setvar x = 10
+setvar x -= 3
+echo x=$x
+
+setvar x = 10
+setvar x *= 3
+echo x=$x
+
+var x = 0
+setvar x = 10
+setvar x /= 2
+echo x=$x

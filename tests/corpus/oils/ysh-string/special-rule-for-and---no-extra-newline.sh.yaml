@@ -1,0 +1,39 @@
+name: Special rule for <<< ''' and <<< """ - no extra newline
+dialect: bash
+source: oils:spec/ysh-string#special-rule-for-and---no-extra-newline
+stdout: "(Str)   \"unquoted\\n\"\n(Str)   \"single with newline\\n\"\n(Str)   \"double
+  with newline\\n\"\n(Str)   \"j8 with newline\\n\"\n\n(Str)   \"multi\\nsingle\\\
+  n\"\n(Str)   \"multi\\ndouble\\n\"\n(Str)   \"multi\\nj8\\n\"\n"
+---
+
+read --all <<< unquoted
+pp test_ (_reply)
+
+read --all <<< 'single with newline'
+pp test_ (_reply)
+
+read --all <<< "double with newline"
+pp test_ (_reply)
+
+read --all <<< u'j8 with newline'
+pp test_ (_reply)
+
+echo
+
+read --all <<< '''
+multi
+single
+'''
+pp test_ (_reply)
+
+read --all <<< """
+multi
+double
+"""
+pp test_ (_reply)
+
+read --all <<< u'''
+multi
+j8
+'''
+pp test_ (_reply)

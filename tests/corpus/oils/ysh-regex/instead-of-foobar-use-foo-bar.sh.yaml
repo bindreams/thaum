@@ -1,0 +1,11 @@
+name: Instead of $'foo\\bar' use 'foo' \\ 'bar'
+dialect: bash
+source: oils:spec/ysh-regex#instead-of-foobar-use-foo-bar
+stdout: "foo\\\\bar\nyes\nno\n"
+---
+shopt -s ysh:all
+var pat = /'foo' \\ 'bar'/
+echo $pat
+
+if (r'foo\bar' ~ pat) { echo yes }
+if (r'foo.bar' !~ pat) { echo no }

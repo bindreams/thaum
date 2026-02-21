@@ -1,0 +1,21 @@
+name: write --sep, --end, -n, varying flag syntax
+dialect: bash
+source: oils:spec/ysh-builtins#write---sep---end--n-varying-flag-syntax
+stdout: "a b\nc d\n.\na b\nc d\n.\na bc d\n.\na b_c d\na b_c d END\nxy\n"
+---
+shopt -s ysh:all
+var a = %('a b' 'c d')
+write @a
+write .
+write -- @a
+write .
+
+write --sep '' --end '' @a; write
+write .
+
+write --sep '_' -- @a
+write --sep '_' --end b' END\n' -- @a
+
+write -n x
+write -n y
+write

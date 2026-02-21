@@ -1,0 +1,6 @@
+name: $'' with quotes
+dialect: bash
+source: oils:spec/quote#with-quotes
+stdout: "single ' double \"\n"
+---
+echo $'single \' double \"'

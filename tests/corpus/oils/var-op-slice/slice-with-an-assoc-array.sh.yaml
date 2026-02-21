@@ -1,0 +1,10 @@
+name: Slice with an assoc array
+dialect: bash
+source: oils:spec/var-op-slice#slice-with-an-assoc-array
+status: 0
+stdout: "assigned\nab\n"
+---
+declare -A A=(['5']=3 ['6']=4)
+mystr=abcdefg
+echo assigned
+echo ${mystr:$A:2}

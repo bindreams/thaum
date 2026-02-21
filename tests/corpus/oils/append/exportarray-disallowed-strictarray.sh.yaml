@@ -1,0 +1,10 @@
+name: export+=array disallowed (strict_array)
+dialect: bash
+source: oils:spec/append#exportarray-disallowed-strictarray
+status: 1
+stdout: "\n"
+---
+shopt -s strict_array
+
+export e+=(e x)
+echo "${e[@]}"

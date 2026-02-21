@@ -1,0 +1,30 @@
+name: dynamic binding names and mutation
+dialect: bash
+source: oils:spec/ysh-builtin-eval#dynamic-binding-names-and-mutation
+stdout: "(Dict)   {\"a\":1,\"z\":\"z\"}\n(Dict)   {\"b\":2,\"z\":\"z\"}\n(Dict)  \
+  \ {\"c\":3,\"z\":\"z\"}\n\n(Dict)   {\"a\":1,\"z\":\"z\",\"d\":0}\n(Dict)   {\"\
+  b\":2,\"z\":\"z\",\"d\":0}\n(Dict)   {\"c\":3,\"z\":\"z\",\"d\":0}\n"
+---
+proc foreach (binding, in_; list ;; block) {
+  if (in_ !== "in") {
+    error 'Must use the "syntax" `foreach <binding> in (<expr>) { ... }`'
+  }
+
+  for item in (list) {
+    call io->eval(block, vars={ [binding]: item })
+  }
+}
+
+var mydicts = [{'a': 1}, {'b': 2}, {'c': 3}]
+foreach mydict in (mydicts) {
+  var mylocal = 'z'
+  setvar mydict.z = mylocal
+
+  pp test_ (mydict)
+  setvar mydict.d = 0
+}
+echo
+
+for d in (mydicts) {
+  pp test_ (d)
+}

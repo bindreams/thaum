@@ -1,0 +1,7 @@
+name: use foo.ysh --all-for-testing
+dialect: bash
+source: oils:spec/ysh-builtin-module#use-fooysh---all-for-testing
+stdout: "\n"
+---
+
+echo TODO

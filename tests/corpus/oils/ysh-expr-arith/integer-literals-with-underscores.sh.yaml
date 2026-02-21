@@ -1,0 +1,33 @@
+name: Integer literals with underscores
+dialect: bash
+source: oils:spec/ysh-expr-arith#integer-literals-with-underscores
+stdout: "SHELL\n65536\n21\n1005\n65551\nsum 40\n"
+---
+const dec = 65_536
+const bin = 0b0001_0101
+const oct = 0o001_755
+const hex = 0x0001_000f
+
+echo SHELL
+echo $dec
+echo $bin
+echo $oct
+echo $hex
+const x = 1_1 + 0b1_1 + 0o1_1 + 0x1_1
+echo sum $x
+
+# This works under Python 3.6, but the continuous build has earlier versions
+if false; then
+  echo ---
+  echo PYTHON
+
+  python3 -c '
+  print(65_536)
+  print(0b0001_0101)
+  print(0o001_755)
+  print(0x0001_000f)
+
+  # Weird syntax
+  print("sum", 1_1 + 0b1_1 + 0o1_1 + 0x1_1)
+  '
+fi

@@ -1,0 +1,8 @@
+name: Quoting double quotes within backticks
+dialect: bash
+source: oils:spec/command-sub#quoting-double-quotes-within-backticks
+stdout: "\"foo\"\n\"foo\"\n\"foo\"\n"
+---
+echo \"foo\"   # for comparison
+echo `echo \"foo\"`
+echo `echo \\"foo\\"`

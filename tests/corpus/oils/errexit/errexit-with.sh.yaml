@@ -1,0 +1,9 @@
+name: errexit with { }
+dialect: bash
+source: oils:spec/errexit#errexit-with
+status: 1
+stdout: "one\n"
+---
+# This aborts because it's not part of an if statement.
+set -o errexit
+{ echo one; false; echo two; }

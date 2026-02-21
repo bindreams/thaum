@@ -1,0 +1,10 @@
+name: first and second word are the same alias, with trailing space
+dialect: bash
+source: 
+  oils:spec/alias#first-and-second-word-are-the-same-alias-with-trailing-space
+stdout: "x echo x\n"
+---
+shopt -s expand_aliases  # bash requires this
+x=x
+alias echo-x='echo $x '  # nothing is evaluated here
+echo-x echo-x

@@ -1,0 +1,23 @@
+name: Comparison of Int
+dialect: bash
+source: oils:spec/ysh-expr-compare#comparison-of-int
+stdout: "<\n<=\n>\n>=\n"
+---
+shopt -s ysh:upgrade
+
+if (1 < 2) {
+  echo '<'
+}
+if (2 <= 2) {
+  echo '<='
+}
+if (5 > 4) {
+  echo '>'
+}
+if (5 >= 5) {
+  echo '>='
+}
+
+if (2 < 1) {
+  echo no
+}

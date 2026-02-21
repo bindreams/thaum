@@ -1,0 +1,23 @@
+name: use builtin usage
+dialect: bash
+source: oils:spec/ysh-builtin-module#use-builtin-usage
+stdout: "no-arg=2\none-arg=1\nextern=0\nbad-flag=2\ntoo-many=2\nno-builtin=1\n"
+---
+
+use
+echo no-arg=$?
+
+use foo
+echo one-arg=$?
+
+use --extern foo
+echo extern=$?
+
+use --bad-flag
+echo bad-flag=$?
+
+use too many
+echo too-many=$?
+
+use ///no-builtin
+echo no-builtin=$?

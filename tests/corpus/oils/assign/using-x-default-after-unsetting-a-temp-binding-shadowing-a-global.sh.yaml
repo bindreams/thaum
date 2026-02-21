@@ -1,0 +1,16 @@
+name: Using ${x-default} after unsetting a temp binding shadowing a global
+dialect: bash
+source: 
+  oils:spec/assign#using-x-default-after-unsetting-a-temp-binding-shadowing-a-global
+stdout: "x=temp-binding\nx=local\n- operator = temp-binding\n:- operator = temp-binding\n"
+---
+f() {
+  echo "x=$x"
+  local x='local'
+  echo "x=$x"
+  unset x
+  echo "- operator = ${x-default}"
+  echo ":- operator = ${x:-default}"
+}
+x=global
+x=temp-binding f

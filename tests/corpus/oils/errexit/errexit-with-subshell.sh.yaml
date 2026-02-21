@@ -1,0 +1,9 @@
+name: errexit with subshell
+dialect: bash
+source: oils:spec/errexit#errexit-with-subshell
+status: 1
+stdout: "one\n"
+---
+set -o errexit
+( echo one; false; echo two; )
+echo three

@@ -1,0 +1,20 @@
+name: Can log to stderr in pure mode
+dialect: bash
+source: oils:spec/ysh-purity#can-log-to-stderr-in-pure-mode
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+var cmd = ^(
+  var name = 'world'
+
+  # I think this should be allowed
+  # And maybe log can be customized with:
+  # - xtrace unification?  hierarchy
+  # - timestamps
+
+  log "hi $name"
+)
+
+call io->eval(cmd)
+call eval (cmd)

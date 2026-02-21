@@ -1,0 +1,24 @@
+name: op-test for ${!array} with array="a[@]" or array="a[*]"
+dialect: bash
+source: oils:spec/var-op-test#op-test-for-array-with-arraya-or-arraya
+stdout: "ref=a[@]: 'no-colon' 'with-colon'\nref=a[*]: 'no-colon' 'with-colon'\nref=a[@]:
+  '' 'with-colon'\nref=a[*]: '' 'with-colon'\nref=a[@]: ' ' ' '\nref=a[*]: ' ' ' '\n\
+  ref=a[@]: ' ' ' '\nref=a[*]: '' 'with-colon'\n"
+---
+case $SH in dash|mksh|zsh) exit ;; esac
+
+test-hyphen() {
+  ref='a[@]'
+  echo "ref=a[@]: '${!ref-no-colon}' '${!ref:-with-colon}'"
+  ref='a[*]'
+  echo "ref=a[*]: '${!ref-no-colon}' '${!ref:-with-colon}'"
+}
+
+a=()
+test-hyphen
+a=("")
+test-hyphen
+a=("" "")
+test-hyphen
+IFS=
+test-hyphen

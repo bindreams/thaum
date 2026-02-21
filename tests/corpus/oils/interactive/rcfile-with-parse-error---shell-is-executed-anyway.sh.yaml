@@ -1,0 +1,11 @@
+name: --rcfile with parse error - shell is executed anyway
+dialect: bash
+source: oils:spec/interactive#rcfile-with-parse-error---shell-is-executed-anyway
+stdout: "flag -c\nstatus=0\n"
+---
+cat >$TMP/rcfile <<EOF
+echo RCFILE; ( echo
+EOF
+
+$SH --rcfile $TMP/rcfile -i -c 'echo flag -c'
+echo status=$?

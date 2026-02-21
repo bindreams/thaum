@@ -1,0 +1,15 @@
+name: trap EXIT clears the EXIT trap
+dialect: bash
+source: oils:spec/builtin-trap#trap-exit-clears-the-exit-trap
+stdout: "trap -- 'echo EXIT' EXIT\ntrap -- 'echo INT' SIGINT\n---\ntrap -- 'echo INT'
+  SIGINT\n---\n"
+---
+trap "echo INT" INT
+trap "echo EXIT" EXIT
+trap
+echo ---
+trap EXIT
+trap
+echo ---
+trap INT
+trap

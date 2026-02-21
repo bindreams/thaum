@@ -1,0 +1,24 @@
+name: Strip unicode prefix
+dialect: bash
+source: oils:spec/var-op-strip#strip-unicode-prefix
+stdout: "   -  \\n\n  2d  0a\n\n   -  \\n\n  2d  0a\n\n   -  \\n\n  2d  0a\n\n   -\
+  \  \\n\n  2d  0a\n## BUG dash/mksh/ash STDOUT:\n 274   -  \\n\n  bc  2d  0a\n\n\
+  \ 274   -  \\n\n  bc  2d  0a\n\n   - 316  \\n\n  2d  ce  0a\n\n   - 316  \\n\n \
+  \ 2d  ce  0a\n"
+---
+
+show_hex() { od -A n -t c -t x1; }
+
+# NOTE: LANG is set to utf-8.
+# ? is a glob that stands for one character
+
+v='μ-'
+echo ${v#?} | show_hex
+echo
+echo ${v##?} | show_hex
+echo
+
+v='-μ'
+echo ${v%?} | show_hex
+echo
+echo ${v%%?} | show_hex

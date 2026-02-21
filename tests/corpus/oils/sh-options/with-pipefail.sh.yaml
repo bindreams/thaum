@@ -1,0 +1,8 @@
+name: $- with pipefail
+dialect: bash
+source: oils:spec/sh-options#with-pipefail
+status: 0
+stdout: "u\n"
+---
+set -o pipefail -o nounset
+echo $-

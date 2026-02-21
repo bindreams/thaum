@@ -1,0 +1,8 @@
+name: Ternary operator
+dialect: bash
+source: oils:spec/arith#ternary-operator
+stdout: "10\n"
+---
+a=1
+b=2
+echo $((a>b?5:10))

@@ -1,0 +1,15 @@
+name: promptVal() with $ and w
+dialect: bash
+source: oils:spec/ysh-prompt#promptval-with-and-w
+stdout: "x=$\npass\n"
+---
+
+var x = io.promptVal('$')
+
+# We're not root, so it should be $
+echo x=$x
+
+var x = io.promptVal('w')
+
+assert [x === $(pwd)]
+echo pass

@@ -1,0 +1,9 @@
+name: Case with empty condition
+dialect: bash
+source: oils:spec/case#case-with-empty-condition
+stdout: "match\n"
+---
+case $empty in
+  ''|foo) echo match ;;
+  *) echo no ;;
+esac

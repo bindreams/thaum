@@ -1,0 +1,12 @@
+name: Str.replace(Eggex, Str)
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplaceeggex-str
+stdout: "mangled-kebab-case\nsmaller---to---bigger\n"
+---
+shopt --set ysh:all
+
+var mystr = 'mangled----kebab--case'
+write $[mystr.replace(/ '-'+ /, '-')]
+
+setvar mystr = 'smaller-to-bigger'
+write $[mystr.replace(/ '-'+ /, '---')]

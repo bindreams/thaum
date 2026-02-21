@@ -1,0 +1,20 @@
+name: sourcing a file that sets parse_at
+dialect: bash
+source: oils:spec/ysh-options#sourcing-a-file-that-sets-parseat
+stdout: "['@words']\nlib.sh\nmain.sh\n['a', 'b c']\n"
+---
+cat >lib.sh <<EOF
+shopt -s parse_at
+echo lib.sh
+EOF
+
+words=(a 'b c')
+argv.py @words
+
+# This has a side effect, which is a bit weird, but not sure how to avoid it.
+# Maybe we should say that libraries aren't allowed to change it?
+
+source lib.sh
+echo 'main.sh'
+
+argv.py @words

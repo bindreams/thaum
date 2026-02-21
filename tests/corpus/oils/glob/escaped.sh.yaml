@@ -1,0 +1,8 @@
+name: ': escaped'
+dialect: bash
+source: oils:spec/glob#escaped
+stdout: "_tmp/foo.- _tmp/*.[[:punct:]]\n"
+---
+
+touch _tmp/foo.-
+echo _tmp/*.[[:punct:]] _tmp/*.[[:punct\:]]

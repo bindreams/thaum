@@ -1,0 +1,12 @@
+name: typeset s+=(my array)
+dialect: bash
+source: oils:spec/append#typeset-smy-array
+status: 0
+stdout: "abc\nstatus=0\n['abc', 'd', 'e', 'f']\n"
+---
+typeset s='abc'
+echo $s
+
+typeset s+=(d e f)
+echo status=$?
+argv.py "${s[@]}"

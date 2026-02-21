@@ -1,0 +1,9 @@
+name: Shift operators
+dialect: bash
+source: oils:spec/ysh-expr-arith#shift-operators
+stdout: "16\n1\n"
+---
+var a = 1 << 4
+echo $a
+var b = 16 >> 4
+echo $b

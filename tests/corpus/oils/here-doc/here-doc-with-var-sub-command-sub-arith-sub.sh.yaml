@@ -1,0 +1,11 @@
+name: Here doc with var sub, command sub, arith sub
+dialect: bash
+source: oils:spec/here-doc#here-doc-with-var-sub-command-sub-arith-sub
+stdout: "var: v\ncommand: hi\narith: 3\n"
+---
+var=v
+cat <<EOF
+var: ${var}
+command: $(echo hi)
+arith: $((1+2))
+EOF

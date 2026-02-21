@@ -1,0 +1,11 @@
+name: history usage
+dialect: bash
+source: oils:spec/builtin-history#history-usage
+stdout: "status=2\nstatus=2\n"
+---
+
+history not-a-number
+echo status=$?
+
+history 3 too-many
+echo status=$?

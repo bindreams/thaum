@@ -1,0 +1,13 @@
+name: "@ in nameref isn't supported, unlike in ${!ref}"
+dialect: bash
+source: oils:spec/nameref#in-nameref-isnt-supported-unlike-in-ref
+status: 1
+stdout: ''
+---
+
+set -- A B
+typeset -n ref='@'  # bash gives an error here
+echo status=$?
+
+echo ref=$ref  # bash doesn't give an error here
+echo status=$?

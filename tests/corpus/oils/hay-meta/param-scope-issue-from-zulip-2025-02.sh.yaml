@@ -1,0 +1,31 @@
+name: Param scope issue (from Zulip, 2025-02)
+dialect: bash
+source: oils:spec/hay-meta#param-scope-issue-from-zulip-2025-02
+stdout: "(Str)   \"remote\"\n(Str)   \"remote\"\n{\n  \"source\": null,\n  \"children\"\
+  : [\n    {\n      \"type\": \"Service\",\n      \"args\": [\n        \"auth.example.com\"\
+  \n      ],\n      \"children\": [],\n      \"attrs\": {\n        \"port\": 80\n\
+  \      }\n    }\n  ]\n}\n"
+---
+shopt --set ysh:all
+
+hay define Service
+
+setvar variant = 'local'
+
+proc gen_service(; ; variant=null) {
+
+  pp test_ (variant)
+
+  Service auth.example.com {    # node taking a block
+    pp test_ (variant)
+    if (variant === 'local') {  # condition
+      port = 8001
+    } else {
+      port = 80
+    }
+  }
+}
+
+gen_service (variant='remote')
+const result = _hay()
+json write (result)

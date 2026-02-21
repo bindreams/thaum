@@ -1,0 +1,29 @@
+name: shvar and shvarGet() obey dynamic scope
+dialect: bash
+source: oils:spec/ysh-scope#shvar-and-shvarget-obey-dynamic-scope
+status: 1
+stdout: "FOO=foo\n"
+---
+
+# On the other hand, in YSH
+# - $x does local/closure/global scope
+# - FOO=foo mycommand modifies the ENV object - shopt --set env_obj
+
+shopt --set ysh:all
+
+proc p3 {
+  echo FOO=$[shvarGet('FOO')]  # dynamic scope
+  echo FOO=$FOO                # fails, not dynamic scope
+}
+
+proc p2 {
+  p3
+}
+
+proc p {
+  shvar FOO=foo {
+    p2
+  }
+}
+
+p

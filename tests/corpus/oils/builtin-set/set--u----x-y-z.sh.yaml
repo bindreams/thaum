@@ -1,0 +1,8 @@
+name: set -u -- x y z
+dialect: bash
+source: oils:spec/builtin-set#set--u----x-y-z
+stdout: "x y z\n"
+---
+set a b c
+set -u -- x y z
+echo "$@"

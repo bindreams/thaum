@@ -1,0 +1,8 @@
+name: Empty case/esac
+dialect: bash
+source: oils:spec/empty-bodies#empty-caseesac
+stdout: "empty\n"
+---
+case foo in
+esac
+echo empty

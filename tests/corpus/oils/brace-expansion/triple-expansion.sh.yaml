@@ -1,0 +1,6 @@
+name: triple expansion
+dialect: bash
+source: oils:spec/brace-expansion#triple-expansion
+stdout: "000 001 010 011 100 101 110 111\n"
+---
+echo {0,1}{0,1}{0,1}

@@ -1,0 +1,20 @@
+name: '#2640 Hanging when reading from character devices'
+dialect: bash
+source: oils:spec/bugs#2640-hanging-when-reading-from-character-devices
+stdout: "00000\n00000\n00000\n00000\n"
+---
+# Relies on timeout from GNU coreutils
+timeout 0.5 $SH -c 'cat /dev/zero | cat | head -c 5 | tr \\0 0; echo'
+
+# The exact cause of the issue is:
+#
+#  $ cat /dev/zero | cat | head -c 5
+#
+# A pipe through cat is necessary and the first cat MUST be reading from a
+# character device.
+
+# Other cases without the bug above
+printf '\0\0\0\0\0\0\0' > tmp.txt
+$SH -c 'cat </dev/zero | head -c 5 | tr \\0 0; echo'
+$SH -c 'cat /dev/zero | head -c 5 | tr \\0 0; echo'
+$SH -c 'cat tmp.txt | cat | head -c 5 | tr \\0 0; echo'

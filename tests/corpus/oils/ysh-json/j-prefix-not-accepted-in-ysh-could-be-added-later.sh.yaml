@@ -1,0 +1,13 @@
+name: j"" prefix not accepted in YSH (could be added later)
+dialect: bash
+source: oils:spec/ysh-json#j-prefix-not-accepted-in-ysh-could-be-added-later
+status: 2
+stdout: "\n"
+---
+
+shopt -s ysh:all
+
+# denied by YSH
+# echo j"\u{7f}"
+
+var s = j"\u{7f}"

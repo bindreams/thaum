@@ -1,0 +1,11 @@
+name: type -t -> keyword
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t---keyword
+---
+type -t for time ! fi do {
+keyword
+keyword
+keyword
+keyword
+keyword
+keyword

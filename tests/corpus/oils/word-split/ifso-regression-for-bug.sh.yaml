@@ -1,0 +1,7 @@
+name: IFS=o (regression for bug)
+dialect: bash
+source: oils:spec/word-split#ifso-regression-for-bug
+stdout: "hi\n"
+---
+IFS=o
+echo hi

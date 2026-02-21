@@ -1,0 +1,17 @@
+name: source
+dialect: bash
+source: oils:spec/ysh-xtrace#source
+stdout: "$1 = a\n$1 = x\n"
+stderr: "> source lib.sh a b c\n  . builtin echo '$1 = a'\n< source lib.sh\n> source
+  lib.sh x $'\\xfe' $'\\xff'\n  . builtin echo '$1 = x'\n< source lib.sh\n"
+---
+echo 'echo "\$1 = $1"' > lib.sh
+
+shopt --set ysh:upgrade
+set -x
+
+source lib.sh a b c
+
+# Test the quoting style.  TODO: Don't use bash style in YSH.
+
+source lib.sh x $'\xfe' $'\xff'

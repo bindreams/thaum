@@ -1,0 +1,20 @@
+name: compgen -A command completes functions and aliases
+dialect: bash
+source: 
+  oils:spec/builtin-completion#compgen--a-command-completes-functions-and-aliases
+stdout: "our_alias\nour_func\nour_func2\nstatus=0\nour_alias\nour_func\nour_func2\n\
+  our_func3\nstatus=0\n"
+---
+our_func() { echo ; }
+our_func2() { echo ; }
+alias our_alias=foo
+
+compgen -A command our_
+echo status=$?
+
+# Introduce another function.  Note that we're missing test coverage for
+# 'complete', i.e. bug #1064.
+our_func3() { echo ; }
+
+compgen -A command our_
+echo status=$?

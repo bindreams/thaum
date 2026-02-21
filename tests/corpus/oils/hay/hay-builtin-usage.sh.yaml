@@ -1,0 +1,16 @@
+name: hay builtin usage
+dialect: bash
+source: oils:spec/hay#hay-builtin-usage
+stdout: "status=2\nstatus=0\nread 0\ngreater 0\n"
+---
+
+hay define
+echo status=$?
+
+hay define -- package user
+echo status=$?
+
+hay pp | wc -l | read n
+echo read $?
+test $n -gt 0
+echo greater $?

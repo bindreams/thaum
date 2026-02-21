@@ -1,0 +1,9 @@
+name: list() from range
+dialect: bash
+source: oils:spec/ysh-convert#list-from-range
+stdout: "0\n1\n2\n"
+---
+shopt -s ysh:upgrade
+
+var mylist = list(0..<3)
+write @mylist

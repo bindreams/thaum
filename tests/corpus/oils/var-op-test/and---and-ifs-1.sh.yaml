@@ -1,0 +1,11 @@
+name: '"$*" ("" "") and - and + (IFS=)'
+dialect: bash
+source: oils:spec/var-op-test#and---and-ifs
+stdout: "argv=\nargv=plus\nargv=minus\nargv=\n"
+---
+set -- "" ""
+IFS=
+echo "argv=${*-minus}"
+echo "argv=${*+plus}"
+echo "argv=${*:-minus}"
+echo "argv=${*:+plus}"

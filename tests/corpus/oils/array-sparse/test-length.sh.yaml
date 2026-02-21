@@ -1,0 +1,14 @@
+name: test length
+dialect: bash
+source: oils:spec/array-sparse#test-length
+stdout: "len=4\nlen=5\n"
+---
+sp=(x y z)
+
+sp[5]=z
+
+echo len=${#sp[@]}
+
+sp[10]=z
+
+echo len=${#sp[@]}

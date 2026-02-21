@@ -1,0 +1,14 @@
+name: 'shopt -s strict_binding: Persistent prefix bindings not allowed on special
+  builtins'
+dialect: bash
+source: 
+  oils:spec/strict-options#shopt--s-strictbinding-persistent-prefix-bindings-not-allowed-on-special-builtins
+status: 1
+stdout: "\n"
+---
+
+shopt --set strict:all
+
+# This differs from what it means in a process
+FOO=bar eval 'echo FOO=$FOO'
+echo FOO=$FOO

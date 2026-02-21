@@ -1,0 +1,7 @@
+name: vars
+dialect: bash
+source: oils:spec/smoke#vars
+stdout: "5 5 5 5\n"
+---
+a=5
+echo $a ${a} "$a ${a}"

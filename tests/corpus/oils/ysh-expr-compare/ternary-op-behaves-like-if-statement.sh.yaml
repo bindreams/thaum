@@ -1,0 +1,16 @@
+name: Ternary op behaves like if statement
+dialect: bash
+source: oils:spec/ysh-expr-compare#ternary-op-behaves-like-if-statement
+stdout: "y=42\nx=42\n"
+---
+shopt -s ysh:upgrade
+
+if ([1]) {
+  var y = 42
+} else {
+  var y = 0
+}
+echo y=$y
+
+var x = 42 if [1] else 0
+echo x=$x

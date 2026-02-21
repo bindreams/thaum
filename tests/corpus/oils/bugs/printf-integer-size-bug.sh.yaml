@@ -1,0 +1,10 @@
+name: printf integer size bug
+dialect: bash
+source: oils:spec/bugs#printf-integer-size-bug
+stdout: "80000000\n2147483648\n"
+---
+
+# from Koiche on Zulip
+
+printf '%x\n' 2147483648
+printf '%u\n' 2147483648

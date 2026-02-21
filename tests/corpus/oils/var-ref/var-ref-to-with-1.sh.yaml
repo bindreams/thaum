@@ -1,0 +1,12 @@
+name: var ref to $? with '?'
+dialect: bash
+source: oils:spec/var-ref#var-ref-to-with
+---
+myfunc() {
+  local ref=$1
+  echo ${!ref}
+}
+myfunc FUNCNAME
+myfunc '?'
+myfunc
+0

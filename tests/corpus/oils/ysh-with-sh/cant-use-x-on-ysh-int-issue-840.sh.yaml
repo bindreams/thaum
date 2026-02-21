@@ -1,0 +1,28 @@
+name: "Can't use x+= on YSH Int (issue #840)"
+dialect: bash
+source: oils:spec/ysh-with-sh#cant-use-x-on-ysh-int-issue-840
+status: 1
+stdout: "sh_str=2\nsh_str=21\nsh_str=211\n\nysh_int=2\n"
+---
+
+sh_str=2
+echo sh_str=$sh_str
+
+sh_str+=1
+echo sh_str=$sh_str
+
+sh_str+=1
+echo sh_str=$sh_str
+
+echo
+
+var ysh_int = 2
+echo ysh_int=$ysh_int
+
+# What should happen here?
+
+ysh_int+=1
+echo ysh_int=$ysh_int
+
+ysh_int+=1
+echo ysh_int=$ysh_int

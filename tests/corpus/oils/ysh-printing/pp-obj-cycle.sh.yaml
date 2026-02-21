@@ -1,0 +1,23 @@
+name: 'pp: Obj cycle'
+dialect: bash
+source: oils:spec/ysh-printing#pp-obj-cycle
+stdout: "(Obj)   (\"z\":99) --> (\"__foo__\":null)\n(Obj)   (z: 99) --> (__foo__:
+  null)\n\n(Obj)   (\"z\":99,\"cycle\":(...)) --> (\"__foo__\":null)\n(Obj)   (z:
+  99, cycle: (...)) --> (__foo__: null)\n\n(List)   [(\"z\":99,\"cycle\":(...)) -->
+  (\"__foo__\":null),(\"z\":99,\"cycle\":(...)) --> (\"__foo__\":null)]\n"
+---
+
+var methods = Object(null, {__foo__: null})
+var obj = Object(methods, {z: 99})
+pp test_ (obj)
+pp value (obj)
+echo
+
+setvar obj.cycle = obj
+pp test_ (obj)
+pp value (obj)
+
+echo
+
+var two = [obj, obj]
+pp test_ (two)

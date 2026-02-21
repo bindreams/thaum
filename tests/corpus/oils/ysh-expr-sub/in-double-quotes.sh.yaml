@@ -1,0 +1,13 @@
+name: In Double quotes
+dialect: bash
+source: oils:spec/ysh-expr-sub#in-double-quotes
+stdout: "func 3\nkey 42\nkey 42\ndq 42\n"
+---
+var a = %(a b c)
+var obj = /d+/
+var d = {}
+setvar d['key'] = 42
+echo "func $[len(a)]"
+echo "key $[d['key']]"
+echo "key $[d.key]"
+echo "dq $[d["key"]]"

@@ -1,0 +1,10 @@
+name: Identity function
+dialect: bash
+source: oils:spec/ysh-func#identity-function
+stdout: "\"ysh\"\n"
+---
+func id(x) {
+  return (x)
+}
+
+json write (id("ysh"))

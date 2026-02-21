@@ -1,0 +1,10 @@
+name: set - + and + -
+dialect: bash
+source: oils:spec/builtin-set#set---and
+stdout: "+\n+\n"
+---
+set - +
+echo "$@"
+
+set + -
+echo "$@"

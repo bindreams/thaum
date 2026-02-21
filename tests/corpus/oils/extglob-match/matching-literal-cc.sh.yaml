@@ -1,0 +1,18 @@
+name: Matching literal '@(cc)'
+dialect: bash
+source: oils:spec/extglob-match#matching-literal-cc
+stdout: "status=0\nstatus=1\nstatus=0\nstatus=1\n"
+---
+
+# extglob is OFF.  Doesn't affect bash or mksh!
+[[ cc == @(cc) ]] 
+echo status=$?
+[[ cc == '@(cc)' ]]
+echo status=$?
+
+shopt -s extglob
+
+[[ cc == @(cc) ]]
+echo status=$?
+[[ cc == '@(cc)' ]]
+echo status=$?

@@ -1,0 +1,10 @@
+name: Bad var sub caught at parse time
+dialect: bash
+source: oils:spec/parse-errors#bad-var-sub-caught-at-parse-time
+status: 2
+---
+if test -f /; then
+  echo ${%}
+else
+  echo ok
+fi

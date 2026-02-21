@@ -1,0 +1,12 @@
+name: YSH case requires ''/dir/*.py  workaround
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#ysh-case-requires-dirpy-workaround
+stdout: "yes\n"
+---
+
+shopt --set ysh:all
+
+case ('/usr/bin/') {
+  ''/usr/* { echo yes }
+  (else) { echo no }
+}

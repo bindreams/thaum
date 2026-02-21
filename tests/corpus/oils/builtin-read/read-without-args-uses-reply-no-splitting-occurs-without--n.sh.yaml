@@ -1,0 +1,23 @@
+name: read without args uses $REPLY, no splitting occurs (without -n)
+dialect: bash
+source: 
+  oils:spec/builtin-read#read-without-args-uses-reply-no-splitting-occurs-without--n
+stdout: "[  a b  ]\n[a b]\n[  a b    line2]\n[a b    line2]\n[  a b  \\]\n[a b  \\\
+  ]\n"
+---
+
+# mksh and zsh implement splitting with $REPLY, bash/ash don't
+
+echo '  a b  ' | (read; echo "[$REPLY]")
+echo '  a b  ' | (read myvar; echo "[$myvar]")
+
+echo '  a b  \
+  line2' | (read; echo "[$REPLY]")
+echo '  a b  \
+  line2' | (read myvar; echo "[$myvar]")
+
+# Now test with -r
+echo '  a b  \
+  line2' | (read -r; echo "[$REPLY]")
+echo '  a b  \
+  line2' | (read -r myvar; echo "[$myvar]")

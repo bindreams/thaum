@@ -1,0 +1,29 @@
+name: Undefined comparisons
+dialect: bash
+source: oils:spec/ysh-expr-compare#undefined-comparisons
+stdout: "\n"
+---
+shopt -s ysh:all
+
+func f() { true }
+var mydict = {}
+var myexpr = ^[123]
+
+var unimpl = [
+    / [a-z]+ /,  # Eggex
+    myexpr,  # Expr
+    ^(echo hello),  # Block
+    f,  # Func
+    ''.upper,  # BoundFunc
+    # These cannot be constructed
+    # - Proc
+    # - Slice
+    # - Range
+]
+
+for val in (unimpl) {
+  try { = val === val }
+  if (_error.code !== 3) {
+    exit 1
+  }
+}

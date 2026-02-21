@@ -1,0 +1,9 @@
+name: $@ $*
+dialect: bash
+source: oils:spec/smoke#unnamed
+stdout: "['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd']\n"
+---
+fun() {
+  argv.py $@ $*
+}
+fun "a b" "c d"

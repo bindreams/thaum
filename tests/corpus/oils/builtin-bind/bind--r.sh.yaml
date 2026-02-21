@@ -1,0 +1,15 @@
+name: bind -r
+dialect: bash
+source: oils:spec/builtin-bind#bind--r
+stdout: "status=1\n\\C-o\\C-s\\C-h\nstatus=0\nstatus=1\n"
+---
+bind -q yank | grep -oF '\C-o\C-s\C-h'
+echo status=$?
+
+bind '"\C-o\C-s\C-h": yank'
+bind -q yank | grep -oF '\C-o\C-s\C-h'
+echo status=$?
+
+bind -r "\C-o\C-s\C-h"
+bind -q yank | grep -oF '\C-o\C-s\C-h'
+echo status=$?

@@ -1,0 +1,14 @@
+name: $RANDOM $SECONDS
+dialect: bash
+source: oils:spec/ysh-purity#random-seconds
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+var cmd = ^(
+  echo not-implemented=$RANDOM
+  echo $SECONDS
+)
+
+call io->eval(cmd)
+call eval(cmd)

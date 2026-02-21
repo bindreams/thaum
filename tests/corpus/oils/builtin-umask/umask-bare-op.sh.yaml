@@ -1,0 +1,19 @@
+name: umask bare op
+dialect: bash
+source: oils:spec/builtin-umask#umask-bare-op
+status: 0
+---
+umask 0124
+umask =+=
+umask | tail -c 4
+
+umask 0124
+umask +=
+umask | tail -c 4
+
+umask 0124
+umask =+rwx+rx
+umask | tail -c 4
+777
+777
+000

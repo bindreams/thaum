@@ -1,0 +1,15 @@
+name: Closed proc with no args, passed too many
+dialect: bash
+source: oils:spec/ysh-proc#closed-proc-with-no-args-passed-too-many
+status: 3
+stdout: "status=42\n"
+---
+shopt --set parse_proc
+
+proc f() {
+  return 42
+}
+f
+echo status=$?
+
+f a b  # status 2

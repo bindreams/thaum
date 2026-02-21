@@ -1,0 +1,8 @@
+name: empty stdin
+dialect: bash
+source: oils:spec/sh-usage#empty-stdin
+status: 0
+stdout: ''
+---
+# had a bug here
+echo -n '' | $SH

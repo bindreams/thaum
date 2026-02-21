@@ -1,0 +1,16 @@
+name: history builtin usage
+dialect: bash
+source: oils:spec/builtin-misc#history-builtin-usage
+status: 0
+stdout: "status=0\nstatus=0\nstatus=2\nstatus=2\nstatus=2\n"
+---
+history
+echo status=$?
+history +5  # hm bash considers this valid
+echo status=$?
+history -5  # invalid flag
+echo status=$?
+history f 
+echo status=$?
+history too many args
+echo status=$?

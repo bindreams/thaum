@@ -1,0 +1,12 @@
+name: For loop with and without semicolon
+dialect: bash
+source: oils:spec/for-expr#for-loop-with-and-without-semicolon
+status: 0
+stdout: "1\n2\n3\n1\n2\n3\n"
+---
+for ((a=1; a <= 3; a++)); do
+  echo $a
+done
+for ((a=1; a <= 3; a++)) do
+  echo $a
+done

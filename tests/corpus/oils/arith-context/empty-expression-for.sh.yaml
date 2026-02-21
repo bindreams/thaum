@@ -1,0 +1,10 @@
+name: Empty expression for (( ))
+dialect: bash
+source: oils:spec/arith-context#empty-expression-for
+stdout: "one\n"
+---
+
+for (( ; ; )); do
+  echo one
+  break
+done

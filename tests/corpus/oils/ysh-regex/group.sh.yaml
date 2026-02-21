@@ -1,0 +1,14 @@
+name: Group ()
+dialect: bash
+source: oils:spec/ysh-regex#group
+stdout: "(^[[:space:]]|[[:digit:]][[:digit:]])\nyes\nyes\nno\n"
+---
+shopt -s ysh:all
+var pat = ''
+
+setvar pat = /(%start s or d d)/
+echo $pat
+
+if (' foo' ~ pat) { echo yes } else { echo no }
+if ('-00-' ~ pat) { echo yes } else { echo no }
+if ('foo' ~ pat) { echo yes } else { echo no }

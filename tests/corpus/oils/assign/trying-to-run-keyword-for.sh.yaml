@@ -1,0 +1,6 @@
+name: Trying to run keyword 'for'
+dialect: bash
+source: oils:spec/assign#trying-to-run-keyword-for
+status: 127
+---
+FOO=bar for

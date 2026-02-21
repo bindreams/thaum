@@ -1,0 +1,9 @@
+name: extglob inside arg word
+dialect: bash
+source: oils:spec/extglob-match#extglob-inside-arg-word
+stdout: "rhs\nrhs arg\nnope\n"
+---
+shopt -s extglob
+[[ foo == @(foo|bar) ]] && echo rhs
+[[ foo == ${unset:-@(foo|bar)} ]] && echo 'rhs arg'
+[[ fo == ${unset:-@(foo|bar)} ]] || echo nope

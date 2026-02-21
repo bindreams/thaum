@@ -1,0 +1,14 @@
+name: wait -n
+dialect: bash
+source: oils:spec/background#wait--n
+---
+case $SH in dash|mksh) return ;; esac
+
+{ sleep 0.09; exit 9; } &
+{ sleep 0.03; exit 3; } &
+wait -n
+echo "status=$?"
+wait -n
+echo "status=$?"
+status=3
+status=9

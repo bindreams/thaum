@@ -1,0 +1,47 @@
+name: Performance demo
+dialect: bash
+source: oils:spec/array-sparse#performance-demo
+stdout: "BashArray\nlen: 6\nsubst: foo 25 26 27 bar sparse\nkeys: 0 1 2 3 4 10\nslice:
+  26 27 bar\nget0: set0\nget1: 25\n---\nappend\nsubst: set0 25 26 27 bar sparse x
+  y\nkeys: 0 1 2 3 4 10 11 12\n---\nunset\nsubst: set0 25 26 27 bar sparse y\nkeys:
+  0 1 2 3 4 10 12\n"
+---
+
+case $SH in bash|mksh) exit ;; esac
+
+shopt -s ysh:upgrade
+
+#pp test_ (a)
+
+sp=( foo {25..27} bar )
+
+sp[10]='sparse'
+
+echo $[type(sp)]
+
+echo len: "${#sp[@]}"
+
+#echo $[len(sp)]
+
+echo subst: "${sp[@]}"
+echo keys: "${!sp[@]}"
+
+echo slice: "${sp[@]:2:3}"
+
+sp[0]=set0
+
+echo get0: "${sp[0]}"
+echo get1: "${sp[1]}"
+echo ---
+
+to_append=(x y)
+echo append
+sp+=("${to_append[@]}")
+echo subst: "${sp[@]}"
+echo keys: "${!sp[@]}"
+echo ---
+
+echo unset
+unset -v 'sp[11]'
+echo subst: "${sp[@]}"
+echo keys: "${!sp[@]}"

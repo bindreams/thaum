@@ -1,0 +1,7 @@
+name: Overflow error
+dialect: bash
+source: oils:spec/builtin-bracket#overflow-error
+stdout: "status=2\n"
+---
+test -t 12345678910
+echo status=$?

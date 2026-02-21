@@ -1,0 +1,24 @@
+name: cd accepts a block, runs it in different dir
+dialect: bash
+source: oils:spec/ysh-blocks#cd-accepts-a-block-runs-it-in-different-dir
+stdout: "/\nOLDPWD=\ndone\nPWD=/tmp\npwd builtin: /tmp\n"
+---
+shopt -s ysh:all
+
+const saved = "$PWD"
+
+# OLDPWD is NOT defined
+cd / { echo $PWD; echo OLDPWD=${OLDPWD:-} }; echo done
+
+if ! test "$saved" = $PWD; then
+  echo FAIL
+fi
+
+cd /tmp {
+  write PWD=$PWD
+  write --sep ' ' pwd builtin: $(pwd)
+}
+
+if ! test "$saved" = $PWD; then
+  echo FAIL
+fi

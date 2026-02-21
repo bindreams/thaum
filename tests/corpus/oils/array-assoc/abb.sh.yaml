@@ -1,0 +1,13 @@
+name: ${A[@]/b/B}
+dialect: bash
+source: oils:spec/array-assoc#abb
+stdout: "BBB\nccc\nddd\n"
+---
+# but ${!A[@]/b/B} doesn't work
+declare -A A
+A['aa']=bbb
+A['bb']=ccc
+A['cc']=ddd
+for val in "${A[@]//b/B}"; do
+  echo $val
+done | sort

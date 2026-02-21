@@ -1,0 +1,7 @@
+name: printf supports tabs
+dialect: bash
+source: oils:spec/quote#printf-supports-tabs
+stdout: "c1\tc2\nc3\tc4\n"
+---
+# This accepts \t by itself, hm.
+printf "c1\tc2\nc3\tc4\n"

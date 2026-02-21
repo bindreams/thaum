@@ -1,0 +1,17 @@
+name: Alias and PS4
+dialect: bash
+source: oils:spec/alias#alias-and-ps4
+stdout: "['foo', 'bar']\n"
+---
+# dash enters an infinite loop!
+case $SH in
+  dash)
+    exit 1
+    ;;
+esac
+
+set -x
+PS4='+$(echo trace) '
+shopt -s expand_aliases
+alias a=argv.py
+a foo bar

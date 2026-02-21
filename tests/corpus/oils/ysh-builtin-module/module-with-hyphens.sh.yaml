@@ -1,0 +1,13 @@
+name: module-with-hyphens
+dialect: bash
+source: oils:spec/ysh-builtin-module#module-with-hyphens
+stdout: "[for-xtrace]\ncounter = 5\ncounter = 6\n(Int)   6\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/for-xtrace.ysh
+
+for-xtrace increment
+
+var mod = getVar('for-xtrace')
+pp test_ (mod.counter)

@@ -1,0 +1,15 @@
+name: redefine_source is on in interactive shell
+dialect: bash
+source: oils:spec/ysh-options#redefinesource-is-on-in-interactive-shell
+stdout: "common\ncommon\nstatus=0\n2 stderr.txt\n"
+---
+
+$SH -O oil:all -i --rcfile /dev/null -c "
+source $REPO_ROOT/spec/testdata/module/common.ysh
+source $REPO_ROOT/spec/testdata/module/common.ysh
+log hi
+" 2>stderr.txt
+echo status=$?
+
+# Make sure there are two lines
+wc -l stderr.txt

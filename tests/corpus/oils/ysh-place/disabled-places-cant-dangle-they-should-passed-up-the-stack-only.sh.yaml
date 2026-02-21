@@ -1,0 +1,28 @@
+name: "[DISABLED] Places can't dangle; they should passed UP the stack only"
+dialect: bash
+source: 
+  oils:spec/ysh-place#disabled-places-cant-dangle-they-should-passed-up-the-stack-only
+status: 1
+stdout: "\n"
+---
+
+func f() {
+  var f_local = null
+  return (&f_local)
+}
+
+func g() {
+  # This place is now INVALID!
+  var place = f()
+
+  # Should fail when we try to use the place
+  echo zzz | read --all (place)
+
+  # This should also fail
+  # call place->setValue('zzz')
+
+}
+
+call g()
+
+echo done

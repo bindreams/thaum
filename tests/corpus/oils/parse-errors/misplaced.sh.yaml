@@ -1,0 +1,7 @@
+name: misplaced ;;
+dialect: bash
+source: oils:spec/parse-errors#misplaced
+status: 2
+stdout: ''
+---
+echo 1 ;; echo 2

@@ -1,0 +1,12 @@
+name: shopt -s failglob exits properly in command context with set -e
+dialect: bash
+source: 
+  oils:spec/glob-bash#shopt--s-failglob-exits-properly-in-command-context-with-set--e
+status: 1
+stdout: "['*.ZZ']\n"
+---
+set -e
+argv.py *.ZZ
+shopt -s failglob
+argv.py *.ZZ
+echo status=$?

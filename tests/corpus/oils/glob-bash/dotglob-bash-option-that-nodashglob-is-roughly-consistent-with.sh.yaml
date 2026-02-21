@@ -1,0 +1,13 @@
+name: dotglob (bash option that no_dash_glob is roughly consistent with)
+dialect: bash
+source: 
+  oils:spec/glob-bash#dotglob-bash-option-that-nodashglob-is-roughly-consistent-with
+stdout: "other\n.foorc other\n"
+---
+mkdir -p $TMP/dotglob
+cd $TMP/dotglob
+touch .foorc other
+
+echo *
+shopt -s dotglob
+echo * | sort

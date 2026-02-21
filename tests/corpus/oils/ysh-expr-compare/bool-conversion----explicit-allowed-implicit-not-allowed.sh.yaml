@@ -1,0 +1,24 @@
+name: Bool conversion -- explicit allowed, implicit not allowed
+dialect: bash
+source: 
+  oils:spec/ysh-expr-compare#bool-conversion----explicit-allowed-implicit-not-allowed
+status: 3
+stdout: "<\n<=\n"
+---
+
+shopt -s ysh:upgrade
+
+if (int(false) < int(true)) {
+  echo '<'
+}
+
+if (int(false) <= int(false) ) {
+  echo '<='
+}
+
+# JavaScript and Python both have this, but YSH prefers being explicit
+
+if (true < false) {
+  echo 'BAD'
+}
+echo 'should not get here'

@@ -1,0 +1,6 @@
+name: osh -O ysh:upgrade
+dialect: bash
+source: oils:spec/ysh-options#osh--o-yshupgrade
+stdout: "one\ntwo\nthree\n"
+---
+$SH -O ysh:upgrade -c 'var x = :|one two three|; write @x'

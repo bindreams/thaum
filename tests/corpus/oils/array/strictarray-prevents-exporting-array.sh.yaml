@@ -1,0 +1,12 @@
+name: strict_array prevents exporting array
+dialect: bash
+source: oils:spec/array#strictarray-prevents-exporting-array
+status: 1
+stdout: "\n"
+---
+
+shopt -s strict_array
+
+export PYTHONPATH
+PYTHONPATH=(a b c)
+printenv.py PYTHONPATH

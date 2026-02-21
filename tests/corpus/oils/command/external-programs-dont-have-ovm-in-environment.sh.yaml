@@ -1,0 +1,8 @@
+name: External programs don't have _OVM in environment
+dialect: bash
+source: oils:spec/command#external-programs-dont-have-ovm-in-environment
+stdout: "status=1\n"
+---
+# bug fix for leakage
+env | grep _OVM
+echo status=$?

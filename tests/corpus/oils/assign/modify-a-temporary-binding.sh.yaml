@@ -1,0 +1,12 @@
+name: Modify a temporary binding
+dialect: bash
+source: oils:spec/assign#modify-a-temporary-binding
+stdout: "x before = 5\nx after  = 6\n"
+---
+# (regression for bug found by Michael Greenberg)
+f() {
+  echo "x before = $x"
+  x=$((x+1))
+  echo "x after  = $x"
+}
+x=5 f

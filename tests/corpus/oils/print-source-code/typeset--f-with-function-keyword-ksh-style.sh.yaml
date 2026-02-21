@@ -1,0 +1,12 @@
+name: typeset -f with function keyword (ksh style)
+dialect: bash
+source: oils:spec/print-source-code#typeset--f-with-function-keyword-ksh-style
+stdout: "serialized\n"
+---
+: prefix; function myfunc {
+	echo serialized
+}
+
+code=$(typeset -f myfunc)
+
+$SH -c "$code; myfunc"

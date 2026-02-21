@@ -1,0 +1,5 @@
+name: Remove const suffix from undefined
+dialect: bash
+source: oils:spec/var-op-strip#remove-const-suffix-from-undefined
+---
+echo ${undef%suffix}

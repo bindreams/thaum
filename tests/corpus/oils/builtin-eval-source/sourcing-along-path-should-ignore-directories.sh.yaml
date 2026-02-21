@@ -1,0 +1,21 @@
+name: sourcing along PATH should ignore directories
+dialect: bash
+source: 
+  oils:spec/builtin-eval-source#sourcing-along-path-should-ignore-directories
+stdout: "hi\nstatus=0\nhi\nstatus=0\n"
+---
+
+mkdir -p _tmp/shell
+mkdir -p _tmp/dir/hello.sh
+printf 'echo hi' >_tmp/shell/hello.sh
+
+DIR=$PWD/_tmp/dir
+SHELL=$PWD/_tmp/shell
+
+# Should find the file hello.sh right away and source it
+PATH="$SHELL:$PATH" . hello.sh
+echo status=$?
+
+# Should fail because hello.sh cannot be found
+PATH="$DIR:$SHELL:$PATH" . hello.sh
+echo status=$?

@@ -1,0 +1,12 @@
+name: oil:upgrade as alias for ysh:upgrade
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#oilupgrade-as-alias-for-yshupgrade
+stdout: "shopt -u simple_word_eval\nshopt -s simple_word_eval\nshopt -u simple_word_eval\n"
+---
+
+shopt -p | grep simple_word
+shopt --set oil:upgrade
+shopt -p | grep simple_word
+
+shopt --unset ysh:upgrade
+shopt -p | grep simple_word

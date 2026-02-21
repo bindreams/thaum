@@ -1,0 +1,26 @@
+name: Modify for loop variable with var or setvar? (Machine Stops)
+dialect: bash
+source: 
+  oils:spec/ysh-user-feedback#modify-for-loop-variable-with-var-or-setvar-machine-stops
+stdout: "a\nzz\nb\nzz\n"
+---
+
+proc do-var {
+  for x in a b {
+    echo $x
+    var x = 'zz'
+    echo $x
+  }
+}
+
+proc do-setvar {
+  for x in a b {
+    echo $x
+    setvar x = 'zz'
+    echo $x
+  }
+}
+
+do-var
+echo
+do-setvar

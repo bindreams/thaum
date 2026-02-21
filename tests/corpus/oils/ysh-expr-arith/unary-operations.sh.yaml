@@ -1,0 +1,15 @@
+name: Unary Operations
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary-operations
+stdout: "-2\n-1\n-2.3\nfalse\n"
+---
+
+var a = ~1
+
+var b = -1
+var c = -2.3
+
+var d = not true
+
+
+write -- $a $b $c $d

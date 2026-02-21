@@ -1,0 +1,28 @@
+name: unset composes when you turn on dynamic scope
+dialect: bash
+source: oils:spec/ysh-scope#unset-composes-when-you-turn-on-dynamic-scope
+stdout: "x=X y=Y\nx= y=\n"
+---
+shopt -s ysh:all
+shopt --unset no_osh_builtins
+
+proc unset-two (v, w) {
+  shopt --set dynamic_scope {
+    unset $v
+    unset $w
+  }
+}
+
+demo() {
+  local x=X
+  local y=Y
+
+  echo "x=$x y=$y"
+
+  unset-two x y
+
+  shopt --unset nounset
+  echo "x=$x y=$y"
+}
+
+demo

@@ -1,0 +1,30 @@
+name: Str.replace(*, Expr), $0
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplace-expr-0
+stdout: "class FooBar:  # this class is called FooBar\nclass FooBar:  # this class
+  is called FooBar\n"
+---
+shopt --set ysh:all
+
+# Functionality
+var mystr = 'class Foo:  # this class is called Foo'
+write $[mystr.replace("Foo", ^"$0Bar")]
+write $[mystr.replace(/ 'Foo' /, ^"$0Bar")]
+
+# Edge-cases
+var dollar0 = "$0"
+#echo dollar0=$dollar0
+#echo "0 = $0"
+
+var expected = "f($dollar0)($dollar0)"
+#echo "expected = $expected"
+
+# Eager replacement
+assert [expected === "foo".replace("o", "($0)")]
+
+assert ['f(o)(o)' === "foo".replace("o", ^"($0)")]
+
+func f() { return ( "<$0>" ) }
+assert ["<$dollar0>" === f()]
+
+assert ['f<o><o>' === "foo".replace("o", ^[f()])]

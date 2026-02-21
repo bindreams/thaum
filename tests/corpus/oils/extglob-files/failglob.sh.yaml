@@ -1,0 +1,18 @@
+name: failglob
+dialect: bash
+source: oils:spec/extglob-files#failglob
+stdout: "status=1\nfoo\nstatus=0\n"
+---
+shopt -s extglob
+
+rm -f _failglob/*
+mkdir -p _failglob
+cd _failglob
+
+shopt -s failglob
+echo @(*)
+echo status=$?
+
+touch foo
+echo @(*)
+echo status=$?

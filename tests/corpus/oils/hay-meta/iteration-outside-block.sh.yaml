@@ -1,0 +1,28 @@
+name: Iteration Outside Block
+dialect: bash
+source: oils:spec/hay-meta#iteration-outside-block
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Rule
+
+for name in spam eggs ham {
+  Rule $name {
+    path = "/usr/bin/$name"
+  }
+}
+
+json write (_hay()) | jq '.children[].attrs' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "path": "/usr/bin/spam"
+}
+{
+  "path": "/usr/bin/eggs"
+}
+{
+  "path": "/usr/bin/ham"
+}
+EOF

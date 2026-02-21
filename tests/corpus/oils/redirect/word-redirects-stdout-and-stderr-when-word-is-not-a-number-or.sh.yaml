@@ -1,0 +1,17 @@
+name: '>&word redirects stdout and stderr when word is not a number or -'
+dialect: bash
+source: 
+  oils:spec/redirect#word-redirects-stdout-and-stderr-when-word-is-not-a-number-or
+stdout: "STDOUT\nSTDERR\n"
+---
+
+# dash, mksh don't implement this bash behaviour.
+case $SH in dash|mksh) exit 1 ;; esac
+
+tmp="$(basename $SH)-$$.txt"  # unique name for shell and test case
+
+stdout_stderr.py >&$tmp
+
+# order is indeterminate
+grep STDOUT $tmp
+grep STDERR $tmp

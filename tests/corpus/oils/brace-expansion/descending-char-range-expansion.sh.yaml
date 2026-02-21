@@ -1,0 +1,6 @@
+name: Descending char range expansion
+dialect: bash
+source: oils:spec/brace-expansion#descending-char-range-expansion
+stdout: "-e- -c- -a-\n"
+---
+echo -{e..a..-2}-

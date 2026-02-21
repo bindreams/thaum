@@ -1,0 +1,9 @@
+name: Locals don't leak
+dialect: bash
+source: oils:spec/sh-func#locals-dont-leak
+---
+f() {
+  local f_var=f_var
+}
+f
+echo $f_var

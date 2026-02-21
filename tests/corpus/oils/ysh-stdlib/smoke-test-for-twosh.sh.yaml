@@ -1,0 +1,13 @@
+name: smoke test for two.sh
+dialect: bash
+source: oils:spec/ysh-stdlib#smoke-test-for-twosh
+stdout: "status=1\n"
+---
+
+source --builtin osh/two.sh
+
+log 'hi'
+
+shopt --unset errexit
+forkwait { die "bad" }
+echo status=$?

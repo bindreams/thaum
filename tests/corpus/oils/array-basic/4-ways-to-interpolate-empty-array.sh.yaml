@@ -1,0 +1,6 @@
+name: 4 ways to interpolate empty array
+dialect: bash
+source: oils:spec/array-basic#4-ways-to-interpolate-empty-array
+stdout: "['1', '2', '3', '', '4', '5']\n"
+---
+argv.py 1 "${a[@]}" 2 ${a[@]} 3 "${a[*]}" 4 ${a[*]} 5

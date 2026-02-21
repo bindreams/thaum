@@ -1,0 +1,10 @@
+name: set -o allexport (long form)
+dialect: bash
+source: oils:spec/builtin-set#set--o-allexport-long-form
+stdout: "value1\nNone\n"
+---
+set -o allexport
+VAR1=value1
+set +o allexport
+VAR2=value2
+printenv.py VAR1 VAR2

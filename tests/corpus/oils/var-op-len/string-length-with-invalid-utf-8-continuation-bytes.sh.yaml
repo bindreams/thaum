@@ -1,0 +1,27 @@
+name: String length with invalid utf-8 continuation bytes
+dialect: bash
+source: oils:spec/var-op-len#string-length-with-invalid-utf-8-continuation-bytes
+stdout: "-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n-1\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 0 in string of 1 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 1 in string of 2 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 2 in string of 3 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 2 in string of 4 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 4 in string of 5 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 5 in string of 6 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 5 in string of 7 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 5 in string of 8 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 8 in string of 9 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 9 in string of 10 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 9 in string of 11 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 9 in string of 12 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 9 in string of 13 bytes\n[ stdin ]:3:
+  warning: UTF-8 decode: Bad encoding at offset 13 in string of 14 bytes\n[ stdin
+  ]:3: warning: UTF-8 decode: Bad encoding at offset 13 in string of 14 bytes\n"
+---
+for num_bytes in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14; do
+  s=$(head -c $num_bytes $REPO_ROOT/spec/testdata/utf8-chars.txt)$(echo -e "\xFF")
+  echo ${#s}
+done 2> $TMP/err.txt
+
+grep 'warning:' $TMP/err.txt
+true

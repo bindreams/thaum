@@ -1,0 +1,6 @@
+name: Default value when unset
+dialect: bash
+source: oils:spec/var-op-test#default-value-when-unset
+stdout: "is unset\n"
+---
+echo ${unset-is unset}

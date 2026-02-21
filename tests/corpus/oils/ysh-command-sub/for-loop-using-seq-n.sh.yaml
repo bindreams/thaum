@@ -1,0 +1,13 @@
+name: for loop using @(seq $n)
+dialect: bash
+source: oils:spec/ysh-command-sub#for-loop-using-seq-n
+stdout: "[1]\n[2]\n[3]\n['z']\n['z']\n['z']\n"
+---
+shopt -s oil:upgrade
+
+for x in @(seq 3) {
+  echo "[$x]"
+}
+for x in @(seq 3) {
+  argv.py z @[glob("[$x]")]
+}

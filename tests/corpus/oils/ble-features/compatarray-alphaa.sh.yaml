@@ -1,0 +1,9 @@
+name: '[compat_array] ${alpha@a}'
+dialect: bash
+source: oils:spec/ble-features#compatarray-alphaa
+stdout: "type=A\ntype=A\n"
+---
+declare -A alpha=(['1']=2)
+echo type=${alpha@a}
+shopt -s compat_array
+echo type=${alpha@a}

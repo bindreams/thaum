@@ -1,0 +1,12 @@
+name: no_parse_bare_word eliminates confusion
+dialect: bash
+source: oils:spec/ysh-for#noparsebareword-eliminates-confusion
+status: 2
+stdout: "\n"
+---
+
+shopt --set no_parse_bare_word
+
+for x in mylist {  # THIS FAILS
+  echo "BAD $x"
+}

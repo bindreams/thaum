@@ -1,0 +1,13 @@
+name: 'complete both -W and -F: words and functions'
+dialect: bash
+source: oils:spec/ysh-completion#complete-both--w-and--f-words-and-functions
+stdout: "Hm they are kinda reversed, I want to fix that.  This is true even in Python\n\
+  though, weird.\n"
+---
+
+__git() {
+  COMPREPLY=(corn dill)
+}
+complete -W 'ale $(echo bean)' -F __git GIT
+
+compexport -c 'GIT '

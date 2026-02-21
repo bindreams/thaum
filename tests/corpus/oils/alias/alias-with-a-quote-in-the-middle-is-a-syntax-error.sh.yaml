@@ -1,0 +1,9 @@
+name: Alias with a quote in the middle is a syntax error
+dialect: bash
+source: oils:spec/alias#alias-with-a-quote-in-the-middle-is-a-syntax-error
+status: 2
+---
+shopt -s expand_aliases
+alias e_='echo "'
+var=x
+e_ '${var}"'

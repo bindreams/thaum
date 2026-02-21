@@ -1,0 +1,14 @@
+name: Local OPTIND
+dialect: bash
+source: oils:spec/builtin-getopts#local-optind
+stdout: "loop 2\n"
+---
+# minimal test case extracted from bash-completion
+min() {
+  local OPTIND=1
+
+  while getopts "n:e:o:i:s" flag "$@"; do
+    echo "loop $OPTIND";
+  done
+}
+min -s

@@ -1,0 +1,13 @@
+name: $PATH lookup
+dialect: bash
+source: oils:spec/command#path-lookup
+stdout: "one\n"
+---
+cd $TMP
+mkdir -p one two
+echo 'echo one' > one/mycmd
+echo 'echo two' > two/mycmd
+chmod +x one/mycmd two/mycmd
+
+PATH='one:two'
+mycmd

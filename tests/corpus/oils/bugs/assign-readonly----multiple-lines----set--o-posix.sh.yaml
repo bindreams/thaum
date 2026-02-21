@@ -1,0 +1,10 @@
+name: assign readonly -- multiple lines -- set -o posix
+dialect: bash
+source: oils:spec/bugs#assign-readonly----multiple-lines----set--o-posix
+status: 1
+stdout: "\n"
+---
+set -o posix
+readonly x=1
+x=2
+echo hi

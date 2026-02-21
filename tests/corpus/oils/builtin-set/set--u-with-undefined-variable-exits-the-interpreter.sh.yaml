@@ -1,0 +1,18 @@
+name: set -u with undefined variable exits the interpreter
+dialect: bash
+source: 
+  oils:spec/builtin-set#set--u-with-undefined-variable-exits-the-interpreter
+stdout: "before\nOK\nbefore\nOK\n"
+---
+
+# non-interactive
+$SH -c 'set -u; echo before; echo $x; echo after'
+if test $? -ne 0; then
+  echo OK
+fi
+
+# interactive
+$SH -i -c 'set -u; echo before; echo $x; echo after'
+if test $? -ne 0; then
+  echo OK
+fi

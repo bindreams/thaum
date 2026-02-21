@@ -1,0 +1,6 @@
+name: Unquoted words
+dialect: bash
+source: oils:spec/quote#unquoted-words
+stdout: "unquoted words\n"
+---
+echo unquoted    words

@@ -1,0 +1,14 @@
+name: read -d '' (null-separated records)
+dialect: bash
+source: oils:spec/builtin-read#read--d-null-separated-records
+stdout: "v1=a,b,c\nv1=d v2=e,f\nv1=g v2=h v3=i\n"
+---
+printf 'a,b,c\0d,e,f\0g,h,i' | {
+  IFS=,
+  read -d '' v1
+  echo "v1=$v1"
+  read -d '' v1 v2
+  echo "v1=$v1 v2=$v2"
+  read -d '' v1 v2 v3
+  echo "v1=$v1 v2=$v2 v3=$v3"
+}

@@ -1,0 +1,29 @@
+name: 'Executor: can run user-defined Procs'
+dialect: bash
+source: oils:spec/ysh-purity#executor-can-run-user-defined-procs
+stdout: "(List)   [\"p-outside\",\"p-inside\"]\n"
+---
+shopt --set ysh:upgrade
+
+var g = []
+
+proc p-outside {
+  # note: append builtin would be nice
+  call g->append('p-outside')
+}
+
+# The Hay file can call any procs?   That seems wrong actually
+# We want to hide some of them
+
+var cmd = ^(
+  p-outside
+
+  proc p-inside {
+    call g->append('p-inside')
+  }
+  p-inside
+)
+
+call eval(cmd)
+
+pp test_ (g)

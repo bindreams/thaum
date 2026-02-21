@@ -1,0 +1,23 @@
+name: Reveal existence of "temp frame" (All shells disagree here!!!)
+dialect: bash
+source: oils:spec/assign#reveal-existence-of-temp-frame-all-shells-disagree-here
+stdout: "x=temp-binding\nx=mutated-temp\nx=local\nx=mutated-temp\nx=global\n"
+---
+f() {
+  echo "x=$x"
+
+  x=mutated-temp  # mutate temp frame
+  echo "x=$x"
+
+  # Declare a new local
+  local x='local'
+  echo "x=$x"
+
+  # Unset it
+  unset x
+  echo "x=$x"
+}
+
+x=global
+x=temp-binding f
+echo "x=$x"

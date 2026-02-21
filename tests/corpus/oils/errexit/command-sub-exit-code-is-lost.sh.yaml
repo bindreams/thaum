@@ -1,0 +1,23 @@
+name: Command sub exit code is lost
+dialect: bash
+source: oils:spec/errexit#command-sub-exit-code-is-lost
+stdout: "ft\nstatus=0\nf\nstatus=0\nft\nstatus=0\n"
+---
+echo ft $(false) $(true)
+echo status=$?
+
+set -o errexit
+shopt -s inherit_errexit || true
+
+# This changes it
+#shopt -s command_sub_errexit || true
+
+echo f $(date %x)
+echo status=$?
+
+# compare with 
+# x=$(date %x)         # FAILS
+# local x=$(date %x)   # does NOT fail
+
+echo ft $(false) $(true)
+echo status=$?

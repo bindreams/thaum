@@ -1,0 +1,25 @@
+name: OPTIND after multiple getopts with different spec
+dialect: bash
+source: 
+  oils:spec/builtin-getopts#optind-after-multiple-getopts-with-different-spec
+stdout: ".\nOPTIND=2\n-\n-\nOPTIND=5\nOPTIND=2\n"
+---
+# Wow this is poorly specified!  A fundamental design problem with the global
+# variable OPTIND.
+set -- -a
+while getopts "ab:" opt; do
+  echo '.'
+done
+echo OPTIND=$OPTIND
+
+set -- -c -d -e foo
+while getopts "cde:" opt; do
+  echo '-'
+done
+echo OPTIND=$OPTIND
+
+set -- -f
+while getopts "f:" opt; do
+  echo '_'
+done
+echo OPTIND=$OPTIND

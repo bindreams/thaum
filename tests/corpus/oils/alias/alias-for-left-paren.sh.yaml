@@ -1,0 +1,8 @@
+name: alias for left paren
+dialect: bash
+source: oils:spec/alias#alias-for-left-paren
+stdout: "one\ntwo\n"
+---
+shopt -s expand_aliases
+alias LEFT='('
+LEFT echo one; echo two )

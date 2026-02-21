@@ -1,0 +1,6 @@
+name: negative number is true
+dialect: bash
+source: oils:spec/dparen#negative-number-is-true
+stdout: "True\n"
+---
+(( -1 )) && echo True

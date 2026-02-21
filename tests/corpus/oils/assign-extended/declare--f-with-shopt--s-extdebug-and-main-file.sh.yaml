@@ -1,0 +1,10 @@
+name: declare -F with shopt -s extdebug and main file
+dialect: bash
+source: 
+  oils:spec/assign-extended#declare--f-with-shopt--s-extdebug-and-main-file
+stdout: "declare -f add\ndeclare -f g\n\nadd 5 ROOT/spec/testdata/extdebug.sh\ng 3
+  ROOT/spec/testdata/bash-source-2.sh\n"
+---
+case $SH in mksh) exit ;; esac
+
+$SH $REPO_ROOT/spec/testdata/extdebug.sh | sed "s;$REPO_ROOT;ROOT;g"

@@ -1,0 +1,13 @@
+name: lookup with unquoted $key and quoted "$i$i"
+dialect: bash
+source: oils:spec/array-assoc#lookup-with-unquoted-key-and-quoted-ii
+stdout: "bar\nb\n"
+---
+declare -A A
+A["aa"]=b
+A["foo"]=bar
+
+key=foo
+echo ${A[$key]}
+i=a
+echo ${A["$i$i"]}   # note: ${A[$i$i]} doesn't work in OSH

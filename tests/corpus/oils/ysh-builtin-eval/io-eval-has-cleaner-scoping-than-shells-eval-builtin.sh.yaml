@@ -1,0 +1,27 @@
+name: io->eval() has cleaner scoping than shell's eval builtin
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#io-eval-has-cleaner-scoping-than-shells-eval-builtin
+status: 1
+stdout: "eval string do_not_leak=42\n"
+---
+
+#shopt --unset ysh:all
+shopt --set ysh:upgrade
+shopt --unset no_osh_builtins  # for local
+
+sh-eval() {
+  local do_not_leak=42  # this is visible
+  eval $1
+}
+
+sh-eval 'echo "eval string do_not_leak=$do_not_leak"'
+
+proc ysh-eval (;;; block) {
+  var do_not_leak = 99
+  call io->eval(block, in_captured_frame=true)
+}
+
+ysh-eval {
+  echo "ysh block do_not_leak=$do_not_leak"
+}

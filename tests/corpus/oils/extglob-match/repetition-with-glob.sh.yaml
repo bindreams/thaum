@@ -1,0 +1,8 @@
+name: repetition with glob
+dialect: bash
+source: oils:spec/extglob-match#repetition-with-glob
+stdout: "TRUE\nFALSE\n"
+---
+# NOTE that * means two different things here
+[[ foofoo_foo__foo___ == *(foo*) ]] && echo TRUE
+[[ Xoofoo_foo__foo___ == *(foo*) ]] || echo FALSE

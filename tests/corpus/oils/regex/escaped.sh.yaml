@@ -1,0 +1,7 @@
+name: Escaped {
+dialect: bash
+source: oils:spec/regex#escaped
+stdout: "['$PA', '$', 'PA']\n"
+---
+# from bash-completion
+[[ '$PA' =~ ^(\$\{?)([A-Za-z0-9_]*)$ ]] && argv.py "${BASH_REMATCH[@]}"

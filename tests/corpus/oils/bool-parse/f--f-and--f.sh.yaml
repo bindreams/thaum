@@ -1,0 +1,10 @@
+name: '[[ -f -f ]] and [[ -f == ]]'
+dialect: bash
+source: oils:spec/bool-parse#f--f-and--f
+stdout: "status=1\nstatus=1\n"
+---
+[[ -f -f ]]
+echo status=$?
+
+[[ -f == ]]
+echo status=$?

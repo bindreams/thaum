@@ -1,0 +1,24 @@
+name: JSON \uXXXX\uYYYY as max code point - can't go above
+dialect: bash
+source: oils:spec/ysh-unicode#json-uxxxxuyyyy-as-max-code-point---cant-go-above
+stdout: " f4 8f bf bf 0a\n f4 8f bf bf 0a\n"
+---
+
+py-decode() {
+  python2 -c 'import json, sys; print json.load(sys.stdin).encode("utf-8")'
+}
+
+to-hex() {
+  od -A n -t x1
+}
+
+max='"\udbff\udfff"'
+
+# incrementing by one gives invalid surrogates
+# the encoding is "tight"
+# too_big='"\udc00\udfff"'
+
+echo "$max" | py-decode | to-hex
+
+echo "$max" | json read
+echo "$_reply" | to-hex

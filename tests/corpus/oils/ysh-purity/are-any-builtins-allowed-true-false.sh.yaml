@@ -1,0 +1,40 @@
+name: Are any builtins allowed?  true, false
+dialect: bash
+source: oils:spec/ysh-purity#are-any-builtins-allowed-true-false
+stdout: "true\nbuiltin true\ncommand true\n"
+---
+shopt --set ysh:upgrade
+
+
+# what other builtins should be allowed?
+# - set and shopt could be dangerous?
+# - set -- 1 2 3 may be OK
+# - test -n is safe, but test --file is not
+#   - YSH mostly won't need it
+# - not part of YSH
+#   - unset
+#   - printf -v (otherwise printf does I/O)
+#   - shift - use ARGV
+#   - getopts
+#   - alias
+# Other:
+#   - type - some of this does I/O
+#
+# If we only consider YSH, everything has a trivial replacement, e.g. true and
+# false.  false can be assert [false]
+
+var cmd = ^(
+  true
+  echo true
+  builtin true
+  echo builtin true
+  command true
+  echo command true
+
+  builtin false
+  echo builtin false
+)
+
+call io->eval(cmd)
+call eval(cmd)
+echo

@@ -1,0 +1,6 @@
+name: echo -e with hex escape
+dialect: bash
+source: oils:spec/builtin-echo#echo--e-with-hex-escape
+stdout: "abcdef\n"
+---
+echo -e 'abcd\x65f'

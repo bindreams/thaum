@@ -1,0 +1,24 @@
+name: trap DEBUG function call
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-function-call
+stdout: "  [13]\ni=A\ni=B\n  [15]\nnext\n  [17]\ni=X\ni=Y\n  [19]\nok\n"
+---
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+f() {
+  local mylocal=1
+  for i in "$@"; do
+    echo i=$i
+  done
+}
+
+f A B  # executes ONCE here, but does NOT go into the function call
+
+echo next
+
+f X Y
+
+echo ok

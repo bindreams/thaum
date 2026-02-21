@@ -1,0 +1,6 @@
+name: IFS 3
+dialect: bash
+source: oils:spec/toysh-posix#ifs-3
+stdout: "one two  three\n"
+---
+IFS=x; X="onextwoxxthree"; y=$X; echo $y

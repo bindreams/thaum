@@ -1,0 +1,8 @@
+name: errexit with ||
+dialect: bash
+source: oils:spec/errexit#errexit-with
+status: 0
+stdout: "ok\n"
+---
+set -o errexit
+echo hi | grep nonexistent || echo ok

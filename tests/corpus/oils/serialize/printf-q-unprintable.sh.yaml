@@ -1,0 +1,11 @@
+name: printf %q unprintable
+dialect: bash
+source: oils:spec/serialize#printf-q-unprintable
+stdout: "$'\\377'\n"
+---
+case $SH in ash) return ;; esac  # yash and ash don't implement this
+
+unprintable=$'\xff'
+printf '%q\n' "$unprintable"
+
+# bash and zsh agree

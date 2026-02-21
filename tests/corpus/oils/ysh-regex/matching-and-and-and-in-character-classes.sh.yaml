@@ -1,0 +1,22 @@
+name: Matching ] and \ and ' and " in character classes
+dialect: bash
+source: oils:spec/ysh-regex#matching-and-and-and-in-character-classes
+stdout: "pat=[]'\"\\\\]\nbackslash \\\nrbracket ]\nsq '\ndq \"\"\n"
+---
+shopt -s ysh:all
+
+# BUG: need C strings in array literal
+var lines = :|
+  'backslash \'
+  'rbracket ]'
+  'lbracket ['
+  "sq '"
+  'dq ""'
+|
+
+# Weird GNU quirk: ] has to come first!
+# []abc] works.  But [abc\]] does NOT work.  Stupid rule!
+
+var pat = / [ ']' \\ \' \" ] /
+write pat=$pat
+write @lines | egrep $pat 

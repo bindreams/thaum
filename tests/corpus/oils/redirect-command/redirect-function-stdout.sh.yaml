@@ -1,0 +1,8 @@
+name: Redirect function stdout
+dialect: bash
+source: oils:spec/redirect-command#redirect-function-stdout
+stdout: "one\ntwo\n"
+---
+f() { echo one; echo two; }
+f > $TMP/redirect-func.txt
+cat $TMP/redirect-func.txt

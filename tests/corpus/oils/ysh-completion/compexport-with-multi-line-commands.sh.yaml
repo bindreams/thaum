@@ -1,0 +1,10 @@
+name: compexport with multi-line commands
+dialect: bash
+source: oils:spec/ysh-completion#compexport-with-multi-line-commands
+stdout: "\"complete \"\n"
+---
+
+# TODO: Why do we get 3 copies of echo?
+# compexport -c $'for x in y; do\nec'
+
+compexport -c $'for x in y; do\ncompl'

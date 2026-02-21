@@ -1,0 +1,8 @@
+name: Append array to array
+dialect: bash
+source: oils:spec/append#append-array-to-array
+stdout: "['x', 'y', 't', 'u v']\n"
+---
+a=(x y )
+a+=(t 'u v')
+argv.py "${a[@]}"

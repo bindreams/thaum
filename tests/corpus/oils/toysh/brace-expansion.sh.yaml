@@ -1,0 +1,12 @@
+name: Brace Expansion
+dialect: bash
+source: oils:spec/toysh#brace-expansion
+stdout: "/home/foo/pwd /root/pwd\n{~,~root}/pwd\n~/pwd ~root/pwd\n"
+---
+# http://landley.net/notes.html#04-01-2020
+
+HOME=/home/foo
+
+echo {~,~root}/pwd
+echo \{~,~root}/pwd
+echo ""{~,~root}/pwd

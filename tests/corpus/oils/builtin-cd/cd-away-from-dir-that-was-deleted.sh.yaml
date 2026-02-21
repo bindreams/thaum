@@ -1,0 +1,12 @@
+name: cd away from dir that was deleted
+dialect: bash
+source: oils:spec/builtin-cd#cd-away-from-dir-that-was-deleted
+stdout: "cd-nonexistent\nstatus=0\n"
+---
+dir=$TMP/cd-nonexistent
+mkdir -p $dir
+cd $dir
+rmdir $dir
+cd $TMP
+echo $(basename $OLDPWD)
+echo status=$?

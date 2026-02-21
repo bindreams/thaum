@@ -1,0 +1,5 @@
+name: Brace group on oneline
+dialect: bash
+source: oils:spec/shell-grammar#brace-group-on-oneline
+---
+{ echo word_a; echo word_b; }

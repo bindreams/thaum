@@ -1,0 +1,25 @@
+name: Dict (&d) and setglobal
+dialect: bash
+source: oils:spec/ysh-builtin-eval#dict-d-and-setglobal
+stdout: "    [frame_vars_] __E__ a\n\n(Dict)   {\"a\":42}\ng=zz\n"
+---
+
+proc Dict ( ; out; ; block) {
+  var d = io->eval(block, to_dict=true)
+  call out->setValue(d)
+}
+
+var g = 'xx'
+
+Dict (&d) {
+  setglobal g = 'zz'
+
+  a = 42
+  pp frame_vars_
+}
+echo
+
+pp test_ (d)
+echo g=$g
+
+#pp frame_vars_

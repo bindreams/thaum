@@ -1,0 +1,7 @@
+name: No brace expansion in ==
+dialect: bash
+source: oils:spec/extglob-match#no-brace-expansion-in
+stdout: "TRUE\nFALSE\n"
+---
+[[ --X{a,b}X == --@(help|X{a,b}X) ]] && echo TRUE
+[[ --oops == --@(help|X{a,b}X) ]] || echo FALSE

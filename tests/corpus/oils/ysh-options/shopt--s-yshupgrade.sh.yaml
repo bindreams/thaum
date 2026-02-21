@@ -1,0 +1,17 @@
+name: shopt -s ysh:upgrade
+dialect: bash
+source: oils:spec/ysh-options#shopt--s-yshupgrade
+stdout: "set -o errexit\nset -o nounset\nset -o pipefail\nshopt -s command_sub_errexit\n\
+  shopt -s env_obj\nshopt -s errexit\nshopt -s for_loop_frames\nshopt -s inherit_errexit\n\
+  shopt -s init_ysh_globals\nshopt -s no_dash_glob\nshopt -s no_xtrace_osh\nshopt
+  -s nounset\nshopt -s nullglob\nshopt -s parse_at\nshopt -s parse_brace\nshopt -s
+  parse_bracket\nshopt -s parse_equals\nshopt -s parse_func\nshopt -s parse_paren\n\
+  shopt -s parse_proc\nshopt -s parse_triple_quote\nshopt -s parse_ysh_expr_sub\n\
+  shopt -s parse_ysh_string\nshopt -s pipefail\nshopt -s process_sub_fail\nshopt -s
+  sigpipe_status_ok\nshopt -s simple_word_eval\nshopt -s verbose_errexit\nshopt -s
+  verbose_warn\nshopt -s xtrace_rich\nshopt -s ysh_rewrite_extern\n"
+---
+shopt -s ysh:upgrade
+# normal option names
+shopt -o -p | grep -- ' -o ' | grep -v hashall
+shopt -p ysh:upgrade

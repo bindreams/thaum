@@ -1,0 +1,20 @@
+name: Match newline with [\n]
+dialect: bash
+source: oils:spec/ysh-regex-bytes-chars#match-newline-with-n
+stdout: "(Str)   \"[\\n]\"\n(Bool)   false\n(Bool)   true\n"
+---
+shopt -s ysh:all
+
+var pat = / [\n] /
+
+pp test_ (str(pat))
+
+pp test_ ('z' ~ pat)
+
+# this matches
+pp test_ (b'\n' ~ pat)
+
+# but then what happens with grep?
+# invalid regular expression
+
+# write 1 2 3 | egrep "$pat"

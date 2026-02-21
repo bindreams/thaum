@@ -1,0 +1,14 @@
+name: Open proc (any number of args)
+dialect: bash
+source: oils:spec/ysh-proc#open-proc-any-number-of-args
+stdout: "status=42\n"
+---
+shopt --set parse_proc
+
+proc f {
+  var x = 42
+  return $x
+}
+# this gets called with 3 args then?
+f a b c
+echo status=$?

@@ -1,0 +1,12 @@
+name: Negation of Character Class ![a-z]
+dialect: bash
+source: oils:spec/ysh-regex#negation-of-character-class-a-z
+stdout: "[^a-z]\nyes\nno\n"
+---
+shopt -s ysh:all
+
+var pat = / ![ a-z ] /
+echo $pat
+
+if ('0' ~ pat) { echo yes }
+if ('a' !~ pat) { echo no }

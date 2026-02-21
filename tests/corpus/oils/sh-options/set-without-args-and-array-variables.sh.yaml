@@ -1,0 +1,8 @@
+name: set without args and array variables
+dialect: bash
+source: oils:spec/sh-options#set-without-args-and-array-variables
+stdout: "__array=(1 2 '3 4')\n"
+---
+declare -a __array
+__array=(1 2 '3 4')
+set | grep '^__'

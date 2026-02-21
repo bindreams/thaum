@@ -1,0 +1,9 @@
+name: Slicing of string with variables
+dialect: bash
+source: oils:spec/arith-context#slicing-of-string-with-variables
+stdout: "abcd abcd b\n"
+---
+s='abcd'
+zero=0
+one=1
+echo ${s:$zero} ${s:$zero:4} ${s:$one:$one}

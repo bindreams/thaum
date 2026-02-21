@@ -1,0 +1,8 @@
+name: current working dir
+dialect: bash
+source: oils:spec/prompt#current-working-dir
+stdout: "status=0\n"
+---
+PS1='\w '
+test "${PS1@P}" = "${PWD} "
+echo status=$?

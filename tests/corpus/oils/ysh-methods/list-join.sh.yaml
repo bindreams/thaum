@@ -1,0 +1,15 @@
+name: List => join()
+dialect: bash
+source: oils:spec/ysh-methods#list-join
+stdout: "\"123\"\n\"1 2 3\"\n\"1, 2, 3\"\nfailed with status 3\n"
+---
+var items = [1, 2, 3]
+
+json write (items => join())  # default separator is ''
+json write (items => join(" "))  # explicit separator (can be any number or chars)
+json write (items => join(", "))  #  separator can be any number of chars
+
+try {
+  json write (items => join(1))  # separator must be a string
+}
+echo "failed with status $[_error.code]"

@@ -1,0 +1,7 @@
+name: compgen -e on unknown var
+dialect: bash
+source: oils:spec/builtin-completion#compgen--e-on-unknown-var
+status: 1
+stdout: ''
+---
+compgen -e __nonexistent__

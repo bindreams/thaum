@@ -1,0 +1,54 @@
+name: assert on values
+dialect: bash
+source: oils:spec/ysh-builtin-error#assert-on-values
+stdout: "passed\ncode 0\n\n\ncode 3\n\n\ncode 3\n\n\ncode 3\n\npassed\ncode 0\n\n"
+---
+
+try {
+  $[ENV.SH] -c '
+  assert (true)
+  echo passed
+  '
+}
+echo code $[_error.code]
+echo
+
+try {
+  $[ENV.SH] -c '
+  func f() { return (false) }
+
+  assert (f())
+  echo "unreachable"
+  ' | grep -v Value
+}
+echo code $[_error.code]
+echo
+
+try {
+  $[ENV.SH] -c '
+  assert (null)
+  echo "unreachable"
+  ' | grep -v Value
+}
+echo code $[_error.code]
+echo
+
+try {
+  $[ENV.SH] -c '
+  func f() { return (false) }
+
+  assert (true === f())
+  echo "unreachable"
+  ' | grep -v Value
+}
+echo code $[_error.code]
+echo
+
+try {
+  $[ENV.SH] -c '
+  assert (42 === 42)
+  echo passed
+  '
+}
+echo code $[_error.code]
+echo

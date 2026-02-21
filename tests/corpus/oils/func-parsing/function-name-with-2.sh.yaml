@@ -1,0 +1,7 @@
+name: Function name with -
+dialect: bash
+source: oils:spec/func-parsing#function-name-with
+status: 0
+---
+# bash allows this; dash doesn't.
+foo-bar() { ls ; }

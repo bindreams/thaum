@@ -1,0 +1,14 @@
+name: continue 1 extra, break, etc.
+dialect: bash
+source: oils:spec/arg-parse#continue-1-extra-break-etc
+stdout: "\n"
+---
+$SH -c '
+for i in foo; do
+  continue 1 extra
+done
+echo status=$?
+'
+if test $? -eq 0; then
+  echo fail
+fi

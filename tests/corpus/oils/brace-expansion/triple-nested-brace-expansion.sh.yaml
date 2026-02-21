@@ -1,0 +1,6 @@
+name: triple nested brace expansion
+dialect: bash
+source: oils:spec/brace-expansion#triple-nested-brace-expansion
+stdout: "-A- -=a=- -=.x.=- -=.y.=- -=b=- -B-\n"
+---
+echo -{A,={a,.{x,y}.,b}=,B}-

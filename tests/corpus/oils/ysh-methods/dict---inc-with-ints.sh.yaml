@@ -1,0 +1,12 @@
+name: Dict -> inc() with ints
+dialect: bash
+source: oils:spec/ysh-methods#dict---inc-with-ints
+stdout: "\n"
+---
+var histogram = {a: 1979}
+
+call histogram->inc('a', 3)
+assert [{"a": 1982} === histogram]
+
+call histogram->inc('b', 3)
+assert [{"a": 1982, "b": 3} === histogram]

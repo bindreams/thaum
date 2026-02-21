@@ -1,0 +1,11 @@
+name: Multiple Patterns Match
+dialect: bash
+source: oils:spec/case#multiple-patterns-match
+stdout: "- X\n"
+---
+x=foo
+result='-'
+case "$x" in
+  f*|*o) result="$result X"
+esac
+echo $result

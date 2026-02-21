@@ -1,0 +1,8 @@
+name: 'for loop (issue #1446)'
+dialect: bash
+source: oils:spec/bugs#for-loop-issue-1446
+stdout: "0\n1\n"
+---
+case $SH in dash|mksh|ash) exit ;; esac
+
+for (( n=0; n<(3-(1)); n++ )) ; do echo $n; done

@@ -1,0 +1,18 @@
+name: Augmented assignment of List
+dialect: bash
+source: oils:spec/ysh-augmented#augmented-assignment-of-list
+stdout: "31 42\n31 21\n31 10.5\n"
+---
+
+shopt -s parse_at
+
+var mylist = :| 32 42 |
+
+setvar mylist[0] -= 1
+echo @mylist
+
+setvar mylist[1] //= 2
+echo @mylist
+
+setvar mylist[1] /= 2
+echo @mylist

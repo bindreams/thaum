@@ -1,0 +1,10 @@
+name: $OLDPWD
+dialect: bash
+source: oils:spec/builtin-cd#oldpwd
+stdout: "old: /\nOLDPWD=/\n/\n"
+---
+cd /
+cd $TMP
+echo "old: $OLDPWD"
+env | grep OLDPWD  # It's EXPORTED too!
+cd -

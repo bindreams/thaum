@@ -1,0 +1,21 @@
+name: help oils-err-12 (case insensitive)
+dialect: bash
+source: oils:spec/ysh-builtin-help#help-oils-err-12-case-insensitive
+stdout: "catalog.html#oils-err-12\nstatus=0\ncatalog.html#oils-err-12\nstatus=0\n"
+---
+
+# note that the topics are lower-casedo
+
+help oils-err-12 | grep -o 'catalog.html#oils-err-12'
+echo status=$?
+
+help OILS-ERR-12 | grep -o 'catalog.html#oils-err-12'
+echo status=$?
+
+# these are bad
+
+# help oils-err-zz
+# echo status=$?
+
+# help OILS-ERR-zz
+# echo status=$?

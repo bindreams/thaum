@@ -1,0 +1,11 @@
+name: test -p named pipe
+dialect: bash
+source: oils:spec/builtin-bracket#test--p-named-pipe
+stdout: "status=0\nstatus=1\n"
+---
+mkfifo $TMP/fifo
+test -p $TMP/fifo
+echo status=$?
+
+test -p testdata
+echo status=$?

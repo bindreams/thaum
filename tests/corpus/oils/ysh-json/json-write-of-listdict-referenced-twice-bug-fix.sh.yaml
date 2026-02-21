@@ -1,0 +1,14 @@
+name: json write of List/Dict referenced twice (bug fix)
+dialect: bash
+source: oils:spec/ysh-json#json-write-of-listdict-referenced-twice-bug-fix
+stdout: "{\"k\":[1,2,3],\"k2\":[1,2,3],\"k3\":{\"foo\":\"bar\"},\"k4\":{\"foo\":\"\
+  bar\"}}\n"
+---
+
+var mylist = [1,2,3]
+var mydict = {foo: "bar"}
+
+var top = {k: mylist, k2: mylist, k3: mydict, k4: mydict}
+
+# BUG!
+json write (top, space=0)

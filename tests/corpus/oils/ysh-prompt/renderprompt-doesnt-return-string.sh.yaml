@@ -1,0 +1,17 @@
+name: renderPrompt() doesn't return string
+dialect: bash
+source: oils:spec/ysh-prompt#renderprompt-doesnt-return-string
+stdout: "hi\n^D\n"
+stderr: '<Error: renderPrompt() should return Str, got List> <Error: renderPrompt()
+  should return Str, got List> '
+---
+
+setglobal ENV.PS1 = r'myprompt\$ '
+
+cat >yshrc <<'EOF'
+func renderPrompt(io) {
+  return ([42, 43])
+}
+EOF
+
+echo 'echo hi' | $[ENV.SH] -i --rcfile yshrc

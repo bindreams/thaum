@@ -1,0 +1,9 @@
+name: exec redirect then various builtins
+dialect: bash
+source: oils:spec/redirect#exec-redirect-then-various-builtins
+stdout: "done\n"
+---
+exec 5>$TMP/log.txt
+echo hi >&5
+set -o >&5
+echo done

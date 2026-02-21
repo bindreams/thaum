@@ -1,0 +1,38 @@
+name: SetValue scope and shopt --unset dynamic_scope
+dialect: bash
+source: oils:spec/ysh-scope#setvalue-scope-and-shopt---unset-dynamicscope
+stdout: "x=stack\n---\nf x=f\np x=stack\nfunset x=stack\n---\nx=global\n"
+---
+shopt --set parse_proc
+
+f() {
+  x=f
+}
+
+proc p {
+  var x = 'p'
+}
+
+demo() {
+  local x=stack
+  echo x=$x
+  echo ---
+
+  f
+  echo f x=$x
+
+  x=stack
+  p
+  echo p x=$x
+
+  shopt --unset dynamic_scope
+  x=stack
+  f
+  echo funset x=$x
+}
+
+x=global
+demo
+
+echo ---
+echo x=$x

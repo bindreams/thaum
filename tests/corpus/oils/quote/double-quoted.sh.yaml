@@ -1,0 +1,6 @@
+name: Double-quoted
+dialect: bash
+source: oils:spec/quote#double-quoted
+stdout: "double   quoted\n"
+---
+echo "double   quoted"

@@ -1,0 +1,7 @@
+name: All elements quoted
+dialect: bash
+source: oils:spec/array#all-elements-quoted
+stdout: "['1', '2 3']\n"
+---
+a=(1 '2 3')
+argv.py "${a[@]}"

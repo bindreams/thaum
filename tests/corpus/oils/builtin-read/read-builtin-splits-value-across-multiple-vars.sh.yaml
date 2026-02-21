@@ -1,0 +1,12 @@
+name: read builtin splits value across multiple vars
+dialect: bash
+source: oils:spec/builtin-read#read-builtin-splits-value-across-multiple-vars
+status: 0
+stdout: "[A/B/C D E]\n"
+---
+# NOTE: there are TABS below
+read x y z <<EOF
+A		B C D E 
+FG
+EOF
+echo "[$x/$y/$z]"

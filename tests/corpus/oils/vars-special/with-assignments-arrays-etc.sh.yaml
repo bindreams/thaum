@@ -1,0 +1,28 @@
+name: $_ with assignments, arrays, etc.
+dialect: bash
+source: oils:spec/vars-special#with-assignments-arrays-etc
+stdout: "colon [foo]\nbare assign []\ndeclare [s=bar]\narray []\ndeclare array [a]\n\
+  declare flag [d]\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+: foo
+echo "colon [$_]"
+
+s=bar
+echo "bare assign [$_]"
+
+# zsh uses declare; bash uses s=bar
+declare s=bar
+echo "declare [$_]"
+
+# zsh remains s:declare, bash resets it
+a=(1 2)
+echo "array [$_]"
+
+# zsh sets it to declare, bash uses the LHS a
+declare a=(1 2)
+echo "declare array [$_]"
+
+declare -g d=(1 2)
+echo "declare flag [$_]"

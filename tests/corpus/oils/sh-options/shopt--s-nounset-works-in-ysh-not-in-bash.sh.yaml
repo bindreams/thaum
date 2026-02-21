@@ -1,0 +1,16 @@
+name: shopt -s nounset works in YSH, not in bash
+dialect: bash
+source: oils:spec/sh-options#shopt--s-nounset-works-in-ysh-not-in-bash
+stdout: "status=0\nset -o nounset\n"
+---
+case $SH in
+  *dash|*mksh)
+    echo N-I
+    exit
+    ;;
+esac
+shopt -s nounset
+echo status=$?
+
+# get rid of extra space in bash output
+set -o | grep nounset | sed 's/[ \t]\+/ /g'

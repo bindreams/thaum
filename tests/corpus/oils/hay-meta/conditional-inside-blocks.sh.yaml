@@ -1,0 +1,33 @@
+name: Conditional Inside Blocks
+dialect: bash
+source: oils:spec/hay-meta#conditional-inside-blocks
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Rule
+
+const DEBUG = true
+
+Rule one {
+  if (DEBUG) {
+    deps = 'foo'
+  } else {
+    deps = 'bar'
+  }
+}
+
+json write (_hay()) | jq '.children[0]' > actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "type": "Rule",
+  "args": [
+    "one"
+  ],
+  "children": [],
+  "attrs": {
+    "deps": "foo"
+  }
+}
+EOF

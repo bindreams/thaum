@@ -1,0 +1,17 @@
+name: printf %b does backslash escaping
+dialect: bash
+source: oils:spec/builtin-printf#printf-b-does-backslash-escaping
+stdout: "[\\044]\n[$]\n\n[\\x7e]\n[~]\n\n[\\A]\n[\\A]\n"
+---
+
+printf '[%s]\n' '\044'  # escapes not evaluated
+printf '[%b]\n' '\044'  # YES, escapes evaluated
+echo
+
+printf '[%s]\n' '\x7e'  # escapes not evaluated
+printf '[%b]\n' '\x7e'  # YES, escapes evaluated
+echo
+
+# not a valid escape
+printf '[%s]\n' '\A'
+printf '[%b]\n' '\A'

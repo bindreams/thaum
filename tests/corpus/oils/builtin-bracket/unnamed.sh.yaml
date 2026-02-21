@@ -1,0 +1,7 @@
+name: ( )
+dialect: bash
+source: oils:spec/builtin-bracket#unnamed
+stdout: "status=0\n"
+---
+[ -z '' -a '(' ! -z x ')' ]
+echo status=$?

@@ -1,0 +1,9 @@
+name: 'Regression: ${!v} should be split'
+dialect: bash
+source: oils:spec/word-split#regression-v-should-be-split
+stdout: "\n5\n"
+---
+v=hello
+IFS=5
+echo ${#v}
+echo "${#v}"

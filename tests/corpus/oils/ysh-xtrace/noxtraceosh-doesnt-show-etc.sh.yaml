@@ -1,0 +1,14 @@
+name: no_xtrace_osh doesn't show [[ ]] etc.
+dialect: bash
+source: oils:spec/ysh-xtrace#noxtraceosh-doesnt-show-etc
+stdout: ''
+stderr: ". builtin cd /\n"
+---
+shopt -s ysh:upgrade
+set -x
+
+dir=/
+if [[ -d $dir ]]; then
+  (( a = 42 ))
+fi
+cd /

@@ -1,0 +1,61 @@
+name: hay eval Attr node, and JSON
+dialect: bash
+source: oils:spec/hay#hay-eval-attr-node-and-json
+stdout: "diff 0\n"
+---
+shopt --set parse_brace parse_equals
+
+hay define Package User
+
+hay eval :result {
+  Package foo {
+    # not doing floats now
+    int = 42
+    bool = true
+    mynull = null
+    mystr = $'spam\n'
+
+    mylist = [5, 'foo', {}]
+    # TODO: Dict literals need to be in insertion order!
+    #mydict = {alice: 10, bob: 20}
+  }
+
+  User alice
+}
+
+# Note: using jq to normalize
+json write (result) | jq . > out.txt
+
+diff -u - out.txt <<EOF
+{
+  "source": null,
+  "children": [
+    {
+      "type": "Package",
+      "args": [
+        "foo"
+      ],
+      "children": [],
+      "attrs": {
+        "int": 42,
+        "bool": true,
+        "mynull": null,
+        "mystr": "spam\n",
+        "mylist": [
+          5,
+          "foo",
+          {}
+        ]
+      }
+    },
+    {
+      "type": "User",
+      "args": [
+        "alice"
+      ]
+    }
+  ]
+}
+EOF
+
+echo "diff $?"

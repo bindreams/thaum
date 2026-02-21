@@ -1,0 +1,7 @@
+name: _this_dir not affected by 'cd'
+dialect: bash
+source: oils:spec/ysh-special-vars#thisdir-not-affected-by-cd
+stdout: "hi from this_dir.ysh\n$_this_dir = REPLACED/oils/spec/testdata/module\n"
+---
+cd /tmp
+source $[ENV.REPO_ROOT]/spec/testdata/module/this_dir.ysh

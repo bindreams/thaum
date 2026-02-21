@@ -1,0 +1,6 @@
+name: nested and double brace expansion
+dialect: bash
+source: oils:spec/brace-expansion#nested-and-double-brace-expansion
+stdout: "-A- -=ac=- -=ad=- -=bc=- -=bd=- -B-\n"
+---
+echo -{A,={a,b}{c,d}=,B}-

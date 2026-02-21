@@ -1,0 +1,22 @@
+name: wait for N parallel jobs and check failure
+dialect: bash
+source: oils:spec/background#wait-for-n-parallel-jobs-and-check-failure
+stdout: "1\n2\n3\nstatus=3\nstatus=2\nstatus=1\n"
+---
+
+set -o errexit
+
+pids=''
+for i in 3 2 1; do
+  { sleep 0.0$i; echo $i; exit $i; } &
+  pids="$pids $!"
+done
+
+for pid in $pids; do
+  set +o errexit
+  wait $pid
+  status=$?
+  set -o errexit
+
+  echo status=$status
+done

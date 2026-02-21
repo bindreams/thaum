@@ -1,0 +1,10 @@
+name: slice of @ and @ - http://landley.net/notes.html#23-04-2020
+dialect: bash
+source: oils:spec/toysh#slice-of-and---httplandleynetnoteshtml23-04-2020
+stdout: "=ef=\n=gh=\n=ij=\n=kl=\n=mn=\n=ef gh ij kl mn=\n"
+---
+IFS=x; X=x; eval abc=a${X}b
+
+chicken() { for i in "${@:3:5}"; do echo =$i=; done; } ; chicken ab cd ef gh ij kl mn op qr
+
+chicken() { for i in "${*:3:5}"; do echo =$i=; done; } ; chicken ab cd ef gh ij kl mn op qr

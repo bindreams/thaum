@@ -1,0 +1,18 @@
+name: two different objects can share the same __invoke__
+dialect: bash
+source: oils:spec/ysh-proc#two-different-objects-can-share-the-same-invoke
+stdout: "sum = 9\nsum = 53\n"
+---
+shopt --set ysh:upgrade
+
+proc boundProc(; self, more) {
+  echo "sum = $[self.x + self.y + more]"
+}
+
+var methods = Object(null, {__invoke__: boundProc})
+
+var i1 = Object(methods, {x: 3, y: 5})
+var i2 = Object(methods, {x: 10, y: 42})
+
+i1 (1)
+i2 (1)

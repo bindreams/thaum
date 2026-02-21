@@ -1,0 +1,7 @@
+name: glob can expand to command and arg
+dialect: bash
+source: oils:spec/glob#glob-can-expand-to-command-and-arg
+stdout: "spec/testdata/echo.sz\n"
+---
+cd $REPO_ROOT
+spec/testdata/echo.s[hz]

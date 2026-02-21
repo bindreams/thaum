@@ -1,0 +1,13 @@
+name: 'set -e in function #2'
+dialect: bash
+source: oils:spec/errexit#set--e-in-function-2
+stdout: "should be executed\nshould be executed\n"
+---
+foo() {
+  set -e
+  false
+  echo "should be executed"
+}
+! foo
+
+echo "should be executed"

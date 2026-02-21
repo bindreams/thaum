@@ -1,0 +1,11 @@
+name: xtrace with tabs
+dialect: bash
+source: oils:spec/xtrace#xtrace-with-tabs
+stdout: "[\t]\n"
+stderr: "+ echo $'[\\t]'\n"
+---
+case $SH in dash) exit ;; esac
+
+set -o xtrace
+echo $'[\t]'
+# this is a bug because it's hard to see

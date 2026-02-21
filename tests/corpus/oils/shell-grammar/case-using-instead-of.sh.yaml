@@ -1,0 +1,12 @@
+name: 'case: Using ; instead of ;;'
+dialect: bash
+source: oils:spec/shell-grammar#case-using-instead-of
+status: 99
+---
+case word_a in
+  word_a)
+    ;
+  word_b)
+    echo
+    ;;
+esac

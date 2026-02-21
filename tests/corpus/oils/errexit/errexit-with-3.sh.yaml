@@ -1,0 +1,11 @@
+name: errexit with !
+dialect: bash
+source: oils:spec/errexit#errexit-with
+stdout: "one\ntwo\nthree\n"
+---
+set -o errexit
+echo one
+! true
+echo two
+! false
+echo three

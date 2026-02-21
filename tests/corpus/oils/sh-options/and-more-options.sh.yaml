@@ -1,0 +1,11 @@
+name: $- and more options
+dialect: bash
+source: oils:spec/sh-options#and-more-options
+stdout: "yes\nyes\nyes\nyes\n"
+---
+set -efuC
+o=$-
+[[ $o == *e* ]]; echo yes
+[[ $o == *f* ]]; echo yes
+[[ $o == *u* ]]; echo yes
+[[ $o == *C* ]]; echo yes

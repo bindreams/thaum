@@ -1,0 +1,9 @@
+name: Named file descriptor
+dialect: bash
+source: oils:spec/redirect#named-file-descriptor
+status: 0
+stdout: "named-fd-contents\n"
+---
+exec {myfd}> $TMP/named-fd.txt
+echo named-fd-contents >& $myfd
+cat $TMP/named-fd.txt

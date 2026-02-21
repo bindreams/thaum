@@ -1,0 +1,23 @@
+name: ${!prefix@} ${!prefix*} yields sorted array of var names
+dialect: bash
+source: oils:spec/var-op-bash#prefix-prefix-yields-sorted-array-of-var-names
+stdout: "['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO ZOOM']\n\
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n\
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO ZOOM']\n['Z
+  ZIP ZOO ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n"
+---
+ZOO=zoo
+ZIP=zip
+ZOOM='one two'
+Z='three four'
+
+z=lower
+
+argv.py ${!Z*}
+argv.py ${!Z@}
+argv.py "${!Z*}"
+argv.py "${!Z@}"
+for i in 1 2; do argv.py ${!Z*}  ; done
+for i in 1 2; do argv.py ${!Z@}  ; done
+for i in 1 2; do argv.py "${!Z*}"; done
+for i in 1 2; do argv.py "${!Z@}"; done

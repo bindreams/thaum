@@ -1,0 +1,10 @@
+name: 'fastlex: NUL byte inside shebang line'
+dialect: bash
+source: oils:spec/ysh-bugs#fastlex-nul-byte-inside-shebang-line
+stdout: "hi\n"
+---
+
+# Hm this test doesn't really tickle the bug
+
+echo b'#! /usr/bin/env \y00 sh \necho hi' > tmp.ysh
+env OILS_HIJACK_SHEBANG=1 $[ENV.SH] tmp.ysh

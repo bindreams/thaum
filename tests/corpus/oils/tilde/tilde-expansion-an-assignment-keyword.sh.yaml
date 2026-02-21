@@ -1,0 +1,11 @@
+name: tilde expansion an assignment keyword
+dialect: bash
+source: oils:spec/tilde#tilde-expansion-an-assignment-keyword
+stdout: "foo:/home/bar\n"
+---
+HOME=/home/bar
+f() {
+  local x=foo:~
+  echo $x
+}
+f

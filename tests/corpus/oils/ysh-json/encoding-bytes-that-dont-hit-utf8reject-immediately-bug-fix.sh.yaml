@@ -1,0 +1,21 @@
+name: Encoding bytes that don't hit UTF8_REJECT immediately (bug fix)
+dialect: bash
+source: 
+  oils:spec/ysh-json#encoding-bytes-that-dont-hit-utf8reject-immediately-bug-fix
+stdout: "b'\\yce'\ndeclare -- x=$'\\xce'\n\nb'\\ybc'\ndeclare -- y=$'\\xbc'\n\nb'\\\
+  yf0\\y9f\\ya4\\yff'\ndeclare -- z=$'\\xf0\\x9f\\xa4\\xff'\n"
+---
+
+var x = $'\xce'
+json8 write (x)
+declare -p x
+echo
+
+var y = $'\xbc'
+json8 write (y)
+declare -p y
+echo
+
+var z = $'\xf0\x9f\xa4\xff'
+json8 write (z)
+declare -p z

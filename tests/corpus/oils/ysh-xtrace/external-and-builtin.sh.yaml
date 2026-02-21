@@ -1,0 +1,19 @@
+name: external and builtin
+dialect: bash
+source: oils:spec/ysh-xtrace#external-and-builtin
+stdout: ''
+stderr: "| command 12345: env 'false'\n; process 12345: status 1\n. builtin 'true'\n\
+  . builtin set '+x'\n"
+---
+shopt --set ysh:upgrade
+shopt --unset errexit
+set -x
+
+{
+  env false
+  true
+  set +x
+} 2>err.txt
+
+# normalize PIDs, assumed to be 2 or more digits
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt >&2

@@ -1,0 +1,13 @@
+name: Minus operator is left associative
+dialect: bash
+source: oils:spec/ysh-expr-arith#minus-operator-is-left-associative
+stdout: "a=0 b=0\na=0 b=0\n"
+---
+
+var a = 1 - 0 - 1
+var b = (1 - 0) - 1
+echo a=$a b=$b
+
+var a = 3 - 1 - 2
+var b = (3 - 1) - 2
+echo a=$a b=$b

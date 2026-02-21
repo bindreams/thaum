@@ -1,0 +1,18 @@
+name: setvar to swap List and Dict elements
+dialect: bash
+source: oils:spec/ysh-assign#setvar-to-swap-list-and-dict-elements
+stdout: "1 2 3\n2 1 3\n42 1 3\n{\n  \"int\": 2\n}\n"
+---
+var x = [1, 2, 3]
+echo @x
+
+setvar x[0], x[1] = x[1], x[0]
+
+echo @x
+
+var d = {int: 42}
+
+setvar x[0], d.int = d.int, x[0]
+
+echo @x
+json write (d)

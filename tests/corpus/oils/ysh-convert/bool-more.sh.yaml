@@ -1,0 +1,8 @@
+name: bool() more
+dialect: bash
+source: oils:spec/ysh-convert#bool-more
+stdout: "false\ntrue\n"
+---
+var a = bool( :|| )
+var b = bool( :|foo| )
+write $a $b

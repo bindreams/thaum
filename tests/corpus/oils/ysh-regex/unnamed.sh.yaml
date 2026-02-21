@@ -1,0 +1,25 @@
+name: /^.$/
+dialect: bash
+source: oils:spec/ysh-regex#unnamed
+stdout: "pat=^.$\npat=^.$\nno\nyes\n"
+---
+shopt -s ysh:all
+var pat = ''
+
+setvar pat = /^.$/
+echo pat=$pat
+
+setvar pat = /%start dot %end/
+echo pat=$pat
+
+if ('' ~ pat) {  # ERE syntax
+  echo yes
+} else {
+  echo no
+}
+# $pat is same as pat
+if ('f' ~ pat) {  # ERE syntax
+  echo yes
+} else {
+  echo no
+}

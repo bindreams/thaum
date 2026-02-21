@@ -1,0 +1,21 @@
+name: Unquoted backslash escapes, as in J8 strings
+dialect: bash
+source: oils:spec/ysh-string#unquoted-backslash-escapes-as-in-j8-strings
+stdout: "(Str)   \"\\n\"\n(Str)   \"\\t\"\n(Str)   \"\\r\"\n(Str)   \"\\\"'\\\\\"\n\
+  backslash \\\nbackslash \\\n"
+---
+
+# everything except \b \f \n
+
+var nl = \n
+pp test_ (nl)
+
+var tab = \t
+pp test_ (tab)
+
+pp test_ (\r)
+
+pp test_ (\" ++ \' ++ \\)
+
+echo backslash $[\\]
+echo "backslash $[\\]"

@@ -1,0 +1,17 @@
+name: printf %d with + prefix (positive sign)
+dialect: bash
+source: oils:spec/builtin-printf#printf-d-with-prefix-positive-sign
+stdout: "decimal\n42\noctal\n63\nhex lowercase\n171\nhex uppercase\n171\n"
+---
+
+echo decimal
+printf '%d\n' +42
+
+echo octal
+printf '%d\n' +077
+
+echo hex lowercase
+printf '%d\n' +0xab
+
+echo hex uppercase
+printf '%d\n' +0XAB

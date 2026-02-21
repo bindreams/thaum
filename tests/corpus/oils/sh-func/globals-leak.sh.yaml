@@ -1,0 +1,10 @@
+name: Globals leak
+dialect: bash
+source: oils:spec/sh-func#globals-leak
+stdout: "f_var\n"
+---
+f() {
+  f_var=f_var
+}
+f
+echo $f_var

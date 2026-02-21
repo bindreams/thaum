@@ -1,0 +1,10 @@
+name: Alias and command sub (bug regression)
+dialect: bash
+source: oils:spec/alias#alias-and-command-sub-bug-regression
+stdout: "['foo', 'bar']\n"
+---
+cd $TMP
+shopt -s expand_aliases
+echo foo bar > tmp.txt
+alias a=argv.py
+a `cat tmp.txt`

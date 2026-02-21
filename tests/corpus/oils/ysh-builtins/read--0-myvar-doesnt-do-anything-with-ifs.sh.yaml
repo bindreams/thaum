@@ -1,0 +1,12 @@
+name: read -0 myvar doesn't do anything with IFS
+dialect: bash
+source: oils:spec/ysh-builtins#read--0-myvar-doesnt-do-anything-with-ifs
+stdout: "[./foo bar  ]\n[./foo bar  ]\n"
+---
+
+touch 'foo bar  '
+find -type f -print0 | read -0 
+echo "[$REPLY]"
+
+find -type f -print0 | read -0 myvar
+echo "[$myvar]"

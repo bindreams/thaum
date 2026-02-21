@@ -1,0 +1,13 @@
+name: io->eval() with exit
+dialect: bash
+source: oils:spec/ysh-method-io#io-eval-with-exit
+stdout: "one\n"
+---
+
+var c = ^(echo one; exit; echo two)
+
+try {
+  call io->eval(c)
+}
+echo 'we do not get here'
+pp test_ (_error)

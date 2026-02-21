@@ -1,0 +1,10 @@
+name: 'Regression: "${!v*}"x should not be split'
+dialect: bash
+source: oils:spec/word-split#regression-vx-should-not-be-split
+stdout: "axb\naxbx\n"
+---
+case $SH in dash|mksh|ash|yash) exit 99;; esac
+IFS=x
+axb=1
+echo "${!axb*}"
+echo "${!axb*}"x

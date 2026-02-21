@@ -1,0 +1,32 @@
+name: Iteration Inside Block
+dialect: bash
+source: oils:spec/hay-meta#iteration-inside-block
+stdout: "\n"
+---
+shopt --set ysh:all
+
+hay define Rule
+
+Rule foo {
+  var d = {}
+  # private var with _
+  for name_ in spam eggs ham {
+    setvar d[name_] = true
+  }
+}
+
+json write (_hay()) | jq '.children[0].attrs' > actual.txt
+
+# For loop name leaks!  Might want to make it "name_" instead!
+
+#cat actual.txt
+
+diff -u - actual.txt <<EOF
+{
+  "d": {
+    "spam": true,
+    "eggs": true,
+    "ham": true
+  }
+}
+EOF

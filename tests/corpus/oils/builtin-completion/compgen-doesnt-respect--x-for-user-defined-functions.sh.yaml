@@ -1,0 +1,20 @@
+name: compgen doesn't respect -X for user-defined functions
+dialect: bash
+source: 
+  oils:spec/builtin-completion#compgen-doesnt-respect--x-for-user-defined-functions
+stdout: "one\nthree\n--\ntwo\nbin\n"
+---
+# WORKAROUND: wrap in bash -i -c because non-interactive bash behaves
+# differently!
+case $SH in
+  *bash|*osh)
+    $SH --rcfile /dev/null -i -c '
+shopt -s extglob
+fun() {
+  COMPREPLY=(one two three bin)
+}
+compgen -X "@(two|bin)" -F fun
+echo --
+compgen -X "!@(two|bin)" -F fun
+'
+esac

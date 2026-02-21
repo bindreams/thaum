@@ -1,0 +1,8 @@
+name: Dynamic var names - result of runtime parse/eval
+dialect: bash
+source: oils:spec/arith#dynamic-var-names---result-of-runtime-parseeval
+stdout: "11\n"
+---
+foo=5
+x=oo
+echo $(( foo + f$x + 1 ))

@@ -1,0 +1,18 @@
+name: splice and stringify array
+dialect: bash
+source: oils:spec/ysh-list#splice-and-stringify-array
+status: 1
+stdout: "['a b', 'c']\n"
+---
+shopt --set parse_at
+shopt --unset no_osh_builtins
+
+var x = :| 'a b' c |
+
+declare -a array=( @x )
+
+argv.py "${array[@]}"  # should work
+
+echo -$array-  # fails because of strict_arraywith type error
+
+echo -$x-  # fails with type error

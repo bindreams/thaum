@@ -1,0 +1,14 @@
+name: simple_word_eval and strict_array conflict over globs
+dialect: bash
+source: oils:spec/ysh-options#simplewordeval-and-strictarray-conflict-over-globs
+status: 1
+stdout: "['foo.txt']\n['foo.txt']\n"
+---
+touch foo.txt bar.txt
+set -- f
+
+argv.py "$@"*.txt
+shopt -s simple_word_eval
+argv.py "$@"*.txt
+shopt -s strict_array
+argv.py "$@"*.txt

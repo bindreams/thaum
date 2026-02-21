@@ -1,0 +1,12 @@
+name: Return statement
+dialect: bash
+source: oils:spec/sh-func#return-statement
+status: 42
+stdout: "one\n"
+---
+f() {
+  echo one
+  return 42
+  echo two
+}
+f

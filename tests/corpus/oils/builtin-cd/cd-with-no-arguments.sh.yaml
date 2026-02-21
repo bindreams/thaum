@@ -1,0 +1,9 @@
+name: cd with no arguments
+dialect: bash
+source: oils:spec/builtin-cd#cd-with-no-arguments
+stdout: "OK\n"
+---
+HOME=$TMP/home
+mkdir -p $HOME
+cd
+test $(pwd) = "$HOME" && echo OK

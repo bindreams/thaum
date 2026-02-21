@@ -1,0 +1,6 @@
+name: Omitting ( )
+dialect: bash
+source: oils:spec/regex#omitting
+stdout: "true\n"
+---
+[[ '^a b$' == ^a\ b$ ]] && echo true

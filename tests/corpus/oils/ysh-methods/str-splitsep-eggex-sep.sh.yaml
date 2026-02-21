@@ -1,0 +1,11 @@
+name: Str => split(sep), eggex sep
+dialect: bash
+source: oils:spec/ysh-methods#str-splitsep-eggex-sep
+stdout: "(List)   [\"a\",\"b\",\"c\"]\n(List)   [\"\",\"\",\"\"]\n(List)   [\"a\"\
+  ,\"b\",\"c<d\"]\n(List)   [\"a\",\"b\",\"cd\"]\n(List)   []\n"
+---
+pp test_ ('a,b;c'.split(/ ',' | ';' /))
+pp test_ ('aa'.split(/ dot /))
+pp test_ ('a<>b@@c<d'.split(/ '<>' | '@@' /))
+pp test_ ('a b  cd'.split(/ space+ /))
+pp test_ (''.split(/ dot /))

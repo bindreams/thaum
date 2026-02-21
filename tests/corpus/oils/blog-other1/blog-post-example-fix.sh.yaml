@@ -1,0 +1,11 @@
+name: Blog Post Example Fix
+dialect: bash
+source: oils:spec/blog-other1#blog-post-example-fix
+stdout: "/foo\n/bar\n/baz\n"
+---
+paths=`tr '\n' ':' | sed -e 's/:$//'<<EOPATHS
+/foo
+/bar
+/baz
+EOPATHS`
+echo "$paths"

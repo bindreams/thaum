@@ -1,0 +1,7 @@
+name: '[[ has quote joining'
+dialect: bash
+source: oils:spec/dbracket#has-quote-joining
+stdout: "true\n"
+---
+var='one two'
+[[ 'one 'tw"o" == $var ]] && echo true

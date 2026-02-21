@@ -1,0 +1,7 @@
+name: sh -c
+dialect: bash
+source: oils:spec/sh-usage#sh--c
+status: 0
+stdout: "hi\n"
+---
+$SH -c 'echo hi'

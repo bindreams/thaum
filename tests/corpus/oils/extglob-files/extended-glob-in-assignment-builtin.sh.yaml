@@ -1,0 +1,14 @@
+name: Extended glob in assignment builtin
+dialect: bash
+source: oils:spec/extglob-files#extended-glob-in-assignment-builtin
+stdout: "status=2\n"
+---
+
+# Another invocation of _EvalWordToParts() that OSH should handle
+
+shopt -s extglob
+mkdir -p eg9
+cd eg9
+touch {foo,bar}.py
+typeset -@(*.py) myvar
+echo status=$?

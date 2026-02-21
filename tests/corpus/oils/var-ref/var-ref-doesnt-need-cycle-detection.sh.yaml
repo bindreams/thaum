@@ -1,0 +1,13 @@
+name: var ref doesn't need cycle detection
+dialect: bash
+source: oils:spec/var-ref#var-ref-doesnt-need-cycle-detection
+status: 1
+stdout: "cycle=x\n"
+---
+x=y
+y=x
+echo cycle=${!x}
+
+typeset -n a=b
+typeset -n b=a
+echo cycle=${a}

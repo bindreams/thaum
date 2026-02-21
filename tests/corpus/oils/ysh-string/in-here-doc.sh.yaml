@@ -1,0 +1,12 @@
+name: "''' in Here Doc"
+dialect: bash
+source: oils:spec/ysh-string#in-here-doc
+stdout: "\\u{61}\n'' '\n'\ntwo = $two\n"
+---
+
+tac <<< '''
+  two = $two
+  '
+  '' '
+  \u{61}
+  '''

@@ -1,0 +1,11 @@
+name: type -t control flow
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t-control-flow
+stdout: "builtin\nbuiltin\nbuiltin\nbuiltin\n"
+---
+type -t break continue return exit
+
+
+# In OSH, tye are now keywords AND dynamic builtins
+#
+# We MAY make them builtins in OSH, and keywords in YSH

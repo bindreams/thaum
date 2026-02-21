@@ -1,0 +1,7 @@
+name: Case with last dsemi on same line
+dialect: bash
+source: oils:spec/shell-grammar#case-with-last-dsemi-on-same-line
+---
+case word_a in
+  word_b) echo ;;
+esac

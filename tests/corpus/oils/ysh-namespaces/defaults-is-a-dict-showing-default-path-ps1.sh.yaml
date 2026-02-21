@@ -1,0 +1,9 @@
+name: __defaults__ is a Dict, showing default PATH, PS1
+dialect: bash
+source: oils:spec/ysh-namespaces#defaults-is-a-dict-showing-default-path-ps1
+stdout: "(Str)   \"Dict\"\n"
+---
+
+pp test_ (type(__defaults__))
+
+pp test_ (__defaults__)

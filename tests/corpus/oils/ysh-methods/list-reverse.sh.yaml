@@ -1,0 +1,22 @@
+name: List->reverse()
+dialect: bash
+source: oils:spec/ysh-methods#list-reverse
+stdout: "(List)   []\n(List)   [0]\n(List)   [3,1,2]\n(List)   [\"world\",\"hello\"\
+  ]\n"
+---
+
+var empty = []
+
+var a = [0]
+var b = [2, 1, 3]
+var c = :| hello world |
+
+call empty->reverse()
+call a->reverse()
+call b->reverse()
+call c->reverse()
+
+pp test_ (empty)
+pp test_ (a)
+pp test_ (b)
+pp test_ (c)

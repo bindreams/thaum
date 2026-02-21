@@ -1,0 +1,9 @@
+name: Initializing indexed array with ([index]=value)
+dialect: bash
+source: oils:spec/array-sparse#initializing-indexed-array-with-indexvalue
+stdout: "status=0\n['3']\n"
+---
+case $SH in mksh) exit 99 ;; esac
+declare -a a=([xx]=1 [yy]=2 [zz]=3)
+echo status=$?
+argv.py "${a[@]}"

@@ -1,0 +1,9 @@
+name: glob() function should be retired in favor of io.glob()
+dialect: bash
+source: 
+  oils:spec/ysh-TODO-deprecate#glob-function-should-be-retired-in-favor-of-ioglob
+stdout: "\n"
+---
+
+touch -- foo
+pp test_ (glob('*'))

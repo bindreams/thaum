@@ -1,0 +1,24 @@
+name: Can't x+= on other YSH types
+dialect: bash
+source: oils:spec/ysh-with-sh#cant-x-on-other-ysh-types
+stdout: "eggex 1\nDict 1\nBashAssoc 1\n"
+---
+
+$SH -c '
+var x = /d+/
+x+=1
+'
+echo eggex $?
+
+$SH -c '
+var d = {}
+d+=1
+'
+echo Dict $?
+
+# This is unspecified for now, could try to match bash
+$SH -c '
+declare -A A=()
+A+=1
+'
+echo BashAssoc $?

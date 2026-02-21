@@ -1,0 +1,25 @@
+name: Parsing source code - YSH source code rejects encoded string
+dialect: bash
+source: 
+  oils:spec/ysh-unicode#parsing-source-code---ysh-source-code-rejects-encoded-string
+stdout: "\n"
+---
+
+max=$(bash <<'EOF'
+echo $'\U0010ffff'
+EOF
+)
+
+# bash allows the bad one
+too_big=$(bash <<'EOF'
+echo $'\U00110000'
+EOF
+)
+
+echo "var x = u'"$max"'; = x" | $SH
+echo status=$?
+#pp test_ (_reply)
+
+echo "var x = u'"$too_big"'; = x" | $SH
+echo status=$?
+#pp test_ (_reply)

@@ -1,0 +1,8 @@
+name: complete -o -F (git)
+dialect: bash
+source: oils:spec/builtin-completion#complete--o--f-git
+status: 0
+---
+foo() { echo foo; }
+wrapper=foo
+complete -o default -o nospace -F $wrapper git

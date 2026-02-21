@@ -1,0 +1,19 @@
+name: decode integer larger than 2^64
+dialect: bash
+source: oils:spec/ysh-json#decode-integer-larger-than-264
+stdout: "status=1\nstatus=1\nok\n"
+---
+
+$SH <<'EOF'
+json read <<< '123456789123456789123456789'
+echo status=$?
+pp test_ (_reply)
+EOF
+
+$SH <<'EOF'
+json read <<< '-123456789123456789123456789'
+echo status=$?
+pp test_ (_reply)
+EOF
+
+echo ok

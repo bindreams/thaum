@@ -1,0 +1,14 @@
+name: "fastlex: PS1 format string that's incomplete / with NUL byte"
+dialect: bash
+source: oils:spec/bugs#fastlex-ps1-format-string-thats-incomplete-with-nul-byte
+stdout: "x=\\D{%H:%M\n"
+---
+case $SH in bash) exit ;; esac
+
+x=$'\\D{%H:%M'  # leave off trailing }
+echo x=${x@P}
+
+
+# bash just ignores the missing }
+
+# These shells don't understand @P

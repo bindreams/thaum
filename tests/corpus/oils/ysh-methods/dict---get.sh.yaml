@@ -1,0 +1,10 @@
+name: Dict -> get()
+dialect: bash
+source: oils:spec/ysh-methods#dict---get
+status: 0
+stdout: "(Str)   \"Hitchhiker's Guide\"\n(Int)   1979\n(Str)   \"\"\n"
+---
+var book = {title: "Hitchhiker's Guide", published: 1979}
+pp test_ (book => get("title", ""))
+pp test_ (book => get("published", 0))
+pp test_ (book => get("author", ""))

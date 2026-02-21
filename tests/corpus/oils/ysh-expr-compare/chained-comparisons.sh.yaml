@@ -1,0 +1,19 @@
+name: Chained Comparisons
+dialect: bash
+source: oils:spec/ysh-expr-compare#chained-comparisons
+stdout: "123\n123\nno\n"
+---
+shopt -s ysh:upgrade
+
+if (1 < 2 < 3) {
+  echo '123'
+}
+if (1 < 2 <= 2 <= 3 < 4) {
+  echo '123'
+}
+
+if (1 < 2 < 2) {
+  echo '123'
+} else {
+  echo 'no'
+}

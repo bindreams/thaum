@@ -1,0 +1,21 @@
+name: json8 accepts j"" prefix, but json doesn't
+dialect: bash
+source: oils:spec/ysh-json#json8-accepts-j-prefix-but-json-doesnt
+stdout: "json=1\n\njson8=0\n(Str)   \"foo\\nbar\"\n\njson8=0\n(Str)   \"A\"\n"
+---
+
+var msg = r'j"foo\nbar"'
+
+echo "$msg" | json read
+echo json=$?
+echo
+
+echo "$msg" | json8 read
+echo json8=$?
+pp test_ (_reply)
+echo
+
+var msg = r'j"\u0041"'
+echo "$msg" | json8 read
+echo json8=$?
+pp test_ (_reply)

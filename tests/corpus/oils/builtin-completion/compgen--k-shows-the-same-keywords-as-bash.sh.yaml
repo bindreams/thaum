@@ -1,0 +1,19 @@
+name: compgen -k shows the same keywords as bash
+dialect: bash
+source: oils:spec/builtin-completion#compgen--k-shows-the-same-keywords-as-bash
+stdout: "!\n[[\n]]\ncase\ndo\ndone\nelif\nelse\nesac\nfi\nfor\nfunction\nif\nin\n\
+  then\ntime\nuntil\nwhile\n{\n}\n"
+---
+
+# bash adds ]] and } and coproc
+
+# Use bash as an oracle
+bash -c 'compgen -k' | sort > bash.txt
+
+# osh vs. bash, or bash vs. bash
+$SH -c 'compgen -k' | sort > this-shell.txt
+
+#comm bash.txt this-shell.txt
+
+# show lines in both files
+comm -12 bash.txt this-shell.txt | egrep -v 'coproc|select'

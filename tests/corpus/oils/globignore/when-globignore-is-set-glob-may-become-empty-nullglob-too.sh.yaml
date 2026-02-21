@@ -1,0 +1,15 @@
+name: When GLOBIGNORE is set, glob may become empty (nullglob too)
+dialect: bash
+source: 
+  oils:spec/globignore#when-globignore-is-set-glob-may-become-empty-nullglob-too
+stdout: "-foo.txt foo.txt\n*t\nnullglob\n"
+---
+touch -- foo.txt -foo.txt
+
+echo *t
+
+GLOBIGNORE=*.txt
+echo *t
+
+shopt -s nullglob
+echo nullglob *t

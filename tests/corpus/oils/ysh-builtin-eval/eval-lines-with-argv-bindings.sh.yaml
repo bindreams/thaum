@@ -1,0 +1,31 @@
+name: eval lines with argv bindings
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-lines-with-argv-bindings
+stdout: "b a\nd c\nb a mylocal\nd c mylocal\n\nb a local2\nd c local2\n"
+---
+proc my-split (;;; block) {
+  while read --raw-line {
+    var cols = split(_reply)
+    call io->eval(block, pos_args=cols)
+  }
+}
+
+printf 'a b\nc d\n' | my-split {
+  echo "$2 $1"
+}
+
+printf 'a b\nc d\n' | my-split {
+  var mylocal = 'mylocal'
+  echo "$2 $1 $mylocal"
+}
+
+# Now do the same thing inside a proc
+proc p {
+  printf 'a b\nc d\n' | my-split {
+    var local2 = 'local2'
+    echo "$2 $1 $local2"
+  }
+}
+
+echo
+p

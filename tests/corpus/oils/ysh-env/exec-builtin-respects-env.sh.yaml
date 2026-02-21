@@ -1,0 +1,14 @@
+name: exec builtin respects ENV
+dialect: bash
+source: oils:spec/ysh-env#exec-builtin-respects-env
+stdout: "child ZZ=zz\nexec ZZ=zz\n"
+---
+
+shopt --set ysh:upgrade
+
+#export ZZ=zzz
+setglobal ENV.ZZ = 'zz'
+
+env sh -c 'echo child ZZ=$ZZ'
+
+exec env sh -c 'echo exec ZZ=$ZZ'

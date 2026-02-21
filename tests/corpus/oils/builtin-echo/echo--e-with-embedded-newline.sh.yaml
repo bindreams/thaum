@@ -1,0 +1,10 @@
+name: echo -e with embedded newline
+dialect: bash
+source: oils:spec/builtin-echo#echo--e-with-embedded-newline
+stdout: "foo\nbar\n"
+---
+flags='-e'
+case $SH in dash) flags='' ;; esac
+
+echo $flags 'foo
+bar'

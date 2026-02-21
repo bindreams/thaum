@@ -1,0 +1,12 @@
+name: noglob
+dialect: bash
+source: oils:spec/extglob-files#noglob
+stdout: "@(*)\n@(__nope__*|__nope__?|*|?|[:alpha:]||)\n"
+---
+shopt -s extglob
+mkdir -p _noglob
+cd _noglob
+
+set -o noglob
+echo @(*)
+echo @(__nope__*|__nope__?|'*'|'?'|'[:alpha:]'|'|')

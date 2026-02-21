@@ -1,0 +1,16 @@
+name: typeset -p
+dialect: bash
+source: oils:spec/assign-extended#typeset--p
+stdout: "1\n1\n0\n## BUG mksh STDOUT:\n# mksh doesn't respect exit codes\n0\n0\n0\n"
+---
+var1() { echo func; }  # function names are NOT found.
+typeset -p var1 var2 >/dev/null
+echo $?
+
+var1=x
+typeset -p var1 var2 >/dev/null
+echo $?
+
+var2=y
+typeset -p var1 var2 >/dev/null
+echo $?

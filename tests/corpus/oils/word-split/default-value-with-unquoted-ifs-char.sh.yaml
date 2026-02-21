@@ -1,0 +1,7 @@
+name: default value with unquoted IFS char
+dialect: bash
+source: oils:spec/word-split#default-value-with-unquoted-ifs-char
+stdout: "['12_3x', 'x4_56']\n"
+---
+IFS=_
+argv.py 1${undefined:-"2_3"x_x"4_5"}6

@@ -1,0 +1,18 @@
+name: fromJson() fromJson8()
+dialect: bash
+source: oils:spec/ysh-json#fromjson-fromjson8
+status: 4
+stdout: "(List)   [42,1.5,null,true,\"hi\"]\n(List)   [42,1.5,null,true,\"hi\"]\n\
+  (List)   [42,1.5,null,true,\"hi\",\"\"]\n"
+---
+
+var m1 = '[42,1.5,null,true,"hi"]'
+
+# JSON8 message
+var m2 = '[42,1.5,null,true,"hi",' ++ "u''" ++ ']'
+
+pp test_ (fromJson8(m1))
+pp test_ (fromJson(m1))
+
+pp test_ (fromJson8(m2))
+pp test_ (fromJson(m2))  # fails

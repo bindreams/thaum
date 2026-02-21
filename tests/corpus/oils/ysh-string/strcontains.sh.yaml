@@ -1,0 +1,17 @@
+name: str.contains()
+dialect: bash
+source: oils:spec/ysh-string#strcontains
+status: 0
+---
+
+var mystr = 'abcaz'
+
+assert [true === mystr.contains('b')]
+assert [true === mystr.contains('z')]
+assert [false === mystr.contains('y')]
+# test with chars taking up two bytes
+assert [true === 'абаба'.contains('б')]
+assert [true === 'абаба'.contains('аб')]
+assert [true === 'абаба'.contains('')]
+assert [false === 'абаба'.contains('a')]
+assert [false === 'абаба'.contains('бабаба')]

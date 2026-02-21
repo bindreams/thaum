@@ -1,0 +1,28 @@
+name: Integer Division (rounds toward zero)
+dialect: bash
+source: oils:spec/ysh-expr-arith#integer-division-rounds-toward-zero
+stdout: "(Int)   2\n(Int)   -2\n(Int)   -2\n(Int)   2\n---\n(Int)   4\n(Int)   -4\n\
+  (Int)   -4\n(Int)   4\n"
+---
+pp test_ (5//2)
+pp test_ (-5//2)
+pp test_ (5//-2)
+pp test_ (-5//-2)
+
+echo ---
+
+var x = 9
+setvar x //= 2
+pp test_ (x)
+
+var x = -9
+setvar x //= 2
+pp test_ (x)
+
+var x = 9
+setvar x //= -2
+pp test_ (x)
+
+var x = -9
+setvar x //= -2
+pp test_ (x)

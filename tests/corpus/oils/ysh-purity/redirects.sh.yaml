@@ -1,0 +1,17 @@
+name: Redirects
+dialect: bash
+source: oils:spec/ysh-purity#redirects
+stdout: "TODO\n"
+---
+shopt --set ysh:upgrade
+
+hay define Package
+var cmd = ^( Package foo > out.txt )
+call io->eval(cmd)
+rm -v out.txt
+
+try {
+  call eval(cmd)
+}
+# not created, but there's also no error?
+# oh it's because of the PureExecutor

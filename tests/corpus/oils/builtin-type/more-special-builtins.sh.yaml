@@ -1,0 +1,13 @@
+name: more special builtins
+dialect: bash
+source: oils:spec/builtin-type#more-special-builtins
+stdout: ". is a special shell builtin\nsource is a shell builtin\n"
+---
+case $SH in bash|zsh|dash) exit ;; esac
+
+type .
+type source
+
+# no agreement here!
+# type local
+# type typeset

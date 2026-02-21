@@ -1,0 +1,6 @@
+name: Length of undefined variable
+dialect: bash
+source: oils:spec/var-op-len#length-of-undefined-variable
+stdout: "0\n"
+---
+echo ${#undef}

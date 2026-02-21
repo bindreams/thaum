@@ -1,0 +1,9 @@
+name: cd - without OLDPWD
+dialect: bash
+source: oils:spec/builtin-cd#cd---without-oldpwd
+stdout: "status=1\n"
+---
+
+cd - > /dev/null  # silence dash output
+echo status=$?
+#pwd

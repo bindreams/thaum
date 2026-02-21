@@ -1,0 +1,9 @@
+name: shopt -s failglob in command context
+dialect: bash
+source: oils:spec/glob-bash#shopt--s-failglob-in-command-context
+stdout: "['*.ZZ']\nstatus=1\n"
+---
+argv.py *.ZZ
+shopt -s failglob
+argv.py *.ZZ  # nothing is printed, not []
+echo status=$?

@@ -1,0 +1,8 @@
+name: set -u -- clears argv
+dialect: bash
+source: oils:spec/builtin-set#set--u----clears-argv
+stdout: "\n"
+---
+set a b c
+set -u -- # shouldn't touch argv
+echo "$@"

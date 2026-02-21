@@ -1,0 +1,6 @@
+name: glob backslash escape
+dialect: bash
+source: oils:spec/glob#glob-backslash-escape
+stdout: "*.sh\n"
+---
+echo \*.sh

@@ -1,0 +1,8 @@
+name: top-level break/continue/return (without strict_control_flow)
+dialect: bash
+source: oils:spec/loop#top-level-breakcontinuereturn-without-strictcontrolflow
+stdout: "break=0\ncontinue=0\n"
+---
+$SH -c 'break; echo break=$?'
+$SH -c 'continue; echo continue=$?'
+$SH -c 'return; echo return=$?'

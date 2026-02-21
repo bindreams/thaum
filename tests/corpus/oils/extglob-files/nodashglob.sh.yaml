@@ -1,0 +1,14 @@
+name: no_dash_glob
+dialect: bash
+source: oils:spec/extglob-files#nodashglob
+stdout: "-dash bar foo\nbar foo\n"
+---
+shopt -s extglob
+mkdir -p opts
+cd opts
+
+touch -- foo bar -dash
+echo @(*)
+
+shopt --set no_dash_glob
+echo @(*)

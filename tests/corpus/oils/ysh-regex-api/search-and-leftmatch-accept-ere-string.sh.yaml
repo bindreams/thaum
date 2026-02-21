@@ -1,0 +1,19 @@
+name: search() and leftMatch() accept ERE string
+dialect: bash
+source: oils:spec/ysh-regex-api#search-and-leftmatch-accept-ere-string
+stdout: "g0 2 6 hi5-\ng1 2 4 hi\ng2 4 5 5\n---\ng0 0 4 hi5-\ng1 0 2 hi\ng2 2 3 5\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var s = '= hi5- bye6-'
+
+var m = s.search('([[:alpha:]]+)([[:digit:]]+)-')
+echo "g0 $[m.start(0)] $[m.end(0)] $[m.group(0)]"
+echo "g1 $[m.start(1)] $[m.end(1)] $[m.group(1)]"
+echo "g2 $[m.start(2)] $[m.end(2)] $[m.group(2)]"
+echo ---
+
+var m = s[2:].leftMatch('([[:alpha:]]+)([[:digit:]]+)-')
+echo "g0 $[m.start(0)] $[m.end(0)] $[m.group(0)]"
+echo "g1 $[m.start(1)] $[m.end(1)] $[m.group(1)]"
+echo "g2 $[m.start(2)] $[m.end(2)] $[m.group(2)]"

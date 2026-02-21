@@ -1,0 +1,12 @@
+name: Command Closures in a different module
+dialect: bash
+source: oils:spec/ysh-closures#command-closures-in-a-different-module
+stdout: "global!\nglobal local!\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/closure.ysh --pick {local,global}_block
+
+call io->eval(global_block)
+
+call io->eval(local_block())

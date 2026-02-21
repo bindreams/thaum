@@ -1,0 +1,24 @@
+name: op-test for ${!array} with array="a" and array="a[0]"
+dialect: bash
+source: oils:spec/var-op-test#op-test-for-array-with-arraya-and-arraya0
+stdout: "ref=a   : 'no-colon' 'with-colon'\nref=a[0]: 'no-colon' 'with-colon'\nref=a\
+  \   : '' 'with-colon'\nref=a[0]: '' 'with-colon'\nref=a   : '' 'with-colon'\nref=a[0]:
+  '' 'with-colon'\nref=a   : '' 'with-colon'\nref=a[0]: '' 'with-colon'\n"
+---
+case $SH in dash|mksh|zsh) exit ;; esac
+
+test-hyphen() {
+  ref='a'
+  echo "ref=a   : '${!ref-no-colon}' '${!ref:-with-colon}'"
+  ref='a[0]'
+  echo "ref=a[0]: '${!ref-no-colon}' '${!ref:-with-colon}'"
+}
+
+a=()
+test-hyphen
+a=("")
+test-hyphen
+a=("" "")
+test-hyphen
+IFS=
+test-hyphen

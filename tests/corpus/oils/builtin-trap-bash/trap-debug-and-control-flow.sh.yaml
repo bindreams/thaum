@@ -1,0 +1,15 @@
+name: trap DEBUG and control flow
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-and-control-flow
+stdout: "  [6]\n  [7]\nhello\n  [8]\n"
+---
+
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+while true; do
+  echo hello
+  break
+done

@@ -1,0 +1,17 @@
+name: Filename quoting
+dialect: bash
+source: oils:spec/ysh-usage#filename-quoting
+stdout: "no-quoting:1\n\"with spaces.sh\":1\nb'bad \\yff':1\n"
+---
+
+echo '(BAD' > no-quoting
+echo '(BAD' > 'with spaces.sh'
+echo '(BAD' > b'bad \yff'
+
+write -n '' > err.txt
+
+$[ENV.SH] no-quoting 2>>err.txt || true
+$[ENV.SH] 'with spaces.sh' 2>>err.txt || true
+$[ENV.SH] b'bad \yff' 2>>err.txt || true
+
+egrep --only-matching '^.*:1' err.txt

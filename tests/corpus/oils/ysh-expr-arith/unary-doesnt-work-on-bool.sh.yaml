@@ -1,0 +1,7 @@
+name: unary ~ doesn't work on bool
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary-doesnt-work-on-bool
+status: 3
+stdout: "\n"
+---
+= ~false

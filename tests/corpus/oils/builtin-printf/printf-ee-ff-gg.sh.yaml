@@ -1,0 +1,12 @@
+name: printf eE fF gG
+dialect: bash
+source: oils:spec/builtin-printf#printf-ee-ff-gg
+stdout: "[3.140000e+00]\n[3.140000E+00]\n[3.140000]\n[3.14]\n[3.14]\n"
+---
+printf '[%e]\n' 3.14
+printf '[%E]\n' 3.14
+printf '[%f]\n' 3.14
+# bash is the only one that implements %F?  Is it a synonym?
+#printf '[%F]\n' 3.14
+printf '[%g]\n' 3.14
+printf '[%G]\n' 3.14

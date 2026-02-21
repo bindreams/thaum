@@ -1,0 +1,14 @@
+name: 'Regression: Assigning with out-of-range negative index'
+dialect: bash
+source: oils:spec/array#regression-assigning-with-out-of-range-negative-index
+status: 1
+stdout: "\n"
+stderr: "  a[-1]=1\n  ^~\n[ stdin ]:2: fatal: Index -1 is out of bounds for array
+  of length 0\n"
+---
+a=()
+a[-1]=1
+
+
+
+# Note: mksh interprets -1 as 0xFFFFFFFF

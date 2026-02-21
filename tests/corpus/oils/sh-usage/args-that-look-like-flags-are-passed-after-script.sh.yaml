@@ -1,0 +1,9 @@
+name: args that look like flags are passed after script
+dialect: bash
+source: oils:spec/sh-usage#args-that-look-like-flags-are-passed-after-script
+stdout: "['--help', '--help', '-h']\n"
+---
+script=$TMP/sh1.sh
+echo 'argv.py "$@"' > $script
+chmod +x $script
+$SH $script --help --help -h

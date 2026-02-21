@@ -1,0 +1,12 @@
+name: read with IFS=$'\n'
+dialect: bash
+source: oils:spec/builtin-read#read-with-ifsn
+stdout: "[  a b c]\n"
+---
+# The leading spaces are stripped if they appear in IFS.
+IFS=$(echo -e '\n')
+read var <<EOF
+  a b c
+  d e f
+EOF
+echo "[$var]"

@@ -1,0 +1,8 @@
+name: bad assertion when pretty printing
+dialect: bash
+source: oils:spec/ysh-bugs#bad-assertion-when-pretty-printing
+stdout: "status=0\n"
+---
+
+pp value (__builtins__) > /dev/null
+echo status=$?

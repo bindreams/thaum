@@ -1,0 +1,7 @@
+name: String
+dialect: bash
+source: oils:spec/ysh-printing#string
+stdout: "(Str)   'double quoted'\n(Str)   'single quoted'\n"
+---
+= "double quoted"
+= 'single quoted'

@@ -1,0 +1,9 @@
+name: 'Expression for loop with index: Dict (TODO: define dict iter order)'
+dialect: bash
+source: 
+  oils:spec/ysh-for#expression-for-loop-with-index-dict-todo-define-dict-iter-order
+stdout: "pair name bob\npair age 40\n"
+---
+for key, value in ({name: 'bob', age: 40}) {
+  echo "pair $key $value"
+}

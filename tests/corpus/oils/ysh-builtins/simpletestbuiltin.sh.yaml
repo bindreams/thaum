@@ -1,0 +1,40 @@
+name: simple_test_builtin
+dialect: bash
+source: oils:spec/ysh-builtins#simpletestbuiltin
+stdout: "status=0\nstatus=0\nstatus=0\n---\nstatus=2\nstatus=2\nstatus=1\n---\nstatus=2\n\
+  status=2\n"
+---
+
+test -n "foo"
+echo status=$?
+
+test -n "foo" -a -n "bar"
+echo status=$?
+
+[ -n foo ]
+echo status=$?
+
+echo ---
+
+shopt --set ysh:all
+shopt --unset errexit
+
+test -n "foo" -a -n "bar"
+echo status=$?
+
+[ -n foo ]
+echo status=$?
+
+test -z foo
+echo status=$?
+
+
+echo ---
+
+# The one arg form is disallowed because it's confusing that test -n test -n -n
+# are the same thing.  In YSH, things that look like flags should be flags.
+test z
+echo status=$?
+
+test -z
+echo status=$?

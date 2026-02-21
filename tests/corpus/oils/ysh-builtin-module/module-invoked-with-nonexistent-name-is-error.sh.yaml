@@ -1,0 +1,12 @@
+name: module invoked with nonexistent name is error
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-module#module-invoked-with-nonexistent-name-is-error
+status: 2
+stdout: "caller_no_leak = null\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/util.ysh
+
+util zzz

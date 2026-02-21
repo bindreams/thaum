@@ -1,0 +1,12 @@
+name: read -u 3 -d 5
+dialect: bash
+source: oils:spec/builtin-read#read--u-3--d-5
+stdout: "reply=1234\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+# file descriptor
+read -u 3 -d 5 3<<EOF
+123456789
+EOF
+echo reply=$REPLY

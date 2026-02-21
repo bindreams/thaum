@@ -1,0 +1,33 @@
+name: unset inside proc - closures and dynamic scope
+dialect: bash
+source: oils:spec/ysh-scope#unset-inside-proc---closures-and-dynamic-scope
+stdout: "shellfunc x=\nunset-proc x=\nunset-proc-dynamic-scope x=\n"
+---
+shopt --set parse_brace
+shopt --set parse_proc
+
+shellfunc() {
+  unset x
+}
+
+proc unset-proc() {
+  unset x
+}
+
+proc unset-proc-dynamic-scope() {
+  shopt --set dynamic_scope {  # turn it back on
+    unset x
+  }
+}
+
+x=foo
+shellfunc
+echo shellfunc x=$x
+
+x=bar
+unset-proc
+echo unset-proc x=$x
+
+x=spam
+unset-proc
+echo unset-proc-dynamic-scope x=$x

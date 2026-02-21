@@ -1,0 +1,10 @@
+name: Extended glob in ${x//pat/replace}
+dialect: bash
+source: oils:spec/extglob-match#extended-glob-in-xpatreplace
+stdout: "foZ\n"
+---
+# not supported in OSH due to GlobToERE() strategy for positional info
+
+shopt -s extglob
+x=foo.py
+echo ${x//@(?.py)/Z}

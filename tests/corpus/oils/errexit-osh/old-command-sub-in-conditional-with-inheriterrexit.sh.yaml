@@ -1,0 +1,11 @@
+name: 'OLD: command sub in conditional, with inherit_errexit'
+dialect: bash
+source: oils:spec/errexit-osh#old-command-sub-in-conditional-with-inheriterrexit
+stdout: "1 2\nA\ndone\n"
+---
+set -o errexit
+shopt -s inherit_errexit || true
+if echo $(echo 1; false; echo 2); then
+  echo A
+fi
+echo done

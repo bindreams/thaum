@@ -1,0 +1,6 @@
+name: args are passed
+dialect: bash
+source: oils:spec/sh-usage#args-are-passed
+stdout: "['a', 'b']\n"
+---
+$SH -c 'argv.py "$@"' dummy a b

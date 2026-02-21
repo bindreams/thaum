@@ -1,0 +1,39 @@
+name: invoke --proc --sh-func --builtin --extern
+dialect: bash
+source: oils:spec/ysh-builtin-private#invoke---proc---sh-func---builtin---extern
+stdout: "--sh-func\nsh-func true\nstatus=0\n\n--proc\nproc true\nstatus=0\n\n--builtin\n\
+  status=0\n\n--extern\nstatus=0\n\n"
+---
+case $SH in bash) exit ;; esac
+
+true() {
+  echo 'sh-func true'
+}
+
+shopt --set ysh:all
+
+proc true {
+  echo 'proc true'
+}
+
+# Now INVOKE each one
+
+echo --sh-func
+invoke --sh-func true
+echo status=$?
+echo
+
+echo --proc
+invoke --proc true
+echo status=$?
+echo
+
+echo --builtin
+invoke --builtin true --help || true
+echo status=$?
+echo
+
+echo --extern
+invoke --extern true
+echo status=$?
+echo

@@ -1,0 +1,18 @@
+name: Named captures with m.group()
+dialect: bash
+source: oils:spec/ysh-regex-api#named-captures-with-mgroup
+status: 3
+stdout: "['2020', '08']\n3 7\n8 10\n"
+---
+shopt -s ysh:all
+
+var s = 'zz 2020-08-20'
+var pat = /<capture d+ as year> '-' <capture d+ as month>/
+
+var m = s.search(pat)
+argv.py $[m.group('year')] $[m.group('month')]
+echo $[m.start('year')] $[m.end('year')]
+echo $[m.start('month')] $[m.end('month')]
+
+argv.py $[m.group('oops')]
+echo 'error'

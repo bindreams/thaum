@@ -1,0 +1,8 @@
+name: Function def
+dialect: bash
+source: oils:spec/shell-grammar#function-def
+---
+name_a() {
+  echo word_a
+  echo word_b
+}

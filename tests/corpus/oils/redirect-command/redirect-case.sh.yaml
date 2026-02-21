@@ -1,0 +1,12 @@
+name: redirect case
+dialect: bash
+source: oils:spec/redirect-command#redirect-case
+stdout: "case-body\n"
+---
+case foo in
+  foo)
+    echo case-body
+    ;;
+esac > out
+
+cat out

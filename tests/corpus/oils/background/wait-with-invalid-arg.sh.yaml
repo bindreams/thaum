@@ -1,0 +1,7 @@
+name: wait with invalid arg
+dialect: bash
+source: oils:spec/background#wait-with-invalid-arg
+status: 2
+---
+wait zzz
+# mksh confuses a syntax error with 'command not found'!

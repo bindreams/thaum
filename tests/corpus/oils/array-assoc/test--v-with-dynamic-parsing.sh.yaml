@@ -1,0 +1,20 @@
+name: test -v with dynamic parsing
+dialect: bash
+source: oils:spec/array-assoc#test--v-with-dynamic-parsing
+stdout: "empty=0\nk=0\nnonexistent=1\n"
+---
+
+typeset -A assoc
+assoc=([empty]='' [k]=v)
+
+key=empty
+test -v 'assoc[$key]'
+echo empty=$?
+
+key=k
+test -v 'assoc[$key]'
+echo k=$?
+
+key=nonexistent
+test -v 'assoc[$key]'
+echo nonexistent=$?

@@ -1,0 +1,6 @@
+name: OPTIND
+dialect: bash
+source: oils:spec/builtin-getopts#optind
+stdout: "1\n"
+---
+echo $OPTIND

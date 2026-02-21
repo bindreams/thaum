@@ -1,0 +1,12 @@
+name: "proc static check: const can't be mutated"
+dialect: bash
+source: oils:spec/ysh-assign#proc-static-check-const-cant-be-mutated
+status: 2
+stdout: "\n"
+---
+proc f {
+  const x = 'local'
+  echo x=$x
+  setvar x = 'mutated'
+  echo x=$x
+}

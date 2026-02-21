@@ -1,0 +1,7 @@
+name: Line continuation
+dialect: bash
+source: oils:spec/quote#line-continuation
+stdout: "foo$\n"
+---
+echo foo\
+$

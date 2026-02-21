@@ -1,0 +1,6 @@
+name: \0377 is the highest octal byte
+dialect: bash
+source: oils:spec/builtin-echo#0377-is-the-highest-octal-byte
+stdout: " ff 37\n"
+---
+echo -en '\03777' | od -A n -t x1 | sed 's/ \+/ /g'

@@ -1,0 +1,7 @@
+name: test whether ']]' is empty
+dialect: bash
+source: oils:spec/dbracket#test-whether-is-empty
+status: 0
+---
+[[ ']]' ]]
+echo status=$?

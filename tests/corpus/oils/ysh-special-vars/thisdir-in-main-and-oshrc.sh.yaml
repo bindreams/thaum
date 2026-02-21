@@ -1,0 +1,12 @@
+name: _this_dir in main and oshrc
+dialect: bash
+source: oils:spec/ysh-special-vars#thisdir-in-main-and-oshrc
+stdout: "hi from this_dir.ysh\n$_this_dir = REPLACED/oils/spec/testdata/module\ninteractive\n\
+  hi from this_dir.ysh\n$_this_dir = REPLACED/oils/spec/testdata/module\n-c\n"
+---
+
+$[ENV.SH] $[ENV.REPO_ROOT]/spec/testdata/module/this_dir.ysh
+
+echo interactive
+
+$[ENV.SH] -i --rcfile $[ENV.REPO_ROOT]/spec/testdata/module/this_dir.ysh -c 'echo -c'

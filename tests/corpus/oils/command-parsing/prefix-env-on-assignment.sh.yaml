@@ -1,0 +1,12 @@
+name: Prefix env on assignment
+dialect: bash
+source: oils:spec/command-parsing#prefix-env-on-assignment
+status: 0
+stdout: "env var\n"
+---
+f() {
+  # NOTE: local treated like a special builtin!
+  E=env local v=var
+  echo $E $v
+}
+f

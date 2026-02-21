@@ -1,0 +1,5 @@
+name: Subshell
+dialect: bash
+source: oils:spec/shell-grammar#subshell
+---
+(echo word_a; echo word_b;)

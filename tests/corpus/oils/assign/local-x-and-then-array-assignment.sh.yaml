@@ -1,0 +1,12 @@
+name: "'local x' and then array assignment"
+dialect: bash
+source: oils:spec/assign#local-x-and-then-array-assignment
+status: 0
+stdout: "foo\n"
+---
+f() {
+  local x
+  x[3]=foo
+  echo ${x[3]}
+}
+f

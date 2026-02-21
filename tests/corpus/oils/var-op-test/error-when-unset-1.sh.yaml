@@ -1,0 +1,7 @@
+name: Error when unset
+dialect: bash
+source: oils:spec/var-op-test#error-when-unset
+stdout: "v is not unset\n"
+---
+v=foo
+echo ${v+v is not unset} ${unset:+is not unset}

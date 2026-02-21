@@ -1,0 +1,14 @@
+name: yshrc
+dialect: bash
+source: oils:spec/ysh-interactive#yshrc
+stdout: "yshrc\nhello\n"
+---
+cat >$[ENV.TMP]/yshrc <<EOF
+proc f {
+  if ('foo') {
+    echo yshrc
+  }
+}
+f
+EOF
+$[ENV.SH] --rcfile $[ENV.TMP]/yshrc -i -c 'echo hello'

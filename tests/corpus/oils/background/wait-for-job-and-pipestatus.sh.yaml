@@ -1,0 +1,20 @@
+name: Wait for job and PIPESTATUS
+dialect: bash
+source: oils:spec/background#wait-for-job-and-pipestatus
+stdout: "fore status=1 pipestatus=55 1\nback status=0 pipestatus=0\nwait status=1
+  pipestatus=1\n"
+---
+
+# foreground
+{ echo hi; exit 55; } | false
+echo fore status=$? pipestatus=${PIPESTATUS[@]}
+
+# background
+{ echo hi; exit 44; } | false &
+echo back status=$? pipestatus=${PIPESTATUS[@]}
+
+# wait for pipeline
+wait %+
+#wait %1
+#wait $!
+echo wait status=$? pipestatus=${PIPESTATUS[@]}

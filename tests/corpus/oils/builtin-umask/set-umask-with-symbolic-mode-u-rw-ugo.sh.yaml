@@ -1,0 +1,37 @@
+name: 'set umask with symbolic mode: u-rw  ...  u=,g+,o-  ...'
+dialect: bash
+source: oils:spec/builtin-umask#set-umask-with-symbolic-mode-u-rw-ugo
+status: 0
+stdout: "status0=0\n600\nstatus1=0\n300\nstatus2=0\n356\nstatus3=0\n356\nstatus4=0\n\
+  421\nstatus5=0\n737\n"
+---
+
+umask 0000
+umask u-rw
+echo status0=$?
+umask | tail -c 4
+
+umask 0700
+umask u=r
+echo status1=$?
+umask | tail -c 4
+
+umask 0000
+umask u=r,g=w,o=x
+echo status2=$?
+umask | tail -c 4
+
+umask 0777
+umask u+r,g+w,o+x
+echo status3=$?
+umask | tail -c 4
+
+umask 0000
+umask u-r,g-w,o-x
+echo status4=$?
+umask | tail -c 4
+
+umask 0137
+umask u=,g+,o-
+echo status5=$?
+umask | tail -c 4

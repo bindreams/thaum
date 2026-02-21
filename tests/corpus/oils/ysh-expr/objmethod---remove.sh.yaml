@@ -1,0 +1,10 @@
+name: obj=>method() - remove?
+dialect: bash
+source: oils:spec/ysh-expr#objmethod---remove
+stdout: "HI\n"
+---
+var s = 'hi'
+
+# TODO: This does a bound method thing we probably don't want
+var s2 = s=>upper()
+echo $s2

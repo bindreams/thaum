@@ -1,0 +1,12 @@
+name: append to element (BashArray)
+dialect: bash
+source: oils:spec/array-literal#append-to-element-basharray
+stdout: "keys: ['100']\nvals: ['12']\nkeys: ['100']\nvals: ['12:34:56']\n"
+---
+hello=100
+a=([hello]=1 [hello]+=2)
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+a+=([hello]+=:34 [hello]+=:56)
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"

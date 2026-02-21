@@ -1,0 +1,23 @@
+name: xtrace with unprintable chars
+dialect: bash
+source: oils:spec/xtrace#xtrace-with-unprintable-chars
+stdout: "STDOUT\n   a 003   b 004   c  \\0   d  \\n\n  61  03  62  04  63  00  64\
+  \  0a\n\nSTDERR\n+ echo $'a\\u0003b\\u0004c\\u0000d'\n"
+---
+case $SH in dash) exit ;; esac
+
+$SH >stdout 2>stderr <<'EOF'
+
+s=$'a\x03b\004c\x00d'
+set -o xtrace
+echo "$s"
+EOF
+
+show_hex() { od -A n -t c -t x1; }
+
+echo STDOUT
+cat stdout | show_hex
+echo
+
+echo STDERR
+grep 'echo' stderr 

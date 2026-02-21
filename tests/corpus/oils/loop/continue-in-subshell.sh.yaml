@@ -1,0 +1,12 @@
+name: continue in subshell
+dialect: bash
+source: oils:spec/loop#continue-in-subshell
+stdout: "# osh lets you fail\n> 1\nsubshell status=1\n. 1\n> 2\nsubshell status=1\n\
+  . 2\n"
+---
+for i in $(seq 2); do
+  echo "> $i"
+  ( if true; then continue; fi; echo "Should not print" )
+  echo subshell status=$?
+  echo ". $i"
+done

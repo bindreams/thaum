@@ -1,0 +1,40 @@
+name: JSON and J8 reject encoded string above max code point
+dialect: bash
+source: 
+  oils:spec/ysh-unicode#json-and-j8-reject-encoded-string-above-max-code-point
+stdout: "status=0\nstatus=1\nstatus=0\nstatus=1\n"
+---
+
+max=$(bash <<'EOF'
+echo $'\U0010ffff'
+EOF
+)
+
+# bash allows the bad one
+too_big=$(bash <<'EOF'
+echo $'\U00110000'
+EOF
+)
+
+# JSON string
+
+echo '"'$max'"' | json read
+echo status=$?
+#pp test_ (_reply)
+
+# Need to propagate the reason here
+
+echo '"'$too_big'"' | json read
+echo status=$?
+#pp test_ (_reply)
+
+
+# J8 string
+
+echo "u'"$max"'" | json8 read
+echo status=$?
+#pp test_ (_reply)
+
+echo "u'"$too_big"'" | json8 read
+echo status=$?
+#pp test_ (_reply)

@@ -1,0 +1,6 @@
+name: incomplete trailing expansion
+dialect: bash
+source: oils:spec/brace-expansion#incomplete-trailing-expansion
+stdout: "a_{ b_{\n"
+---
+echo {a,b}_{

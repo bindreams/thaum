@@ -1,0 +1,19 @@
+name: cd passed a block defined in a different scope
+dialect: bash
+source: oils:spec/ysh-blocks#cd-passed-a-block-defined-in-a-different-scope
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+proc my-cd (; b) {
+  cd /tmp ( ; ; b)
+}
+
+proc p {
+  var i = 42
+  var b = ^(echo "i = $i")
+
+  my-cd (b)
+}
+
+p

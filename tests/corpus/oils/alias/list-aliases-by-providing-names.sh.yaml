@@ -1,0 +1,8 @@
+name: List aliases by providing names
+dialect: bash
+source: oils:spec/alias#list-aliases-by-providing-names
+stdout: "alias e='echo'\nalias ll='ls -l'\n"
+---
+
+alias e=echo ll='ls -l'
+alias e ll

@@ -1,0 +1,13 @@
+name: "IFS='x ' read a b: trailing spaces (with max_split)"
+dialect: bash
+source: oils:spec/builtin-read#ifsx-read-a-b-trailing-spaces-with-maxsplit
+stdout: "['hello', 'world  test']\n-- IFS=x --\n['a', 'ax  x']\n['a', 'ax  x  x']\n\
+  ['a', 'ax  x  x']\n['a', 'ax  x  x  a']\n"
+---
+echo 'hello world  test   ' | (read a b; argv.py "$a" "$b")
+echo '-- IFS=x --'
+IFS='x '
+echo 'a ax  x  '     | (read a b; argv.py "$a" "$b")
+echo 'a ax  x  x'    | (read a b; argv.py "$a" "$b")
+echo 'a ax  x  x  '  | (read a b; argv.py "$a" "$b")
+echo 'a ax  x  x  a' | (read a b; argv.py "$a" "$b")

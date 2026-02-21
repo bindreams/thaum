@@ -1,0 +1,11 @@
+name: ctx with value.Place, not List/Dict (error location bug fix)
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-ctx#ctx-with-valueplace-not-listdict-error-location-bug-fix
+status: 3
+stdout: "\n"
+---
+
+ctx push (&p) {
+  true
+}

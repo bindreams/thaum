@@ -1,0 +1,10 @@
+name: '[[ $x == !($str) ]]'
+dialect: bash
+source: oils:spec/extglob-match#x-str
+stdout: "TRUE\nFALSE\n"
+---
+shopt -s extglob
+empty=''
+str='x'
+[[ $empty == !($str) ]] && echo TRUE  # test glob match
+[[ $str == !($str) ]]   || echo FALSE

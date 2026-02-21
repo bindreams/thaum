@@ -1,0 +1,14 @@
+name: eggex respects flags
+dialect: bash
+source: oils:spec/ysh-case#eggex-respects-flags
+stdout: "Python\n"
+---
+const x = 'MAIN.PY'
+case (x) {
+  / dot* '.py' ; i / {
+    echo Python
+  }
+  / dot* ('.cc' | '.h') / {
+   echo C++
+  }
+}

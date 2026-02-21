@@ -1,0 +1,8 @@
+name: Empty do/done
+dialect: bash
+source: oils:spec/empty-bodies#empty-dodone
+stdout: "empty\n"
+---
+while false; do
+done
+echo empty

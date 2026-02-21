@@ -1,0 +1,18 @@
+name: kill -15 %% kills current job
+dialect: bash
+source: oils:spec/builtin-kill#kill--15-kills-current-job
+stdout: "kill=0\nwait=143\nwait=127\n"
+---
+#case $SH in mksh|dash) exit ;; esac
+
+sleep 0.5 &
+pid=$!
+kill -15 %%
+echo kill=$?
+
+wait %%
+echo wait=$?
+
+# no such job
+wait %%
+echo wait=$?

@@ -1,0 +1,17 @@
+name: '"backslash + newline" should be swallowed regardless of "-d <delim>"'
+dialect: bash
+source: 
+  oils:spec/builtin-read#backslash-newline-should-be-swallowed-regardless-of--d-delim
+stdout: "['a bc d']\n['a b,c d']\n['a bc d\\n']\n['a b,c d\\n']\n"
+---
+
+printf '%s\n' 'a b\' 'c d' | (read; argv.py "$REPLY")
+printf '%s\n' 'a b\,c d'   | (read; argv.py "$REPLY")
+printf '%s\n' 'a b\' 'c d' | (read -d ,; argv.py "$REPLY")
+printf '%s\n' 'a b\,c d'   | (read -d ,; argv.py "$REPLY")
+
+# mksh/zsh swallows "backslash + delim" instead.
+['a bc d']
+['a b,c d']
+['a b\nc d']
+['a bc d']

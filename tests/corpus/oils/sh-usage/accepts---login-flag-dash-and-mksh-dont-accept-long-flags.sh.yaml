@@ -1,0 +1,7 @@
+name: accepts --login flag (dash and mksh don't accept long flags)
+dialect: bash
+source: 
+  oils:spec/sh-usage#accepts---login-flag-dash-and-mksh-dont-accept-long-flags
+status: 0
+---
+$SH --login -c 'exit 0'

@@ -1,0 +1,8 @@
+name: shopt -s nullglob
+dialect: bash
+source: oils:spec/glob-bash#shopt--s-nullglob
+stdout: "['_tmp/spec-tmp/*.nonexistent']\n[]\n"
+---
+argv.py _tmp/spec-tmp/*.nonexistent
+shopt -s nullglob
+argv.py _tmp/spec-tmp/*.nonexistent

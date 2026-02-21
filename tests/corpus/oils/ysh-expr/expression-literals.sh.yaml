@@ -1,0 +1,21 @@
+name: expression literals
+dialect: bash
+source: oils:spec/ysh-expr#expression-literals
+stdout: "type=Expr\n3\nfalse\ntrue\n(List)   [3,4]\n"
+---
+var e = ^[1 + 2]
+
+shopt --set parse_ysh_expr_sub
+
+echo type=$[type(e)]
+echo $[io->evalExpr(e)]
+
+var e = ^[2 < 1]
+echo $[io->evalExpr(e)]
+
+var x = 42
+var e = ^[42 === x and true]
+echo $[io->evalExpr(e)]
+
+var mylist = ^[3, 4]
+pp test_ (io->evalExpr(mylist))

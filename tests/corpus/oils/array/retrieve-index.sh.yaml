@@ -1,0 +1,7 @@
+name: Retrieve index
+dialect: bash
+source: oils:spec/array#retrieve-index
+stdout: "['2 3']\n"
+---
+a=(1 '2 3')
+argv.py "${a[1]}"

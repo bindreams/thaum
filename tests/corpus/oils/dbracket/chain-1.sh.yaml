@@ -1,0 +1,6 @@
+name: '|| chain'
+dialect: bash
+source: oils:spec/dbracket#chain
+stdout: "true\n"
+---
+[[ '' || '' || t ]] && echo true

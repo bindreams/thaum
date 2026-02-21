@@ -1,0 +1,10 @@
+name: 'Issue #1069 [59] N-I: arr=s should set RHS to arr[0]'
+dialect: bash
+source: oils:spec/ble-idioms#issue-1069-59-n-i-arrs-should-set-rhs-to-arr0
+stdout: "['v', '2', '3']\n"
+---
+case $SH in ash|dash) exit 99 ;; esac
+a=(1 2 3)
+a=v
+argv.py "${a[@]}"
+# Note: ash/dash does not have arrays

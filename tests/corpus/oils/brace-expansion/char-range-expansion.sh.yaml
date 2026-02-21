@@ -1,0 +1,6 @@
+name: Char range expansion
+dialect: bash
+source: oils:spec/brace-expansion#char-range-expansion
+stdout: "-a- -b- -c- -d- -e-\n"
+---
+echo -{a..e}-

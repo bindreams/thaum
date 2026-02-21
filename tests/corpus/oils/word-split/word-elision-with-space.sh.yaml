@@ -1,0 +1,7 @@
+name: Word elision with space
+dialect: bash
+source: oils:spec/word-split#word-elision-with-space
+stdout: "[]\n"
+---
+s1=' '
+argv.py $s1

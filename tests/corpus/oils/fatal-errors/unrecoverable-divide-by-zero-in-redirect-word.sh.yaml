@@ -1,0 +1,15 @@
+name: 'Unrecoverable: divide by zero in redirect word'
+dialect: bash
+source: oils:spec/fatal-errors#unrecoverable-divide-by-zero-in-redirect-word
+stdout: "outside=1\n"
+---
+
+$SH -c '
+echo hi > file$(( 42 / 0 )) in
+echo inside=$?
+'
+echo outside=$?
+
+
+
+# bash makes the command fail

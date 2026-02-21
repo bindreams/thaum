@@ -1,0 +1,27 @@
+name: Type Errors
+dialect: bash
+source: oils:spec/ysh-expr#type-errors
+stdout: "3\n3\n3\n3\n"
+---
+shopt --set parse_brace parse_ysh_expr_sub
+
+# TODO: It might be nice to get a message
+try {
+  var x = {} + []
+}
+echo $[_error.code]
+
+try {
+  setvar x = {} + 3
+}
+echo $[_error.code]
+
+try {
+  = 'foo' ++ 3
+}
+echo $[_error.code]
+
+try {
+  = 'foo' ++ 3
+}
+echo $[_error.code]

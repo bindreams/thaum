@@ -1,0 +1,10 @@
+name: Case with | pattern
+dialect: bash
+source: oils:spec/posix#case-with-pattern
+stdout: "A\n"
+---
+foo=a
+case $foo in
+  a|b) echo A ;;
+  c)
+esac

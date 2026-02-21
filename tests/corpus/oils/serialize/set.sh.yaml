@@ -1,0 +1,10 @@
+name: set
+dialect: bash
+source: oils:spec/serialize#set
+stdout: "zz=$'one\\ntwo'\n"
+---
+case $SH in zsh) return ;; esac  # zsh doesn't make much sense
+
+zz=$'one\ntwo'
+
+set | grep zz

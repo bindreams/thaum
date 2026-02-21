@@ -1,0 +1,11 @@
+name: Two adjacent alternations
+dialect: bash
+source: oils:spec/extglob-files#two-adjacent-alternations
+stdout: "2/ab 2/ac 2/cb 2/cc\n2/ab 2/ac 2/bb 2/bc 2/cb 2/cc\n2/ab 2/ac\n"
+---
+shopt -s extglob
+mkdir -p 2
+touch 2/{aa,ab,ac,ba,bb,bc,ca,cb,cc}
+echo 2/!(b)@(b|c)
+echo 2/!(b)?@(b|c)  # wildcard in between
+echo 2/!(b)a@(b|c)  # constant in between

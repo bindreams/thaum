@@ -1,0 +1,10 @@
+name: glob after $@ expansion
+dialect: bash
+source: oils:spec/glob#glob-after-expansion
+stdout: "_tmp/b.B\n"
+---
+touch _tmp/b.B
+fun() {
+  echo $@
+}
+fun '_tmp/*.B'

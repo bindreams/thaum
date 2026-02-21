@@ -1,0 +1,31 @@
+name: builtin rm -f - still fails when file can't be removed
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-private#builtin-rm--f---still-fails-when-file-cant-be-removed
+stdout: "status=1\nread-only/stuck\nstatus=1\nstatus=0\n"
+---
+
+mkdir read-only
+touch read-only/stuck
+chmod -w read-only
+ls -l stuck
+
+touch foo bar
+$prefix rm -- read-only/stuck foo bar
+echo status=$?
+
+if test -f foo; then echo fail; fi
+if test -f bar; then echo fail; fi
+
+ls read-only/stuck
+
+touch foo bar
+$prefix rm -- read-only/stuck foo bar
+echo status=$?
+
+# Clean up for real
+chmod +w read-only
+$prefix rm -- read-only/stuck
+echo status=$?
+
+if test -f read-only/stuck; then echo fail; fi

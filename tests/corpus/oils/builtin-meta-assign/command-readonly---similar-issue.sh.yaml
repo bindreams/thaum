@@ -1,0 +1,30 @@
+name: \command readonly - similar issue
+dialect: bash
+source: oils:spec/builtin-meta-assign#command-readonly---similar-issue
+stdout: "a b\na b\na b\na b\n"
+---
+case $SH in zsh) exit ;; esac
+
+# \command readonly is equivalent to \builtin declare
+# except dash implements it
+
+x='a b'
+
+readonly b=$x
+echo $b
+
+command readonly c=$x
+echo $c
+
+\command readonly d=$x
+echo $d
+
+'command' readonly e=$x
+echo $e
+
+# The issue here is that we have a heuristic in EvalWordSequence2:
+# fs len(part_vals) == 1
+
+
+
+# note: later versions of dash are fixed

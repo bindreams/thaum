@@ -1,0 +1,13 @@
+name: Customize PS4
+dialect: bash
+source: oils:spec/ysh-xtrace#customize-ps4
+stdout: "1\n2\n3\n"
+stderr: "5 . builtin echo 1\n5 . builtin echo 2\n6 . builtin echo 3\n"
+---
+shopt -s ysh:upgrade
+set -x
+
+# Reuse the default
+PS4=$['$LINENO ' ++ PS4]
+echo 1; echo 2
+echo 3

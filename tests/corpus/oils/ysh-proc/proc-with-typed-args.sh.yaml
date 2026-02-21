@@ -1,0 +1,21 @@
+name: proc with typed args
+dialect: bash
+source: oils:spec/ysh-proc#proc-with-typed-args
+stdout: "(Str)   \"WORD\"\n(List)   [1,2,3]\n(Dict)   {\"name\":\"bob\"}\n---\n(Str)\
+  \   \"x\"\n(List)   [\"a\",\"b\"]\n(Dict)   {\"bob\":42}\n"
+---
+shopt --set ysh:upgrade
+
+# TODO: duplicate param names aren't allowed
+proc p (a; mylist, mydict; opt Int = 42) {
+  pp test_ (a)
+  pp test_ (mylist)
+  pp test_ (mydict)
+  #pp test_ (opt)
+}
+
+p WORD ([1,2,3], {name: 'bob'})
+
+echo ---
+
+p x (:| a b |, {bob: 42}, a = 5)

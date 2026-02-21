@@ -1,0 +1,23 @@
+name: Background job &
+dialect: bash
+source: oils:spec/ysh-purity#background-job
+stdout: "code=5 message=Background jobs aren't allowed in pure mode (OILS-ERR-204)\n\
+  3\ncode=5 message=Pipelines aren't allowed in pure mode (OILS-ERR-204)\n"
+---
+shopt --set ysh:upgrade
+
+var cmd = ^( sleep 0.01 & wait )
+call io->eval(cmd)
+
+try {
+  call eval(cmd)
+}
+echo code=$[_error.code] message=$[_error.message]
+
+var cmd = ^( seq 3 | wc -l )
+call io->eval(cmd)
+
+try {
+  call eval(cmd)
+}
+echo code=$[_error.code] message=$[_error.message]

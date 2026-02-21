@@ -1,0 +1,35 @@
+name: io->eval(to_dict=true) with in_captured_frame=true
+dialect: bash
+source: oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-incapturedframetrue
+stdout: "{\n  \"var_in_p_frame\": \"p\",\n  \"foo\": \"global\",\n  \"z\": \"zero\"\
+  ,\n  \"one\": \"a\",\n  \"two\": \"b\",\n  \"three\": \"+c\",\n  \"x\": \"X\",\n\
+  \  \"y\": \"_Y\"\n}\n"
+---
+
+proc Dict ( ; out; ; block) {
+  var d = io->eval(block, dollar0='zero', pos_args=:|a b c|,
+                   vars={X: 'X', _Y: '_Y'}, in_captured_frame=true, to_dict=true)
+  call out->setValue(d)
+}
+
+var global = 'global'
+
+func makeDict() {
+  var var_in_p_frame = 'p'
+
+  Dict (&d) {
+    foo = global
+    z = $0
+    one = $1
+    two = ${2}
+    three = "+$3"
+    # Note: X does NOT appear in the output, ctx_Eval makes it work.
+    x = X
+    y = _Y
+  }
+
+  return (d)
+}
+
+var d = makeDict()
+json write (d)

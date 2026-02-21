@@ -1,0 +1,22 @@
+name: LHS array is protected with shopt -s eval_unsafe_arith, e.g. 'a[$(echo 
+  2)]'
+dialect: bash
+source: 
+  oils:spec/array-assign#lhs-array-is-protected-with-shopt--s-evalunsafearith-eg-aecho-2
+stdout: "declare -a b=([0]=\"3\" [1]=\"4\" [2]=\"5\")\nget 5\nset zzz\ndeclare -a
+  b=([0]=\"3\" [1]=\"4\" [2]=\"zzz\")\n"
+---
+case $SH in zsh|ash) exit ;; esac
+
+a=(0 1 2)
+b=(3 4 5)
+typeset -p b
+
+expr='a[$(echo 2)]' 
+
+echo 'get' "${b[expr]}"
+
+b[expr]=zzz
+
+echo 'set' "${b[expr]}"
+typeset -p b

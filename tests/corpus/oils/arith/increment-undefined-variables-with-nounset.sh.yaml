@@ -1,0 +1,10 @@
+name: Increment undefined variables with nounset
+dialect: bash
+source: oils:spec/arith#increment-undefined-variables-with-nounset
+status: 1
+stdout: ''
+---
+set -o nounset
+(( undef1++ ))
+(( ++undef2 ))
+echo "[$undef1][$undef2]"

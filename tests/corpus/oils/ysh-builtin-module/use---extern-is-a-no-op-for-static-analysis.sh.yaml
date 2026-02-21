@@ -1,0 +1,11 @@
+name: use --extern is a no-op, for static analysis
+dialect: bash
+source: oils:spec/ysh-builtin-module#use---extern-is-a-no-op-for-static-analysis
+stdout: "status=0\nstatus=0\n"
+---
+
+use --extern grep sed awk
+echo status=$?
+
+use --extern zzz
+echo status=$?

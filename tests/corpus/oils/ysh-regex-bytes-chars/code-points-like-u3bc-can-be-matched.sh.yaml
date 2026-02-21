@@ -1,0 +1,16 @@
+name: Code points like \u{3bc} can be matched
+dialect: bash
+source: oils:spec/ysh-regex-bytes-chars#code-points-like-u3bc-can-be-matched
+stdout: "(Bool)   false\n(Bool)   true\n\n(Bool)   false\n(Bool)   true\n"
+---
+
+var pat = / [\u{3bc}] /
+pp test_ (b'a' ~ pat)
+pp test_ (b'\u{3bc}' ~ / [\u{3bc}] /)
+echo
+
+var pat = / [\u{10ffff}] /
+pp test_ (b'a' ~ pat)
+pp test_ (b'\u{10ffff}' ~ pat)
+
+#echo "-$pat-"

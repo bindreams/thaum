@@ -1,0 +1,13 @@
+name: non-{ } function bodies can be serialized (rare)
+dialect: bash
+source: oils:spec/print-source-code#non--function-bodies-can-be-serialized-rare
+stdout: "subshell body\n"
+---
+
+# TODO: we can add more of these
+
+f() ( echo 'subshell body' )
+
+code=$(typeset -f f)
+
+$SH -c "$code; f"

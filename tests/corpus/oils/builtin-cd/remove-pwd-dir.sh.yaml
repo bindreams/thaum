@@ -1,0 +1,13 @@
+name: remove pwd dir
+dialect: bash
+source: oils:spec/builtin-cd#remove-pwd-dir
+stdout: "/tmp/oil-spec-test/pwd\nstatus=0\n/tmp/oil-spec-test/pwd\nstatus=0\n"
+---
+dir=/tmp/oil-spec-test/pwd
+mkdir -p $dir
+cd $dir
+pwd
+rmdir $dir
+echo status=$?
+pwd
+echo status=$?

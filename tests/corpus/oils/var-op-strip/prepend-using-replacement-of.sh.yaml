@@ -1,0 +1,8 @@
+name: 'Prepend using replacement of #'
+dialect: bash
+source: oils:spec/var-op-strip#prepend-using-replacement-of
+stdout: "['prefix-aa', 'prefix-bb', 'prefix-']\n"
+---
+# This case was found in Kubernetes and others
+array=(aa bb '')
+argv.py ${array[@]/#/prefix-}

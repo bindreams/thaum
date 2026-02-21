@@ -1,0 +1,27 @@
+name: DebugFrame.toString() running io->evalExpr()
+dialect: bash
+source: oils:spec/ysh-introspect#debugframetostring-running-io-evalexpr
+stdout: "  %1 [ -c flag ]:15\n    p\n    ^\n  %2 [ -c flag ]:12\n      call io->evalExpr(e)\n\
+  \                       ^\n  %3 [ -c flag ]:9\n    var e = ^[2 + $(print-num)]\n\
+  \                    ^~~~~~~~~\n  %4 [ -c flag ]:5\n      print-stack > stack-trace.txt\n\
+  \      ^~~~~~~~~~~\n"
+---
+
+$[ENV.SH] -c '
+source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh
+
+proc print-num {
+  print-stack > stack-trace.txt
+  echo 42
+}
+
+var e = ^[2 + $(print-num)]
+
+proc p {
+  call io->evalExpr(e)
+}
+
+p
+' 
+
+sed 's;#;%;g' stack-trace.txt

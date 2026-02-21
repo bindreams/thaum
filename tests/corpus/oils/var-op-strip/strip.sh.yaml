@@ -1,0 +1,10 @@
+name: strip ?
+dialect: bash
+source: oils:spec/var-op-strip#strip
+stdout: "['bc']\n['bc']\n['ab']\n['ab']\n"
+---
+x=abc
+argv.py "${x#?}"
+argv.py "${x##?}"
+argv.py "${x%?}"
+argv.py "${x%%?}"

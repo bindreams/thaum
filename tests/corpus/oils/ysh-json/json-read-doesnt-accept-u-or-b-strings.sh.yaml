@@ -1,0 +1,17 @@
+name: json read doesn't accept u'' or b'' strings
+dialect: bash
+source: oils:spec/ysh-json#json-read-doesnt-accept-u-or-b-strings
+stdout: "status=1\nstatus=1\n"
+---
+
+json read <<EOF
+{"key": u'val'}
+EOF
+echo status=$?
+
+#pp test_ (_reply)
+
+json read <<EOF
+{"key": b'val'}
+EOF
+echo status=$?

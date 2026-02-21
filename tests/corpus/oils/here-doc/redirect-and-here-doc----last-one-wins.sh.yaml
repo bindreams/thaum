@@ -1,0 +1,11 @@
+name: < redirect and here doc -- last one wins
+dialect: bash
+source: oils:spec/here-doc#redirect-and-here-doc----last-one-wins
+stdout: "here\n"
+---
+
+echo hello >$TMP/hello.txt
+
+cat <$TMP/hello.txt <<EOF
+here
+EOF

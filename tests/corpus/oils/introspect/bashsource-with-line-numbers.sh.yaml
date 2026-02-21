@@ -1,0 +1,16 @@
+name: ${BASH_SOURCE[@]} with line numbers
+dialect: bash
+source: oils:spec/introspect#bashsource-with-line-numbers
+---
+cd $REPO_ROOT
+
+$SH spec/testdata/bash-source.sh
+['begin F funcs', 'f', 'main']
+['begin F files', 'spec/testdata/bash-source.sh', 'spec/testdata/bash-source.sh']
+['begin F lines', '21', '0']
+['G funcs', 'g', 'f', 'main']
+['G files', 'spec/testdata/bash-source-2.sh', 'spec/testdata/bash-source.sh', 'spec/testdata/bash-source.sh']
+['G lines', '15', '21', '0']
+['end F funcs', 'f', 'main']
+['end F', 'spec/testdata/bash-source.sh', 'spec/testdata/bash-source.sh']
+['end F lines', '21', '0']

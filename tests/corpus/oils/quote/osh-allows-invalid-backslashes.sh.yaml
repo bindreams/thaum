@@ -1,0 +1,11 @@
+name: OSH allows invalid backslashes
+dialect: bash
+source: oils:spec/quote#osh-allows-invalid-backslashes
+stdout: "\\uZ \\u{03bc \\z\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+w=$'\uZ'
+x=$'\u{03bc'
+y=$'\z'
+echo $w $x $y

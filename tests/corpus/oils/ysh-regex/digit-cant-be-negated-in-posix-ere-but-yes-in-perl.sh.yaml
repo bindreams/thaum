@@ -1,0 +1,9 @@
+name: "[!digit] can't be negated in POSIX ERE (but yes in Perl)"
+dialect: bash
+source: oils:spec/ysh-regex#digit-cant-be-negated-in-posix-ere-but-yes-in-perl
+status: 1
+stdout: ''
+---
+var pat = null
+setvar pat = / [ !digit 'z' ] /
+echo $pat

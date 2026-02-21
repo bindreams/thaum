@@ -1,0 +1,8 @@
+name: Length op, index op, then transform op is not allowed
+dialect: bash
+source: oils:spec/array#length-op-index-op-then-transform-op-is-not-allowed
+status: 2
+stdout: ''
+---
+a=('123' '456')
+echo "${#a[0]}" "${#a[0]/1/xxx}"

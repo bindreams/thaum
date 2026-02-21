@@ -1,0 +1,13 @@
+name: continue
+dialect: bash
+source: oils:spec/loop#continue
+status: 0
+stdout: "a\na\nb\nc\nc\n"
+---
+for i in a b c; do
+  echo $i
+  if test $i = b; then
+    continue
+  fi
+  echo $i
+done

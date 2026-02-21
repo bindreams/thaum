@@ -1,0 +1,20 @@
+name: ${BASH_LINENO[@]} is a stack of line numbers for function calls
+dialect: bash
+source: 
+  oils:spec/introspect#bashlineno-is-a-stack-of-line-numbers-for-function-calls
+---
+# note: it's CALLS, not DEFINITIONS.
+g() {
+  argv.py G "${BASH_LINENO[@]}"
+}
+f() {
+  argv.py 'begin F' "${BASH_LINENO[@]}"
+  g  # line 6
+  argv.py 'end F' "${BASH_LINENO[@]}"
+}
+argv.py ${BASH_LINENO[@]}
+f  # line 9
+[]
+['begin F', '10']
+['G', '6', '10']
+['end F', '10']

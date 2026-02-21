@@ -1,0 +1,17 @@
+name: dict literal with implicit value
+dialect: bash
+source: oils:spec/ysh-dict#dict-literal-with-implicit-value
+stdout: "len=1\nfoo\nlen=2\nfoo\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var name = 'foo'
+var d1 = {name}
+echo len=$[len(d1)]
+var v1 = d1['name']
+echo $v1
+
+var d2 = {name, other: 'val'}
+echo len=$[len(d2)]
+var v2 = d2['name']
+echo $v2

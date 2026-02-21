@@ -1,0 +1,8 @@
+name: Assignments and assign builtins
+dialect: bash
+source: oils:spec/xtrace#assignments-and-assign-builtins
+stdout: "2\n"
+stderr: "+ x=1\n+ x=2\n+ echo 2\n+ readonly x=3\n"
+---
+set -x
+x=1 x=2; echo $x; readonly x=3

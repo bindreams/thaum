@@ -1,0 +1,5 @@
+name: Filename Redirect
+dialect: bash
+source: oils:spec/shell-grammar#filename-redirect
+---
+echo 2>filename

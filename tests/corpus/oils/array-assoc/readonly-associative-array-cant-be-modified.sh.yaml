@@ -1,0 +1,8 @@
+name: readonly associative array can't be modified
+dialect: bash
+source: oils:spec/array-assoc#readonly-associative-array-cant-be-modified
+stdout: "status=1\n"
+---
+declare -Ar A
+A['x']=1
+echo status=$?

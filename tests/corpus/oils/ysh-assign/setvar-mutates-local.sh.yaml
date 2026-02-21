@@ -1,0 +1,16 @@
+name: setvar mutates local
+dialect: bash
+source: oils:spec/ysh-assign#setvar-mutates-local
+stdout: "x=global\nx=local\nx=mutated\nx=global\n"
+---
+proc f {
+  var x = 'local'
+  echo x=$x
+  setvar x = 'mutated'
+  echo x=$x
+}
+
+var x = 'global'
+echo x=$x
+f
+echo x=$x

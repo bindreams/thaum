@@ -1,0 +1,15 @@
+name: shopt histappend toggle check
+dialect: bash
+source: oils:spec/builtin-history#shopt-histappend-toggle-check
+stdout: "status=0\nshopt -s histappend\nstatus=0\nshopt -u histappend\n^D\n"
+---
+
+shopt -s histappend
+echo status=$?
+shopt -p histappend
+shopt -u histappend
+echo status=$?
+shopt -p histappend
+
+# match osh's behaviour of echoing ^D for EOF
+case $SH in bash) echo '^D' ;; esac

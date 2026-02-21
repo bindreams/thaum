@@ -1,0 +1,19 @@
+name: export readonly +=
+dialect: bash
+source: oils:spec/append#export-readonly
+stdout: "e=foo\nr=bar\ne=foofoo\n"
+---
+
+export e+=foo
+echo e=$e
+
+readonly r+=bar
+echo r=$r
+
+set -u
+
+export e+=foo
+echo e=$e
+
+#readonly r+=foo
+#echo r=$e

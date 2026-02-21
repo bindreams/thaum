@@ -1,0 +1,14 @@
+name: Extended glob with word splitting
+dialect: bash
+source: oils:spec/extglob-files#extended-glob-with-word-splitting
+stdout: "['a', 'bar.cc', 'bar.h']\n"
+---
+shopt -s extglob
+mkdir -p 3
+cd 3
+
+x='a b'
+touch bar.{cc,h}
+
+# OSH may disallow splitting when there's an extended glob
+argv.py $x*.@(cc|h)

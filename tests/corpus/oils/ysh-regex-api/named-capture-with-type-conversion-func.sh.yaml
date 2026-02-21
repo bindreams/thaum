@@ -1,0 +1,26 @@
+name: Named Capture with Type Conversion Func
+dialect: bash
+source: oils:spec/ysh-regex-api#named-capture-with-type-conversion-func
+stdout: "-3.14\nInt Float\n-3.14\nInt Float\n"
+---
+shopt -s ysh:upgrade
+
+func floatNegate(x) {
+  return (-float(x))
+}
+
+var s = 'hi 42-3.14'
+var pat = / <capture d+ as left: int> '-' <capture d+ '.' d+ as right: floatNegate> /
+
+if (s ~ pat) {
+  var g1 = _group('left')  # Int
+  var g2 = _group('right')  # Float
+  echo $g2
+  echo $[type(g1)] $[type(g2)]
+}
+
+var m = s.search(pat)
+if (m) {
+  echo $[m.group('right')]
+  echo $[m.group('left') => type()] $[m.group('right') => type()]
+}

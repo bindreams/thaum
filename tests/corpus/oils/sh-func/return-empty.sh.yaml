@@ -1,0 +1,13 @@
+name: return $empty
+dialect: bash
+source: oils:spec/sh-func#return-empty
+stdout: "f\nstatus=0\n"
+---
+f() {
+  echo f
+  empty=
+  return $empty
+}
+
+f
+echo status=$?

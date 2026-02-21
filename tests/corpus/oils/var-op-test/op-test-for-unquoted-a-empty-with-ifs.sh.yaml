@@ -1,0 +1,10 @@
+name: op-test for unquoted ${a[*]:-empty} with IFS=
+dialect: bash
+source: oils:spec/var-op-test#op-test-for-unquoted-a-empty-with-ifs
+stdout: "[]\n"
+---
+case $SH in dash) exit ;; esac
+
+IFS=
+a=("" "")
+argv.py ${a[*]:-empty}

@@ -1,0 +1,28 @@
+name: ysh --eval respects _this_dir and $0
+dialect: bash
+source: oils:spec/ysh-usage#ysh---eval-respects-thisdir-and-0
+stdout: "one\ntwo\nthree AA\ndollar0 = three.ysh\nflag -c\n"
+---
+
+#echo tmp=$[ENV.TMP]
+
+var dir = "$[ENV.TMP]/code"
+mkdir -p $dir
+
+echo '
+  echo one
+  source $_this_dir/two.ysh
+  ' > $dir/one.ysh
+echo 'echo two' > $dir/two.ysh
+
+echo '
+  proc p {
+    echo three @ARGV
+  }
+  p AA
+  var x = $0
+  echo "dollar0 = $(basename $x)"
+  ' > $dir/three.ysh
+chmod +x $dir/three.ysh
+
+$[ENV.SH] --eval $dir/one.ysh --eval $dir/three.ysh -c 'echo flag -c'

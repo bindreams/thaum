@@ -1,0 +1,17 @@
+name: Str => trimEnd(), unicode decoding error types
+dialect: bash
+source: oils:spec/ysh-methods#str-trimend-unicode-decoding-error-types
+stdout: "status=3\nstatus=3\nstatus=3\nstatus=3\nstatus=3\n"
+---
+# Tests the backwards UTF-8 decoder
+var badStrs = [
+  b'\yF4\yA2\yA4\yB0',  # Too large of a codepoint
+  b'\yED\yBF\y80',      # Surrogate
+  b'\yC1\y81',          # Overlong
+  b'\y80', b'\yFF',     # Does not match UTF8 bit pattern
+]
+
+for badStr in (badStrs) {
+  try { call badStr => trimEnd() }
+  echo status=$[_error.code]
+}

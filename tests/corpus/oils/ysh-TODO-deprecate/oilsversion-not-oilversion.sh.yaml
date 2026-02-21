@@ -1,0 +1,9 @@
+name: OILS_VERSION, not OIL_VERSION
+dialect: bash
+source: oils:spec/ysh-TODO-deprecate#oilsversion-not-oilversion
+stdout: "OIL\n"
+---
+
+if test -n "$OIL_VERSION"; then
+  echo OIL
+fi

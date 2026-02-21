@@ -1,0 +1,7 @@
+name: \x55 hex literals not supported
+dialect: bash
+source: oils:spec/prompt#x55-hex-literals-not-supported
+stdout: "[\\x55]\n"
+---
+PS1='[\x55]'
+echo "${PS1@P}"

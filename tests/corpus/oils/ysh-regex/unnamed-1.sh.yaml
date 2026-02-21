@@ -1,0 +1,16 @@
+name: /.+/
+dialect: bash
+source: oils:spec/ysh-regex#unnamed
+stdout: ".+\nyes\nno\n"
+---
+shopt -s ysh:all
+
+var pat = /.+/
+echo $pat
+
+var s = 'foo'
+if (s ~ pat) {  # ERE syntax
+  echo yes
+}
+var empty = ''
+if (empty ~ pat) { echo yes } else { echo no }

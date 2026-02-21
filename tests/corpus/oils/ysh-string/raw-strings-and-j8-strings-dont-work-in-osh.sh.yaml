@@ -1,0 +1,25 @@
+name: raw strings and J8 strings don't work in OSH
+dialect: bash
+source: oils:spec/ysh-string#raw-strings-and-j8-strings-dont-work-in-osh
+stdout: "rhello \\\numu \\u{3bc}\nbbyte \\yff\n--\nr\nraw multi\n\nu\nu multi\n\n\
+  b\nb multi\n\n"
+---
+shopt --unset ysh:all
+
+echo r'hello \'
+echo u'mu \u{3bc}'
+echo b'byte \yff'
+
+echo --
+
+echo r'''
+raw multi
+'''
+
+echo u'''
+u multi
+'''
+
+echo b'''
+b multi
+'''

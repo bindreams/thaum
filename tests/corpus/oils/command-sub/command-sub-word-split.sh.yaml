@@ -1,0 +1,6 @@
+name: Command Sub word split
+dialect: bash
+source: oils:spec/command-sub#command-sub-word-split
+stdout: "['hi', 'there', 'hi there']\n"
+---
+argv.py $(echo 'hi there') "$(echo 'hi there')"

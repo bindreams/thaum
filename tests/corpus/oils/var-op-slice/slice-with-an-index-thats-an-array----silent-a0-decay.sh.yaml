@@ -1,0 +1,11 @@
+name: Slice with an index that's an array -- silent a[0] decay
+dialect: bash
+source: 
+  oils:spec/var-op-slice#slice-with-an-index-thats-an-array----silent-a0-decay
+status: 0
+stdout: "assigned\nde\n"
+---
+i=(3 4 5)
+mystr=abcdefg
+echo assigned
+echo ${mystr:$i:2}

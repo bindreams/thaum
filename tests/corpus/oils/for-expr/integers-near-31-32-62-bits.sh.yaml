@@ -1,0 +1,21 @@
+name: Integers near 31, 32, 62 bits
+dialect: bash
+source: oils:spec/for-expr#integers-near-31-32-62-bits
+stdout: "2147483646\n2147483647\n2147483648\n2147483649\n---\n4294967294\n4294967295\n\
+  4294967296\n4294967297\n---\n4611686018427387902\n4611686018427387903\n4611686018427387904\n\
+  4611686018427387905\n---\n"
+---
+
+# Hm this was never a bug, but it's worth testing.
+# The bug was EvalToInt() in the condition.
+
+for base in 31 32 62; do
+
+  start=$(( (1 << $base) - 2))
+  end=$(( (1 << $base) + 2))
+
+  for ((i = start; i < end; ++i)); do
+    echo $i
+  done
+  echo ---
+done

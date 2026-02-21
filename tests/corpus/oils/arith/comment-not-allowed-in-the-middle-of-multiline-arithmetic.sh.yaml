@@ -1,0 +1,18 @@
+name: Comment not allowed in the middle of multiline arithmetic
+dialect: bash
+source: 
+  oils:spec/arith#comment-not-allowed-in-the-middle-of-multiline-arithmetic
+status: 1
+stdout: "6\n"
+---
+echo $((
+1 +
+2 + \
+3
+))
+echo $((
+1 + 2  # not a comment
+))
+(( a = 3 + 4  # comment
+))
+echo [$a]

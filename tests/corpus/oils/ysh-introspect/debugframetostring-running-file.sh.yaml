@@ -1,0 +1,10 @@
+name: DebugFrame.toString() running file
+dialect: bash
+source: oils:spec/ysh-introspect#debugframetostring-running-file
+stdout: "  %1 MYROOT/spec/testdata/debug-frame-main.ysh:4\n    print-stack\n    ^~~~~~~~~~~\n\
+  \n  %1 MYROOT/spec/testdata/debug-frame-main.ysh:7\n    my-proc\n    ^~~~~~~\n \
+  \ %2 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n      print-stack\n      ^~~~~~~~~~~\n"
+---
+
+$[ENV.SH] $[ENV.REPO_ROOT]/spec/testdata/debug-frame-main.ysh |
+  sed -e "s;$[ENV.REPO_ROOT];MYROOT;g" -e 's;#;%;g'

@@ -1,0 +1,28 @@
+name: bare assignment inside Hay blocks
+dialect: bash
+source: oils:spec/ysh-options-assign#bare-assignment-inside-hay-blocks
+stdout: "x is 1\n"
+---
+
+shopt --set ysh:all
+
+hay define Package
+
+# problem: we would allow it here, which is weird
+
+proc p { 
+  var x = 42
+}
+
+cd /tmp {
+  var x = 'hi'
+}
+
+hay eval :result {
+  Package {
+    version = 1
+  }
+}
+
+var x = 1
+echo "x is $x"

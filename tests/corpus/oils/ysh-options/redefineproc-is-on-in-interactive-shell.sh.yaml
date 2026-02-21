@@ -1,0 +1,12 @@
+name: redefine_proc is on in interactive shell
+dialect: bash
+source: oils:spec/ysh-options#redefineproc-is-on-in-interactive-shell
+stdout: "common\nredefinition\n"
+stderr: "hi\n"
+---
+
+$SH -O oil:all -i --rcfile /dev/null -c "
+source $REPO_ROOT/spec/testdata/module/common.ysh
+source $REPO_ROOT/spec/testdata/module/redefinition.ysh
+log hi
+"

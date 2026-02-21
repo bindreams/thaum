@@ -1,0 +1,9 @@
+name: cd with 2 or more args is allowed (strict_arg_parse disabled)
+dialect: bash
+source: 
+  oils:spec/builtin-cd#cd-with-2-or-more-args-is-allowed-strictargparse-disabled
+status: 0
+---
+
+mkdir -p foo
+cd foo bar

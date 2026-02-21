@@ -1,0 +1,23 @@
+name: read -n doesn't strip whitespace (bug fix)
+dialect: bash
+source: oils:spec/builtin-read#read--n-doesnt-strip-whitespace-bug-fix
+stdout: "[  a ]\n[  a b]\n[  a b ]\n\none var strips whitespace\n[a]\n[a b]\n[a b]\n\
+  \nthree vars\n[a] [] []\n[a] [b] []\n[a] [b] []\n"
+---
+case $SH in dash|zsh) exit ;; esac
+
+echo '  a b  ' | (read -n 4; echo "[$REPLY]")
+echo '  a b  ' | (read -n 5; echo "[$REPLY]")
+echo '  a b  ' | (read -n 6; echo "[$REPLY]")
+echo
+
+echo 'one var strips whitespace'
+echo '  a b  ' | (read -n 4 myvar; echo "[$myvar]")
+echo '  a b  ' | (read -n 5 myvar; echo "[$myvar]")
+echo '  a b  ' | (read -n 6 myvar; echo "[$myvar]")
+echo
+
+echo 'three vars'
+echo '  a b  ' | (read -n 4 x y z; echo "[$x] [$y] [$z]")
+echo '  a b  ' | (read -n 5 x y z; echo "[$x] [$y] [$z]")
+echo '  a b  ' | (read -n 6 x y z; echo "[$x] [$y] [$z]")

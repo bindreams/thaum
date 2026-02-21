@@ -1,0 +1,15 @@
+name: HISTFILE set to array
+dialect: bash
+source: oils:spec/builtin-history#histfile-set-to-array
+stdout: "status=1\n^D\n"
+---
+
+echo '
+HISTFILE=(a b c)
+history -a
+echo status=$?
+' | $SH -i
+
+case $SH in bash) echo '^D' ;; esac
+
+# note that bash actually writes the file 'a', since that's ${HISTFILE[0]} 

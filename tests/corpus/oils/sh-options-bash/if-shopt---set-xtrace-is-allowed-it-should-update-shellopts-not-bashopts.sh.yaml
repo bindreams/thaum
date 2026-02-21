@@ -1,0 +1,14 @@
+name: If shopt --set xtrace is allowed, it should update SHELLOPTS, not BASHOPTS
+dialect: bash
+source: 
+  oils:spec/sh-options-bash#if-shopt---set-xtrace-is-allowed-it-should-update-shellopts-not-bashopts
+stdout: "SHELLOPTS=xtrace\nSHELLOPTS=xtrace\nSHELLOPTS=\n"
+---
+case $SH in bash) exit ;; esac
+
+shopt --set xtrace
+echo SHELLOPTS=$SHELLOPTS
+set -x
+echo SHELLOPTS=$SHELLOPTS
+set +x
+echo SHELLOPTS=$SHELLOPTS

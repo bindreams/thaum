@@ -1,0 +1,14 @@
+name: 'shvar then replace - bug #1986 context manager crash'
+dialect: bash
+source: oils:spec/ysh-bugs#shvar-then-replace---bug-1986-context-manager-crash
+stdout: "hi\n"
+---
+
+shvar FOO=bar {
+  for x in (1 ..< 500) {
+    var Q = "hello"
+    setvar Q = Q=>replace("hello","world")
+  }
+}
+#echo $Q
+echo hi

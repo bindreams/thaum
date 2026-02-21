@@ -1,0 +1,9 @@
+name: errexit test && and fail
+dialect: bash
+source: oils:spec/errexit#errexit-test-and-fail
+status: 1
+stdout: ''
+---
+set -o errexit
+test -n X && false
+echo status=$?

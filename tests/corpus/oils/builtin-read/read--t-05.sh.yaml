@@ -1,0 +1,9 @@
+name: read -t 0.5
+dialect: bash
+source: oils:spec/builtin-read#read--t-05
+stdout: "1\n"
+---
+case $SH in dash) exit ;; esac
+
+read -t 0.5 < /dev/null
+echo $?

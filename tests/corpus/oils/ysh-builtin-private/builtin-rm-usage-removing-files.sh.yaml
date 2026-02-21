@@ -1,0 +1,25 @@
+name: 'builtin rm: usage, removing files'
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-rm-usage-removing-files
+stdout: "ok\nok\nstatus=1\nstatus=0\n"
+---
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+$prefix rm 
+if test "$?" != 0; then echo ok; fi
+
+$prefix rm --
+if test "$?" != 0; then echo ok; fi
+
+$prefix rm -- nonexistent
+echo status=$?
+
+touch foo bar
+$prefix rm -- foo bar
+echo status=$?
+
+if test -f foo; then echo fail; fi
+if test -f bar; then echo fail; fi

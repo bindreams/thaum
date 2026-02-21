@@ -1,0 +1,6 @@
+name: arguments to pwd
+dialect: bash
+source: oils:spec/builtin-cd#arguments-to-pwd
+status: 0
+---
+pwd /

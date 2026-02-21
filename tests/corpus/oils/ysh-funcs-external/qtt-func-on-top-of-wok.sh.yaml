@@ -1,0 +1,23 @@
+name: QTT func on top of wok
+dialect: bash
+source: oils:spec/ysh-funcs-external#qtt-func-on-top-of-wok
+stdout: "\n"
+---
+
+wok foo {
+  BEGIN {
+    write --sep $TAB -- $_schema_str' result:Int'
+  }
+
+  # for all rows.  Could be 'each' or 'row'
+  when {
+    const result = _row->x + _row->y
+    write --sep $TAB -- $_row_str $result
+  }
+}
+
+
+
+# Notes:
+# - consider JSON-RPC
+# - consider multiple return values

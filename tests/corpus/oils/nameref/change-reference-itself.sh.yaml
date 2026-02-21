@@ -1,0 +1,22 @@
+name: change reference itself
+dialect: bash
+source: oils:spec/nameref#change-reference-itself
+stdout: "ref=XX\nx=XX\ny=YY\n----\nref=YY\nx=XX\ny=YY\n----\nref=z\nx=XX\ny=z\n"
+---
+x=XX
+y=YY
+typeset -n ref=x
+echo ref=$ref
+echo x=$x
+echo y=$y
+
+echo ----
+typeset -n ref=y
+echo ref=$ref
+echo x=$x
+echo y=$y
+echo ----
+ref=z
+echo ref=$ref
+echo x=$x
+echo y=$y

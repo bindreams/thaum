@@ -1,0 +1,22 @@
+name: Eggex flags to ignore case are respected
+dialect: bash
+source: oils:spec/ysh-regex-api#eggex-flags-to-ignore-case-are-respected
+stdout: "yes\nyes\n"
+---
+shopt -s ysh:upgrade
+
+# based on Python's spelling
+var pat = / 'abc' ; i /
+var pat2 = / @pat 'def' ; reg_icase /  # this is allowed
+
+if ('-abcdef-' ~ pat2) {
+  echo 'yes'
+}
+
+if ('-ABCDEF-' ~ pat2) {
+  echo 'yes'
+}
+
+if ('ABCDE' ~ pat2) {
+  echo 'BUG'
+}

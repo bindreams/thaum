@@ -1,0 +1,16 @@
+name: ${!ref} to undefined string var is fatal, INCONSISTENT with array
+dialect: bash
+source: 
+  oils:spec/nix-idioms#ref-to-undefined-string-var-is-fatal-inconsistent-with-array
+status: 1
+stdout: "[]\n"
+---
+hookSlice='preHooks'
+
+argv.py ${!hookSlice}
+
+set -u
+
+argv.py ${!hookSlice}
+
+echo end

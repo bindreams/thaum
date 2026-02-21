@@ -1,0 +1,13 @@
+name: 'bash: K in (( A[K] = V )) is a constant string'
+dialect: bash
+source: oils:spec/dparen#bash-k-in-ak-v-is-a-constant-string
+stdout: "A[5]=\nkeys = K\nvalues = 42\n"
+---
+K=5
+V=42
+typeset -A A
+(( A[K] = V ))
+
+echo A["5"]=${A["5"]}
+echo keys = ${!A[@]}
+echo values = ${A[@]}

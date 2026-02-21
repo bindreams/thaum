@@ -1,0 +1,9 @@
+name: String slice with math
+dialect: bash
+source: oils:spec/var-op-slice#string-slice-with-math
+stdout: "def\n"
+---
+# I think this is the $(()) language inside?
+i=1
+foo=abcdefg
+echo ${foo: i+4-2 : i + 2}

@@ -1,0 +1,13 @@
+name: Dict -> erase()
+dialect: bash
+source: oils:spec/ysh-methods#dict---erase
+status: 0
+stdout: "(Dict)   {\"title\":\"The Histories\"}\n(Dict)   {\"title\":\"The Histories\"\
+  }\n"
+---
+var book = {title: "The Histories", author: "Herodotus"}
+call book->erase("author")
+pp test_ (book)
+# confirm method is idempotent
+call book->erase("author")
+pp test_ (book)

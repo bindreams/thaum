@@ -1,0 +1,7 @@
+name: unquoted whitespace arg is elided
+dialect: bash
+source: oils:spec/word-split#unquoted-whitespace-arg-is-elided
+stdout: "['1', '2']\n"
+---
+space=" "
+argv.py 1 $space 2

@@ -1,0 +1,11 @@
+name: If with then on same line missing semicolon
+dialect: bash
+source: oils:spec/shell-grammar#if-with-then-on-same-line-missing-semicolon
+status: 2
+---
+# My ANTLR parsers fail to flag this.  The 'else' keyword should be unexpected.
+if echo then
+  echo
+else
+  echo
+fi

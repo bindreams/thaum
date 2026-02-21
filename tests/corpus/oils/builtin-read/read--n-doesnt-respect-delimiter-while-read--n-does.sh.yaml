@@ -1,0 +1,10 @@
+name: read -N doesn't respect delimiter, while read -n does
+dialect: bash
+source: 
+  oils:spec/builtin-read#read--n-doesnt-respect-delimiter-while-read--n-does
+stdout: "foo\nfooba\n"
+---
+case $SH in dash|zsh|ash) exit ;; esac
+
+echo foobar | { read -n 5 -d b; echo $REPLY; }
+echo foobar | { read -N 5 -d b; echo $REPLY; }

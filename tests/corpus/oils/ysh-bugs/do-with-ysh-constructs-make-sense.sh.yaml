@@ -1,0 +1,27 @@
+name: Do && || with YSH constructs make sense/
+dialect: bash
+source: oils:spec/ysh-bugs#do-with-ysh-constructs-make-sense
+stdout: "\n"
+---
+
+# I guess there's nothing wrong with this?
+#
+# But I generally feel && || are only for
+#
+# test --file x && test --file y
+
+var x = []
+true && call x->append(42)
+false && call x->append(43)
+pp test_ (x)
+
+func amp() {
+  true && return (42)
+}
+
+func pipe() {
+  false || return (42)
+}
+
+pp test_ (amp())
+pp test_ (pipe())

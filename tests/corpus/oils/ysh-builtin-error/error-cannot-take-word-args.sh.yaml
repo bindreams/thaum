@@ -1,0 +1,7 @@
+name: error cannot take word args
+dialect: bash
+source: oils:spec/ysh-builtin-error#error-cannot-take-word-args
+status: 3
+stdout: "\n"
+---
+error uh-oh ('error', status=1)

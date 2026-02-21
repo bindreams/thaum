@@ -1,0 +1,15 @@
+name: s[0] with string '12 34'
+dialect: bash
+source: oils:spec/arith#s0-with-string-12-34
+status: 1
+stdout: "\n"
+---
+
+s='12 34'
+echo '12 34' $(( s[0] )) $(( s[1] ))
+echo status=$?
+
+
+
+
+# bash prints an error, but doesn't fail

@@ -1,0 +1,9 @@
+name: SHELLOPTS is readonly
+dialect: bash
+source: oils:spec/sh-options-bash#shellopts-is-readonly
+stdout: "status=1\n"
+---
+SHELLOPTS=x
+echo status=$?
+
+# Setting a readonly variable in osh is a hard failure.

@@ -1,0 +1,8 @@
+name: printf -v %s
+dialect: bash
+source: oils:spec/builtin-printf#printf--v-s
+stdout: "['hello there']\n"
+---
+var=foo
+printf -v $var %s 'hello there'
+argv.py "$foo"

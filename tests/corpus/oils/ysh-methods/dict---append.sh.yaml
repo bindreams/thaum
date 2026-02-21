@@ -1,0 +1,16 @@
+name: Dict -> append()
+dialect: bash
+source: oils:spec/ysh-methods#dict---append
+stdout: "\n"
+---
+var mydict = {a: [1]}
+call mydict->append('a', 2)
+assert [{"a": [1,2]} === mydict]
+call mydict->append('a', 'b')
+assert [{"a": [1,2,'b']} === mydict]
+call mydict->append('b', 1)
+assert [{"a": [1,2,'b'], "b": [1]} === mydict]
+call mydict->append('c', [1,2])
+
+# list of lists
+assert [{"a": [1,2,'b'], "b": [1], "c": [[1,2]]} === mydict]

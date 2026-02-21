@@ -1,0 +1,16 @@
+name: simple var sub $name $0 $1 $? etc.
+dialect: bash
+source: oils:spec/ysh-expr#simple-var-sub-name-0-1-etc
+stdout: "status=42\na b\nnamed=a\n"
+---
+( exit 42 )
+var status = $?
+echo status=$status
+
+set -- a b c
+var one = $1
+var two = $2
+echo $one $two
+
+var named = "$one"  # equivalent to 'one'
+echo named=$named

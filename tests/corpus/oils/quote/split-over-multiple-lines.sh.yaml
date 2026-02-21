@@ -1,0 +1,14 @@
+name: $? split over multiple lines
+dialect: bash
+source: oils:spec/quote#split-over-multiple-lines
+stdout: "$?\n"
+---
+# Same with $$, etc.  OSH won't do this because $? is a single token.
+echo $\
+?
+
+#
+# Bad quotes
+#
+
+# TODO: Also test unterminated quotes inside ${} and $()

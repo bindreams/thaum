@@ -1,0 +1,27 @@
+name: io->eval(to_dict=true) - local and global
+dialect: bash
+source: oils:spec/ysh-builtin-eval#io-evaltodicttrue---local-and-global
+stdout: "(Dict)   {\"foo\":42,\"bar\":\"global\"}\n(Dict)   {\"foo\":42,\"g\":\"-global\"\
+  ,\"p\":\"-param\",\"L\":\"-local\"}\n"
+---
+
+var g = 'global'
+
+# in the global frame
+var d = io->eval(^(var foo = 42; var bar = g;), to_dict=true)
+pp test_ (d)
+
+# Same thing in a local frame
+proc p (myparam) {
+  var mylocal = 'local'
+  # TODO: ^() needs to capture
+  var cmd = ^(
+    var foo = 42
+    var g = "-$g"
+    var p = "-$myparam"
+    var L = "-$mylocal"
+  )
+  var d = io->eval(cmd, to_dict=true)
+  pp test_ (d)
+}
+p param

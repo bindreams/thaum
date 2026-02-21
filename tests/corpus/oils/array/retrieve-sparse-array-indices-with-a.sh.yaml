@@ -1,0 +1,8 @@
+name: Retrieve sparse array indices with ${!a}
+dialect: bash
+source: oils:spec/array#retrieve-sparse-array-indices-with-a
+stdout: "['99']\n"
+---
+a=()
+(( a[99]=1 ))
+argv.py "${!a[@]}"

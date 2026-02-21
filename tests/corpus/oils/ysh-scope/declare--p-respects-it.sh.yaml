@@ -1,0 +1,29 @@
+name: declare -p respects it
+dialect: bash
+source: oils:spec/ysh-scope#declare--p-respects-it
+stdout: "declare -- ___g=G\ndeclare -- ___x=X\ndeclare -- ___y=Y\nstatus=0\n-\ndeclare
+  -- ___y=Y\nstatus=0\n---\ndeclare -- ___g=G\ndeclare -- ___x=X\nstatus=0\n-\nstatus=1\n"
+---
+
+___g=G
+
+show-vars() {
+  local ___x=X
+  declare -p | grep '___'
+  echo status=$?
+
+  echo -
+  declare -p ___y | grep '___'
+  echo status=$?
+}
+
+demo() {
+  local ___y=Y
+
+  show-vars
+  echo ---
+  shopt --unset dynamic_scope
+  show-vars
+}
+
+demo

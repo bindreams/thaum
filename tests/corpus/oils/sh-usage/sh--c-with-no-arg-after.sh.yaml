@@ -1,0 +1,17 @@
+name: sh -c with no arg after --
+dialect: bash
+source: oils:spec/sh-usage#sh--c-with-no-arg-after
+stdout: "failed\nfailed\n"
+---
+
+# variant of above case
+
+$SH -c --
+if test $? -ne 0; then
+  echo failed
+fi
+
+$SH -c -
+if test $? -ne 0; then
+  echo failed
+fi

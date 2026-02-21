@@ -1,0 +1,11 @@
+name: compadjust
+dialect: bash
+source: oils:spec/array-sparse#compadjust
+stdout: "['world!', 'Bash', '3']\n['echo', 'Hello,', 'Bash', 'world!']\n"
+---
+case $SH in bash|mksh) exit ;; esac
+
+COMP_ARGV=(echo 'Hello,' 'Bash' 'world!')
+compadjust cur prev words cword
+argv.py "$cur" "$prev" "$cword"
+argv.py "${words[@]}"

@@ -1,0 +1,17 @@
+name: vi and emacs are mutually exclusive
+dialect: bash
+source: oils:spec/sh-options#vi-and-emacs-are-mutually-exclusive
+stdout: "set +o emacs\nset +o vi\n___\nset -o emacs\nset +o vi\n___\nset +o emacs\n\
+  set -o vi\n___\n"
+---
+show() {
+  shopt -o -p | egrep 'emacs$|vi$'
+  echo ___
+};
+show
+
+set -o emacs
+show
+
+set -o vi
+show

@@ -1,0 +1,15 @@
+name: Parsing of x=1> and related cases
+dialect: bash
+source: oils:spec/redirect#parsing-of-x1-and-related-cases
+stdout: "x=1\nx=1\nx=\n+1\n+1\n+\na1\n"
+---
+
+echo x=1>/dev/stdout
+echo x=1 >/dev/stdout
+echo x= 1>/dev/stdout
+
+echo +1>/dev/stdout
+echo +1 >/dev/stdout
+echo + 1>/dev/stdout
+
+echo a1>/dev/stdout

@@ -1,0 +1,12 @@
+name: Mutate __sh_function__
+dialect: bash
+source: oils:spec/ysh-proc-meta#mutate-shfunction
+stdout: "sh-func\n"
+---
+
+f() { echo sh-func; }
+f
+
+setvar __sh_function__.f = 42
+
+f

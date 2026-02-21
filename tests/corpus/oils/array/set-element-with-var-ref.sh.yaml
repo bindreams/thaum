@@ -1,0 +1,9 @@
+name: Set element with var ref
+dialect: bash
+source: oils:spec/array#set-element-with-var-ref
+stdout: "['9', '2 3']\n"
+---
+a=(1 '2 3')
+i=0
+a[$i]=9
+argv.py "${a[@]}"

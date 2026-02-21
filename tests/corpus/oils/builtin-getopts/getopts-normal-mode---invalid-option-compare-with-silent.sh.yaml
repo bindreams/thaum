@@ -1,0 +1,11 @@
+name: getopts normal mode - invalid option (compare with silent)
+dialect: bash
+source: 
+  oils:spec/builtin-getopts#getopts-normal-mode---invalid-option-compare-with-silent
+status: 0
+stdout: "status=0 opt=? OPTARG=\n"
+---
+# Normal mode: OPTARG is empty, prints error message
+set -- -Z
+getopts 'a:' opt 2>/dev/null
+echo "status=$? opt=$opt OPTARG=$OPTARG"

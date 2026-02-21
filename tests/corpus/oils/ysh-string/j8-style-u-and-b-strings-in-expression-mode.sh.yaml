@@ -1,0 +1,12 @@
+name: J8-style u'' and b'' strings in expression mode
+dialect: bash
+source: oils:spec/ysh-string#j8-style-u-and-b-strings-in-expression-mode
+stdout: " ce bc\n ff\n"
+---
+
+var x = u'\u{3bc}'
+var y = b'\yff'
+
+
+write --end '' -- $x | od -A n -t x1
+write --end '' -- $y | od -A n -t x1

@@ -1,0 +1,9 @@
+name: Exit builtin with too many args
+dialect: bash
+source: oils:spec/builtin-process#exit-builtin-with-too-many-args
+status: 2
+stdout: ''
+---
+# This is a parse error in OSH.
+exit 7 8 9
+echo status=$?

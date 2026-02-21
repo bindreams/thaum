@@ -1,0 +1,27 @@
+name: 'Consistency: Exit Status and Blocks'
+dialect: bash
+source: oils:spec/ysh-blocks#consistency-exit-status-and-blocks
+stdout: "cd=0\nshopt=0\n  FOO=foo\nshvar=0\ntry=0\n"
+---
+shopt --set parse_brace
+
+cd / {
+  false 
+}
+echo cd=$?
+
+shopt --unset errexit {
+  false
+}
+echo shopt=$?
+
+shvar FOO=foo {
+  echo "  FOO=$FOO"
+  false
+}
+echo shvar=$?
+
+try {
+  false
+}
+echo try=$?

@@ -1,0 +1,13 @@
+name: ${!ref-default}
+dialect: bash
+source: oils:spec/var-ref#ref-default
+stdout: "x=default\nx=\nx=foo\n"
+---
+ref=x
+echo x=${!ref-default}
+
+x=''
+echo x=${!ref-default}
+
+x=foo
+echo x=${!ref-default}

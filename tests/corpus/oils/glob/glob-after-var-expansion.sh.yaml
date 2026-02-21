@@ -1,0 +1,9 @@
+name: glob after var expansion
+dialect: bash
+source: oils:spec/glob#glob-after-var-expansion
+stdout: "_tmp/a.A _tmp/aa.A _tmp/b.B\n"
+---
+touch _tmp/a.A _tmp/aa.A _tmp/b.B
+f="_tmp/*.A"
+g="$f _tmp/*.B"
+echo $g

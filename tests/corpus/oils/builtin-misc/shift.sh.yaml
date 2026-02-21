@@ -1,0 +1,11 @@
+name: shift
+dialect: bash
+source: oils:spec/builtin-misc#shift
+status: 0
+stdout: "2 3 4\n4\n"
+---
+set -- 1 2 3 4
+shift
+echo "$@"
+shift 2
+echo "$@"

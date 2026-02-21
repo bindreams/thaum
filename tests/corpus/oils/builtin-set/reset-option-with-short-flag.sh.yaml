@@ -1,0 +1,9 @@
+name: reset option with short flag
+dialect: bash
+source: oils:spec/builtin-set#reset-option-with-short-flag
+status: 0
+stdout: "[]\n"
+---
+set -u 
+set +u
+echo "[$unset]"

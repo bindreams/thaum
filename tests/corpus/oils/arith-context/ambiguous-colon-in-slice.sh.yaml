@@ -1,0 +1,8 @@
+name: Ambiguous colon in slice
+dialect: bash
+source: oils:spec/arith-context#ambiguous-colon-in-slice
+stdout: "2\nc\n"
+---
+s='abcd'
+echo $(( 0 < 1 ? 2 : 0 ))  # evaluates to 2
+echo ${s: 0 < 1 ? 2 : 0 : 1}  # 2:1 -- TRICKY THREE COLONS

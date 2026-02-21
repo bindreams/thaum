@@ -1,0 +1,13 @@
+name: Length operator can't be followed by test operator
+dialect: bash
+source: oils:spec/var-op-len#length-operator-cant-be-followed-by-test-operator
+status: 2
+stdout: ''
+---
+echo ${#x-default}
+
+x=''
+echo ${#x-default}
+
+x='foo'
+echo ${#x-default}

@@ -1,0 +1,21 @@
+name: Str.replace(Eggex, Lazy), convert_func
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplaceeggex-lazy-convertfunc
+stdout: "124\n123\nstatus=3\n"
+---
+shopt --set ysh:all
+
+var mystr = '123'
+
+write $[mystr.replace(/ <capture d+ as n : int> /, ^"$[n + 1]")]
+
+# values automatically get stringified
+write $[mystr.replace(/ <capture d+ as n : int> /, ^"$1")]
+
+func not_str(inp) {
+  return ({ "value": inp })
+}
+
+# should fail to stringify $1
+try { call mystr.replace(/ <capture d+ : not_str> /, ^"$1") }
+write status=$[_error.code]

@@ -1,0 +1,11 @@
+name: string array with command sub, varsub, etc.
+dialect: bash
+source: oils:spec/ysh-list#string-array-with-command-sub-varsub-etc
+stdout: "len=4\n1\nhi\nsq\ndq 1\n"
+---
+shopt -s ysh:all
+
+var x = 1
+var a = :| $x $(write hi) 'sq' "dq $x" |
+write len=$[len(a)]
+write @a

@@ -1,0 +1,10 @@
+name: extglob empty pattern
+dialect: bash
+source: oils:spec/extglob-match#extglob-empty-pattern
+stdout: "TRUE\nTRUE\nFALSE\nFALSE\n"
+---
+shopt -s extglob
+[[ '' == @() ]] && echo TRUE
+[[ '' == @(||) ]] && echo TRUE
+[[ X == @() ]] || echo FALSE
+[[ '|' == @(||) ]] || echo FALSE

@@ -1,0 +1,13 @@
+name: Local without variable is still unset!
+dialect: bash
+source: oils:spec/builtin-vars#local-without-variable-is-still-unset
+status: 1
+stdout: ''
+---
+set -o nounset
+f() {
+  local foo
+  echo "[$foo]"
+}
+f
+# zsh doesn't support nounset?

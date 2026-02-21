@@ -1,0 +1,17 @@
+name: builtin cat
+dialect: bash
+source: oils:spec/ysh-builtin-private#builtin-cat
+stdout: "2\n3\n---\n"
+---
+
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+seq 2 3 | $prefix cat
+echo ---
+
+# from file
+#echo FOO > foo
+#$prefix cat foo foo

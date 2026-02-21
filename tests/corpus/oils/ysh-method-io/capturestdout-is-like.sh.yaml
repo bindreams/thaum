@@ -1,0 +1,15 @@
+name: captureStdout() is like $()
+dialect: bash
+source: oils:spec/ysh-method-io#capturestdout-is-like
+stdout: "(Str)   \"one\\ncaptured\"\n"
+---
+
+proc p {
+  var captured = 'captured'
+  var cmd = ^(echo one; echo $captured)
+  
+  var stdout = io.captureStdout(cmd)
+  pp test_ (stdout)
+}
+
+p

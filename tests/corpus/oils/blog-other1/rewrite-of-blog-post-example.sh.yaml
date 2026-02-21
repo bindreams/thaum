@@ -1,0 +1,12 @@
+name: Rewrite of Blog Post Example
+dialect: bash
+source: oils:spec/blog-other1#rewrite-of-blog-post-example
+stdout: "/foo\n/bar\n/baz\n"
+---
+paths=$(tr '\n' ':' | sed -e 's/:$//' <<EOPATHS
+/foo
+/bar
+/baz
+EOPATHS
+)
+echo "$paths"

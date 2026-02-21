@@ -1,0 +1,12 @@
+name: set +o errexit with 2 levels of ignored
+dialect: bash
+source: oils:spec/errexit#set-o-errexit-with-2-levels-of-ignored
+stdout: "1\n2\n3\n6\n7\n"
+---
+set -o errexit
+if { echo 1; ! set +o errexit; echo 2; }; then
+  echo 3
+fi
+echo 6
+false
+echo 7

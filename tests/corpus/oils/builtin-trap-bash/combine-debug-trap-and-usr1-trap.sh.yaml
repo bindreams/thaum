@@ -1,0 +1,13 @@
+name: Combine DEBUG trap and USR1 trap
+dialect: bash
+source: oils:spec/builtin-trap-bash#combine-debug-trap-and-usr1-trap
+stdout: "6 dbg\n1 dbg\n1 dbg\n1 usr1\n7 dbg\nafter=0\n"
+---
+
+case $SH in dash|mksh|ash) exit ;; esac
+
+trap 'false; echo $LINENO usr1' USR1
+trap 'false; echo $LINENO dbg' DEBUG
+
+sh -c "kill -USR1 $$"
+echo after=$?

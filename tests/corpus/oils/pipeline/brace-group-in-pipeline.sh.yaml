@@ -1,0 +1,6 @@
+name: Brace group in pipeline
+dialect: bash
+source: oils:spec/pipeline#brace-group-in-pipeline
+stdout: "two\none\n"
+---
+{ echo one; echo two; } | tac

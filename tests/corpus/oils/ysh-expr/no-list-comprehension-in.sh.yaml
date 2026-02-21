@@ -1,0 +1,9 @@
+name: No list comprehension in ^[]
+dialect: bash
+source: oils:spec/ysh-expr#no-list-comprehension-in
+status: 2
+stdout: "\n"
+---
+
+var mylist = ^[x for x in y]  
+pp test_ (io->evalExpr(mylist))

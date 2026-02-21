@@ -1,0 +1,20 @@
+name: ysh --eval
+dialect: bash
+source: oils:spec/ysh-usage#ysh---eval
+stdout: "one --eval: x y z\nflag -c: x y z\n\none --eval: a b c\nmyscript: a b c\n\
+  \none --eval: P Q\nyshrc: P Q\nflag -c: P Q\n\n"
+---
+
+# args are available in both, similar to --rcfile
+echo 'echo one --eval: @ARGV' >one.ysh
+$[ENV.SH] --eval one.ysh -c 'echo flag -c: @ARGV' dummy x y z
+echo
+
+echo 'echo myscript: @ARGV' >myscript.sh
+$[ENV.SH] --eval one.ysh myscript.sh a b c
+echo
+
+# eval comes before oshrc
+echo 'echo yshrc: @ARGV' >yshrc
+$[ENV.SH] --rcfile yshrc --eval one.ysh -i -c 'echo flag -c: @ARGV' dummy P Q
+echo

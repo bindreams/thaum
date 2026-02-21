@@ -1,0 +1,9 @@
+name: source works for files in subdirectory
+dialect: bash
+source: oils:spec/builtin-eval-source#source-works-for-files-in-subdirectory
+stdout: "path\n"
+---
+mkdir -p dir
+echo "echo path" > dir/cmd
+. dir/cmd
+rm dir/cmd

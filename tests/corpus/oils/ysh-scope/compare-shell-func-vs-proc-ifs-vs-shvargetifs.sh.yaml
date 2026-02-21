@@ -1,0 +1,45 @@
+name: Compare shell func vs. proc, $IFS vs. shvarGet('IFS')
+dialect: bash
+source: oils:spec/ysh-scope#compare-shell-func-vs-proc-ifs-vs-shvargetifs
+stdout: "shellfunc\nIFS=z\nshvarGet IFS=z\n['x', 'x ', 'x']\n\nmyproc -> p2\nIFS=x\n\
+  shvarGet IFS=x\n['', 'z', ' z', 'z']\n\nnull\n"
+---
+
+shopt --set parse_proc parse_ysh_expr_sub
+
+s='xzx zxz'
+
+shellfunc() {  # dynamic scope everywhere
+  echo shellfunc
+  echo IFS="$IFS"
+  echo shvarGet IFS=$[shvarGet('IFS')]
+  argv.py $s
+}
+
+proc myproc {  # no dynamic scope
+
+  # Subtle behavior: we see 'x' rather than "temp frame" 'z' - I think because
+  # there is a CHAIN of __E__ enclosed scopes, up to the global frame.
+  #
+  # That frame comes FIRST.   That seems OK, but it changed when procs became closures.
+  proc p2 {
+    echo "myproc -> p2"
+    echo IFS="$IFS"  
+    echo shvarGet IFS=$[shvarGet('IFS')]  # dynamic scope opt-in
+    argv.py $s  # dynamic scope in osh/split.py
+  }
+
+  p2 
+}
+
+IFS=x
+
+IFS=z shellfunc
+echo
+
+# this makes a temp frame, but the proc can't see it?
+IFS=z myproc
+echo
+
+# null
+echo $[shvarGet('nonexistent')]

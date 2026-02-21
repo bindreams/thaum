@@ -1,0 +1,10 @@
+name: bind -s -S accepted
+dialect: bash
+source: oils:spec/builtin-bind#bind--s--s-accepted
+stdout: "\n"
+---
+
+# TODO: add non-trivial tests here
+
+bind -s
+bind -S

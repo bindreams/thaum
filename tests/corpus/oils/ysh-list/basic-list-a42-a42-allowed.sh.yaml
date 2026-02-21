@@ -1,0 +1,17 @@
+name: Basic List, a[42] a['42'] allowed
+dialect: bash
+source: oils:spec/ysh-list#basic-list-a42-a42-allowed
+status: 3
+stdout: "len=3\n(Str)   \"2\"\n(Str)   \"3\"\n"
+---
+
+var x = :| 1 2 3 |
+write len=$[len(x)]
+
+pp test_ (x[1])
+
+# Can be int-looking string
+pp test_ (x['2'])
+
+# Not allowed
+pp test_ (x['zz'])

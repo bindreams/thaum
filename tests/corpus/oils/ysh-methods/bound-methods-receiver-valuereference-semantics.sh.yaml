@@ -1,0 +1,17 @@
+name: Bound methods, receiver value/reference semantics
+dialect: bash
+source: oils:spec/ysh-methods#bound-methods-receiver-valuereference-semantics
+status: 0
+stdout: "(List)   [\"foo\"]\n(List)   [\"foo\",\"baz\"]\n(Bool)   true\n(Bool)   true\n"
+---
+var is_a_ref = { "foo": "bar" }
+const f = is_a_ref => keys
+pp test_ (f())
+setvar is_a_ref["baz"] = 42
+pp test_ (f())
+
+var is_a_val = "abc"
+const g = is_a_val => startsWith
+pp test_ (g("a"))
+setvar is_a_val = "xyz"
+pp test_ (g("a"))

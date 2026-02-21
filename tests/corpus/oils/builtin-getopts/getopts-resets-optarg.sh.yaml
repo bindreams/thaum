@@ -1,0 +1,10 @@
+name: getopts resets OPTARG
+dialect: bash
+source: oils:spec/builtin-getopts#getopts-resets-optarg
+stdout: "status=0 opt=c OPTARG=foo\nstatus=0 opt=h OPTARG=\n"
+---
+set -- -c foo -h
+getopts 'hc:' opt
+echo status=$? opt=$opt OPTARG=$OPTARG
+getopts 'hc:' opt
+echo status=$? opt=$opt OPTARG=$OPTARG

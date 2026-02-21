@@ -1,0 +1,6 @@
+name: glob double quote escape
+dialect: bash
+source: oils:spec/glob#glob-double-quote-escape
+stdout: "*.sh\n"
+---
+echo "*.sh"

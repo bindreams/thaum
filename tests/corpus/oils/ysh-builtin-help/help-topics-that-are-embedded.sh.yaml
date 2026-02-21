@@ -1,0 +1,17 @@
+name: help topics that are embedded
+dialect: bash
+source: oils:spec/ysh-builtin-help#help-topics-that-are-embedded
+stdout: "no args 0\n\n~~~ help\nhelp 0\n\n~~~ oils-usage\noils-usage 0\n\n~~~ osh-usage\n\
+  osh-usage 0\n\n~~~ ysh-usage\nysh-usage 0\n\n~~~ osh-chapters\nosh-chapters 0\n\n\
+  ~~~ ysh-chapters\nysh-chapters 0\n\n"
+---
+
+help > help.txt
+echo no args $?
+echo
+
+for topic in help oils-usage {osh,ysh}-usage {osh,ysh}-chapters; do
+  help $topic | fgrep -o "~~~ $topic"
+  echo $topic $?
+  echo
+done

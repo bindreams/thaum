@@ -1,0 +1,10 @@
+name: Augmented assignment with integers
+dialect: bash
+source: oils:spec/ysh-augmented#augmented-assignment-with-integers
+stdout: "x=7\nx=11\n"
+---
+var x = 1 + 2 * 3
+echo x=$x
+
+setvar x += 4 * 1
+echo x=$x

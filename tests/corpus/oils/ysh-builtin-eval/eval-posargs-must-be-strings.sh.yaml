@@ -1,0 +1,6 @@
+name: eval pos_args must be strings
+dialect: bash
+source: oils:spec/ysh-builtin-eval#eval-posargs-must-be-strings
+status: 3
+---
+call io->eval(^(true), pos_args=[1, 2, 3])

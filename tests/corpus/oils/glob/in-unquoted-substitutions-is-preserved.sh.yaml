@@ -1,0 +1,8 @@
+name: \ in unquoted substitutions is preserved
+dialect: bash
+source: oils:spec/glob#in-unquoted-substitutions-is-preserved
+stdout: "\\*\\*.txt\n\\*\\*.txt\n"
+---
+v='\*\*.txt'
+echo $v
+echo "$v"

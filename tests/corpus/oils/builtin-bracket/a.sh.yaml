@@ -1,0 +1,7 @@
+name: '! -a'
+dialect: bash
+source: oils:spec/builtin-bracket#a
+stdout: "status=0\n"
+---
+[ -z '' -a ! -z x ]
+echo status=$?

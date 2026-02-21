@@ -1,0 +1,10 @@
+name: cat here doc; echo; cat here doc
+dialect: bash
+source: oils:spec/posix#cat-here-doc-echo-cat-here-doc
+stdout: "one\ntwo\nthree\n"
+---
+cat <<EOF1; echo two; cat <<EOF2
+one
+EOF1
+three
+EOF2

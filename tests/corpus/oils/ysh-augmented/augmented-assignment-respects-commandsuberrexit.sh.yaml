@@ -1,0 +1,14 @@
+name: Augmented assignment respects command_sub_errexit
+dialect: bash
+source: oils:spec/ysh-augmented#augmented-assignment-respects-commandsuberrexit
+status: 1
+stdout: "x=45\n"
+---
+
+
+var x = '42'
+setvar x += $(echo 3)
+echo x=$x
+
+setvar x += $(echo 3; false)
+echo x=$x

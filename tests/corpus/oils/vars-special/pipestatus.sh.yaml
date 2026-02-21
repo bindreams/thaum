@@ -1,0 +1,8 @@
+name: $PIPESTATUS
+dialect: bash
+source: oils:spec/vars-special#pipestatus
+status: 0
+stdout: "['0', '33', '0']\n"
+---
+echo hi | sh -c 'cat; exit 33' | wc -l >/dev/null
+argv.py "${PIPESTATUS[@]}"

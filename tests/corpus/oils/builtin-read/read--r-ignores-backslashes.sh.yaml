@@ -1,0 +1,9 @@
+name: read -r ignores backslashes
+dialect: bash
+source: oils:spec/builtin-read#read--r-ignores-backslashes
+stdout: "['one two', 'one\\\\ two']\n"
+---
+echo 'one\ two' > $TMP/readr.txt
+read escaped < $TMP/readr.txt
+read -r raw < $TMP/readr.txt
+argv.py "$escaped" "$raw"

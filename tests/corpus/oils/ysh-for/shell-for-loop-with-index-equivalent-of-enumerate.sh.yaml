@@ -1,0 +1,8 @@
+name: Shell for loop with index (equivalent of enumerate())
+dialect: bash
+source: oils:spec/ysh-for#shell-for-loop-with-index-equivalent-of-enumerate
+stdout: "0 a\n1 b\n2 c\n"
+---
+for i, item in a b c {
+  echo "$i $item"
+}

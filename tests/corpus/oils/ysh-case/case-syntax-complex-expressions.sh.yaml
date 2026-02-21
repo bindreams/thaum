@@ -1,0 +1,10 @@
+name: case syntax, complex expressions
+dialect: bash
+source: oils:spec/ysh-case#case-syntax-complex-expressions
+stdout: "three\n"
+---
+const x = 3
+case (x) {
+  (1 + 2) { echo three }
+  (2 + 2) { echo four }
+}

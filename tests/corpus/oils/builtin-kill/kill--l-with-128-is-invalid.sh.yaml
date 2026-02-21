@@ -1,0 +1,9 @@
+name: kill -l with 128 is invalid
+dialect: bash
+source: oils:spec/builtin-kill#kill--l-with-128-is-invalid
+stdout: "invalid\n## N-I mksh STDOUT:\n128\n"
+---
+kill -l 128
+if [ $? -ne 0 ]; then
+    echo "invalid"
+fi

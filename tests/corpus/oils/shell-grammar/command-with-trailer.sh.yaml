@@ -1,0 +1,5 @@
+name: Command with trailer
+dialect: bash
+source: oils:spec/shell-grammar#command-with-trailer
+---
+echo word word &

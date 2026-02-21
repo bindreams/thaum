@@ -1,0 +1,10 @@
+name: 'global assignment with command sub: last command fails and it aborts'
+dialect: bash
+source: 
+  oils:spec/errexit-osh#global-assignment-with-command-sub-last-command-fails-and-it-aborts
+status: 1
+stdout: ''
+---
+set -o errexit
+s=$(echo one; false)
+echo status=$?

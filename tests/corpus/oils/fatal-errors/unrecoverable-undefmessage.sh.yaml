@@ -1,0 +1,19 @@
+name: 'Unrecoverable: ${undef?message}'
+dialect: bash
+source: oils:spec/fatal-errors#unrecoverable-undefmessage
+stdout: "outside=1\noutside=1\n"
+---
+
+$SH -c '
+echo ${undef?message}
+echo inside=$?
+'
+echo outside=$?
+
+$SH -c '
+case ${undef?message} in 
+  (*) echo hi ;;
+esac
+echo inside=$?
+'
+echo outside=$?

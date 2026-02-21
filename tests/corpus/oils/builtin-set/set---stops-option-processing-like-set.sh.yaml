@@ -1,0 +1,20 @@
+name: set - stops option processing like set --
+dialect: bash
+source: oils:spec/builtin-set#set---stops-option-processing-like-set
+stdout: "argv -v\n"
+---
+case $SH in zsh) exit ;; esac
+
+show_options() {
+  case $- in
+    *v*) echo verbose-on ;;
+  esac
+  case $- in
+    *x*) echo xtrace-on ;;
+  esac
+}
+
+set -x - -v
+
+show_options
+echo argv "$@"

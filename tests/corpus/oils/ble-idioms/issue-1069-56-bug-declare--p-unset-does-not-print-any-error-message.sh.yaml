@@ -1,0 +1,9 @@
+name: 'Issue #1069 [56] BUG: declare -p unset does not print any error message'
+dialect: bash
+source: 
+  oils:spec/ble-idioms#issue-1069-56-bug-declare--p-unset-does-not-print-any-error-message
+status: 1
+stdout: "\n"
+stderr: "[ stdin ]:1: osh: typeset: 'nonexistent' is not defined\n"
+---
+typeset -p nonexistent

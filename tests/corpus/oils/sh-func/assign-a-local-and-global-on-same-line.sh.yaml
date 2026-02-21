@@ -1,0 +1,14 @@
+name: Assign a local and global on same line
+dialect: bash
+source: oils:spec/sh-func#assign-a-local-and-global-on-same-line
+status: 0
+stdout: "[L G]\n[ G]\n"
+---
+myglobal=
+f() {
+  local mylocal
+  mylocal=L myglobal=G
+  echo "[$mylocal $myglobal]"
+}
+f
+echo "[$mylocal $myglobal]"

@@ -1,0 +1,10 @@
+name: $@ ("" "") and - and +
+dialect: bash
+source: oils:spec/var-op-test#and---and
+stdout: "argv=\nargv=plus\nargv=\nargv=plus\n"
+---
+set -- "" ""
+echo argv=${@-minus}
+echo argv=${@+plus}
+echo argv=${@:-minus}
+echo argv=${@:+plus}

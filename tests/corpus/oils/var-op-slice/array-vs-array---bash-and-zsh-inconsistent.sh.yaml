@@ -1,0 +1,11 @@
+name: '${array[@]:} vs ${array[@]: }  - bash and zsh inconsistent'
+dialect: bash
+source: oils:spec/var-op-slice#array-vs-array---bash-and-zsh-inconsistent
+stdout: "['space', '1', '2', '3']\n['space', '123']\n"
+---
+
+$SH -c 'array=(1 2 3); argv.py ${array[@]:}'
+$SH -c 'array=(1 2 3); argv.py space ${array[@]: }'
+
+$SH -c 's=123; argv.py ${s:}'
+$SH -c 's=123; argv.py space ${s: }'

@@ -1,0 +1,9 @@
+name: assign to readonly variable - errexit
+dialect: bash
+source: oils:spec/builtin-vars#assign-to-readonly-variable---errexit
+status: 1
+---
+set -o errexit
+readonly foo=bar
+foo=eggs
+echo "status=$?"  # nothing happens

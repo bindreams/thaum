@@ -1,0 +1,11 @@
+name: Proc name-with-hyphen
+dialect: bash
+source: oils:spec/ysh-proc#proc-name-with-hyphen
+stdout: "x y z\n"
+---
+shopt --set parse_proc parse_at
+
+proc name-with-hyphen {
+  echo @ARGV
+}
+name-with-hyphen x y z

@@ -1,0 +1,12 @@
+name: source works for files in current directory (bash only)
+dialect: bash
+source: 
+  oils:spec/builtin-eval-source#source-works-for-files-in-current-directory-bash-only
+stdout: "current dir\nstatus=0\n"
+---
+cd $TMP
+echo "echo current dir" > cmd
+. cmd
+echo status=$?
+
+# This is a special builtin so failure is fatal.

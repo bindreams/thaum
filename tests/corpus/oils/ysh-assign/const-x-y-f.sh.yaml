@@ -1,0 +1,18 @@
+name: const x, y = f()
+dialect: bash
+source: oils:spec/ysh-assign#const-x-y-f
+status: 1
+stdout: "a=3 b=4\n"
+---
+
+func f() {
+  # this syntax would be nice, but is illegal
+  # return (3, 4)
+  return ([3, 4])
+}
+
+
+const a, b = f()
+echo "a=$a b=$b"
+
+setvar a = 9  # error

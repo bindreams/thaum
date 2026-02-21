@@ -1,0 +1,6 @@
+name: Str => startsWith(), too many args
+dialect: bash
+source: oils:spec/ysh-methods#str-startswith-too-many-args
+status: 3
+---
+= 'abc' => startsWith('extra', 'arg')

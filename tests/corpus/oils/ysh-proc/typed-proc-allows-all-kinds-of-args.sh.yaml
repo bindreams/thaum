@@ -1,0 +1,17 @@
+name: typed proc allows all kinds of args
+dialect: bash
+source: oils:spec/ysh-proc#typed-proc-allows-all-kinds-of-args
+stdout: "(Str)   \"word\"\n(Int)   42\n(Int)   99\nCommand\n"
+---
+shopt -s ysh:upgrade
+
+typed proc p (w; t; n; block) {
+  pp test_ (w)
+  pp test_ (t)
+  pp test_ (n)
+  echo $[type(block)]
+}
+
+p word (42, n=99) {
+  echo block
+}

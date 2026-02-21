@@ -1,0 +1,11 @@
+name: local -a
+dialect: bash
+source: oils:spec/assign-extended#local--a
+stdout: "['x', 'y', 'z']\n"
+---
+# nixpkgs setup.sh uses this (issue #26)
+f() {
+  local -a array=(x y z)
+  argv.py "${array[@]}"
+}
+f

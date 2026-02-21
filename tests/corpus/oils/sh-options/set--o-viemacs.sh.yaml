@@ -1,0 +1,9 @@
+name: set -o vi/emacs
+dialect: bash
+source: oils:spec/sh-options#set--o-viemacs
+stdout: "0\n0\n"
+---
+set -o vi
+echo $?
+set -o emacs
+echo $?

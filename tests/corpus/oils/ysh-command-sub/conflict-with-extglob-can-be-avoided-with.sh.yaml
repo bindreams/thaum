@@ -1,0 +1,14 @@
+name: Conflict with extglob @( can be avoided with ,(
+dialect: bash
+source: oils:spec/ysh-command-sub#conflict-with-extglob-can-be-avoided-with
+stdout: "status=0\nstatus=0\n"
+---
+
+shopt -s extglob
+
+[[ foo.py == @(*.sh|*.py) ]]
+echo status=$?
+
+# Synonym.  This is a syntax error in bash.
+[[ foo.py == ,(*.sh|*.py) ]]
+echo status=$?

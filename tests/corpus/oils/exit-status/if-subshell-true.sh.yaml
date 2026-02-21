@@ -1,0 +1,7 @@
+name: If subshell true
+dialect: bash
+source: oils:spec/exit-status#if-subshell-true
+status: 0
+stdout: "TRUE\n"
+---
+if `true`; then echo TRUE; else echo FALSE; fi

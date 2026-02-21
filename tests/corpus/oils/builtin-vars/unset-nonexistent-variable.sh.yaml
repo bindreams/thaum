@@ -1,0 +1,7 @@
+name: Unset nonexistent variable
+dialect: bash
+source: oils:spec/builtin-vars#unset-nonexistent-variable
+stdout: "status=0\n"
+---
+unset ZZZ
+echo status=$?

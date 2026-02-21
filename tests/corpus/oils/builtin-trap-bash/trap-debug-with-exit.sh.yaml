@@ -1,0 +1,17 @@
+name: trap DEBUG with 'exit'
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-with-exit
+status: 42
+stdout: "  [7]\n"
+---
+debuglog() {
+  echo "  [$@]"
+}
+
+trap 'debuglog $LINENO; exit 42' DEBUG
+
+echo status=$?
+echo A
+echo status=$?
+echo B
+echo status=$?

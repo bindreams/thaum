@@ -1,0 +1,7 @@
+name: default error code is 10
+dialect: bash
+source: oils:spec/ysh-builtin-error#default-error-code-is-10
+status: 10
+stdout: "\n"
+---
+error 'some error'

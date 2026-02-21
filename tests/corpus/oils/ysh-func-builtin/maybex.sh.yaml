@@ -1,0 +1,11 @@
+name: '@[maybe(x)]'
+dialect: bash
+source: oils:spec/ysh-func-builtin#maybex
+stdout: "['a', 'X', 'b']\n['a', 'b']\n"
+---
+setvar empty = ''
+setvar x = 'X'
+argv.py a @[maybe(empty)] @[maybe(x)] b
+
+setvar n = null
+argv.py a @[maybe(n)] b

@@ -1,0 +1,12 @@
+name: More negative numbers
+dialect: bash
+source: oils:spec/builtin-bracket#more-negative-numbers
+stdout: "status=0\nstatus=0\n"
+---
+case $SH in dash) exit ;; esac
+
+[[ -1 -le 0 ]]
+echo status=$?
+
+[[ $((-1)) -le 0 ]]
+echo status=$?

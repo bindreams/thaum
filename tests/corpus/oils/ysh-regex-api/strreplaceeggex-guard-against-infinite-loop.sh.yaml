@@ -1,0 +1,10 @@
+name: Str.replace(Eggex, *), guard against infinite loop
+dialect: bash
+source: oils:spec/ysh-regex-api#strreplaceeggex-guard-against-infinite-loop
+status: 3
+stdout: "\n"
+---
+shopt --set ysh:all
+
+var mystr = 'foo bar  baz'
+write $[mystr.replace(/ space* /, ' ')]

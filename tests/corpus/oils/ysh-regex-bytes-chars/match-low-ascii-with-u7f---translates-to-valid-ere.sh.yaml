@@ -1,0 +1,20 @@
+name: Match low ASCII with \u{7f} - translates to valid ERE
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#match-low-ascii-with-u7f---translates-to-valid-ere
+stdout: " 5b 7f 5d 0a\nyes\nno\nequal\nyes\nno\n"
+---
+shopt -s ysh:all
+var pat = /[ \u{7f} ]/;
+
+echo $pat | od -A n -t x1
+if (b'\y7f' ~ pat) { echo yes } else { echo no }
+if (b'\y7e' ~ pat) { echo yes } else { echo no }
+
+var pat2 = /[ \u{7f} ]/;
+var pat3 = /[ \u{0007f} ]/;
+test "$pat2" = "$pat3" && echo 'equal'
+
+var range = / [ \u{70} - \u{7f} ] /
+if (b'\y70' ~ range) { echo yes } else { echo no }
+if (b'\y69' ~ range) { echo yes } else { echo no }

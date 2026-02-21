@@ -1,0 +1,26 @@
+name: '[k]=$v and [k]="$@" (BashAssoc)'
+dialect: bash
+source: oils:spec/array-literal#kv-and-k-bashassoc
+stdout: "keys: ['i']\nvals: ['1 2 3']\nkeys: ['i']\nvals: ['3 5 7']\nkeys: ['i']\n\
+  vals: ['3 5 7']\nkeys: ['i']\nvals: ['3 5 7']\nkeys: ['i']\nvals: ['3 5 7']\n"
+---
+i=5
+v='1 2 3'
+declare -A a
+a=([i]=$v)
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+
+x=(3 5 7)
+a=([i]="${x[*]}")
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+a=([i]="${x[@]}")
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+a=([i]=${x[*]})
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"
+a=([i]=${x[@]})
+printf 'keys: '; argv.py "${!a[@]}"
+printf 'vals: '; argv.py "${a[@]}"

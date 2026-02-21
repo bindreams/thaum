@@ -1,0 +1,12 @@
+name: 'mutate through nameref: ref[0]='
+dialect: bash
+source: oils:spec/nameref#mutate-through-nameref-ref0
+stdout: "xx Y Z\n"
+---
+
+# This is DIFFERENT than the nameref itself being 'array[0]' !
+
+array=(X Y Z)
+typeset -n ref=array
+ref[0]=xx
+echo ${array[@]}

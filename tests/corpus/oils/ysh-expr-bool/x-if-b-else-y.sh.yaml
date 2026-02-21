@@ -1,0 +1,11 @@
+name: x if b else y
+dialect: bash
+source: oils:spec/ysh-expr-bool#x-if-b-else-y
+stdout: "43\n41\n"
+---
+var b = true
+var i = 42
+var t = i+1 if b else i-1
+echo $t
+var f = i+1 if false else i-1
+echo $f

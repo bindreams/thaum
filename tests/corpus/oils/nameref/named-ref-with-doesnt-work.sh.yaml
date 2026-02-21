@@ -1,0 +1,14 @@
+name: named ref with $# doesn't work
+dialect: bash
+source: oils:spec/nameref#named-ref-with-doesnt-work
+stdout: "ref=#\nref=#\n"
+---
+set -- one two three
+
+ref='#'
+echo ref=$ref
+typeset -n ref
+echo ref=$ref
+
+
+# mksh does respect it!!  Gah.

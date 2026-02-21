@@ -1,0 +1,13 @@
+name: $'\xff' is disallowed in Eggex, because it's disallowed in YSH
+dialect: bash
+source: 
+  oils:spec/ysh-regex-bytes-chars#xff-is-disallowed-in-eggex-because-its-disallowed-in-ysh
+status: 2
+stdout: "\n"
+---
+
+# NOTE: This pattern doesn't work with en_US.UTF-8.  I think the user should
+# set LANG=C or shopt --unset libc_utf8.
+
+shopt -s ysh:all
+=  /[ $'\xff' ]/;

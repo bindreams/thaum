@@ -1,0 +1,8 @@
+name: Logical Ops
+dialect: bash
+source: oils:spec/arith#logical-ops
+stdout: "1\n1\n0\n"
+---
+echo $((1 || 2))
+echo $((1 && 2))
+echo $((!(1 || 2)))

@@ -1,0 +1,20 @@
+name: IFS=x and '' and unquoted $@ - reduction of case above - copied into 
+  spec/word-split
+dialect: bash
+source: 
+  oils:spec/toysh-posix#ifsx-and-and-unquoted---reduction-of-case-above---copied-into-specword-split
+stdout: "['one', '', 'two']\n-one-\n--\n-two-\n"
+---
+
+setopt SH_WORD_SPLIT
+#set -x
+
+set -- one "" two
+
+IFS=x
+
+argv.py $@
+
+for i in $@; do
+  echo -$i-
+done

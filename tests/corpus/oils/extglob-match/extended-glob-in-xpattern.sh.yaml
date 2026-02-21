@@ -1,0 +1,12 @@
+name: Extended glob in ${x%PATTERN}
+dialect: bash
+source: oils:spec/extglob-match#extended-glob-in-xpattern
+stdout: "strip %  foo\nstrip %% foo\nstrip #  .py\nstrip ## .py\n"
+---
+
+shopt -s extglob
+x=foo.py
+echo 'strip % ' ${x%.@(py|cc)}
+echo 'strip %%' ${x%%.@(py|cc)}
+echo 'strip # ' ${x#@(foo)}
+echo 'strip ##' ${x##@(foo)}

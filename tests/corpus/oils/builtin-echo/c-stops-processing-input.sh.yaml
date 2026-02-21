@@ -1,0 +1,9 @@
+name: \c stops processing input
+dialect: bash
+source: oils:spec/builtin-echo#c-stops-processing-input
+stdout: xy ab
+---
+flags='-e'
+case $SH in dash) flags='' ;; esac
+
+echo $flags xy  'ab\cde'  'zzz'

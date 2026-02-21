@@ -1,0 +1,6 @@
+name: pipeline
+dialect: bash
+source: oils:spec/smoke#pipeline
+stdout: "1\n"
+---
+hostname | wc -l

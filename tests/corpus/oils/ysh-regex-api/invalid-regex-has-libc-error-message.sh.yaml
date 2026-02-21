@@ -1,0 +1,19 @@
+name: Invalid regex has libc error message
+dialect: bash
+source: oils:spec/ysh-regex-api#invalid-regex-has-libc-error-message
+status: 2
+stdout: "\n"
+---
+
+shopt -s ysh:upgrade
+
+# Hm it's hard to test this, we can't get stderr of YSH from within YSH?
+#redir 2>err.txt {
+#  if ('abc' ~ '+') {
+#    echo 'bad'
+#  }
+#}
+
+if ('abc' ~ '+') {
+  echo 'bad'
+}

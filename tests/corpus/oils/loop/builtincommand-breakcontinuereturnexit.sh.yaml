@@ -1,0 +1,37 @@
+name: builtin,command break,continue,return,exit
+dialect: bash
+source: oils:spec/loop#builtincommand-breakcontinuereturnexit
+status: 5
+stdout: "- break\n1\n- continue\n1\n3\n- return\n1\n2\nstatus=99\n- exit\n"
+---
+case $SH in dash|zsh) exit ;; esac
+
+echo '- break'
+for i in 1 2 3; do
+  echo $i
+  builtin break
+done
+
+echo '- continue'
+for i in 1 2 3; do
+  if test $i = 2; then
+    command continue
+  fi
+  echo $i
+done
+
+f() {
+  echo '- return'
+  for i in 1 2 3; do
+    echo $i
+    if test $i = 2; then
+      builtin command return 99
+    fi
+  done
+}
+f
+echo status=$?
+
+echo '- exit'
+command builtin exit 5
+echo 'not executed'

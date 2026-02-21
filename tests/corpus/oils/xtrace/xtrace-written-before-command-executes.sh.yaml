@@ -1,0 +1,10 @@
+name: xtrace written before command executes
+dialect: bash
+source: oils:spec/xtrace#xtrace-written-before-command-executes
+stdout: ''
+stderr: "+ echo one\none\n+ echo two\ntwo\n## OK mksh STDERR:\n# mksh traces redirects!\n\
+  + >&2 \n+ echo one\none\n+ >&2 \n+ echo two\ntwo\n"
+---
+set -x
+echo one >&2
+echo two >&2

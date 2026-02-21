@@ -1,0 +1,6 @@
+name: Two single-quoted parts
+dialect: bash
+source: oils:spec/quote#two-single-quoted-parts
+stdout: "two single-quoted parts in one token\n"
+---
+echo 'two single-quoted pa''rts in one token'

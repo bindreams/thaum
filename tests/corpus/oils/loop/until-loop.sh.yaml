@@ -1,0 +1,10 @@
+name: until loop
+dialect: bash
+source: oils:spec/loop#until-loop
+stdout: "hi\n"
+---
+# This is just the opposite of while?  while ! cond?
+until false; do
+  echo hi
+  break
+done

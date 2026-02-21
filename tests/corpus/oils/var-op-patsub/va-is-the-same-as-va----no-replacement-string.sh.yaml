@@ -1,0 +1,8 @@
+name: ${v/a} is the same as ${v/a/}  -- no replacement string
+dialect: bash
+source: oils:spec/var-op-patsub#va-is-the-same-as-va----no-replacement-string
+stdout: "abb\nstatus=0\n"
+---
+v='aabb'
+echo ${v/a}
+echo status=$?

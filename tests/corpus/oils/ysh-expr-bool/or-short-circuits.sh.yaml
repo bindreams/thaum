@@ -1,0 +1,11 @@
+name: or short circuits
+dialect: bash
+source: oils:spec/ysh-expr-bool#or-short-circuits
+stdout: "OK\n"
+---
+shopt -s ysh:upgrade
+
+var x = [1, 2]
+if (true or x[3]) {
+  echo OK
+}

@@ -1,0 +1,7 @@
+name: :-
+dialect: bash
+source: oils:spec/var-sub-quote#unnamed
+stdout: "['a', 'b']\n"
+---
+empty=''
+argv.py ${empty:-a} ${Unset:-b}

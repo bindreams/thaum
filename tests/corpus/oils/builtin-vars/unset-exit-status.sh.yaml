@@ -1,0 +1,8 @@
+name: Unset exit status
+dialect: bash
+source: oils:spec/builtin-vars#unset-exit-status
+stdout: "status=0\n"
+---
+V=123
+unset V
+echo status=$?

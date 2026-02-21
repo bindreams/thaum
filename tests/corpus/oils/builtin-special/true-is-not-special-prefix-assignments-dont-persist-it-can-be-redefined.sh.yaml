@@ -1,0 +1,20 @@
+name: true is not special; prefix assignments don't persist, it can be redefined
+dialect: bash
+source: 
+  oils:spec/builtin-special#true-is-not-special-prefix-assignments-dont-persist-it-can-be-redefined
+stdout: "foo=\ntrue func\nfoo=\n"
+---
+foo=bar true
+echo foo=$foo
+
+true() {
+  echo true func
+}
+foo=bar true
+echo foo=$foo
+
+
+
+# POSIX rule about special builtins pointed at:
+#
+# https://www.reddit.com/r/oilshell/comments/5ykpi3/oildev_is_alive/

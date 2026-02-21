@@ -1,0 +1,9 @@
+name: errexit is silent (verbose_errexit for Oils)
+dialect: bash
+source: oils:spec/errexit-osh#errexit-is-silent-verboseerrexit-for-oils
+status: 1
+stderr: ''
+---
+shopt -u verbose_errexit 2>/dev/null || true
+set -e
+false

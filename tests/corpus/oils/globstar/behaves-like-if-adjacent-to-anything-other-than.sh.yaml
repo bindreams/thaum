@@ -1,0 +1,17 @@
+name: '** behaves like * if adjacent to anything other than /'
+dialect: bash
+source: oils:spec/globstar#behaves-like-if-adjacent-to-anything-other-than
+stdout: "directory/leaf.md leaf.md\ndirectory/leaf.md\ndirectory/leaf.md\ndirectory/leaf.md\n\
+  directory/leaf.md\n"
+---
+shopt -s globstar
+
+mkdir directory
+touch leaf.md
+touch directory/leaf.md
+
+echo **/*.* | sort
+echo directory/**/*.md | sort
+echo d**/*.md | sort
+echo **y/*.md | sort
+echo d**y/*.md | sort

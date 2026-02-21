@@ -1,0 +1,8 @@
+name: Regex with == and not =~ is parse error, different lexer mode required
+dialect: bash
+source: 
+  oils:spec/regex#regex-with-and-not-is-parse-error-different-lexer-mode-required
+status: 2
+---
+# They both give a syntax error.  This is lame.
+[[ '^(a b)$' == ^(a\ b)$ ]] && echo true

@@ -1,0 +1,10 @@
+name: dirs don't convert to tilde when $HOME is substring
+dialect: bash
+source: oils:spec/builtin-dirs#dirs-dont-convert-to-tilde-when-home-is-substring
+---
+cd /
+mkdir -p /tmp/oil_test
+mkdir -p /tmp/oil_tests
+HOME=/tmp/oil_test
+pushd /tmp/oil_tests
+dirs

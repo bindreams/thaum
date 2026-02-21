@@ -1,0 +1,6 @@
+name: pushd does not take more than one argument
+dialect: bash
+source: oils:spec/builtin-dirs#pushd-does-not-take-more-than-one-argument
+stdout: "too many args!\n"
+---
+pushd . . >/dev/null || echo too many args!

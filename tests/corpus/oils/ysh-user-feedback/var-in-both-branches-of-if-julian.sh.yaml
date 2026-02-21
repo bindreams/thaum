@@ -1,0 +1,20 @@
+name: var in both branches of if (Julian)
+dialect: bash
+source: oils:spec/ysh-user-feedback#var-in-both-branches-of-if-julian
+stdout: "\n"
+---
+
+# remove static check?
+
+proc scopetest(; var) {
+  if (var === 2) {
+    var tmp = "hello"
+    write $tmp
+  } else {
+    var tmp = "world"
+    write $tmp
+  }
+}
+
+scopetest (1)
+scopetest (2)

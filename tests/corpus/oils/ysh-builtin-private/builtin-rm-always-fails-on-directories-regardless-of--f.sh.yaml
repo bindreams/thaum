@@ -1,0 +1,26 @@
+name: builtin rm always fails on directories (regardless of -f)
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-private#builtin-rm-always-fails-on-directories-regardless-of--f
+stdout: "status=1\nstatus=1\n"
+---
+case $SH in
+  *osh) prefix='builtin' ;;
+  *) prefix='' ;;
+esac
+
+touch foo bar
+mkdir -p tmp
+$prefix rm -- foo tmp bar
+echo status=$?
+
+if test -f foo; then echo fail; fi
+if test -f bar; then echo fail; fi
+
+touch foo bar
+mkdir -p tmp
+$prefix rm -f -- foo tmp bar
+echo status=$?
+
+if test -f foo; then echo fail; fi
+if test -f bar; then echo fail; fi

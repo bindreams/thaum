@@ -1,0 +1,9 @@
+name: $0 with filename
+dialect: bash
+source: oils:spec/var-num#0-with-filename
+stdout: "dollar0\n"
+---
+s=dollar0
+echo 'echo $0' > $s
+chmod +x $s
+$SH $s

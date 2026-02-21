@@ -1,0 +1,7 @@
+name: Backticks within arith sub
+dialect: bash
+source: oils:spec/arith#backticks-within-arith-sub
+stdout: "3\n"
+---
+# This is unnecessary but works in all shells.
+echo $((`echo 1` + 2))

@@ -1,0 +1,12 @@
+name: 'cd with block: requires explicit command'
+dialect: bash
+source: oils:spec/ysh-blocks#cd-with-block-requires-explicit-command
+status: 2
+stdout: "/tmp\n"
+---
+shopt --set ysh:upgrade
+
+cd /tmp { echo $PWD }
+
+HOME=~
+cd { echo $PWD }

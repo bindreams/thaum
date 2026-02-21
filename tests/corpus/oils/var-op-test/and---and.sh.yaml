@@ -1,0 +1,13 @@
+name: $@ ("") and - and +
+dialect: bash
+source: oils:spec/var-op-test#and---and
+stdout: "argv=\nargv=plus\nargv=minus\nargv=\n"
+---
+set -- ""
+echo argv=${@-minus}
+echo argv=${@+plus}
+echo argv=${@:-minus}
+echo argv=${@:+plus}
+
+# Zsh treats $@ as an array unlike Bash converting it to a string by joining it
+# with a space.

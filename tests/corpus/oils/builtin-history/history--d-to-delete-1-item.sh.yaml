@@ -1,0 +1,14 @@
+name: history -d to delete 1 item
+dialect: bash
+source: oils:spec/builtin-history#history--d-to-delete-1-item
+stdout: "status=1\n"
+---
+
+cd $TMP
+HISTFILE=tmp
+printf "cmd orig%s\n" {1..3} > tmp
+history -c
+history -r
+history -d 1
+history | grep orig1 > /dev/null
+echo "status=$?"

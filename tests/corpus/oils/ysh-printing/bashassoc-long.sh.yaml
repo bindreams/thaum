@@ -1,0 +1,15 @@
+name: BashAssoc, long
+dialect: bash
+source: oils:spec/ysh-printing#bashassoc-long
+stdout: "(BashAssoc)\n(BashAssoc ['1']='one')\n(BashAssoc ['1']='one' ['two']='2'
+  ['3']='three')\n(BashAssoc\n    ['Lorem']='ipsum'\n    ['dolor']='sit amet,'\n \
+  \   ['consectetur adipiscing']='elit, sed'\n    ['do']='eiusmod.'\n)\n"
+---
+declare -A assoc_0=()
+declare -A assoc_1=([1]=one)
+declare -A assoc_3=([1]=one [two]=2 [3]=three)
+declare -A assoc_long=([Lorem]=ipsum [dolor]="sit amet," ['consectetur adipiscing']="elit, sed" [do]="eiusmod.")
+= assoc_0
+= assoc_1
+= assoc_3
+= assoc_long

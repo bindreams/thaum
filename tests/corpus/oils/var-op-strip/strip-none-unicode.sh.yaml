@@ -1,0 +1,11 @@
+name: strip none unicode
+dialect: bash
+source: oils:spec/var-op-strip#strip-none-unicode
+stdout: "['\\xce\\xbcabc\\xce\\xbc']\n['\\xce\\xbcabc\\xce\\xbc']\n['\\xce\\xbcabc\\\
+  xce\\xbc']\n['\\xce\\xbcabc\\xce\\xbc']\n"
+---
+x=μabcμ
+argv.py "${x#}"
+argv.py "${x##}"
+argv.py "${x%}"
+argv.py "${x%%}"

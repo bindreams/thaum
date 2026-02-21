@@ -1,0 +1,21 @@
+name: "\"${undef-'c d'}\" and \"${foo%'c d'}\" are parsed differently"
+dialect: bash
+source: oils:spec/var-sub-quote#undef-c-d-and-fooc-d-are-parsed-differently
+stdout: "[\"'c d'\", \"'c  d'\"]\n['c d', 'c  d']\n---\n['a b ', 'a b c d']\n['a b
+  zzz', 'a b c d']\n['a b zzz', 'a b c d']\n"
+---
+
+# quotes are LITERAL here
+argv.py "${undef-'c d'}" "${undef-'c  d'}"
+argv.py ${undef-'c d'} ${undef-'c  d'}
+
+echo ---
+
+# quotes are RESPECTED here
+foo='a b c d'
+argv.py "${foo%'c d'}" "${foo%'c  d'}"
+
+case $SH in dash) exit ;; esac
+
+argv.py "${foo//'c d'/zzz}" "${foo//'c  d'/zzz}"
+argv.py "${foo//'c d'/'zzz'}" "${foo//'c  d'/'zzz'}"

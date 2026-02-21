@@ -1,0 +1,18 @@
+name: Copy to Dict with dict(), and mutate
+dialect: bash
+source: oils:spec/ysh-object#copy-to-dict-with-dict-and-mutate
+stdout: "(Obj)   (\"x\":3,\"y\":4)\n(Dict)   {\"x\":3,\"y\":4}\n(Obj)   (\"x\":99,\"\
+  y\":4)\n(Dict)   {\"x\":100,\"y\":4}\n"
+---
+
+var rect = Object(null, {x: 3, y: 4})
+var d = dict(rect)
+
+pp test_ (rect)
+pp test_ (d)
+
+setvar rect.x = 99
+setvar d.x = 100
+
+pp test_ (rect)
+pp test_ (d)

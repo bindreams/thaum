@@ -1,0 +1,10 @@
+name: echo `cat OSCFLAGS` "world" > OSCFLAGS (from Alpine imap)
+dialect: bash
+source: oils:spec/redir-order#echo-cat-oscflags-world-oscflags-from-alpine-imap
+stdout: "hello world\n"
+---
+
+echo hello > OSCFLAGS
+echo `cat OSCFLAGS` "world" > OSCFLAGS
+#echo $(cat OSCFLAGS) "world" > OSCFLAGS
+cat OSCFLAGS

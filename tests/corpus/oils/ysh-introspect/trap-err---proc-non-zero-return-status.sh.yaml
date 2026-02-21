@@ -1,0 +1,26 @@
+name: trap ERR - proc non-zero return status
+dialect: bash
+source: oils:spec/ysh-introspect#trap-err---proc-non-zero-return-status
+status: 42
+stdout: "[ stdin ]:16\n    f\n    ^\n"
+---
+
+source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh
+
+trap --add ERR {
+  print-stack (prefix=false)
+}
+set -o errtrace  # enable always
+
+proc f {
+  g
+}
+
+proc g {
+  return 42
+}
+
+f
+
+
+# Hm we do not get the "g" call here?  Because we get an exception raised

@@ -1,0 +1,20 @@
+name: but trap DEBUG respects errexit
+dialect: bash
+source: oils:spec/builtin-trap-bash#but-trap-debug-respects-errexit
+status: 42
+stdout: "  [10]\n"
+---
+set -o errexit
+
+debuglog() {
+  echo "  [$@]"
+  return 42
+}
+
+trap 'debuglog $LINENO' DEBUG
+
+echo status=$?
+echo A
+echo status=$?
+echo B
+echo status=$?

@@ -1,0 +1,12 @@
+name: NUL bytes with echo -e
+dialect: bash
+source: oils:spec/nul-bytes#nul-bytes-with-echo--e
+stdout: "  \\0   -  \\n\n  00  2d  0a\n"
+---
+case $SH in dash) exit ;; esac
+
+show_hex() { od -A n -t c -t x1; }
+
+echo -e '\0-' | show_hex
+#echo -e '\x00-'
+#echo -e '\000-'

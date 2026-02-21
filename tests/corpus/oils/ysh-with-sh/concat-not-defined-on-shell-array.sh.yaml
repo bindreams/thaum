@@ -1,0 +1,11 @@
+name: Concat ++ not defined on shell array
+dialect: bash
+source: oils:spec/ysh-with-sh#concat-not-defined-on-shell-array
+status: 3
+stdout: "\n"
+---
+
+declare -a a=(x y)
+declare -a b=(x y)
+
+= a ++ b

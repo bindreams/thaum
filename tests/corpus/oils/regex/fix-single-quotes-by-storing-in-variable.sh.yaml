@@ -1,0 +1,7 @@
+name: Fix single quotes by storing in variable
+dialect: bash
+source: oils:spec/regex#fix-single-quotes-by-storing-in-variable
+stdout: "true\n"
+---
+pat='^(a b)$'
+[[ 'a b' =~ $pat ]] && echo true

@@ -1,0 +1,8 @@
+name: alias can override builtin
+dialect: bash
+source: oils:spec/alias#alias-can-override-builtin
+stdout: "foo bar\n"
+---
+shopt -s expand_aliases
+alias echo='echo foo'
+echo bar

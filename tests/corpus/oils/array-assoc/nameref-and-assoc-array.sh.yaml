@@ -1,0 +1,27 @@
+name: nameref and assoc array
+dialect: bash
+source: oils:spec/array-assoc#nameref-and-assoc-array
+stdout: "values: val\nbefore val\nafter val2\nvalues: val2\n---\nbefore val2\nafter
+  val3\nvalues: val3\n"
+---
+show-values() {
+  echo values: ${A[@]}
+}
+
+declare -A A=(['K']=val)
+show-values
+
+declare -n ref='A["K"]'
+echo before $ref
+ref='val2'
+echo after $ref
+show-values
+
+echo ---
+
+key=K
+declare -n ref='A[$key]'
+echo before $ref
+ref='val3'
+echo after $ref
+show-values

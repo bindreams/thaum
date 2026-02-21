@@ -1,0 +1,12 @@
+name: Module with parse error
+dialect: bash
+source: oils:spec/ysh-builtin-module#module-with-parse-error
+status: 2
+stdout: "\n"
+---
+
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/parse-error.ysh
+
+echo 'should not get here'

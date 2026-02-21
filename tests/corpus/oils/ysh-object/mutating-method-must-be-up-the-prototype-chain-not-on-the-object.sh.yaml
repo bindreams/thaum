@@ -1,0 +1,14 @@
+name: Mutating method must be up the prototype chain, not on the object
+dialect: bash
+source: 
+  oils:spec/ysh-object#mutating-method-must-be-up-the-prototype-chain-not-on-the-object
+status: 3
+stdout: "\n"
+---
+
+func inc(self, n) {
+  setvar self.i += n
+}
+var c = Object(null, {'M/inc': inc, i: 0})
+
+call c->inc(3)

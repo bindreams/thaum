@@ -1,0 +1,15 @@
+name: Invalid JSON in J8 is rejected
+dialect: bash
+source: oils:spec/ysh-json#invalid-json-in-j8-is-rejected
+stdout: "status=1\nstatus=1\n"
+---
+
+json8 read <<EOF
+b'$(echo -e -n '\xff')'
+EOF
+echo status=$?
+
+json8 read <<EOF
+u'$(echo -e -n '\xff')'
+EOF
+echo status=$?

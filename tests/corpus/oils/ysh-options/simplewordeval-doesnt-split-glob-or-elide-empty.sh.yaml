@@ -1,0 +1,23 @@
+name: simple_word_eval doesn't split, glob, or elide empty
+dialect: bash
+source: oils:spec/ysh-options#simplewordeval-doesnt-split-glob-or-elide-empty
+stdout: "['a', 'b', 'bar.z', 'foo.z', 'spam.z', 'spam.z']\n['-x y', 'z-']\n['a b',
+  '*.z', '', 'spam.z']\n['-x y', 'z-']\n"
+---
+mkdir mydir
+touch foo.z bar.z spam.z
+spaces='a b'
+dir=mydir
+glob=*.z
+prefix=sp
+set -- 'x y' z
+
+for i in 1 2; do
+  local empty=
+  argv.py $spaces $glob $empty $prefix*.z
+
+  # arrays still work too, with this weird rule
+  argv.py -"$@"-
+
+  shopt -s simple_word_eval
+done

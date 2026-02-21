@@ -1,0 +1,13 @@
+name: coerce to string with ${A[*]}, etc.
+dialect: bash
+source: oils:spec/array-assoc#coerce-to-string-with-a-etc
+stdout: "['xx yy']\n['X X Y Y']\n['xx', 'yy']\n['X', 'X', 'Y', 'Y']\n"
+---
+declare -A A
+A['X X']=xx
+A['Y Y']=yy
+argv.py "${A[*]}"
+argv.py "${!A[*]}"
+
+argv.py ${A[@]}
+argv.py ${!A[@]}

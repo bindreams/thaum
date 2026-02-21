@@ -1,0 +1,13 @@
+name: Infinite loop with ((;;))
+dialect: bash
+source: oils:spec/for-expr#infinite-loop-with
+status: 0
+stdout: "1\n2\n3\n"
+---
+a=1
+for ((  ;  ;  )); do
+  if test $a = 4; then
+    break
+  fi
+  echo $((a++))
+done

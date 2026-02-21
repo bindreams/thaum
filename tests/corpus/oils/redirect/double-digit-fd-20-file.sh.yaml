@@ -1,0 +1,8 @@
+name: Double digit fd (20> file)
+dialect: bash
+source: oils:spec/redirect#double-digit-fd-20-file
+stdout: "hello20\n"
+---
+exec 20> "$TMP/double-digit-fd.txt"
+echo hello20 >&20
+cat "$TMP/double-digit-fd.txt"

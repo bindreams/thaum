@@ -1,0 +1,7 @@
+name: equality
+dialect: bash
+source: oils:spec/dbracket#equality
+stdout: "true\nfalse\n"
+---
+[[ '*.py' == '*.py' ]] && echo true
+[[ foo.py == '*.py' ]] || echo false

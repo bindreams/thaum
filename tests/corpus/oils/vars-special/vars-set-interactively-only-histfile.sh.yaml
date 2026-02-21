@@ -1,0 +1,9 @@
+name: 'Vars set interactively only: $HISTFILE'
+dialect: bash
+source: oils:spec/vars-special#vars-set-interactively-only-histfile
+stdout: "histfile=\nhistfile=yes\n"
+---
+case $SH in dash|mksh|zsh) exit ;; esac
+
+$SH --norc --rcfile /dev/null -c 'echo histfile=${HISTFILE:+yes}'
+$SH --norc --rcfile /dev/null -i -c 'echo histfile=${HISTFILE:+yes}'

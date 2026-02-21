@@ -1,0 +1,31 @@
+name: Expr Closures in a Loop !
+dialect: bash
+source: oils:spec/ysh-closures#expr-closures-in-a-loop
+stdout: "x: i = 0, j = 2\nx: i = 1, j = 3\nx: i = 2, j = 4\n"
+---
+
+# see demo/survey-closure.sh
+
+shopt --set ysh:upgrade
+
+proc task (; tasks, expr) {
+  call tasks->append(expr)
+}
+
+func makeTasks() {
+  var tasks = []
+  var x = 'x'
+  for i in (0 ..< 3) {
+    var j = i + 2
+    task (tasks, ^"$x: i = $i, j = $j")
+  }
+  return (tasks)
+}
+
+var exprs = makeTasks()
+#= blocks
+
+for ex in (exprs) {
+  var s = io->evalExpr(ex)
+  echo $s
+}

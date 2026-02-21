@@ -1,0 +1,15 @@
+name: Single quotes and splicing (do what "foo $x ${x}" used to)
+dialect: bash
+source: oils:spec/ysh-regex#single-quotes-and-splicing-do-what-foo-x-x-used-to
+stdout: "xxabcxy\nno\nyes\n"
+---
+shopt -s ysh:all
+var pat = ''
+
+var x = 'x'
+var y = 'y'
+setvar pat = / @x @x 'abc' @x @y /
+echo $pat
+
+if ('xxabcx' ~ pat) { echo yes } else { echo no }
+if ('xxabcxyf' ~ pat) { echo yes } else { echo no }

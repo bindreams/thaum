@@ -1,0 +1,31 @@
+name: Background pipeline (separate code path)
+dialect: bash
+source: oils:spec/ysh-xtrace#background-pipeline-separate-code-path
+stdout: "status=0\n"
+stderr: "    . 12345 builtin echo 1\n    . 12345 builtin echo 2\n  . 12345 exec grep
+  ZZZ\n  . 12345 exec sort\n  ; process 12345: status 0\n  ; process 12345: status
+  0\n  ; process 12345: status 1\n  < 12345 proc myfunc\n  > 12345 proc myfunc\n.
+  builtin ':' begin\n. builtin echo 'status=0'\n. builtin set '+x'\n< wait\n> wait\n\
+  | part 12345\n| part 12345\n| part 12345\n"
+---
+
+shopt --set ysh:upgrade
+shopt --unset errexit
+set -x
+
+myfunc() {
+  echo 2
+  echo 1
+}
+
+{
+	: begin
+	myfunc | sort | grep ZZZ &
+	wait
+	echo status=$?
+  set +x
+} 2>err.txt
+
+# SORT for determinism
+sed --regexp-extended 's/[[:digit:]]{2,}/12345/g' err.txt |
+  LC_ALL=C sort >&2

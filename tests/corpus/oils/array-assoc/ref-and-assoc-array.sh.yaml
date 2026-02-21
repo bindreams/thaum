@@ -1,0 +1,19 @@
+name: ${!ref} and assoc array
+dialect: bash
+source: oils:spec/array-assoc#ref-and-assoc-array
+stdout: "values: val\nref val\nref val\n"
+---
+
+show-values() {
+  echo values: ${A[@]}
+}
+
+declare -A A=(['K']=val)
+show-values
+
+declare ref='A["K"]'
+echo ref ${!ref}
+
+key=K
+declare ref='A[$key]'
+echo ref ${!ref}

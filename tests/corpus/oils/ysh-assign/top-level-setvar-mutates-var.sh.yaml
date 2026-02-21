@@ -1,0 +1,10 @@
+name: 'top level: setvar mutates var'
+dialect: bash
+source: oils:spec/ysh-assign#top-level-setvar-mutates-var
+stdout: "42\n50\n"
+---
+var x = 1
+setvar x = 42  # this is allowed
+echo $x
+setvar y = 50  # error because it's not declared
+echo $y

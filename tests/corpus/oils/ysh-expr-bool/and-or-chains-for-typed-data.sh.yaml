@@ -1,0 +1,64 @@
+name: and-or chains for typed data
+dialect: bash
+source: oils:spec/ysh-expr-bool#and-or-chains-for-typed-data
+stdout: "s\nNone\nx\ny\ny\n\n42\n0\n42\n0\n0.5\n0.0\n['a']\n[]\n{'d': 1}\n{}\nOR\n\
+  AND\n---\n\"s\"\nnull\nx\ny\ny\n\n42\n0\n42\n0\n0.5\n0.0\n(List)   [\"a\"]\n(List)\
+  \   []\n(Dict)   {\"d\":1}\n(Dict)   {}\nOR\nAND\n"
+---
+shopt --set parse_ysh_expr_sub
+
+python2 -c 'print(None or "s")'
+python2 -c 'print(None and "s")'
+
+python2 -c 'print("x" or "y")'
+python2 -c 'print("x" and "y")'
+
+python2 -c 'print("" or "y")'
+python2 -c 'print("" and "y")'
+
+python2 -c 'print(42 or 0)'
+python2 -c 'print(42 and 0)'
+
+python2 -c 'print(0 or 42)'
+python2 -c 'print(0 and 42)'
+
+python2 -c 'print(0.0 or 0.5)'
+python2 -c 'print(0.0 and 0.5)'
+
+python2 -c 'print(["a"] or [])'
+python2 -c 'print(["a"] and [])'
+
+python2 -c 'print({"d": 1} or {})'
+python2 -c 'print({"d": 1} and {})'
+
+python2 -c 'print(0 or 0.0 or False or [] or {} or "OR")'
+python2 -c 'print(1 and 1.0 and True and [5] and {"d":1} and "AND")'
+
+echo ---
+
+json write (null or "s")
+json write (null and "s")
+
+echo $["x" or "y"]
+echo $["x" and "y"]
+
+echo $["" or "y"]
+echo $["" and "y"]
+
+echo $[42 or 0]
+echo $[42 and 0]
+
+echo $[0 or 42]
+echo $[0 and 42]
+
+echo $[0.0 or 0.5]
+echo $[0.0 and 0.5]
+
+pp test_ (["a"] or [])
+pp test_ (["a"] and [])
+
+pp test_ ({"d": 1} or {})
+pp test_ ({"d": 1} and {})
+
+echo $[0 or 0.0 or false or [] or {} or "OR"]
+echo $[1 and 1.0 and true and [5] and {"d":1} and "AND"]

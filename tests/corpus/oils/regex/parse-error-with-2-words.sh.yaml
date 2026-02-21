@@ -1,0 +1,10 @@
+name: Parse error with 2 words
+dialect: bash
+source: oils:spec/regex#parse-error-with-2-words
+status: 2
+stdout: "\n"
+---
+
+if [[ a =~ c a ]]; then
+  echo one
+fi

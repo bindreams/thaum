@@ -1,0 +1,15 @@
+name: Make sure [[ is not affected by --true --false
+dialect: bash
+source: oils:spec/ysh-builtins#make-sure-is-not-affected-by---true---false
+stdout: "dbracket=0\ndbracket=0\nparse error 2\nparse error 2\n"
+---
+
+set +o errexit
+
+$SH +o ysh:all -c '[[ --true ]]; echo dbracket=$?'
+$SH +o ysh:all -c '[[ --false ]]; echo dbracket=$?'
+
+$SH +o ysh:all -c '[[ --true true ]]; echo dbracket=$?'
+echo "parse error $?"
+$SH +o ysh:all -c '[[ --false false ]]; echo dbracket=$?'
+echo "parse error $?"

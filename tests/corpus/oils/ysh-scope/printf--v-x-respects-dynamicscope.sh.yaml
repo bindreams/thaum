@@ -1,0 +1,24 @@
+name: printf -v x respects dynamic_scope
+dialect: bash
+source: oils:spec/ysh-scope#printf--v-x-respects-dynamicscope
+stdout: "x=42\nx=dynamic-scope\nx=\n---\nx=42\nx=42\nx=\n"
+---
+set -o errexit
+
+set-x() {
+  printf -v x "%s" dynamic-scope
+}
+demo() {
+  local x=42
+  echo x=$x
+  set-x
+  echo x=$x
+}
+demo
+echo x=$x
+
+echo ---
+
+shopt --unset dynamic_scope  # should NOT affect read
+demo
+echo x=$x

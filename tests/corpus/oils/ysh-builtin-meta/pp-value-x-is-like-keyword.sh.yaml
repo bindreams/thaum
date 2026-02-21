@@ -1,0 +1,27 @@
+name: pp value (x) is like = keyword
+dialect: bash
+source: oils:spec/ysh-builtin-meta#pp-value-x-is-like-keyword
+stdout: "(Str)   'foo'\n(Str)   b'isn\\'t this sq'\n(Str)   '\"dq $myvar\"'\n(Str)\
+  \   b'\\\\ backslash \\\\\\\\'\n(Str)   b'one \\t two \\n'\n(List)\n[\n    123,
+  123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,\n    123,
+  123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,\n    123,
+  123, 123, 123, 123, 123, 123, 123, 123, 123\n]\n"
+---
+
+shopt --set ysh:upgrade
+source $LIB_YSH/list.ysh
+
+# It can be piped!
+
+pp value ('foo') | cat
+
+pp value ("isn't this sq") | cat
+
+pp value ('"dq $myvar"') | cat
+
+pp value (r'\ backslash \\') | cat
+
+pp value (u'one \t two \n') | cat
+
+# Without a terminal, default width is 80
+pp value (repeat([123], 40)) | cat

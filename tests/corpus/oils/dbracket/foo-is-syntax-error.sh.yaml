@@ -1,0 +1,7 @@
+name: "[[ '(' foo ]] is syntax error"
+dialect: bash
+source: oils:spec/dbracket#foo-is-syntax-error
+status: 2
+---
+[[ '(' foo ]]
+echo status=$?

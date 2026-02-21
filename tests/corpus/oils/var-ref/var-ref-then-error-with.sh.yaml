@@ -1,0 +1,10 @@
+name: Var ref, then error with ${ ? }
+dialect: bash
+source: oils:spec/var-ref#var-ref-then-error-with
+status: 1
+stdout: "\n"
+---
+w=ww
+ww=
+echo ${!w:?'my message'}
+echo done

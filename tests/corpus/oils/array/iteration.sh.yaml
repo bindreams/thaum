@@ -1,0 +1,9 @@
+name: Iteration
+dialect: bash
+source: oils:spec/array#iteration
+stdout: "1\n2 3\n"
+---
+a=(1 '2 3')
+for v in "${a[@]}"; do
+  echo $v
+done

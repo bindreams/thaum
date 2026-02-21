@@ -1,0 +1,13 @@
+name: local after readonly
+dialect: bash
+source: oils:spec/builtin-vars#local-after-readonly
+status: 1
+stdout: ''
+---
+f() { 
+  readonly y
+  local x=1 y=$(( x ))
+  echo y=$y
+}
+f
+echo y=$y

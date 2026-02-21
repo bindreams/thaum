@@ -1,0 +1,12 @@
+name: command local
+dialect: bash
+source: oils:spec/builtin-meta-assign#command-local
+stdout: "s=local\n"
+---
+
+f() {
+  command local s=local
+  echo s=$s
+}
+
+f

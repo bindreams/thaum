@@ -1,0 +1,27 @@
+name: test -b -c -S (block, character, socket)
+dialect: bash
+source: oils:spec/builtin-bracket#test--b--c--s-block-character-socket
+stdout: "-b\nstatus=1\nstatus=1\nstatus=1\n-c\nstatus=1\nstatus=1\n-S\nstatus=1\n\
+  status=1\n"
+---
+# NOTE: we do not have the "true" case
+
+echo -b
+test -b nonexistent
+echo status=$?
+test -b testdata
+echo status=$?
+test -b /
+echo status=$?
+
+echo -c
+test -c nonexistent
+echo status=$?
+test -c testdata
+echo status=$?
+
+echo -S
+test -S nonexistent
+echo status=$?
+test -S testdata
+echo status=$?

@@ -1,0 +1,14 @@
+name: Unary plus on integers and floats
+dialect: bash
+source: oils:spec/ysh-expr-arith#unary-plus-on-integers-and-floats
+stdout: "1\n42\n2.5\n-10\n"
+---
+
+var a = +1
+var b = +42
+var c = +2.5
+
+var d = -10
+var e = +d
+
+write -- $a $b $c $e

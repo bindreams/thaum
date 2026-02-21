@@ -1,0 +1,7 @@
+name: Var length
+dialect: bash
+source: oils:spec/quote#var-length
+stdout: "foo3\n"
+---
+FOO=bar
+echo "foo${#FOO}"

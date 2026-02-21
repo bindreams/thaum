@@ -1,0 +1,15 @@
+name: '] syntax errors'
+dialect: bash
+source: oils:spec/builtin-bracket#syntax-errors
+stdout: "status=2\nstatus=1\nstatus=2\nstatus=2\nstatus=2\n"
+---
+[
+echo status=$?
+test  # not a syntax error
+echo status=$?
+[ -n x  # missing ]
+echo status=$?
+[ -n x ] y  # extra arg after ]
+echo status=$?
+[ -n x y  # extra arg
+echo status=$?

@@ -1,0 +1,14 @@
+name: Synthesized ${x///} bug (similar to above)
+dialect: bash
+source: oils:spec/var-op-patsub#synthesized-x-bug-similar-to-above
+stdout: "ambiguous: slash brace } hi\nquoted:    slash brace } hi\n"
+---
+
+# found via test/parse-errors.sh
+
+x='slash / brace } hi'
+echo 'ambiguous:' ${x///}
+
+echo 'quoted:   ' ${x//'/'}
+
+# Wow we have all combination here -- TERRIBLE

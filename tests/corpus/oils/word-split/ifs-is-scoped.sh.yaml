@@ -1,0 +1,10 @@
+name: IFS is scoped
+dialect: bash
+source: oils:spec/word-split#ifs-is-scoped
+stdout: "['ab', 'd']\n['a', 'cd']\n"
+---
+IFS=b
+word=abcd
+f() { local IFS=c; argv.py $word; }
+f
+argv.py $word

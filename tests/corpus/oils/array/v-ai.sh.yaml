@@ -1,0 +1,14 @@
+name: '[[ -v a[i] ]]'
+dialect: bash
+source: oils:spec/array#v-ai
+stdout: "status=0\nstatus=1\n"
+---
+
+# note: modern versions of zsh implement this
+
+array=(1 2 3)
+[[ -v array[1] ]]
+echo status=$?
+
+[[ -v array[4] ]]
+echo status=$?

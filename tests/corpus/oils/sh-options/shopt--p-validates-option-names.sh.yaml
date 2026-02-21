@@ -1,0 +1,12 @@
+name: shopt -p validates option names
+dialect: bash
+source: oils:spec/sh-options#shopt--p-validates-option-names
+stdout: "status=2\nstatus=2\n"
+---
+shopt -p nullglob invalid failglob
+echo status=$?
+# same thing as -p, slightly different format in bash
+shopt nullglob invalid failglob > $TMP/out.txt
+status=$?
+sed --regexp-extended 's/\s+/ /' $TMP/out.txt  # make it easier to assert
+echo status=$status

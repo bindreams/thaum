@@ -1,0 +1,6 @@
+name: trap -l
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap--l
+status: 0
+---
+trap -l | grep INT >/dev/null

@@ -1,0 +1,12 @@
+name: patsub with [^]]
+dialect: bash
+source: oils:spec/var-op-patsub#patsub-with
+stdout: "ab^cd^\n"
+---
+
+# This is a PARSING divergence.  In OSH we match [], rather than using POSIX
+# rules!
+
+pat='[^]]'
+s='ab^cd^'
+echo ${s//$pat/z}

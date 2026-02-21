@@ -1,0 +1,13 @@
+name: unset PWD; then pwd
+dialect: bash
+source: oils:spec/builtin-cd#unset-pwd-then-pwd
+stdout: "PWD=\n/tmp/oil-spec-test/pwd\nPWD=\n"
+---
+dir=/tmp/oil-spec-test/pwd
+mkdir -p $dir
+cd $dir
+
+unset PWD
+echo PWD=$PWD
+pwd
+echo PWD=$PWD

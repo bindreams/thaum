@@ -1,0 +1,34 @@
+name: Control flow must be static in YSH (strict_control_flow)
+dialect: bash
+source: 
+  oils:spec/strict-options#control-flow-must-be-static-in-ysh-strictcontrolflow
+stdout: "a\n---\na\ncode=1\n===\na\ncode=1\n===\na\ncode=1\n===\na\ncode=1\n===\n"
+---
+case $SH in bash*|dash|mksh) exit ;; esac
+
+shopt --set ysh:all
+
+for x in a b c { 
+  echo $x
+  if (x === 'a') {
+    break
+  }
+}
+
+echo ---
+
+for keyword in break continue return exit {
+  try {
+    $[ENV.SH] -o ysh:all -c '
+    var k = $1
+    for x in a b c { 
+      echo $x
+      if (x === "a") {
+        $k
+      }
+    }
+    ' unused $keyword
+  }
+  echo code=$[_error.code]
+  echo '==='
+}

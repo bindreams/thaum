@@ -1,0 +1,11 @@
+name: Comparison Ops
+dialect: bash
+source: oils:spec/arith#comparison-ops
+stdout: "1\n0\n0\n1\n0\n1\n"
+---
+echo $(( 1 == 1 ))
+echo $(( 1 != 1 ))
+echo $(( 1 < 1 ))
+echo $(( 1 <= 1 ))
+echo $(( 1 > 1 ))
+echo $(( 1 >= 1 ))

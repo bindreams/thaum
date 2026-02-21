@@ -1,0 +1,17 @@
+name: read-lines can be built on top of read --all and Str.lines()
+dialect: bash
+source: 
+  oils:spec/ysh-methods#read-lines-can-be-built-on-top-of-read---all-and-strlines
+stdout: "(List)   [\"4\",\"5\",\"6\",\"7\"]\n"
+---
+
+proc read-lines (; out) {
+  read --all 
+  call out->setValue(_reply.lines())
+}
+
+seq 4 7 > tmp.txt
+
+read-lines (&x) < tmp.txt
+
+pp test_ (x)

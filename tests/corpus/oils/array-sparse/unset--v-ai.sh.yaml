@@ -1,0 +1,15 @@
+name: unset -v a[i]
+dialect: bash
+source: oils:spec/array-sparse#unset--v-ai
+stdout: "declare -a a=(1 2 3 4 5 6 7 8 9)\ndeclare -a a=([0]=1 [2]=3 [3]=4 [4]=5 [5]=6
+  [6]=7 [7]=8 [8]=9)\ndeclare -a a=([0]=1 [2]=3 [3]=4 [4]=5 [5]=6 [6]=7 [7]=8 [8]=9)\n\
+  declare -a a=([2]=3 [3]=4 [4]=5 [5]=6 [6]=7 [7]=8 [8]=9)\n"
+---
+a=(1 2 3 4 5 6 7 8 9)
+typeset -p a
+unset -v "a[1]"
+typeset -p a
+unset -v "a[9]"
+typeset -p a
+unset -v "a[0]"
+typeset -p a

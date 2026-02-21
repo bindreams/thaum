@@ -1,0 +1,9 @@
+name: nested @() with quotes and vars
+dialect: bash
+source: oils:spec/extglob-match#nested-with-quotes-and-vars
+stdout: "TRUE\n"
+---
+shopt -s extglob
+prefix=no
+[[ --no-long-option == --@(help|verbose|$prefix-@(long|short)-'option') ]] &&
+  echo TRUE

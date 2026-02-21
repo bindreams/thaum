@@ -1,0 +1,15 @@
+name: Named args with ...rest
+dialect: bash
+source: oils:spec/ysh-func#named-args-with-rest
+stdout: "x=3\n(Dict)   {}\nx=4\n(Dict)   {}\nx=4\n(Dict)   {\"y\":5}\n"
+---
+func f(; x=3, ...named) {
+  echo x=$x
+  pp test_ (named)
+}
+
+call f()
+
+call f(x=4)
+
+call f(x=4, y=5)

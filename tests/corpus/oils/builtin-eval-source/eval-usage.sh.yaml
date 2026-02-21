@@ -1,0 +1,12 @@
+name: eval usage
+dialect: bash
+source: oils:spec/builtin-eval-source#eval-usage
+stdout: "127\n2\n"
+---
+eval -
+echo $?
+eval -z
+echo $?
+127
+0
+127

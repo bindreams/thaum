@@ -1,0 +1,9 @@
+name: typeset -a a[1]=a a[3]=c
+dialect: bash
+source: oils:spec/assign-deferred#typeset--a-a1a-a3c
+stdout: "['x', 'z']\n"
+---
+# declare works the same way in bash, but not mksh.
+# spaces are NOT allowed here.
+typeset -a a[1*1]=x a[1+2]=z
+argv.py "${a[@]}"

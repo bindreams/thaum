@@ -1,0 +1,6 @@
+name: Octal constant
+dialect: bash
+source: oils:spec/arith#octal-constant
+stdout: "9\n"
+---
+echo $(( 011 ))

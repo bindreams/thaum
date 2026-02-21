@@ -1,0 +1,14 @@
+name: ${undef} with nounset
+dialect: bash
+source: oils:spec/fatal-errors#undef-with-nounset
+stdout: "outside=1\n"
+---
+
+$SH -c '
+set -o nounset
+case ${undef} in 
+  (*) echo hi ;;
+esac
+echo inside=$?
+'
+echo outside=$?

@@ -1,0 +1,42 @@
+name: getFrame()
+dialect: bash
+source: oils:spec/ysh-introspect#getframe
+status: 3
+stdout: "<Frame>\n(List)   []\n\np2 frame -1\n<Frame>\n(Dict)   {\"__E__\":<Frame>,\"\
+  ARGV\":[],\"fr\":<Frame>}\n(List)   [\"__E__\",\"ARGV\",\"fr\"]\n\np2 frame -2\n\
+  <Frame>\n(List)   [\"__E__\",\"ARGV\",\"p1_var\"]\n\n"
+---
+
+var fr = vm.getFrame(0)
+pp test_ (fr)
+var d = dict(fr)
+pp test_ (d.ARGV)
+echo
+
+proc p1 {
+  var p1_var = 'x'
+  p2
+}
+
+proc p2 {
+  echo 'p2 frame -1'
+  var fr = vm.getFrame(-1)
+  var d = dict(fr)
+
+  pp test_ (fr)
+  pp test_ (d)
+  pp test_ (keys(d))
+  echo
+
+  echo 'p2 frame -2'
+  setvar fr = vm.getFrame(-2)
+  setvar d = dict(fr)
+
+  pp test_ (fr)
+  pp test_ (keys(d))
+  echo
+}
+
+p1
+
+var fr = vm.getFrame(99)  # fails

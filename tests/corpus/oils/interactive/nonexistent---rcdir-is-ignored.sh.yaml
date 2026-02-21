@@ -1,0 +1,9 @@
+name: nonexistent --rcdir is ignored
+dialect: bash
+source: oils:spec/interactive#nonexistent---rcdir-is-ignored
+stdout: "hi\nstatus=0\n"
+---
+case $SH in bash) exit ;; esac
+
+$SH --rcdir $TMP/__does-not-exist -i -c 'echo hi'
+echo status=$?

@@ -1,0 +1,10 @@
+name: readonly +
+dialect: bash
+source: oils:spec/explore-parsing#readonly
+stdout: "status=0\n"
+---
+
+# dash and bash validate this!  But not set +
+
+readonly + >/dev/null
+echo status=$?

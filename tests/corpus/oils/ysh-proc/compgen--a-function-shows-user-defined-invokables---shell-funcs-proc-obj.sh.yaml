@@ -1,0 +1,38 @@
+name: compgen -A function shows user-defined invokables - shell funcs, Proc, Obj
+dialect: bash
+source: 
+  oils:spec/ysh-proc#compgen--a-function-shows-user-defined-invokables---shell-funcs-proc-obj
+stdout: "my-shell-func\nmyproc\n---\ndefine-inner\ninner\nmy-shell-func\nmyproc\n\
+  ---\ndefine-inner\nmy-shell-func\nmyinvoke\nmyobj\nmyproc\n"
+---
+shopt --set ysh:upgrade
+
+my-shell-func() {
+  echo hi
+}
+
+proc myproc {
+  echo hi
+}
+
+compgen -A function
+
+echo ---
+
+proc define-inner {
+  eval 'proc inner { echo inner }'
+  #eval 'proc myproc { echo inner }'  # shadowed name
+  compgen -A function
+}
+define-inner
+
+echo ---
+
+proc myinvoke (w; self) {
+  pp test_ ([w, self])
+}
+
+var methods = Object(null, {__invoke__: myinvoke})
+var myobj = Object(methods, {})
+
+compgen -A function

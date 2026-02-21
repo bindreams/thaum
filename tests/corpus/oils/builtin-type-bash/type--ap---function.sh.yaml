@@ -1,0 +1,7 @@
+name: type -ap -> function
+dialect: bash
+source: oils:spec/builtin-type-bash#type--ap---function
+stdout: "\n"
+---
+f () { :; }
+type -ap f

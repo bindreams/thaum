@@ -1,0 +1,7 @@
+name: Negative index
+dialect: bash
+source: oils:spec/array#negative-index
+stdout: "['2 3', '1', '']\n"
+---
+a=(1 '2 3')
+argv.py "${a[-1]}" "${a[-2]}" "${a[-5]}"  # last one out of bounds

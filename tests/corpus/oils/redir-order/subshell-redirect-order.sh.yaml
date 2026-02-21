@@ -1,0 +1,9 @@
+name: subshell + redirect order
+dialect: bash
+source: oils:spec/redir-order#subshell-redirect-order
+stdout: "world\n"
+---
+
+echo hello > OSCFLAGS
+(echo `cat OSCFLAGS` "world") > OSCFLAGS
+cat OSCFLAGS

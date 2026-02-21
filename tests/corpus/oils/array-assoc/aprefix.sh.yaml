@@ -1,0 +1,12 @@
+name: ${A[@]#prefix}
+dialect: bash
+source: oils:spec/array-assoc#aprefix
+stdout: "hree\none\nwo\n"
+---
+declare -A A
+A['aa']=one
+A['bb']=two
+A['cc']=three
+for val in "${A[@]#t}"; do
+  echo $val
+done | sort

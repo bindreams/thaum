@@ -1,0 +1,13 @@
+name: json write of Dict in cycle
+dialect: bash
+source: oils:spec/ysh-json#json-write-of-dict-in-cycle
+stdout: "(Dict)   {\"k\":{...}}\nstatus=1\n"
+---
+
+var d = {}
+setvar d.k = d
+
+pp test_ (d)
+
+json write (d)
+echo status=$?

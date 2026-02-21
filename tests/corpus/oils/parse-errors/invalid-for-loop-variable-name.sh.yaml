@@ -1,0 +1,10 @@
+name: Invalid for loop variable name
+dialect: bash
+source: oils:spec/parse-errors#invalid-for-loop-variable-name
+status: 2
+stdout: ''
+---
+for i.j in a b c; do
+  echo hi
+done
+echo done

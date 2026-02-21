@@ -1,0 +1,7 @@
+name: Failed match
+dialect: bash
+source: oils:spec/regex#failed-match
+status: 1
+stdout: ''
+---
+[[ 'bar' =~ X ]] && echo true

@@ -1,0 +1,18 @@
+name: type and command builtin don't find private sleep
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-private#type-and-command-builtin-dont-find-private-sleep
+stdout: "file\nsleep is sleep\n\nsleep is sleep\n\nsleep\n"
+---
+
+remove-path() { sed 's;/.*/;;'; }
+
+type -t sleep
+type sleep | remove-path
+echo
+
+# this is meant to find the "first word"
+type -a sleep | remove-path | uniq
+echo
+
+command -v sleep | remove-path

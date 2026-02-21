@@ -1,0 +1,32 @@
+name: with runtime REFLECTION via __invoke__ - no parsing
+dialect: bash
+source: oils:spec/ysh-proc-meta#with-runtime-reflection-via-invoke---no-parsing
+stdout: "prefix a\nprefix b\n"
+---
+
+# self is the first typed arg
+proc p (prefix; self) {
+  echo $prefix $[self.param]
+}
+
+# p is invoked with "self", which has self.param
+var methods = Object(null, {__invoke__: p})
+
+var procs = {}
+for param in a b {
+  setvar procs["echo_$param"] = Object(methods, {param: param})
+}
+
+var my_echo_a = procs.echo_a
+var my_echo_b = procs.echo_b
+
+if false {
+  = my_echo_a
+  = my_echo_b
+  type -t my_echo_a
+  type -t my_echo_b
+}
+
+# Maybe show an error if this is not value.Obj?
+my_echo_a prefix
+my_echo_b prefix

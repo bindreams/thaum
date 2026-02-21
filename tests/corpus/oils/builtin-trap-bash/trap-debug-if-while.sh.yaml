@@ -1,0 +1,17 @@
+name: trap DEBUG if while
+dialect: bash
+source: oils:spec/builtin-trap-bash#trap-debug-if-while
+stdout: "  [6]\n  [7]\nif\n  [10]\n"
+---
+debuglog() {
+  echo "  [$@]"
+}
+trap 'debuglog $LINENO' DEBUG
+
+if test x = x; then
+  echo if
+fi 
+
+while test x != x; do
+  echo while
+done

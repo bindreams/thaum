@@ -1,0 +1,8 @@
+name: Invalid syntax of alias
+dialect: bash
+source: oils:spec/alias#invalid-syntax-of-alias
+status: 127
+---
+shopt -s expand_aliases  # bash requires this
+alias echo_alias_= 'echo --; echo'  # bad space here
+echo_alias_ x

@@ -1,0 +1,9 @@
+name: -o plusdirs and -o dirnames with compgen
+dialect: bash
+source: oils:spec/builtin-completion#o-plusdirs-and--o-dirnames-with-compgen
+stdout: "b1\nb2\nbenchmarks\nbin\nbuild\nbuiltin\n---\nbenchmarks\nbin\nbuild\nbuiltin\n"
+---
+cd $REPO_ROOT
+compgen -o plusdirs -W 'a b1 b2' b | sort
+echo ---
+compgen -o dirnames b | sort

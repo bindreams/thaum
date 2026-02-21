@@ -1,0 +1,10 @@
+name: the word 'in' can be the loop variable
+dialect: bash
+source: oils:spec/loop#the-word-in-can-be-the-loop-variable
+stdout: "a\nb\nc\nfinished=c\n"
+---
+
+for in in a b c; do
+  echo $in
+done
+echo finished=$in

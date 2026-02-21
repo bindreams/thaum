@@ -1,0 +1,21 @@
+name: shopt -q
+dialect: bash
+source: oils:spec/sh-options#shopt--q
+stdout: "nullglob=1\nnullglob=0\nnullglob,failglob=1\nnullglob,failglob=0\n"
+---
+shopt -q nullglob
+echo nullglob=$?
+
+# set it
+shopt -s nullglob
+
+shopt -q nullglob
+echo nullglob=$?
+
+shopt -q nullglob failglob
+echo nullglob,failglob=$?
+
+# set it
+shopt -s failglob
+shopt -q nullglob failglob
+echo nullglob,failglob=$?

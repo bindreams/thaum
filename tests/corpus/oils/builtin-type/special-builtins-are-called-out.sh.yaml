@@ -1,0 +1,13 @@
+name: special builtins are called out
+dialect: bash
+source: oils:spec/builtin-type#special-builtins-are-called-out
+stdout: "cd is a shell builtin\neval is a special shell builtin\n: is a special shell
+  builtin\ntrue is a shell builtin\n\nexport is a special shell builtin\n"
+---
+type cd
+type eval
+type :
+type true
+
+echo
+type export

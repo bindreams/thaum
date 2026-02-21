@@ -1,0 +1,7 @@
+name: pass long options like sh -o errexit
+dialect: bash
+source: oils:spec/sh-options#pass-long-options-like-sh--o-errexit
+status: 1
+stdout: ''
+---
+$SH -o errexit -c 'false; echo status=$?'

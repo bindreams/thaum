@@ -1,0 +1,6 @@
+name: "[[ -z '>' ]]"
+dialect: bash
+source: oils:spec/dbracket#z
+stdout: "false\n"
+---
+[[ -z '>' ]] || echo false  # -z is operator

@@ -1,0 +1,18 @@
+name: a[i]=v with BigInt
+dialect: bash
+source: oils:spec/array-sparse#aiv-with-bigint
+stdout: "3\n4\n5\n6\n"
+---
+case $SH in mksh) exit ;; esac
+
+sp1[1]=x
+sp1[5]=y
+sp1[9]=z
+
+echo "${#sp1[@]}"
+sp1[0x7FFFFFFFFFFFFFFF]=a
+echo "${#sp1[@]}"
+sp1[0x7FFFFFFFFFFFFFFE]=b
+echo "${#sp1[@]}"
+sp1[0x7FFFFFFFFFFFFFFD]=c
+echo "${#sp1[@]}"

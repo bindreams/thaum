@@ -1,0 +1,7 @@
+name: Eval with syntax error
+dialect: bash
+source: oils:spec/builtin-eval-source#eval-with-syntax-error
+stdout: "status=2\n"
+---
+eval 'echo >'
+echo status=$?

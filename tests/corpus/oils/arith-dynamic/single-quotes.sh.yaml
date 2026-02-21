@@ -1,0 +1,10 @@
+name: Single quotes
+dialect: bash
+source: oils:spec/arith-dynamic#single-quotes
+stdout: "status=1\nstatus=1\n"
+---
+echo $(( '1' + '2' * 3 ))
+echo status=$?
+
+echo $(( '1 + 2' * 3 ))
+echo status=$?

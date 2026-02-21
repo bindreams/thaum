@@ -1,0 +1,7 @@
+name: compopt with invalid syntax
+dialect: bash
+source: oils:spec/builtin-completion#compopt-with-invalid-syntax
+stdout: "status=2\n"
+---
+compopt -o invalid
+echo status=$?

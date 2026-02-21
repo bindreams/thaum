@@ -1,0 +1,14 @@
+name: Substitute one unicode character (UTF-8)
+dialect: bash
+source: oils:spec/var-op-patsub#substitute-one-unicode-character-utf-8
+stdout: "foo and foo\nfoo and _μ_\n_μ_ and foo\n"
+---
+export LANG='en_US.UTF-8'
+
+s='_μ_ and _μ_'
+
+# ? should match one char
+
+echo ${s//_?_/foo}  # all
+echo ${s/#_?_/foo}  # left
+echo ${s/%_?_/foo}  # right

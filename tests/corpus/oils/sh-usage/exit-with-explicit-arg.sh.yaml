@@ -1,0 +1,6 @@
+name: exit with explicit arg
+dialect: bash
+source: oils:spec/sh-usage#exit-with-explicit-arg
+status: 42
+---
+exit 42

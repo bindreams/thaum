@@ -1,0 +1,8 @@
+name: global frame doesn't have PWD, IFS
+dialect: bash
+source: oils:spec/ysh-namespaces#global-frame-doesnt-have-pwd-ifs
+stdout: "\n"
+---
+
+echo "IFS=[$IFS]"
+echo "PWD=[$PWD]"

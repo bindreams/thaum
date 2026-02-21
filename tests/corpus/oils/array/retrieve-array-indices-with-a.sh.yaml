@@ -1,0 +1,7 @@
+name: Retrieve array indices with ${!a}
+dialect: bash
+source: oils:spec/array#retrieve-array-indices-with-a
+stdout: "['0', '1']\n"
+---
+a=(1 '2 3')
+argv.py "${!a[@]}"

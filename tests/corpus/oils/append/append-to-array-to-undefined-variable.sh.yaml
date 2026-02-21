@@ -1,0 +1,8 @@
+name: Append to array to undefined variable
+dialect: bash
+source: oils:spec/append#append-to-array-to-undefined-variable
+stdout: "['c', 'd']\n"
+---
+
+y+=(c d)
+argv.py "${y[@]}"

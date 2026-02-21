@@ -1,0 +1,13 @@
+name: Varadic arguments, no other args
+dialect: bash
+source: oils:spec/ysh-func#varadic-arguments-no-other-args
+stdout: "(List)   []\n(List)   [1]\n(List)   [1,2]\n(List)   [1,2,3]\n"
+---
+func f(...args) {
+pp test_ (args)
+}
+
+call f()
+call f(1)
+call f(1, 2)
+call f(1, 2, 3)

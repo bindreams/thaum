@@ -1,0 +1,20 @@
+name: cd with 2 or more args - with strict_arg_parse
+dialect: bash
+source: oils:spec/builtin-cd#cd-with-2-or-more-args---with-strictargparse
+stdout: "status=0\nstatus=0\nfailed with multiple args\n"
+---
+
+shopt -s strict_arg_parse
+
+mkdir -p foo
+cd foo
+echo status=$?
+cd ..
+echo status=$?
+
+
+cd foo bar
+st=$?
+if test $st -ne 0; then
+  echo 'failed with multiple args'
+fi

@@ -1,0 +1,9 @@
+name: 'Out of range string slice: length'
+dialect: bash
+source: oils:spec/var-op-slice#out-of-range-string-slice-length
+stdout: "_defg\n0\n"
+---
+# OK in both bash and mksh
+foo=abcdefg
+echo _${foo:3:100}
+echo $?

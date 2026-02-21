@@ -1,0 +1,17 @@
+name: push-registers usage
+dialect: bash
+source: oils:spec/ysh-builtins#push-registers-usage
+stdout: "status=2\nstatus=2\nhi\nstatus=0\n"
+---
+shopt --set parse_brace
+
+push-registers
+echo status=$?
+
+push-registers a b
+echo status=$?
+
+push-registers a b {  # hm extra args are ignored
+  echo hi
+}
+echo status=$?

@@ -1,0 +1,8 @@
+name: Tilde sub is not split, but var sub is
+dialect: bash
+source: oils:spec/word-split#tilde-sub-is-not-split-but-var-sub-is
+stdout: "['foo bar']\n['foo', 'bar']\n"
+---
+HOME="foo bar"
+argv.py ~
+argv.py $HOME

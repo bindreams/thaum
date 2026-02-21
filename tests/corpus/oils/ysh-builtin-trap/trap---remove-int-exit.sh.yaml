@@ -1,0 +1,20 @@
+name: trap --remove INT EXIT
+dialect: bash
+source: oils:spec/ysh-builtin-trap#trap---remove-int-exit
+stdout: "3 traps.txt\n---\n1 traps.txt\n---\nexit\n"
+---
+
+trap --add INT EXIT HUP {
+  echo one
+  echo two
+}
+trap -p > traps.txt
+wc -l traps.txt
+echo ---
+
+trap --remove INT EXIT
+trap -p > traps.txt
+wc -l traps.txt
+echo ---
+
+trap --add EXIT { echo 'exit' }

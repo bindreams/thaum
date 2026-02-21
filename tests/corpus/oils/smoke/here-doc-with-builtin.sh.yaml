@@ -1,0 +1,9 @@
+name: here doc with builtin
+dialect: bash
+source: oils:spec/smoke#here-doc-with-builtin
+stdout: "var = value\n"
+---
+read var <<EOF
+value
+EOF
+echo "var = $var"

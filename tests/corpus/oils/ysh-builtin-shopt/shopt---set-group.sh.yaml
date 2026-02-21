@@ -1,0 +1,32 @@
+name: shopt --set GROUP { }
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt---set-group
+stdout: "shopt -u command_sub_errexit\nshopt -u inherit_errexit\nshopt -u strict_errexit\n\
+  shopt -u verbose_errexit\n---\nshopt -s command_sub_errexit\nshopt -s inherit_errexit\n\
+  shopt -s strict_errexit\nshopt -s verbose_errexit\n---\nshopt -s command_sub_errexit\n\
+  shopt -s inherit_errexit\nshopt -u strict_errexit\nshopt -s verbose_errexit\n---\n\
+  shopt -u command_sub_errexit\nshopt -u inherit_errexit\nshopt -s strict_errexit\n\
+  shopt -u verbose_errexit\n"
+---
+shopt --set parse_brace
+
+shopt -p | grep errexit
+echo ---
+
+shopt --set oil:all {
+  #false
+  #echo status=$?
+  shopt -p | grep errexit
+}
+echo ---
+
+shopt --set oil:upgrade {
+  shopt -p | grep errexit
+}
+echo ---
+
+shopt --set strict:all {
+  shopt -p | grep errexit
+}
+
+# TODO: shopt --table should show the error value

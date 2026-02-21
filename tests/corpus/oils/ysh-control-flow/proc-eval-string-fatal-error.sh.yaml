@@ -1,0 +1,16 @@
+name: 'proc eval string: fatal error'
+dialect: bash
+source: oils:spec/ysh-control-flow#proc-eval-string-fatal-error
+status: 1
+stdout: "one\n"
+---
+shopt -s ysh:all
+
+proc proc-that-evals (s) {
+  eval $s
+}
+proc-that-evals '
+  echo one
+  false
+  echo two
+'

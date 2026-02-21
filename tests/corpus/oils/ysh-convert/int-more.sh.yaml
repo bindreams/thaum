@@ -1,0 +1,15 @@
+name: int() more
+dialect: bash
+source: oils:spec/ysh-convert#int-more
+stdout: "(Int)   3\n(Int)   -35\n(Int)   56\ncode=3\n"
+---
+pp test_ (int("3"))
+pp test_ (int("-35"))
+pp test_ (int('5_6'))
+
+shopt -s ysh:upgrade
+
+try {
+  var c = int("bad")
+}
+echo code=$[_error.code]

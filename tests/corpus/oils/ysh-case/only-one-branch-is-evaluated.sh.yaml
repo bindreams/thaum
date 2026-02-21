@@ -1,0 +1,16 @@
+name: only one branch is evaluated
+dialect: bash
+source: oils:spec/ysh-case#only-one-branch-is-evaluated
+status: 0
+stdout: "a\n"
+---
+var x = "42"
+case (x) {
+  ('42') { echo a }
+  42 { echo b }
+  / '42' / { echo c }
+  (Str(40 + 2)) { echo d }
+
+  # even errors are ignored
+  (42 / 0) { echo no error }
+}

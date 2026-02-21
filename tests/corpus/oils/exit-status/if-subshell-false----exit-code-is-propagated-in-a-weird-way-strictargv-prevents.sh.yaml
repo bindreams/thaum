@@ -1,0 +1,9 @@
+name: If subshell false -- exit code is propagated in a weird way (strict_argv 
+  prevents)
+dialect: bash
+source: 
+  oils:spec/exit-status#if-subshell-false----exit-code-is-propagated-in-a-weird-way-strictargv-prevents
+status: 0
+stdout: "FALSE\n"
+---
+if `false`; then echo TRUE; else echo FALSE; fi

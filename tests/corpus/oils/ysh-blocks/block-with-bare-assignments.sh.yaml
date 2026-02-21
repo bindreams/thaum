@@ -1,0 +1,29 @@
+name: Block with Bare Assignments
+dialect: bash
+source: oils:spec/ysh-blocks#block-with-bare-assignments
+stdout: "rule foo-python\nrule foo-cc\nrule bar-python\nrule bar-cc\n"
+---
+
+# oil:all has parse_equals
+# is there any way to turn on parse_equals only in config blocks?
+# but we don't know what's a block ahead of time
+# I think we would have to check at runtime.  Look at VarChecker
+
+shopt --set oil:all
+
+proc Rule(s ; ; ; b) {
+  echo "rule $s"
+}
+
+proc myrules(name) { 
+  Rule $name-python { 
+    kind = 'python'
+  }
+
+  Rule $name-cc {
+    kind = 'cc'  # should NOT conflict
+  }
+}
+
+myrules foo
+myrules bar

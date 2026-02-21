@@ -1,0 +1,16 @@
+name: bindings created shvar persist, which is different than eval(to_dict=true)
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-eval#bindings-created-shvar-persist-which-is-different-than-evaltodicttrue
+stdout: "a=b\na=a\ninner=z\ninner2=z\n"
+---
+
+var a = 'a'
+shvar IFS=: a='b' {
+  echo a=$a
+  inner=z
+  var inner2 = 'z'
+}
+echo a=$a
+echo inner=$inner 
+echo inner2=$inner2

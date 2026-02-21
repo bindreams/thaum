@@ -1,0 +1,15 @@
+name: Functions can be nested
+dialect: bash
+source: oils:spec/ysh-func#functions-can-be-nested
+status: 1
+stdout: "0\n"
+---
+proc build {
+  func f(x) {
+    return (x)
+  }
+
+  echo $[f(0)]
+}
+build
+echo $[f(0)]  # This will fail as f is locally scoped in `proc build`

@@ -1,0 +1,9 @@
+name: Set array item to array
+dialect: bash
+source: oils:spec/array#set-array-item-to-array
+status: 2
+stdout: ''
+---
+a=(1 2)
+a[0]=(3 4)
+echo "status=$?"

@@ -1,0 +1,8 @@
+name: pretty print INFINITY, -INFINITY, NAN
+dialect: bash
+source: oils:spec/ysh-int-float#pretty-print-infinity--infinity-nan
+stdout: "(List)  [INFINITY, -INFINITY, NAN]\n(List)   [INFINITY,-INFINITY,NAN]\n"
+---
+
+= [INFINITY, -INFINITY, NAN]
+pp test_ ([INFINITY, -INFINITY, NAN])

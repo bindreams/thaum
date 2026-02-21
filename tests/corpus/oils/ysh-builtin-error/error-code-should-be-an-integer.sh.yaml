@@ -1,0 +1,7 @@
+name: error code should be an integer
+dialect: bash
+source: oils:spec/ysh-builtin-error#error-code-should-be-an-integer
+status: 3
+stdout: "\n"
+---
+error 'error' (code='a string?')

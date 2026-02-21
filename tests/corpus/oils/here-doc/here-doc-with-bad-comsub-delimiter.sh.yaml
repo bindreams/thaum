@@ -1,0 +1,10 @@
+name: Here doc with bad comsub delimiter
+dialect: bash
+source: oils:spec/here-doc#here-doc-with-bad-comsub-delimiter
+status: 2
+stdout: ''
+---
+# bash is OK with this; dash isn't.  Should be a parse error.
+cat <<$(a)
+here
+$(a)

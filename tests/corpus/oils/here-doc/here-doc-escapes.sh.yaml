@@ -1,0 +1,9 @@
+name: Here doc escapes
+dialect: bash
+source: oils:spec/here-doc#here-doc-escapes
+stdout: "\\ \\\" $ `\n"
+---
+# these are the chars from _DQ_ESCAPED_CHAR
+cat <<EOF
+\\ \" \$ \`
+EOF

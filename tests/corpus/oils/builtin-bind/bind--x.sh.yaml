@@ -1,0 +1,12 @@
+name: bind -X
+dialect: bash
+source: oils:spec/builtin-bind#bind--x
+stdout: "status=1\n\\C-o\\C-s\\C-h\necho foo\nstatus=0\n"
+---
+bind -X | grep -oF '\C-o\C-s\C-h'
+echo status=$?
+
+bind -x '"\C-o\C-s\C-h": echo foo'
+bind -X | grep -oF '\C-o\C-s\C-h'
+bind -X | grep -oF 'echo foo'
+echo status=$?

@@ -1,0 +1,12 @@
+name: Unset has dynamic scope
+dialect: bash
+source: oils:spec/builtin-vars#unset-has-dynamic-scope
+stdout: "foo=bar\nfoo=\n"
+---
+f() {
+  unset foo
+}
+foo=bar
+echo foo=$foo
+f
+echo foo=$foo

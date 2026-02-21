@@ -1,0 +1,8 @@
+name: Multiple non-whitespace IFS chars.
+dialect: bash
+source: oils:spec/word-split#multiple-non-whitespace-ifs-chars
+stdout: "['a', '', 'b', '', '', 'c', 'd']\n"
+---
+IFS=_-
+s1='a__b---c_d'
+argv.py $s1

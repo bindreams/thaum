@@ -1,0 +1,17 @@
+name: Iterate over array with holes (bug fix)
+dialect: bash
+source: oils:spec/ysh-with-sh#iterate-over-array-with-holes-bug-fix
+status: 3
+stdout: "['a', 'b', 'c']\narray=([0]=a [1]=b [5]=c)\n"
+---
+
+declare -a array=(a b)
+array[5]=c
+argv.py "${array[@]}"
+
+# TODO: Should print this like this bash, with value.BashArray
+declare -a
+
+for i, item in (array) {
+  echo "$i $item"
+}

@@ -1,0 +1,14 @@
+name: use may only be used a TOP level, not within proc
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-module#use-may-only-be-used-a-top-level-not-within-proc
+status: 2
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+proc use-it {
+  use $REPO_ROOT/spec/testdata/module2/builtins.ysh
+}
+
+use-it

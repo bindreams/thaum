@@ -1,0 +1,12 @@
+name: read multiple vars spanning many lines
+dialect: bash
+source: oils:spec/builtin-read#read-multiple-vars-spanning-many-lines
+stdout: "['one-two', 'three-four five-six', '']\n"
+---
+read x y << 'EOF'
+one-\
+two three-\
+four five-\
+six
+EOF
+argv.py "$x" "$y" "$z"

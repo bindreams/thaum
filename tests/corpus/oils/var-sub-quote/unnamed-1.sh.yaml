@@ -1,0 +1,8 @@
+name: '-'
+dialect: bash
+source: oils:spec/var-sub-quote#unnamed
+stdout: "['b']\n"
+---
+empty=''
+argv.py ${empty-a} ${Unset-b}
+# empty one is still elided!

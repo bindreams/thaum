@@ -1,0 +1,9 @@
+name: \u0001 unicode literals not supported
+dialect: bash
+source: oils:spec/prompt#u0001-unicode-literals-not-supported
+stdout: "status=0\n"
+---
+PS1='[\u0001]'
+USER=$(whoami)
+test "${PS1@P}" = "[${USER}0001]"
+echo status=$?

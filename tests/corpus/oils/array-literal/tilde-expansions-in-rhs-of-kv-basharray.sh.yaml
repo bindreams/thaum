@@ -1,0 +1,9 @@
+name: Tilde expansions in RHS of [k]=v (BashArray)
+dialect: bash
+source: oils:spec/array-literal#tilde-expansions-in-rhs-of-kv-basharray
+stdout: "/home/user\n/home/user:/home/user:/home/user\n"
+---
+HOME=/home/user
+a=([2]=~ [4]=~:~:~)
+echo "${a[2]}"
+echo "${a[4]}"

@@ -1,0 +1,10 @@
+name: double quoted respects strict_array
+dialect: bash
+source: oils:spec/ysh-expr#double-quoted-respects-strictarray
+status: 1
+stdout: ''
+---
+shopt -s strict:all
+declare -a a=(one two three)
+var x = "-${a[@]}-"
+echo $x

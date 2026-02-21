@@ -1,0 +1,8 @@
+name: Redefining functions is allowed
+dialect: bash
+source: oils:spec/ysh-func#redefining-functions-is-allowed
+status: 0
+stdout: "\n"
+---
+func f() { return (0) }
+func f() { return (1) }

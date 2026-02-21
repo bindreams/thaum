@@ -1,0 +1,7 @@
+name: ${x|html}
+dialect: bash
+source: oils:spec/ysh-var-sub#xhtml
+stdout: "echo hi 2&gt;&amp;1\n"
+---
+x='echo hi 2>&1'
+echo "${x|html}"

@@ -1,0 +1,8 @@
+name: Can't parse extra }
+dialect: bash
+source: oils:spec/toysh-posix#cant-parse-extra
+status: 2
+stdout: "\n"
+---
+
+$SH -c 'for i in a"$@"b;do echo =$i=;done;}' 123 456 789

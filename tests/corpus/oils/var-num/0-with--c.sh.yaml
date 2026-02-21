@@ -1,0 +1,6 @@
+name: $0 with -c
+dialect: bash
+source: oils:spec/var-num#0-with--c
+stdout: "sh\n"
+---
+$SH -c 'echo $0' | grep -o 'sh$'

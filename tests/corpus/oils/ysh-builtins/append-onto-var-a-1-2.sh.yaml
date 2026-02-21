@@ -1,0 +1,9 @@
+name: append onto var a = :| 1 2 |
+dialect: bash
+source: oils:spec/ysh-builtins#append-onto-var-a-1-2
+stdout: "['1', '2', '3 4', '5']\n"
+---
+shopt -s parse_at parse_proc
+var a = :| 1 2 |
+append '3 4' '5' (a)
+argv.py @a

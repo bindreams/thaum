@@ -1,0 +1,9 @@
+name: $@ (empty) and - and +
+dialect: bash
+source: oils:spec/var-op-test#empty-and---and
+stdout: "argv=minus\nargv=\nargv=minus\nargv=\n"
+---
+echo argv=${@-minus}
+echo argv=${@+plus}
+echo argv=${@:-minus}
+echo argv=${@:+plus}

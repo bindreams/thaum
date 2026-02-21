@@ -1,0 +1,10 @@
+name: Two aliases in pipeline
+dialect: bash
+source: oils:spec/alias#two-aliases-in-pipeline
+stdout: "3\n"
+---
+shopt -s expand_aliases
+alias SEQ='seq '
+alias THREE='3 '
+alias WC='wc '
+SEQ THREE | WC -l

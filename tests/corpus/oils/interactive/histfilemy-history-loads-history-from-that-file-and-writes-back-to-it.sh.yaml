@@ -1,0 +1,17 @@
+name: HISTFILE=my-history loads history from that file, and writes back to it
+dialect: bash
+source: 
+  oils:spec/interactive#histfilemy-history-loads-history-from-that-file-and-writes-back-to-it
+stdout: "2\n    1  echo 1\n    2  echo 2\n    3  history\n\n-- after shell exit --\n\
+  echo 1\necho 2\nhistory\n"
+---
+
+echo 'echo 1' > my-history
+
+# paper over OSH difference by deleting the ^D line
+echo 'echo 2
+history' | HISTFILE=my-history $SH --rcfile /dev/null -i | sed '/\^D/d'
+
+echo
+echo '-- after shell exit --'
+cat my-history

@@ -1,0 +1,12 @@
+name: named ref with $# and shopt -s strict_nameref
+dialect: bash
+source: oils:spec/nameref#named-ref-with-and-shopt--s-strictnameref
+status: 1
+stdout: "ref=#\n"
+---
+shopt -s strict_nameref
+
+ref='#'
+echo ref=$ref
+typeset -n ref
+echo ref=$ref

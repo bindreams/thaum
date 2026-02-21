@@ -1,0 +1,26 @@
+name: BashAssoc, short
+dialect: bash
+source: oils:spec/ysh-printing#bashassoc-short
+stdout: "(BashAssoc)\n(BashAssoc ['k']=$'foo \\u0001μ')\n\n(Dict)  {k: (BashAssoc)}\n\
+  (Dict)  {k: (BashAssoc ['k']=$'foo \\u0001μ')}\n\n{\"type\":\"BashAssoc\",\"data\"\
+  :{}}\n{\"type\":\"BashAssoc\",\"data\":{\"k\":\"foo \\u0001μ\"}}\n\n(Dict)   {\"\
+  k\":{\"type\":\"BashAssoc\",\"data\":{}}}\n(Dict)   {\"k\":{\"type\":\"BashAssoc\"\
+  ,\"data\":{\"k\":\"foo \\u0001μ\"}}}\n"
+---
+declare -A empty
+declare -A assoc=(['k']=$'foo \x01\u03bc')
+
+pp value (empty)
+pp value (assoc)
+echo
+
+pp value ({k:empty})
+pp value ({k:assoc})
+echo
+
+pp test_ (empty)
+pp test_ (assoc)
+echo
+
+pp test_ ({k:empty})
+pp test_ ({k:assoc})

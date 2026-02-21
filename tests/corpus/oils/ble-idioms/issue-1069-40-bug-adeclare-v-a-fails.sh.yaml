@@ -1,0 +1,11 @@
+name: 'Issue #1069 [40] BUG: a=(declare v); "${a[@]}" fails'
+dialect: bash
+source: oils:spec/ble-idioms#issue-1069-40-bug-adeclare-v-a-fails
+stdout: "v=1\n"
+---
+case $SH in ash|dash)  exit 99 ;; esac
+a=(typeset v=1)
+v=x
+"${a[@]}"
+echo "v=$v"
+# Note: ash/dash does not have arrays

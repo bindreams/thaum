@@ -1,0 +1,8 @@
+name: double expansion with braced variable
+dialect: bash
+source: oils:spec/brace-expansion#double-expansion-with-braced-variable
+stdout: "A_c A_d b_c b_d\n"
+---
+# This fixes it
+a=A
+echo {${a},b}_{c,d}

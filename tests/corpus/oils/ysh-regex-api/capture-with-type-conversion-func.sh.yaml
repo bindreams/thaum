@@ -1,0 +1,20 @@
+name: Capture with Type Conversion Func
+dialect: bash
+source: oils:spec/ysh-regex-api#capture-with-type-conversion-func
+stdout: "Int Float\nInt Float\n"
+---
+shopt -s ysh:upgrade
+
+var s = 'hi 42-3.14'
+var pat = / <capture d+: int> '-' <capture d+ '.' d+ : float> /
+
+if (s  ~ pat) {
+  var g1 = _group(1)  # Int
+  var g2 = _group(2)  # Float
+  echo $[type(g1)] $[type(g2)]
+}
+
+var m = s.search(pat)
+if (m) {
+  echo $[m.group(1) => type()] $[m.group(2) => type()]
+}

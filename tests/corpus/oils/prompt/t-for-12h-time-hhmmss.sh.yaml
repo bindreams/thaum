@@ -1,0 +1,8 @@
+name: \T for 12h time (HH:MM:SS)
+dialect: bash
+source: oils:spec/prompt#t-for-12h-time-hhmmss
+stdout: "matched=0\n"
+---
+PS1='foo \T bar'
+echo "${PS1@P}" | egrep -q 'foo [0-1][0-9]:[0-5][0-9]:[0-5][0-9] bar'
+echo matched=$?

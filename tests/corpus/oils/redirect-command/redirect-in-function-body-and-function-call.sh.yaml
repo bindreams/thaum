@@ -1,0 +1,8 @@
+name: Redirect in function body AND function call
+dialect: bash
+source: oils:spec/redirect-command#redirect-in-function-body-and-function-call
+stdout: "hi\n"
+stderr: "\n"
+---
+fun() { echo hi; } 1>&2
+fun 2>&1

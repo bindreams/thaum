@@ -1,0 +1,6 @@
+name: Not a dir
+dialect: bash
+source: oils:spec/command#not-a-dir
+status: 127
+---
+$TMP/not-a-dir/text-file

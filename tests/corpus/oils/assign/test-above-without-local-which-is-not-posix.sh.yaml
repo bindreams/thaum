@@ -1,0 +1,19 @@
+name: Test above without 'local' (which is not POSIX)
+dialect: bash
+source: oils:spec/assign#test-above-without-local-which-is-not-posix
+stdout: "x=temp-binding\nx=mutated-temp\nx=global\nx=global\n"
+---
+f() {
+  echo "x=$x"
+
+  x=mutated-temp  # mutate temp frame
+  echo "x=$x"
+
+  # Unset it
+  unset x
+  echo "x=$x"
+}
+
+x=global
+x=temp-binding f
+echo "x=$x"

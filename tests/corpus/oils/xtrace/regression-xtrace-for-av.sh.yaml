@@ -1,0 +1,10 @@
+name: 'Regression: xtrace for "a+=(v)"'
+dialect: bash
+source: oils:spec/xtrace#regression-xtrace-for-av
+stderr: "+ a+=(2)\n"
+---
+case $SH in dash|mksh) exit ;; esac
+
+a=(1)
+set -x
+a+=(2)

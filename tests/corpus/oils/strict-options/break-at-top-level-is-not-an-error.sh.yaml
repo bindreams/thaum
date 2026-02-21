@@ -1,0 +1,7 @@
+name: break at top level is NOT an error
+dialect: bash
+source: oils:spec/strict-options#break-at-top-level-is-not-an-error
+stdout: "status=0\n"
+---
+break
+echo status=$?

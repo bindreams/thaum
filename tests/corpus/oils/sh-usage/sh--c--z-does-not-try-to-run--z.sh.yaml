@@ -1,0 +1,18 @@
+name: "'sh -c -z' does not try to run -z"
+dialect: bash
+source: oils:spec/sh-usage#sh--c--z-does-not-try-to-run--z
+stdout: "flag-parsing-error\n0=-z 1=\nstatus=0\n0=foo 1=-z\nstatus=0\n"
+---
+
+$SH -c -z
+case $? in
+  1) echo flag-parsing-error ;;
+  2) echo flag-parsing-error ;;
+  *) echo fail ;;
+esac
+
+$SH -c 'echo 0=$0 1=$1' -z
+echo status=$?
+
+$SH -c 'echo 0=$0 1=$1' foo -z
+echo status=$?

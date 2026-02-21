@@ -1,0 +1,15 @@
+name: getopts missing required argument
+dialect: bash
+source: oils:spec/builtin-getopts#getopts-missing-required-argument
+status: 2
+stdout: "ERROR 3\n"
+---
+set -- -h -c
+while getopts "hc:" opt; do
+  case $opt in
+    h) FLAG_h=1 ;;
+    c) FLAG_c="$OPTARG" ;;
+    '?') echo ERROR $OPTIND; exit 2; ;;
+  esac
+done
+echo status=$?

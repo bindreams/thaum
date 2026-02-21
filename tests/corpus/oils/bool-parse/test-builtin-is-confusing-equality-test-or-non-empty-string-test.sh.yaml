@@ -1,0 +1,14 @@
+name: 'test builtin: ( = ) is confusing: equality test or non-empty string test'
+dialect: bash
+source: 
+  oils:spec/bool-parse#test-builtin-is-confusing-equality-test-or-non-empty-string-test
+stdout: "status=1\nstatus=0\n"
+---
+
+# here it's equality
+test '(' = ')'
+echo status=$?
+
+# here it's like -n =
+test 0 -eq 0 -a '(' = ')'
+echo status=$?

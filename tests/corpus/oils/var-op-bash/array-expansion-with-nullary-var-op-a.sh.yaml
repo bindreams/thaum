@@ -1,0 +1,15 @@
+name: Array expansion with nullary var op @a
+dialect: bash
+source: oils:spec/var-op-bash#array-expansion-with-nullary-var-op-a
+stdout: "['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a']\n['a a a a a a a a a']\n['A',
+  'A', 'A', 'A']\n['A A A A']\n[]\n['']\n"
+---
+declare -a a=({1..9})
+declare -A A=(['a']=hello ['b']=world ['c']=osh ['d']=ysh)
+
+argv.py "${a[@]@a}"
+argv.py "${a[*]@a}"
+argv.py "${A[@]@a}"
+argv.py "${A[*]@a}"
+argv.py "${u[@]@a}"
+argv.py "${u[*]@a}"

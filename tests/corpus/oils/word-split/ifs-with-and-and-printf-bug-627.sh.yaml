@@ -1,0 +1,9 @@
+name: "IFS='' with $@ and $* and printf (bug #627)"
+dialect: bash
+source: oils:spec/word-split#ifs-with-and-and-printf-bug-627
+stdout: "[a]\n[b c]\n[a]\n[b c]\n"
+---
+set -- a 'b c'
+IFS=''
+printf '[%s]\n' $@
+printf '[%s]\n' $*

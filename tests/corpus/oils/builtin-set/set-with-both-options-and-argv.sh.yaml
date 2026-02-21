@@ -1,0 +1,10 @@
+name: set with both options and argv
+dialect: bash
+source: oils:spec/builtin-set#set-with-both-options-and-argv
+status: 1
+stdout: "a b c\n"
+---
+set -o errexit a b c
+echo "$@"
+false
+echo done

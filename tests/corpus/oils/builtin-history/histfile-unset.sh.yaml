@@ -1,0 +1,13 @@
+name: HISTFILE unset
+dialect: bash
+source: oils:spec/builtin-history#histfile-unset
+stdout: "status=1\n^D\n"
+---
+
+echo '
+unset HISTFILE
+history -a
+echo status=$?
+' | $SH -i
+
+case $SH in bash) echo '^D' ;; esac

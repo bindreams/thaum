@@ -1,0 +1,15 @@
+name: braced var sub ${x:-default}
+dialect: bash
+source: oils:spec/ysh-expr#braced-var-sub-x-default
+stdout: "default\n-default-\n--default--\n"
+---
+
+# without double quotes
+
+var b = ${foo:-default}
+echo $b
+var c = ${bar:-"-$b-"}
+echo $c
+
+var d = "${bar:-"-$c-"}"  # another one
+echo $d

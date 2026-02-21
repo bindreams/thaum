@@ -1,0 +1,8 @@
+name: Env bindings shouldn't contain array assignments
+dialect: bash
+source: 
+  oils:spec/assign-extended#env-bindings-shouldnt-contain-array-assignments
+status: 2
+stdout: ''
+---
+a=1 b[0]=2 c=3 printenv.py a b c

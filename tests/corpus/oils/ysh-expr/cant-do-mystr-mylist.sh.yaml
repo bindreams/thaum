@@ -1,0 +1,7 @@
+name: can't do mystr ++ mylist
+dialect: bash
+source: oils:spec/ysh-expr#cant-do-mystr-mylist
+status: 3
+stdout: "\n"
+---
+= ["s"] + "t"

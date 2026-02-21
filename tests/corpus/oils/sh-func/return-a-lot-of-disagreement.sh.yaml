@@ -1,0 +1,13 @@
+name: return "" (a lot of disagreement)
+dialect: bash
+source: oils:spec/sh-func#return-a-lot-of-disagreement
+status: 0
+stdout: "f\nstatus=0\n"
+---
+f() {
+  echo f
+  return ""
+}
+
+f
+echo status=$?

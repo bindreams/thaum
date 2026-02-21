@@ -1,0 +1,26 @@
+name: _hay() register
+dialect: bash
+source: oils:spec/hay#hay-register
+stdout: "1\n2\n0\n"
+---
+shopt --set parse_paren parse_brace parse_equals parse_proc parse_ysh_expr_sub
+
+hay define user
+
+var result = {}
+
+hay eval :result {
+
+  user alice
+  # = _hay()
+  write -- $[len(_hay()['children'])]
+
+  user bob
+  setvar result = _hay()
+  write -- $[len(_hay()['children'])]
+
+}
+
+# TODO: Should be cleared here
+setvar result = _hay()
+write -- $[len(_hay()['children'])]

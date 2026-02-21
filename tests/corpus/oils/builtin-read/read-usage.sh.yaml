@@ -1,0 +1,8 @@
+name: read usage
+dialect: bash
+source: oils:spec/builtin-read#read-usage
+stdout: "status=2\n"
+---
+read -n -1
+echo status=$?
+# zsh gives a fatal error?  seems inconsistent

@@ -1,0 +1,11 @@
+name: Iterate over range
+dialect: bash
+source: oils:spec/ysh-slice-range#iterate-over-range
+stdout: "1\n2\n3\n4\n0, 1\n1, 2\n2, 3\n"
+---
+for i in (1..<5) {
+    echo $[i]
+}
+for i, n in (1..<4) {
+    echo "$[i], $[n]"
+}

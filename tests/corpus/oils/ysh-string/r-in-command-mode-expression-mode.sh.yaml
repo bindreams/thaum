@@ -1,0 +1,15 @@
+name: r''' in Command Mode, Expression mode
+dialect: bash
+source: oils:spec/ysh-string#r-in-command-mode-expression-mode
+stdout: "\\\n\\\nr\\\n"
+---
+
+echo r'''\'''
+
+var x = r'''\'''
+echo $x
+
+shopt --unset parse_ysh_string
+shopt --unset no_parse_word_join
+
+echo r'''\'''

@@ -1,0 +1,8 @@
+name: Here doc and backslash double quote
+dialect: bash
+source: oils:spec/here-doc#here-doc-and-backslash-double-quote
+stdout: "a \\\"quote\\\"\n"
+---
+cat <<EOF
+a \"quote\"
+EOF

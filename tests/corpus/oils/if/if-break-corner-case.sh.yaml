@@ -1,0 +1,13 @@
+name: if break corner case
+dialect: bash
+source: oils:spec/if#if-break-corner-case
+stdout: "hi\n"
+---
+
+# This is analogous to the 'while' case in spec/loop
+f() {
+  if break; then
+    echo hi
+  fi
+}
+f

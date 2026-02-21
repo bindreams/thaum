@@ -1,0 +1,20 @@
+name: 'parse_equals: allows bare assignment in Caps blocks'
+dialect: bash
+source: 
+  oils:spec/ysh-options-assign#parseequals-allows-bare-assignment-in-caps-blocks
+stdout: "x=\ny=foo\n"
+---
+shopt --set parse_proc parse_brace parse_equals 
+
+proc Rule {
+  true
+}
+
+Rule {
+  x = 1 + 2*3
+}
+echo x=$x
+
+# still allowed since we didn't unset parse_sh_assign
+y=foo
+echo y=$y

@@ -1,0 +1,15 @@
+name: Export a global variable and unset it
+dialect: bash
+source: oils:spec/builtin-vars#export-a-global-variable-and-unset-it
+---
+f() { export GLOBAL=X; }
+f
+echo $GLOBAL
+printenv.py GLOBAL
+unset GLOBAL
+echo g=$GLOBAL
+printenv.py GLOBAL
+X
+X
+g=
+None

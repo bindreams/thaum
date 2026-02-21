@@ -1,0 +1,17 @@
+name: Dynamic $c readonly - bash and dash change behavior, mksh bug
+dialect: bash
+source: 
+  oils:spec/builtin-meta-assign#dynamic-c-readonly---bash-and-dash-change-behavior-mksh-bug
+stdout: "a b\na b\n"
+---
+case $SH in zsh) exit ;; esac
+
+x='a b'
+
+z=command
+$z readonly c=$x
+echo $c
+
+z=c
+${z}ommand readonly d=$x
+echo $d

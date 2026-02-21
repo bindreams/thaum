@@ -1,0 +1,35 @@
+name: '""" and $""" in Expression Mode'
+dialect: bash
+source: oils:spec/ysh-string#and-in-expression-mode
+stdout: "line1=line1\nline2=line2\n[one \"\ntwo = 2 \"\"\n three = 3\n]\n[good\n bad
+  42\n]\n[good\n bad 42\n]\n"
+---
+
+var line1 = """line1"""
+echo line1=$line1
+var line2 = """
+line2"""
+echo line2=$line2
+
+var two = 2
+var three = 3
+var x = """
+  one "
+  two = $two ""
+   three = $three
+  """
+echo "[$x]"
+
+var i = 42
+var x = """
+  good
+ bad $i
+  """
+echo "[$x]"
+
+# alias
+var x = $"""
+  good
+ bad $i
+  """
+echo "[$x]"

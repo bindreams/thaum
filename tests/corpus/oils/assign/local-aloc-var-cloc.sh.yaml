@@ -1,0 +1,13 @@
+name: local a=loc $var c=loc
+dialect: bash
+source: oils:spec/assign#local-aloc-var-cloc
+stdout: "global\n['loc', '', 'loc']\n"
+---
+var='b'
+b=global
+echo $b
+f() {
+  local a=loc $var c=loc
+  argv.py "$a" "$b" "$c"
+}
+f

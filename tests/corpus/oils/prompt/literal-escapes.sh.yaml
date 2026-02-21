@@ -1,0 +1,7 @@
+name: literal escapes
+dialect: bash
+source: oils:spec/prompt#literal-escapes
+stdout: "\a\e\r\n\n"
+---
+PS1='\a\e\r\n'
+echo "${PS1@P}"

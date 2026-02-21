@@ -1,0 +1,11 @@
+name: source-guard is an old way of preventing redefinition - could remove it
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-module#source-guard-is-an-old-way-of-preventing-redefinition---could-remove-it
+stdout: "common\nmodule1\n"
+---
+shopt --set ysh:upgrade
+
+source-guard 'main' || return 0
+source $REPO_ROOT/spec/testdata/module/common.ysh
+source $REPO_ROOT/spec/testdata/module/module1.ysh

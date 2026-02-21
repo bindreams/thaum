@@ -1,0 +1,44 @@
+name: exit code of var, const, setvar with command sub
+dialect: bash
+source: oils:spec/ysh-assign#exit-code-of-var-const-setvar-with-command-sub
+stdout: "outside1=1\noutside2=1\noutside3=1\noutside4=1\n"
+---
+
+# NOTE: This feels PROBLEMATIC without command_sub_errexit feels like it should
+# be the last one ...
+
+run() {
+  $[ENV.REPO_ROOT]/bin/osh -O parse_proc -c "$@"
+
+  # Identical
+  # $[ENV.SH] +O ysh:all -O parse_proc -c "$@"
+}
+
+shopt --unset errexit
+
+run '
+var x = $(false)
+echo inside1=$?
+'
+echo outside1=$?
+
+run '
+setvar x = $(false)
+echo inside2=$?
+'
+echo outside2=$?
+
+# Argument list
+run '
+call split( $(false) )
+echo inside3=$?
+'
+echo outside3=$?
+
+# Place expression
+run '
+var d = {}
+setvar d[ $(false) ] = 42
+echo inside4=$?
+'
+echo outside4=$?

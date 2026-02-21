@@ -1,0 +1,15 @@
+name: setglobal ENV.PYTHONPATH = 'foo' changes child process state
+dialect: bash
+source: 
+  oils:spec/ysh-env#setglobal-envpythonpath-foo-changes-child-process-state
+stdout: "pythonpath=foo\n"
+---
+shopt -s ysh:upgrade
+
+setglobal ENV.PYTHONPATH = 'foo'
+
+#pp test_ (ENV)
+#export PYTHONPATH=zz
+
+# execute POSIX shell
+sh -c 'echo pythonpath=$PYTHONPATH'

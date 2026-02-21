@@ -1,0 +1,24 @@
+name: error builtin adds named args as properties on _error Dict
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-error#error-builtin-adds-named-args-as-properties-on-error-dict
+stdout: "(Dict)   {\"code\":99,\"message\":\"bad\"}\n(Dict)   {\"myData\":{\"spam\"\
+  :\"eggs\"},\"code\":99,\"message\":\"bad\"}\n(Dict)   {\"message\":\"bad\",\"code\"\
+  :99}\n"
+---
+
+try {
+  error 'bad' (code=99)
+}
+pp test_ (_error)
+
+# Note: myData co
+try {
+  error 'bad' (code=99, myData={spam:'eggs'})
+}
+pp test_ (_error)
+
+try {
+  error 'bad' (code=99, message='cannot override')
+}
+pp test_ (_error)

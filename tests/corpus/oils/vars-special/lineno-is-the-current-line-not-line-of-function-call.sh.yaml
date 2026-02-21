@@ -1,0 +1,19 @@
+name: $LINENO is the current line, not line of function call
+dialect: bash
+source: 
+  oils:spec/vars-special#lineno-is-the-current-line-not-line-of-function-call
+---
+echo $LINENO  # first line
+g() {
+  argv.py $LINENO  # line 3
+}
+f() {
+  argv.py $LINENO  # line 6
+  g
+  argv.py $LINENO  # line 8
+}
+f
+1
+['6']
+['3']
+['8']

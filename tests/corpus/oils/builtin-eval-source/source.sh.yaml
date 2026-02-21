@@ -1,0 +1,9 @@
+name: Source
+dialect: bash
+source: oils:spec/builtin-eval-source#source
+stdout: "libvar\n"
+---
+lib=$TMP/spec-test-lib.sh
+echo 'LIBVAR=libvar' > $lib
+. $lib  # dash doesn't have source
+echo $LIBVAR

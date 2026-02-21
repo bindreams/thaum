@@ -1,0 +1,20 @@
+name: 'For loop over expression: Dict, not BashAssoc'
+dialect: bash
+source: oils:spec/ysh-for#for-loop-over-expression-dict-not-bashassoc
+status: 3
+stdout: "key name\nkey age\n"
+---
+
+var mydict = {name: 'bob', age: 40}
+for key in (mydict) {
+  echo "key $key"
+}
+
+# We can declare this
+shopt --unset no_osh_builtins
+declare -A A=([name]=bob)
+
+# But there is no iteration
+for key in (A) {
+  echo "key $key"
+}

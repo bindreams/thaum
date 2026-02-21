@@ -1,0 +1,16 @@
+name: $"foo $x" to make "foo $x" explicit
+dialect: bash
+source: oils:spec/ysh-string#foo-x-to-make-foo-x-explicit
+stdout: "foo bar\nequal\n"
+---
+
+var x = $"bar"
+
+# expression mode
+var y = $"foo $x"
+echo "$y"
+
+# command mode
+if test "$y" = $"foo $x"; then
+  echo equal
+fi

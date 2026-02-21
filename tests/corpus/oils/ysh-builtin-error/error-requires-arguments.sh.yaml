@@ -1,0 +1,7 @@
+name: error requires arguments
+dialect: bash
+source: oils:spec/ysh-builtin-error#error-requires-arguments
+status: 2
+stdout: "\n"
+---
+error

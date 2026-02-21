@@ -1,0 +1,30 @@
+name: QTT func on top of proc
+dialect: bash
+source: oils:spec/ysh-funcs-external#qtt-func-on-top-of-proc
+stdout: "\n"
+---
+
+proc myadd {
+
+  # I thought this was 'wok'
+  qtt read-rows {
+    if (_index === 0) {
+      # could write header first here
+      write --sep $TAB -- $_schema_str 'result:Int'
+
+      # _schema is the raw schema
+    }
+    # or use BEGIN and 'when', like awk-style
+
+    const result = _row->x + _row->y
+    write --sep $TAB -- $_row_str $result
+  }
+}
+
+qtt tabify '''
+x:Int y:Int
+1     2
+3     4
+''' | myadd | qtt read-cols result
+
+echo "result = $result"

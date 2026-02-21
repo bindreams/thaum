@@ -1,0 +1,6 @@
+name: Env value with escaped <
+dialect: bash
+source: oils:spec/assign#env-value-with-escaped
+stdout: "foo<foo\n"
+---
+FOO=foo\<foo printenv.py FOO

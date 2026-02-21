@@ -1,0 +1,15 @@
+name: Double Quotes in Command Sub in Double Quotes
+dialect: bash
+source: oils:spec/command-sub#double-quotes-in-command-sub-in-double-quotes
+stdout: "x hi\nx hi\nx \"hi\"\nx hi\nx hi\nx hi\n"
+---
+# virtualenv's bin/activate uses this.
+# This is weird!  Double quotes within `` is different than double quotes
+# within $()!  All shells agree.
+# I think this is related to the nested backticks case!
+echo "x $(echo hi)"
+echo "x $(echo "hi")"
+echo "x $(echo \"hi\")"
+echo "x `echo hi`"
+echo "x `echo "hi"`"
+echo "x `echo \"hi\"`"

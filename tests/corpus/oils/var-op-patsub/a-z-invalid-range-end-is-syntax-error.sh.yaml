@@ -1,0 +1,11 @@
+name: '[a-z] Invalid range end is syntax error'
+dialect: bash
+source: oils:spec/var-op-patsub#a-z-invalid-range-end-is-syntax-error
+status: 1
+stdout: ''
+---
+x=fooz
+pat='[z-a]'  # Invalid range.  Other shells don't catch it!
+#pat='[a-y]'
+echo ${x//$pat}
+echo status=$?

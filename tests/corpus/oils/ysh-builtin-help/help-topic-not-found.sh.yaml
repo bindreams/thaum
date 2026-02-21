@@ -1,0 +1,8 @@
+name: help topic not found
+dialect: bash
+source: oils:spec/ysh-builtin-help#help-topic-not-found
+status: 1
+stdout: "\n"
+---
+
+help zz

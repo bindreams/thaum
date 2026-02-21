@@ -1,0 +1,8 @@
+name: Can simulate read --all-lines with a proc and value.Place
+dialect: bash
+source: 
+  oils:spec/ysh-builtins#can-simulate-read---all-lines-with-a-proc-and-valueplace
+stdout: "[\n  \"1\",\n  \"2\",\n  \"3\"\n]\n"
+---
+
+$SH $REPO_ROOT/spec/testdata/ysh-read-2.sh

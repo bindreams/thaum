@@ -1,0 +1,32 @@
+name: Redirect with if, case, while, for
+dialect: bash
+source: oils:spec/ysh-cmd-lang#redirect-with-if-case-while-for
+stdout: "ysh-if\nysh-case\nysh-while\nysh-for\n"
+---
+
+if (true) {
+  echo ysh-if
+} > out
+
+cat out
+
+case (true) {
+  (true) {
+    echo ysh-case
+  }
+} > out
+
+cat out
+
+while (true) {
+  echo ysh-while
+  break
+} > out
+
+cat out
+
+for x in ([42]) {
+  echo ysh-for
+} > out
+
+cat out

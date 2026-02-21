@@ -1,0 +1,8 @@
+name: _error register is initially empty dict
+dialect: bash
+source: oils:spec/ysh-builtin-error#error-register-is-initially-empty-dict
+stdout: "Dict\n0\n"
+---
+
+echo $[type(_error)]
+echo $[len(_error)]

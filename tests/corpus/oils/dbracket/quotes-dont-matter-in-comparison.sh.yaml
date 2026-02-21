@@ -1,0 +1,7 @@
+name: Quotes don't matter in comparison
+dialect: bash
+source: oils:spec/dbracket#quotes-dont-matter-in-comparison
+stdout: "true\ntrue\n"
+---
+[[ '3' = 3 ]] && echo true
+[[ '3' -eq 3 ]] && echo true

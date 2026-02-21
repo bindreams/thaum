@@ -1,0 +1,14 @@
+name: json write evaluation error
+dialect: bash
+source: oils:spec/ysh-json#json-write-evaluation-error
+status: 1
+stdout: "\n"
+---
+
+#var block = ^(echo hi)
+#json write (block) 
+#echo status=$?
+
+# undefined var
+json write (a) 
+echo 'should have failed'

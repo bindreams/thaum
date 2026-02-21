@@ -1,0 +1,8 @@
+name: Unset invalid variable name
+dialect: bash
+source: oils:spec/builtin-vars#unset-invalid-variable-name
+stdout: "status=2\n"
+---
+unset %
+echo status=$?
+# dash does a hard failure!

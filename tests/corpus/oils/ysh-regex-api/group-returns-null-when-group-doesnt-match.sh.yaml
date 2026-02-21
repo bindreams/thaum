@@ -1,0 +1,11 @@
+name: _group() returns null when group doesn't match
+dialect: bash
+source: oils:spec/ysh-regex-api#group-returns-null-when-group-doesnt-match
+stdout: "null b\n"
+---
+shopt -s ysh:upgrade
+
+var pat = / <capture 'a'> | <capture 'b'> /
+if ('b' ~ pat) {
+  echo "$[_group(1)] $[_group(2)]"
+}

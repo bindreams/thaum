@@ -1,0 +1,16 @@
+name: not operator behaves like Python
+dialect: bash
+source: oils:spec/ysh-expr-bool#not-operator-behaves-like-python
+stdout: "(Bool)   false\n(Bool)   false\n(Bool)   false\n(Bool)   true\n(Bool)   true\n\
+  (Bool)   true\n(Bool)   false\n"
+---
+
+# consistent with if statement, ternary if, and, or
+
+pp test_ (not "s")
+pp test_ (not 3)
+pp test_ (not 4.5)
+pp test_ (not {})
+pp test_ (not [])
+pp test_ (not false)
+pp test_ (not true)

@@ -1,0 +1,18 @@
+name: \ in unquoted substitutions escapes globchars
+dialect: bash
+source: oils:spec/glob#in-unquoted-substitutions-escapes-globchars
+stdout: "['x/test.ifs.*.txt']\n['x/test.ifs.*.txt']\n['x/test.ifs.*.txt']\n"
+---
+mkdir x
+touch \
+  'x/test.ifs.\.txt' \
+  'x/test.ifs.*.txt'
+
+v='*\*.txt'
+argv.py x/$v
+
+v="\\" u='*.txt'
+argv.py x/*$v$u
+
+v="\\" u="*.txt"
+argv.py x/*$v*.txt

@@ -1,0 +1,6 @@
+name: 'compgen with actions: shopt'
+dialect: bash
+source: oils:spec/builtin-completion#compgen-with-actions-shopt
+stdout: "[nullglob]\n"
+---
+compgen -A shopt -P [ -S ] nu

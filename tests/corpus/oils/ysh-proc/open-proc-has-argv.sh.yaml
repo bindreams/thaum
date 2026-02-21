@@ -1,0 +1,14 @@
+name: Open proc has ARGV
+dialect: bash
+source: oils:spec/ysh-proc#open-proc-has-argv
+stdout: "ARGV x y z\ndollar-at a b c\n"
+---
+shopt -s ysh:all
+proc foo { 
+  echo ARGV @ARGV
+  # do we care about this?  I think we want to syntactically remove it from YSH
+  # but it can still be used for legacy
+  echo dollar-at "$@"
+}
+builtin set -- a b c
+foo x y z

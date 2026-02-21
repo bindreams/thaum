@@ -1,0 +1,18 @@
+name: Stateful proc with counter
+dialect: bash
+source: oils:spec/ysh-proc#stateful-proc-with-counter
+stdout: "counter = 1\ncounter = 3\ncounter = 6\n"
+---
+shopt --set ysh:upgrade
+
+proc invokeCounter(; self, inc) {
+  setvar self.i += inc
+  echo "counter = $[self.i]"
+}
+
+var methods = Object(null, {__invoke__: invokeCounter})
+var counter = Object(methods, {i: 0})
+
+counter (1)
+counter (2)
+counter (3)

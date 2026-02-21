@@ -1,0 +1,15 @@
+name: Background process and then a singleton pipeline
+dialect: bash
+source: oils:spec/background#background-process-and-then-a-singleton-pipeline
+stdout: "begin\nend\nstatus=42\n"
+---
+
+# This was inspired by #416, although that symptom there was timing, so it's
+# technically not a regression test.  It's hard to test timing.
+
+{ sleep 0.1; exit 42; } &
+echo begin
+! true
+echo end
+wait $!
+echo status=$?

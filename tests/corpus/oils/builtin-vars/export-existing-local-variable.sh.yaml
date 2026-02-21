@@ -1,0 +1,13 @@
+name: Export existing local variable
+dialect: bash
+source: oils:spec/builtin-vars#export-existing-local-variable
+---
+f() {
+  local L1=local1
+  export L1
+  printenv.py L1
+}
+f
+printenv.py L1
+local1
+None

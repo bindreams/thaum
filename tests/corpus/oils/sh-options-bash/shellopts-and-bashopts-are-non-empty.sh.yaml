@@ -1,0 +1,19 @@
+name: SHELLOPTS and BASHOPTS are non-empty
+dialect: bash
+source: oils:spec/sh-options-bash#shellopts-and-bashopts-are-non-empty
+stdout: "shellopts is set\nbashopts is set\n"
+---
+
+# 2024-06 - tickled by Samuel testing Gentoo
+
+if test -v SHELLOPTS; then
+  echo 'shellopts is set'
+fi
+if test -v BASHOPTS; then
+	echo 'bashopts is set'
+fi
+
+# bash: braceexpand:hashall etc.
+
+echo shellopts ${SHELLOPTS:?} > /dev/null
+echo bashopts ${BASHOPTS:?} > /dev/null

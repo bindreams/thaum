@@ -1,0 +1,14 @@
+name: dirs -c to clear the stack
+dialect: bash
+source: oils:spec/builtin-dirs#dirs--c-to-clear-the-stack
+status: 0
+stdout: "--\n/tmp /\n--\n/tmp\n"
+---
+set -o errexit
+cd /
+pushd /tmp >/dev/null  # zsh pushd doesn't print anything, but bash does
+echo --
+dirs
+dirs -c
+echo --
+dirs

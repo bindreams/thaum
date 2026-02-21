@@ -1,0 +1,25 @@
+name: "haynode: shell nodes require block args; attribute nodes don't"
+dialect: bash
+source: 
+  oils:spec/hay#haynode-shell-nodes-require-block-args-attribute-nodes-dont
+stdout: "status 0\nstatus 2\n"
+---
+
+shopt --set parse_brace parse_equals parse_proc parse_ysh_expr_sub
+
+hay define package TASK
+
+try {
+  hay eval :result {
+    package glibc > /dev/null
+  }
+}
+echo "status $[_error.code]"
+
+
+try {
+  hay eval :result {
+    TASK build
+  }
+}
+echo "status $[_error.code]"

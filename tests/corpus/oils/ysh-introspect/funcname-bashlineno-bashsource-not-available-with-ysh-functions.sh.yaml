@@ -1,0 +1,24 @@
+name: FUNCNAME BASH_LINENO BASH_SOURCE not available with YSH functions
+dialect: bash
+source: 
+  oils:spec/ysh-introspect#funcname-bashlineno-bashsource-not-available-with-ysh-functions
+stdout: "p\n16\n[ stdin ]\n"
+---
+
+func g(x) {
+  echo ${FUNCNAME[@]}
+  echo ${BASH_LINENO[@]}
+  echo ${BASH_SOURCE[@]}
+}
+
+func f(x) {
+  return (g(x))
+}
+
+# We can allow it in procs -- there's no cost to doing so? 
+
+proc p {
+  call f(42)
+}
+
+p

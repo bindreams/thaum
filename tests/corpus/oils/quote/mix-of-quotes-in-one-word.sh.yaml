@@ -1,0 +1,6 @@
+name: Mix of quotes in one word
+dialect: bash
+source: oils:spec/quote#mix-of-quotes-in-one-word
+stdout: "unquoted  single-quoted  double-quoted  unquoted\n"
+---
+echo unquoted'  single-quoted'"  double-quoted  "unquoted

@@ -1,0 +1,7 @@
+name: Lambda not implemented
+dialect: bash
+source: oils:spec/ysh-reserved#lambda-not-implemented
+status: 2
+stdout: "\n"
+---
+const f = |x| x + 1

@@ -1,0 +1,9 @@
+name: FOO=foo fun
+dialect: bash
+source: oils:spec/assign#foofoo-fun
+stdout: "[foo]\n"
+---
+fun() {
+  echo "[$FOO]"
+}
+FOO=foo fun

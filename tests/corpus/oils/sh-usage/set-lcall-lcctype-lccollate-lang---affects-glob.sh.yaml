@@ -1,0 +1,26 @@
+name: Set LC_ALL LC_CTYPE LC_COLLATE LANG - affects glob ?
+dialect: bash
+source: oils:spec/sh-usage#set-lcall-lcctype-lccollate-lang---affects-glob
+stdout: "LC_ALL _x_\nLC_ALL _x_ _μ_\n\nLC_CTYPE _x_\nLC_CTYPE _x_ _μ_\n\nLC_COLLATE
+  _x_\nLC_COLLATE _x_\n\nLANG _x_\nLANG _x_ _μ_\n"
+---
+
+# note: test/spec-common.sh sets LC_ALL
+unset LC_ALL
+
+touch _x_ _μ_
+
+LC_ALL=C       $SH -c 'echo LC_ALL _?_'
+LC_ALL=C.UTF-8 $SH -c 'echo LC_ALL _?_'
+echo
+
+LC_CTYPE=C       $SH -c 'echo LC_CTYPE _?_'
+LC_CTYPE=C.UTF-8 $SH -c 'echo LC_CTYPE _?_'
+echo
+
+LC_COLLATE=C       $SH -c 'echo LC_COLLATE _?_'
+LC_COLLATE=C.UTF-8 $SH -c 'echo LC_COLLATE _?_'
+echo
+
+LANG=C       $SH -c 'echo LANG _?_'
+LANG=C.UTF-8 $SH -c 'echo LANG _?_'

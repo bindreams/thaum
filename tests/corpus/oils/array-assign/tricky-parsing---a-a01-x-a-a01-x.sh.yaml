@@ -1,0 +1,23 @@
+name: Tricky parsing - a[ a[0]=1 ]=X  a[ a[0]+=1 ]+=X
+dialect: bash
+source: oils:spec/array-assign#tricky-parsing---a-a01-x-a-a01-x
+stdout: "assign=42\ndeclare -a a=([0]=\"1\" [1]=\"X\")\ndeclare -a a=([0]=\"1\" [1]=\"\
+  X\" [2]=\"3\" [3]=\"Y\")\n---\ndeclare -a a=([0]=\"2\" [1]=\"X\" [2]=\"3X\" [3]=\"\
+  Y\")\n"
+---
+case $SH in zsh|mksh|ash) exit ;; esac
+
+# the nested [] means we can't use regular language lookahead?
+
+echo assign=$(( z[0] = 42 ))
+
+a[a[0]=1]=X
+declare -p a
+
+a[ a[2]=3 ]=Y
+declare -p a
+
+echo ---
+
+a[ a[0]+=1 ]+=X
+declare -p a

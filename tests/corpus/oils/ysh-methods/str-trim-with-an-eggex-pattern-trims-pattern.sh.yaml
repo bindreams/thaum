@@ -1,0 +1,22 @@
+name: Str => trim*() with an eggex pattern trims pattern
+dialect: bash
+source: oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-pattern
+status: 0
+stdout: "\"\", \"\", \"\"\n\"   \", \"   \", \"   \"\n\"xy\", \"xy\", \"xy\"\n\"yz\"\
+  , \"yz\", \"yz\"\n\"\", \"\", \"\"\n\"xyz\", \"xyz\", \"\"\n\"xyzxyz\", \"xyzxyz\"\
+  , \"xyz\"\n\"abcxyz\", \"xyzabc\", \"abc\"\n\"abcxyz\", \"xyzabcxyz\", \"abcxyz\"\
+  \n\"xyzabcxyz\", \"xyzabc\", \"xyzabc\"\n\"abc123\", \"123abc\", \"abc\"\n"
+---
+func test(s, p) { write --sep ', ' --j8 $[s => trimStart(p)] $[s => trimEnd(p)] $[s => trim(p)] }
+
+call test(''         , / 'xyz' /)
+call test('   '      , / 'xyz' /)
+call test('xy'       , / 'xyz' /)
+call test('yz'       , / 'xyz' /)
+call test('xyz'      , / 'xyz' /)
+call test('xyzxyz'   , / 'xyz' /)
+call test('xyzxyzxyz', / 'xyz' /)
+call test('xyzabcxyz', / 'xyz' /)
+call test('xyzabcxyz', / %start 'xyz' /)
+call test('xyzabcxyz', / 'xyz' %end /)
+call test('123abc123', / d+ /)

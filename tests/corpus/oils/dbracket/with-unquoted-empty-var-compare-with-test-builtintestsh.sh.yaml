@@ -1,0 +1,8 @@
+name: '[[ with unquoted empty var (compare with test-builtin.test.sh)'
+dialect: bash
+source: 
+  oils:spec/dbracket#with-unquoted-empty-var-compare-with-test-builtintestsh
+stdout: "true\n"
+---
+empty=''
+[[ $empty == '' ]] && echo true

@@ -1,0 +1,12 @@
+name: read builtin with too few variables
+dialect: bash
+source: oils:spec/builtin-read#read-builtin-with-too-few-variables
+status: 0
+stdout: "/A/B//\n"
+---
+set -o errexit
+set -o nounset  # hm this doesn't change it
+read x y z <<EOF
+A B
+EOF
+echo /$x/$y/$z/

@@ -1,0 +1,11 @@
+name: Alias must be an unquoted word, no expansions allowed
+dialect: bash
+source: oils:spec/alias#alias-must-be-an-unquoted-word-no-expansions-allowed
+stdout: "X\nstatus=127\n"
+---
+shopt -s expand_aliases  # bash requires this
+alias echo_alias_='echo'
+cmd=echo_alias_
+echo_alias_ X  # this works
+$cmd X  # this fails because it's quoted
+echo status=$?

@@ -1,0 +1,9 @@
+name: 'Issue #1069 [49] BUG: \return 0 does not work'
+dialect: bash
+source: oils:spec/ble-idioms#issue-1069-49-bug-return-0-does-not-work
+stdout: "status=3\nstatus=3\n"
+---
+f0() { return 3;          echo unexpected; return 0; }
+f1() { \return 3;         echo unexpected; return 0; }
+f0; echo "status=$?"
+f1; echo "status=$?"

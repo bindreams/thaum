@@ -1,0 +1,9 @@
+name: no provided names
+dialect: bash
+source: oils:spec/ysh-builtin-module#no-provided-names
+status: 1
+stdout: "\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/no-provide.ysh

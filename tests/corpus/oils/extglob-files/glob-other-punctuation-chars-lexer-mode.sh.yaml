@@ -1,0 +1,12 @@
+name: Glob other punctuation chars (lexer mode)
+dialect: bash
+source: oils:spec/extglob-files#glob-other-punctuation-chars-lexer-mode
+stdout: "['__#', '__&&', '__<>', '__aa', '__{}']\n"
+---
+shopt -s extglob
+mkdir -p eg5
+cd eg5
+touch __{aa,'<>','{}','#','&&'}
+argv.py @(__aa|'__<>'|__{}|__#|__&&|)
+
+# mksh sorts them differently

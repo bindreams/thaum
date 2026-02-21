@@ -1,0 +1,16 @@
+name: DebugFrame.toString() running io->eval() on command
+dialect: bash
+source: oils:spec/ysh-introspect#debugframetostring-running-io-eval-on-command
+stdout: "  %1 [ -c flag ]:7\n    p\n    ^\n  %2 [ -c flag ]:5\n      call io->eval(b)\n\
+  \                   ^\n  %3 [ -c flag ]:3\n    var b = ^(my-proc a b)\n        \
+  \      ^~~~~~~\n  %4 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n      print-stack\n\
+  \      ^~~~~~~~~~~\n"
+---
+$[ENV.SH] -c '
+source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh
+var b = ^(my-proc a b)
+proc p {
+  call io->eval(b)
+}
+p
+' | sed -e "s;$[ENV.REPO_ROOT];MYROOT;g" -e 's;#;%;g'

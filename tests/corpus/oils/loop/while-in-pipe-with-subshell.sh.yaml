@@ -1,0 +1,11 @@
+name: while in pipe with subshell
+dialect: bash
+source: oils:spec/loop#while-in-pipe-with-subshell
+stdout: "3\n"
+---
+i=0
+seq 3 | ( while read foo; do
+  i=$((i+1))
+  #echo $i
+done
+echo $i )

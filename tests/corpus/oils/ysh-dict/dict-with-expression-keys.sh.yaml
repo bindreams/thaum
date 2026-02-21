@@ -1,0 +1,17 @@
+name: dict with expression keys
+dialect: bash
+source: oils:spec/ysh-dict#dict-with-expression-keys
+stdout: "len=1\nhello\nlen=1\nbar\n"
+---
+shopt --set parse_ysh_expr_sub
+
+var d1 = {['name']: "hello"}
+echo len=$[len(d1)]
+var v = d1['name']
+echo $v
+
+var key='k'
+var d2 = {["$key"]: "bar"}
+echo len=$[len(d2)]
+var v2 = d2['k']
+echo $v2

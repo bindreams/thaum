@@ -1,0 +1,13 @@
+name: File redirects have word splitting too!
+dialect: bash
+source: oils:spec/redirect-multi#file-redirects-have-word-splitting-too
+stdout: "status=1\nstatus=1\n"
+---
+
+file='foo bar'
+
+echo hi > $file
+echo status=$?
+
+cat "$file"
+echo status=$?

@@ -1,0 +1,12 @@
+name: local array
+dialect: bash
+source: oils:spec/array#local-array
+status: 0
+stdout: "['1']\n"
+---
+# mksh support local variables, but not local arrays, oddly.
+f() {
+  local a=(1 '2 3')
+  argv.py "${a[0]}"
+}
+f

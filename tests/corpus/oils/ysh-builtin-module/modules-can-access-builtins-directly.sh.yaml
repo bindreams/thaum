@@ -1,0 +1,12 @@
+name: modules can access __builtins__ directly
+dialect: bash
+source: oils:spec/ysh-builtin-module#modules-can-access-builtins-directly
+stdout: "(Int)   3\n"
+---
+shopt --set ysh:upgrade
+
+use $REPO_ROOT/spec/testdata/module2/builtins.ysh
+
+var mylen = builtins.mylen
+
+pp test_ (mylen([3,4,5]))

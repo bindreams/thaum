@@ -1,0 +1,22 @@
+name: $(< file; end) is not a special case
+dialect: bash
+source: oils:spec/redirect-command#file-end-is-not-a-special-case
+stdout: "begin\n---\nend\n---\n\n---\n"
+---
+
+seq 5 6 > myfile
+
+# zsh prints the file each time!
+# other shells do nothing?
+
+foo=$(echo begin; < myfile)
+echo $foo
+echo ---
+
+foo=$(< myfile; echo end)
+echo $foo
+echo ---
+
+foo=$(< myfile; <myfile)
+echo $foo
+echo ---

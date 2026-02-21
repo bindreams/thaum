@@ -1,0 +1,14 @@
+name: shopt supports long flags
+dialect: bash
+source: oils:spec/ysh-builtin-shopt#shopt-supports-long-flags
+stdout: "shopt -u nullglob\nshopt -s nullglob\nshopt -u nullglob\n---\n"
+---
+shopt -p nullglob
+
+shopt --set nullglob
+shopt -p nullglob
+
+shopt --unset nullglob
+shopt -p nullglob
+
+echo ---

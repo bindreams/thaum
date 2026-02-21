@@ -1,0 +1,10 @@
+name: '[ with op variable'
+dialect: bash
+source: oils:spec/builtin-bracket#with-op-variable
+status: 0
+stdout: "true\nfalse\n"
+---
+# OK -- parsed AFTER evaluation of vars
+op='='
+[ a $op a ] && echo true
+[ a $op b ] || echo false

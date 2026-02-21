@@ -1,0 +1,8 @@
+name: Splice in array
+dialect: bash
+source: oils:spec/ysh-word-eval#splice-in-array
+stdout: "['one', 'two', 'three']\n"
+---
+shopt -s ysh:upgrade
+var a = %(one two three)
+argv.py @a

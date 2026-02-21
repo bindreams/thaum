@@ -1,0 +1,12 @@
+name: getopts three invocations
+dialect: bash
+source: oils:spec/builtin-getopts#getopts-three-invocations
+stdout: "status=0 opt=h\nstatus=0 opt=c\nstatus=1 opt=?\n"
+---
+set -- -h -c foo
+getopts 'hc:' opt
+echo status=$? opt=$opt
+getopts 'hc:' opt
+echo status=$? opt=$opt
+getopts 'hc:' opt
+echo status=$? opt=$opt

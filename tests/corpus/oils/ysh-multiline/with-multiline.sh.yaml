@@ -1,0 +1,15 @@
+name: '... with multiline $()'
+dialect: bash
+source: oils:spec/ysh-multiline#with-multiline
+stdout: "one two\n1\n"
+---
+
+# newlines mean the normal thing
+echo $(echo one
+       echo two)
+
+... echo
+    $(echo 3
+      echo 4)  # is this right?
+  | wc -l
+  ;

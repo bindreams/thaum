@@ -1,0 +1,10 @@
+name: type -t -> not found
+dialect: bash
+source: oils:spec/builtin-type-bash#type--t---not-found
+stderr: "\n"
+---
+type -t echo ZZZ find ==
+echo status=$?
+builtin
+file
+status=1

@@ -1,0 +1,26 @@
+name: User can handle errors - toJson() toJson8()
+dialect: bash
+source: oils:spec/ysh-json#user-can-handle-errors---tojson-tojson8
+status: 4
+stdout: "status=4\nencode error Can't encode List (object id) in object cycle\nstatus=4\n\
+  encode error Can't serialize object of type Eggex\n"
+---
+shopt -s ysh:upgrade
+
+var obj = []
+call obj->append(obj)
+
+try {
+  echo $[toJson(obj)]
+}
+echo status=$[_error.code]
+echo "encode error $[_error.message]" | sed 's/0x[a-f0-9]\+/(object id)/'
+
+try {  # use different style
+  echo $[toJson8( /d+/ )]
+}
+echo status=$[_error.code]
+echo "encode error $[_error.message]"
+
+# This makes the interpreter fail with a message
+echo $[toJson(obj)]

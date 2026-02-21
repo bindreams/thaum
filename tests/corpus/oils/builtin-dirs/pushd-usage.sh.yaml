@@ -1,0 +1,11 @@
+name: pushd usage
+dialect: bash
+source: oils:spec/builtin-dirs#pushd-usage
+stdout: "status=2\nstatus=0\nstatus=0\n"
+---
+pushd -z
+echo status=$?
+pushd /tmp >/dev/null
+echo status=$?
+pushd -- /tmp >/dev/null
+echo status=$?

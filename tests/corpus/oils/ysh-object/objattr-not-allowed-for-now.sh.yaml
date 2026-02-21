@@ -1,0 +1,10 @@
+name: obj['attr'] not allowed (for now)
+dialect: bash
+source: oils:spec/ysh-object#objattr-not-allowed-for-now
+status: 3
+stdout: "\n"
+---
+
+var rect = Object(null, {x: 3, y: 4})
+
+pp test_ ([rect['x'], rect['y']])

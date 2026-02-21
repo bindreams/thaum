@@ -1,0 +1,6 @@
+name: strict_arith option
+dialect: bash
+source: oils:spec/strict-options#strictarith-option
+status: 0
+---
+shopt -s strict_arith

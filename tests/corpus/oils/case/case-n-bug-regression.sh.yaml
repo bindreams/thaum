@@ -1,0 +1,9 @@
+name: case \n bug regression
+dialect: bash
+source: oils:spec/case#case-n-bug-regression
+status: 2
+stdout: "\n"
+---
+
+case
+in esac

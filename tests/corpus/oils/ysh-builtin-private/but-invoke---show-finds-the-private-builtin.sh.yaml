@@ -1,0 +1,9 @@
+name: but invoke --show finds the private builtin
+dialect: bash
+source: 
+  oils:spec/ysh-builtin-private#but-invoke---show-finds-the-private-builtin
+stdout: "        sleep       builtin     private\n"
+---
+case $SH in bash) exit ;; esac
+
+invoke --show sleep | grep builtin

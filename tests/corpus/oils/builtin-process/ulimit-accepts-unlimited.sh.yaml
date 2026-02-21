@@ -1,0 +1,17 @@
+name: ulimit accepts 'unlimited'
+dialect: bash
+source: oils:spec/builtin-process#ulimit-accepts-unlimited
+stdout: "  arg zz\nunlimited\nstatus=0\nFAILED\n\n  arg unlimited\nunlimited\nstatus=0\n\
+  \n"
+---
+
+for arg in zz unlimited; do
+  echo "  arg $arg"
+  ulimit -f
+  echo status=$?
+  ulimit -f $arg
+  if test $? -ne 0; then
+    echo 'FAILED'
+  fi
+  echo
+done

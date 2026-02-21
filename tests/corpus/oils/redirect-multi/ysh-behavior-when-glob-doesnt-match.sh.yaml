@@ -1,0 +1,13 @@
+name: ysh behavior when glob doesn't match
+dialect: bash
+source: oils:spec/redirect-multi#ysh-behavior-when-glob-doesnt-match
+status: 1
+stdout: "\n"
+---
+
+shopt -s ysh:upgrade
+
+echo hi > qq-*-zz
+echo status=$?
+
+echo qq*

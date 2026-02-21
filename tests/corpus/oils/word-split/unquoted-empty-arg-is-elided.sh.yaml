@@ -1,0 +1,7 @@
+name: unquoted empty arg is elided
+dialect: bash
+source: oils:spec/word-split#unquoted-empty-arg-is-elided
+stdout: "['1', '2']\n"
+---
+empty=""
+argv.py 1 $empty 2

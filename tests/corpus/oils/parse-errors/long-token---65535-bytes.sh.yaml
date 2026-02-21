@@ -1,0 +1,9 @@
+name: Long Token - 65535 bytes
+dialect: bash
+source: oils:spec/parse-errors#long-token---65535-bytes
+stdout: "65535 out\n"
+---
+
+python2 -c 'print("echo -n %s" % ("x" * 65535))' > tmp.sh
+$SH tmp.sh > out
+wc --bytes out

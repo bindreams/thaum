@@ -1,0 +1,30 @@
+name: 'parse_paren: while statement'
+dialect: bash
+source: oils:spec/ysh-options#parseparen-while-statement
+stdout: "1\n2\ndone ksh\n1\n2\ndone sh\n1\n2\ndone oil\n"
+---
+shopt -s oil:upgrade
+
+# ksh style
+var x = 1
+while (( x < 3 )) {
+  echo $x
+  setvar x += 1
+}
+echo 'done ksh'
+
+# sh style
+var y = 1
+while test $y -lt 3 {
+  echo $y
+  setvar y += 1
+}
+echo 'done sh'
+
+# oil
+var z = 1
+while (z < 3) {
+  echo $z
+  setvar z += 1
+}
+echo 'done oil'

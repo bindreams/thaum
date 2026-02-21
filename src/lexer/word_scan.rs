@@ -367,6 +367,27 @@ impl Lexer {
         loop {
             match self.chars.peek_at(i) {
                 Some(']') => return true,
+                // Skip double-quoted content — ] inside "..." is literal
+                Some('"') => {
+                    i += 1;
+                    loop {
+                        match self.chars.peek_at(i) {
+                            Some('"') | None => { i += 1; break; }
+                            Some('\\') => i += 2,
+                            _ => i += 1,
+                        }
+                    }
+                }
+                // Skip single-quoted content — ] inside '...' is literal
+                Some('\'') => {
+                    i += 1;
+                    loop {
+                        match self.chars.peek_at(i) {
+                            Some('\'') | None => { i += 1; break; }
+                            _ => i += 1,
+                        }
+                    }
+                }
                 Some(' ' | '\t' | '\n' | '|' | '&' | ';' | '<' | '>' | '(' | ')') | None => {
                     return false
                 }

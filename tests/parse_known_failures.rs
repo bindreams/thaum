@@ -43,22 +43,9 @@ use thaum::{parse, parse_with, Dialect};
 
 // ---------------------------------------------------------------------------
 // 9. Quoting edge cases
+//    - ansi_c_backslash_c: NOT A BUG (bash also rejects $'\c'' as unterminated quote)
+//    - glob_with_closing_bracket_and_quotes: FIXED (see tests/bash_features.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn ansi_c_backslash_c_terminates_quote() {
-    // In some shells \c inside $'...' terminates the string.
-    // The trailing ' opens a new single-quoted string that contains ` | cat`.
-    parse_with("echo -n $'\\c'' | cat", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn glob_with_closing_bracket_and_quotes() {
-    // Quotes inside bracket expressions in globs.
-    parse_with("echo [hello\"]\"", Dialect::Bash).unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 10. Nested function declaration

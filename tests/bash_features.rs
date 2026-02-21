@@ -1754,3 +1754,11 @@ fn regex_with_parens_in_grouped_double_bracket() {
         panic!("expected BashDoubleBracket");
     }
 }
+
+#[test]
+fn glob_bracket_with_quoted_close() {
+    // ] inside quotes doesn't close a bracket expression.
+    // bash treats [hello"]" as the literal word [hello] (no glob match).
+    let prog = parse_with("echo [hello\"]\"", Dialect::Bash).unwrap();
+    assert_eq!(prog.statements.len(), 1);
+}

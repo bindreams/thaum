@@ -1546,3 +1546,59 @@ fn arith_array_length() {
     let input = "arr=(a b c); (( ${#arr[@]} ))";
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
+
+// --- Array subscripts in arithmetic ---
+
+#[test]
+fn arith_array_subscript_basic() {
+    parse_with("(( a[0] ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_in_expansion() {
+    parse_with("echo $(( a[0] + a[1] ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_assignment() {
+    parse_with("(( a[0] = 5 ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_increment() {
+    parse_with("(( a[0]++ ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_compound_key() {
+    parse_with("(( A[K] = V ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_expr_key() {
+    parse_with("(( a[i+1] ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn arith_array_subscript_comma() {
+    // Multiple array subscript operations with comma operator
+    parse_with("(( a[0]++, ++a[1], a[2]--, --a[3] ))", Dialect::Bash).unwrap();
+}
+
+#[test]
+fn bracket_glob_word_order() {
+    // Verify bracket glob produces correct fragment order: Literal, Glob, Literal(content])
+    let prog = parse_with("echo a[0-9]", Dialect::Bash).unwrap();
+    if let Expression::Command(cmd) = &prog.statements[0].expression {
+        if let Argument::Word(word) = &cmd.arguments[1] {
+            let parts = &word.parts;
+            assert!(matches!(&parts[0], Fragment::Literal(s) if s == "a"));
+            assert!(matches!(&parts[1], Fragment::Glob(GlobChar::BracketOpen)));
+            assert!(matches!(&parts[2], Fragment::Literal(s) if s == "0-9]"));
+        } else {
+            panic!("expected Argument::Word");
+        }
+    } else {
+        panic!("expected Command");
+    }
+}

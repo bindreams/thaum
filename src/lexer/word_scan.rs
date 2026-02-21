@@ -503,6 +503,10 @@ impl Lexer {
     }
 
     /// Scan a bracket glob expression: [ followed by bracket content through ].
+    ///
+    /// Produces two tokens in order: `Glob(BracketOpen)` then `Literal(content])`
+    /// where content includes the closing `]`. The glob marker is pushed into the
+    /// buffer first; the content literal is returned (and pushed by scan_next after).
     fn scan_bracket_glob(&mut self, start: usize) -> Result<SpannedToken, LexError> {
         self.advance_char(); // consume [
         let glob_span = Span::new(start, self.cursor_pos().0);
@@ -529,17 +533,16 @@ impl Lexer {
             }
         }
 
-        // Push the bracket content as a Literal token into the buffer
-        if !bracket_content.is_empty() {
-            self.buffer.push_back(SpannedToken {
-                token: Token::Literal(bracket_content),
-                span: Span::new(bracket_start, self.cursor_pos().0),
-            });
-        }
-
-        Ok(SpannedToken {
+        // Push the [ glob marker into the buffer first (consumed before content)
+        self.buffer.push_back(SpannedToken {
             token: Token::Glob(GlobKind::BracketOpen),
             span: glob_span,
+        });
+
+        // Return the bracket content as Literal (pushed after glob by scan_next)
+        Ok(SpannedToken {
+            token: Token::Literal(bracket_content),
+            span: Span::new(bracket_start, self.cursor_pos().0),
         })
     }
 

@@ -134,6 +134,10 @@ impl Lexer {
 
     /// Consume a `Whitespace` token that must be present at the current position.
     /// Panics (debug) if the current token is not `Whitespace`.
+    ///
+    /// For parser code facing user input, use `expect_whitespace()` instead —
+    /// it returns a `ParseError` rather than panicking.
+    #[cfg(test)]
     pub(crate) fn skip_whitespace(&mut self) -> Result<(), ParseError> {
         self.ensure_buffered()?;
         debug_assert_eq!(
@@ -144,6 +148,23 @@ impl Lexer {
         );
         self.consume_front();
         Ok(())
+    }
+
+    /// Consume a `Whitespace` token that must be present, or return a parse error.
+    /// Use this at grammar positions where whitespace is mandatory (e.g., between
+    /// a keyword and its required argument).
+    pub(crate) fn expect_whitespace(&mut self) -> Result<(), ParseError> {
+        self.ensure_buffered()?;
+        if self.buffer[self.buf_pos].token == Token::Whitespace {
+            self.consume_front();
+            Ok(())
+        } else {
+            Err(ParseError::UnexpectedToken {
+                found: self.buffer[self.buf_pos].token.display_name().to_string(),
+                expected: "whitespace".to_string(),
+                span: self.buffer[self.buf_pos].span,
+            })
+        }
     }
 
     /// Consume a `Whitespace` token if present. Returns `true` if one was consumed.

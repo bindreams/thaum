@@ -120,7 +120,7 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("for")?;
 
-        self.lexer.skip_whitespace()?;
+        self.lexer.expect_whitespace()?;
         if self.options.arithmetic_for && self.lexer.peek()?.token == Token::LParen {
             return self.parse_arithmetic_for(start_span);
         }
@@ -183,7 +183,7 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect_keyword("case")?;
 
-        self.lexer.skip_whitespace()?;
+        self.lexer.expect_whitespace()?;
         if !self.lexer.peek()?.token.is_fragment() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),

@@ -1,4 +1,4 @@
-use thaum::parse;
+use thaum::{parse, parse_with, Dialect};
 
 #[test]
 fn error_unclosed_if() {
@@ -163,4 +163,31 @@ fn error_unterminated_dollar_paren_with_semi() {
 #[test]
 fn error_unterminated_backtick() {
     assert!(parse("echo `echo test").is_err());
+}
+
+// Newline directly after keyword (grammar requires whitespace, not newline)
+
+#[test]
+fn error_for_newline_before_name() {
+    assert!(parse("for\nx in a b; do echo $x; done").is_err());
+}
+
+#[test]
+fn error_case_newline_before_word() {
+    assert!(parse("case\nx in a) ;; esac").is_err());
+}
+
+#[test]
+fn error_function_newline_before_name() {
+    assert!(parse_with("function\nfoo { :; }", Dialect::Bash).is_err());
+}
+
+#[test]
+fn error_select_newline_before_name() {
+    assert!(parse_with("select\nx in a b; do echo $x; done", Dialect::Bash).is_err());
+}
+
+#[test]
+fn error_coproc_newline_before_command() {
+    assert!(parse_with("coproc\ncat", Dialect::Bash).is_err());
 }

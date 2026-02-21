@@ -242,9 +242,18 @@ fn expand_complex_parameter(
             }
         }
         Some(ParamOp::DefaultAssign) => {
-            return Err(ExecError::UnsupportedFeature(
-                "${var:=word} default assignment".to_string(),
-            ));
+            match value.as_deref() {
+                Some(v) if !v.is_empty() => out.push_str(v),
+                _ => {
+                    let expanded = if let Some(arg) = argument {
+                        expand_word(arg, env)?
+                    } else {
+                        String::new()
+                    };
+                    env.set_var(name, &expanded)?;
+                    out.push_str(&expanded);
+                }
+            }
         }
         Some(ParamOp::Error) => {
             match value.as_deref() {

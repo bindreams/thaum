@@ -592,7 +592,18 @@ fn unsupported_eval_builtin() {
     expect_unsupported("eval echo hello");
 }
 
+// --- DefaultAssign (${var:=default}) ---
+
 #[test]
-fn unsupported_default_assign() {
-    expect_unsupported("echo ${UNSET_VAR:=default}");
+fn default_assign_when_unset() {
+    let (out, status) = exec_ok("echo ${X:=hello}; echo $X");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\nhello\n");
+}
+
+#[test]
+fn default_assign_when_set() {
+    let (out, status) = exec_ok("X=existing; echo ${X:=fallback}; echo $X");
+    assert_eq!(status, 0);
+    assert_eq!(out, "existing\nexisting\n");
 }

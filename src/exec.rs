@@ -1,5 +1,6 @@
 pub mod arithmetic;
 pub mod builtins;
+pub(crate) mod command_ex;
 mod compound;
 pub mod environment;
 pub mod error;

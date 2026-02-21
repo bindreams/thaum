@@ -32,15 +32,10 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 7. { without space — not a keyword
+// 7. { without space — NOT A BUG. Bash also rejects `{ls; }` (status 2).
+//    `{` requires whitespace to be a keyword; `{ls;` is a word, but `}` alone
+//    in command position is a syntax error in both bash and our parser.
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn brace_without_space_is_command() {
-    // { is only a keyword when followed by whitespace. {ls; is a command name.
-    parse("{ls; }").unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 8. case inside $()

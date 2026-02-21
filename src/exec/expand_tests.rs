@@ -223,3 +223,70 @@ fn expand_param_default_assign_when_empty() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "filled");
     assert_eq!(env.get_var("EMPTY"), Some("filled"));
 }
+
+#[test]
+fn expand_param_trim_small_prefix() {
+    let mut env = Environment::new();
+    env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
+        name: "PATH".into(),
+        operator: Some(ParamOp::TrimSmallPrefix),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("*/".into())]))),
+    })]);
+    // Shortest prefix matching */: "/" matches, so result is "usr/bin:/usr/local/bin"
+    assert_eq!(
+        expand_word(&word, &mut env).unwrap(),
+        "usr/bin:/usr/local/bin"
+    );
+}
+
+#[test]
+fn expand_param_trim_large_prefix() {
+    let mut env = Environment::new();
+    env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
+        name: "PATH".into(),
+        operator: Some(ParamOp::TrimLargePrefix),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("*/".into())]))),
+    })]);
+    // Longest prefix matching */: "/usr/bin:/usr/local/" matches, result is "bin"
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "bin");
+}
+
+#[test]
+fn expand_param_trim_small_suffix() {
+    let mut env = Environment::new();
+    env.set_var("FILE", "archive.tar.gz").unwrap();
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
+        name: "FILE".into(),
+        operator: Some(ParamOp::TrimSmallSuffix),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal(".*".into())]))),
+    })]);
+    // Shortest suffix matching .*: ".gz" matches, result is "archive.tar"
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "archive.tar");
+}
+
+#[test]
+fn expand_param_trim_large_suffix() {
+    let mut env = Environment::new();
+    env.set_var("FILE", "archive.tar.gz").unwrap();
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
+        name: "FILE".into(),
+        operator: Some(ParamOp::TrimLargeSuffix),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal(".*".into())]))),
+    })]);
+    // Longest suffix matching .*: ".tar.gz" matches, result is "archive"
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "archive");
+}
+
+#[test]
+fn expand_param_trim_unset_var() {
+    let mut env = Environment::new();
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
+        name: "UNSET".into(),
+        operator: Some(ParamOp::TrimSmallPrefix),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("*".into())]))),
+    })]);
+    // Unset var → empty string, trim has nothing to do
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "");
+}

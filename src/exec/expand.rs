@@ -279,15 +279,41 @@ fn expand_complex_parameter(
                 _ => {}
             }
         }
-        Some(
-            ParamOp::TrimSmallSuffix
-            | ParamOp::TrimLargeSuffix
-            | ParamOp::TrimSmallPrefix
-            | ParamOp::TrimLargePrefix,
-        ) => {
-            return Err(ExecError::UnsupportedFeature(
-                "parameter pattern trimming".to_string(),
-            ));
+        Some(ParamOp::TrimSmallPrefix) => {
+            let val = value.as_deref().unwrap_or("");
+            let pat = if let Some(arg) = argument {
+                expand_word(arg, env)?
+            } else {
+                String::new()
+            };
+            out.push_str(super::pattern::trim_smallest_prefix(val, &pat));
+        }
+        Some(ParamOp::TrimLargePrefix) => {
+            let val = value.as_deref().unwrap_or("");
+            let pat = if let Some(arg) = argument {
+                expand_word(arg, env)?
+            } else {
+                String::new()
+            };
+            out.push_str(super::pattern::trim_largest_prefix(val, &pat));
+        }
+        Some(ParamOp::TrimSmallSuffix) => {
+            let val = value.as_deref().unwrap_or("");
+            let pat = if let Some(arg) = argument {
+                expand_word(arg, env)?
+            } else {
+                String::new()
+            };
+            out.push_str(super::pattern::trim_smallest_suffix(val, &pat));
+        }
+        Some(ParamOp::TrimLargeSuffix) => {
+            let val = value.as_deref().unwrap_or("");
+            let pat = if let Some(arg) = argument {
+                expand_word(arg, env)?
+            } else {
+                String::new()
+            };
+            out.push_str(super::pattern::trim_largest_suffix(val, &pat));
         }
     }
     Ok(())

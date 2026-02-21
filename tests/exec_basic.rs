@@ -577,9 +577,31 @@ fn unsupported_set_options() {
     expect_unsupported("set -e");
 }
 
+// --- Pattern trimming ---
+
 #[test]
-fn unsupported_pattern_trim() {
-    expect_unsupported("X=hello.txt; echo ${X%.txt}");
+fn trim_small_suffix() {
+    let (out, _) = exec_ok("X=hello.txt; echo ${X%.txt}");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn trim_large_suffix() {
+    let (out, _) = exec_ok("X=archive.tar.gz; echo ${X%%.*}");
+    assert_eq!(out, "archive\n");
+}
+
+#[test]
+fn trim_small_prefix() {
+    let (out, _) = exec_ok("X=/usr/bin:/usr/local/bin; echo ${X#*/}");
+    assert_eq!(out, "usr/bin:/usr/local/bin\n");
+}
+
+#[test]
+fn trim_large_prefix() {
+    // ${X##*/} extracts basename
+    let (out, _) = exec_ok("X=/a/b/c.txt; echo ${X##*/}");
+    assert_eq!(out, "c.txt\n");
 }
 
 #[test]

@@ -72,3 +72,55 @@ fn match_pattern(text: &[u8], pattern: &[u8], mut ti: usize, mut pi: usize) -> b
     }
     ti == text.len()
 }
+
+/// Remove the shortest matching prefix from `text`.
+///
+/// Used by `${var#pattern}`. Tries `text[..i]` for increasing `i` and returns
+/// `text[i..]` on the first match. Returns the original text if no prefix matches.
+pub(super) fn trim_smallest_prefix<'a>(text: &'a str, pattern: &str) -> &'a str {
+    for i in 0..=text.len() {
+        if text.is_char_boundary(i) && shell_pattern_match(&text[..i], pattern) {
+            return &text[i..];
+        }
+    }
+    text
+}
+
+/// Remove the longest matching prefix from `text`.
+///
+/// Used by `${var##pattern}`. Tries `text[..i]` for decreasing `i` and returns
+/// `text[i..]` on the first match.
+pub(super) fn trim_largest_prefix<'a>(text: &'a str, pattern: &str) -> &'a str {
+    for i in (0..=text.len()).rev() {
+        if text.is_char_boundary(i) && shell_pattern_match(&text[..i], pattern) {
+            return &text[i..];
+        }
+    }
+    text
+}
+
+/// Remove the shortest matching suffix from `text`.
+///
+/// Used by `${var%pattern}`. Tries `text[i..]` for decreasing `i` (starting
+/// from the end) and returns `text[..i]` on the first match.
+pub(super) fn trim_smallest_suffix<'a>(text: &'a str, pattern: &str) -> &'a str {
+    for i in (0..=text.len()).rev() {
+        if text.is_char_boundary(i) && shell_pattern_match(&text[i..], pattern) {
+            return &text[..i];
+        }
+    }
+    text
+}
+
+/// Remove the longest matching suffix from `text`.
+///
+/// Used by `${var%%pattern}`. Tries `text[i..]` for increasing `i` and returns
+/// `text[..i]` on the first match.
+pub(super) fn trim_largest_suffix<'a>(text: &'a str, pattern: &str) -> &'a str {
+    for i in 0..=text.len() {
+        if text.is_char_boundary(i) && shell_pattern_match(&text[i..], pattern) {
+            return &text[..i];
+        }
+    }
+    text
+}

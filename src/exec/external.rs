@@ -54,7 +54,7 @@ impl Executor {
 
     /// Apply redirections to a std::process::Command.
     pub(super) fn apply_redirects_to_command(
-        &self,
+        &mut self,
         child_cmd: &mut std::process::Command,
         redirects: &[Redirect],
     ) -> Result<(), ExecError> {
@@ -62,7 +62,7 @@ impl Executor {
             let fd = redirect.fd;
             match &redirect.kind {
                 RedirectKind::Input(word) => {
-                    let path = expand::expand_word(word, &self.env)?;
+                    let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
                     let file = std::fs::File::open(&resolved).map_err(|e| {
                         ExecError::BadRedirect(format!("{}: {}", path, e))
@@ -78,7 +78,7 @@ impl Executor {
                     }
                 }
                 RedirectKind::Output(word) | RedirectKind::Clobber(word) => {
-                    let path = expand::expand_word(word, &self.env)?;
+                    let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
                     let file = std::fs::File::create(&resolved).map_err(|e| {
                         ExecError::BadRedirect(format!("{}: {}", path, e))
@@ -95,7 +95,7 @@ impl Executor {
                     }
                 }
                 RedirectKind::Append(word) => {
-                    let path = expand::expand_word(word, &self.env)?;
+                    let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
                     let file = std::fs::OpenOptions::new()
                         .create(true)
@@ -119,7 +119,7 @@ impl Executor {
                     ));
                 }
                 RedirectKind::DupInput(word) => {
-                    let target = expand::expand_word(word, &self.env)?;
+                    let target = expand::expand_word(word, &mut self.env)?;
                     if target == "-" {
                         child_cmd.stdin(Stdio::null());
                     } else {
@@ -129,7 +129,7 @@ impl Executor {
                     }
                 }
                 RedirectKind::DupOutput(word) => {
-                    let target = expand::expand_word(word, &self.env)?;
+                    let target = expand::expand_word(word, &mut self.env)?;
                     if target == "-" {
                         match fd.unwrap_or(1) {
                             1 => { child_cmd.stdout(Stdio::null()); }

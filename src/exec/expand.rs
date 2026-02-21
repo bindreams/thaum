@@ -12,7 +12,7 @@ use crate::exec::error::ExecError;
 /// 5. Field splitting (done at a higher level)
 /// 6. Pathname expansion / globbing (done at a higher level)
 /// 7. Quote removal
-pub fn expand_word(word: &Word, env: &Environment) -> Result<String, ExecError> {
+pub fn expand_word(word: &Word, env: &mut Environment) -> Result<String, ExecError> {
     let mut result = String::new();
     for fragment in &word.parts {
         expand_fragment(fragment, env, &mut result)?;
@@ -24,7 +24,7 @@ pub fn expand_word(word: &Word, env: &Environment) -> Result<String, ExecError> 
 ///
 /// Currently returns a single-element vec. Field splitting and glob expansion
 /// will be added in later steps.
-pub fn expand_word_to_fields(word: &Word, env: &Environment) -> Result<Vec<String>, ExecError> {
+pub fn expand_word_to_fields(word: &Word, env: &mut Environment) -> Result<Vec<String>, ExecError> {
     let s = expand_word(word, env)?;
     if s.is_empty() {
         Ok(vec![s])
@@ -34,7 +34,7 @@ pub fn expand_word_to_fields(word: &Word, env: &Environment) -> Result<Vec<Strin
 }
 
 /// Expand an `Argument` into fields.
-pub fn expand_argument(arg: &Argument, env: &Environment) -> Result<Vec<String>, ExecError> {
+pub fn expand_argument(arg: &Argument, env: &mut Environment) -> Result<Vec<String>, ExecError> {
     match arg {
         Argument::Word(word) => expand_word_to_fields(word, env),
         Argument::Atom(atom) => match atom {
@@ -48,7 +48,7 @@ pub fn expand_argument(arg: &Argument, env: &Environment) -> Result<Vec<String>,
 /// Expand a single fragment, appending to `out`.
 fn expand_fragment(
     fragment: &Fragment,
-    env: &Environment,
+    env: &mut Environment,
     out: &mut String,
 ) -> Result<(), ExecError> {
     match fragment {
@@ -112,7 +112,7 @@ fn expand_fragment(
 /// Expand a fragment inside double quotes (no field splitting, no glob).
 fn expand_fragment_in_double_quotes(
     fragment: &Fragment,
-    env: &Environment,
+    env: &mut Environment,
     out: &mut String,
 ) -> Result<(), ExecError> {
     match fragment {
@@ -166,7 +166,7 @@ fn expand_fragment_in_double_quotes(
 }
 
 /// Expand a tilde prefix.
-fn expand_tilde(user: &str, env: &Environment, out: &mut String) {
+fn expand_tilde(user: &str, env: &mut Environment, out: &mut String) {
     if user.is_empty() {
         if let Some(home) = env.get_var("HOME") {
             out.push_str(home);
@@ -184,7 +184,7 @@ fn expand_tilde(user: &str, env: &Environment, out: &mut String) {
 /// Expand a parameter expansion.
 fn expand_parameter(
     param: &ParameterExpansion,
-    env: &Environment,
+    env: &mut Environment,
     out: &mut String,
 ) -> Result<(), ExecError> {
     match param {
@@ -211,7 +211,7 @@ fn expand_complex_parameter(
     name: &str,
     operator: Option<&crate::ast::ParamOp>,
     argument: Option<&Word>,
-    env: &Environment,
+    env: &mut Environment,
     out: &mut String,
 ) -> Result<(), ExecError> {
     use crate::ast::ParamOp;

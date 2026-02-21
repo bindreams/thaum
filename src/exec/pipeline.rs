@@ -90,7 +90,7 @@ fn spawn_pipeline_stage(
             // Expand arguments
             let mut expanded_args: Vec<String> = Vec::new();
             for arg in &cmd.arguments {
-                let fields = crate::exec::expand::expand_argument(arg, executor.env())?;
+                let fields = crate::exec::expand::expand_argument(arg, executor.env_mut())?;
                 expanded_args.extend(fields);
             }
 
@@ -99,7 +99,7 @@ fn spawn_pipeline_stage(
                 for assignment in &cmd.assignments {
                     let value = crate::exec::expand::expand_word(
                         &assignment.value.as_scalar(),
-                        executor.env(),
+                        executor.env_mut(),
                     )?;
                     executor.env_mut().set_var(&assignment.name, &value)?;
                 }
@@ -171,7 +171,7 @@ fn spawn_pipeline_stage(
             for assignment in &cmd.assignments {
                 let value = crate::exec::expand::expand_word(
                     &assignment.value.as_scalar(),
-                    executor.env(),
+                    executor.env_mut(),
                 )?;
                 child_cmd.env(&assignment.name, &value);
             }

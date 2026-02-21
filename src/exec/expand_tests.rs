@@ -15,16 +15,16 @@ fn make_word(parts: Vec<Fragment>) -> Word {
 
 #[test]
 fn expand_literal() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::Literal("hello".into())]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "hello");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "hello");
 }
 
 #[test]
 fn expand_single_quoted() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::SingleQuoted("don't expand $VAR".into())]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "don't expand $VAR");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "don't expand $VAR");
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn expand_concatenated_fragments() {
         Fragment::Literal("hello_".into()),
         Fragment::Parameter(ParameterExpansion::Simple("NAME".into())),
     ]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "hello_world");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "hello_world");
 }
 
 #[test]
@@ -47,7 +47,7 @@ fn expand_double_quoted_with_param() {
         Fragment::Parameter(ParameterExpansion::Simple("X".into())),
         Fragment::Literal("_post".into()),
     ])]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "pre_value_post");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "pre_value_post");
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn expand_tilde_alone() {
     let mut env = Environment::new();
     env.set_var("HOME", "/home/user").unwrap();
     let word = make_word(vec![Fragment::TildePrefix(String::new())]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "/home/user");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "/home/user");
 }
 
 #[test]
@@ -63,16 +63,16 @@ fn expand_tilde_no_home() {
     let mut env = Environment::new();
     env.unset_var("HOME").unwrap();
     let word = make_word(vec![Fragment::TildePrefix(String::new())]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "~");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "~");
 }
 
 #[test]
 fn expand_unset_variable() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Simple(
         "NONEXISTENT".into(),
     ))]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "");
 }
 
 #[test]
@@ -82,12 +82,12 @@ fn expand_special_param_question_mark() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Simple(
         "?".into(),
     ))]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "42");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "42");
 }
 
 #[test]
 fn expand_param_default() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
         operator: Some(ParamOp::Default),
@@ -95,7 +95,7 @@ fn expand_param_default() {
             "fallback".into(),
         )]))),
     })]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "fallback");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "fallback");
 }
 
 #[test]
@@ -109,12 +109,12 @@ fn expand_param_default_when_set() {
             "fallback".into(),
         )]))),
     })]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "actual");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "actual");
 }
 
 #[test]
 fn expand_param_error_when_unset() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "MISSING".into(),
         operator: Some(ParamOp::Error),
@@ -122,7 +122,7 @@ fn expand_param_error_when_unset() {
             "var is required".into(),
         )]))),
     })]);
-    let err = expand_word(&word, &env).unwrap_err();
+    let err = expand_word(&word, &mut env).unwrap_err();
     assert!(matches!(err, ExecError::BadSubstitution(_)));
 }
 
@@ -135,18 +135,18 @@ fn expand_param_alternative() {
         operator: Some(ParamOp::Alternative),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("alt".into())]))),
     })]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "alt");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "alt");
 }
 
 #[test]
 fn expand_param_alternative_when_unset() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
         operator: Some(ParamOp::Alternative),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("alt".into())]))),
     })]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "");
 }
 
 #[test]
@@ -158,24 +158,24 @@ fn expand_param_length() {
         operator: Some(ParamOp::Length),
         argument: None,
     })]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "5");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "5");
 }
 
 #[test]
 fn expand_glob_literal_outside_quotes() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![
         Fragment::Glob(GlobChar::Star),
         Fragment::Literal(".txt".into()),
     ]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "*.txt");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "*.txt");
 }
 
 #[test]
 fn expand_glob_literal_inside_double_quotes() {
-    let env = Environment::new();
+    let mut env = Environment::new();
     let word = make_word(vec![Fragment::DoubleQuoted(vec![Fragment::Glob(
         GlobChar::Star,
     )])]);
-    assert_eq!(expand_word(&word, &env).unwrap(), "*");
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "*");
 }

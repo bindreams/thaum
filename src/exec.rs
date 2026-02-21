@@ -130,7 +130,7 @@ impl Executor {
     /// Expand a word, resolving command substitutions first.
     fn expand_word(&mut self, word: &crate::ast::Word) -> Result<String, ExecError> {
         let resolved = self.resolve_cmd_subs_in_word(word)?;
-        expand::expand_word(&resolved, &self.env)
+        expand::expand_word(&resolved, &mut self.env)
     }
 
     /// Expand an argument, resolving command substitutions first.
@@ -141,7 +141,7 @@ impl Executor {
         match arg {
             crate::ast::Argument::Word(word) => {
                 let resolved = self.resolve_cmd_subs_in_word(word)?;
-                expand::expand_word_to_fields(&resolved, &self.env)
+                expand::expand_word_to_fields(&resolved, &mut self.env)
             }
             crate::ast::Argument::Atom(atom) => match atom {
                 crate::ast::Atom::BashProcessSubstitution { .. } => {
@@ -159,7 +159,7 @@ impl Executor {
         word: &crate::ast::Word,
     ) -> Result<Vec<String>, ExecError> {
         let resolved = self.resolve_cmd_subs_in_word(word)?;
-        expand::expand_word_to_fields(&resolved, &self.env)
+        expand::expand_word_to_fields(&resolved, &mut self.env)
     }
 
     /// Pre-process a Word, executing command substitutions and replacing
@@ -222,14 +222,14 @@ impl Executor {
                 Expression::Command(cmd) => {
                     let mut args: Vec<String> = Vec::new();
                     for arg in &cmd.arguments {
-                        let fields = expand::expand_argument(arg, &self.env)?;
+                        let fields = expand::expand_argument(arg, &mut self.env)?;
                         args.extend(fields);
                     }
 
                     if args.is_empty() {
                         for assignment in &cmd.assignments {
                             let value =
-                                expand::expand_word(&assignment.value.as_scalar(), &self.env)?;
+                                expand::expand_word(&assignment.value.as_scalar(), &mut self.env)?;
                             self.env.set_var(&assignment.name, &value)?;
                         }
                         continue;

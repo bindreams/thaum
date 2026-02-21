@@ -12,28 +12,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 2. Heredoc in pipeline / condition
+// 2. Heredoc in pipeline / condition — FIXED (see tests/redirects.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn heredoc_in_if_condition() {
-    // Heredoc body appears between the condition line and `then`.
-    parse("if cat <<EOF; then\nhello\nEOF\necho yes\nfi").unwrap();
-}
-
-#[test]
-#[ignore]
-fn heredoc_with_pipe_on_last_line() {
-    // Pipe on the heredoc-triggering line; body before the next command.
-    parse("cat <<EOF |\n1\n2\nEOF\ntac").unwrap();
-}
-
-#[test]
-#[ignore]
-fn multiple_heredocs_in_pipeline() {
-    parse("cat <<A |\na\nA\ncat <<B\nb\nB").unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 3. << inside (( )) parsed as heredoc instead of left-shift

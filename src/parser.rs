@@ -10,6 +10,7 @@ mod word_collect;
 use crate::ast::*;
 use crate::dialect::ParseOptions;
 use crate::error::ParseError;
+use crate::fold::Fold;
 use crate::lexer::Lexer;
 use crate::span::Span;
 use crate::token::{SpannedToken, Token};
@@ -26,7 +27,26 @@ pub fn parse(input: &str) -> Result<Program, ParseError> {
 /// Parse a complete shell program with the given options.
 pub fn parse_with_options(input: &str, options: ParseOptions) -> Result<Program, ParseError> {
     let mut parser = Parser::new(input, options)?;
-    parser.parse_program()
+    let program = parser.parse_program()?;
+    // Post-parse: fill heredoc bodies that were side-queued during lexing.
+    let program = HereDocFiller(&mut parser.lexer).fold_program(program);
+    Ok(program)
+}
+
+/// Fills empty heredoc redirect bodies from the lexer's completed-bodies queue.
+struct HereDocFiller<'a>(&'a mut Lexer);
+
+impl crate::fold::Fold for HereDocFiller<'_> {
+    fn fold_redirect(&mut self, mut redirect: Redirect) -> Redirect {
+        if let RedirectKind::HereDoc { ref mut body, .. } = redirect.kind {
+            if body.is_empty() {
+                if let Some(b) = self.0.take_heredoc_body() {
+                    *body = b;
+                }
+            }
+        }
+        crate::fold::fold_redirect(self, redirect)
+    }
 }
 
 /// Wrap an expression in a Statement with Sequential mode.
@@ -143,30 +163,6 @@ impl Parser {
             // No eat_whitespace here: after Newline, LastScanned::Other → WS suppressed
         }
         Ok(())
-    }
-
-    /// Consume heredoc body tokens that belong to the just-parsed statement.
-    pub(super) fn consume_heredoc_bodies(&mut self) -> Result<Vec<String>, ParseError> {
-        self.lexer.eat_whitespace()?;
-        if self.lexer.peek()?.token != Token::Newline {
-            return Ok(Vec::new());
-        }
-
-        let result = self.lexer.speculate(|s| {
-            s.advance()?; // consume Newline tentatively
-            // No eat_whitespace: after Newline, LastScanned::Other → WS suppressed
-            if !matches!(s.peek()?.token, Token::HereDocBody(_)) {
-                return Ok(None);
-            }
-            let mut bodies = Vec::new();
-            while let Token::HereDocBody(body) = &s.peek()?.token {
-                bodies.push(body.clone());
-                s.advance()?;
-            }
-            Ok(Some(bodies))
-        })?;
-
-        Ok(result.unwrap_or_default())
     }
 
     fn skip_newline_list(&mut self) -> Result<bool, ParseError> {

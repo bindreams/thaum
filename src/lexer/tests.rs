@@ -403,14 +403,9 @@ fn lex_heredoc_basic() {
     assert_eq!(lexer.next_token().unwrap().token, Token::HereDocOp);
     assert_eq!(lexer.next_token().unwrap().token, Token::Literal("EOF".into()));
 
+    // Newline triggers heredoc body reading into side queue (not buffer).
     assert_eq!(lexer.next_token().unwrap().token, Token::Newline);
-
-    let t = lexer.next_token().unwrap();
-    if let Token::HereDocBody(body) = &t.token {
-        assert_eq!(body, "hello world\n");
-    } else {
-        panic!("expected HereDocBody, got {:?}", t.token);
-    }
+    assert_eq!(lexer.take_heredoc_body().unwrap(), "hello world\n");
 }
 
 #[test]
@@ -422,14 +417,9 @@ fn lex_heredoc_strip_tabs() {
     lexer.next_token().unwrap(); // Whitespace
     lexer.next_token().unwrap(); // <<-
     lexer.next_token().unwrap(); // EOF
-    lexer.next_token().unwrap(); // \n
+    lexer.next_token().unwrap(); // \n (triggers body reading into side queue)
 
-    let t = lexer.next_token().unwrap();
-    if let Token::HereDocBody(body) = &t.token {
-        assert_eq!(body, "hello\nworld\n");
-    } else {
-        panic!("expected HereDocBody, got {:?}", t.token);
-    }
+    assert_eq!(lexer.take_heredoc_body().unwrap(), "hello\nworld\n");
 }
 
 #[test]
@@ -624,12 +614,15 @@ fn speculate_tokens_stay_in_buffer() {
     // Speculate past a << operator and heredoc. On rewind, buf_pos moves
     // back but the scanned tokens stay in the buffer. Re-reading gives
     // the same token sequence — no re-scanning needed.
+    // NOTE: HereDocBody no longer appears in the buffer; bodies go into
+    // the side queue. But the other tokens (operator, delimiter, newline)
+    // must survive speculation.
     let mut s = make_lexer("<<EOF\nhello\nEOF\n");
     let result: Option<()> = s.speculate(|s| {
         assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
         assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
         assert_eq!(s.advance().unwrap().token, Token::Newline);
-        assert!(matches!(s.advance().unwrap().token, Token::HereDocBody(_)));
+        // Body is in the side queue, not the buffer
         // Rewind
         Ok(None)
     }).unwrap();
@@ -638,10 +631,6 @@ fn speculate_tokens_stay_in_buffer() {
     assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
     assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
     assert_eq!(s.advance().unwrap().token, Token::Newline);
-    let body_tok = s.advance().unwrap();
-    if let Token::HereDocBody(body) = &body_tok.token {
-        assert_eq!(body, "hello\n");
-    } else {
-        panic!("expected HereDocBody, got {:?}", body_tok.token);
-    }
+    // Body was read during the first speculative pass and is in the queue
+    assert_eq!(s.take_heredoc_body().unwrap(), "hello\n");
 }

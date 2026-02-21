@@ -66,6 +66,9 @@ pub struct Lexer {
     /// One-token lookbehind. See `LastScanned` doc comment for details.
     pub(super) last_scanned: LastScanned,
 
+    // --- Heredoc bodies (read during newline scan, consumed post-parse) ---
+    completed_bodies: VecDeque<String>,
+
     // --- Stream infrastructure ---
     buffer: VecDeque<SpannedToken>,
     buf_pos: usize,
@@ -98,6 +101,7 @@ impl Lexer {
             expecting_heredoc_delimiter: false,
             pending_strip_tabs: false,
             last_scanned: LastScanned::Other,
+            completed_bodies: VecDeque::new(),
             buffer: VecDeque::new(),
             buf_pos: 0,
             speculation_depth: 0,
@@ -165,6 +169,12 @@ impl Lexer {
                 span: self.buffer[self.buf_pos].span,
             })
         }
+    }
+
+    /// Pop the next completed heredoc body from the side queue, if any.
+    /// Bodies are queued in source order when newlines trigger heredoc reading.
+    pub(crate) fn take_heredoc_body(&mut self) -> Option<String> {
+        self.completed_bodies.pop_front()
     }
 
     /// Consume a `Whitespace` token if present. Returns `true` if one was consumed.
@@ -343,18 +353,14 @@ impl Lexer {
                 });
 
                 if !self.pending_heredocs.is_empty() {
-                    // Read all pending heredoc bodies directly into buffer
+                    // Read all pending heredoc bodies into the side queue.
+                    // They are NOT emitted as tokens — the parser fills them
+                    // into HereDoc redirects via a post-parse Fold pass.
                     let pending = std::mem::take(&mut self.pending_heredocs);
                     for heredoc in &pending {
                         let body =
                             self.read_single_heredoc(&heredoc.delimiter, heredoc.strip_tabs)?;
-                        // TODO: The span should cover the actual body content in the source,
-                        // not the newline. Track the cursor position before/after reading
-                        // the body and use that for the span.
-                        self.buffer.push_back(SpannedToken {
-                            token: Token::HereDocBody(body),
-                            span: newline_span, // wrong — should be the body's span
-                        });
+                        self.completed_bodies.push_back(body);
                     }
                 }
 

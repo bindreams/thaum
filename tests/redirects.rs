@@ -2,6 +2,7 @@ mod common;
 
 use common::*;
 use thaum::ast::*;
+use thaum::parse;
 
 #[test]
 fn stderr_redirect() {
@@ -211,4 +212,79 @@ fn heredoc_with_and_rhs_after_body() {
         &prog.statements[0].expression,
         Expression::And { .. }
     ));
+}
+
+#[test]
+fn heredoc_in_if_condition() {
+    // Heredoc body appears between the condition line and `then`.
+    let input = "if cat <<EOF; then\nhello\nEOF\necho yes\nfi";
+    let prog = parse(input).unwrap();
+    // The program should parse and the heredoc body should be filled.
+    let expr = &prog.statements[0].expression;
+    if let Expression::Compound {
+        body: CompoundCommand::IfClause { condition, then_body, .. },
+        ..
+    } = expr
+    {
+        // Condition: cat <<EOF with body filled
+        if let Expression::Command(cmd) = &condition[0].expression {
+            if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
+                assert_eq!(body, "hello\n");
+            } else {
+                panic!("expected heredoc redirect");
+            }
+        } else {
+            panic!("expected command in condition");
+        }
+        // Then body: echo yes
+        assert_eq!(then_body.len(), 1);
+    } else {
+        panic!("expected if clause");
+    }
+}
+
+#[test]
+fn heredoc_with_pipe_on_last_line() {
+    // Pipe on the heredoc-triggering line.
+    let input = "cat <<EOF |\n1\n2\nEOF\ntac";
+    let prog = parse(input).unwrap();
+    if let Expression::Pipe { left, .. } = &prog.statements[0].expression {
+        if let Expression::Command(cmd) = left.as_ref() {
+            if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
+                assert_eq!(body, "1\n2\n");
+            } else {
+                panic!("expected heredoc redirect");
+            }
+        } else {
+            panic!("expected command on left side of pipe");
+        }
+    } else {
+        panic!("expected pipe");
+    }
+}
+
+#[test]
+fn multiple_heredocs_in_pipeline() {
+    let input = "cat <<A |\na\nA\ncat <<B\nb\nB";
+    let prog = parse(input).unwrap();
+    if let Expression::Pipe { left, right, .. } = &prog.statements[0].expression {
+        // Left: cat <<A with body "a\n"
+        if let Expression::Command(cmd) = left.as_ref() {
+            if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
+                assert_eq!(body, "a\n");
+            } else {
+                panic!("expected heredoc on left");
+            }
+        }
+        // Right: cat <<B with body "b\n"
+        if let Expression::Command(cmd) = right.as_ref() {
+            if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
+                assert_eq!(body, "b\n");
+            } else {
+                panic!("expected heredoc on right");
+            }
+        }
+    } else {
+        panic!("expected pipe");
+    }
 }

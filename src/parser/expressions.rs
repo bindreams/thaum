@@ -32,11 +32,6 @@ impl Parser {
         let mut expr = self.parse_and_or()?;
         let mut span = expr_span(&expr);
 
-        let bodies = self.consume_heredoc_bodies()?;
-        if !bodies.is_empty() {
-            fill_expression_heredocs(&mut expr, &bodies);
-        }
-
         loop {
             self.lexer.eat_whitespace()?;
             match self.lexer.peek()?.token {
@@ -53,10 +48,6 @@ impl Parser {
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
-                        let bodies = self.consume_heredoc_bodies()?;
-                        if !bodies.is_empty() {
-                            fill_expression_heredocs(&mut expr, &bodies);
-                        }
                     } else {
                         return Ok(());
                     }
@@ -74,10 +65,6 @@ impl Parser {
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
                         span = expr_span(&expr);
-                        let bodies = self.consume_heredoc_bodies()?;
-                        if !bodies.is_empty() {
-                            fill_expression_heredocs(&mut expr, &bodies);
-                        }
                     } else {
                         return Ok(());
                     }
@@ -99,10 +86,6 @@ impl Parser {
             match self.lexer.peek()?.token {
                 Token::AndIf => {
                     self.lexer.advance()?;
-                    let bodies = self.consume_heredoc_bodies()?;
-                    if !bodies.is_empty() {
-                        fill_expression_heredocs(&mut left, &bodies);
-                    }
                     self.skip_linebreak()?;
                     let right = self.parse_pipeline()?;
                     left = Expression::And {
@@ -112,10 +95,6 @@ impl Parser {
                 }
                 Token::OrIf => {
                     self.lexer.advance()?;
-                    let bodies = self.consume_heredoc_bodies()?;
-                    if !bodies.is_empty() {
-                        fill_expression_heredocs(&mut left, &bodies);
-                    }
                     self.skip_linebreak()?;
                     let right = self.parse_pipeline()?;
                     left = Expression::Or {
@@ -270,25 +249,5 @@ impl Parser {
         }
 
         Ok(Expression::Compound { body, redirects })
-    }
-}
-
-/// Fill heredoc bodies in an expression's redirects.
-fn fill_expression_heredocs(expr: &mut Expression, bodies: &[String]) {
-    let redirects = match expr {
-        Expression::Command(cmd) => &mut cmd.redirects,
-        Expression::Compound { redirects, .. } => redirects,
-        _ => return,
-    };
-
-    let mut body_iter = bodies.iter();
-    for redir in redirects.iter_mut() {
-        if let RedirectKind::HereDoc { body, .. } = &mut redir.kind {
-            if body.is_empty() {
-                if let Some(b) = body_iter.next() {
-                    *body = b.clone();
-                }
-            }
-        }
     }
 }

@@ -19,9 +19,7 @@ impl Lexer {
             '~' if self.last_scanned != LastScanned::Fragment => self.scan_tilde_prefix(start),
             '*' | '?' => self.scan_glob_or_extglob(start, ch),
             '[' if self.has_bracket_close_in_word() => self.scan_bracket_glob(start),
-            '+' | '@' | '!'
-                if self.options.extglob && self.peek_second_char() == Some('(') =>
-            {
+            '+' | '@' | '!' if self.options.extglob && self.peek_second_char() == Some('(') => {
                 self.scan_extglob(start, ch)
             }
             '<' | '>'
@@ -68,9 +66,7 @@ impl Lexer {
                 // meaning ~ would be handled by scan_tilde_prefix from scan_fragment)
                 '~' if literal.is_empty() && self.last_scanned != LastScanned::Fragment => break,
                 // ExtGlob prefix with ( following
-                '+' | '@' | '!'
-                    if self.options.extglob && self.peek_second_char() == Some('(') =>
-                {
+                '+' | '@' | '!' if self.options.extglob && self.peek_second_char() == Some('(') => {
                     break;
                 }
                 // Hash at word start is a comment
@@ -153,33 +149,15 @@ impl Lexer {
                             if self.peek_char() == Some('(') {
                                 self.advance_char();
                                 content.push('(');
-                                self.read_balanced_into(
-                                    &mut content,
-                                    '(',
-                                    ')',
-                                    2,
-                                    quote_start,
-                                )?;
+                                self.read_balanced_into(&mut content, '(', ')', 2, quote_start)?;
                             } else {
-                                self.read_balanced_into(
-                                    &mut content,
-                                    '(',
-                                    ')',
-                                    1,
-                                    quote_start,
-                                )?;
+                                self.read_balanced_into(&mut content, '(', ')', 1, quote_start)?;
                             }
                         }
                         Some('{') => {
                             self.advance_char();
                             content.push('{');
-                            self.read_balanced_into(
-                                &mut content,
-                                '{',
-                                '}',
-                                1,
-                                quote_start,
-                            )?;
+                            self.read_balanced_into(&mut content, '{', '}', 1, quote_start)?;
                         }
                         _ => {}
                     }
@@ -284,7 +262,9 @@ impl Lexer {
                 })
             }
             // $"..." — locale translation (Bash, only in normal mode)
-            Some('"') if self.mode == super::LexerMode::Normal && self.options.locale_translation => {
+            Some('"')
+                if self.mode == super::LexerMode::Normal && self.options.locale_translation =>
+            {
                 self.advance_char(); // consume "
                 let mut content = String::new();
                 loop {
@@ -357,7 +337,7 @@ impl Lexer {
     /// the current position. Used to decide if `[` starts a bracket glob.
     fn has_bracket_close_in_word(&self) -> bool {
         let mut i = 1; // skip the [
-        // POSIX bracket expression rules: negation and first ] are special
+                       // POSIX bracket expression rules: negation and first ] are special
         if matches!(self.chars.peek_at(i), Some('!') | Some('^')) {
             i += 1;
         }
@@ -372,7 +352,10 @@ impl Lexer {
                     i += 1;
                     loop {
                         match self.chars.peek_at(i) {
-                            Some('"') | None => { i += 1; break; }
+                            Some('"') | None => {
+                                i += 1;
+                                break;
+                            }
                             Some('\\') => i += 2,
                             _ => i += 1,
                         }
@@ -383,7 +366,10 @@ impl Lexer {
                     i += 1;
                     loop {
                         match self.chars.peek_at(i) {
-                            Some('\'') | None => { i += 1; break; }
+                            Some('\'') | None => {
+                                i += 1;
+                                break;
+                            }
                             _ => i += 1,
                         }
                     }
@@ -433,10 +419,10 @@ impl Lexer {
             // Line continuation: \<newline> is removed entirely (POSIX 2.2.1)
             self.advance_char(); // skip backslash
             self.advance_char(); // skip newline
-            // Continue to the next fragment (line continuation is invisible)
-            // Emit nothing — let next_token call scan_fragment again.
-            // But we're in scan_fragment which must return a token...
-            // Recursively try the next fragment.
+                                 // Continue to the next fragment (line continuation is invisible)
+                                 // Emit nothing — let next_token call scan_fragment again.
+                                 // But we're in scan_fragment which must return a token...
+                                 // Recursively try the next fragment.
             let new_start = self.cursor_pos().0;
             if self.is_at_eof() {
                 return Ok(SpannedToken {
@@ -488,7 +474,14 @@ impl Lexer {
                 break;
             }
             // Stop at operator characters
-            if ch == '|' || ch == '&' || ch == ';' || ch == '<' || ch == '>' || ch == '(' || ch == ')' {
+            if ch == '|'
+                || ch == '&'
+                || ch == ';'
+                || ch == '<'
+                || ch == '>'
+                || ch == '('
+                || ch == ')'
+            {
                 break;
             }
             user.push(ch);
@@ -501,11 +494,7 @@ impl Lexer {
     }
 
     /// Scan a glob character (* or ?) with extglob detection.
-    fn scan_glob_or_extglob(
-        &mut self,
-        start: usize,
-        ch: char,
-    ) -> Result<SpannedToken, LexError> {
+    fn scan_glob_or_extglob(&mut self, start: usize, ch: char) -> Result<SpannedToken, LexError> {
         // Check for extglob: ?(...) or *(...)
         if self.options.extglob && self.peek_second_char() == Some('(') {
             return self.scan_extglob(start, ch);
@@ -615,10 +604,7 @@ impl Lexer {
         self.advance_char(); // consume (
         let content = self.read_balanced_content('(', ')', 1, start)?;
         Ok(SpannedToken {
-            token: Token::BashProcessSub {
-                direction,
-                content,
-            },
+            token: Token::BashProcessSub { direction, content },
             span: Span::new(start, self.cursor_pos().0),
         })
     }
@@ -729,7 +715,7 @@ impl Lexer {
         let mut current_word = String::new();
 
         // Check if a completed word is `case` or `esac` and update depth.
-        let mut check_keyword = |w: &mut String, case_depth: &mut i32| {
+        let check_keyword = |w: &mut String, case_depth: &mut i32| {
             match w.as_str() {
                 "case" => *case_depth += 1,
                 "esac" => *case_depth = (*case_depth - 1).max(0),

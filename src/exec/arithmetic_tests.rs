@@ -175,10 +175,7 @@ fn eval_mod_by_zero() {
 fn eval_add_wrapping_overflow() {
     let mut env = Environment::new();
     let expr = binary(num(i64::MAX), ArithBinaryOp::Add, num(1));
-    assert_eq!(
-        evaluate_arith_expr(&expr, &mut env).unwrap(),
-        i64::MIN
-    );
+    assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), i64::MIN);
 }
 
 // --- Exponentiation ---
@@ -564,10 +561,7 @@ fn eval_comma_returns_right() {
 #[test]
 fn eval_comma_evaluates_left_side_effect() {
     let mut env = Environment::new();
-    let expr = comma(
-        assign("x", ArithAssignOp::Assign, num(42)),
-        num(0),
-    );
+    let expr = comma(assign("x", ArithAssignOp::Assign, num(42)), num(0));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0);
     assert_eq!(env.get_var("x"), Some("42"));
 }

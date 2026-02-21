@@ -102,10 +102,7 @@ impl Parser {
     }
 
     /// Convert a single fragment token to a Fragment AST node.
-    pub(super) fn token_to_fragment(
-        &mut self,
-        st: SpannedToken,
-    ) -> Result<Fragment, ParseError> {
+    pub(super) fn token_to_fragment(&mut self, st: SpannedToken) -> Result<Fragment, ParseError> {
         match st.token {
             Token::Literal(s) => Ok(Fragment::Literal(de_escape_literal(&s))),
             Token::SingleQuoted(s) => Ok(Fragment::SingleQuoted(s)),
@@ -113,9 +110,7 @@ impl Parser {
                 let inner = self.lex_double_quoted_content(&raw)?;
                 Ok(Fragment::DoubleQuoted(inner))
             }
-            Token::SimpleParam(name) => {
-                Ok(Fragment::Parameter(ParameterExpansion::Simple(name)))
-            }
+            Token::SimpleParam(name) => Ok(Fragment::Parameter(ParameterExpansion::Simple(name))),
             Token::BraceParam(raw) => {
                 let expansion = crate::word::parse_brace_param_content(&raw);
                 Ok(Fragment::Parameter(expansion))
@@ -156,21 +151,24 @@ impl Parser {
                     ExtGlobTokenKind::ExactlyOne => ExtGlobKind::ExactlyOne,
                     ExtGlobTokenKind::Not => ExtGlobKind::Not,
                 };
-                Ok(Fragment::BashExtGlob { kind: ast_kind, pattern })
+                Ok(Fragment::BashExtGlob {
+                    kind: ast_kind,
+                    pattern,
+                })
             }
             Token::BashProcessSub { content, .. } => {
                 let stmts = crate::word::parse_command_substitution(&content);
                 Ok(Fragment::CommandSubstitution(stmts))
             }
-            _ => unreachable!("token_to_fragment called with non-fragment token: {:?}", st.token),
+            _ => unreachable!(
+                "token_to_fragment called with non-fragment token: {:?}",
+                st.token
+            ),
         }
     }
 
     /// Lex the inner content of a double-quoted string into fragments.
-    fn lex_double_quoted_content(
-        &mut self,
-        raw: &str,
-    ) -> Result<Vec<Fragment>, ParseError> {
+    fn lex_double_quoted_content(&mut self, raw: &str) -> Result<Vec<Fragment>, ParseError> {
         let mut inner_lexer = Lexer::new_double_quote_mode(raw, self.options.clone());
         let mut fragments = Vec::new();
         loop {

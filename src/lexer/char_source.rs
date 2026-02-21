@@ -115,8 +115,7 @@ fn read_char(inner: &mut CharSourceInner) -> Result<Option<char>, LexError> {
 
     if buf.len() >= char_len {
         // All bytes available in the buffer
-        let s =
-            std::str::from_utf8(&buf[..char_len]).map_err(|e| LexError::Io(e.to_string()))?;
+        let s = std::str::from_utf8(&buf[..char_len]).map_err(|e| LexError::Io(e.to_string()))?;
         let ch = s.chars().next().unwrap();
         inner.reader.consume(char_len);
         Ok(Some(ch))
@@ -136,8 +135,7 @@ fn read_char(inner: &mut CharSourceInner) -> Result<Option<char>, LexError> {
             *byte = b[0];
             inner.reader.consume(1);
         }
-        let s =
-            std::str::from_utf8(&bytes[..char_len]).map_err(|e| LexError::Io(e.to_string()))?;
+        let s = std::str::from_utf8(&bytes[..char_len]).map_err(|e| LexError::Io(e.to_string()))?;
         let ch = s.chars().next().unwrap();
         Ok(Some(ch))
     }

@@ -7,9 +7,28 @@ use crate::exec::error::ExecError;
 pub fn is_builtin(name: &str) -> bool {
     matches!(
         name,
-        "echo" | "true" | "false" | "exit" | ":" | "cd" | "export" | "unset" | "return"
-            | "break" | "continue" | "shift" | "read" | "eval" | "exec" | "." | "source"
-            | "set" | "test" | "[" | "readonly" | "local"
+        "echo"
+            | "true"
+            | "false"
+            | "exit"
+            | ":"
+            | "cd"
+            | "export"
+            | "unset"
+            | "return"
+            | "break"
+            | "continue"
+            | "shift"
+            | "read"
+            | "eval"
+            | "exec"
+            | "."
+            | "source"
+            | "set"
+            | "test"
+            | "["
+            | "readonly"
+            | "local"
     )
 }
 
@@ -41,9 +60,9 @@ pub fn run_builtin(
         "test" | "[" => builtin_test(name, args, stderr),
         "readonly" => builtin_readonly(args, env),
         "local" => builtin_local(args, env),
-        "eval" | "exec" | "." | "source" => Err(ExecError::UnsupportedFeature(
-            format!("{} builtin", name),
-        )),
+        "eval" | "exec" | "." | "source" => {
+            Err(ExecError::UnsupportedFeature(format!("{} builtin", name)))
+        }
         _ => Err(ExecError::CommandNotFound(name.to_string())),
     }
 }
@@ -76,7 +95,11 @@ fn builtin_exit(args: &[String]) -> Result<i32, ExecError> {
     Err(ExecError::ExitRequested(code))
 }
 
-fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+fn builtin_cd(
+    args: &[String],
+    env: &mut Environment,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
     let target = if let Some(dir) = args.first() {
         if dir == "-" {
             // cd - : go to previous directory ($OLDPWD)
@@ -112,7 +135,8 @@ fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) ->
     match env.set_cwd(resolved) {
         Ok(()) => {
             let _ = env.set_var("OLDPWD", &old_cwd.to_string_lossy());
-            let _ = env.set_var("PWD", &env.cwd().to_string_lossy().to_string());
+            let pwd = env.cwd().to_string_lossy().into_owned();
+            let _ = env.set_var("PWD", &pwd);
             Ok(0)
         }
         Err(e) => {
@@ -172,7 +196,11 @@ fn builtin_continue(args: &[String]) -> Result<i32, ExecError> {
     Err(ExecError::ContinueRequested(n))
 }
 
-fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+fn builtin_shift(
+    args: &[String],
+    env: &mut Environment,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
     let n = if let Some(arg) = args.first() {
         match arg.parse::<usize>() {
             Ok(n) => n,
@@ -195,7 +223,11 @@ fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write)
     Ok(0)
 }
 
-fn builtin_read(args: &[String], env: &mut Environment, stdin: &mut dyn Read) -> Result<i32, ExecError> {
+fn builtin_read(
+    args: &[String],
+    env: &mut Environment,
+    stdin: &mut dyn Read,
+) -> Result<i32, ExecError> {
     use std::io::BufRead;
     // Minimal `read VAR` implementation: read one line from stdin.
     let var_name = args.first().map(|s| s.as_str()).unwrap_or("REPLY");
@@ -203,7 +235,7 @@ fn builtin_read(args: &[String], env: &mut Environment, stdin: &mut dyn Read) ->
     let mut reader = std::io::BufReader::new(stdin);
     let mut line = String::new();
     match reader.read_line(&mut line) {
-        Ok(0) => return Ok(1), // EOF
+        Ok(0) => Ok(1), // EOF
         Ok(_) => {
             // Remove trailing newline
             if line.ends_with('\n') {
@@ -288,16 +320,12 @@ fn evaluate_test(args: &[String]) -> bool {
                         std::path::Path::new(&args[1]).exists()
                     }
                 }
-                "-s" => {
-                    std::fs::metadata(&args[1])
-                        .map(|m| m.len() > 0)
-                        .unwrap_or(false)
-                }
-                "-L" | "-h" => {
-                    std::fs::symlink_metadata(&args[1])
-                        .map(|m| m.file_type().is_symlink())
-                        .unwrap_or(false)
-                }
+                "-s" => std::fs::metadata(&args[1])
+                    .map(|m| m.len() > 0)
+                    .unwrap_or(false),
+                "-L" | "-h" => std::fs::symlink_metadata(&args[1])
+                    .map(|m| m.file_type().is_symlink())
+                    .unwrap_or(false),
                 _ => false,
             }
         }

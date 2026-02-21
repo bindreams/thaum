@@ -17,7 +17,11 @@ impl<'io> IoContext<'io> {
         stdout: &'io mut dyn Write,
         stderr: &'io mut dyn Write,
     ) -> Self {
-        IoContext { stdin, stdout, stderr }
+        IoContext {
+            stdin,
+            stdout,
+            stderr,
+        }
     }
 }
 
@@ -46,11 +50,23 @@ impl ProcessIo {
     }
 }
 
+impl Default for ProcessIo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// I/O context backed by in-memory buffers for testing.
 pub struct CapturedIo {
     pub stdin: Cursor<Vec<u8>>,
     pub stdout: Vec<u8>,
     pub stderr: Vec<u8>,
+}
+
+impl Default for CapturedIo {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CapturedIo {

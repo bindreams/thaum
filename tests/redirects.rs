@@ -222,7 +222,12 @@ fn heredoc_in_if_condition() {
     // The program should parse and the heredoc body should be filled.
     let expr = &prog.statements[0].expression;
     if let Expression::Compound {
-        body: CompoundCommand::IfClause { condition, then_body, .. },
+        body:
+            CompoundCommand::IfClause {
+                condition,
+                then_body,
+                ..
+            },
         ..
     } = expr
     {

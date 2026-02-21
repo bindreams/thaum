@@ -36,10 +36,14 @@ impl Parser {
             let first_word = self.collect_word()?.unwrap();
             let word_span = first_word.span;
             // Extract raw name from the first word (for coproc naming)
-            let saved_name = first_word.parts.iter().map(|f| match f {
-                Fragment::Literal(s) => s.clone(),
-                _ => String::new(),
-            }).collect::<String>();
+            let saved_name = first_word
+                .parts
+                .iter()
+                .map(|f| match f {
+                    Fragment::Literal(s) => s.clone(),
+                    _ => String::new(),
+                })
+                .collect::<String>();
 
             // If now we see a compound command start, the word was the name
             self.lexer.eat_whitespace()?;
@@ -75,7 +79,7 @@ impl Parser {
             }
 
             let cmd_span =
-                start_span.merge(arguments.last().map(|a| argument_span(a)).unwrap_or(word_span));
+                start_span.merge(arguments.last().map(argument_span).unwrap_or(word_span));
             let body_expr = Expression::Command(Command {
                 assignments: Vec::new(),
                 arguments,
@@ -127,7 +131,9 @@ impl Parser {
             let mut word_list = Vec::new();
             loop {
                 self.lexer.eat_whitespace()?;
-                if !self.lexer.peek()?.token.is_fragment() { break; }
+                if !self.lexer.peek()?.token.is_fragment() {
+                    break;
+                }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
@@ -201,7 +207,9 @@ impl Parser {
         let mut redirects = Vec::new();
         loop {
             self.lexer.eat_whitespace()?;
-            if !self.lexer.peek()?.token.is_redirect_start() { break; }
+            if !self.lexer.peek()?.token.is_redirect_start() {
+                break;
+            }
             redirects.push(self.parse_redirect()?);
         }
 

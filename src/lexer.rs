@@ -92,7 +92,11 @@ impl Lexer {
     /// Create a lexer in double-quote mode for parsing the inner content
     /// of a double-quoted string.
     pub(crate) fn new_double_quote_mode(source: &str, options: ParseOptions) -> Self {
-        Self::build(CharSource::from_str(source), options, LexerMode::DoubleQuote)
+        Self::build(
+            CharSource::from_str(source),
+            options,
+            LexerMode::DoubleQuote,
+        )
     }
 
     fn build(chars: CharSource, options: ParseOptions, mode: LexerMode) -> Self {
@@ -227,10 +231,7 @@ impl Lexer {
     }
 
     /// Peek at a token at an offset from the current position.
-    pub(crate) fn peek_at_offset(
-        &mut self,
-        offset: usize,
-    ) -> Result<&SpannedToken, ParseError> {
+    pub(crate) fn peek_at_offset(&mut self, offset: usize) -> Result<&SpannedToken, ParseError> {
         let target = self.buf_pos + offset;
         self.ensure_buffered_at(target)?;
         Ok(&self.buffer[target])
@@ -324,8 +325,7 @@ impl Lexer {
                     // Significant: word boundary between fragments — emit token.
                     debug_assert!(
                         self.buffer.is_empty()
-                            || self.buffer.back().map(|t| &t.token)
-                                != Some(&Token::Whitespace),
+                            || self.buffer.back().map(|t| &t.token) != Some(&Token::Whitespace),
                         "consecutive Whitespace tokens must not be emitted"
                     );
                     self.buffer.push_back(SpannedToken {

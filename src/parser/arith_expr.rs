@@ -486,7 +486,6 @@ pub(crate) fn parse_arith_expr(input: &str) -> Result<ArithExpr, String> {
 // Tests
 // ============================================================================
 
-
 #[cfg(test)]
 #[path = "arith_expr/tests.rs"]
 mod tests;

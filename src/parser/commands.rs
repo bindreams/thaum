@@ -67,7 +67,8 @@ impl Parser {
                             });
                             end_span = rparen_span;
                         } else {
-                            let value_word = self.collect_assignment_value(&value_prefix, word_span)?;
+                            let value_word =
+                                self.collect_assignment_value(&value_prefix, word_span)?;
                             assignments.push(Assignment {
                                 name,
                                 value: AssignmentValue::Scalar(value_word),
@@ -205,10 +206,13 @@ impl Parser {
                 // If it's some other fragment, collect the whole word as raw text
                 let w = self.collect_word()?.unwrap();
                 // Reconstruct raw text from fragments (approximation)
-                w.parts.iter().map(|f| match f {
-                    Fragment::Literal(s) => s.as_str(),
-                    _ => "",
-                }).collect::<String>()
+                w.parts
+                    .iter()
+                    .map(|f| match f {
+                        Fragment::Literal(s) => s.as_str(),
+                        _ => "",
+                    })
+                    .collect::<String>()
             }
         };
         let delim_span = self.lexer.peek()?.span;

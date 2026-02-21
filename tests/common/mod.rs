@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub mod docker;
 
 use thaum::ast::*;

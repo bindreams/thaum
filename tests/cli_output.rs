@@ -95,8 +95,8 @@ fn extract_key(line: &str) -> Option<&str> {
     let content = trimmed.strip_prefix("- ").unwrap_or(trimmed);
     if let Some(colon) = content.find(": ") {
         Some(&content[..colon])
-    } else if content.ends_with(':') {
-        Some(&content[..content.len() - 1])
+    } else if let Some(stripped) = content.strip_suffix(':') {
+        Some(stripped)
     } else {
         None
     }
@@ -548,7 +548,7 @@ fn cli_lex_simple_command() {
     assert!(stdout.contains("TOKEN"));
     assert!(stdout.contains("TEXT"));
     // Should contain the tokens
-    assert!(stdout.contains("Word"));
+    assert!(stdout.contains("Literal"));
     assert!(stdout.contains("echo"));
     assert!(stdout.contains("hello"));
 }
@@ -613,7 +613,7 @@ fn cli_lex_error() {
 fn cli_lex_from_stdin() {
     let (stdout, _, code) = run_exec_with_args(&["lex", "-"], "true; false");
     assert_eq!(code, 0);
-    assert!(stdout.contains("Word"));
+    assert!(stdout.contains("Literal"));
     assert!(stdout.contains("Semicolon"));
     assert!(stdout.contains("true"));
     assert!(stdout.contains("false"));

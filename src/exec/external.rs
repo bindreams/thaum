@@ -33,7 +33,7 @@ impl Executor {
 
         // Apply prefix assignments as extra env vars
         for assignment in assignments {
-            let value = self.expand_word(&assignment.value.as_scalar())?;
+            let value = self.expand_word(assignment.value.as_scalar())?;
             child_cmd.env(&assignment.name, &value);
         }
 

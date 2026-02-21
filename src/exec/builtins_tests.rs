@@ -6,7 +6,15 @@ fn echo_simple() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("echo", &["hello".into(), "world".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "echo",
+        &["hello".into(), "world".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
     assert_eq!(String::from_utf8(out).unwrap(), "hello world\n");
 }
@@ -17,7 +25,15 @@ fn echo_n_flag() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("echo", &["-n".into(), "no newline".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "echo",
+        &["-n".into(), "no newline".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
     assert_eq!(String::from_utf8(out).unwrap(), "no newline");
 }
@@ -79,7 +95,14 @@ fn exit_with_code() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let result = run_builtin("exit", &["42".into()], &mut env, &mut sin, &mut out, &mut err);
+    let result = run_builtin(
+        "exit",
+        &["42".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    );
     assert!(matches!(result, Err(ExecError::ExitRequested(42))));
 }
 
@@ -89,7 +112,15 @@ fn export_sets_and_exports() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    run_builtin("export", &["FOO=bar".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    run_builtin(
+        "export",
+        &["FOO=bar".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(env.get_var("FOO"), Some("bar"));
     assert!(env.is_exported("FOO"));
 }
@@ -101,7 +132,15 @@ fn unset_removes_var() {
     let mut out = Vec::new();
     let mut err = Vec::new();
     env.set_var("X", "val").unwrap();
-    run_builtin("unset", &["X".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    run_builtin(
+        "unset",
+        &["X".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(env.get_var("X"), None);
 }
 
@@ -122,7 +161,15 @@ fn test_string_non_empty() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("test", &["hello".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "test",
+        &["hello".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
 }
 
@@ -142,7 +189,15 @@ fn test_string_equals() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("test", &["a".into(), "=".into(), "a".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "test",
+        &["a".into(), "=".into(), "a".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
 }
 
@@ -152,7 +207,15 @@ fn test_int_eq() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("test", &["5".into(), "-eq".into(), "5".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "test",
+        &["5".into(), "-eq".into(), "5".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
 }
 
@@ -162,7 +225,15 @@ fn test_bracket_syntax() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("[", &["hello".into(), "]".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "[",
+        &["hello".into(), "]".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 0);
 }
 
@@ -172,6 +243,14 @@ fn test_bracket_missing_close() {
     let mut sin = std::io::empty();
     let mut out = Vec::new();
     let mut err = Vec::new();
-    let status = run_builtin("[", &["hello".into()], &mut env, &mut sin, &mut out, &mut err).unwrap();
+    let status = run_builtin(
+        "[",
+        &["hello".into()],
+        &mut env,
+        &mut sin,
+        &mut out,
+        &mut err,
+    )
+    .unwrap();
     assert_eq!(status, 2);
 }

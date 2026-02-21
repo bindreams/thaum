@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 
@@ -26,7 +28,9 @@ pub fn docker_image_available(image: &str) -> bool {
 /// for safety. The script is passed via `-c`.
 pub fn run_thaum_in_docker(script: &str, bash: bool) -> DockerResult {
     let mut args = vec![
-        "run", "--rm", "-i",
+        "run",
+        "--rm",
+        "-i",
         "--network=none",
         "--read-only",
         "--tmpfs=/tmp:size=1m",
@@ -59,7 +63,9 @@ pub fn run_thaum_in_docker(script: &str, bash: bool) -> DockerResult {
 pub fn run_in_reference_shell(script: &str, shell: &str) -> DockerResult {
     let mut child = Command::new("docker")
         .args([
-            "run", "--rm", "-i",
+            "run",
+            "--rm",
+            "-i",
             "--network=none",
             "--read-only",
             "--tmpfs=/tmp:size=1m",
@@ -73,7 +79,9 @@ pub fn run_in_reference_shell(script: &str, shell: &str) -> DockerResult {
         .expect("failed to start docker");
 
     if let Some(ref mut stdin) = child.stdin {
-        stdin.write_all(script.as_bytes()).expect("write to docker stdin");
+        stdin
+            .write_all(script.as_bytes())
+            .expect("write to docker stdin");
     }
     child.stdin.take();
 

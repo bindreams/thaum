@@ -160,7 +160,11 @@ fn lex_number_with_space_is_word() {
     let tokens = lex_all("2 >").unwrap();
     assert_eq!(
         tokens,
-        vec![Token::Literal("2".into()), Token::Whitespace, Token::RedirectToFile]
+        vec![
+            Token::Literal("2".into()),
+            Token::Whitespace,
+            Token::RedirectToFile
+        ]
     );
 }
 
@@ -187,7 +191,10 @@ fn lex_comment_after_word() {
     let tokens = lex_all_skip_whitespace("echo hello # comment").unwrap();
     assert_eq!(
         tokens,
-        vec![Token::Literal("echo".into()), Token::Literal("hello".into())]
+        vec![
+            Token::Literal("echo".into()),
+            Token::Literal("hello".into())
+        ]
     );
 }
 
@@ -218,10 +225,7 @@ fn lex_whitespace_after_operator_suppressed() {
 #[test]
 fn lex_whitespace_after_newline_suppressed() {
     let tokens = lex_all("\n echo").unwrap();
-    assert_eq!(
-        tokens,
-        vec![Token::Newline, Token::Literal("echo".into())]
-    );
+    assert_eq!(tokens, vec![Token::Newline, Token::Literal("echo".into())]);
 }
 
 #[test]
@@ -398,10 +402,16 @@ fn lex_heredoc_basic() {
     let input = "cat <<EOF\nhello world\nEOF\n";
     let mut lexer = Lexer::from_str(input, ParseOptions::default());
 
-    assert_eq!(lexer.next_token().unwrap().token, Token::Literal("cat".into()));
+    assert_eq!(
+        lexer.next_token().unwrap().token,
+        Token::Literal("cat".into())
+    );
     assert_eq!(lexer.next_token().unwrap().token, Token::Whitespace);
     assert_eq!(lexer.next_token().unwrap().token, Token::HereDocOp);
-    assert_eq!(lexer.next_token().unwrap().token, Token::Literal("EOF".into()));
+    assert_eq!(
+        lexer.next_token().unwrap().token,
+        Token::Literal("EOF".into())
+    );
 
     // Newline triggers heredoc body reading into side queue (not buffer).
     assert_eq!(lexer.next_token().unwrap().token, Token::Newline);
@@ -480,10 +490,7 @@ fn lex_glob_star() {
     let tokens = lex_all("*.txt").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Glob(GlobKind::Star),
-            Token::Literal(".txt".into()),
-        ]
+        vec![Token::Glob(GlobKind::Star), Token::Literal(".txt".into()),]
     );
 }
 
@@ -510,10 +517,7 @@ fn lex_lone_dollar() {
     let tokens = lex_all_skip_whitespace("$ foo").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Literal("$".into()),
-            Token::Literal("foo".into()),
-        ]
+        vec![Token::Literal("$".into()), Token::Literal("foo".into()),]
     );
 }
 
@@ -579,12 +583,14 @@ fn skip_whitespace_then_peek() {
 #[test]
 fn speculate_rewinds_on_none() {
     let mut s = make_lexer("a b c");
-    let result: Option<()> = s.speculate(|s| {
-        s.advance()?;
-        s.skip_whitespace()?;
-        s.advance()?;
-        Ok(None)
-    }).unwrap();
+    let result: Option<()> = s
+        .speculate(|s| {
+            s.advance()?;
+            s.skip_whitespace()?;
+            s.advance()?;
+            Ok(None)
+        })
+        .unwrap();
     assert!(result.is_none());
     assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
 }
@@ -592,11 +598,13 @@ fn speculate_rewinds_on_none() {
 #[test]
 fn speculate_keeps_position_on_some() {
     let mut s = make_lexer("a b c");
-    let result = s.speculate(|s| {
-        s.advance()?;
-        s.skip_whitespace()?;
-        Ok(Some("found"))
-    }).unwrap();
+    let result = s
+        .speculate(|s| {
+            s.advance()?;
+            s.skip_whitespace()?;
+            Ok(Some("found"))
+        })
+        .unwrap();
     assert_eq!(result, Some("found"));
     assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }
@@ -618,14 +626,16 @@ fn speculate_tokens_stay_in_buffer() {
     // the side queue. But the other tokens (operator, delimiter, newline)
     // must survive speculation.
     let mut s = make_lexer("<<EOF\nhello\nEOF\n");
-    let result: Option<()> = s.speculate(|s| {
-        assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
-        assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
-        assert_eq!(s.advance().unwrap().token, Token::Newline);
-        // Body is in the side queue, not the buffer
-        // Rewind
-        Ok(None)
-    }).unwrap();
+    let result: Option<()> = s
+        .speculate(|s| {
+            assert_eq!(s.advance().unwrap().token, Token::HereDocOp);
+            assert_eq!(s.advance().unwrap().token, Token::Literal("EOF".into()));
+            assert_eq!(s.advance().unwrap().token, Token::Newline);
+            // Body is in the side queue, not the buffer
+            // Rewind
+            Ok(None)
+        })
+        .unwrap();
     assert!(result.is_none());
     // After rewind: same tokens are re-read from buffer
     assert_eq!(s.advance().unwrap().token, Token::HereDocOp);

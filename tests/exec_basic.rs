@@ -5,8 +5,8 @@ use thaum::Dialect;
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 fn exec_ok(script: &str) -> (String, i32) {
-    let program = thaum::parse(script)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
     // Use a controlled PATH for tests
@@ -30,8 +30,8 @@ fn exec_status(script: &str) -> i32 {
 /// Parse and execute a script, returning the exit status or 1 on error.
 /// Unlike `exec_ok`, this does not panic on execution errors.
 fn exec_result(script: &str) -> i32 {
-    let program = thaum::parse(script)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
     let _ = executor
@@ -205,12 +205,15 @@ fn for_loop_over_words() {
 
 #[test]
 fn case_exact_match() {
-    let program = thaum::parse(r#"
+    let program = thaum::parse(
+        r#"
 case hello in
     hello) X=matched ;;
     *) X=default ;;
 esac
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -219,12 +222,15 @@ esac
 
 #[test]
 fn case_wildcard_match() {
-    let program = thaum::parse(r#"
+    let program = thaum::parse(
+        r#"
 case world in
     hello) X=hello ;;
     *) X=default ;;
 esac
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -318,14 +324,17 @@ fn bracket_test_syntax() {
 
 #[test]
 fn break_in_while() {
-    let program = thaum::parse(r#"
+    let program = thaum::parse(
+        r#"
 X=0
 while true; do
     X=1
     break
     X=2
 done
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -334,7 +343,8 @@ done
 
 #[test]
 fn continue_in_for() {
-    let program = thaum::parse(r#"
+    let program = thaum::parse(
+        r#"
 RESULT=
 for i in a skip b; do
     if test "$i" = skip; then
@@ -342,7 +352,9 @@ for i in a skip b; do
     fi
     RESULT=${RESULT}${i}
 done
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -405,8 +417,8 @@ fn command_substitution_exit_status() {
 // --- Unsupported features produce explicit errors ---
 
 fn expect_unsupported(script: &str) {
-    let program = thaum::parse(script)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
     let _ = executor
         .env_mut()
@@ -488,7 +500,9 @@ fn arith_expansion_division_by_zero() {
     let program = thaum::parse("X=$((1/0))").unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    let err = executor.execute(&program, &mut captured.context()).unwrap_err();
+    let err = executor
+        .execute(&program, &mut captured.context())
+        .unwrap_err();
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
@@ -517,7 +531,10 @@ fn bash_arith_command_nonzero_is_success() {
     let program = thaum::parse_with("(( 5 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 0);
+    assert_eq!(
+        executor.execute(&program, &mut captured.context()).unwrap(),
+        0
+    );
 }
 
 #[test]
@@ -525,7 +542,10 @@ fn bash_arith_command_zero_is_failure() {
     let program = thaum::parse_with("(( 0 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 1);
+    assert_eq!(
+        executor.execute(&program, &mut captured.context()).unwrap(),
+        1
+    );
 }
 
 #[test]
@@ -542,10 +562,7 @@ fn bash_arith_command_with_assignment() {
 
 #[test]
 fn bash_arith_for_basic() {
-    let program = thaum::parse_with(
-        "for ((i=0; i<5; i++)); do true; done",
-        Dialect::Bash,
-    ).unwrap();
+    let program = thaum::parse_with("for ((i=0; i<5; i++)); do true; done", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -557,7 +574,8 @@ fn bash_arith_for_sum() {
     let program = thaum::parse_with(
         "sum=0\nfor ((i=1; i<=10; i++)); do sum=$((sum+i)); done",
         Dialect::Bash,
-    ).unwrap();
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -569,7 +587,8 @@ fn bash_arith_for_break() {
     let program = thaum::parse_with(
         "for ((i=0; i<100; i++)); do if test $i -eq 3; then break; fi; done",
         Dialect::Bash,
-    ).unwrap();
+    )
+    .unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -672,9 +691,7 @@ fn readonly_prevents_assignment() {
 
 #[test]
 fn local_scopes_variable_in_function() {
-    let (out, _) = exec_ok(
-        "f() { local X=inner; echo $X; }; X=outer; f; echo $X",
-    );
+    let (out, _) = exec_ok("f() { local X=inner; echo $X; }; X=outer; f; echo $X");
     assert_eq!(out, "inner\nouter\n");
 }
 
@@ -713,16 +730,10 @@ fn redirect_builtin_append() {
     let _ = std::fs::create_dir_all(&dir);
     let file = dir.join("append.txt");
 
-    let script = format!(
-        "echo first > {f}; echo second >> {f}",
-        f = file.display()
-    );
+    let script = format!("echo first > {f}; echo second >> {f}", f = file.display());
     let (_, status) = exec_ok(&script);
     assert_eq!(status, 0);
-    assert_eq!(
-        std::fs::read_to_string(&file).unwrap(),
-        "first\nsecond\n"
-    );
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "first\nsecond\n");
 
     let _ = std::fs::remove_dir_all(&dir);
 }

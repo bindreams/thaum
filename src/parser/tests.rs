@@ -375,8 +375,7 @@ fn parse_for_with_newlines() {
 
 #[test]
 fn parse_case_with_empty_arm() {
-    if let CompoundCommand::CaseClause { arms, .. } = &first_compound("case x in\na) ;;\nesac")
-    {
+    if let CompoundCommand::CaseClause { arms, .. } = &first_compound("case x in\na) ;;\nesac") {
         assert_eq!(arms.len(), 1);
         assert!(arms[0].body.is_empty());
     } else {

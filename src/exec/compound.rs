@@ -19,15 +19,11 @@ impl Executor {
             ));
         }
         match body {
-            CompoundCommand::BraceGroup { body, .. } => {
-                self.execute_statements(body, io)
-            }
+            CompoundCommand::BraceGroup { body, .. } => self.execute_statements(body, io),
 
-            CompoundCommand::Subshell { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "subshell (requires fork)".to_string(),
-                ));
-            }
+            CompoundCommand::Subshell { .. } => Err(ExecError::UnsupportedFeature(
+                "subshell (requires fork)".to_string(),
+            )),
 
             CompoundCommand::IfClause {
                 condition,
@@ -163,26 +159,20 @@ impl Executor {
                 Ok(status)
             }
 
-            CompoundCommand::BashDoubleBracket { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "bash [[ ]] conditional".to_string(),
-                ));
-            }
+            CompoundCommand::BashDoubleBracket { .. } => Err(ExecError::UnsupportedFeature(
+                "bash [[ ]] conditional".to_string(),
+            )),
             CompoundCommand::BashArithmeticCommand { expression, .. } => {
                 let value = arithmetic::evaluate_arith_expr(expression, &mut self.env)?;
                 // (( )) returns 0 (success) if expression is non-zero,
                 // 1 (failure) if expression is zero.
                 Ok(if value != 0 { 0 } else { 1 })
             }
-            CompoundCommand::BashSelectClause { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "bash select clause".to_string(),
-                ));
-            }
+            CompoundCommand::BashSelectClause { .. } => Err(ExecError::UnsupportedFeature(
+                "bash select clause".to_string(),
+            )),
             CompoundCommand::BashCoproc { .. } => {
-                return Err(ExecError::UnsupportedFeature(
-                    "bash coproc".to_string(),
-                ));
+                Err(ExecError::UnsupportedFeature("bash coproc".to_string()))
             }
             CompoundCommand::BashArithmeticFor {
                 init,

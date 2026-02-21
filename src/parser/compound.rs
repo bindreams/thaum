@@ -50,7 +50,9 @@ impl Parser {
         loop {
             self.lexer.eat_whitespace()?;
             let tok = self.lexer.peek()?.token.clone();
-            if !tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "elif") { break; }
+            if !tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "elif") {
+                break;
+            }
             let elif_span = self.lexer.peek()?.span;
             self.lexer.advance()?;
             let elif_cond = self.parse_required_compound_list("elif condition")?;
@@ -145,7 +147,9 @@ impl Parser {
             let mut word_list = Vec::new();
             loop {
                 self.lexer.eat_whitespace()?;
-                if !self.lexer.peek()?.token.is_fragment() { break; }
+                if !self.lexer.peek()?.token.is_fragment() {
+                    break;
+                }
                 if let Some(w) = self.collect_word()? {
                     word_list.push(w);
                 }
@@ -209,9 +213,7 @@ impl Parser {
         loop {
             // No eat_whitespace: preceded by skip_linebreak (line 206/218)
             let tok = self.lexer.peek()?.token.clone();
-            if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
-                || tok == Token::Eof
-            {
+            if tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac") || tok == Token::Eof {
                 break;
             }
             arms.push(self.parse_case_arm()?);
@@ -339,7 +341,8 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::LParen)?;
 
-        if self.options.arithmetic_command && self.lexer.peek()?.token == Token::LParen
+        if self.options.arithmetic_command
+            && self.lexer.peek()?.token == Token::LParen
             && self.lexer.peek()?.span.start.0 == start_span.end.0
         {
             // Speculate: try (( as arithmetic. If )) is never found, rewind

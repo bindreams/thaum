@@ -214,10 +214,7 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
         } => CompoundCommand::IfClause {
             condition: fold_stmts(f, condition),
             then_body: fold_stmts(f, then_body),
-            elifs: elifs
-                .into_iter()
-                .map(|e| f.fold_elif_clause(e))
-                .collect(),
+            elifs: elifs.into_iter().map(|e| f.fold_elif_clause(e)).collect(),
             else_body: else_body.map(|b| fold_stmts(f, b)),
             span,
         },
@@ -387,10 +384,7 @@ mod tests {
             Expression::Command(c) => c,
             _ => panic!("expected command"),
         };
-        assert_eq!(
-            cmd.arguments[0].try_to_static_string(),
-            Some("ECHO".into())
-        );
+        assert_eq!(cmd.arguments[0].try_to_static_string(), Some("ECHO".into()));
         assert_eq!(
             cmd.arguments[1].try_to_static_string(),
             Some("HELLO".into())

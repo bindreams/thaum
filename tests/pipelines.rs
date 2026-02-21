@@ -167,10 +167,7 @@ fn backslash_newline_pipe_into_for() {
 fn backslash_newline_pipe_into_if() {
     // Source: /usr/bin/ssh-copy-id
     let input = "printf '%s\\n' \"$x\" | \\\n  if [ \"$y\" ] ; then\n    echo sftp\n  else\n    echo ssh\n  fi";
-    assert!(
-        parse(input).is_ok(),
-        "pipe into if with line continuation"
-    );
+    assert!(parse(input).is_ok(), "pipe into if with line continuation");
 }
 
 #[test]

@@ -329,9 +329,7 @@ impl Fragment {
     /// if the fragment requires runtime expansion.
     fn append_static_string(&self, buf: &mut String) -> Option<()> {
         match self {
-            Fragment::Literal(s)
-            | Fragment::SingleQuoted(s)
-            | Fragment::BashAnsiCQuoted(s) => {
+            Fragment::Literal(s) | Fragment::SingleQuoted(s) | Fragment::BashAnsiCQuoted(s) => {
                 buf.push_str(s);
             }
             Fragment::DoubleQuoted(parts) => {
@@ -644,14 +642,20 @@ mod tests {
     }
 
     fn word(parts: Vec<Fragment>) -> Word {
-        Word { parts, span: span() }
+        Word {
+            parts,
+            span: span(),
+        }
     }
 
     // -- Fragment -----------------------------------------------------------
 
     #[test]
     fn literal_is_static() {
-        assert_eq!(literal("hello").try_to_static_string(), Some("hello".into()));
+        assert_eq!(
+            literal("hello").try_to_static_string(),
+            Some("hello".into())
+        );
     }
 
     #[test]
@@ -704,7 +708,10 @@ mod tests {
 
     #[test]
     fn tilde_is_none() {
-        assert_eq!(Fragment::TildePrefix("".into()).try_to_static_string(), None);
+        assert_eq!(
+            Fragment::TildePrefix("".into()).try_to_static_string(),
+            None
+        );
     }
 
     #[test]
@@ -742,15 +749,15 @@ mod tests {
 
     #[test]
     fn word_single_literal() {
-        assert_eq!(word(vec![literal("echo")]).try_to_static_string(), Some("echo".into()));
+        assert_eq!(
+            word(vec![literal("echo")]).try_to_static_string(),
+            Some("echo".into())
+        );
     }
 
     #[test]
     fn word_concatenated_static() {
-        let w = word(vec![
-            literal("hel"),
-            Fragment::SingleQuoted("lo".into()),
-        ]);
+        let w = word(vec![literal("hel"), Fragment::SingleQuoted("lo".into())]);
         assert_eq!(w.try_to_static_string(), Some("hello".into()));
     }
 

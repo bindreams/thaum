@@ -1,5 +1,5 @@
 use super::*;
-use crate::format::yaml_value::{MappingBuilder, YamlValue};
+use crate::format::yaml_value::YamlValue;
 
 // ---------------------------------------------------------------------------
 // Round-trip safety: emitted YAML must parse back as strings (not numbers,
@@ -18,7 +18,10 @@ fn roundtrip_string(key: &str, value: &str) {
     assert!(
         matches!(actual, yaml_rust2::Yaml::String(_)),
         "expected String for key {:?} with value {:?}, got {:?}\nemitted: {}",
-        key, value, actual, emitted
+        key,
+        value,
+        actual,
+        emitted
     );
     assert_eq!(
         actual.as_str().unwrap(),
@@ -116,15 +119,9 @@ fn emit_nested_mapping() {
 
 #[test]
 fn emit_scalar_sequence() {
-    let seq = YamlValue::Sequence(vec![
-        YamlValue::scalar("echo"),
-        YamlValue::scalar("hello"),
-    ]);
+    let seq = YamlValue::Sequence(vec![YamlValue::scalar("echo"), YamlValue::scalar("hello")]);
     let value = YamlValue::mapping().value("arguments", seq).build();
-    assert_eq!(
-        emit(&value),
-        "arguments:\n  - echo\n  - hello\n"
-    );
+    assert_eq!(emit(&value), "arguments:\n  - echo\n  - hello\n");
 }
 
 #[test]
@@ -210,10 +207,8 @@ fn emit_yaml_escape_backslash() {
 
 #[test]
 fn emit_nested_indentation() {
-    let inner_seq = YamlValue::Sequence(vec![
-        YamlValue::scalar("echo"),
-        YamlValue::scalar("hello"),
-    ]);
+    let inner_seq =
+        YamlValue::Sequence(vec![YamlValue::scalar("echo"), YamlValue::scalar("hello")]);
     let stmt = YamlValue::mapping()
         .raw("source", "<stdin>:1:1")
         .raw("type", "Command")
@@ -242,10 +237,7 @@ fn emit_escaped_scalar_in_sequence() {
         YamlValue::scalar("hello:world"),
     ]);
     let value = YamlValue::mapping().value("items", seq).build();
-    assert_eq!(
-        emit(&value),
-        "items:\n  - \"true\"\n  - \"hello:world\"\n"
-    );
+    assert_eq!(emit(&value), "items:\n  - \"true\"\n  - \"hello:world\"\n");
 }
 
 #[test]

@@ -26,11 +26,7 @@ pub fn expand_word(word: &Word, env: &mut Environment) -> Result<String, ExecErr
 /// will be added in later steps.
 pub fn expand_word_to_fields(word: &Word, env: &mut Environment) -> Result<Vec<String>, ExecError> {
     let s = expand_word(word, env)?;
-    if s.is_empty() {
-        Ok(vec![s])
-    } else {
-        Ok(vec![s])
-    }
+    Ok(vec![s])
 }
 
 /// Expand an `Argument` into fields.
@@ -79,14 +75,12 @@ fn expand_fragment(
                 "arithmetic expansion $((expr))".to_string(),
             ));
         }
-        Fragment::Glob(_) => {
-            match fragment {
-                Fragment::Glob(crate::ast::GlobChar::Star) => out.push('*'),
-                Fragment::Glob(crate::ast::GlobChar::Question) => out.push('?'),
-                Fragment::Glob(crate::ast::GlobChar::BracketOpen) => out.push('['),
-                _ => unreachable!(),
-            }
-        }
+        Fragment::Glob(_) => match fragment {
+            Fragment::Glob(crate::ast::GlobChar::Star) => out.push('*'),
+            Fragment::Glob(crate::ast::GlobChar::Question) => out.push('?'),
+            Fragment::Glob(crate::ast::GlobChar::BracketOpen) => out.push('['),
+            _ => unreachable!(),
+        },
         Fragment::BashAnsiCQuoted(s) => {
             out.push_str(s);
         }
@@ -129,13 +123,11 @@ fn expand_fragment_in_double_quotes(
             ));
         }
         Fragment::SingleQuoted(s) => out.push_str(s),
-        Fragment::Glob(g) => {
-            match g {
-                crate::ast::GlobChar::Star => out.push('*'),
-                crate::ast::GlobChar::Question => out.push('?'),
-                crate::ast::GlobChar::BracketOpen => out.push('['),
-            }
-        }
+        Fragment::Glob(g) => match g {
+            crate::ast::GlobChar::Star => out.push('*'),
+            crate::ast::GlobChar::Question => out.push('?'),
+            crate::ast::GlobChar::BracketOpen => out.push('['),
+        },
         Fragment::DoubleQuoted(parts) => {
             for part in parts {
                 expand_fragment_in_double_quotes(part, env, out)?;
@@ -230,55 +222,47 @@ fn expand_complex_parameter(
             let len = value.as_deref().unwrap_or("").len();
             out.push_str(&len.to_string());
         }
-        Some(ParamOp::Default) => {
-            match value.as_deref() {
-                Some(v) if !v.is_empty() => out.push_str(v),
-                _ => {
-                    if let Some(arg) = argument {
-                        let expanded = expand_word(arg, env)?;
-                        out.push_str(&expanded);
-                    }
-                }
-            }
-        }
-        Some(ParamOp::DefaultAssign) => {
-            match value.as_deref() {
-                Some(v) if !v.is_empty() => out.push_str(v),
-                _ => {
-                    let expanded = if let Some(arg) = argument {
-                        expand_word(arg, env)?
-                    } else {
-                        String::new()
-                    };
-                    env.set_var(name, &expanded)?;
+        Some(ParamOp::Default) => match value.as_deref() {
+            Some(v) if !v.is_empty() => out.push_str(v),
+            _ => {
+                if let Some(arg) = argument {
+                    let expanded = expand_word(arg, env)?;
                     out.push_str(&expanded);
                 }
             }
-        }
-        Some(ParamOp::Error) => {
-            match value.as_deref() {
-                Some(v) if !v.is_empty() => out.push_str(v),
-                _ => {
-                    let msg = if let Some(arg) = argument {
-                        expand_word(arg, env)?
-                    } else {
-                        format!("{}: parameter null or not set", name)
-                    };
-                    return Err(ExecError::BadSubstitution(msg));
+        },
+        Some(ParamOp::DefaultAssign) => match value.as_deref() {
+            Some(v) if !v.is_empty() => out.push_str(v),
+            _ => {
+                let expanded = if let Some(arg) = argument {
+                    expand_word(arg, env)?
+                } else {
+                    String::new()
+                };
+                env.set_var(name, &expanded)?;
+                out.push_str(&expanded);
+            }
+        },
+        Some(ParamOp::Error) => match value.as_deref() {
+            Some(v) if !v.is_empty() => out.push_str(v),
+            _ => {
+                let msg = if let Some(arg) = argument {
+                    expand_word(arg, env)?
+                } else {
+                    format!("{}: parameter null or not set", name)
+                };
+                return Err(ExecError::BadSubstitution(msg));
+            }
+        },
+        Some(ParamOp::Alternative) => match value.as_deref() {
+            Some(v) if !v.is_empty() => {
+                if let Some(arg) = argument {
+                    let expanded = expand_word(arg, env)?;
+                    out.push_str(&expanded);
                 }
             }
-        }
-        Some(ParamOp::Alternative) => {
-            match value.as_deref() {
-                Some(v) if !v.is_empty() => {
-                    if let Some(arg) = argument {
-                        let expanded = expand_word(arg, env)?;
-                        out.push_str(&expanded);
-                    }
-                }
-                _ => {}
-            }
-        }
+            _ => {}
+        },
         Some(ParamOp::TrimSmallPrefix) => {
             let val = value.as_deref().unwrap_or("");
             let pat = if let Some(arg) = argument {

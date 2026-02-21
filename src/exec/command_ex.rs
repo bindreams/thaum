@@ -26,6 +26,9 @@ impl CommandEx {
         }
     }
 
+    /// Add a single argument. Currently unused but part of the CommandEx API
+    /// (mirrors std::process::Command for FD 3+ support).
+    #[allow(dead_code)]
     pub fn arg<S: AsRef<OsStr>>(&mut self, arg: S) -> &mut Self {
         self.inner.arg(arg);
         self
@@ -108,9 +111,7 @@ impl CommandEx {
                     child_fd,
                 })
                 .collect();
-            self.inner
-                .fd_mappings(mappings)
-                .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+            self.inner.fd_mappings(mappings).map_err(io::Error::other)?;
         }
         self.inner.spawn()
     }

@@ -1,5 +1,7 @@
 use super::*;
-use pattern::{trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix};
+use pattern::{
+    trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix,
+};
 
 #[test]
 fn pattern_match_literal() {
@@ -36,7 +38,10 @@ fn pattern_match_bracket() {
 #[test]
 fn trim_smallest_prefix_star_slash() {
     // ${var#*/} — remove shortest prefix ending in /
-    assert_eq!(trim_smallest_prefix("/usr/bin:/usr/local/bin", "*/"), "usr/bin:/usr/local/bin");
+    assert_eq!(
+        trim_smallest_prefix("/usr/bin:/usr/local/bin", "*/"),
+        "usr/bin:/usr/local/bin"
+    );
 }
 
 #[test]

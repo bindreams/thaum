@@ -185,7 +185,6 @@ impl Parser {
     }
 }
 
-
 #[cfg(test)]
 #[path = "parser/tests.rs"]
 mod tests;

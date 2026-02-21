@@ -188,8 +188,12 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
                 }
             }
         }
-        CompoundCommand::WhileClause { condition, body, .. }
-        | CompoundCommand::UntilClause { condition, body, .. } => {
+        CompoundCommand::WhileClause {
+            condition, body, ..
+        }
+        | CompoundCommand::UntilClause {
+            condition, body, ..
+        } => {
             for stmt in condition {
                 v.visit_statement(stmt);
             }

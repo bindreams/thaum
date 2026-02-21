@@ -20,7 +20,7 @@ use pattern::shell_pattern_match;
 use std::collections::HashMap;
 use std::process::Stdio;
 
-use crate::ast::{Command, Expression, ExecutionMode, Program, Statement};
+use crate::ast::{Command, ExecutionMode, Expression, Program, Statement};
 
 /// The shell executor.
 ///
@@ -73,7 +73,11 @@ impl Executor {
     }
 
     /// Execute a list of statements, returning the last exit status.
-    pub fn execute_statements(&mut self, stmts: &[Statement], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub fn execute_statements(
+        &mut self,
+        stmts: &[Statement],
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
         let mut status = 0;
         for stmt in stmts {
             status = self.execute_statement(stmt, io)?;
@@ -82,13 +86,15 @@ impl Executor {
     }
 
     /// Execute a single statement.
-    fn execute_statement(&mut self, stmt: &Statement, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    fn execute_statement(
+        &mut self,
+        stmt: &Statement,
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
         match stmt.mode {
-            ExecutionMode::Background => {
-                return Err(ExecError::UnsupportedFeature(
-                    "background execution (&)".to_string(),
-                ));
-            }
+            ExecutionMode::Background => Err(ExecError::UnsupportedFeature(
+                "background execution (&)".to_string(),
+            )),
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
                 let status = self.execute_expression(&stmt.expression, io)?;
                 self.env.set_last_exit_status(status);
@@ -98,13 +104,15 @@ impl Executor {
     }
 
     /// Execute an expression, returning its exit status.
-    pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub fn execute_expression(
+        &mut self,
+        expr: &Expression,
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
         match expr {
             Expression::Command(cmd) => self.execute_command(cmd, io),
 
-            Expression::Compound { body, redirects } => {
-                self.execute_compound(body, redirects, io)
-            }
+            Expression::Compound { body, redirects } => self.execute_compound(body, redirects, io),
 
             Expression::FunctionDef(fndef) => {
                 let stored = environment::StoredFunction::from(fndef);
@@ -151,10 +159,7 @@ impl Executor {
     }
 
     /// Expand an argument, resolving command substitutions first.
-    fn expand_argument(
-        &mut self,
-        arg: &crate::ast::Argument,
-    ) -> Result<Vec<String>, ExecError> {
+    fn expand_argument(&mut self, arg: &crate::ast::Argument) -> Result<Vec<String>, ExecError> {
         match arg {
             crate::ast::Argument::Word(word) => {
                 let resolved = self.resolve_cmd_subs_in_word(word)?;
@@ -171,10 +176,7 @@ impl Executor {
     }
 
     /// Expand a word into fields, resolving command substitutions first.
-    fn expand_word_to_fields(
-        &mut self,
-        word: &crate::ast::Word,
-    ) -> Result<Vec<String>, ExecError> {
+    fn expand_word_to_fields(&mut self, word: &crate::ast::Word) -> Result<Vec<String>, ExecError> {
         let resolved = self.resolve_cmd_subs_in_word(word)?;
         expand::expand_word_to_fields(&resolved, &mut self.env)
     }
@@ -228,10 +230,7 @@ impl Executor {
     /// the output buffer. For external commands, uses piped stdout.
     /// Creates its own internal IoContext with a capture buffer for stdout
     /// and io::sink() for stderr (discarding stderr from command substitutions).
-    fn execute_command_substitution(
-        &mut self,
-        stmts: &[Statement],
-    ) -> Result<String, ExecError> {
+    fn execute_command_substitution(&mut self, stmts: &[Statement]) -> Result<String, ExecError> {
         let mut captured = Vec::new();
 
         for stmt in stmts {
@@ -246,7 +245,7 @@ impl Executor {
                     if args.is_empty() {
                         for assignment in &cmd.assignments {
                             let value =
-                                expand::expand_word(&assignment.value.as_scalar(), &mut self.env)?;
+                                expand::expand_word(assignment.value.as_scalar(), &mut self.env)?;
                             self.env.set_var(&assignment.name, &value)?;
                         }
                         continue;
@@ -326,7 +325,7 @@ impl Executor {
         // If no command name, just process assignments
         if expanded_args.is_empty() {
             for assignment in &cmd.assignments {
-                let value = self.expand_word(&assignment.value.as_scalar())?;
+                let value = self.expand_word(assignment.value.as_scalar())?;
                 self.env.set_var(&assignment.name, &value)?;
             }
             return Ok(0);
@@ -402,7 +401,7 @@ impl Executor {
         let mut saved = Vec::new();
         for assignment in assignments {
             let old = self.env.get_var(&assignment.name).map(|s| s.to_string());
-            let value = self.expand_word(&assignment.value.as_scalar())?;
+            let value = self.expand_word(assignment.value.as_scalar())?;
             self.env.set_var(&assignment.name, &value)?;
             saved.push((assignment.name.clone(), old));
         }
@@ -413,12 +412,15 @@ impl Executor {
     fn restore_prefix_assignments(&mut self, saved: Vec<(String, Option<String>)>) {
         for (name, old_val) in saved {
             match old_val {
-                Some(val) => { let _ = self.env.set_var(&name, &val); }
-                None => { let _ = self.env.unset_var(&name); }
+                Some(val) => {
+                    let _ = self.env.set_var(&name, &val);
+                }
+                None => {
+                    let _ = self.env.unset_var(&name);
+                }
             }
         }
     }
-
 }
 
 impl Default for Executor {
@@ -429,9 +431,8 @@ impl Default for Executor {
 
 /// Convenience: parse and execute a script string.
 pub fn run(input: &str) -> Result<i32, ExecError> {
-    let program = crate::parse(input).map_err(|e| {
-        ExecError::BadSubstitution(format!("parse error: {}", e))
-    })?;
+    let program = crate::parse(input)
+        .map_err(|e| ExecError::BadSubstitution(format!("parse error: {}", e)))?;
     let mut executor = Executor::new();
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {

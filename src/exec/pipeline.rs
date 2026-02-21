@@ -32,7 +32,11 @@ fn collect_pipeline_stages<'a>(expr: &'a Expression, stages: &mut Vec<&'a Expres
 /// Execute a pipeline of commands connected by pipes.
 ///
 /// Returns the exit status of the last command in the pipeline.
-pub fn execute_pipeline(executor: &mut Executor, stages: &[&Expression], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+pub fn execute_pipeline(
+    executor: &mut Executor,
+    stages: &[&Expression],
+    io: &mut IoContext<'_>,
+) -> Result<i32, ExecError> {
     debug_assert!(!stages.is_empty());
 
     if stages.len() == 1 {
@@ -99,7 +103,7 @@ fn spawn_pipeline_stage(
                 // Assignment-only command — handle in-process
                 for assignment in &cmd.assignments {
                     let value = crate::exec::expand::expand_word(
-                        &assignment.value.as_scalar(),
+                        assignment.value.as_scalar(),
                         executor.env_mut(),
                     )?;
                     executor.env_mut().set_var(&assignment.name, &value)?;
@@ -144,14 +148,10 @@ fn spawn_pipeline_stage(
                 } else {
                     // Last stage or no output — write directly
                     if !stdout_buf.is_empty() {
-                        io.stdout
-                            .write_all(&stdout_buf)
-                            .map_err(ExecError::Io)?;
+                        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
                     }
                     if !stderr_buf.is_empty() {
-                        io.stderr
-                            .write_all(&stderr_buf)
-                            .map_err(ExecError::Io)?;
+                        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
                     }
                     return Ok(None);
                 }
@@ -171,7 +171,7 @@ fn spawn_pipeline_stage(
             // Apply prefix assignments as env vars
             for assignment in &cmd.assignments {
                 let value = crate::exec::expand::expand_word(
-                    &assignment.value.as_scalar(),
+                    assignment.value.as_scalar(),
                     executor.env_mut(),
                 )?;
                 child_cmd.env(&assignment.name, &value);

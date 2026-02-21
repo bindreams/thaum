@@ -2,7 +2,7 @@ mod common;
 
 use common::*;
 use thaum::ast::*;
-use thaum::{parse, parse_with, Dialect};
+use thaum::parse;
 
 #[test]
 fn if_with_test_command() {

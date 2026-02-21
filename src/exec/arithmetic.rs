@@ -73,9 +73,15 @@ fn parse_i64(context: &str, s: &str) -> Result<i64, ExecError> {
         (false, s)
     };
 
-    let abs = if let Some(hex) = digits.strip_prefix("0x").or_else(|| digits.strip_prefix("0X")) {
+    let abs = if let Some(hex) = digits
+        .strip_prefix("0x")
+        .or_else(|| digits.strip_prefix("0X"))
+    {
         i64::from_str_radix(hex, 16)
-    } else if digits.starts_with('0') && digits.len() > 1 && digits.bytes().all(|b| b.is_ascii_digit()) {
+    } else if digits.starts_with('0')
+        && digits.len() > 1
+        && digits.bytes().all(|b| b.is_ascii_digit())
+    {
         i64::from_str_radix(digits, 8)
     } else {
         digits.parse::<i64>()
@@ -287,7 +293,7 @@ fn eval_assignment(
 ///
 /// Increment/decrement operators require a variable target. The parser
 /// guarantees this, but we handle the error gracefully in release builds.
-fn expect_variable<'a>(expr: &'a ArithExpr) -> Result<&'a str, ExecError> {
+fn expect_variable(expr: &ArithExpr) -> Result<&str, ExecError> {
     match expr {
         ArithExpr::Variable(name) => Ok(name),
         _ => {

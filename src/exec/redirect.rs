@@ -31,6 +31,7 @@ impl ActiveRedirects {
     }
 
     /// Returns true if any redirections are active.
+    #[allow(dead_code)] // Part of the ActiveRedirects API, needed for upcoming exec changes.
     pub fn is_active(&self) -> bool {
         self.stdin.is_some()
             || self.stdout.is_some()
@@ -81,17 +82,15 @@ impl Executor {
                 RedirectKind::Input(word) => {
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file = File::open(&resolved).map_err(|e| {
-                        ExecError::BadRedirect(format!("{}: {}", path, e))
-                    })?;
+                    let file = File::open(&resolved)
+                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), file)?;
                 }
                 RedirectKind::Output(word) | RedirectKind::Clobber(word) => {
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file = File::create(&resolved).map_err(|e| {
-                        ExecError::BadRedirect(format!("{}: {}", path, e))
-                    })?;
+                    let file = File::create(&resolved)
+                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
                     assign_write_fd(&mut active, fd.unwrap_or(1), file)?;
                 }
                 RedirectKind::Append(word) => {
@@ -111,6 +110,7 @@ impl Executor {
                         .read(true)
                         .write(true)
                         .create(true)
+                        .truncate(false)
                         .open(&resolved)
                         .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), file)?;
@@ -149,9 +149,7 @@ impl Executor {
                 RedirectKind::HereDoc { body, .. } => {
                     // Create a temporary file with the heredoc body, use as stdin.
                     let mut tmpfile = tempfile()?;
-                    tmpfile
-                        .write_all(body.as_bytes())
-                        .map_err(ExecError::Io)?;
+                    tmpfile.write_all(body.as_bytes()).map_err(ExecError::Io)?;
                     tmpfile.seek_to_start()?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), tmpfile)?;
                 }
@@ -161,9 +159,7 @@ impl Executor {
                     tmpfile
                         .write_all(expanded.as_bytes())
                         .map_err(ExecError::Io)?;
-                    tmpfile
-                        .write_all(b"\n")
-                        .map_err(ExecError::Io)?;
+                    tmpfile.write_all(b"\n").map_err(ExecError::Io)?;
                     tmpfile.seek_to_start()?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), tmpfile)?;
                 }
@@ -171,12 +167,9 @@ impl Executor {
                     // &> file — redirect both stdout and stderr to file
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file = File::create(&resolved).map_err(|e| {
-                        ExecError::BadRedirect(format!("{}: {}", path, e))
-                    })?;
-                    let clone = file
-                        .try_clone()
-                        .map_err(ExecError::Io)?;
+                    let file = File::create(&resolved)
+                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                    let clone = file.try_clone().map_err(ExecError::Io)?;
                     active.stdout = Some(file);
                     active.stderr = Some(clone);
                 }
@@ -189,9 +182,7 @@ impl Executor {
                         .append(true)
                         .open(&resolved)
                         .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
-                    let clone = file
-                        .try_clone()
-                        .map_err(ExecError::Io)?;
+                    let clone = file.try_clone().map_err(ExecError::Io)?;
                     active.stdout = Some(file);
                     active.stderr = Some(clone);
                 }
@@ -203,28 +194,24 @@ impl Executor {
 }
 
 /// Assign a file to the appropriate read FD slot.
-fn assign_read_fd(
-    active: &mut ActiveRedirects,
-    fd: i32,
-    file: File,
-) -> Result<(), ExecError> {
+fn assign_read_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
     match fd {
         0 => active.stdin = Some(file),
-        n => { active.extra_fds.insert(n, file); }
+        n => {
+            active.extra_fds.insert(n, file);
+        }
     }
     Ok(())
 }
 
 /// Assign a file to the appropriate write FD slot.
-fn assign_write_fd(
-    active: &mut ActiveRedirects,
-    fd: i32,
-    file: File,
-) -> Result<(), ExecError> {
+fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
     match fd {
         1 => active.stdout = Some(file),
         2 => active.stderr = Some(file),
-        n => { active.extra_fds.insert(n, file); }
+        n => {
+            active.extra_fds.insert(n, file);
+        }
     }
     Ok(())
 }
@@ -238,7 +225,9 @@ fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
         // The caller handles the default fallback.
         1 => active.stdout = None,
         2 => active.stderr = None,
-        n => { active.extra_fds.remove(&n); }
+        n => {
+            active.extra_fds.remove(&n);
+        }
     }
 }
 
@@ -246,7 +235,9 @@ fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
 fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
     match fd {
         0 => active.stdin = None,
-        n => { active.extra_fds.remove(&n); }
+        n => {
+            active.extra_fds.remove(&n);
+        }
     }
 }
 
@@ -296,11 +287,7 @@ fn tempfile() -> Result<File, ExecError> {
     static COUNTER: AtomicU64 = AtomicU64::new(0);
 
     let n = COUNTER.fetch_add(1, Ordering::Relaxed);
-    let path = std::env::temp_dir().join(format!(
-        "thaum-heredoc-{}-{}",
-        std::process::id(),
-        n,
-    ));
+    let path = std::env::temp_dir().join(format!("thaum-heredoc-{}-{}", std::process::id(), n,));
     let file = OpenOptions::new()
         .read(true)
         .write(true)

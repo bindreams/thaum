@@ -266,9 +266,7 @@ impl Environment {
                 format!("cd: {}: No such file or directory", path.display()),
             )));
         }
-        let canonical = path
-            .canonicalize()
-            .map_err(|e| ExecError::Io(e))?;
+        let canonical = path.canonicalize().map_err(ExecError::Io)?;
         self.cwd = canonical;
         Ok(())
     }

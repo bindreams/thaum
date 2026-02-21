@@ -190,7 +190,7 @@ impl Parser {
                             return Ok(None);
                         }
                         s.advance()?; // consume (
-                        // No eat_whitespace: after ( (operator → LastScanned::Other)
+                                      // No eat_whitespace: after ( (operator → LastScanned::Other)
                         if s.peek()?.token != Token::RParen {
                             return Ok(None);
                         }
@@ -205,7 +205,9 @@ impl Parser {
                         let mut redirects = Vec::new();
                         loop {
                             self.lexer.eat_whitespace()?;
-                            if !self.lexer.peek()?.token.is_redirect_start() { break; }
+                            if !self.lexer.peek()?.token.is_redirect_start() {
+                                break;
+                            }
                             redirects.push(self.parse_redirect()?);
                         }
                         let end_span = redirects
@@ -227,9 +229,7 @@ impl Parser {
             Token::BashDblLBracket => self.parse_compound_expression(),
             Token::IoNumber(_) => Ok(Expression::Command(self.parse_command()?)),
             _ if tok.is_redirect_op() => Ok(Expression::Command(self.parse_command()?)),
-            _ if tok.is_fragment() => {
-                Ok(Expression::Command(self.parse_command()?))
-            }
+            _ if tok.is_fragment() => Ok(Expression::Command(self.parse_command()?)),
             _ => Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
                 expected: "a command".to_string(),
@@ -244,7 +244,9 @@ impl Parser {
         let mut redirects = Vec::new();
         loop {
             self.lexer.eat_whitespace()?;
-            if !self.lexer.peek()?.token.is_redirect_start() { break; }
+            if !self.lexer.peek()?.token.is_redirect_start() {
+                break;
+            }
             redirects.push(self.parse_redirect()?);
         }
 

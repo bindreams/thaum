@@ -43,8 +43,8 @@ struct ShellResult {
 
 /// Run a script in our executor, capturing stdout.
 fn run_ours(script: &str) -> ShellResult {
-    let program = thaum::parse(script)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
     // Set a minimal PATH
@@ -73,8 +73,8 @@ fn run_in_docker(script: &str, shell: &str) -> ShellResult {
             "run",
             "--rm",
             "-i",
-            "--network=none",      // No network access for safety
-            "--read-only",         // Read-only root filesystem
+            "--network=none",       // No network access for safety
+            "--read-only",          // Read-only root filesystem
             "--tmpfs=/tmp:size=1m", // Writable /tmp with size limit
             "shell-exec-test",
             shell,
@@ -87,7 +87,9 @@ fn run_in_docker(script: &str, shell: &str) -> ShellResult {
 
     // Write script to stdin
     if let Some(ref mut stdin) = child.stdin {
-        stdin.write_all(script.as_bytes()).expect("write to docker stdin");
+        stdin
+            .write_all(script.as_bytes())
+            .expect("write to docker stdin");
     }
     child.stdin.take(); // Close stdin
 

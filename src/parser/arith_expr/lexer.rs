@@ -324,11 +324,7 @@ impl ArithLexer {
                         match self.next_char() {
                             Some('{') => depth += 1,
                             Some('}') => depth -= 1,
-                            None => {
-                                return Err(
-                                    "unclosed ${ in arithmetic expression".to_string()
-                                )
-                            }
+                            None => return Err("unclosed ${ in arithmetic expression".to_string()),
                             _ => {}
                         }
                     }
@@ -343,20 +339,16 @@ impl ArithLexer {
                         match self.next_char() {
                             Some('(') => depth += 1,
                             Some(')') => depth -= 1,
-                            None => {
-                                return Err(
-                                    "unclosed $( in arithmetic expression".to_string()
-                                )
-                            }
+                            None => return Err("unclosed $( in arithmetic expression".to_string()),
                             _ => {}
                         }
                     }
                     let content: String = self.chars[dollar_pos..self.pos].iter().collect();
                     Ok(ArithToken::Ident(content))
-                } else if self.peek_char().map_or(false, |c| c.is_ascii_digit()) {
+                } else if self.peek_char().is_some_and(|c| c.is_ascii_digit()) {
                     // $N positional parameter (e.g. $1, $2)
                     let start = self.pos;
-                    while self.peek_char().map_or(false, |c| c.is_ascii_digit()) {
+                    while self.peek_char().is_some_and(|c| c.is_ascii_digit()) {
                         self.next_char();
                     }
                     let name: String = self.chars[start..self.pos].iter().collect();

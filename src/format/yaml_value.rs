@@ -38,6 +38,12 @@ pub struct MappingBuilder {
     entries: Vec<(String, YamlValue)>,
 }
 
+impl Default for MappingBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MappingBuilder {
     pub fn new() -> Self {
         MappingBuilder {

@@ -110,7 +110,9 @@ impl Cli {
         let bash_mode = self.bash;
         match self.subcmd {
             None => resolve_source(Subcommand::Parse, bash_mode, false, self.c, self.file),
-            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file),
+            Some(CliCommand::Lex(a)) => {
+                resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file)
+            }
             Some(CliCommand::Parse(a)) => {
                 resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file)
             }
@@ -276,8 +278,18 @@ fn do_lex(cli: &CliArgs) {
     }
 
     // Compute column widths
-    let loc_width = rows.iter().map(|(l, _, _)| l.len()).max().unwrap_or(8).max(8);
-    let name_width = rows.iter().map(|(_, n, _)| n.len()).max().unwrap_or(5).max(5);
+    let loc_width = rows
+        .iter()
+        .map(|(l, _, _)| l.len())
+        .max()
+        .unwrap_or(8)
+        .max(8);
+    let name_width = rows
+        .iter()
+        .map(|(_, n, _)| n.len())
+        .max()
+        .unwrap_or(5)
+        .max(5);
 
     // Print header
     println!(

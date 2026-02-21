@@ -569,13 +569,13 @@ fn complex_precedence() {
 // --- Error cases ---
 
 #[test]
-fn error_empty_expression() {
-    assert!(parse_arith_expr("").is_err());
+fn empty_expression_is_zero() {
+    assert_eq!(parse_arith_expr("").unwrap(), ArithExpr::Number(0));
 }
 
 #[test]
-fn error_only_whitespace() {
-    assert!(parse_arith_expr("   ").is_err());
+fn whitespace_only_expression_is_zero() {
+    assert_eq!(parse_arith_expr("   ").unwrap(), ArithExpr::Number(0));
 }
 
 #[test]

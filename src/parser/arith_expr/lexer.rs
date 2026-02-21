@@ -96,7 +96,30 @@ impl ArithLexer {
 
         // Numbers: decimal, octal (0NNN), hex (0xNNN)
         if ch.is_ascii_digit() {
-            return self.lex_number();
+            let num_start = self.pos;
+            let number = self.lex_number()?;
+            // Check for subscript: 1[2] — treat the whole thing as an opaque
+            // identifier (bash rejects assignment to it at runtime, not parse time).
+            if self.peek_char() == Some('[') {
+                self.next_char(); // consume [
+                let mut depth = 1;
+                while let Some(c) = self.peek_char() {
+                    self.next_char();
+                    match c {
+                        '[' => depth += 1,
+                        ']' => {
+                            depth -= 1;
+                            if depth == 0 {
+                                break;
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+                let name: String = self.chars[num_start..self.pos].iter().collect();
+                return Ok(ArithToken::Ident(name));
+            }
+            return Ok(number);
         }
 
         // Identifiers (variable names)
@@ -311,9 +334,51 @@ impl ArithLexer {
                     }
                     let inner: String = self.chars[start..self.pos - 1].iter().collect();
                     Ok(ArithToken::Ident(format!("${{{}}}", inner)))
+                } else if self.peek_char() == Some('(') {
+                    // $(...) command substitution — consume balanced parens as opaque Ident
+                    let dollar_pos = self.pos - 1; // position of $
+                    self.next_char(); // consume (
+                    let mut depth = 1;
+                    while depth > 0 {
+                        match self.next_char() {
+                            Some('(') => depth += 1,
+                            Some(')') => depth -= 1,
+                            None => {
+                                return Err(
+                                    "unclosed $( in arithmetic expression".to_string()
+                                )
+                            }
+                            _ => {}
+                        }
+                    }
+                    let content: String = self.chars[dollar_pos..self.pos].iter().collect();
+                    Ok(ArithToken::Ident(content))
+                } else if self.peek_char().map_or(false, |c| c.is_ascii_digit()) {
+                    // $N positional parameter (e.g. $1, $2)
+                    let start = self.pos;
+                    while self.peek_char().map_or(false, |c| c.is_ascii_digit()) {
+                        self.next_char();
+                    }
+                    let name: String = self.chars[start..self.pos].iter().collect();
+                    Ok(ArithToken::Ident(name))
                 } else {
                     Ok(ArithToken::Dollar)
                 }
+            }
+            '\'' => {
+                // Single-quoted string inside arithmetic (e.g. A['x'] = 'y').
+                // Consumed as an opaque Ident — the evaluator handles semantics
+                // (ASCII value in bash, or variable name coercion).
+                let start = self.pos;
+                self.next_char(); // consume opening '
+                while self.peek_char().is_some() && self.peek_char() != Some('\'') {
+                    self.next_char();
+                }
+                if self.peek_char() == Some('\'') {
+                    self.next_char(); // consume closing '
+                }
+                let content: String = self.chars[start..self.pos].iter().collect();
+                Ok(ArithToken::Ident(content))
             }
             _ => Err(format!(
                 "unexpected character '{}' in arithmetic expression",

@@ -1684,3 +1684,51 @@ fn double_paren_subshell_not_arithmetic() {
         }
     ));
 }
+
+// ---------------------------------------------------------------------------
+// Arithmetic features: (( )) must parse as BashArithmeticCommand, not Subshell
+// ---------------------------------------------------------------------------
+
+#[test]
+fn arith_empty_expression() {
+    // (( )) is valid bash — evaluates to 0 (exit status 1).
+    let expr = parse_arith_cmd("(( ))");
+    assert_eq!(expr, ArithExpr::Number(0));
+}
+
+#[test]
+fn arith_single_quoted_value() {
+    // Single-quoted string as rhs inside (( )).
+    parse_arith_cmd("(( A['y'] = 'y' ))");
+}
+
+#[test]
+fn arith_command_sub() {
+    // $() inside (( )).
+    parse_arith_cmd("(( a = $(echo 1) + 2 ))");
+}
+
+#[test]
+fn arith_dollar_positional() {
+    // $N (positional parameter) inside (( )).
+    parse_arith_cmd("(( A[$key] += $2 ))");
+}
+
+#[test]
+fn arith_literal_subscript() {
+    // 1[2] should parse as arithmetic, not fall back to subshell.
+    parse_arith_cmd("(( 1[2] = 3 ))");
+}
+
+#[test]
+fn arith_redirect_after_dparen() {
+    // Redirect after (( )) with $() inside.
+    let prog = parse_with("(( a = $(echo 42) + 10 )) 2>/dev/null", Dialect::Bash).unwrap();
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Compound {
+            body: CompoundCommand::BashArithmeticCommand { .. },
+            ..
+        }
+    ));
+}

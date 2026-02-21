@@ -24,50 +24,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 5. Arithmetic features — syntax inside (( )) and $(( ))
+// 5. Arithmetic features — FIXED (see tests/bash_features.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn arith_empty_expression() {
-    // (( )) is valid bash — evaluates to 0 (exit status 1).
-    parse_with("(( ))\necho ok", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn arith_literal_subscript() {
-    // 1[2] — a literal with subscript. Should parse; runtime error, not parse error.
-    parse_with("(( 1[2] = 3 ))", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn arith_single_quoted_value() {
-    // Single-quoted string as rhs inside (( )).
-    parse_with("(( A['y'] = 'y' ))", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn arith_command_sub() {
-    // $() inside (( )) — the $ before ( must not be confused.
-    parse_with("(( a = $(echo 1) + 2 ))", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn arith_dollar_positional() {
-    // $N (positional parameter) inside (( )).
-    parse_with("(( A[$key] += $2 ))", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn arith_redirect_after_dparen() {
-    // Redirect after (( )) — the $() inside triggers the bug.
-    parse_with("(( a = $(echo 42) + 10 )) 2>/dev/null", Dialect::Bash).unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 6. [[ edge cases

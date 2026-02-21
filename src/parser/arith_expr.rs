@@ -468,7 +468,8 @@ impl ArithParser {
 pub(crate) fn parse_arith_expr(input: &str) -> Result<ArithExpr, String> {
     let trimmed = input.trim();
     if trimmed.is_empty() {
-        return Err("empty arithmetic expression".to_string());
+        // Bash treats (( )) and $(( )) as evaluating to 0.
+        return Ok(ArithExpr::Number(0));
     }
     let mut parser = ArithParser::new(trimmed)?;
     let expr = parser.parse_expr()?;

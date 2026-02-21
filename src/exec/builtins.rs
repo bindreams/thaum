@@ -9,7 +9,7 @@ pub fn is_builtin(name: &str) -> bool {
         name,
         "echo" | "true" | "false" | "exit" | ":" | "cd" | "export" | "unset" | "return"
             | "break" | "continue" | "shift" | "read" | "eval" | "exec" | "." | "source"
-            | "set" | "test" | "["
+            | "set" | "test" | "[" | "readonly" | "local"
     )
 }
 
@@ -39,6 +39,8 @@ pub fn run_builtin(
         "read" => builtin_read(args, env, stdin),
         "set" => builtin_set(args, env),
         "test" | "[" => builtin_test(name, args, stderr),
+        "readonly" => builtin_readonly(args, env),
+        "local" => builtin_local(args, env),
         "eval" | "exec" | "." | "source" => Err(ExecError::UnsupportedFeature(
             format!("{} builtin", name),
         )),
@@ -341,6 +343,49 @@ fn evaluate_test(args: &[String]) -> bool {
 
 fn parse_int(s: &str) -> i64 {
     s.parse().unwrap_or(0)
+}
+
+fn builtin_readonly(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    if args.is_empty() {
+        // `readonly` with no args: list readonly vars (simplified — just return 0).
+        // TODO: implement readonly variable listing
+        return Ok(0);
+    }
+
+    for arg in args {
+        if arg.starts_with('-') {
+            continue; // Skip flags like -p
+        }
+        if let Some((name, value)) = arg.split_once('=') {
+            env.set_var(name, value)?;
+            env.set_readonly(name);
+        } else {
+            env.set_readonly(arg);
+        }
+    }
+    Ok(0)
+}
+
+fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    if !env.in_function_scope() {
+        return Err(ExecError::BadSubstitution(
+            "local: can only be used in a function".to_string(),
+        ));
+    }
+
+    for arg in args {
+        if let Some((name, value)) = arg.split_once('=') {
+            env.declare_local(name)?;
+            env.set_var(name, value)?;
+        } else {
+            env.declare_local(arg)?;
+            // If the variable doesn't exist yet, create it with empty value.
+            if env.get_var(arg).is_none() {
+                env.set_var(arg, "")?;
+            }
+        }
+    }
+    Ok(0)
 }
 
 #[cfg(test)]

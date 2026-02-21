@@ -27,6 +27,25 @@ fn exec_status(script: &str) -> i32 {
     exec_ok(script).1
 }
 
+/// Parse and execute a script, returning the exit status or 1 on error.
+/// Unlike `exec_ok`, this does not panic on execution errors.
+fn exec_result(script: &str) -> i32 {
+    let program = thaum::parse(script)
+        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+
+    let mut executor = Executor::new();
+    let _ = executor
+        .env_mut()
+        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => status,
+        Err(ExecError::ExitRequested(code)) => code,
+        Err(_) => 1,
+    }
+}
+
 // --- Basic command execution ---
 
 #[test]
@@ -577,6 +596,32 @@ fn unsupported_set_options() {
     expect_unsupported("set -e");
 }
 
+#[test]
+fn unsupported_bash_double_bracket() {
+    expect_unsupported_bash("[[ -n hello ]]");
+}
+
+#[test]
+fn unsupported_eval_builtin() {
+    expect_unsupported("eval echo hello");
+}
+
+// --- DefaultAssign (${var:=default}) ---
+
+#[test]
+fn default_assign_when_unset() {
+    let (out, status) = exec_ok("echo ${X:=hello}; echo $X");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\nhello\n");
+}
+
+#[test]
+fn default_assign_when_set() {
+    let (out, status) = exec_ok("X=existing; echo ${X:=fallback}; echo $X");
+    assert_eq!(status, 0);
+    assert_eq!(out, "existing\nexisting\n");
+}
+
 // --- Pattern trimming ---
 
 #[test]
@@ -604,28 +649,39 @@ fn trim_large_prefix() {
     assert_eq!(out, "c.txt\n");
 }
 
-#[test]
-fn unsupported_bash_double_bracket() {
-    expect_unsupported_bash("[[ -n hello ]]");
-}
+// --- readonly builtin ---
 
 #[test]
-fn unsupported_eval_builtin() {
-    expect_unsupported("eval echo hello");
-}
-
-// --- DefaultAssign (${var:=default}) ---
-
-#[test]
-fn default_assign_when_unset() {
-    let (out, status) = exec_ok("echo ${X:=hello}; echo $X");
+fn readonly_set_and_read() {
+    let (out, status) = exec_ok("readonly X=42; echo $X");
     assert_eq!(status, 0);
-    assert_eq!(out, "hello\nhello\n");
+    assert_eq!(out, "42\n");
 }
 
 #[test]
-fn default_assign_when_set() {
-    let (out, status) = exec_ok("X=existing; echo ${X:=fallback}; echo $X");
-    assert_eq!(status, 0);
-    assert_eq!(out, "existing\nexisting\n");
+fn readonly_prevents_assignment() {
+    let status = exec_result("readonly X=42; X=99");
+    assert_ne!(status, 0);
+}
+
+// --- local builtin ---
+
+#[test]
+fn local_scopes_variable_in_function() {
+    let (out, _) = exec_ok(
+        "f() { local X=inner; echo $X; }; X=outer; f; echo $X",
+    );
+    assert_eq!(out, "inner\nouter\n");
+}
+
+#[test]
+fn local_unset_var_removed_on_exit() {
+    let (out, _) = exec_ok("f() { local Y=temp; echo $Y; }; f; echo \"${Y:-gone}\"");
+    assert_eq!(out, "temp\ngone\n");
+}
+
+#[test]
+fn local_outside_function_fails() {
+    let status = exec_result("local X=1");
+    assert_ne!(status, 0);
 }

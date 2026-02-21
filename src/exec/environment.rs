@@ -168,6 +168,14 @@ impl Environment {
         Ok(())
     }
 
+    /// Returns whether a variable is readonly.
+    pub fn is_readonly(&self, name: &str) -> bool {
+        self.variables
+            .get(name)
+            .map(|v| v.readonly)
+            .unwrap_or(false)
+    }
+
     /// Returns whether a variable is exported.
     pub fn is_exported(&self, name: &str) -> bool {
         self.variables
@@ -310,6 +318,42 @@ impl Environment {
                 }
             }
         }
+    }
+
+    /// Returns true if we are inside a function scope.
+    pub fn in_function_scope(&self) -> bool {
+        !self.scope_stack.is_empty()
+    }
+
+    /// Declare a variable as local in the current function scope.
+    ///
+    /// Saves the current value (or absence) so `pop_scope` will restore it.
+    /// Replaces the variable with a non-readonly copy so assignments to the
+    /// local work even if the outer was readonly.
+    pub fn declare_local(&mut self, name: &str) -> Result<(), ExecError> {
+        let scope = self.scope_stack.last_mut().ok_or_else(|| {
+            ExecError::BadSubstitution("local: can only be used in a function".to_string())
+        })?;
+
+        // Only save the first time — repeated `local X` is a no-op.
+        if !scope.saved.contains_key(name) {
+            let current = self.variables.get(name).cloned();
+            scope.saved.insert(name.to_string(), current.clone());
+
+            // Replace with a non-readonly copy so the local can be assigned.
+            let value = current.as_ref().map(|v| v.value.as_str()).unwrap_or("");
+            let exported = current.as_ref().map(|v| v.exported).unwrap_or(false);
+            self.variables.insert(
+                name.to_string(),
+                ShellVar {
+                    value: value.to_string(),
+                    exported,
+                    readonly: false,
+                },
+            );
+        }
+
+        Ok(())
     }
 
     /// Returns the IFS string (default: " \t\n").

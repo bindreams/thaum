@@ -2,5 +2,6 @@ name: Argument that looks like a real operator
 dialect: bash
 source: oils:spec/dbracket#argument-that-looks-like-a-real-operator
 status: 2
+parse-error: "unexpected token '<', expected a word in test expression"
 ---
 [[ -f < ]] && echo 'should be parse error'

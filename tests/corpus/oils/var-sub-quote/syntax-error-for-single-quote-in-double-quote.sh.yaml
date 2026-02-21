@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/var-sub-quote#syntax-error-for-single-quote-in-double-quote
 status: 2
 stdout: ''
+parse-error: "unterminated single quote"
 ---
 foo="'a b c d'"
 argv.py "${foo%d'}"

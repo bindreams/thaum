@@ -22,6 +22,30 @@ enum Disabled {
     WithReason { reason: String },
 }
 
+/// Spec for the `parse-error` YAML field.
+///
+/// ```yaml
+/// parse-error: true                          # just assert parsing fails
+/// parse-error: "missing 'then' to close 'if'"  # exact message match
+/// parse-error: { contains: "unexpected token" } # substring match
+/// parse-error: { regex: "missing '\\w+'" }      # regex match
+/// parse-error: { contains: "}", at: "1:1" }     # message + location
+/// ```
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum ParseErrorSpec {
+    Bool(bool),
+    Exact(String),
+    Pattern(ParseErrorPattern),
+}
+
+#[derive(Deserialize)]
+struct ParseErrorPattern {
+    contains: Option<String>,
+    regex: Option<String>,
+    at: Option<String>,
+}
+
 impl Default for Disabled {
     fn default() -> Self {
         Disabled::Bool(false)
@@ -51,6 +75,9 @@ struct TestSpec {
     #[serde(rename = "is-valid", default = "default_true")]
     is_valid: bool,
     error_contains: Option<String>,
+
+    #[serde(rename = "parse-error")]
+    parse_error: Option<ParseErrorSpec>,
 
     // ast is parsed separately from the raw YAML header using yaml_rust2
     // to avoid version mismatches with serde_yaml2's wrapper type.
@@ -267,6 +294,89 @@ fn extract_ast_field(yaml_header: &str) -> Result<Option<Yaml>, String> {
 // Test execution
 // ---------------------------------------------------------------------------
 
+/// Convert a byte offset in `source` to a 1-based (line, col) pair.
+fn byte_offset_to_line_col(source: &str, offset: usize) -> (usize, usize) {
+    let mut line = 1;
+    let mut col = 1;
+    for (i, ch) in source.char_indices() {
+        if i == offset {
+            return (line, col);
+        }
+        if ch == '\n' {
+            line += 1;
+            col = 1;
+        } else {
+            col += 1;
+        }
+    }
+    // offset is at or past the end of the string
+    (line, col)
+}
+
+fn check_parse_error(
+    spec: &ParseErrorSpec,
+    err: &thaum::ParseError,
+    source: &str,
+) -> Result<(), Failed> {
+    let msg = err.to_string();
+    match spec {
+        ParseErrorSpec::Bool(true) => { /* just assert failure — already done by caller */ }
+        ParseErrorSpec::Bool(false) => {
+            return Err("parse-error: false is not meaningful; remove the field".into());
+        }
+        ParseErrorSpec::Exact(expected) => {
+            if msg != *expected {
+                return Err(format!(
+                    "parse-error mismatch:\n  expected: {:?}\n  actual:   {:?}",
+                    expected, msg
+                )
+                .into());
+            }
+        }
+        ParseErrorSpec::Pattern(pat) => {
+            if let Some(substr) = &pat.contains {
+                if !msg.contains(substr.as_str()) {
+                    return Err(format!(
+                        "parse-error does not contain {:?}:\n  actual: {:?}",
+                        substr, msg
+                    )
+                    .into());
+                }
+            }
+            if let Some(re_str) = &pat.regex {
+                let re = regex::Regex::new(re_str).map_err(|e| {
+                    format!("parse-error invalid regex {:?}: {}", re_str, e)
+                })?;
+                if !re.is_match(&msg) {
+                    return Err(format!(
+                        "parse-error does not match regex {:?}:\n  actual: {:?}",
+                        re_str, msg
+                    )
+                    .into());
+                }
+            }
+            if let Some(expected_at) = &pat.at {
+                let span = err.span().ok_or_else(|| {
+                    format!(
+                        "parse-error `at: {:?}` specified but error has no span:\n  error: {:?}",
+                        expected_at, msg
+                    )
+                })?;
+                let (line, col) = byte_offset_to_line_col(source, span.start.0);
+                let actual_at = format!("{}:{}", line, col);
+                if actual_at != *expected_at {
+                    return Err(format!(
+                        "parse-error location mismatch:\n  expected: {:?}\n  actual:   {:?}",
+                        expected_at, actual_at
+                    )
+                    .into());
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     let spec = &parsed.spec;
     let input = &parsed.shell_input;
@@ -274,6 +384,15 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
 
     // 1. Parse
     let parse_result = thaum::parse_with(input, dialect);
+
+    // 1a. parse-error assertion (takes priority over is-valid)
+    if let Some(ref error_spec) = spec.parse_error {
+        let err = parse_result.err().ok_or_else(|| {
+            "parse-error field present, but parsing succeeded".to_string()
+        })?;
+        check_parse_error(error_spec, &err, input)?;
+        return Ok(());
+    }
 
     if spec.is_valid {
         let program = parse_result.map_err(|e| {

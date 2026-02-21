@@ -2,6 +2,7 @@ name: empty clause in [[
 dialect: bash
 source: oils:spec/parse-errors#empty-clause-in
 status: 2
+parse-error: "unexpected token '||', expected a word in test expression"
 ---
 
 # regression test for commit 451ca9e2b437e0326fc8155783d970a6f32729d8

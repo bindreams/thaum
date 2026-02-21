@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#incomplete-while
 status: 2
 stdout: ''
+parse-error: "missing ''do'' to close 'while'"
 ---
 echo hi; while
 echo status=$?

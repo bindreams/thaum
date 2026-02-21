@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/case#case-n-bug-regression
 status: 2
 stdout: "\n"
+parse-error: "unexpected token newline, expected whitespace"
 ---
 
 case

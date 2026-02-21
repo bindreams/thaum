@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/builtin-trap#trap-exit-with-parse-error
 status: 2
 stdout: "FAILED\n"
+parse-error: "unexpected token newline, expected whitespace"
 ---
 trap 'echo FAILED' EXIT
 for

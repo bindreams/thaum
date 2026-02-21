@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#is-a-parse-error
 status: 2
 stdout: ''
+parse-error: "unexpected token '}', expected a command"
 ---
 }
 echo should not get here

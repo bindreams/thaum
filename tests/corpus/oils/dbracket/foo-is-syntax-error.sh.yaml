@@ -2,6 +2,7 @@ name: "[[ '(' foo ]] is syntax error"
 dialect: bash
 source: oils:spec/dbracket#foo-is-syntax-error
 status: 2
+parse-error: "unexpected token ']]', expected a command"
 ---
 [[ '(' foo ]]
 echo status=$?

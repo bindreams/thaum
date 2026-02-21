@@ -2,6 +2,7 @@ name: Empty action for case is syntax error
 dialect: bash
 source: oils:spec/posix#empty-action-for-case-is-syntax-error
 status: 2
+parse-error: "unexpected token ')', expected a pattern in case arm"
 ---
 # POSIX grammar seems to allow this, but bash and dash don't.  Need ;;
 foo=a

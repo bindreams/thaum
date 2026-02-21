@@ -2,5 +2,6 @@ name: incomplete backticks
 dialect: bash
 source: oils:spec/parse-errors#incomplete-backticks
 status: 2
+parse-error: "unterminated backquote"
 ---
 `x

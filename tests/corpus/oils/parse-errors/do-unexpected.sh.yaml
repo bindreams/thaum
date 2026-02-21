@@ -3,5 +3,6 @@ dialect: bash
 source: oils:spec/parse-errors#do-unexpected
 status: 2
 stdout: ''
+parse-error: "unexpected token 'do', expected a command"
 ---
 do echo hi

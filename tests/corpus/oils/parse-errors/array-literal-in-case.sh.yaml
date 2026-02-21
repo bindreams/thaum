@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#array-literal-in-case
 status: 2
 stdout: ''
+parse-error: "unexpected token '(', expected 'in'"
 ---
 f() {
   case a=() in

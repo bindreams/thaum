@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#array-literal-inside-loop-is-a-parse-error
 status: 2
 stdout: ''
+parse-error: "unexpected token '(', expected 'do'"
 ---
 f() {
   for x in a=(); do

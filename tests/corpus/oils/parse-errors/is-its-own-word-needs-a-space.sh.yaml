@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#is-its-own-word-needs-a-space
 status: 2
 stdout: ''
+parse-error: "unexpected token '}', expected a command"
 ---
 # bash and mksh give parse time error because of }
 # dash gives 127 as runtime error

@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/parse-errors#incomplete-for
 status: 2
 stdout: ''
+parse-error: "unexpected token newline, expected whitespace"
 ---
 echo hi; for
 echo status=$?

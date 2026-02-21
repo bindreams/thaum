@@ -2,6 +2,7 @@ name: array with invalid token
 dialect: bash
 source: oils:spec/array#array-with-invalid-token
 status: 2
+parse-error: "unexpected token ')', expected a command"
 ---
 a=(
 1

@@ -2,6 +2,7 @@ name: If with then on same line missing semicolon
 dialect: bash
 source: oils:spec/shell-grammar#if-with-then-on-same-line-missing-semicolon
 status: 2
+parse-error: "unexpected token a word, expected 'then'"
 ---
 # My ANTLR parsers fail to flag this.  The 'else' keyword should be unexpected.
 if echo then

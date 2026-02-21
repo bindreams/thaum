@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/arith#invalid-lvalue-two-sets-of-brackets
 status: 2
 stdout: ''
+parse-error: "unexpected token unexpected character '[' in arithmetic expression, expected a valid arithmetic expression"
 ---
 (( a[1][2] = 3 ))
 echo "status=$?"

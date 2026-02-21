@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/var-sub#here-doc-with-bad-delimiter
 status: 2
 stdout: ''
+parse-error: "unterminated here-document (delimiter: '$@')"
 ---
 # bash - syntax error
 # dash - syntax error: end of file unexpected

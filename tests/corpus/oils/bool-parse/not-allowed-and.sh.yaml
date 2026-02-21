@@ -3,6 +3,7 @@ dialect: bash
 source: oils:spec/bool-parse#not-allowed-and
 status: 2
 stdout: "\n"
+parse-error: "unexpected token ')', expected a word in test expression"
 ---
 
 [[ ) ]]

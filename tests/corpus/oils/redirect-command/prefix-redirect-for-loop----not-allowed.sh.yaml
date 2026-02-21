@@ -2,6 +2,7 @@ name: Prefix redirect for loop -- not allowed
 dialect: bash
 source: oils:spec/redirect-command#prefix-redirect-for-loop----not-allowed
 status: 2
+parse-error: "unexpected token 'do', expected a command"
 ---
 >$TMP/redirect2.txt for i in $(seq 3)
 do

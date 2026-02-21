@@ -2,7 +2,7 @@ mod common;
 
 use common::*;
 use thaum::ast::*;
-use thaum::parse;
+use thaum::{parse, parse_with, Dialect};
 
 #[test]
 fn if_with_test_command() {
@@ -209,4 +209,44 @@ fn deeply_nested_compound() {
 fi"#;
     let prog = parse_ok(input);
     assert!(!prog.statements.is_empty());
+}
+
+#[test]
+fn bash_empty_then_fi() {
+    let compound = first_compound_bash("if true; then\nfi");
+    if let CompoundCommand::IfClause { then_body, .. } = &compound {
+        assert!(then_body.is_empty());
+    } else {
+        panic!("expected if clause");
+    }
+}
+
+#[test]
+fn bash_empty_do_done() {
+    let compound = first_compound_bash("while false; do\ndone");
+    if let CompoundCommand::WhileClause { body, .. } = &compound {
+        assert!(body.is_empty());
+    } else {
+        panic!("expected while clause");
+    }
+}
+
+#[test]
+fn bash_empty_for_body() {
+    let compound = first_compound_bash("for i in a b; do\ndone");
+    if let CompoundCommand::ForClause { body, .. } = &compound {
+        assert!(body.is_empty());
+    } else {
+        panic!("expected for clause");
+    }
+}
+
+#[test]
+fn posix_rejects_empty_then_fi() {
+    assert!(parse("if true; then\nfi").is_err());
+}
+
+#[test]
+fn posix_rejects_empty_do_done() {
+    assert!(parse("while false; do\ndone").is_err());
 }

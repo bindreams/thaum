@@ -8,20 +8,8 @@
 use thaum::{parse, parse_with, Dialect};
 
 // ---------------------------------------------------------------------------
-// 1. Empty compound bodies — bash allows empty then/fi and do/done
+// 1. Empty compound bodies — FIXED (see tests/compound.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn empty_then_fi() {
-    parse_with("if true; then\nfi\necho done", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn empty_do_done() {
-    parse_with("while false; do\ndone\necho done", Dialect::Bash).unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 2. Heredoc in pipeline / condition

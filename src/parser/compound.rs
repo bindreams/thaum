@@ -44,7 +44,7 @@ impl Parser {
 
         let condition = self.parse_required_compound_list("if condition")?;
         self.expect_closing_keyword("then", "if", start_span)?;
-        let then_body = self.parse_required_compound_list("then body")?;
+        let then_body = self.parse_body("then body")?;
 
         let mut elifs = Vec::new();
         loop {
@@ -55,7 +55,7 @@ impl Parser {
             self.lexer.advance()?;
             let elif_cond = self.parse_required_compound_list("elif condition")?;
             self.expect_closing_keyword("then", "elif", elif_span)?;
-            let elif_body = self.parse_required_compound_list("elif body")?;
+            let elif_body = self.parse_body("elif body")?;
             let end = elif_body.last().map(|s| s.span).unwrap_or(elif_span);
             elifs.push(ElifClause {
                 condition: elif_cond,
@@ -89,7 +89,7 @@ impl Parser {
         self.expect_keyword("while")?;
         let condition = self.parse_required_compound_list("while condition")?;
         self.expect_closing_keyword("do", "while", start_span)?;
-        let body = self.parse_required_compound_list("do body")?;
+        let body = self.parse_body("do body")?;
         let done_tok = self.expect_closing_keyword("done", "while", start_span)?;
         Ok(CompoundCommand::WhileClause {
             condition,
@@ -103,7 +103,7 @@ impl Parser {
         self.expect_keyword("until")?;
         let condition = self.parse_required_compound_list("until condition")?;
         self.expect_closing_keyword("do", "until", start_span)?;
-        let body = self.parse_required_compound_list("do body")?;
+        let body = self.parse_body("do body")?;
         let done_tok = self.expect_closing_keyword("done", "until", start_span)?;
         Ok(CompoundCommand::UntilClause {
             condition,
@@ -164,7 +164,7 @@ impl Parser {
         };
 
         self.expect_closing_keyword("do", "for", start_span)?;
-        let body = self.parse_required_compound_list("do body")?;
+        let body = self.parse_body("do body")?;
         let done_tok = self.expect_closing_keyword("done", "for", start_span)?;
 
         Ok(CompoundCommand::ForClause {
@@ -437,6 +437,17 @@ impl Parser {
         Ok(list)
     }
 
+    /// Parse a compound body (then-body, do-body, etc.).
+    /// In bash mode, empty bodies are allowed; in POSIX mode, at least one
+    /// command is required.
+    fn parse_body(&mut self, context: &str) -> Result<Vec<Statement>, ParseError> {
+        if self.options.empty_compound_body {
+            self.parse_compound_list()
+        } else {
+            self.parse_required_compound_list(context)
+        }
+    }
+
     pub(super) fn parse_compound_list(&mut self) -> Result<Vec<Statement>, ParseError> {
         self.skip_linebreak()?;
 
@@ -512,7 +523,7 @@ impl Parser {
         self.skip_linebreak()?;
 
         self.expect_closing_keyword("do", "for", start_span)?;
-        let body = self.parse_required_compound_list("do body")?;
+        let body = self.parse_body("do body")?;
         let done_tok = self.expect_closing_keyword("done", "for", start_span)?;
 
         Ok(CompoundCommand::BashArithmeticFor {

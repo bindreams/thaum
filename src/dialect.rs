@@ -38,6 +38,8 @@ pub struct ParseOptions {
     pub extglob: bool,
     /// `for ((init; cond; update))` C-style for loop.
     pub arithmetic_for: bool,
+    /// Allow empty compound bodies (`if true; then fi`, `while false; do done`).
+    pub empty_compound_body: bool,
 }
 
 /// A named set of parse options.
@@ -72,6 +74,7 @@ impl Dialect {
                 locale_translation: true,
                 extglob: true,
                 arithmetic_for: true,
+                empty_compound_body: true,
             },
         }
     }

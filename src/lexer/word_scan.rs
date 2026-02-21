@@ -702,16 +702,43 @@ impl Lexer {
         mut depth: i32,
         start: usize,
     ) -> Result<(), LexError> {
+        // Track case/esac nesting so that ) in case patterns inside $()
+        // doesn't prematurely close the command substitution.
+        let mut case_depth: i32 = 0;
+        let mut current_word = String::new();
+
+        // Check if a completed word is `case` or `esac` and update depth.
+        let mut check_keyword = |w: &mut String, case_depth: &mut i32| {
+            match w.as_str() {
+                "case" => *case_depth += 1,
+                "esac" => *case_depth = (*case_depth - 1).max(0),
+                _ => {}
+            }
+            w.clear();
+        };
+
         while let Some(ch) = self.advance_char() {
             word.push(ch);
             if ch == open {
+                check_keyword(&mut current_word, &mut case_depth);
                 depth += 1;
             } else if ch == close {
+                check_keyword(&mut current_word, &mut case_depth);
                 depth -= 1;
-                if depth == 0 {
+                if depth == 0 && (case_depth == 0 || close != ')') {
                     return Ok(());
                 }
+                // Inside a case construct, ) at the outermost $() level is a
+                // pattern delimiter, not the command substitution closer.
+                // Only applies to () balancing, not {} or other delimiters.
+                if depth == 0 {
+                    depth = 1;
+                }
+            } else if ch.is_ascii_alphanumeric() || ch == '_' {
+                current_word.push(ch);
+                continue; // don't hit the keyword check below
             } else if ch == '\'' {
+                check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
                         Some('\'') => {
@@ -727,6 +754,7 @@ impl Lexer {
                     }
                 }
             } else if ch == '"' {
+                check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
                         Some('"') => {
@@ -748,10 +776,12 @@ impl Lexer {
                     }
                 }
             } else if ch == '\\' {
+                check_keyword(&mut current_word, &mut case_depth);
                 if let Some(c) = self.advance_char() {
                     word.push(c);
                 }
             } else if ch == '`' {
+                check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
                         Some('`') => {
@@ -772,6 +802,9 @@ impl Lexer {
                         }
                     }
                 }
+            } else {
+                // Any other character (whitespace, operators, etc.) is a word boundary.
+                check_keyword(&mut current_word, &mut case_depth);
             }
         }
         // Reached EOF without finding matching close delimiter

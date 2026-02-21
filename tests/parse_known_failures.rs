@@ -38,15 +38,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 8. case inside $()
+// 8. case inside $() — FIXED (see tests/commands.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn case_in_command_sub() {
-    // ) in a case pattern inside $() must not close the command substitution.
-    parse("echo $(case x in a) echo yes;; esac)").unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 9. Quoting edge cases

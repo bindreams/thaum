@@ -138,3 +138,10 @@ fn assignment_with_quoted_value() {
     assert_eq!(cmd.assignments.len(), 1);
     assert_eq!(cmd.assignments[0].name, "FOO");
 }
+
+#[test]
+fn case_inside_command_substitution() {
+    // ) in a case pattern inside $() must not close the command substitution.
+    let prog = parse_ok("echo $(case x in a) echo yes;; esac)");
+    assert_eq!(prog.statements.len(), 1);
+}

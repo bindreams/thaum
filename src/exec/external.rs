@@ -1,19 +1,22 @@
 use std::process::Stdio;
 
-use crate::ast::{Redirect, RedirectKind};
 use crate::exec::error::ExecError;
-use crate::exec::expand;
 use crate::exec::io_context::IoContext;
+use crate::exec::redirect::ActiveRedirects;
 use crate::exec::Executor;
 
 impl Executor {
     /// Execute an external command via fork/exec.
+    ///
+    /// Redirections are pre-resolved in `active`. FDs 0-2 are set on the child
+    /// via `Stdio::from(file)`. The original `io` is used only for error
+    /// messages (command not found, permission denied).
     pub(super) fn execute_external(
         &mut self,
         name: &str,
         args: &[String],
         assignments: &[crate::ast::Assignment],
-        redirects: &[Redirect],
+        active: &mut ActiveRedirects,
         io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
         let mut child_cmd = std::process::Command::new(name);
@@ -32,8 +35,21 @@ impl Executor {
             child_cmd.env(&assignment.name, &value);
         }
 
-        // Apply redirections
-        self.apply_redirects_to_command(&mut child_cmd, redirects)?;
+        // Apply FDs 0-2 from pre-resolved redirects
+        if let Some(ref file) = active.stdin {
+            child_cmd.stdin(Stdio::from(file.try_clone().map_err(ExecError::Io)?));
+        }
+        if let Some(ref file) = active.stdout {
+            child_cmd.stdout(Stdio::from(file.try_clone().map_err(ExecError::Io)?));
+        }
+        if let Some(ref file) = active.stderr {
+            child_cmd.stderr(Stdio::from(file.try_clone().map_err(ExecError::Io)?));
+        }
+
+        // TODO: pass active.extra_fds (FDs 3+) to child process via
+        // platform-specific APIs (pre_exec + dup2 on Unix, handle
+        // inheritance on Windows). For now, extra FDs are opened as a
+        // side effect but not inherited by the child.
 
         match child_cmd.spawn() {
             Ok(mut child) => {
@@ -50,106 +66,6 @@ impl Executor {
             }
             Err(e) => Err(ExecError::Io(e)),
         }
-    }
-
-    /// Apply redirections to a std::process::Command.
-    pub(super) fn apply_redirects_to_command(
-        &mut self,
-        child_cmd: &mut std::process::Command,
-        redirects: &[Redirect],
-    ) -> Result<(), ExecError> {
-        for redirect in redirects {
-            let fd = redirect.fd;
-            match &redirect.kind {
-                RedirectKind::Input(word) => {
-                    let path = expand::expand_word(word, &mut self.env)?;
-                    let resolved = self.resolve_path(&path);
-                    let file = std::fs::File::open(&resolved).map_err(|e| {
-                        ExecError::BadRedirect(format!("{}: {}", path, e))
-                    })?;
-                    match fd.unwrap_or(0) {
-                        0 => { child_cmd.stdin(file); }
-                        fd => {
-                            return Err(ExecError::UnsupportedFeature(format!(
-                                "input redirect on fd {}",
-                                fd,
-                            )));
-                        }
-                    }
-                }
-                RedirectKind::Output(word) | RedirectKind::Clobber(word) => {
-                    let path = expand::expand_word(word, &mut self.env)?;
-                    let resolved = self.resolve_path(&path);
-                    let file = std::fs::File::create(&resolved).map_err(|e| {
-                        ExecError::BadRedirect(format!("{}: {}", path, e))
-                    })?;
-                    match fd.unwrap_or(1) {
-                        1 => { child_cmd.stdout(file); }
-                        2 => { child_cmd.stderr(file); }
-                        fd => {
-                            return Err(ExecError::UnsupportedFeature(format!(
-                                "output redirect on fd {}",
-                                fd,
-                            )));
-                        }
-                    }
-                }
-                RedirectKind::Append(word) => {
-                    let path = expand::expand_word(word, &mut self.env)?;
-                    let resolved = self.resolve_path(&path);
-                    let file = std::fs::OpenOptions::new()
-                        .create(true)
-                        .append(true)
-                        .open(&resolved)
-                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
-                    match fd.unwrap_or(1) {
-                        1 => { child_cmd.stdout(file); }
-                        2 => { child_cmd.stderr(file); }
-                        fd => {
-                            return Err(ExecError::UnsupportedFeature(format!(
-                                "append redirect on fd {}",
-                                fd,
-                            )));
-                        }
-                    }
-                }
-                RedirectKind::HereDoc { .. } => {
-                    return Err(ExecError::UnsupportedFeature(
-                        "heredoc redirect".to_string(),
-                    ));
-                }
-                RedirectKind::DupInput(word) => {
-                    let target = expand::expand_word(word, &mut self.env)?;
-                    if target == "-" {
-                        child_cmd.stdin(Stdio::null());
-                    } else {
-                        return Err(ExecError::UnsupportedFeature(
-                            "fd duplication".to_string(),
-                        ));
-                    }
-                }
-                RedirectKind::DupOutput(word) => {
-                    let target = expand::expand_word(word, &mut self.env)?;
-                    if target == "-" {
-                        match fd.unwrap_or(1) {
-                            1 => { child_cmd.stdout(Stdio::null()); }
-                            2 => { child_cmd.stderr(Stdio::null()); }
-                            _ => {}
-                        }
-                    } else {
-                        return Err(ExecError::UnsupportedFeature(
-                            "fd duplication".to_string(),
-                        ));
-                    }
-                }
-                _ => {
-                    return Err(ExecError::UnsupportedFeature(
-                        "redirect kind not implemented".to_string(),
-                    ));
-                }
-            }
-        }
-        Ok(())
     }
 
     /// Resolve a path relative to the executor's CWD.

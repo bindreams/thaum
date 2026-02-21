@@ -316,6 +316,12 @@ impl Executor {
             expanded_args.extend(fields);
         }
 
+        // Resolve redirects before dispatch — applies to all command types.
+        // Files are opened here (side effect: `> file` creates/truncates even
+        // without a command). Redirect handles are dropped when `active` goes
+        // out of scope.
+        let mut active = self.resolve_redirects(&cmd.redirects)?;
+
         // If no command name, just process assignments
         if expanded_args.is_empty() {
             for assignment in &cmd.assignments {
@@ -330,18 +336,13 @@ impl Executor {
 
         // Check for functions first
         if let Some(func) = self.env.get_function(cmd_name).cloned() {
-            // Apply prefix assignments temporarily
             let saved = self.apply_prefix_assignments(&cmd.assignments)?;
-
-            // Push new scope with positional params
             self.env.push_scope(cmd_args.to_vec());
 
-            let result = self.execute_compound(&func.body, &func.redirects, io);
+            let mut cmd_io = active.apply_to_io(io);
+            let result = self.execute_compound(&func.body, &func.redirects, &mut cmd_io);
 
-            // Pop scope
             self.env.pop_scope();
-
-            // Restore prefix assignments
             self.restore_prefix_assignments(saved);
 
             return match result {
@@ -353,35 +354,43 @@ impl Executor {
 
         // Check for builtins
         if builtins::is_builtin(cmd_name) {
-            // Apply prefix assignments temporarily for builtins
             let saved = self.apply_prefix_assignments(&cmd.assignments)?;
 
+            let cmd_io = active.apply_to_io(io);
             let mut stdout_buf: Vec<u8> = Vec::new();
             let mut stderr_buf: Vec<u8> = Vec::new();
 
-            let result =
-                builtins::run_builtin(cmd_name, cmd_args, &mut self.env, io.stdin, &mut stdout_buf, &mut stderr_buf);
+            let result = builtins::run_builtin(
+                cmd_name,
+                cmd_args,
+                &mut self.env,
+                cmd_io.stdin,
+                &mut stdout_buf,
+                &mut stderr_buf,
+            );
 
-            // Write captured output to io context stdout/stderr
+            // Write captured output to the (possibly redirected) io context
             if !stdout_buf.is_empty() {
-                io.stdout
+                cmd_io
+                    .stdout
                     .write_all(&stdout_buf)
                     .map_err(ExecError::Io)?;
             }
             if !stderr_buf.is_empty() {
-                io.stderr
+                cmd_io
+                    .stderr
                     .write_all(&stderr_buf)
                     .map_err(ExecError::Io)?;
             }
 
-            // Restore prefix assignments
             self.restore_prefix_assignments(saved);
 
             return result;
         }
 
-        // External command
-        self.execute_external(cmd_name, cmd_args, &cmd.assignments, &cmd.redirects, io)
+        // External command — pass ActiveRedirects for Stdio setup;
+        // `io` is used only for error messages (not redirected).
+        self.execute_external(cmd_name, cmd_args, &cmd.assignments, &mut active, io)
     }
 
     /// Apply prefix assignments temporarily, returning saved values.

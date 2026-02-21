@@ -2,6 +2,7 @@ use std::io::Write;
 use std::process::{Child, Command, Stdio};
 
 use crate::ast::Expression;
+use crate::exec::command_ex::CommandEx;
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
@@ -157,7 +158,7 @@ fn spawn_pipeline_stage(
             }
 
             // External command
-            let mut child_cmd = Command::new(cmd_name);
+            let mut child_cmd = CommandEx::new(cmd_name);
             child_cmd.args(cmd_args);
             child_cmd.current_dir(executor.env().cwd());
 
@@ -174,6 +175,11 @@ fn spawn_pipeline_stage(
                     executor.env_mut(),
                 )?;
                 child_cmd.env(&assignment.name, &value);
+            }
+
+            // Inherit persistent FDs 3+ from the executor's fd_table
+            for (&fd, file) in executor.fd_table().iter() {
+                child_cmd.fd_mapping(fd, file.try_clone().map_err(ExecError::Io)?);
             }
 
             // Set up stdin from previous stage

@@ -787,3 +787,19 @@ fn redirect_creates_empty_file() {
 
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn external_command_inherits_fd3() {
+    // sh -c 'echo hello >&3' writes to FD 3, which is redirected to a file.
+    // This tests that FDs 3+ are passed to external child processes.
+    let dir = std::path::PathBuf::from("/tmp/claude/fd-inherit-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("fd3.txt");
+
+    let script = format!("sh -c 'echo hello >&3' 3>{}", file.display());
+    let (_, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}

@@ -1,5 +1,6 @@
 use std::process::Stdio;
 
+use crate::exec::command_ex::CommandEx;
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::redirect::ActiveRedirects;
@@ -9,8 +10,9 @@ impl Executor {
     /// Execute an external command via fork/exec.
     ///
     /// Redirections are pre-resolved in `active`. FDs 0-2 are set on the child
-    /// via `Stdio::from(file)`. The original `io` is used only for error
-    /// messages (command not found, permission denied).
+    /// via `Stdio::from(file)`. FDs 3+ are passed via `CommandEx::fd_mapping()`.
+    /// The original `io` is used only for error messages (command not found,
+    /// permission denied).
     pub(super) fn execute_external(
         &mut self,
         name: &str,
@@ -19,7 +21,7 @@ impl Executor {
         active: &mut ActiveRedirects,
         io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
-        let mut child_cmd = std::process::Command::new(name);
+        let mut child_cmd = CommandEx::new(name);
         child_cmd.args(args);
         child_cmd.current_dir(self.env.cwd());
 
@@ -46,10 +48,10 @@ impl Executor {
             child_cmd.stderr(Stdio::from(file.try_clone().map_err(ExecError::Io)?));
         }
 
-        // TODO: pass active.extra_fds (FDs 3+) to child process via
-        // platform-specific APIs (pre_exec + dup2 on Unix, handle
-        // inheritance on Windows). For now, extra FDs are opened as a
-        // side effect but not inherited by the child.
+        // FDs 3+ from command-level redirects and persistent fd_table
+        for (&fd, file) in self.fd_table.iter().chain(active.extra_fds.iter()) {
+            child_cmd.fd_mapping(fd, file.try_clone().map_err(ExecError::Io)?);
+        }
 
         match child_cmd.spawn() {
             Ok(mut child) => {

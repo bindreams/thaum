@@ -20,16 +20,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 4. (( paren ambiguity — arithmetic vs subshell-of-subshell
+// 4. (( paren ambiguity — FIXED (see tests/bash_features.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn subshell_starting_with_path() {
-    // ((/path/cmd ...)) — (( followed by / means subshell, not arithmetic.
-    // In bash mode, (( triggers arithmetic parsing; the / disambiguates.
-    parse_with("((/usr/bin/cat </dev/zero; echo hi) | true)", Dialect::Bash).unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 5. Arithmetic features — syntax inside (( )) and $(( ))

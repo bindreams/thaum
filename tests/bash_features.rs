@@ -1666,3 +1666,21 @@ fn for_arith_left_shift_not_heredoc() {
     let input = "x=0\n\nfor ((i = 1 << 32; i; ++i)); do\nbreak\ndone";
     parse_with(input, Dialect::Bash).unwrap();
 }
+
+#[test]
+fn double_paren_subshell_not_arithmetic() {
+    // ((/path/cmd ...)) — (( followed by / means subshell-of-subshell, not arithmetic.
+    // The speculative arithmetic attempt fails (no )) found), so it falls back to subshell.
+    let prog = parse_with(
+        "((/usr/bin/cat </dev/zero; echo hi) | true)",
+        Dialect::Bash,
+    )
+    .unwrap();
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Compound {
+            body: CompoundCommand::Subshell { .. },
+            ..
+        }
+    ));
+}

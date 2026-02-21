@@ -336,75 +336,74 @@ impl Parser {
         if self.options.arithmetic_command && self.lexer.peek()?.token == Token::LParen
             && self.lexer.peek()?.span.start.0 == start_span.end.0
         {
-            self.lexer.advance()?;
-            let mut expr = String::new();
-            let mut depth = 0i32;
+            // Speculate: try (( as arithmetic. If )) is never found, rewind
+            // and fall through to subshell (the second ( becomes a nested subshell).
+            let arith = self.lexer.speculate(|lex| {
+                lex.advance()?; // consume second (
+                let mut expr = String::new();
+                let mut depth = 0i32;
 
-            // Use raw API to see Whitespace tokens (arithmetic needs all content)
-            loop {
-                let tok = self.lexer.peek()?.token.clone();
-                match &tok {
-                    Token::RParen if depth == 0 => {
-                        self.lexer.advance()?;
-                        if self.lexer.peek()?.token == Token::RParen {
-                            let end_span = self.lexer.peek()?.span;
-                            self.lexer.advance()?;
-                            let expression = parse_arith_expr(expr.trim()).map_err(|msg| {
-                                ParseError::UnexpectedToken {
-                                    found: msg,
-                                    expected: "a valid arithmetic expression".to_string(),
+                loop {
+                    let tok = lex.peek()?.token.clone();
+                    match &tok {
+                        Token::RParen if depth == 0 => {
+                            lex.advance()?;
+                            if lex.peek()?.token == Token::RParen {
+                                let end_span = lex.peek()?.span;
+                                lex.advance()?;
+                                let expression = match parse_arith_expr(expr.trim()) {
+                                    Ok(e) => e,
+                                    Err(_) => return Ok(None), // not arithmetic
+                                };
+                                return Ok(Some(CompoundCommand::BashArithmeticCommand {
+                                    expression,
                                     span: start_span.merge(end_span),
-                                }
-                            })?;
-                            return Ok(CompoundCommand::BashArithmeticCommand {
-                                expression,
-                                span: start_span.merge(end_span),
-                            });
-                        } else {
+                                }));
+                            } else {
+                                expr.push(')');
+                            }
+                        }
+                        Token::LParen => {
+                            depth += 1;
+                            expr.push('(');
+                            lex.advance()?;
+                        }
+                        Token::RParen => {
+                            depth -= 1;
                             expr.push(')');
+                            lex.advance()?;
                         }
-                    }
-                    Token::LParen => {
-                        depth += 1;
-                        expr.push('(');
-                        self.lexer.advance()?;
-                    }
-                    Token::RParen => {
-                        depth -= 1;
-                        expr.push(')');
-                        self.lexer.advance()?;
-                    }
-                    Token::Eof => {
-                        return Err(ParseError::UnclosedConstruct {
-                            keyword: "'))'".to_string(),
-                            opening: "((".to_string(),
-                            span: start_span,
-                        });
-                    }
-                    Token::Whitespace => {
-                        if !expr.is_empty() {
-                            expr.push(' ');
+                        Token::Eof => return Ok(None), // no )) found
+                        Token::Whitespace => {
+                            if !expr.is_empty() {
+                                expr.push(' ');
+                            }
+                            lex.advance()?;
                         }
-                        self.lexer.advance()?;
-                    }
-                    tok if tok.is_fragment() => {
-                        expr.push_str(&fragment_token_to_source(tok));
-                        self.lexer.advance()?;
-                    }
-                    _ => {
-                        // << / <<- inside (( )) is a shift operator, not heredoc.
-                        if matches!(tok, Token::HereDocOp | Token::HereDocStripOp) {
-                            self.lexer.cancel_pending_heredoc();
+                        tok if tok.is_fragment() => {
+                            expr.push_str(&fragment_token_to_source(tok));
+                            lex.advance()?;
                         }
-                        if !expr.is_empty() {
-                            expr.push(' ');
+                        _ => {
+                            if matches!(tok, Token::HereDocOp | Token::HereDocStripOp) {
+                                lex.cancel_pending_heredoc();
+                            }
+                            if !expr.is_empty() {
+                                expr.push(' ');
+                            }
+                            let text = tok.display_name().trim_matches('\'');
+                            expr.push_str(text);
+                            lex.advance()?;
                         }
-                        let text = tok.display_name().trim_matches('\'');
-                        expr.push_str(text);
-                        self.lexer.advance()?;
                     }
                 }
+            })?;
+
+            if let Some(cmd) = arith {
+                return Ok(cmd);
             }
+            // Speculation failed — fall through to subshell.
+            // The second ( is back in the buffer.
         }
 
         let body = self.parse_compound_list()?;

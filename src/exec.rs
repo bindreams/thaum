@@ -8,6 +8,7 @@ mod external;
 pub mod io_context;
 mod pattern;
 pub mod pipeline;
+mod redirect;
 
 pub use environment::Environment;
 pub use error::ExecError;
@@ -15,6 +16,7 @@ pub use io_context::{CapturedIo, IoContext, ProcessIo};
 #[cfg(test)]
 use pattern::shell_pattern_match;
 
+use std::collections::HashMap;
 use std::process::Stdio;
 
 use crate::ast::{Command, Expression, ExecutionMode, Program, Statement};
@@ -25,6 +27,9 @@ use crate::ast::{Command, Expression, ExecutionMode, Program, Statement};
 /// functions, CWD, exit status) in an `Environment`.
 pub struct Executor {
     env: Environment,
+    /// Persistent extra file descriptors (3+), typically set by `exec N>file`.
+    /// FDs 0-2 are handled by IoContext; this table holds FDs 3 and above.
+    fd_table: HashMap<i32, std::fs::File>,
 }
 
 impl Executor {
@@ -32,12 +37,18 @@ impl Executor {
     pub fn new() -> Self {
         let mut env = Environment::new();
         env.inherit_from_process();
-        Executor { env }
+        Executor {
+            env,
+            fd_table: HashMap::new(),
+        }
     }
 
     /// Create an executor with a specific environment.
     pub fn with_env(env: Environment) -> Self {
-        Executor { env }
+        Executor {
+            env,
+            fd_table: HashMap::new(),
+        }
     }
 
     /// Get a mutable reference to the environment.
@@ -48,6 +59,11 @@ impl Executor {
     /// Get a reference to the environment.
     pub fn env(&self) -> &Environment {
         &self.env
+    }
+
+    /// Get a reference to the persistent FD table.
+    pub fn fd_table(&self) -> &HashMap<i32, std::fs::File> {
+        &self.fd_table
     }
 
     /// Execute a parsed program. Returns the exit status of the last command.

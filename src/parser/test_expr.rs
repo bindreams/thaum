@@ -59,7 +59,10 @@ impl Parser {
             || matches!(&peeked.token, Token::Literal(w) if w == "(");
         if is_lparen {
             self.lexer.advance()?;
+            let saved = self.in_test_group;
+            self.in_test_group = true;
             let inner = self.parse_test_or()?;
+            self.in_test_group = saved;
             let close = self.lexer.peek()?;
             let is_rparen = matches!(&close.token, Token::RParen)
                 || matches!(&close.token, Token::Literal(w) if w == ")");
@@ -91,7 +94,7 @@ impl Parser {
         if let Some(op) = self.lexer.peek()?.token.as_binary_test_op() {
             self.advance_binary_op()?;
             let right_word = if op == BinaryTestOp::RegexMatch {
-                self.consume_regex_pattern()?
+                self.consume_regex_pattern(self.in_test_group)?
             } else {
                 self.consume_test_word()?
             };
@@ -105,16 +108,20 @@ impl Parser {
         Ok(BashTestExpr::Word(first_word))
     }
 
-    fn consume_regex_pattern(&mut self) -> Result<Word, ParseError> {
+    fn consume_regex_pattern(&mut self, in_group: bool) -> Result<Word, ParseError> {
         self.lexer.eat_whitespace()?;
         let start_span = self.lexer.peek()?.span;
         let mut text = String::new();
         let mut end_span = start_span;
+        let mut paren_depth = 0i32;
 
         loop {
             let peeked = self.lexer.peek()?.clone();
             match &peeked.token {
                 Token::BashDblRBracket | Token::Eof | Token::Newline => break,
+                // ) at depth 0 inside a grouped expression (e.g., [[ (foo =~ bar) ]])
+                // closes the group, not the regex. Outside a group, ) is regex content.
+                Token::RParen if in_group && paren_depth <= 0 => break,
                 tok if tok.is_fragment() => {
                     if !text.is_empty() {
                         text.push(' ');
@@ -129,6 +136,11 @@ impl Parser {
                     self.lexer.advance()?;
                 }
                 _ => {
+                    match &peeked.token {
+                        Token::LParen => paren_depth += 1,
+                        Token::RParen => paren_depth -= 1,
+                        _ => {}
+                    }
                     let ch = match &peeked.token {
                         Token::LParen => "(",
                         Token::RParen => ")",

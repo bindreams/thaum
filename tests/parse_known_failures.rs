@@ -28,30 +28,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 6. [[ edge cases
+// 6. [[ edge cases — FIXED (see tests/bash_features.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn double_bracket_close_not_after_open() {
-    // ]] when not preceded by [[ — e.g. from variable expansion.
-    // $dbracket expands to [[ at runtime; ]] should be a regular word.
-    parse_with("dbracket=[[\n$dbracket foo == foo ]]", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn glob_posix_char_class() {
-    // [[:punct:]] is a POSIX character class in a glob, not [[ ]].
-    parse_with("echo *.[[:punct:]]", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn regex_with_parens_in_double_bracket() {
-    // Parenthesized regex pattern inside [[ =~ ]].
-    parse_with("[[ (foo =~ bar) ]]", Dialect::Bash).unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 7. { without space — not a keyword

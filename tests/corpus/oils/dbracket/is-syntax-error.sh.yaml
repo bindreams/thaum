@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/dbracket#is-syntax-error
 status: 2
 stdout: ''
-parse-error: "unexpected token ']]', expected a word in test expression"
+parse-error: "unexpected token a word, expected ']]'"
 ---
 [[ ]]
 echo status=$?

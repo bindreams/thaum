@@ -119,25 +119,14 @@ fn bash_double_brackets_with_and() {
 }
 
 #[test]
-fn bash_double_brackets_no_space() {
+fn bash_double_brackets_requires_space() {
+    // [[-f is NOT [[ -f — bash requires whitespace after [[.
+    // Without space, [[-f is a literal command name.
     let prog = parse_with("[[-f foo ]]", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
-    if let Expression::Compound {
-        body: CompoundCommand::BashDoubleBracket { expression, .. },
-        ..
-    } = &stmt.expression
-    {
-        // [[-f is lexed as [[ then -f, so: Unary { op: FileIsRegular, arg: foo }
-        assert!(matches!(
-            expression,
-            BashTestExpr::Unary {
-                op: UnaryTestOp::FileIsRegular,
-                ..
-            }
-        ));
-    } else {
-        panic!("expected DoubleBracket, got {:?}", stmt.expression);
-    }
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Command(_)
+    ));
 }
 
 #[test]
@@ -1731,4 +1720,37 @@ fn arith_redirect_after_dparen() {
             ..
         }
     ));
+}
+
+// ---------------------------------------------------------------------------
+// [[ ]] edge cases
+// ---------------------------------------------------------------------------
+
+#[test]
+fn double_bracket_close_as_literal_word() {
+    // ]] outside [[ ]] is a regular word, not BashDblRBracket.
+    let prog = parse_with("dbracket=[[\n$dbracket foo == foo ]]", Dialect::Bash).unwrap();
+    assert!(prog.statements.len() >= 2);
+}
+
+#[test]
+fn glob_posix_char_class_not_double_bracket() {
+    // [[:punct:]] is a POSIX character class in a glob, not [[ ]].
+    let prog = parse_with("echo *.[[:punct:]]", Dialect::Bash).unwrap();
+    assert_eq!(prog.statements.len(), 1);
+}
+
+#[test]
+fn regex_with_parens_in_grouped_double_bracket() {
+    // [[ (foo =~ bar) ]] — grouped test expression with =~ inside.
+    let prog = parse_with("[[ (foo =~ bar) ]]", Dialect::Bash).unwrap();
+    if let Expression::Compound {
+        body: CompoundCommand::BashDoubleBracket { expression, .. },
+        ..
+    } = &prog.statements[0].expression
+    {
+        assert!(matches!(expression, BashTestExpr::Group(_)));
+    } else {
+        panic!("expected BashDoubleBracket");
+    }
 }

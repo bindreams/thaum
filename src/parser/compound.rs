@@ -305,24 +305,30 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.expect(&Token::BashDblLBracket)?;
 
-        let expression = self.parse_test_expression()?;
+        // Enable ]] recognition in the lexer (outside [[ ]], ]] is a regular word).
+        self.lexer.inside_double_bracket = true;
+        let result = (|| {
+            let expression = self.parse_test_expression()?;
 
-        self.lexer.eat_whitespace()?;
-        if self.lexer.peek()?.token == Token::Eof {
-            return Err(ParseError::UnclosedConstruct {
-                keyword: "']]'".to_string(),
-                opening: "[[".to_string(),
-                span: start_span,
-            });
-        }
+            self.lexer.eat_whitespace()?;
+            if self.lexer.peek()?.token == Token::Eof {
+                return Err(ParseError::UnclosedConstruct {
+                    keyword: "']]'".to_string(),
+                    opening: "[[".to_string(),
+                    span: start_span,
+                });
+            }
 
-        let end_span = self.lexer.peek()?.span;
-        self.lexer.advance()?;
+            let end_span = self.lexer.peek()?.span;
+            self.expect(&Token::BashDblRBracket)?;
 
-        Ok(CompoundCommand::BashDoubleBracket {
-            expression,
-            span: start_span.merge(end_span),
-        })
+            Ok(CompoundCommand::BashDoubleBracket {
+                expression,
+                span: start_span.merge(end_span),
+            })
+        })();
+        self.lexer.inside_double_bracket = false;
+        result
     }
 
     fn parse_subshell_or_arithmetic(&mut self) -> Result<CompoundCommand, ParseError> {

@@ -80,10 +80,19 @@ impl Lexer {
                 }
                 _ => (Token::RedirectToFile, 1),
             },
-            '[' if self.options.double_brackets && self.chars.peek_at(1) == Some('[') => {
+            '[' if self.options.double_brackets
+                && self.chars.peek_at(1) == Some('[')
+                && self.last_scanned != LastScanned::Fragment
+                // [[ must be followed by whitespace/newline/EOF to be a keyword.
+                // [[z] is a bracket glob, not [[ z].
+                && matches!(self.chars.peek_at(2), None | Some(' ' | '\t' | '\n')) =>
+            {
                 (Token::BashDblLBracket, 2)
             }
-            ']' if self.options.double_brackets && self.chars.peek_at(1) == Some(']') => {
+            ']' if self.options.double_brackets
+                && self.inside_double_bracket
+                && self.chars.peek_at(1) == Some(']') =>
+            {
                 (Token::BashDblRBracket, 2)
             }
             _ => return Ok(None),

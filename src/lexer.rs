@@ -65,6 +65,9 @@ pub struct Lexer {
     pending_strip_tabs: bool,
     /// One-token lookbehind. See `LastScanned` doc comment for details.
     pub(super) last_scanned: LastScanned,
+    /// Set by the parser when inside `[[ ]]`. The lexer only produces
+    /// `BashDblRBracket` when this flag is true; otherwise `]]` is literal.
+    pub(crate) inside_double_bracket: bool,
 
     // --- Heredoc bodies (read during newline scan, consumed post-parse) ---
     completed_bodies: VecDeque<String>,
@@ -101,6 +104,7 @@ impl Lexer {
             expecting_heredoc_delimiter: false,
             pending_strip_tabs: false,
             last_scanned: LastScanned::Other,
+            inside_double_bracket: false,
             completed_bodies: VecDeque::new(),
             buffer: VecDeque::new(),
             buf_pos: 0,

@@ -61,12 +61,19 @@ fn stmt(expression: Expression, span: Span) -> Statement {
 pub(crate) struct Parser {
     pub(super) lexer: Lexer,
     pub(super) options: ParseOptions,
+    /// Set inside `( ... )` groups in `[[ ]]`. Tells `consume_regex_pattern`
+    /// that an unmatched `)` closes the group rather than being regex content.
+    pub(super) in_test_group: bool,
 }
 
 impl Parser {
     pub fn new(input: &str, options: ParseOptions) -> Result<Self, ParseError> {
         let lexer = Lexer::from_str(input, options.clone());
-        Ok(Parser { lexer, options })
+        Ok(Parser {
+            lexer,
+            options,
+            in_test_group: false,
+        })
     }
 
     // ================================================================

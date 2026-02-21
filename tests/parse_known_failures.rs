@@ -16,28 +16,8 @@ use thaum::{parse, parse_with, Dialect};
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 3. << inside (( )) parsed as heredoc instead of left-shift
+// 3. << inside (( )) — FIXED (see tests/bash_features.rs)
 // ---------------------------------------------------------------------------
-
-#[test]
-#[ignore]
-fn double_paren_shift_not_heredoc() {
-    // << inside (( )) is left-shift, not a heredoc operator.
-    parse_with("(( 1 << 32 ))\necho ok", Dialect::Bash).unwrap();
-}
-
-#[test]
-#[ignore]
-fn c_style_for_with_shift() {
-    // << inside for (( )) is left-shift, not a heredoc.
-    // NOTE: the single-line form `for ((i = 1 << 32; ...))` parses fine;
-    // the bug triggers when other statements precede the for loop.
-    parse_with(
-        "x=0\n\nfor ((i = 1 << 32; i; ++i)); do\nbreak\ndone",
-        Dialect::Bash,
-    )
-    .unwrap();
-}
 
 // ---------------------------------------------------------------------------
 // 4. (( paren ambiguity — arithmetic vs subshell-of-subshell

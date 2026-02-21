@@ -1641,3 +1641,28 @@ fn bracket_glob_word_order() {
         panic!("expected Command");
     }
 }
+
+// ---------------------------------------------------------------------------
+// << inside (( )) is left-shift, not heredoc
+// ---------------------------------------------------------------------------
+
+#[test]
+fn arith_left_shift_not_heredoc() {
+    // << inside (( )) is left-shift, not a heredoc operator.
+    let prog = parse_with("(( 1 << 32 ))\necho ok", Dialect::Bash).unwrap();
+    assert_eq!(prog.statements.len(), 2);
+    assert!(matches!(
+        &prog.statements[0].expression,
+        Expression::Compound {
+            body: CompoundCommand::BashArithmeticCommand { .. },
+            ..
+        }
+    ));
+}
+
+#[test]
+fn for_arith_left_shift_not_heredoc() {
+    // << inside for (( )) is left-shift, not a heredoc.
+    let input = "x=0\n\nfor ((i = 1 << 32; i; ++i)); do\nbreak\ndone";
+    parse_with(input, Dialect::Bash).unwrap();
+}

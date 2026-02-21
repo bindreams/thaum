@@ -171,6 +171,12 @@ impl Lexer {
         }
     }
 
+    /// Cancel heredoc state triggered by a `<<` that was consumed as a
+    /// non-heredoc operator (e.g. left-shift inside arithmetic context).
+    pub(crate) fn cancel_pending_heredoc(&mut self) {
+        self.expecting_heredoc_delimiter = false;
+    }
+
     /// Pop the next completed heredoc body from the side queue, if any.
     /// Bodies are queued in source order when newlines trigger heredoc reading.
     pub(crate) fn take_heredoc_body(&mut self) -> Option<String> {

@@ -392,6 +392,10 @@ impl Parser {
                         self.lexer.advance()?;
                     }
                     _ => {
+                        // << / <<- inside (( )) is a shift operator, not heredoc.
+                        if matches!(tok, Token::HereDocOp | Token::HereDocStripOp) {
+                            self.lexer.cancel_pending_heredoc();
+                        }
                         if !expr.is_empty() {
                             expr.push(' ');
                         }
@@ -587,6 +591,10 @@ impl Parser {
                     self.lexer.advance()?;
                 }
                 _ => {
+                    // << / <<- inside for (( )) is a shift operator, not heredoc.
+                    if matches!(tok, Token::HereDocOp | Token::HereDocStripOp) {
+                        self.lexer.cancel_pending_heredoc();
+                    }
                     if !content.is_empty() && !content.ends_with(';') {
                         content.push(' ');
                     }

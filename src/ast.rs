@@ -106,6 +106,15 @@ impl Argument {
             },
         }
     }
+
+    /// If this argument resolves to a statically known string (no runtime
+    /// expansion needed), return it. `Atom` variants always return `None`.
+    pub fn try_to_static_string(&self) -> Option<String> {
+        match self {
+            Argument::Word(w) => w.try_to_static_string(),
+            Argument::Atom(_) => None,
+        }
+    }
 }
 
 /// A standalone argument that always occupies one argument slot by itself.
@@ -263,6 +272,19 @@ pub struct Word {
     pub span: Span,
 }
 
+impl Word {
+    /// If every fragment in this word resolves statically, concatenate them
+    /// and return the result. Returns `None` if any fragment requires runtime
+    /// expansion (parameters, command substitutions, globs, etc.).
+    pub fn try_to_static_string(&self) -> Option<String> {
+        let mut result = String::new();
+        for part in &self.parts {
+            part.append_static_string(&mut result)?;
+        }
+        Some(result)
+    }
+}
+
 /// A concatenable piece within a word.
 ///
 /// Fragments can be combined with other fragments to form a single `Word`.
@@ -290,6 +312,44 @@ pub enum Fragment {
     },
     /// Brace expansion (Bash): `{a,b,c}` or `{1..5}`.
     BashBraceExpansion(BraceExpansionKind),
+}
+
+impl Fragment {
+    /// If this fragment has a statically known string value (no runtime
+    /// expansion needed), return it. Returns `None` for parameters,
+    /// command substitutions, arithmetic, globs, tilde prefixes, locale
+    /// quoting, extglobs, and brace expansions.
+    pub fn try_to_static_string(&self) -> Option<String> {
+        let mut result = String::new();
+        self.append_static_string(&mut result)?;
+        Some(result)
+    }
+
+    /// Append this fragment's static string value to `buf`, or return `None`
+    /// if the fragment requires runtime expansion.
+    fn append_static_string(&self, buf: &mut String) -> Option<()> {
+        match self {
+            Fragment::Literal(s)
+            | Fragment::SingleQuoted(s)
+            | Fragment::BashAnsiCQuoted(s) => {
+                buf.push_str(s);
+            }
+            Fragment::DoubleQuoted(parts) => {
+                for part in parts {
+                    part.append_static_string(buf)?;
+                }
+            }
+            Fragment::Parameter(_)
+            | Fragment::CommandSubstitution(_)
+            | Fragment::ArithmeticExpansion(_)
+            | Fragment::Glob(_)
+            | Fragment::TildePrefix(_)
+            | Fragment::BashLocaleQuoted(_)
+            | Fragment::BashExtGlob { .. }
+            | Fragment::BashBraceExpansion(_) => return None,
+        }
+        Some(())
+    }
 }
 
 /// Kind of brace expansion (Bash).
@@ -568,4 +628,161 @@ pub enum RedirectKind {
     BashOutputAll(Word),
     /// `&>>` append stdout+stderr (Bash).
     BashAppendAll(Word),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::span::Span;
+
+    fn span() -> Span {
+        Span::new(0, 0)
+    }
+
+    fn literal(s: &str) -> Fragment {
+        Fragment::Literal(s.into())
+    }
+
+    fn word(parts: Vec<Fragment>) -> Word {
+        Word { parts, span: span() }
+    }
+
+    // -- Fragment -----------------------------------------------------------
+
+    #[test]
+    fn literal_is_static() {
+        assert_eq!(literal("hello").try_to_static_string(), Some("hello".into()));
+    }
+
+    #[test]
+    fn single_quoted_is_static() {
+        assert_eq!(
+            Fragment::SingleQuoted("world".into()).try_to_static_string(),
+            Some("world".into())
+        );
+    }
+
+    #[test]
+    fn ansi_c_quoted_is_static() {
+        assert_eq!(
+            Fragment::BashAnsiCQuoted("line\n".into()).try_to_static_string(),
+            Some("line\n".into())
+        );
+    }
+
+    #[test]
+    fn double_quoted_all_literal_is_static() {
+        let frag = Fragment::DoubleQuoted(vec![literal("a"), literal("b")]);
+        assert_eq!(frag.try_to_static_string(), Some("ab".into()));
+    }
+
+    #[test]
+    fn double_quoted_with_param_is_none() {
+        let frag = Fragment::DoubleQuoted(vec![
+            literal("hi "),
+            Fragment::Parameter(ParameterExpansion::Simple("USER".into())),
+        ]);
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn parameter_is_none() {
+        let frag = Fragment::Parameter(ParameterExpansion::Simple("x".into()));
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn command_sub_is_none() {
+        let frag = Fragment::CommandSubstitution(vec![]);
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn glob_is_none() {
+        assert_eq!(Fragment::Glob(GlobChar::Star).try_to_static_string(), None);
+    }
+
+    #[test]
+    fn tilde_is_none() {
+        assert_eq!(Fragment::TildePrefix("".into()).try_to_static_string(), None);
+    }
+
+    #[test]
+    fn arithmetic_is_none() {
+        let frag = Fragment::ArithmeticExpansion(ArithExpr::Number(42));
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn brace_expansion_is_none() {
+        let frag = Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
+            start: "1".into(),
+            end: "5".into(),
+            step: None,
+        });
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn extglob_is_none() {
+        let frag = Fragment::BashExtGlob {
+            kind: ExtGlobKind::ZeroOrMore,
+            pattern: "*.rs".into(),
+        };
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn locale_quoted_is_none() {
+        let frag = Fragment::BashLocaleQuoted(vec![literal("hi")]);
+        assert_eq!(frag.try_to_static_string(), None);
+    }
+
+    // -- Word ---------------------------------------------------------------
+
+    #[test]
+    fn word_single_literal() {
+        assert_eq!(word(vec![literal("echo")]).try_to_static_string(), Some("echo".into()));
+    }
+
+    #[test]
+    fn word_concatenated_static() {
+        let w = word(vec![
+            literal("hel"),
+            Fragment::SingleQuoted("lo".into()),
+        ]);
+        assert_eq!(w.try_to_static_string(), Some("hello".into()));
+    }
+
+    #[test]
+    fn word_with_dynamic_part() {
+        let w = word(vec![
+            literal("dir/"),
+            Fragment::Parameter(ParameterExpansion::Simple("name".into())),
+        ]);
+        assert_eq!(w.try_to_static_string(), None);
+    }
+
+    #[test]
+    fn empty_word() {
+        assert_eq!(word(vec![]).try_to_static_string(), Some(String::new()));
+    }
+
+    // -- Argument -----------------------------------------------------------
+
+    #[test]
+    fn argument_word_delegates() {
+        let arg = Argument::Word(word(vec![literal("test")]));
+        assert_eq!(arg.try_to_static_string(), Some("test".into()));
+    }
+
+    #[test]
+    fn argument_atom_is_none() {
+        let arg = Argument::Atom(Atom::BashProcessSubstitution {
+            direction: ProcessDirection::In,
+            body: vec![],
+            span: span(),
+        });
+        assert_eq!(arg.try_to_static_string(), None);
+    }
 }

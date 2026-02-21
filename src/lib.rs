@@ -7,6 +7,7 @@ pub mod lexer;
 pub mod parser;
 pub mod span;
 pub mod token;
+pub mod visit;
 pub mod word;
 
 pub use ast::Program;

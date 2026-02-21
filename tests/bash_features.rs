@@ -1103,6 +1103,45 @@ fn test_expr_grouped() {
     }
 }
 
+// --- [[ ]] multi-line and edge cases ---
+
+#[test]
+fn dbracket_multiline_and() {
+    // [[ over multiple lines with &&
+    let expr = parse_test_expr("[[ foo == foo\n&& bar == bar\n]]");
+    assert!(matches!(expr, BashTestExpr::And { .. }));
+}
+
+#[test]
+fn dbracket_multiline_or() {
+    // [[ over multiple lines with ||
+    let expr = parse_test_expr("[[ -f a\n|| -d b\n]]");
+    assert!(matches!(expr, BashTestExpr::Or { .. }));
+}
+
+// TODO: [[ word]] (no space before ]]) requires context-aware lexing.
+// The lexer doesn't recognize ]] inside a word. Bash handles this because
+// its parser feeds back to the lexer that it's inside [[ ]].
+// #[test]
+// fn dbracket_no_space_before_close() {
+//     let expr = parse_test_expr("[[ word]]");
+//     assert!(matches!(expr, BashTestExpr::Word(_)));
+// }
+
+#[test]
+fn dbracket_string_gt_no_space() {
+    // [[ b>a ]] — string > comparison with no spaces around >
+    let expr = parse_test_expr("[[ b>a ]]");
+    assert!(matches!(expr, BashTestExpr::Binary { op: BinaryTestOp::StringGreaterThan, .. }));
+}
+
+#[test]
+fn dbracket_string_lt_no_space() {
+    // [[ a<b ]] — string < comparison
+    let expr = parse_test_expr("[[ a<b ]]");
+    assert!(matches!(expr, BashTestExpr::Binary { op: BinaryTestOp::StringLessThan, .. }));
+}
+
 #[test]
 fn test_expr_bare_word() {
     // [[ word ]] → implicit -n test

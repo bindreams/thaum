@@ -23,6 +23,14 @@ Place contracts on every function where there is a meaningful invariant to check
 3. **Query logic belongs on the data, not the consumer.** Token-level queries (is this a keyword? can a command start here?) are methods on `Token`. The parser peeks tokens itself and calls Token methods — it does not wrap peek+query in its own methods.
 4. **Token ownership.** A parsing function consumes only the tokens that constitute the AST node it creates. Leading whitespace is the caller's responsibility to skip; trailing whitespace is the next consumer's responsibility. For example, `collect_word()` does not skip whitespace before or after — the caller handles word boundaries. Helper methods (`eat`, `expect`, `expect_keyword`, `expect_closing_keyword`) skip whitespace internally because they are boundary utilities, not AST-building functions.
 
+## Pre-commit checklist
+Before every commit, run these three commands and fix any issues they report:
+```sh
+cargo test --features cli       # all tests must pass (including CLI output tests)
+cargo clippy --all-targets --features cli -- -D warnings   # zero warnings
+cargo fmt                       # auto-format; commit the result
+```
+
 ## Architecture
 
 See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, dialect system, adding new features).

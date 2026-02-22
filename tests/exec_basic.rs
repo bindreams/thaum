@@ -1005,3 +1005,50 @@ fn alias_list() {
     let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias e=echo\nalias");
     assert!(out.contains("alias e='echo'") || out.contains("alias e=echo"));
 }
+
+#[test]
+fn alias_redefine_then_unalias() {
+    // Line 2: alias a="touch"  → defines a=touch
+    // Line 3: alias a="echo"; unalias a  → redefines then removes
+    // Line 4: a hello  → not found (unalias took effect)
+    let (_, status) = bash_exec_ok(
+        "shopt -s expand_aliases\nalias a=touch\nalias a=echo; unalias a\na hello",
+    );
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_snapshot_uses_previous_line() {
+    // Line 2: alias a="echo"  → defines a=echo
+    // Line 3: alias a="touch"; a hello; unalias a
+    //   → snapshot for line 3 has a=echo (from before line 3 executed)
+    //   → so "a hello" expands to "echo hello" (not "touch hello")
+    //   → then alias a is redefined to touch, then unaliased — both during execution
+    // Line 4: a hello  → not found (unalias from line 3 took effect)
+    let (out, _) = bash_exec_ok(
+        "shopt -s expand_aliases\nalias a=echo\nalias a=touch; a hello; unalias a",
+    );
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn alias_snapshot_touch_file() {
+    // Line 2: alias a="touch"
+    // Line 3: alias a="echo"; a hello; unalias a
+    //   → snapshot for line 3 has a=touch (from line 2)
+    //   → "a hello" expands to "touch hello" (creates file)
+    // Line 4: a hello  → not found
+    let dir = std::path::PathBuf::from("/tmp/claude/alias-touch-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("hello");
+    let _ = std::fs::remove_file(&file);
+
+    let script = format!(
+        "shopt -s expand_aliases\nalias a=touch\ncd {}; alias a=echo; a hello; unalias a",
+        dir.display()
+    );
+    let (_, _) = bash_exec_ok(&script);
+    assert!(file.exists(), "touch hello should have created the file");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}

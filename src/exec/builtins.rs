@@ -25,6 +25,9 @@ pub fn is_builtin(name: &str) -> bool {
             | "."
             | "source"
             | "set"
+            | "shopt"
+            | "alias"
+            | "unalias"
             | "test"
             | "["
             | "readonly"
@@ -57,6 +60,9 @@ pub fn run_builtin(
         "shift" => builtin_shift(args, env, stderr),
         "read" => builtin_read(args, env, stdin),
         "set" => builtin_set(args, env),
+        "shopt" => builtin_shopt(args, env, stderr),
+        "alias" => builtin_alias(args, env, stdout),
+        "unalias" => builtin_unalias(args, env, stderr),
         "test" | "[" => builtin_test(name, args, stderr),
         "readonly" => builtin_readonly(args, env),
         "local" => builtin_local(args, env),
@@ -177,6 +183,94 @@ fn builtin_unset(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
         }
     }
     Ok(0)
+}
+
+fn builtin_alias(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    if args.is_empty() {
+        // List all aliases
+        let aliases = env.aliases();
+        let mut names: Vec<_> = aliases.keys().collect();
+        names.sort();
+        for name in names {
+            let value = &aliases[name];
+            let _ = writeln!(stdout, "alias {}='{}'", name, value);
+        }
+        return Ok(0);
+    }
+
+    let mut status = 0;
+    for arg in args {
+        if let Some((name, value)) = arg.split_once('=') {
+            env.define_alias(name, value);
+        } else {
+            // Print a single alias
+            match env.get_alias(arg) {
+                Some(value) => {
+                    let _ = writeln!(stdout, "alias {}='{}'", arg, value);
+                }
+                None => {
+                    status = 1;
+                }
+            }
+        }
+    }
+    Ok(status)
+}
+
+fn builtin_unalias(
+    args: &[String],
+    env: &mut Environment,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    if args.is_empty() {
+        let _ = writeln!(stderr, "unalias: usage: unalias [-a] name [name ...]");
+        return Ok(2);
+    }
+
+    let mut status = 0;
+    for arg in args {
+        if arg == "-a" {
+            env.unalias_all();
+        } else if !env.unalias(arg) {
+            let _ = writeln!(stderr, "unalias: {}: not found", arg);
+            status = 1;
+        }
+    }
+    Ok(status)
+}
+
+fn builtin_shopt(
+    args: &[String],
+    env: &mut Environment,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    // Minimal shopt: only supports expand_aliases
+    if args.len() == 2 {
+        let flag = &args[0];
+        let option = &args[1];
+        if option == "expand_aliases" {
+            match flag.as_str() {
+                "-s" => {
+                    env.set_expand_aliases(true);
+                    return Ok(0);
+                }
+                "-u" => {
+                    env.set_expand_aliases(false);
+                    return Ok(0);
+                }
+                _ => {}
+            }
+        }
+    }
+    let _ = writeln!(
+        stderr,
+        "shopt: only 'shopt -s/-u expand_aliases' is supported"
+    );
+    Ok(1)
 }
 
 fn builtin_return(args: &[String]) -> Result<i32, ExecError> {

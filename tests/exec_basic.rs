@@ -929,3 +929,79 @@ fn array_for_loop() {
     let (out, _) = bash_exec_ok(r#"a=(x y z); for i in ${a[@]}; do echo $i; done"#);
     assert_eq!(out, "x y z\n");
 }
+
+// --- Bash alias expansion ---
+
+#[test]
+fn alias_basic() {
+    let (out, status) = bash_exec_ok("shopt -s expand_aliases\nalias hi='echo hello'\nhi");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn alias_requires_shopt() {
+    // Without shopt -s expand_aliases, aliases are defined but not expanded
+    let (_, status) = bash_exec_ok("alias hi='echo hello'\nhi");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_same_line_not_expanded() {
+    // alias e=echo; e one — same line, e is NOT expanded (parsed before defined)
+    let (_, status) = bash_exec_ok("shopt -s expand_aliases\nalias e=echo; e one");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_cross_line_expanded() {
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias e=echo\ne hello");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn alias_semicolon_then_newline() {
+    // alias a="echo";  ← trailing semicolon, then newline → next line sees alias
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias a=echo;\na hello");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn alias_unalias() {
+    let (_, status) = bash_exec_ok("shopt -s expand_aliases\nalias e=echo\nunalias e\ne hello");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_unalias_same_line() {
+    // alias + unalias on one line; next line sees no alias
+    let (_, status) = bash_exec_ok("shopt -s expand_aliases\nalias a=echo; unalias a\na hello");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_recursive() {
+    let (out, _) =
+        bash_exec_ok("shopt -s expand_aliases\nalias hi='e_ hello'\nalias e_='echo __'\nhi");
+    assert_eq!(out, "__ hello\n");
+}
+
+#[test]
+fn alias_trailing_space() {
+    // Alias ending with space → next word also alias-expanded
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias hi='echo '\nalias w='hello'\nhi w");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn alias_quoted_not_expanded() {
+    // Quoted command name must NOT trigger alias expansion
+    let (_, status) = bash_exec_ok("shopt -s expand_aliases\nalias hi='echo hello'\n'hi'");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn alias_list() {
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias e=echo\nalias");
+    assert!(out.contains("alias e='echo'") || out.contains("alias e=echo"));
+}

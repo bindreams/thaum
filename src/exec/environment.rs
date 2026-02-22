@@ -65,6 +65,8 @@ pub struct Environment {
     cwd: PathBuf,
     pid: u32,
     scope_stack: Vec<Scope>,
+    aliases: HashMap<String, String>,
+    expand_aliases: bool,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -101,6 +103,8 @@ impl Environment {
             cwd,
             pid,
             scope_stack: Vec::new(),
+            aliases: HashMap::new(),
+            expand_aliases: false,
         };
 
         let _ = env.set_var("IFS", " \t\n");
@@ -501,6 +505,48 @@ impl Environment {
 
     pub fn ifs(&self) -> &str {
         self.get_var("IFS").unwrap_or(" \t\n")
+    }
+
+    // --- Aliases ---
+
+    /// Define an alias. Takes effect immediately in the alias table.
+    pub fn define_alias(&mut self, name: &str, value: &str) {
+        self.aliases.insert(name.to_string(), value.to_string());
+    }
+
+    /// Remove an alias. Returns true if it existed.
+    pub fn unalias(&mut self, name: &str) -> bool {
+        self.aliases.remove(name).is_some()
+    }
+
+    /// Remove all aliases.
+    pub fn unalias_all(&mut self) {
+        self.aliases.clear();
+    }
+
+    /// Look up an alias by name.
+    pub fn get_alias(&self, name: &str) -> Option<&str> {
+        self.aliases.get(name).map(|s| s.as_str())
+    }
+
+    /// Return a snapshot of the current alias table.
+    pub fn alias_snapshot(&self) -> HashMap<String, String> {
+        self.aliases.clone()
+    }
+
+    /// Return a reference to the alias table (for listing).
+    pub fn aliases(&self) -> &HashMap<String, String> {
+        &self.aliases
+    }
+
+    /// Whether alias expansion is enabled.
+    pub fn expand_aliases_enabled(&self) -> bool {
+        self.expand_aliases
+    }
+
+    /// Enable or disable alias expansion.
+    pub fn set_expand_aliases(&mut self, enabled: bool) {
+        self.expand_aliases = enabled;
     }
 
     pub fn inherit_from_process(&mut self) {

@@ -17,7 +17,7 @@ pub use io_context::{CapturedIo, IoContext, ProcessIo};
 #[cfg(test)]
 use pattern::shell_pattern_match;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::process::Stdio;
 
 use crate::ast::{Command, ExecutionMode, Expression, Program, Statement};
@@ -31,6 +31,10 @@ pub struct Executor {
     /// Persistent extra file descriptors (3+), typically set by `exec N>file`.
     /// FDs 0-2 are handled by IoContext; this table holds FDs 3 and above.
     fd_table: HashMap<i32, std::fs::File>,
+    /// Alias table snapshot taken at the start of each line.  Alias expansion
+    /// uses this snapshot so that `alias`/`unalias` within a line don't affect
+    /// expansion of later commands on the same line (matching bash semantics).
+    alias_snapshot: HashMap<String, String>,
 }
 
 impl Executor {
@@ -41,6 +45,7 @@ impl Executor {
         Executor {
             env,
             fd_table: HashMap::new(),
+            alias_snapshot: HashMap::new(),
         }
     }
 
@@ -49,6 +54,7 @@ impl Executor {
         Executor {
             env,
             fd_table: HashMap::new(),
+            alias_snapshot: HashMap::new(),
         }
     }
 
@@ -73,6 +79,9 @@ impl Executor {
     }
 
     /// Execute a list of lines, returning the last exit status.
+    ///
+    /// Takes an alias table snapshot before each line so that alias
+    /// definitions within a line only take effect for subsequent lines.
     pub fn execute_lines(
         &mut self,
         lines: &[crate::ast::Line],
@@ -80,6 +89,7 @@ impl Executor {
     ) -> Result<i32, ExecError> {
         let mut status = 0;
         for line in lines {
+            self.alias_snapshot = self.env.alias_snapshot();
             status = self.execute_statements(line, io)?;
         }
         Ok(status)
@@ -123,7 +133,14 @@ impl Executor {
         io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
         match expr {
-            Expression::Command(cmd) => self.execute_command(cmd, io),
+            Expression::Command(cmd) => {
+                // Try alias expansion before normal execution
+                let no_aliases = HashSet::new();
+                if let Some(status) = self.try_alias_expansion(cmd, io, &no_aliases)? {
+                    return Ok(status);
+                }
+                self.execute_command(cmd, io)
+            }
 
             Expression::Compound { body, redirects } => self.execute_compound(body, redirects, io),
 
@@ -316,6 +333,131 @@ impl Executor {
         }
 
         Ok(String::from_utf8_lossy(&captured).to_string())
+    }
+
+    /// Try to expand the command via alias substitution.
+    ///
+    /// Returns `Some(exit_status)` if alias expansion happened and the expanded
+    /// command was executed, or `None` if no alias matched.
+    fn try_alias_expansion(
+        &mut self,
+        cmd: &Command,
+        io: &mut IoContext<'_>,
+        already_expanded: &HashSet<String>,
+    ) -> Result<Option<i32>, ExecError> {
+        if !self.env.expand_aliases_enabled() || cmd.arguments.is_empty() {
+            return Ok(None);
+        }
+
+        // Only expand plain unquoted literals — 'hi', "hi", $hi etc. must NOT expand.
+        let candidate = match &cmd.arguments[0] {
+            crate::ast::Argument::Word(w) if w.parts.len() == 1 => match &w.parts[0] {
+                crate::ast::Fragment::Literal(name) => name.clone(),
+                _ => return Ok(None),
+            },
+            _ => return Ok(None),
+        };
+
+        // Check recursion guard
+        if already_expanded.contains(&candidate) {
+            return Ok(None);
+        }
+
+        // Look up in the snapshot (not the live table)
+        let expansion = match self.alias_snapshot.get(&candidate) {
+            Some(exp) => exp.clone(),
+            None => return Ok(None),
+        };
+
+        // Build the full command line: alias expansion + remaining original args.
+        let mut remaining_args = &cmd.arguments[1..];
+
+        // Trailing-space rule: if the expansion ends with whitespace, the
+        // next word is also subject to alias expansion.
+        let mut extra_expansion = String::new();
+        if expansion.ends_with(' ') || expansion.ends_with('\t') {
+            if let Some(crate::ast::Argument::Word(w)) = remaining_args.first() {
+                if let [crate::ast::Fragment::Literal(next_name)] = w.parts.as_slice() {
+                    if let Some(next_exp) = self.alias_snapshot.get(next_name.as_str()) {
+                        extra_expansion = next_exp.clone();
+                        remaining_args = &remaining_args[1..];
+                    }
+                }
+            }
+        }
+
+        let mut remaining_source = String::new();
+        for arg in remaining_args {
+            if !remaining_source.is_empty() {
+                remaining_source.push(' ');
+            }
+            match arg.try_to_static_string() {
+                Some(s) => remaining_source.push_str(&s),
+                None => {
+                    let fields = self.expand_argument(arg)?;
+                    remaining_source.push_str(&fields.join(" "));
+                }
+            }
+        }
+
+        let mut full_line = expansion.clone();
+        if !extra_expansion.is_empty() {
+            full_line.push_str(&extra_expansion);
+        }
+        if !remaining_source.is_empty() {
+            if !full_line.ends_with(' ') && !full_line.ends_with('\t') {
+                full_line.push(' ');
+            }
+            full_line.push_str(&remaining_source);
+        }
+
+        // Re-parse the expanded line
+        let dialect = crate::Dialect::Bash;
+        let program = match crate::parse_with(&full_line, dialect) {
+            Ok(prog) => prog,
+            Err(_) => return Ok(None), // parse failure → treat as no expansion
+        };
+
+        // Update recursion guard
+        let mut expanded = already_expanded.clone();
+        expanded.insert(candidate.clone());
+
+        // If the alias expansion ends with whitespace, the next word should
+        // also be subject to alias expansion.  We handle this by recursing
+        // through the re-parsed program which will naturally hit
+        // try_alias_expansion again for each command.
+
+        // Execute the re-parsed program
+        let mut status = 0;
+        for line in &program.lines {
+            for stmt in line {
+                status =
+                    self.execute_expression_with_alias_guard(&stmt.expression, io, &expanded)?;
+                self.env.set_last_exit_status(status);
+            }
+        }
+        Ok(Some(status))
+    }
+
+    /// Execute an expression with an alias recursion guard.
+    fn execute_expression_with_alias_guard(
+        &mut self,
+        expr: &Expression,
+        io: &mut IoContext<'_>,
+        already_expanded: &HashSet<String>,
+    ) -> Result<i32, ExecError> {
+        match expr {
+            Expression::Command(cmd) => {
+                // Try alias expansion first
+                if let Some(status) = self.try_alias_expansion(cmd, io, already_expanded)? {
+                    return Ok(status);
+                }
+                // No alias match — execute normally
+                self.execute_command(cmd, io)
+            }
+            // For non-Command expressions, delegate normally
+            _ => self.execute_expression(expr, io),
+        }
     }
 
     /// Execute a simple command.

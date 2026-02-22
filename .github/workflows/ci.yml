@@ -22,6 +22,18 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --features cli
 
+  test-exec:
+    name: Execution tests
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build Docker image
+        run: scripts/build-corpus-docker.sh
+      - run: cargo test --features cli --test corpus
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

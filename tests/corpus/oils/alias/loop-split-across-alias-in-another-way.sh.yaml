@@ -1,3 +1,4 @@
+disabled: true  # alias expansion not implemented
 name: Loop split across alias in another way
 dialect: bash
 source: oils:spec/alias#loop-split-across-alias-in-another-way

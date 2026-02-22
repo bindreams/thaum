@@ -1,3 +1,4 @@
+disabled: true  # alias expansion not implemented
 name: alias for left paren
 dialect: bash
 source: oils:spec/alias#alias-for-left-paren

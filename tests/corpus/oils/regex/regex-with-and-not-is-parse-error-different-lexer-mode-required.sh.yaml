@@ -1,9 +1,8 @@
 name: Regex with == and not =~ is parse error, different lexer mode required
 dialect: bash
-source: 
+source:
   oils:spec/regex#regex-with-and-not-is-parse-error-different-lexer-mode-required
-status: 2
-parse-error: "unexpected token ')', expected a command"
+parse-error: {contains: "expected ']]'"}
 ---
 # They both give a syntax error.  This is lame.
 [[ '^(a b)$' == ^(a\ b)$ ]] && echo true

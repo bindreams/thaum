@@ -1,3 +1,4 @@
+is-valid: false  # bash also rejects: unexpected end of file (unterminated 'function foo')
 name: Unset -v
 dialect: bash
 source: oils:spec/builtin-vars#unset--v

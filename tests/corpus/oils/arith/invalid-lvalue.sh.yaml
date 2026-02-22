@@ -1,9 +1,9 @@
 name: Invalid LValue
 dialect: bash
 source: oils:spec/arith#invalid-lvalue
-status: 2
-stdout: ''
-parse-error: "unexpected token assignment target must be a variable, expected a valid arithmetic expression"
+status: 0
+stdout: "9\n"
+stderr: {contains: "attempted assignment to non-variable"}
 ---
 a=9
 (( (a + 2) = 3 ))

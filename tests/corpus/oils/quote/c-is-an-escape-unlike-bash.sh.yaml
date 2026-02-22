@@ -1,7 +1,7 @@
+is-valid: false  # bash also rejects: unexpected EOF while looking for matching '
 name: \c' is an escape, unlike bash
 dialect: bash
 source: oils:spec/quote#c-is-an-escape-unlike-bash
-stdout: "  \\a\n  07\n"
 ---
 
 # mksh and ksh agree this is an esacpe

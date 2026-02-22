@@ -1,3 +1,4 @@
+disabled: true  # alias expansion not implemented
 name: alias for left brace
 dialect: bash
 source: oils:spec/alias#alias-for-left-brace

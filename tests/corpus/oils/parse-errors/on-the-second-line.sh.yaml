@@ -1,7 +1,7 @@
+is-valid: false  # bash also rejects: syntax error near unexpected token '}'
 name: '} on the second line'
 dialect: bash
 source: oils:spec/parse-errors#on-the-second-line
-status: 127
 ---
 set -o errexit
 {ls;

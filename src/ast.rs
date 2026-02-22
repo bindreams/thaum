@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::span::Span;
 
 /// A newline-delimited group of statements.
@@ -7,7 +9,7 @@ use crate::span::Span;
 pub type Line = Vec<Statement>;
 
 /// A complete parsed shell program.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Program {
     pub lines: Vec<Line>,
     pub span: Span,
@@ -17,7 +19,7 @@ pub struct Program {
 ///
 /// Statements appear at list boundaries (program top-level, compound command
 /// bodies) — the only places where `;` and `&` are valid.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Statement {
     pub expression: Expression,
     pub mode: ExecutionMode,
@@ -30,7 +32,7 @@ pub struct Statement {
 /// statements are distinct complete commands (e.g. `set -e` checks exit
 /// status between them), while `;`-separated statements form a single
 /// list where behavior may differ.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ExecutionMode {
     /// Newline-terminated or last in list. Each newline-separated statement
     /// is a separate complete command.
@@ -47,7 +49,7 @@ pub enum ExecutionMode {
 ///
 /// Binary operators (`And`, `Or`, `Pipe`) form left-associative trees.
 /// Precedence from low to high: `&&`/`||`, `!`, `|`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Expression {
     /// A simple command: name, arguments, assignments, redirections.
     Command(Command),
@@ -80,7 +82,7 @@ pub enum Expression {
 }
 
 /// A simple command: optional assignments, arguments, and redirections.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Command {
     pub assignments: Vec<Assignment>,
     /// First element is the command name, rest are arguments.
@@ -94,7 +96,7 @@ pub struct Command {
 /// Most arguments are composed `Word`s (one or more `Fragment`s concatenated).
 /// Some (like process substitution) are standalone `Atom`s that always occupy
 /// an entire argument slot by themselves.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Argument {
     /// A composed word: one or more fragments concatenated.
     Word(Word),
@@ -127,7 +129,7 @@ impl Argument {
 ///
 /// Unlike `Fragment`s, atoms cannot be concatenated with other parts to form
 /// a larger word.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Atom {
     /// `<(cmd)` or `>(cmd)` — process substitution (Bash).
     BashProcessSubstitution {
@@ -137,7 +139,7 @@ pub enum Atom {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Assignment {
     pub name: String,
     /// Array subscript, if present: `name[index]=value`.
@@ -147,7 +149,7 @@ pub struct Assignment {
 }
 
 /// The right-hand side of an assignment.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AssignmentValue {
     /// A scalar value: `name=word`.
     Scalar(Word),
@@ -166,7 +168,7 @@ impl AssignmentValue {
 }
 
 /// A function definition: `name () compound_command [redirects]`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FunctionDef {
     pub name: String,
     pub body: Box<CompoundCommand>,
@@ -175,7 +177,7 @@ pub struct FunctionDef {
 }
 
 /// Compound commands.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CompoundCommand {
     BraceGroup {
         body: Vec<Line>,
@@ -248,7 +250,7 @@ pub enum CompoundCommand {
 }
 
 /// How a case arm is terminated.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CaseTerminator {
     /// `;;` — stop matching (POSIX).
     Break,
@@ -258,7 +260,7 @@ pub enum CaseTerminator {
     BashContinue,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CaseArm {
     pub patterns: Vec<Word>,
     pub body: Vec<Line>,
@@ -266,7 +268,7 @@ pub struct CaseArm {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ElifClause {
     pub condition: Vec<Line>,
     pub body: Vec<Line>,
@@ -274,7 +276,7 @@ pub struct ElifClause {
 }
 
 /// A shell word — a sequence of fragments that are concatenated.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Word {
     pub parts: Vec<Fragment>,
     pub span: Span,
@@ -298,7 +300,7 @@ impl Word {
 /// Fragments can be combined with other fragments to form a single `Word`.
 /// For example, `foo${bar}baz` is three fragments: `Literal`, `Parameter`,
 /// `Literal`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Fragment {
     Literal(String),
     SingleQuoted(String),
@@ -359,7 +361,7 @@ impl Fragment {
 }
 
 /// Kind of brace expansion (Bash).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BraceExpansionKind {
     /// `{word,word,...}` — comma-separated alternatives.
     List(Vec<Vec<Fragment>>),
@@ -372,7 +374,7 @@ pub enum BraceExpansionKind {
 }
 
 /// Kind of extended glob pattern (Bash extglob).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ExtGlobKind {
     /// `?(pattern)` — matches zero or one occurrence.
     ZeroOrOne,
@@ -387,7 +389,7 @@ pub enum ExtGlobKind {
 }
 
 /// Expression inside `[[ ]]` (Bash extended test).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BashTestExpr {
     /// `-op arg` (unary file/string test).
     Unary { op: UnaryTestOp, arg: Word },
@@ -416,7 +418,7 @@ pub enum BashTestExpr {
 }
 
 /// Unary test operator inside `[[ ]]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum UnaryTestOp {
     // File existence/type
     FileExists,         // -e
@@ -448,7 +450,7 @@ pub enum UnaryTestOp {
 }
 
 /// Binary test operator inside `[[ ]]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BinaryTestOp {
     // String comparison
     StringEquals,      // == or =
@@ -471,7 +473,7 @@ pub enum BinaryTestOp {
 
 /// Arithmetic expression (Bash). Used by `(( ))` command, `$(( ))` expansion,
 /// and `for (( ; ; ))` loop.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ArithExpr {
     /// Integer literal: `42`, `0x1F`.
     Number(i64),
@@ -515,7 +517,7 @@ pub enum ArithExpr {
 }
 
 /// Arithmetic binary operator.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ArithBinaryOp {
     Add,
     Sub,
@@ -539,7 +541,7 @@ pub enum ArithBinaryOp {
 }
 
 /// Arithmetic unary operator (prefix or postfix).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ArithUnaryOp {
     Negate,    // - (prefix)
     Plus,      // + (prefix, no-op)
@@ -550,7 +552,7 @@ pub enum ArithUnaryOp {
 }
 
 /// Arithmetic assignment operator.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ArithAssignOp {
     Assign,           // =
     AddAssign,        // +=
@@ -566,7 +568,7 @@ pub enum ArithAssignOp {
 }
 
 /// Direction of a Bash process substitution.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ProcessDirection {
     /// `<(cmd)` — read from command's stdout.
     In,
@@ -574,7 +576,7 @@ pub enum ProcessDirection {
     Out,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ParameterExpansion {
     Simple(String),
     Complex {
@@ -584,7 +586,7 @@ pub enum ParameterExpansion {
     },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ParamOp {
     Default,
     DefaultAssign,
@@ -597,7 +599,7 @@ pub enum ParamOp {
     TrimLargePrefix,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum GlobChar {
     Star,
     Question,
@@ -605,14 +607,14 @@ pub enum GlobChar {
 }
 
 /// An I/O redirection.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Redirect {
     pub fd: Option<i32>,
     pub kind: RedirectKind,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RedirectKind {
     Input(Word),
     Output(Word),

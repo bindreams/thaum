@@ -11,6 +11,8 @@ cli = ["dep:colored", "dep:clap"]
 thiserror = "2"
 contracts = "0.6"
 strum = { version = "0.27", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 colored = { version = "3", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 
@@ -22,7 +24,6 @@ winspawn = "0.1"
 
 [dev-dependencies]
 pretty_assertions = "1"
-serde = { version = "1", features = ["derive"] }
 serde_yaml2 = "0.1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"

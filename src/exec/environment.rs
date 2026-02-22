@@ -2,13 +2,14 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
 
 use contracts::debug_ensures;
+use serde::{Deserialize, Serialize};
 
 use crate::ast::{CompoundCommand, FunctionDef};
 use crate::exec::error::ExecError;
 
 /// The value of a shell variable — scalar or indexed array.
-#[derive(Debug, Clone)]
-pub(crate) enum VarValue {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum VarValue {
     /// A single string value (POSIX).
     Scalar(String),
     /// A sparse indexed array (Bash).  Uses `BTreeMap` so iteration is in
@@ -17,8 +18,8 @@ pub(crate) enum VarValue {
 }
 
 /// A shell variable with metadata.
-#[derive(Debug, Clone)]
-struct ShellVar {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct ShellVar {
     value: VarValue,
     exported: bool,
     readonly: bool,

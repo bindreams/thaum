@@ -93,10 +93,16 @@ pub trait Visit<'ast> {
 // walk_* free functions
 // ---------------------------------------------------------------------------
 
-pub fn walk_program<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, program: &'ast Program) {
-    for stmt in &program.statements {
-        v.visit_statement(stmt);
+fn walk_lines<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, lines: &'ast [Line]) {
+    for line in lines {
+        for stmt in line {
+            v.visit_statement(stmt);
+        }
     }
+}
+
+pub fn walk_program<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, program: &'ast Program) {
+    walk_lines(v, &program.lines);
 }
 
 pub fn walk_statement<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, stmt: &'ast Statement) {
@@ -145,9 +151,7 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
 ) {
     match compound {
         CompoundCommand::BraceGroup { body, .. } | CompoundCommand::Subshell { body, .. } => {
-            for stmt in body {
-                v.visit_statement(stmt);
-            }
+            walk_lines(v, body);
         }
         CompoundCommand::ForClause { words, body, .. }
         | CompoundCommand::BashSelectClause { words, body, .. } => {
@@ -156,9 +160,7 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
                     v.visit_word(w);
                 }
             }
-            for stmt in body {
-                v.visit_statement(stmt);
-            }
+            walk_lines(v, body);
         }
         CompoundCommand::CaseClause { word, arms, .. } => {
             v.visit_word(word);
@@ -173,19 +175,13 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
             else_body,
             ..
         } => {
-            for stmt in condition {
-                v.visit_statement(stmt);
-            }
-            for stmt in then_body {
-                v.visit_statement(stmt);
-            }
+            walk_lines(v, condition);
+            walk_lines(v, then_body);
             for elif in elifs {
                 v.visit_elif_clause(elif);
             }
-            if let Some(else_stmts) = else_body {
-                for stmt in else_stmts {
-                    v.visit_statement(stmt);
-                }
+            if let Some(else_lines) = else_body {
+                walk_lines(v, else_lines);
             }
         }
         CompoundCommand::WhileClause {
@@ -194,12 +190,8 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
         | CompoundCommand::UntilClause {
             condition, body, ..
         } => {
-            for stmt in condition {
-                v.visit_statement(stmt);
-            }
-            for stmt in body {
-                v.visit_statement(stmt);
-            }
+            walk_lines(v, condition);
+            walk_lines(v, body);
         }
         CompoundCommand::BashDoubleBracket { .. }
         | CompoundCommand::BashArithmeticCommand { .. } => {}
@@ -207,9 +199,7 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
             v.visit_expression(body);
         }
         CompoundCommand::BashArithmeticFor { body, .. } => {
-            for stmt in body {
-                v.visit_statement(stmt);
-            }
+            walk_lines(v, body);
         }
     }
 }
@@ -254,18 +244,12 @@ pub fn walk_case_arm<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, arm: &'ast CaseAr
     for pattern in &arm.patterns {
         v.visit_word(pattern);
     }
-    for stmt in &arm.body {
-        v.visit_statement(stmt);
-    }
+    walk_lines(v, &arm.body);
 }
 
 pub fn walk_elif_clause<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, elif: &'ast ElifClause) {
-    for stmt in &elif.condition {
-        v.visit_statement(stmt);
-    }
-    for stmt in &elif.body {
-        v.visit_statement(stmt);
-    }
+    walk_lines(v, &elif.condition);
+    walk_lines(v, &elif.body);
 }
 
 pub fn walk_argument<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, argument: &'ast Argument) {

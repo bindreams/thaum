@@ -11,20 +11,22 @@ impl Parser {
         let start_span = self.lexer.peek()?.span;
         self.skip_linebreak()?;
 
-        let mut statements = Vec::new();
+        let mut lines = Vec::new();
         while self.lexer.peek()?.token != Token::Eof {
-            self.parse_list_into(&mut statements)?;
+            let mut line = Vec::new();
+            self.parse_list_into(&mut line)?;
+            lines.push(line);
             self.skip_linebreak()?;
         }
 
         let end_span = self.lexer.peek()?.span;
         Ok(Program {
-            span: if statements.is_empty() {
+            span: if lines.is_empty() {
                 start_span
             } else {
                 start_span.merge(end_span)
             },
-            statements,
+            lines,
         })
     }
 
@@ -42,8 +44,14 @@ impl Parser {
                         span,
                     });
                     self.lexer.advance()?;
-                    self.skip_linebreak()?;
-                    // No eat_whitespace: skip_linebreak already ate any WS
+                    // If a newline follows `;`, this line ends here.
+                    // The newline will be consumed by the caller's skip_linebreak.
+                    self.lexer.eat_whitespace()?;
+                    if self.lexer.peek()?.token == Token::Newline
+                        || self.lexer.peek()?.token == Token::Eof
+                    {
+                        return Ok(());
+                    }
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;
@@ -59,8 +67,13 @@ impl Parser {
                         span,
                     });
                     self.lexer.advance()?;
-                    self.skip_linebreak()?;
-                    // No eat_whitespace: skip_linebreak already ate any WS
+                    // If a newline follows `&`, this line ends here.
+                    self.lexer.eat_whitespace()?;
+                    if self.lexer.peek()?.token == Token::Newline
+                        || self.lexer.peek()?.token == Token::Eof
+                    {
+                        return Ok(());
+                    }
                     let tok = self.lexer.peek()?.token.clone();
                     if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
                         expr = self.parse_and_or()?;

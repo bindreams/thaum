@@ -30,7 +30,7 @@ fi"#;
     let compound = first_compound(input);
     if let CompoundCommand::IfClause { then_body, .. } = &compound {
         assert!(matches!(
-            then_body[0].expression,
+            then_body[0][0].expression,
             Expression::Compound {
                 body: CompoundCommand::IfClause { .. },
                 ..
@@ -166,7 +166,7 @@ fn brace_group_with_redirect() {
         redirects,
     } = &e
     {
-        assert_eq!(body.len(), 2);
+        assert_eq!(body.iter().flatten().count(), 2);
         assert_eq!(redirects.len(), 1);
     } else {
         panic!("expected brace group with redirect");
@@ -208,7 +208,7 @@ fn deeply_nested_compound() {
     done
 fi"#;
     let prog = parse_ok(input);
-    assert!(!prog.statements.is_empty());
+    assert!(!prog.lines.is_empty());
 }
 
 #[test]

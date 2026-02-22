@@ -1,9 +1,15 @@
 use crate::span::Span;
 
+/// A newline-delimited group of statements.
+///
+/// In bash, each line is read, alias-expanded, parsed, and executed before the
+/// next line is read.  Semicolons within a line do NOT create alias boundaries.
+pub type Line = Vec<Statement>;
+
 /// A complete parsed shell program.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Program {
-    pub statements: Vec<Statement>,
+    pub lines: Vec<Line>,
     pub span: Span,
 }
 
@@ -172,17 +178,17 @@ pub struct FunctionDef {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CompoundCommand {
     BraceGroup {
-        body: Vec<Statement>,
+        body: Vec<Line>,
         span: Span,
     },
     Subshell {
-        body: Vec<Statement>,
+        body: Vec<Line>,
         span: Span,
     },
     ForClause {
         variable: String,
         words: Option<Vec<Word>>,
-        body: Vec<Statement>,
+        body: Vec<Line>,
         span: Span,
     },
     CaseClause {
@@ -191,20 +197,20 @@ pub enum CompoundCommand {
         span: Span,
     },
     IfClause {
-        condition: Vec<Statement>,
-        then_body: Vec<Statement>,
+        condition: Vec<Line>,
+        then_body: Vec<Line>,
         elifs: Vec<ElifClause>,
-        else_body: Option<Vec<Statement>>,
+        else_body: Option<Vec<Line>>,
         span: Span,
     },
     WhileClause {
-        condition: Vec<Statement>,
-        body: Vec<Statement>,
+        condition: Vec<Line>,
+        body: Vec<Line>,
         span: Span,
     },
     UntilClause {
-        condition: Vec<Statement>,
-        body: Vec<Statement>,
+        condition: Vec<Line>,
+        body: Vec<Line>,
         span: Span,
     },
     // --- Bash extensions ---
@@ -222,7 +228,7 @@ pub enum CompoundCommand {
     BashSelectClause {
         variable: String,
         words: Option<Vec<Word>>,
-        body: Vec<Statement>,
+        body: Vec<Line>,
         span: Span,
     },
     /// `coproc [NAME] command` — coprocess (Bash).
@@ -236,7 +242,7 @@ pub enum CompoundCommand {
         init: Option<ArithExpr>,
         condition: Option<ArithExpr>,
         update: Option<ArithExpr>,
-        body: Vec<Statement>,
+        body: Vec<Line>,
         span: Span,
     },
 }
@@ -255,15 +261,15 @@ pub enum CaseTerminator {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CaseArm {
     pub patterns: Vec<Word>,
-    pub body: Vec<Statement>,
+    pub body: Vec<Line>,
     pub terminator: Option<CaseTerminator>,
     pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ElifClause {
-    pub condition: Vec<Statement>,
-    pub body: Vec<Statement>,
+    pub condition: Vec<Line>,
+    pub body: Vec<Line>,
     pub span: Span,
 }
 

@@ -94,8 +94,8 @@ fn heredoc_strip_tabs() {
 fn heredoc_with_separate_lines() {
     // Heredoc where the body is on a separate line from the command
     let prog = parse_ok("cat <<EOF\nhello\nEOF\necho after\n");
-    assert_eq!(prog.statements.len(), 2);
-    if let Expression::Command(cmd) = &prog.statements[0].expression {
+    assert_eq!(prog.lines.len(), 2);
+    if let Expression::Command(cmd) = &prog.lines[0][0].expression {
         if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
             assert_eq!(body, "hello\n");
         } else {
@@ -114,10 +114,10 @@ fn heredoc_inside_if() {
     if let Expression::Compound {
         body: CompoundCommand::IfClause { then_body, .. },
         ..
-    } = &prog.statements[0].expression
+    } = &prog.lines[0][0].expression
     {
-        assert_eq!(then_body.len(), 2);
-        if let Expression::Command(cmd) = &then_body[0].expression {
+        assert_eq!(then_body.iter().flatten().count(), 2);
+        if let Expression::Command(cmd) = &then_body[0][0].expression {
             if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
                 assert_eq!(body, "hello\n");
             } else {
@@ -137,9 +137,9 @@ fn heredoc_inside_while() {
     if let Expression::Compound {
         body: CompoundCommand::WhileClause { body, .. },
         ..
-    } = &prog.statements[0].expression
+    } = &prog.lines[0][0].expression
     {
-        assert_eq!(body.len(), 2); // cat with heredoc + break
+        assert_eq!(body.iter().flatten().count(), 2); // cat with heredoc + break
     } else {
         panic!("expected WhileClause");
     }
@@ -150,9 +150,9 @@ fn heredoc_with_redirect_inside_function() {
     // The pattern from dockerd-rootless-setuptool.sh
     let input = "f() {\n\tcat <<- EOT > /tmp/out\n\t\thello\n\tEOT\n\techo done\n}\n";
     let prog = thaum::parse_with(input, thaum::Dialect::Bash).unwrap();
-    if let Expression::FunctionDef(f) = &prog.statements[0].expression {
+    if let Expression::FunctionDef(f) = &prog.lines[0][0].expression {
         if let CompoundCommand::BraceGroup { body, .. } = f.body.as_ref() {
-            assert_eq!(body.len(), 2); // cat with heredoc + echo
+            assert_eq!(body.iter().flatten().count(), 2); // cat with heredoc + echo
         } else {
             panic!("expected BraceGroup");
         }
@@ -187,7 +187,7 @@ fn heredoc_with_or_rhs_after_body() {
     let input = "cat <<EOF ||\nhello world\nEOF\necho \"heredoc failed\"";
     let prog = parse_ok(input);
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Or { .. }
     ));
 }
@@ -198,7 +198,7 @@ fn heredoc_with_or_rhs_same_line() {
     let input = "cat <<EOF || echo \"heredoc failed\"\nhello world\nEOF";
     let prog = parse_ok(input);
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Or { .. }
     ));
 }
@@ -209,7 +209,7 @@ fn heredoc_with_and_rhs_after_body() {
     let input = "cat <<EOF &&\nhello world\nEOF\necho \"next\"";
     let prog = parse_ok(input);
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::And { .. }
     ));
 }
@@ -220,7 +220,7 @@ fn heredoc_in_if_condition() {
     let input = "if cat <<EOF; then\nhello\nEOF\necho yes\nfi";
     let prog = parse(input).unwrap();
     // The program should parse and the heredoc body should be filled.
-    let expr = &prog.statements[0].expression;
+    let expr = &prog.lines[0][0].expression;
     if let Expression::Compound {
         body:
             CompoundCommand::IfClause {
@@ -232,7 +232,7 @@ fn heredoc_in_if_condition() {
     } = expr
     {
         // Condition: cat <<EOF with body filled
-        if let Expression::Command(cmd) = &condition[0].expression {
+        if let Expression::Command(cmd) = &condition[0][0].expression {
             if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
                 assert_eq!(body, "hello\n");
             } else {
@@ -242,7 +242,7 @@ fn heredoc_in_if_condition() {
             panic!("expected command in condition");
         }
         // Then body: echo yes
-        assert_eq!(then_body.len(), 1);
+        assert_eq!(then_body.iter().flatten().count(), 1);
     } else {
         panic!("expected if clause");
     }
@@ -253,7 +253,7 @@ fn heredoc_with_pipe_on_last_line() {
     // Pipe on the heredoc-triggering line.
     let input = "cat <<EOF |\n1\n2\nEOF\ntac";
     let prog = parse(input).unwrap();
-    if let Expression::Pipe { left, .. } = &prog.statements[0].expression {
+    if let Expression::Pipe { left, .. } = &prog.lines[0][0].expression {
         if let Expression::Command(cmd) = left.as_ref() {
             if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {
                 assert_eq!(body, "1\n2\n");
@@ -272,7 +272,7 @@ fn heredoc_with_pipe_on_last_line() {
 fn multiple_heredocs_in_pipeline() {
     let input = "cat <<A |\na\nA\ncat <<B\nb\nB";
     let prog = parse(input).unwrap();
-    if let Expression::Pipe { left, right, .. } = &prog.statements[0].expression {
+    if let Expression::Pipe { left, right, .. } = &prog.lines[0][0].expression {
         // Left: cat <<A with body "a\n"
         if let Expression::Command(cmd) = left.as_ref() {
             if let RedirectKind::HereDoc { body, .. } = &cmd.redirects[0].kind {

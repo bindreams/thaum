@@ -41,8 +41,9 @@ impl<'a> YamlWriter<'a> {
 
     fn build_program(&self, prog: &Program) -> YamlValue {
         let stmts: Vec<YamlValue> = prog
-            .statements
+            .lines
             .iter()
+            .flatten()
             .map(|s| self.build_statement(s))
             .collect();
         let mut m = MappingBuilder::new();
@@ -217,12 +218,12 @@ impl<'a> YamlWriter<'a> {
             CompoundCommand::BraceGroup { body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "BraceGroup");
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::Subshell { body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "Subshell");
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::ForClause {
                 variable,
@@ -242,7 +243,7 @@ impl<'a> YamlWriter<'a> {
                 } else if self.verbose {
                     m.null("words");
                 }
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::CaseClause { word, arms, span } => {
                 m.raw("source", &self.source(*span));
@@ -261,8 +262,8 @@ impl<'a> YamlWriter<'a> {
             } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "IfClause");
-                self.extend_statement_list(&mut m, "condition", condition);
-                self.extend_statement_list(&mut m, "then_body", then_body);
+                self.extend_lines(&mut m, "condition", condition);
+                self.extend_lines(&mut m, "then_body", then_body);
                 if !elifs.is_empty() {
                     let items: Vec<YamlValue> = elifs.iter().map(|e| self.build_elif(e)).collect();
                     m.value("elifs", YamlValue::Sequence(items));
@@ -270,7 +271,7 @@ impl<'a> YamlWriter<'a> {
                     m.empty_seq("elifs");
                 }
                 if let Some(else_cmds) = else_body {
-                    self.extend_statement_list(&mut m, "else_body", else_cmds);
+                    self.extend_lines(&mut m, "else_body", else_cmds);
                 } else if self.verbose {
                     m.null("else_body");
                 }
@@ -282,8 +283,8 @@ impl<'a> YamlWriter<'a> {
             } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "WhileClause");
-                self.extend_statement_list(&mut m, "condition", condition);
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "condition", condition);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::UntilClause {
                 condition,
@@ -292,8 +293,8 @@ impl<'a> YamlWriter<'a> {
             } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "UntilClause");
-                self.extend_statement_list(&mut m, "condition", condition);
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "condition", condition);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::BashDoubleBracket { expression, span } => {
                 m.raw("source", &self.source(*span));
@@ -323,7 +324,7 @@ impl<'a> YamlWriter<'a> {
                 } else if self.verbose {
                     m.null("words");
                 }
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "body", body);
             }
             CompoundCommand::BashCoproc { name, body, span } => {
                 m.raw("source", &self.source(*span));
@@ -361,15 +362,19 @@ impl<'a> YamlWriter<'a> {
                 } else if self.verbose {
                     m.null("update");
                 }
-                self.extend_statement_list(&mut m, "body", body);
+                self.extend_lines(&mut m, "body", body);
             }
         }
         m.build()
     }
 
-    /// Helper: add a named statement list to a mapping.
-    fn extend_statement_list(&self, m: &mut MappingBuilder, key: &str, stmts: &[Statement]) {
-        let items: Vec<YamlValue> = stmts.iter().map(|s| self.build_statement(s)).collect();
+    /// Helper: add a named statement list to a mapping, flattening lines.
+    fn extend_lines(&self, m: &mut MappingBuilder, key: &str, lines: &[Line]) {
+        let items: Vec<YamlValue> = lines
+            .iter()
+            .flatten()
+            .map(|s| self.build_statement(s))
+            .collect();
         m.value(key, YamlValue::Sequence(items));
     }
 
@@ -383,7 +388,7 @@ impl<'a> YamlWriter<'a> {
             .collect();
         m.value("patterns", YamlValue::Sequence(patterns));
         if !arm.body.is_empty() {
-            self.extend_statement_list(&mut m, "body", &arm.body);
+            self.extend_lines(&mut m, "body", &arm.body);
         } else if self.verbose {
             m.empty_seq("body");
         }
@@ -393,8 +398,8 @@ impl<'a> YamlWriter<'a> {
     fn build_elif(&self, elif: &ElifClause) -> YamlValue {
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(elif.span));
-        self.extend_statement_list(&mut m, "condition", &elif.condition);
-        self.extend_statement_list(&mut m, "body", &elif.body);
+        self.extend_lines(&mut m, "condition", &elif.condition);
+        self.extend_lines(&mut m, "body", &elif.body);
         m.build()
     }
 

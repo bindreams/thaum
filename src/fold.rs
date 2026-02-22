@@ -35,7 +35,7 @@
 //!
 //! let prog = thaum::parse("echo hello").unwrap();
 //! let prog = Uppercaser.fold_program(prog);
-//! let cmd = match &prog.statements[0].expression {
+//! let cmd = match &prog.lines[0][0].expression {
 //!     Expression::Command(c) => c,
 //!     _ => panic!(),
 //! };
@@ -107,6 +107,10 @@ fn fold_stmts<F: Fold + ?Sized>(f: &mut F, stmts: Vec<Statement>) -> Vec<Stateme
     stmts.into_iter().map(|s| f.fold_statement(s)).collect()
 }
 
+fn fold_lines<F: Fold + ?Sized>(f: &mut F, lines: Vec<Line>) -> Vec<Line> {
+    lines.into_iter().map(|line| fold_stmts(f, line)).collect()
+}
+
 fn fold_words<F: Fold + ?Sized>(f: &mut F, words: Vec<Word>) -> Vec<Word> {
     words.into_iter().map(|w| f.fold_word(w)).collect()
 }
@@ -117,7 +121,7 @@ fn fold_redirects<F: Fold + ?Sized>(f: &mut F, redirects: Vec<Redirect>) -> Vec<
 
 pub fn fold_program<F: Fold + ?Sized>(f: &mut F, program: Program) -> Program {
     Program {
-        statements: fold_stmts(f, program.statements),
+        lines: fold_lines(f, program.lines),
         span: program.span,
     }
 }
@@ -182,11 +186,11 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
 ) -> CompoundCommand {
     match compound {
         CompoundCommand::BraceGroup { body, span } => CompoundCommand::BraceGroup {
-            body: fold_stmts(f, body),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::Subshell { body, span } => CompoundCommand::Subshell {
-            body: fold_stmts(f, body),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::ForClause {
@@ -197,7 +201,7 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
         } => CompoundCommand::ForClause {
             variable,
             words: words.map(|w| fold_words(f, w)),
-            body: fold_stmts(f, body),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::CaseClause { word, arms, span } => CompoundCommand::CaseClause {
@@ -212,10 +216,10 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
             else_body,
             span,
         } => CompoundCommand::IfClause {
-            condition: fold_stmts(f, condition),
-            then_body: fold_stmts(f, then_body),
+            condition: fold_lines(f, condition),
+            then_body: fold_lines(f, then_body),
             elifs: elifs.into_iter().map(|e| f.fold_elif_clause(e)).collect(),
-            else_body: else_body.map(|b| fold_stmts(f, b)),
+            else_body: else_body.map(|b| fold_lines(f, b)),
             span,
         },
         CompoundCommand::WhileClause {
@@ -223,8 +227,8 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
             body,
             span,
         } => CompoundCommand::WhileClause {
-            condition: fold_stmts(f, condition),
-            body: fold_stmts(f, body),
+            condition: fold_lines(f, condition),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::UntilClause {
@@ -232,8 +236,8 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
             body,
             span,
         } => CompoundCommand::UntilClause {
-            condition: fold_stmts(f, condition),
-            body: fold_stmts(f, body),
+            condition: fold_lines(f, condition),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::BashDoubleBracket { expression, span } => {
@@ -250,7 +254,7 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
         } => CompoundCommand::BashSelectClause {
             variable,
             words: words.map(|w| fold_words(f, w)),
-            body: fold_stmts(f, body),
+            body: fold_lines(f, body),
             span,
         },
         CompoundCommand::BashCoproc { name, body, span } => CompoundCommand::BashCoproc {
@@ -268,7 +272,7 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
             init,
             condition,
             update,
-            body: fold_stmts(f, body),
+            body: fold_lines(f, body),
             span,
         },
     }
@@ -320,7 +324,7 @@ pub fn fold_assignment<F: Fold + ?Sized>(f: &mut F, assignment: Assignment) -> A
 pub fn fold_case_arm<F: Fold + ?Sized>(f: &mut F, arm: CaseArm) -> CaseArm {
     CaseArm {
         patterns: fold_words(f, arm.patterns),
-        body: fold_stmts(f, arm.body),
+        body: fold_lines(f, arm.body),
         terminator: arm.terminator,
         span: arm.span,
     }
@@ -328,8 +332,8 @@ pub fn fold_case_arm<F: Fold + ?Sized>(f: &mut F, arm: CaseArm) -> CaseArm {
 
 pub fn fold_elif_clause<F: Fold + ?Sized>(f: &mut F, elif: ElifClause) -> ElifClause {
     ElifClause {
-        condition: fold_stmts(f, elif.condition),
-        body: fold_stmts(f, elif.body),
+        condition: fold_lines(f, elif.condition),
+        body: fold_lines(f, elif.body),
         span: elif.span,
     }
 }
@@ -381,7 +385,7 @@ mod tests {
     fn fold_uppercases_literals() {
         let prog = parse_bash("echo hello world");
         let prog = Uppercaser.fold_program(prog);
-        let cmd = match &prog.statements[0].expression {
+        let cmd = match &prog.lines[0][0].expression {
             Expression::Command(c) => c,
             _ => panic!("expected command"),
         };
@@ -401,12 +405,12 @@ mod tests {
         let prog = parse_bash("if true; then echo inner; fi");
         let prog = Uppercaser.fold_program(prog);
         // The fold should reach "inner" inside the if body
-        let if_clause = match &prog.statements[0].expression {
+        let if_clause = match &prog.lines[0][0].expression {
             Expression::Compound { body, .. } => body,
             _ => panic!("expected compound"),
         };
         if let CompoundCommand::IfClause { then_body, .. } = if_clause {
-            let cmd = match &then_body[0].expression {
+            let cmd = match &then_body[0][0].expression {
                 Expression::Command(c) => c,
                 _ => panic!("expected command"),
             };
@@ -430,7 +434,7 @@ mod tests {
                 _ => panic!("expected command"),
             }
         }
-        if let Expression::Pipe { left, right, .. } = &prog.statements[0].expression {
+        if let Expression::Pipe { left, right, .. } = &prog.lines[0][0].expression {
             assert_eq!(first_arg(left), "A");
             assert_eq!(first_arg(right), "B");
         } else {

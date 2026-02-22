@@ -69,7 +69,20 @@ impl Executor {
 
     /// Execute a parsed program. Returns the exit status of the last command.
     pub fn execute(&mut self, program: &Program, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
-        self.execute_statements(&program.statements, io)
+        self.execute_lines(&program.lines, io)
+    }
+
+    /// Execute a list of lines, returning the last exit status.
+    pub fn execute_lines(
+        &mut self,
+        lines: &[crate::ast::Line],
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
+        let mut status = 0;
+        for line in lines {
+            status = self.execute_statements(line, io)?;
+        }
+        Ok(status)
     }
 
     /// Execute a list of statements, returning the last exit status.

@@ -6,7 +6,7 @@ fn parse_ok(input: &str) -> Program {
 }
 
 fn first_stmt(input: &str) -> Statement {
-    parse_ok(input).statements.into_iter().next().unwrap()
+    parse_ok(input).lines.into_iter().flatten().next().unwrap()
 }
 
 fn first_expr(input: &str) -> Expression {
@@ -146,30 +146,31 @@ fn parse_pipe_binds_tighter_than_and() {
 #[test]
 fn parse_semicolon_list() {
     let prog = parse_ok("a; b");
-    assert_eq!(prog.statements.len(), 2);
-    assert_eq!(prog.statements[0].mode, ExecutionMode::Terminated);
-    assert_eq!(prog.statements[1].mode, ExecutionMode::Sequential);
+    assert_eq!(prog.lines.len(), 1);
+    assert_eq!(prog.lines[0].len(), 2);
+    assert_eq!(prog.lines[0][0].mode, ExecutionMode::Terminated);
+    assert_eq!(prog.lines[0][1].mode, ExecutionMode::Sequential);
 }
 
 #[test]
 fn parse_background() {
     let prog = parse_ok("cmd &");
-    assert_eq!(prog.statements.len(), 1);
-    assert_eq!(prog.statements[0].mode, ExecutionMode::Background);
+    assert_eq!(prog.lines[0].len(), 1);
+    assert_eq!(prog.lines[0][0].mode, ExecutionMode::Background);
 }
 
 #[test]
 fn parse_background_then_foreground() {
     let prog = parse_ok("a & b");
-    assert_eq!(prog.statements.len(), 2);
-    assert_eq!(prog.statements[0].mode, ExecutionMode::Background);
-    assert_eq!(prog.statements[1].mode, ExecutionMode::Sequential);
+    assert_eq!(prog.lines[0].len(), 2);
+    assert_eq!(prog.lines[0][0].mode, ExecutionMode::Background);
+    assert_eq!(prog.lines[0][1].mode, ExecutionMode::Sequential);
 }
 
 #[test]
 fn parse_newline_separator() {
     let prog = parse_ok("a\nb");
-    assert_eq!(prog.statements.len(), 2);
+    assert_eq!(prog.lines.len(), 2);
 }
 
 // === Redirections ===
@@ -330,12 +331,12 @@ fn parse_reserved_word_as_argument() {
 
 #[test]
 fn parse_empty_input() {
-    assert!(parse_ok("").statements.is_empty());
+    assert!(parse_ok("").lines.is_empty());
 }
 
 #[test]
 fn parse_only_newlines() {
-    assert!(parse_ok("\n\n\n").statements.is_empty());
+    assert!(parse_ok("\n\n\n").lines.is_empty());
 }
 
 #[test]

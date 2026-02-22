@@ -8,7 +8,7 @@ fn bash_here_string() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("cat <<< hello", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
         assert!(matches!(
@@ -28,7 +28,7 @@ fn posix_rejects_here_string() {
 #[test]
 fn bash_ampersand_redirect() {
     let prog = parse_with("cmd &> /dev/null", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
         assert!(matches!(
@@ -43,7 +43,7 @@ fn bash_ampersand_redirect() {
 #[test]
 fn bash_ampersand_append_redirect() {
     let prog = parse_with("cmd &>> log", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
         assert!(matches!(
@@ -59,7 +59,7 @@ fn bash_ampersand_append_redirect() {
 fn posix_ampersand_is_background() {
     let result = parse("cmd &> /dev/null");
     if let Ok(prog) = &result {
-        assert!(prog.statements[0].mode == ExecutionMode::Background);
+        assert!(prog.lines[0][0].mode == ExecutionMode::Background);
     }
 }
 
@@ -70,7 +70,7 @@ fn bash_double_brackets() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options(r#"[[ -f /etc/passwd ]]"#, opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashDoubleBracket { expression, .. },
         ..
@@ -92,7 +92,7 @@ fn bash_double_brackets() {
 #[test]
 fn bash_double_brackets_with_and() {
     let prog = parse_with(r#"[[ -f foo && -d bar ]]"#, Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashDoubleBracket { expression, .. },
         ..
@@ -128,7 +128,7 @@ fn bash_double_brackets_requires_space() {
     // Without space, [[-f is a literal command name.
     let prog = parse_with("[[-f foo ]]", Dialect::Bash).unwrap();
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Command(_)
     ));
 }
@@ -136,7 +136,7 @@ fn bash_double_brackets_requires_space() {
 #[test]
 fn posix_rejects_double_brackets() {
     let prog = parse("[[ -f foo ]]").unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     assert!(matches!(stmt.expression, Expression::Command(_)));
 }
 
@@ -147,7 +147,7 @@ fn bash_arithmetic_command() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("(( x + 1 ))", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashArithmeticCommand { expression, .. },
         ..
@@ -171,7 +171,7 @@ fn posix_double_paren_is_subshell() {
     let result = parse("(( x + 1 ))");
     if let Ok(prog) = &result {
         assert!(!matches!(
-            &prog.statements[0].expression,
+            &prog.lines[0][0].expression,
             Expression::Compound {
                 body: CompoundCommand::BashArithmeticCommand { .. },
                 ..
@@ -200,7 +200,7 @@ fn bash_nested_subshell_in_pipeline() {
 #[test]
 fn bash_function_keyword() {
     let prog = parse_with("function greet { echo hello; }", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::FunctionDef(f) = &stmt.expression {
         assert_eq!(f.name, "greet");
     } else {
@@ -211,7 +211,7 @@ fn bash_function_keyword() {
 #[test]
 fn bash_function_keyword_with_parens() {
     let prog = parse_with("function greet() { echo hello; }", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::FunctionDef(f) = &stmt.expression {
         assert_eq!(f.name, "greet");
     } else {
@@ -224,7 +224,7 @@ fn posix_rejects_function_keyword() {
     let result = parse("function greet { echo hello; }");
     if let Ok(prog) = &result {
         assert!(!matches!(
-            &prog.statements[0].expression,
+            &prog.lines[0][0].expression,
             Expression::FunctionDef(_)
         ));
     }
@@ -237,7 +237,7 @@ fn bash_process_substitution_input() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("diff <(sort a) <(sort b)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 3);
         assert!(matches!(
@@ -266,7 +266,7 @@ fn bash_process_substitution_output() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("tee >(grep err > log)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 2);
         assert!(matches!(
@@ -296,7 +296,7 @@ fn process_substitution_requires_whitespace() {
 
     // With a space, `< <(sort a)` IS valid: redirect from process substitution
     let prog = thaum::parser::parse_with_options("echo foo < <(sort a)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
         assert!(matches!(&cmd.redirects[0].kind, RedirectKind::Input(_)));
@@ -309,7 +309,7 @@ fn process_substitution_requires_whitespace() {
 fn posix_rejects_process_substitution() {
     let result = parse("diff <(sort a)");
     if let Ok(prog) = &result {
-        if let Expression::Command(cmd) = &prog.statements[0].expression {
+        if let Expression::Command(cmd) = &prog.lines[0][0].expression {
             assert!(!cmd
                 .arguments
                 .iter()
@@ -321,7 +321,7 @@ fn posix_rejects_process_substitution() {
 #[test]
 fn bash_extended_case_fall_through() {
     let prog = parse_with("case x in\na) echo a;;&\nb) echo b;;\nesac", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::CaseClause { arms, .. },
         ..
@@ -338,7 +338,7 @@ fn bash_extended_case_fall_through() {
 #[test]
 fn bash_extended_case_continue() {
     let prog = parse_with("case x in\na) echo a;&\nb) echo b;;\nesac", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::CaseClause { arms, .. },
         ..
@@ -359,7 +359,7 @@ fn bash_select_loop() {
     };
     let prog =
         thaum::parser::parse_with_options("select opt in a b c; do echo $opt; done", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body:
             CompoundCommand::BashSelectClause {
@@ -386,7 +386,7 @@ fn bash_select_no_in() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("select opt\ndo\necho $opt\ndone", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashSelectClause {
             variable, words, ..
@@ -406,7 +406,7 @@ fn posix_rejects_select() {
     let result = parse("select opt in a b c; do echo $opt; done");
     if let Ok(prog) = &result {
         assert!(matches!(
-            &prog.statements[0].expression,
+            &prog.lines[0][0].expression,
             Expression::Command(_)
         ));
     }
@@ -419,7 +419,7 @@ fn bash_coproc_simple() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("coproc cat", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashCoproc { name, body, .. },
         ..
@@ -439,7 +439,7 @@ fn bash_coproc_named() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("coproc mycoproc { cat; }", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashCoproc { name, body, .. },
         ..
@@ -463,7 +463,7 @@ fn posix_rejects_coproc() {
     let result = parse("coproc cat");
     if let Ok(prog) = &result {
         assert!(matches!(
-            &prog.statements[0].expression,
+            &prog.lines[0][0].expression,
             Expression::Command(_)
         ));
     }
@@ -476,7 +476,7 @@ fn bash_array_assignment() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("arr=(one two three)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
         assert_eq!(cmd.assignments[0].name, "arr");
@@ -497,7 +497,7 @@ fn bash_array_assignment_empty() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("arr=()", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
         if let AssignmentValue::BashArray(elements) = &cmd.assignments[0].value {
@@ -517,7 +517,7 @@ fn bash_array_assignment_with_command() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("arr=(a b) echo hello", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.assignments.len(), 1);
         assert_eq!(cmd.arguments.len(), 2);
@@ -536,7 +536,7 @@ fn bash_pipe_stderr() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("cmd1 |& cmd2", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Pipe {
         left,
         right,
@@ -559,7 +559,7 @@ fn bash_pipe_stderr_in_chain() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("a |& b | c", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     // Left-associative: Pipe(Pipe(a, b, stderr=true), c, stderr=false)
     if let Expression::Pipe {
         left,
@@ -593,7 +593,7 @@ fn posix_pipe_ampersand_is_background() {
     if let Ok(prog) = &result {
         // If it parses, it should NOT be a Pipe with stderr
         assert!(!matches!(
-            &prog.statements[0].expression,
+            &prog.lines[0][0].expression,
             Expression::Pipe { stderr: true, .. }
         ));
     }
@@ -608,7 +608,7 @@ fn bash_ansi_c_quoting() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options(r"echo $'\n\t'", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 2);
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -632,7 +632,7 @@ fn bash_ansi_c_quoting_concatenated() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options(r"echo prefix$'\n'suffix", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert_eq!(w.parts.len(), 3);
@@ -651,7 +651,7 @@ fn bash_ansi_c_quoting_concatenated() {
 fn posix_dollar_single_quote_is_dollar_plus_string() {
     // In POSIX, $'...' is just $ followed by a single-quoted string
     let prog = parse(r"echo $'hello'").unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             // Should NOT be BashAnsiCQuoted
@@ -672,7 +672,7 @@ fn bash_locale_quoted() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options(r#"echo $"hello $USER""#, opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(&w.parts[0], Fragment::BashLocaleQuoted(_)));
@@ -693,7 +693,7 @@ fn bash_locale_quoted() {
 fn posix_dollar_double_quote_is_dollar_plus_string() {
     // In POSIX, $"..." is just $ followed by a double-quoted string
     let prog = parse(r#"echo $"hello""#).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(!w
@@ -713,7 +713,7 @@ fn bash_extglob_zero_or_more() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("echo *(*.txt)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(
@@ -738,7 +738,7 @@ fn bash_extglob_not() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("echo !(*.bak)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(
@@ -764,7 +764,7 @@ fn bash_extglob_in_word() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("echo file.@(txt|md)", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(&w.parts[0], Fragment::Literal(s) if s == "file."));
@@ -792,7 +792,7 @@ fn posix_rejects_extglob() {
     // Since * is a glob and ( starts a subshell, this should NOT produce BashExtGlob
     let result = parse("echo *(*.txt)");
     if let Ok(prog) = &result {
-        if let Expression::Command(cmd) = &prog.statements[0].expression {
+        if let Expression::Command(cmd) = &prog.lines[0][0].expression {
             for arg in &cmd.arguments {
                 if let Argument::Word(w) = arg {
                     assert!(!w
@@ -810,7 +810,7 @@ fn posix_rejects_extglob() {
 #[test]
 fn bash_brace_expansion_list() {
     let prog = parse_with("echo {a,b,c}", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(
@@ -831,7 +831,7 @@ fn bash_brace_expansion_list() {
 #[test]
 fn bash_brace_expansion_sequence() {
     let prog = parse_with("echo {1..5}", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) =
@@ -854,7 +854,7 @@ fn bash_brace_expansion_sequence() {
 #[test]
 fn bash_brace_expansion_step() {
     let prog = parse_with("echo {0..10..2}", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) =
@@ -877,7 +877,7 @@ fn bash_brace_expansion_step() {
 #[test]
 fn bash_brace_expansion_in_word() {
     let prog = parse_with("echo file{1,2,3}.txt", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(matches!(&w.parts[0], Fragment::Literal(s) if s == "file"));
@@ -897,7 +897,7 @@ fn bash_brace_expansion_in_word() {
 #[test]
 fn posix_brace_is_literal() {
     let prog = parse("echo {a,b,c}").unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             assert!(!w
@@ -913,7 +913,7 @@ fn posix_brace_is_literal() {
 /// Helper: parse input in Bash mode and extract the BashTestExpr.
 fn parse_test_expr(input: &str) -> BashTestExpr {
     let prog = parse_with(input, Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashDoubleBracket { expression, .. },
         ..
@@ -1381,7 +1381,7 @@ fn parse_arith_cmd(input: &str) -> ArithExpr {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options(input, opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body: CompoundCommand::BashArithmeticCommand { expression, .. },
         ..
@@ -1521,7 +1521,7 @@ fn arith_parenthesized() {
 fn arith_in_word_context() {
     // echo $(( x + 1 )) — the arithmetic expansion should be parsed
     let prog = parse_with("echo $(( x + 1 ))", Dialect::Bash).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.arguments.len(), 2);
         if let Argument::Word(w) = &cmd.arguments[1] {
@@ -1552,7 +1552,7 @@ fn bash_arithmetic_for_basic() {
     };
     let prog = thaum::parser::parse_with_options("for ((i=0; i<10; i++)); do echo $i; done", opts)
         .unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body:
             CompoundCommand::BashArithmeticFor {
@@ -1582,7 +1582,7 @@ fn bash_arithmetic_for_empty_parts() {
         ..Default::default()
     };
     let prog = thaum::parser::parse_with_options("for ((;;)); do break; done", opts).unwrap();
-    let stmt = &prog.statements[0];
+    let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body:
             CompoundCommand::BashArithmeticFor {
@@ -1675,7 +1675,7 @@ fn arith_array_subscript_comma() {
 fn bracket_glob_word_order() {
     // Verify bracket glob produces correct fragment order: Literal, Glob, Literal(content])
     let prog = parse_with("echo a[0-9]", Dialect::Bash).unwrap();
-    if let Expression::Command(cmd) = &prog.statements[0].expression {
+    if let Expression::Command(cmd) = &prog.lines[0][0].expression {
         if let Argument::Word(word) = &cmd.arguments[1] {
             let parts = &word.parts;
             assert!(matches!(&parts[0], Fragment::Literal(s) if s == "a"));
@@ -1697,9 +1697,9 @@ fn bracket_glob_word_order() {
 fn arith_left_shift_not_heredoc() {
     // << inside (( )) is left-shift, not a heredoc operator.
     let prog = parse_with("(( 1 << 32 ))\necho ok", Dialect::Bash).unwrap();
-    assert_eq!(prog.statements.len(), 2);
+    assert_eq!(prog.lines.len(), 2);
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Compound {
             body: CompoundCommand::BashArithmeticCommand { .. },
             ..
@@ -1720,7 +1720,7 @@ fn double_paren_subshell_not_arithmetic() {
     // The speculative arithmetic attempt fails (no )) found), so it falls back to subshell.
     let prog = parse_with("((/usr/bin/cat </dev/zero; echo hi) | true)", Dialect::Bash).unwrap();
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Compound {
             body: CompoundCommand::Subshell { .. },
             ..
@@ -1768,7 +1768,7 @@ fn arith_redirect_after_dparen() {
     // Redirect after (( )) with $() inside.
     let prog = parse_with("(( a = $(echo 42) + 10 )) 2>/dev/null", Dialect::Bash).unwrap();
     assert!(matches!(
-        &prog.statements[0].expression,
+        &prog.lines[0][0].expression,
         Expression::Compound {
             body: CompoundCommand::BashArithmeticCommand { .. },
             ..
@@ -1784,14 +1784,14 @@ fn arith_redirect_after_dparen() {
 fn double_bracket_close_as_literal_word() {
     // ]] outside [[ ]] is a regular word, not BashDblRBracket.
     let prog = parse_with("dbracket=[[\n$dbracket foo == foo ]]", Dialect::Bash).unwrap();
-    assert!(prog.statements.len() >= 2);
+    assert!(prog.lines.len() >= 2);
 }
 
 #[test]
 fn glob_posix_char_class_not_double_bracket() {
     // [[:punct:]] is a POSIX character class in a glob, not [[ ]].
     let prog = parse_with("echo *.[[:punct:]]", Dialect::Bash).unwrap();
-    assert_eq!(prog.statements.len(), 1);
+    assert_eq!(prog.lines[0].len(), 1);
 }
 
 #[test]
@@ -1801,7 +1801,7 @@ fn regex_with_parens_in_grouped_double_bracket() {
     if let Expression::Compound {
         body: CompoundCommand::BashDoubleBracket { expression, .. },
         ..
-    } = &prog.statements[0].expression
+    } = &prog.lines[0][0].expression
     {
         assert!(matches!(expression, BashTestExpr::Group(_)));
     } else {
@@ -1814,5 +1814,5 @@ fn glob_bracket_with_quoted_close() {
     // ] inside quotes doesn't close a bracket expression.
     // bash treats [hello"]" as the literal word [hello] (no glob match).
     let prog = parse_with("echo [hello\"]\"", Dialect::Bash).unwrap();
-    assert_eq!(prog.statements.len(), 1);
+    assert_eq!(prog.lines[0].len(), 1);
 }

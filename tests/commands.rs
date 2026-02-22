@@ -60,16 +60,16 @@ fn reserved_words_as_arguments() {
 #[test]
 fn background_and_sequential() {
     let prog = parse_ok("cmd1 & cmd2; cmd3 &");
-    assert_eq!(prog.statements.len(), 3);
-    assert_eq!(prog.statements[0].mode, ExecutionMode::Background);
-    assert_eq!(prog.statements[1].mode, ExecutionMode::Terminated);
-    assert_eq!(prog.statements[2].mode, ExecutionMode::Background);
+    assert_eq!(prog.lines[0].len(), 3);
+    assert_eq!(prog.lines[0][0].mode, ExecutionMode::Background);
+    assert_eq!(prog.lines[0][1].mode, ExecutionMode::Terminated);
+    assert_eq!(prog.lines[0][2].mode, ExecutionMode::Background);
 }
 
 #[test]
 fn semicolon_separated_commands_on_one_line() {
     let prog = parse_ok("echo a; echo b; echo c");
-    assert_eq!(prog.statements.len(), 3);
+    assert_eq!(prog.lines[0].len(), 3);
 }
 
 #[test]
@@ -80,28 +80,69 @@ cd /tmp
 ls -la
 echo "Done""#;
     let prog = parse_ok(input);
-    assert!(prog.statements.len() >= 3);
+    let total: usize = prog.lines.iter().map(|l| l.len()).sum();
+    assert!(total >= 3);
+}
+
+// --- Line boundary tests ---
+
+#[test]
+fn line_boundary_semicolon_same_line() {
+    // "a; b" → 1 line with 2 statements
+    let prog = parse_ok("echo a; echo b");
+    assert_eq!(prog.lines.len(), 1);
+    assert_eq!(prog.lines[0].len(), 2);
+}
+
+#[test]
+fn line_boundary_newline() {
+    // "a\nb" → 2 lines with 1 statement each
+    let prog = parse_ok("echo a\necho b");
+    assert_eq!(prog.lines.len(), 2);
+    assert_eq!(prog.lines[0].len(), 1);
+    assert_eq!(prog.lines[1].len(), 1);
+}
+
+#[test]
+fn line_boundary_semicolon_then_newline() {
+    // "a;\nb" → 2 lines: line 1 has 1 Terminated stmt, line 2 has 1 Sequential stmt
+    let prog = parse_ok("echo a;\necho b");
+    assert_eq!(prog.lines.len(), 2);
+    assert_eq!(prog.lines[0].len(), 1);
+    assert_eq!(prog.lines[0][0].mode, ExecutionMode::Terminated);
+    assert_eq!(prog.lines[1].len(), 1);
+    assert_eq!(prog.lines[1][0].mode, ExecutionMode::Sequential);
+}
+
+#[test]
+fn line_boundary_mixed() {
+    // "a; b\nc; d\ne" → 3 lines
+    let prog = parse_ok("echo a; echo b\necho c; echo d\necho e");
+    assert_eq!(prog.lines.len(), 3);
+    assert_eq!(prog.lines[0].len(), 2);
+    assert_eq!(prog.lines[1].len(), 2);
+    assert_eq!(prog.lines[2].len(), 1);
 }
 
 #[test]
 fn empty_program() {
-    assert!(parse_ok("").statements.is_empty());
+    assert!(parse_ok("").lines.is_empty());
 }
 
 #[test]
 fn whitespace_only_program() {
-    assert!(parse_ok("   \n\n  \n").statements.is_empty());
+    assert!(parse_ok("   \n\n  \n").lines.is_empty());
 }
 
 #[test]
 fn comment_only() {
-    assert!(parse_ok("# this is a comment").statements.is_empty());
+    assert!(parse_ok("# this is a comment").lines.is_empty());
 }
 
 #[test]
 fn comment_after_command() {
     let prog = parse_ok("echo hello # comment\necho world");
-    assert_eq!(prog.statements.len(), 2);
+    assert_eq!(prog.lines.len(), 2);
 }
 
 #[test]
@@ -143,5 +184,5 @@ fn assignment_with_quoted_value() {
 fn case_inside_command_substitution() {
     // ) in a case pattern inside $() must not close the command substitution.
     let prog = parse_ok("echo $(case x in a) echo yes;; esac)");
-    assert_eq!(prog.statements.len(), 1);
+    assert_eq!(prog.lines[0].len(), 1);
 }

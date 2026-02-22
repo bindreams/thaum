@@ -152,7 +152,7 @@ impl Parser {
         };
 
         self.expect_closing_keyword("do", "select", start_span)?;
-        let body = self.parse_required_compound_list("do body")?;
+        let body = self.parse_body("do body")?;
         let done_tok = self.expect_closing_keyword("done", "select", start_span)?;
 
         Ok(CompoundCommand::BashSelectClause {

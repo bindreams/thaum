@@ -58,7 +58,11 @@ impl Parser {
             let elif_cond = self.parse_required_compound_list("elif condition")?;
             self.expect_closing_keyword("then", "elif", elif_span)?;
             let elif_body = self.parse_body("elif body")?;
-            let end = elif_body.last().map(|s| s.span).unwrap_or(elif_span);
+            let end = elif_body
+                .last()
+                .and_then(|line| line.last())
+                .map(|s| s.span)
+                .unwrap_or(elif_span);
             elifs.push(ElifClause {
                 condition: elif_cond,
                 body: elif_body,
@@ -437,7 +441,7 @@ impl Parser {
     pub(super) fn parse_required_compound_list(
         &mut self,
         context: &str,
-    ) -> Result<Vec<Statement>, ParseError> {
+    ) -> Result<Vec<Line>, ParseError> {
         let list = self.parse_compound_list()?;
         if list.is_empty() {
             return Err(ParseError::UnexpectedToken {
@@ -452,7 +456,7 @@ impl Parser {
     /// Parse a compound body (then-body, do-body, etc.).
     /// In bash mode, empty bodies are allowed; in POSIX mode, at least one
     /// command is required.
-    fn parse_body(&mut self, context: &str) -> Result<Vec<Statement>, ParseError> {
+    pub(super) fn parse_body(&mut self, context: &str) -> Result<Vec<Line>, ParseError> {
         if self.options.empty_compound_body {
             self.parse_compound_list()
         } else {
@@ -460,18 +464,20 @@ impl Parser {
         }
     }
 
-    pub(super) fn parse_compound_list(&mut self) -> Result<Vec<Statement>, ParseError> {
+    pub(super) fn parse_compound_list(&mut self) -> Result<Vec<Line>, ParseError> {
         self.skip_linebreak()?;
 
-        let mut statements = Vec::new();
+        let mut lines = Vec::new();
 
         // No eat_whitespace: skip_linebreak already ate
         let tok = self.lexer.peek()?.token.clone();
         if !tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
-            return Ok(statements);
+            return Ok(lines);
         }
 
-        self.parse_list_into(&mut statements)?;
+        let mut line = Vec::new();
+        self.parse_list_into(&mut line)?;
+        lines.push(line);
 
         loop {
             self.lexer.eat_whitespace()?;
@@ -481,13 +487,15 @@ impl Parser {
             // No eat_whitespace: either skip_newline_list or line 454 already ate
             let tok = self.lexer.peek()?.token.clone();
             if tok.can_start_command(&self.lexer.peek_at_offset(1)?.token) {
-                self.parse_list_into(&mut statements)?;
+                let mut line = Vec::new();
+                self.parse_list_into(&mut line)?;
+                lines.push(line);
                 continue;
             }
             break;
         }
 
-        Ok(statements)
+        Ok(lines)
     }
 
     fn parse_arithmetic_for(

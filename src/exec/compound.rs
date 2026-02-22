@@ -19,7 +19,7 @@ impl Executor {
             ));
         }
         match body {
-            CompoundCommand::BraceGroup { body, .. } => self.execute_statements(body, io),
+            CompoundCommand::BraceGroup { body, .. } => self.execute_lines(body, io),
 
             CompoundCommand::Subshell { .. } => Err(ExecError::UnsupportedFeature(
                 "subshell (requires fork)".to_string(),
@@ -32,18 +32,18 @@ impl Executor {
                 else_body,
                 ..
             } => {
-                let cond_status = self.execute_statements(condition, io)?;
+                let cond_status = self.execute_lines(condition, io)?;
                 if cond_status == 0 {
-                    return self.execute_statements(then_body, io);
+                    return self.execute_lines(then_body, io);
                 }
                 for elif in elifs {
-                    let elif_status = self.execute_statements(&elif.condition, io)?;
+                    let elif_status = self.execute_lines(&elif.condition, io)?;
                     if elif_status == 0 {
-                        return self.execute_statements(&elif.body, io);
+                        return self.execute_lines(&elif.body, io);
                     }
                 }
                 if let Some(else_body) = else_body {
-                    self.execute_statements(else_body, io)
+                    self.execute_lines(else_body, io)
                 } else {
                     Ok(0)
                 }
@@ -54,11 +54,11 @@ impl Executor {
             } => {
                 let mut status = 0;
                 loop {
-                    let cond_status = self.execute_statements(condition, io)?;
+                    let cond_status = self.execute_lines(condition, io)?;
                     if cond_status != 0 {
                         break;
                     }
-                    match self.execute_statements(body, io) {
+                    match self.execute_lines(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -79,11 +79,11 @@ impl Executor {
             } => {
                 let mut status = 0;
                 loop {
-                    let cond_status = self.execute_statements(condition, io)?;
+                    let cond_status = self.execute_lines(condition, io)?;
                     if cond_status == 0 {
                         break;
                     }
-                    match self.execute_statements(body, io) {
+                    match self.execute_lines(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -120,7 +120,7 @@ impl Executor {
                 let mut status = 0;
                 for value in &word_list {
                     self.env.set_var(variable, value)?;
-                    match self.execute_statements(body, io) {
+                    match self.execute_lines(body, io) {
                         Ok(s) => status = s,
                         Err(ExecError::BreakRequested(1)) => break,
                         Err(ExecError::BreakRequested(n)) => {
@@ -150,7 +150,7 @@ impl Executor {
                         }
                     }
                     if matched {
-                        status = self.execute_statements(&arm.body, io)?;
+                        status = self.execute_lines(&arm.body, io)?;
                         // For POSIX `;;`, break after first match.
                         // Bash `;;&` and `;&` are handled differently (not yet).
                         break;
@@ -195,7 +195,7 @@ impl Executor {
                         }
                     }
 
-                    let should_update = match self.execute_statements(body, io) {
+                    let should_update = match self.execute_lines(body, io) {
                         Ok(s) => {
                             status = s;
                             true

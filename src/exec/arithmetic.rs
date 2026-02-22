@@ -50,10 +50,33 @@ pub fn evaluate_arith_expr(expr: &ArithExpr, env: &mut Environment) -> Result<i6
 }
 
 /// Read a variable's value as i64. Unset or empty → 0.
+///
+/// Handles array subscripts: `"a[0]"` reads element 0 of array `a`.
 fn read_var_as_i64(name: &str, env: &Environment) -> Result<i64, ExecError> {
-    match env.get_var(name) {
+    let s = read_arith_var(name, env);
+    match s.as_deref() {
         None | Some("") => Ok(0),
         Some(s) => parse_i64(name, s),
+    }
+}
+
+/// Read a variable value for arithmetic, handling array subscripts.
+fn read_arith_var(name: &str, env: &Environment) -> Option<String> {
+    if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
+        let index: usize = subscript.parse().unwrap_or(0);
+        env.get_array_element(base, index).map(|s| s.to_string())
+    } else {
+        env.get_var(name).map(|s| s.to_string())
+    }
+}
+
+/// Write a variable value for arithmetic, handling array subscripts.
+fn write_arith_var(name: &str, value: &str, env: &mut Environment) -> Result<(), ExecError> {
+    if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
+        let index: usize = subscript.parse().unwrap_or(0);
+        env.set_array_element(base, index, value)
+    } else {
+        env.set_var(name, value)
     }
 }
 
@@ -209,14 +232,14 @@ fn eval_unary_prefix(
             let name = expect_variable(operand)?;
             let old = read_var_as_i64(name, env)?;
             let new = old.wrapping_add(1);
-            env.set_var(name, &new.to_string())?;
+            write_arith_var(name, &new.to_string(), env)?;
             Ok(new)
         }
         ArithUnaryOp::Decrement => {
             let name = expect_variable(operand)?;
             let old = read_var_as_i64(name, env)?;
             let new = old.wrapping_sub(1);
-            env.set_var(name, &new.to_string())?;
+            write_arith_var(name, &new.to_string(), env)?;
             Ok(new)
         }
     }
@@ -242,7 +265,7 @@ fn eval_unary_postfix(
         }
     };
 
-    env.set_var(name, &new.to_string())?;
+    write_arith_var(name, &new.to_string(), env)?;
     Ok(old) // postfix returns old value
 }
 
@@ -285,7 +308,7 @@ fn eval_assignment(
         }
     };
 
-    env.set_var(target, &result.to_string())?;
+    write_arith_var(target, &result.to_string(), env)?;
     Ok(result)
 }
 

@@ -134,6 +134,8 @@ pub enum Atom {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Assignment {
     pub name: String,
+    /// Array subscript, if present: `name[index]=value`.
+    pub index: Option<String>,
     pub value: AssignmentValue,
     pub span: Span,
 }

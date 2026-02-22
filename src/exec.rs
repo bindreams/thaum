@@ -244,9 +244,7 @@ impl Executor {
 
                     if args.is_empty() {
                         for assignment in &cmd.assignments {
-                            let value =
-                                expand::expand_word(assignment.value.as_scalar(), &mut self.env)?;
-                            self.env.set_var(&assignment.name, &value)?;
+                            self.execute_assignment(assignment)?;
                         }
                         continue;
                     }
@@ -325,8 +323,7 @@ impl Executor {
         // If no command name, just process assignments
         if expanded_args.is_empty() {
             for assignment in &cmd.assignments {
-                let value = self.expand_word(assignment.value.as_scalar())?;
-                self.env.set_var(&assignment.name, &value)?;
+                self.execute_assignment(assignment)?;
             }
             return Ok(0);
         }
@@ -393,6 +390,44 @@ impl Executor {
         self.execute_external(cmd_name, cmd_args, &cmd.assignments, &mut active, io)
     }
 
+    /// Execute a full assignment (scalar, indexed, or array).
+    pub(crate) fn execute_assignment(
+        &mut self,
+        assignment: &crate::ast::Assignment,
+    ) -> Result<(), ExecError> {
+        if let Some(ref subscript) = assignment.index {
+            // Indexed assignment: name[subscript]=value
+            let value = self.expand_word(assignment.value.as_scalar())?;
+            let index: usize = subscript.parse().unwrap_or(0);
+            self.env
+                .set_array_element(&assignment.name, index, &value)?;
+        } else {
+            match &assignment.value {
+                crate::ast::AssignmentValue::Scalar(word) => {
+                    let value = self.expand_word(word)?;
+                    self.env.set_var(&assignment.name, &value)?;
+                }
+                crate::ast::AssignmentValue::BashArray(words) => {
+                    let mut elements = Vec::new();
+                    for word in words {
+                        elements.push(self.expand_word(word)?);
+                    }
+                    self.env.set_array(&assignment.name, elements)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Expand a scalar assignment value. Panics on BashArray (use for prefix
+    /// assignments where arrays are not valid).
+    pub(crate) fn expand_scalar_assignment(
+        &mut self,
+        assignment: &crate::ast::Assignment,
+    ) -> Result<String, ExecError> {
+        self.expand_word(assignment.value.as_scalar())
+    }
+
     /// Apply prefix assignments temporarily, returning saved values.
     fn apply_prefix_assignments(
         &mut self,
@@ -401,7 +436,7 @@ impl Executor {
         let mut saved = Vec::new();
         for assignment in assignments {
             let old = self.env.get_var(&assignment.name).map(|s| s.to_string());
-            let value = self.expand_word(assignment.value.as_scalar())?;
+            let value = self.expand_scalar_assignment(assignment)?;
             self.env.set_var(&assignment.name, &value)?;
             saved.push((assignment.name.clone(), old));
         }

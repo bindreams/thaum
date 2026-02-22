@@ -164,7 +164,17 @@ fn builtin_unset(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
         if arg == "-v" || arg == "-f" {
             continue;
         }
-        env.unset_var(arg)?;
+        if let Some((base, subscript)) = super::expand::parse_array_subscript(arg) {
+            if subscript == "@" || subscript == "*" {
+                // unset a[@] / unset a[*] — unset the whole array
+                env.unset_var(base)?;
+            } else {
+                let index: usize = subscript.parse().unwrap_or(0);
+                env.unset_array_element(base, index)?;
+            }
+        } else {
+            env.unset_var(arg)?;
+        }
     }
     Ok(0)
 }

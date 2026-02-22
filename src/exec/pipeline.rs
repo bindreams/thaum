@@ -102,11 +102,7 @@ fn spawn_pipeline_stage(
             if expanded_args.is_empty() {
                 // Assignment-only command — handle in-process
                 for assignment in &cmd.assignments {
-                    let value = crate::exec::expand::expand_word(
-                        assignment.value.as_scalar(),
-                        executor.env_mut(),
-                    )?;
-                    executor.env_mut().set_var(&assignment.name, &value)?;
+                    executor.execute_assignment(assignment)?;
                 }
                 return Ok(None);
             }
@@ -170,10 +166,7 @@ fn spawn_pipeline_stage(
 
             // Apply prefix assignments as env vars
             for assignment in &cmd.assignments {
-                let value = crate::exec::expand::expand_word(
-                    assignment.value.as_scalar(),
-                    executor.env_mut(),
-                )?;
+                let value = executor.expand_scalar_assignment(assignment)?;
                 child_cmd.env(&assignment.name, &value);
             }
 

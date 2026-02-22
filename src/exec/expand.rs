@@ -173,6 +173,37 @@ fn expand_tilde(user: &str, env: &mut Environment, out: &mut String) {
     }
 }
 
+/// Parse an array subscript from a parameter name like `"a[0]"` or `"a[@]"`.
+///
+/// Returns `Some((base_name, subscript))` if the name ends with `[...]`,
+/// or `None` for plain variable names.
+pub(crate) fn parse_array_subscript(name: &str) -> Option<(&str, &str)> {
+    let bracket = name.find('[')?;
+    if name.ends_with(']') {
+        Some((&name[..bracket], &name[bracket + 1..name.len() - 1]))
+    } else {
+        None
+    }
+}
+
+/// Resolve a parameter name to its string value, handling array subscripts.
+fn resolve_var(name: &str, env: &Environment) -> Option<String> {
+    if let Some(val) = env.get_special(name) {
+        return Some(val);
+    }
+    if let Some((base, subscript)) = parse_array_subscript(name) {
+        match subscript {
+            "@" | "*" => env.get_array_all(base).map(|elems| elems.join(" ")),
+            _ => {
+                let index: usize = subscript.parse().unwrap_or(0);
+                env.get_array_element(base, index).map(|s| s.to_string())
+            }
+        }
+    } else {
+        env.get_var(name).map(|s| s.to_string())
+    }
+}
+
 /// Expand a parameter expansion.
 fn expand_parameter(
     param: &ParameterExpansion,
@@ -181,10 +212,8 @@ fn expand_parameter(
 ) -> Result<(), ExecError> {
     match param {
         ParameterExpansion::Simple(name) => {
-            if let Some(val) = env.get_special(name) {
+            if let Some(val) = resolve_var(name, env) {
                 out.push_str(&val);
-            } else if let Some(val) = env.get_var(name) {
-                out.push_str(val);
             }
         }
         ParameterExpansion::Complex {
@@ -208,9 +237,7 @@ fn expand_complex_parameter(
 ) -> Result<(), ExecError> {
     use crate::ast::ParamOp;
 
-    let value = env
-        .get_special(name)
-        .or_else(|| env.get_var(name).map(|s| s.to_string()));
+    let value = resolve_var(name, env);
 
     match operator {
         None => {
@@ -219,8 +246,21 @@ fn expand_complex_parameter(
             }
         }
         Some(ParamOp::Length) => {
-            let len = value.as_deref().unwrap_or("").len();
-            out.push_str(&len.to_string());
+            // ${#a[@]} and ${#a[*]} return the number of array elements.
+            // ${#a[0]} returns the string length of element 0.
+            // ${#var} returns the string length of the scalar.
+            if let Some((base, subscript)) = parse_array_subscript(name) {
+                if subscript == "@" || subscript == "*" {
+                    let len = env.get_array_length(base);
+                    out.push_str(&len.to_string());
+                } else {
+                    let len = value.as_deref().unwrap_or("").len();
+                    out.push_str(&len.to_string());
+                }
+            } else {
+                let len = value.as_deref().unwrap_or("").len();
+                out.push_str(&len.to_string());
+            }
         }
         Some(ParamOp::Default) => match value.as_deref() {
             Some(v) if !v.is_empty() => out.push_str(v),

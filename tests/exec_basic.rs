@@ -451,6 +451,24 @@ fn expect_unsupported_bash(script: &str) {
     );
 }
 
+/// Parse and execute a Bash-dialect script, capturing stdout. Returns (stdout, exit_status).
+fn bash_exec_ok(script: &str) -> (String, i32) {
+    let program = thaum::parse_with(script, Dialect::Bash)
+        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+
+    let mut executor = Executor::new();
+    let _ = executor
+        .env_mut()
+        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => (captured.stdout_string(), status),
+        Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), code),
+        Err(e) => panic!("exec failed for {:?}: {}", script, e),
+    }
+}
+
 #[test]
 fn unsupported_background() {
     expect_unsupported("echo hello &");
@@ -813,4 +831,101 @@ fn external_command_inherits_fd3() {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+// --- Bash indexed arrays ---
+
+#[test]
+fn array_literal_assignment() {
+    let (out, status) = bash_exec_ok("a=(one two three); echo ${a[0]}");
+    assert_eq!(status, 0);
+    assert_eq!(out, "one\n");
+}
+
+#[test]
+fn array_element_access() {
+    let (out, _) = bash_exec_ok("a=(x y z); echo ${a[1]}");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn array_all_elements_at() {
+    let (out, _) = bash_exec_ok("a=(a b c); echo ${a[@]}");
+    assert_eq!(out, "a b c\n");
+}
+
+#[test]
+fn array_all_elements_star() {
+    let (out, _) = bash_exec_ok("a=(a b c); echo ${a[*]}");
+    assert_eq!(out, "a b c\n");
+}
+
+#[test]
+fn array_length() {
+    let (out, _) = bash_exec_ok("a=(a b c); echo ${#a[@]}");
+    assert_eq!(out, "3\n");
+}
+
+#[test]
+fn array_element_length() {
+    let (out, _) = bash_exec_ok("a=(hello); echo ${#a[0]}");
+    assert_eq!(out, "5\n");
+}
+
+#[test]
+fn array_default_index() {
+    // $a is equivalent to ${a[0]} in bash
+    let (out, _) = bash_exec_ok("a=(first second); echo $a");
+    assert_eq!(out, "first\n");
+}
+
+#[test]
+fn array_indexed_assignment() {
+    let (out, _) = bash_exec_ok("a[0]=hello; echo ${a[0]}");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn array_sparse_assignment() {
+    let (out, _) = bash_exec_ok("a[5]=five; echo ${a[5]}");
+    assert_eq!(out, "five\n");
+}
+
+#[test]
+fn array_overwrite_element() {
+    let (out, _) = bash_exec_ok("a=(x y z); a[1]=Y; echo ${a[@]}");
+    assert_eq!(out, "x Y z\n");
+}
+
+#[test]
+fn array_unset_element() {
+    let (out, _) = bash_exec_ok("a=(x y z); unset a[1]; echo ${a[@]}");
+    assert_eq!(out, "x z\n");
+}
+
+#[test]
+fn array_unset_whole() {
+    let (out, _) = bash_exec_ok("a=(x y z); unset a; echo \"${a[@]}\"");
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn array_arith_access() {
+    let (out, _) = bash_exec_ok("a=(10 20 30); echo $(( a[1] + a[2] ))");
+    assert_eq!(out, "50\n");
+}
+
+#[test]
+fn array_arith_assign() {
+    let (out, _) = bash_exec_ok("(( a[0] = 42 )); echo ${a[0]}");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn array_for_loop() {
+    // TODO: field splitting not yet implemented — ${a[@]} expands to a single
+    // "x y z" string instead of three separate fields.  Once field splitting
+    // lands, update this test to expect "x\ny\nz\n".
+    let (out, _) = bash_exec_ok(r#"a=(x y z); for i in ${a[@]}; do echo $i; done"#);
+    assert_eq!(out, "x y z\n");
 }

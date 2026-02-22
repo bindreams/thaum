@@ -62,6 +62,7 @@ impl Parser {
                             let arr_span = word_span.merge(rparen_span);
                             assignments.push(Assignment {
                                 name,
+                                index: None,
                                 value: AssignmentValue::BashArray(elements),
                                 span: arr_span,
                             });
@@ -71,6 +72,7 @@ impl Parser {
                                 self.collect_assignment_value(&value_prefix, word_span)?;
                             assignments.push(Assignment {
                                 name,
+                                index: None,
                                 value: AssignmentValue::Scalar(value_word),
                                 span: word_span,
                             });
@@ -79,6 +81,17 @@ impl Parser {
                         self.lexer.eat_whitespace()?;
                         continue;
                     }
+                }
+            }
+
+            // Indexed array assignment: name[subscript]=value (Bash)
+            // Token stream: Literal("name"), Glob(BracketOpen), Literal("sub]"), Literal("=val")
+            if self.options.arrays {
+                if let Some(indexed) = self.try_parse_indexed_assignment()? {
+                    end_span = indexed.span;
+                    assignments.push(indexed);
+                    self.lexer.eat_whitespace()?;
+                    continue;
                 }
             }
 
@@ -119,6 +132,79 @@ impl Parser {
             arguments,
             redirects,
             span: start_span.merge(end_span),
+        })
+    }
+
+    /// Try to parse an indexed array assignment `name[subscript]=value`.
+    ///
+    /// Token stream: `Literal("name")`, `Glob(BracketOpen)`, `Literal("sub]")`,
+    /// `Literal("=value...")`.  Uses speculation so the token stream is rewound
+    /// on failure.
+    fn try_parse_indexed_assignment(&mut self) -> Result<Option<Assignment>, ParseError> {
+        use crate::token::{GlobKind, Token};
+
+        self.lexer.speculate(|lex| {
+            // 1. Literal that is a valid name
+            let name = match &lex.peek()?.token {
+                Token::Literal(w) if is_valid_name(w) && !w.is_empty() => w.clone(),
+                _ => return Ok(None),
+            };
+            let start_span = lex.peek()?.span;
+            lex.advance()?;
+
+            // 2. Glob(BracketOpen)
+            if lex.peek()?.token != Token::Glob(GlobKind::BracketOpen) {
+                return Ok(None);
+            }
+            lex.advance()?;
+
+            // 3. Literal ending with ']'
+            let subscript = match &lex.peek()?.token {
+                Token::Literal(w) if w.ends_with(']') => w[..w.len() - 1].to_string(),
+                _ => return Ok(None),
+            };
+            lex.advance()?;
+
+            // 4. Literal starting with '='
+            let value_text = match &lex.peek()?.token {
+                Token::Literal(w) if w.starts_with('=') => w[1..].to_string(),
+                _ => return Ok(None),
+            };
+            let eq_span = lex.peek()?.span;
+            lex.advance()?;
+
+            // Collect remaining fragments of the value word
+            let mut fragments = Vec::new();
+            if !value_text.is_empty() {
+                fragments.push(Fragment::Literal(value_text));
+            }
+            // Any additional fragment tokens are part of the value
+            while lex.peek()?.token.is_fragment() {
+                let st = lex.advance()?;
+                // Inline minimal fragment conversion for speculation context.
+                match st.token {
+                    Token::Literal(s) => fragments.push(Fragment::Literal(s)),
+                    Token::SingleQuoted(s) => fragments.push(Fragment::SingleQuoted(s)),
+                    Token::DoubleQuoted(s) => {
+                        // Re-parse double-quoted content to get inner fragments.
+                        // For simplicity during speculation, store as literal.
+                        fragments.push(Fragment::Literal(s));
+                    }
+                    _ => break,
+                }
+            }
+
+            let value_word = Word {
+                parts: fragments,
+                span: eq_span,
+            };
+
+            Ok(Some(Assignment {
+                name,
+                index: Some(subscript),
+                value: AssignmentValue::Scalar(value_word),
+                span: start_span.merge(eq_span),
+            }))
         })
     }
 

@@ -3,16 +3,42 @@ mod common;
 use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum::Dialect;
 
+/// Find the thaum binary for subshell tests.
+///
+/// During `cargo test`, the test binary is NOT the thaum CLI. We need the
+/// actual `thaum` binary which lives at `target/debug/thaum` (or
+/// `target/release/thaum`).
+fn thaum_exe() -> std::path::PathBuf {
+    let mut path = std::env::current_exe()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    path.push("thaum");
+    if cfg!(windows) {
+        path.set_extension("exe");
+    }
+    path
+}
+
+/// Create an executor configured for tests (controlled PATH, thaum exe path).
+fn test_executor() -> Executor {
+    let mut executor = Executor::new();
+    let _ = executor
+        .env_mut()
+        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    executor.set_exe_path(thaum_exe());
+    executor
+}
+
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 fn exec_ok(script: &str) -> (String, i32) {
     let program =
         thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    let mut executor = Executor::new();
-    // Use a controlled PATH for tests
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut executor = test_executor();
 
     let mut captured = CapturedIo::new();
     match executor.execute(&program, &mut captured.context()) {
@@ -33,10 +59,7 @@ fn exec_result(script: &str) -> i32 {
     let program =
         thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    let mut executor = Executor::new();
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut executor = test_executor();
 
     let mut captured = CapturedIo::new();
     match executor.execute(&program, &mut captured.context()) {
@@ -456,10 +479,7 @@ fn bash_exec_ok(script: &str) -> (String, i32) {
     let program = thaum::parse_with(script, Dialect::Bash)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    let mut executor = Executor::new();
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut executor = test_executor();
 
     let mut captured = CapturedIo::new();
     match executor.execute(&program, &mut captured.context()) {
@@ -627,10 +647,7 @@ fn unsupported_compound_redirect() {
     expect_unsupported("if true; then echo hi; fi > /tmp/claude/test-out");
 }
 
-#[test]
-fn unsupported_subshell() {
-    expect_unsupported("(echo hello)");
-}
+// subshell is now supported — see subshell_* tests below
 
 #[test]
 fn unsupported_set_options() {
@@ -1011,9 +1028,8 @@ fn alias_redefine_then_unalias() {
     // Line 2: alias a="touch"  → defines a=touch
     // Line 3: alias a="echo"; unalias a  → redefines then removes
     // Line 4: a hello  → not found (unalias took effect)
-    let (_, status) = bash_exec_ok(
-        "shopt -s expand_aliases\nalias a=touch\nalias a=echo; unalias a\na hello",
-    );
+    let (_, status) =
+        bash_exec_ok("shopt -s expand_aliases\nalias a=touch\nalias a=echo; unalias a\na hello");
     assert_ne!(status, 0);
 }
 
@@ -1025,9 +1041,8 @@ fn alias_snapshot_uses_previous_line() {
     //   → so "a hello" expands to "echo hello" (not "touch hello")
     //   → then alias a is redefined to touch, then unaliased — both during execution
     // Line 4: a hello  → not found (unalias from line 3 took effect)
-    let (out, _) = bash_exec_ok(
-        "shopt -s expand_aliases\nalias a=echo\nalias a=touch; a hello; unalias a",
-    );
+    let (out, _) =
+        bash_exec_ok("shopt -s expand_aliases\nalias a=echo\nalias a=touch; a hello; unalias a");
     assert_eq!(out, "hello\n");
 }
 
@@ -1049,6 +1064,61 @@ fn alias_snapshot_touch_file() {
     );
     let (_, _) = bash_exec_ok(&script);
     assert!(file.exists(), "touch hello should have created the file");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+// --- Subshell execution ---
+
+#[test]
+fn subshell_basic() {
+    let (out, status) = exec_ok("(echo hello)");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn subshell_exit_status() {
+    let (out, _) = exec_ok("(exit 42); echo $?");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn subshell_variable_isolation() {
+    let (out, _) = exec_ok("x=1; (x=2); echo $x");
+    assert_eq!(out, "1\n");
+}
+
+#[test]
+fn subshell_inherits_vars() {
+    let (out, _) = exec_ok("x=hello; (echo $x)");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn subshell_inherits_functions() {
+    let (out, _) = exec_ok("f() { echo hi; }; (f)");
+    assert_eq!(out, "hi\n");
+}
+
+#[test]
+fn subshell_nested() {
+    let (out, _) = exec_ok("((echo inner))");
+    assert_eq!(out, "inner\n");
+}
+
+#[test]
+fn subshell_with_redirect() {
+    // Redirect inside the subshell (not on the compound command).
+    let dir = std::path::PathBuf::from("/tmp/claude/subshell-redir-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("out.txt");
+
+    let script = format!("(echo hello > {})", file.display());
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, ""); // stdout went to file inside subshell
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 
     let _ = std::fs::remove_dir_all(&dir);
 }

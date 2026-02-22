@@ -41,6 +41,9 @@ enum CliCommand {
     Parse(SourceArgs),
     /// Execute the script
     Exec(ExecArgs),
+    /// Execute a serialized AST from stdin (internal, used for subshells)
+    #[command(hide = true)]
+    ExecAst,
 }
 
 #[derive(clap::Args)]
@@ -77,6 +80,7 @@ enum Subcommand {
     Lex,
     Parse,
     Exec,
+    ExecAst,
 }
 
 struct CliArgs {
@@ -117,6 +121,14 @@ impl Cli {
                 resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file)
             }
             Some(CliCommand::Exec(a)) => resolve_exec(bash_mode, a.c, a.args),
+            Some(CliCommand::ExecAst) => CliArgs {
+                subcommand: Subcommand::ExecAst,
+                bash_mode,
+                verbose: false,
+                command_str: None,
+                file_arg: None,
+                script_args: Vec::new(),
+            },
         }
     }
 }
@@ -200,6 +212,7 @@ pub fn run() {
         Subcommand::Lex => do_lex(&args),
         Subcommand::Parse => do_parse(&args),
         Subcommand::Exec => do_exec(&args),
+        Subcommand::ExecAst => do_exec_ast(),
     }
 }
 
@@ -366,6 +379,39 @@ fn do_exec(cli: &CliArgs) {
 
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {
+        Ok(status) => process::exit(status),
+        Err(ExecError::ExitRequested(code)) => process::exit(code),
+        Err(ExecError::CommandNotFound(name)) => {
+            eprintln!("{}: command not found", name);
+            process::exit(127);
+        }
+        Err(e) => {
+            error_fmt::print_exec_error(&e);
+            process::exit(2);
+        }
+    }
+}
+
+fn do_exec_ast() {
+    use thaum::exec::environment::Environment;
+    use thaum::exec::subshell::SubshellPayload;
+
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap_or_else(|e| {
+        eprintln!("exec-ast: error reading stdin: {}", e);
+        process::exit(2);
+    });
+
+    let payload: SubshellPayload = serde_json::from_str(&input).unwrap_or_else(|e| {
+        eprintln!("exec-ast: invalid payload: {}", e);
+        process::exit(2);
+    });
+
+    let env = Environment::from_serialized(payload.env);
+    let mut executor = Executor::with_env(env);
+
+    let mut process_io = ProcessIo::new();
+    match executor.execute_lines(&payload.body, &mut process_io.context()) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(ExecError::CommandNotFound(name)) => {

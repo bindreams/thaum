@@ -21,9 +21,7 @@ impl Executor {
         match body {
             CompoundCommand::BraceGroup { body, .. } => self.execute_lines(body, io),
 
-            CompoundCommand::Subshell { .. } => Err(ExecError::UnsupportedFeature(
-                "subshell (requires fork)".to_string(),
-            )),
+            CompoundCommand::Subshell { body, .. } => self.execute_subshell(body, io),
 
             CompoundCommand::IfClause {
                 condition,

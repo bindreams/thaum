@@ -10,6 +10,7 @@ pub mod io_context;
 mod pattern;
 pub mod pipeline;
 mod redirect;
+pub mod subshell;
 
 pub use environment::Environment;
 pub use error::ExecError;
@@ -18,9 +19,10 @@ pub use io_context::{CapturedIo, IoContext, ProcessIo};
 use pattern::shell_pattern_match;
 
 use std::collections::{HashMap, HashSet};
+use std::io::Write;
 use std::process::Stdio;
 
-use crate::ast::{Command, ExecutionMode, Expression, Program, Statement};
+use crate::ast::{Command, ExecutionMode, Expression, Line, Program, Statement};
 
 /// The shell executor.
 ///
@@ -35,6 +37,9 @@ pub struct Executor {
     /// uses this snapshot so that `alias`/`unalias` within a line don't affect
     /// expansion of later commands on the same line (matching bash semantics).
     alias_snapshot: HashMap<String, String>,
+    /// Path to the thaum binary for subshell spawning.  Defaults to
+    /// `std::env::current_exe()`.  Override for testing.
+    exe_path: Option<std::path::PathBuf>,
 }
 
 impl Executor {
@@ -46,6 +51,7 @@ impl Executor {
             env,
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
+            exe_path: None,
         }
     }
 
@@ -55,7 +61,13 @@ impl Executor {
             env,
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
+            exe_path: None,
         }
+    }
+
+    /// Set the path to the thaum binary for subshell spawning.
+    pub fn set_exe_path(&mut self, path: std::path::PathBuf) {
+        self.exe_path = Some(path);
     }
 
     /// Get a mutable reference to the environment.
@@ -92,6 +104,51 @@ impl Executor {
             self.alias_snapshot = self.env.alias_snapshot();
             status = self.execute_statements(line, io)?;
         }
+        Ok(status)
+    }
+
+    /// Execute a subshell by spawning `thaum exec-ast` as a child process.
+    ///
+    /// Serializes the current environment and the subshell body as JSON,
+    /// pipes it to the child's stdin, and captures stdout/stderr.  The child
+    /// is a real separate process, so `$BASHPID` and signal isolation work
+    /// correctly on all platforms.
+    pub(crate) fn execute_subshell(
+        &mut self,
+        body: &[Line],
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
+        let payload = subshell::SubshellPayload {
+            env: self.env.serialize(),
+            body: body.to_vec(),
+        };
+        let json =
+            serde_json::to_string(&payload).map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
+
+        let exe = match &self.exe_path {
+            Some(p) => p.clone(),
+            None => std::env::current_exe().map_err(ExecError::Io)?,
+        };
+
+        let mut child = std::process::Command::new(&exe)
+            .arg("exec-ast")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .current_dir(self.env.cwd())
+            .spawn()
+            .map_err(ExecError::Io)?;
+
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(json.as_bytes()).map_err(ExecError::Io)?;
+        }
+
+        let output = child.wait_with_output().map_err(ExecError::Io)?;
+        let status = output.status.code().unwrap_or(128);
+
+        io.stdout.write_all(&output.stdout).map_err(ExecError::Io)?;
+        io.stderr.write_all(&output.stderr).map_err(ExecError::Io)?;
+
         Ok(status)
     }
 

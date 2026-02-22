@@ -19,7 +19,7 @@ pub enum VarValue {
 
 /// A shell variable with metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) struct ShellVar {
+pub struct ShellVar {
     value: VarValue,
     exported: bool,
     readonly: bool,
@@ -71,7 +71,7 @@ pub struct Environment {
 }
 
 /// A stored function definition (just the parts we need for execution).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StoredFunction {
     pub body: CompoundCommand,
     pub redirects: Vec<crate::ast::Redirect>,
@@ -562,6 +562,53 @@ impl Environment {
             );
         }
     }
+
+    /// Serialize the environment for cross-process transfer (subshells).
+    ///
+    /// Captures all variables, functions, aliases, positional params, and shell
+    /// options.  FDs and scope stack are NOT serialized.
+    pub(crate) fn serialize(&self) -> SerializedEnvironment {
+        SerializedEnvironment {
+            variables: self.variables.clone(),
+            functions: self.functions.clone(),
+            positional_params: self.positional_params.clone(),
+            program_name: self.program_name.clone(),
+            last_exit_status: self.last_exit_status,
+            aliases: self.aliases.clone(),
+            expand_aliases: self.expand_aliases,
+            cwd: self.cwd.clone(),
+        }
+    }
+
+    /// Reconstruct an environment from serialized state (subshell child).
+    pub fn from_serialized(s: SerializedEnvironment) -> Self {
+        Environment {
+            variables: s.variables,
+            functions: s.functions,
+            positional_params: s.positional_params,
+            program_name: s.program_name,
+            last_exit_status: s.last_exit_status,
+            last_bg_pid: None,
+            cwd: s.cwd,
+            pid: std::process::id(),
+            scope_stack: Vec::new(),
+            aliases: s.aliases,
+            expand_aliases: s.expand_aliases,
+        }
+    }
+}
+
+/// Serializable subset of `Environment` for cross-process transfer.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SerializedEnvironment {
+    pub variables: HashMap<String, ShellVar>,
+    pub functions: HashMap<String, StoredFunction>,
+    pub positional_params: Vec<String>,
+    pub program_name: String,
+    pub last_exit_status: i32,
+    pub aliases: HashMap<String, String>,
+    pub expand_aliases: bool,
+    pub cwd: PathBuf,
 }
 
 impl Default for Environment {

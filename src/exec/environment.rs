@@ -4,7 +4,7 @@
 //! positional parameters for function calls, and serialization for subshell
 //! spawning.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::PathBuf;
 
 use contracts::debug_ensures;
@@ -37,6 +37,8 @@ pub struct ShellVar {
     lowercase: bool,
     /// `-u` flag: convert value to uppercase on assignment.
     uppercase: bool,
+    /// `-n` flag: nameref — this variable is an alias for the named target.
+    nameref: Option<String>,
 }
 
 impl ShellVar {
@@ -71,6 +73,8 @@ pub struct DeclareAttrs {
     pub lowercase_set: bool,
     /// `-u`: uppercase on assignment.
     pub uppercase_set: bool,
+    /// `-n`: nameref (variable is an alias for the named target).
+    pub nameref_set: bool,
     /// `-g`: force global scope (even inside a function).
     pub global: bool,
     /// `-p`: print variable declarations.
@@ -161,12 +165,57 @@ impl Environment {
         env
     }
 
+    // Nameref resolution -------------------------------------------------------------------------------------------------
+
+    /// Follow nameref chain to the ultimate target variable name.
+    /// Uses a `HashSet` to detect cycles of any shape.
+    fn resolve_nameref<'a>(&'a self, name: &'a str) -> &'a str {
+        let mut seen = HashSet::new();
+        seen.insert(name);
+        let mut current = name;
+        loop {
+            match self.variables.get(current) {
+                Some(var) if var.nameref.is_some() => {
+                    let target = var.nameref.as_ref().unwrap().as_str();
+                    if !seen.insert(target) {
+                        return current; // cycle detected
+                    }
+                    current = target;
+                }
+                _ => return current,
+            }
+        }
+    }
+
+    /// Create or update a nameref variable pointing to `target`.
+    pub fn set_nameref(&mut self, name: &str, target: &str) -> Result<(), ExecError> {
+        if let Some(existing) = self.variables.get(name) {
+            if existing.readonly {
+                return Err(ExecError::ReadonlyVariable(name.to_string()));
+            }
+        }
+        self.variables.insert(
+            name.to_string(),
+            ShellVar {
+                value: VarValue::Scalar(String::new()),
+                exported: false,
+                readonly: false,
+                integer: false,
+                lowercase: false,
+                uppercase: false,
+                nameref: Some(target.to_string()),
+            },
+        );
+        Ok(())
+    }
+
     // Scalar variable access ------------------------------------------------------------------------------------------
 
     /// Get the scalar value of a variable, or None if unset.
     ///
     /// For indexed arrays, returns element 0 (bash: `$a` == `${a[0]}`).
     pub fn get_var(&self, name: &str) -> Option<&str> {
+        let name = self.resolve_nameref(name);
         self.variables.get(name).map(|v| v.scalar_str())
     }
 
@@ -179,6 +228,8 @@ impl Environment {
     /// arithmetic expression, lowercase (`-l`) / uppercase (`-u`) transform
     /// the case.
     pub fn set_var(&mut self, name: &str, value: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -221,6 +272,7 @@ impl Environment {
                     integer,
                     lowercase,
                     uppercase,
+                    nameref: None,
                 },
             );
         }
@@ -231,6 +283,7 @@ impl Environment {
 
     /// Get a single element from an indexed array variable.
     pub fn get_array_element(&self, name: &str, index: usize) -> Option<&str> {
+        let name = self.resolve_nameref(name);
         match self.variables.get(name)?.value {
             VarValue::Scalar(ref s) => {
                 if index == 0 {
@@ -249,6 +302,8 @@ impl Environment {
     /// If the variable does not exist, creates a new indexed array.
     /// If it exists as a scalar, promotes it to an array (element 0 = old value).
     pub fn set_array_element(&mut self, name: &str, index: usize, value: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -290,6 +345,7 @@ impl Environment {
                         integer: false,
                         lowercase: false,
                         uppercase: false,
+                        nameref: None,
                     },
                 );
             }
@@ -299,6 +355,8 @@ impl Environment {
 
     /// Set an entire indexed array from a list of values (indices 0..n).
     pub fn set_array(&mut self, name: &str, elements: Vec<String>) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -321,6 +379,7 @@ impl Environment {
                 integer,
                 lowercase,
                 uppercase,
+                nameref: None,
             },
         );
         Ok(())
@@ -328,6 +387,7 @@ impl Environment {
 
     /// Get all elements of an array, in index order (indexed) or arbitrary order (assoc).
     pub fn get_array_all(&self, name: &str) -> Option<Vec<&str>> {
+        let name = self.resolve_nameref(name);
         match self.variables.get(name)?.value {
             VarValue::Scalar(ref s) => Some(vec![s.as_str()]),
             VarValue::IndexedArray(ref map) => Some(map.values().map(|s| s.as_str()).collect()),
@@ -337,6 +397,7 @@ impl Environment {
 
     /// Get the number of set elements in an array.
     pub fn get_array_length(&self, name: &str) -> usize {
+        let name = self.resolve_nameref(name);
         match self.variables.get(name) {
             None => 0,
             Some(var) => match var.value {
@@ -349,6 +410,8 @@ impl Environment {
 
     /// Unset a single element of an indexed array.
     pub fn unset_array_element(&mut self, name: &str, index: usize) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -377,6 +440,7 @@ impl Environment {
 
     /// Check if a variable is an associative array.
     pub fn is_assoc_array(&self, name: &str) -> bool {
+        let name = self.resolve_nameref(name);
         self.variables
             .get(name)
             .map(|v| matches!(v.value, VarValue::AssocArray(_)))
@@ -385,6 +449,8 @@ impl Environment {
 
     /// Create an empty associative array variable, or reset an existing one.
     pub fn create_assoc(&mut self, name: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -403,6 +469,7 @@ impl Environment {
                 integer: false,
                 lowercase,
                 uppercase,
+                nameref: None,
             },
         );
         Ok(())
@@ -414,6 +481,8 @@ impl Environment {
     /// If it exists as a non-assoc variable, falls back to `set_var`.
     /// If it does not exist, creates a new associative array.
     pub fn set_assoc_element(&mut self, name: &str, key: &str, value: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -449,6 +518,7 @@ impl Environment {
                         integer: false,
                         lowercase: false,
                         uppercase: false,
+                        nameref: None,
                     },
                 );
             }
@@ -460,6 +530,7 @@ impl Environment {
     ///
     /// For scalars, returns the value if the key is "0".
     pub fn get_assoc_element(&self, name: &str, key: &str) -> Option<&str> {
+        let name = self.resolve_nameref(name);
         match self.variables.get(name)?.value {
             VarValue::AssocArray(ref map) => map.get(key).map(|s| s.as_str()),
             VarValue::Scalar(ref s) if key == "0" => Some(s.as_str()),
@@ -469,6 +540,8 @@ impl Environment {
 
     /// Unset a single element of an associative array by string key.
     pub fn unset_assoc_element(&mut self, name: &str, key: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -489,6 +562,10 @@ impl Environment {
     /// Handles `"a[0]"` (indexed), `"a[key]"` (assoc), `"a[@]"` / `"a[*]"` (all),
     /// and plain `"a"` (scalar).
     pub fn resolve_element(&self, name: &str) -> Option<String> {
+        // NOTE: resolve_nameref is called by the individual accessors (get_var,
+        // get_array_element, etc.), so we do NOT resolve at this level to avoid
+        // double-resolution. Array subscript bases are resolved inside the
+        // callees.
         if let Some((base, subscript)) = crate::exec::expand::parse_array_subscript(name) {
             match subscript {
                 "@" | "*" => self.get_array_all(base).map(|v| v.join(" ")),
@@ -508,6 +585,8 @@ impl Environment {
     /// Dispatches to `set_assoc_element`, `set_array_element`, or `set_var`
     /// based on the subscript and variable type.
     pub fn set_element(&mut self, name: &str, value: &str) -> Result<(), ExecError> {
+        // NOTE: resolve_nameref is called by the individual mutators (set_var,
+        // set_array_element, etc.), so we do NOT resolve at this level.
         if let Some((base, subscript)) = crate::exec::expand::parse_array_subscript(name) {
             if self.is_assoc_array(base) {
                 self.set_assoc_element(base, subscript, value)
@@ -536,6 +615,7 @@ impl Environment {
                         integer: false,
                         lowercase: false,
                         uppercase: false,
+                        nameref: None,
                     },
                 );
             }
@@ -556,6 +636,7 @@ impl Environment {
                         integer: false,
                         lowercase: false,
                         uppercase: false,
+                        nameref: None,
                     },
                 );
             }
@@ -563,7 +644,11 @@ impl Environment {
     }
 
     /// Unset a variable (whole array or scalar). Returns an error if readonly.
+    ///
+    /// If `name` is a nameref, unsets the *target* variable (not the ref itself).
     pub fn unset_var(&mut self, name: &str) -> Result<(), ExecError> {
+        let name = self.resolve_nameref(name).to_string();
+        let name = name.as_str();
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -749,6 +834,7 @@ impl Environment {
             let integer = current.as_ref().map(|v| v.integer).unwrap_or(false);
             let lowercase = current.as_ref().map(|v| v.lowercase).unwrap_or(false);
             let uppercase = current.as_ref().map(|v| v.uppercase).unwrap_or(false);
+            let nameref = current.as_ref().and_then(|v| v.nameref.clone());
             self.variables.insert(
                 name.to_string(),
                 ShellVar {
@@ -758,6 +844,7 @@ impl Environment {
                     integer,
                     lowercase,
                     uppercase,
+                    nameref,
                 },
             );
         }
@@ -820,6 +907,7 @@ impl Environment {
                     integer: attrs.integer_set,
                     lowercase: attrs.lowercase_set && !attrs.uppercase_set,
                     uppercase: attrs.uppercase_set,
+                    nameref: None,
                 },
             );
             return Ok(());
@@ -942,6 +1030,7 @@ impl Environment {
                     integer: false,
                     lowercase: false,
                     uppercase: false,
+                    nameref: None,
                 },
             );
         }

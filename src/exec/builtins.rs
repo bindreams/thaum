@@ -621,6 +621,7 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
                     'i' => attrs.integer_set = true,
                     'l' => attrs.lowercase_set = true,
                     'u' => attrs.uppercase_set = true,
+                    'n' => attrs.nameref_set = true,
                     'g' => attrs.global = true,
                     'p' => attrs.print = true,
                     'f' => attrs.list_functions = true,
@@ -671,6 +672,17 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
         } else {
             (operand.clone(), None)
         };
+
+        // Handle nameref (declare -n)
+        if attrs.nameref_set {
+            if let Some(ref target) = value {
+                env.set_nameref(&name, target)?;
+            } else {
+                // declare -n var (no target) — create empty nameref
+                env.set_nameref(&name, "")?;
+            }
+            continue;
+        }
 
         // Handle array creation
         if attrs.assoc_array {

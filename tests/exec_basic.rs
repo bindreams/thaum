@@ -1749,3 +1749,78 @@ fn set_e_off() {
     let (out, _) = exec_ok("set -e; set +e; false; echo ok");
     assert_eq!(out, "ok\n");
 }
+
+// Nameref (declare -n) ------------------------------------------------------------------------------------------------
+
+#[test]
+fn nameref_basic() {
+    let (out, _) = bash_exec_ok("declare -n r=x; x=hello; echo $r");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn nameref_write() {
+    let (out, _) = bash_exec_ok("declare -n r=x; r=world; echo $x");
+    assert_eq!(out, "world\n");
+}
+
+#[test]
+fn nameref_function_param() {
+    let (out, _) = bash_exec_ok("f() { declare -n out=$1; out=42; }; f result; echo $result");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn nameref_chain() {
+    let (out, _) = bash_exec_ok("declare -n a=b; declare -n b=c; c=deep; echo $a");
+    assert_eq!(out, "deep\n");
+}
+
+#[test]
+fn nameref_cycle() {
+    // Cycle detection — should not infinite loop. ${a:-safe} provides fallback.
+    let (out, _) = bash_exec_ok("declare -n a=b; declare -n b=a; echo ${a:-safe}");
+    assert_eq!(out, "safe\n");
+}
+
+#[test]
+fn nameref_unset_target() {
+    // unset through nameref unsets the target, not the ref
+    let (out, _) = bash_exec_ok("declare -n r=x; x=hi; unset r; echo ${x:-gone}");
+    assert_eq!(out, "gone\n");
+}
+
+#[test]
+fn nameref_array() {
+    let (out, _) = bash_exec_ok("a=(1 2 3); declare -n r=a; echo ${r[1]}");
+    assert_eq!(out, "2\n");
+}
+
+#[test]
+fn nameref_cycle_3way() {
+    // 3-way cycle: a→b→c→a. Must not hang.
+    let (out, _) = bash_exec_ok("declare -n a=b; declare -n b=c; declare -n c=a; echo ${a:-safe}");
+    assert_eq!(out, "safe\n");
+}
+
+#[test]
+fn nameref_cycle_non_origin() {
+    // x→a→b→a — x is not in the cycle, but the chain it enters is cyclic.
+    // Must not hang. x resolves to a (or b), which is unset → fallback.
+    let (out, _) = bash_exec_ok("declare -n x=a; declare -n a=b; declare -n b=a; echo ${x:-safe}");
+    assert_eq!(out, "safe\n");
+}
+
+#[test]
+fn nameref_cycle_write() {
+    // Writing through a cycle must not hang — should fail gracefully.
+    let status = bash_exec_ok("declare -n a=b; declare -n b=a; a=oops 2>/dev/null; echo ok").1;
+    assert_eq!(status, 0); // shell survives, doesn't hang
+}
+
+#[test]
+fn nameref_self_reference() {
+    // declare -n a=a — self-referencing nameref. Must not hang.
+    let (out, _) = bash_exec_ok("declare -n a=a; echo ${a:-safe}");
+    assert_eq!(out, "safe\n");
+}

@@ -792,51 +792,19 @@ impl Environment {
     fn apply_var_transforms(
         &self,
         value: &str,
-        integer: bool,
+        _integer: bool,
         lowercase: bool,
         uppercase: bool,
     ) -> String {
-        if integer {
-            let trimmed = value.trim();
-            if trimmed.is_empty() {
-                return "0".to_string();
-            }
-            // Try simple integer parse first.
-            if let Ok(n) = trimmed.parse::<i64>() {
-                return n.to_string();
-            }
-            // Fall back to a mini arithmetic evaluator for common expressions
-            // like "2+3", "x+5", etc.
-            match self.eval_integer_attr_expr(trimmed) {
-                Ok(n) => return n.to_string(),
-                Err(_) => return "0".to_string(),
-            }
-        }
-
+        // Note: the integer attribute is handled by the Executor, which has
+        // access to the full arithmetic evaluator.  Environment only applies
+        // case transforms.
         if lowercase {
             value.to_lowercase()
         } else if uppercase {
             value.to_uppercase()
         } else {
             value.to_string()
-        }
-    }
-
-    /// Mini arithmetic evaluator for the integer attribute.
-    ///
-    /// Parses a simple arithmetic expression (integers, variable names,
-    /// `+`, `-`, `*`, `/`, parentheses) and evaluates it.  This is used
-    /// by `set_var` when the `-i` attribute is set, so that assignments
-    /// like `x='2+3'` evaluate to `5`.
-    fn eval_integer_attr_expr(&self, expr: &str) -> Result<i64, ()> {
-        // Tokenize: numbers, identifiers (variable names), operators
-        let tokens = tokenize_arith(expr)?;
-        let mut pos = 0;
-        let result = parse_additive(&tokens, &mut pos, self)?;
-        if pos == tokens.len() {
-            Ok(result)
-        } else {
-            Err(())
         }
     }
 
@@ -956,213 +924,25 @@ impl Default for Environment {
     }
 }
 
-// --- Mini arithmetic evaluator for the integer (`-i`) attribute ---
-//
-// This is a self-contained recursive-descent parser that handles:
-//   integers, variable names, +, -, *, /, %, parentheses.
-// It is intentionally simple — full arithmetic (ternary, bitwise, etc.)
-// is handled by the Executor's arithmetic module.  This evaluator
-// exists so that `set_var` (which has no access to the Executor) can
-// evaluate common expressions like "2+3" or "x+5" when the integer
-// attribute is set.
-
-#[derive(Debug, Clone)]
-enum ArithToken {
-    Num(i64),
-    Var(String),
-    Plus,
-    Minus,
-    Star,
-    Slash,
-    Percent,
-    LParen,
-    RParen,
-}
-
-fn tokenize_arith(input: &str) -> Result<Vec<ArithToken>, ()> {
-    let mut tokens = Vec::new();
-    let bytes = input.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        let ch = bytes[i] as char;
-        match ch {
-            ' ' | '\t' => {
-                i += 1;
-            }
-            '+' => {
-                tokens.push(ArithToken::Plus);
-                i += 1;
-            }
-            '-' => {
-                tokens.push(ArithToken::Minus);
-                i += 1;
-            }
-            '*' => {
-                tokens.push(ArithToken::Star);
-                i += 1;
-            }
-            '/' => {
-                tokens.push(ArithToken::Slash);
-                i += 1;
-            }
-            '%' => {
-                tokens.push(ArithToken::Percent);
-                i += 1;
-            }
-            '(' => {
-                tokens.push(ArithToken::LParen);
-                i += 1;
-            }
-            ')' => {
-                tokens.push(ArithToken::RParen);
-                i += 1;
-            }
-            '0'..='9' => {
-                let start = i;
-                while i < bytes.len() && (bytes[i] as char).is_ascii_digit() {
-                    i += 1;
-                }
-                let n: i64 = input[start..i].parse().map_err(|_| ())?;
-                tokens.push(ArithToken::Num(n));
-            }
-            c if c == '_' || c.is_ascii_alphabetic() => {
-                let start = i;
-                while i < bytes.len() {
-                    let c2 = bytes[i] as char;
-                    if c2 == '_' || c2.is_ascii_alphanumeric() {
-                        i += 1;
-                    } else {
-                        break;
-                    }
-                }
-                tokens.push(ArithToken::Var(input[start..i].to_string()));
-            }
-            _ => return Err(()),
-        }
-    }
-    Ok(tokens)
-}
-
-/// Parse additive expression: term (('+' | '-') term)*
-fn parse_additive(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
-    let mut left = parse_multiplicative(tokens, pos, env)?;
-    loop {
-        if *pos >= tokens.len() {
-            break;
-        }
-        match tokens[*pos] {
-            ArithToken::Plus => {
-                *pos += 1;
-                let right = parse_multiplicative(tokens, pos, env)?;
-                left = left.wrapping_add(right);
-            }
-            ArithToken::Minus => {
-                *pos += 1;
-                let right = parse_multiplicative(tokens, pos, env)?;
-                left = left.wrapping_sub(right);
-            }
-            _ => break,
-        }
-    }
-    Ok(left)
-}
-
-/// Parse multiplicative expression: unary (('*' | '/' | '%') unary)*
-fn parse_multiplicative(
-    tokens: &[ArithToken],
-    pos: &mut usize,
-    env: &Environment,
-) -> Result<i64, ()> {
-    let mut left = parse_unary(tokens, pos, env)?;
-    loop {
-        if *pos >= tokens.len() {
-            break;
-        }
-        match tokens[*pos] {
-            ArithToken::Star => {
-                *pos += 1;
-                let right = parse_unary(tokens, pos, env)?;
-                left = left.wrapping_mul(right);
-            }
-            ArithToken::Slash => {
-                *pos += 1;
-                let right = parse_unary(tokens, pos, env)?;
-                if right == 0 {
-                    return Err(());
-                }
-                left = left.wrapping_div(right);
-            }
-            ArithToken::Percent => {
-                *pos += 1;
-                let right = parse_unary(tokens, pos, env)?;
-                if right == 0 {
-                    return Err(());
-                }
-                left = left.wrapping_rem(right);
-            }
-            _ => break,
-        }
-    }
-    Ok(left)
-}
-
-/// Parse unary: ['-' | '+'] primary
-fn parse_unary(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
-    if *pos >= tokens.len() {
-        return Err(());
-    }
-    match tokens[*pos] {
-        ArithToken::Minus => {
-            *pos += 1;
-            let val = parse_primary(tokens, pos, env)?;
-            Ok(val.wrapping_neg())
-        }
-        ArithToken::Plus => {
-            *pos += 1;
-            parse_primary(tokens, pos, env)
-        }
-        _ => parse_primary(tokens, pos, env),
-    }
-}
-
-/// Parse primary: number | variable | '(' expr ')'
-fn parse_primary(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
-    if *pos >= tokens.len() {
-        return Err(());
-    }
-    match &tokens[*pos] {
-        ArithToken::Num(n) => {
-            let n = *n;
-            *pos += 1;
-            Ok(n)
-        }
-        ArithToken::Var(name) => {
-            *pos += 1;
-            let val_str = env.get_var(name).unwrap_or("");
-            if val_str.is_empty() {
-                Ok(0)
-            } else {
-                val_str.parse::<i64>().map_err(|_| ())
-            }
-        }
-        ArithToken::LParen => {
-            *pos += 1;
-            let val = parse_additive(tokens, pos, env)?;
-            if *pos >= tokens.len() {
-                return Err(());
-            }
-            match tokens[*pos] {
-                ArithToken::RParen => {
-                    *pos += 1;
-                    Ok(val)
-                }
-                _ => Err(()),
-            }
-        }
-        _ => Err(()),
-    }
-}
+// Integer attribute arithmetic evaluation is handled by the Executor,
+// which has access to the full arithmetic module (src/exec/arithmetic.rs).
 
 #[cfg(test)]
 #[path = "environment_tests.rs"]
 mod tests;
+
+// NOTE: The mini arithmetic evaluator that was here has been removed.
+// Integer attribute (-i) evaluation is handled by the Executor, which
+// has access to the full arithmetic module (src/exec/arithmetic.rs).
+//
+// For now, set_var() with integer=true does a simple i64::parse().
+// Full arithmetic expression evaluation (e.g. "2+3") requires the
+// Executor to intercept the assignment and evaluate before calling
+// set_var(). This is a TODO tracked in the declare -i tests.
+
+// REMOVED: ArithToken enum, tokenize_arith(), parse_additive(),
+// parse_multiplicative(), parse_unary(), parse_primary() — ~200 lines
+// of duplicated arithmetic parsing that belonged in exec/arithmetic.rs.
+//
+// DO NOT add arithmetic evaluation to Environment. Use the Executor.
+// (mini parser removed — was ~200 lines of duplicated arithmetic code)

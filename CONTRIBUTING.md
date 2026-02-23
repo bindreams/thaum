@@ -82,7 +82,6 @@ tests/
   exec_basic.rs     — basic execution tests
   exec_conformance.rs — execution conformance tests
   corpus_runner.rs  — oils corpus test runner (custom harness)
-  parse_known_failures.rs — known parser failures tracking
 ```
 
 ## Architecture

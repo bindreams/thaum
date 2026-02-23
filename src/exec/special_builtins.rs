@@ -13,11 +13,7 @@ impl Executor {
     ///
     /// Variables, functions, and state changes persist in the current shell
     /// (unlike a subshell).
-    pub(super) fn builtin_eval(
-        &mut self,
-        args: &[String],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub(super) fn builtin_eval(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let text = args.join(" ");
         if text.is_empty() {
             return Ok(0);
@@ -33,11 +29,7 @@ impl Executor {
     ///
     /// If extra arguments are supplied after the filename, they temporarily
     /// replace the positional parameters for the duration of the sourced file.
-    pub(super) fn builtin_source(
-        &mut self,
-        args: &[String],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub(super) fn builtin_source(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         if args.is_empty() {
             let _ = writeln!(io.stderr, "source: filename argument required");
             return Ok(2);
@@ -94,11 +86,7 @@ impl Executor {
     /// On Unix, uses `CommandExt::exec()` which replaces the process image.
     /// In tests and on non-Unix, spawns the child and exits via
     /// `ExitRequested`.
-    pub(super) fn builtin_exec(
-        &mut self,
-        args: &[String],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub(super) fn builtin_exec(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         if args.is_empty() {
             // Redirect-only mode -- redirects were already applied by the
             // caller before we got here. Nothing else to do.

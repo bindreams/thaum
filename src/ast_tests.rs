@@ -10,20 +10,14 @@ fn literal(s: &str) -> Fragment {
 }
 
 fn word(parts: Vec<Fragment>) -> Word {
-    Word {
-        parts,
-        span: span(),
-    }
+    Word { parts, span: span() }
 }
 
-// -- Fragment -----------------------------------------------------------
+// Fragment ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn literal_is_static() {
-    assert_eq!(
-        literal("hello").try_to_static_string(),
-        Some("hello".into())
-    );
+    assert_eq!(literal("hello").try_to_static_string(), Some("hello".into()));
 }
 
 #[test]
@@ -76,10 +70,7 @@ fn glob_is_none() {
 
 #[test]
 fn tilde_is_none() {
-    assert_eq!(
-        Fragment::TildePrefix("".into()).try_to_static_string(),
-        None
-    );
+    assert_eq!(Fragment::TildePrefix("".into()).try_to_static_string(), None);
 }
 
 #[test]
@@ -113,14 +104,11 @@ fn locale_quoted_is_none() {
     assert_eq!(frag.try_to_static_string(), None);
 }
 
-// -- Word ---------------------------------------------------------------
+// Word ----------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn word_single_literal() {
-    assert_eq!(
-        word(vec![literal("echo")]).try_to_static_string(),
-        Some("echo".into())
-    );
+    assert_eq!(word(vec![literal("echo")]).try_to_static_string(), Some("echo".into()));
 }
 
 #[test]
@@ -143,7 +131,7 @@ fn empty_word() {
     assert_eq!(word(vec![]).try_to_static_string(), Some(String::new()));
 }
 
-// -- Argument -----------------------------------------------------------
+// Argument ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn argument_word_delegates() {

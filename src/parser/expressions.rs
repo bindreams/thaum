@@ -51,9 +51,7 @@ impl Parser {
                     // If a newline follows `;`, this line ends here.
                     // The newline will be consumed by the caller's skip_linebreak.
                     self.lexer.eat_whitespace()?;
-                    if self.lexer.peek()?.token == Token::Newline
-                        || self.lexer.peek()?.token == Token::Eof
-                    {
+                    if self.lexer.peek()?.token == Token::Newline || self.lexer.peek()?.token == Token::Eof {
                         return Ok(());
                     }
                     let tok = self.lexer.peek()?.token.clone();
@@ -73,9 +71,7 @@ impl Parser {
                     self.lexer.advance()?;
                     // If a newline follows `&`, this line ends here.
                     self.lexer.eat_whitespace()?;
-                    if self.lexer.peek()?.token == Token::Newline
-                        || self.lexer.peek()?.token == Token::Eof
-                    {
+                    if self.lexer.peek()?.token == Token::Newline || self.lexer.peek()?.token == Token::Eof {
                         return Ok(());
                     }
                     let tok = self.lexer.peek()?.token.clone();
@@ -227,10 +223,7 @@ impl Parser {
                             }
                             redirects.push(self.parse_redirect()?);
                         }
-                        let end_span = redirects
-                            .last()
-                            .map(|r| r.span)
-                            .unwrap_or(compound_command_span(&body));
+                        let end_span = redirects.last().map(|r| r.span).unwrap_or(compound_command_span(&body));
                         return Ok(Expression::FunctionDef(FunctionDef {
                             name,
                             body: Box::new(body),

@@ -54,9 +54,7 @@ impl Default for MappingBuilder {
 impl MappingBuilder {
     /// Create an empty mapping builder.
     pub fn new() -> Self {
-        MappingBuilder {
-            entries: Vec::new(),
-        }
+        MappingBuilder { entries: Vec::new() }
     }
 
     /// Add a key with an escaped scalar value (quotes special chars).
@@ -96,8 +94,7 @@ impl MappingBuilder {
 
     /// Add a key with an empty sequence (`[]`).
     pub fn empty_seq(&mut self, key: &str) -> &mut Self {
-        self.entries
-            .push((key.to_string(), YamlValue::Sequence(Vec::new())));
+        self.entries.push((key.to_string(), YamlValue::Sequence(Vec::new())));
         self
     }
 

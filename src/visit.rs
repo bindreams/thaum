@@ -102,9 +102,7 @@ pub trait Visit<'ast> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// walk_* free functions
-// ---------------------------------------------------------------------------
+// walk_* free functions ===============================================================================================
 
 fn walk_lines<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, lines: &'ast [Line]) {
     for line in lines {
@@ -163,16 +161,12 @@ pub fn walk_command<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, cmd: &'ast Command
 }
 
 /// Visit body and sub-structures of a compound command. Call from [`Visit::visit_compound_command`] overrides.
-pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
-    v: &mut V,
-    compound: &'ast CompoundCommand,
-) {
+pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, compound: &'ast CompoundCommand) {
     match compound {
         CompoundCommand::BraceGroup { body, .. } | CompoundCommand::Subshell { body, .. } => {
             walk_lines(v, body);
         }
-        CompoundCommand::ForClause { words, body, .. }
-        | CompoundCommand::BashSelectClause { words, body, .. } => {
+        CompoundCommand::ForClause { words, body, .. } | CompoundCommand::BashSelectClause { words, body, .. } => {
             if let Some(word_list) = words {
                 for w in word_list {
                     v.visit_word(w);
@@ -202,17 +196,11 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
                 walk_lines(v, else_lines);
             }
         }
-        CompoundCommand::WhileClause {
-            condition, body, ..
-        }
-        | CompoundCommand::UntilClause {
-            condition, body, ..
-        } => {
+        CompoundCommand::WhileClause { condition, body, .. } | CompoundCommand::UntilClause { condition, body, .. } => {
             walk_lines(v, condition);
             walk_lines(v, body);
         }
-        CompoundCommand::BashDoubleBracket { .. }
-        | CompoundCommand::BashArithmeticCommand { .. } => {}
+        CompoundCommand::BashDoubleBracket { .. } | CompoundCommand::BashArithmeticCommand { .. } => {}
         CompoundCommand::BashCoproc { body, .. } => {
             v.visit_expression(body);
         }

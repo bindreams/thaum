@@ -11,10 +11,7 @@ fn bash_here_string() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
-        assert!(matches!(
-            &cmd.redirects[0].kind,
-            RedirectKind::BashHereString(_)
-        ));
+        assert!(matches!(&cmd.redirects[0].kind, RedirectKind::BashHereString(_)));
     } else {
         panic!("expected Command");
     }
@@ -31,10 +28,7 @@ fn bash_ampersand_redirect() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
-        assert!(matches!(
-            &cmd.redirects[0].kind,
-            RedirectKind::BashOutputAll(_)
-        ));
+        assert!(matches!(&cmd.redirects[0].kind, RedirectKind::BashOutputAll(_)));
     } else {
         panic!("expected Command");
     }
@@ -46,10 +40,7 @@ fn bash_ampersand_append_redirect() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         assert_eq!(cmd.redirects.len(), 1);
-        assert!(matches!(
-            &cmd.redirects[0].kind,
-            RedirectKind::BashAppendAll(_)
-        ));
+        assert!(matches!(&cmd.redirects[0].kind, RedirectKind::BashAppendAll(_)));
     } else {
         panic!("expected Command");
     }
@@ -127,10 +118,7 @@ fn bash_double_brackets_requires_space() {
     // [[-f is NOT [[ -f — bash requires whitespace after [[.
     // Without space, [[-f is a literal command name.
     let prog = parse_with("[[-f foo ]]", Dialect::Bash).unwrap();
-    assert!(matches!(
-        &prog.lines[0][0].expression,
-        Expression::Command(_)
-    ));
+    assert!(matches!(&prog.lines[0][0].expression, Expression::Command(_)));
 }
 
 #[test]
@@ -223,10 +211,7 @@ fn bash_function_keyword_with_parens() {
 fn posix_rejects_function_keyword() {
     let result = parse("function greet { echo hello; }");
     if let Ok(prog) = &result {
-        assert!(!matches!(
-            &prog.lines[0][0].expression,
-            Expression::FunctionDef(_)
-        ));
+        assert!(!matches!(&prog.lines[0][0].expression, Expression::FunctionDef(_)));
     }
 }
 
@@ -357,17 +342,12 @@ fn bash_select_loop() {
         select: true,
         ..Default::default()
     };
-    let prog =
-        thaum::parser::parse_with_options("select opt in a b c; do echo $opt; done", opts).unwrap();
+    let prog = thaum::parser::parse_with_options("select opt in a b c; do echo $opt; done", opts).unwrap();
     let stmt = &prog.lines[0][0];
     if let Expression::Compound {
-        body:
-            CompoundCommand::BashSelectClause {
-                variable,
-                words,
-                body,
-                ..
-            },
+        body: CompoundCommand::BashSelectClause {
+            variable, words, body, ..
+        },
         ..
     } = &stmt.expression
     {
@@ -388,9 +368,7 @@ fn bash_select_no_in() {
     let prog = thaum::parser::parse_with_options("select opt\ndo\necho $opt\ndone", opts).unwrap();
     let stmt = &prog.lines[0][0];
     if let Expression::Compound {
-        body: CompoundCommand::BashSelectClause {
-            variable, words, ..
-        },
+        body: CompoundCommand::BashSelectClause { variable, words, .. },
         ..
     } = &stmt.expression
     {
@@ -405,10 +383,7 @@ fn bash_select_no_in() {
 fn posix_rejects_select() {
     let result = parse("select opt in a b c; do echo $opt; done");
     if let Ok(prog) = &result {
-        assert!(matches!(
-            &prog.lines[0][0].expression,
-            Expression::Command(_)
-        ));
+        assert!(matches!(&prog.lines[0][0].expression, Expression::Command(_)));
     }
 }
 
@@ -462,10 +437,7 @@ fn bash_coproc_named() {
 fn posix_rejects_coproc() {
     let result = parse("coproc cat");
     if let Ok(prog) = &result {
-        assert!(matches!(
-            &prog.lines[0][0].expression,
-            Expression::Command(_)
-        ));
+        assert!(matches!(&prog.lines[0][0].expression, Expression::Command(_)));
     }
 }
 
@@ -526,7 +498,7 @@ fn bash_array_assignment_with_command() {
     }
 }
 
-// --- |& pipe stderr ---
+// |& pipe stderr ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_pipe_stderr() {
@@ -537,12 +509,7 @@ fn bash_pipe_stderr() {
     };
     let prog = thaum::parser::parse_with_options("cmd1 |& cmd2", opts).unwrap();
     let stmt = &prog.lines[0][0];
-    if let Expression::Pipe {
-        left,
-        right,
-        stderr,
-    } = &stmt.expression
-    {
+    if let Expression::Pipe { left, right, stderr } = &stmt.expression {
         assert!(stderr);
         assert!(matches!(left.as_ref(), Expression::Command(_)));
         assert!(matches!(right.as_ref(), Expression::Command(_)));
@@ -569,8 +536,7 @@ fn bash_pipe_stderr_in_chain() {
     {
         assert!(!outer_stderr); // outer pipe is regular
         if let Expression::Pipe {
-            stderr: inner_stderr,
-            ..
+            stderr: inner_stderr, ..
         } = left.as_ref()
         {
             assert!(inner_stderr); // inner pipe has stderr
@@ -599,7 +565,7 @@ fn posix_pipe_ampersand_is_background() {
     }
 }
 
-// --- $'...' ANSI-C quoting ---
+// $'...' ANSI-C quoting -----------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_ansi_c_quoting() {
@@ -655,15 +621,12 @@ fn posix_dollar_single_quote_is_dollar_plus_string() {
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
             // Should NOT be BashAnsiCQuoted
-            assert!(!w
-                .parts
-                .iter()
-                .any(|p| matches!(p, Fragment::BashAnsiCQuoted(_))));
+            assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashAnsiCQuoted(_))));
         }
     }
 }
 
-// --- $"..." locale translation ---
+// $"..." locale translation -------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_locale_quoted() {
@@ -696,15 +659,12 @@ fn posix_dollar_double_quote_is_dollar_plus_string() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            assert!(!w
-                .parts
-                .iter()
-                .any(|p| matches!(p, Fragment::BashLocaleQuoted(_))));
+            assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashLocaleQuoted(_))));
         }
     }
 }
 
-// --- extglob ---
+// extglob -------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_extglob_zero_or_more() {
@@ -795,17 +755,14 @@ fn posix_rejects_extglob() {
         if let Expression::Command(cmd) = &prog.lines[0][0].expression {
             for arg in &cmd.arguments {
                 if let Argument::Word(w) = arg {
-                    assert!(!w
-                        .parts
-                        .iter()
-                        .any(|p| matches!(p, Fragment::BashExtGlob { .. })));
+                    assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashExtGlob { .. })));
                 }
             }
         }
     }
 }
 
-// --- brace expansion ---
+// brace expansion -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_brace_expansion_list() {
@@ -834,9 +791,7 @@ fn bash_brace_expansion_sequence() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) =
-                &w.parts[0]
-            {
+            if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) = &w.parts[0] {
                 assert_eq!(start, "1");
                 assert_eq!(end, "5");
                 assert!(step.is_none());
@@ -857,9 +812,7 @@ fn bash_brace_expansion_step() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) =
-                &w.parts[0]
-            {
+            if let Fragment::BashBraceExpansion(BraceExpansionKind::Sequence { start, end, step }) = &w.parts[0] {
                 assert_eq!(start, "0");
                 assert_eq!(end, "10");
                 assert_eq!(step.as_deref(), Some("2"));
@@ -900,15 +853,12 @@ fn posix_brace_is_literal() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            assert!(!w
-                .parts
-                .iter()
-                .any(|p| matches!(p, Fragment::BashBraceExpansion(_))));
+            assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashBraceExpansion(_))));
         }
     }
 }
 
-// --- [[ ]] test expression parsing ---
+// [[ ]] test expression parsing ---------------------------------------------------------------------------------------
 
 /// Helper: parse input in Bash mode and extract the BashTestExpr.
 fn parse_test_expr(input: &str) -> BashTestExpr {
@@ -1132,7 +1082,7 @@ fn test_expr_grouped() {
     }
 }
 
-// --- [[ ]] multi-line and edge cases ---
+// [[ ]] multi-line and edge cases -------------------------------------------------------------------------------------
 
 #[test]
 fn dbracket_multiline_and() {
@@ -1370,9 +1320,7 @@ fn test_expr_all_binary_word_ops() {
     }
 }
 
-// ============================================================================
-// Arithmetic expression tests (via (( )) and $(( )))
-// ============================================================================
+// Arithmetic expression tests (via (( )) and $(( ))) ------------------------------------------------------------------
 
 /// Helper: parse input in Bash mode (arithmetic_command enabled) and extract ArithExpr.
 fn parse_arith_cmd(input: &str) -> ArithExpr {
@@ -1541,7 +1489,7 @@ fn arith_in_word_context() {
     }
 }
 
-// --- arithmetic for loop ---
+// arithmetic for loop -------------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_arithmetic_for_basic() {
@@ -1550,8 +1498,7 @@ fn bash_arithmetic_for_basic() {
         arithmetic_command: true,
         ..Default::default()
     };
-    let prog = thaum::parser::parse_with_options("for ((i=0; i<10; i++)); do echo $i; done", opts)
-        .unwrap();
+    let prog = thaum::parser::parse_with_options("for ((i=0; i<10; i++)); do echo $i; done", opts).unwrap();
     let stmt = &prog.lines[0][0];
     if let Expression::Compound {
         body:
@@ -1608,7 +1555,7 @@ fn posix_rejects_arithmetic_for() {
     assert!(result.is_err());
 }
 
-// --- parameter expansion inside arithmetic ---
+// parameter expansion inside arithmetic -------------------------------------------------------------------------------
 
 #[test]
 fn arith_brace_param_expansion() {
@@ -1633,7 +1580,7 @@ fn arith_array_length() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-// --- Array subscripts in arithmetic ---
+// Array subscripts in arithmetic --------------------------------------------------------------------------------------
 
 #[test]
 fn arith_array_subscript_basic() {
@@ -1689,9 +1636,7 @@ fn bracket_glob_word_order() {
     }
 }
 
-// ---------------------------------------------------------------------------
-// << inside (( )) is left-shift, not heredoc
-// ---------------------------------------------------------------------------
+// << inside (( )) is left-shift, not heredoc --------------------------------------------------------------------------
 
 #[test]
 fn arith_left_shift_not_heredoc() {
@@ -1728,9 +1673,7 @@ fn double_paren_subshell_not_arithmetic() {
     ));
 }
 
-// ---------------------------------------------------------------------------
-// Arithmetic features: (( )) must parse as BashArithmeticCommand, not Subshell
-// ---------------------------------------------------------------------------
+// Arithmetic features: (( )) must parse as BashArithmeticCommand, not Subshell ----------------------------------------
 
 #[test]
 fn arith_empty_expression() {
@@ -1776,9 +1719,7 @@ fn arith_redirect_after_dparen() {
     ));
 }
 
-// ---------------------------------------------------------------------------
-// [[ ]] edge cases
-// ---------------------------------------------------------------------------
+// [[ ]] edge cases ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn double_bracket_close_as_literal_word() {

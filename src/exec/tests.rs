@@ -2,9 +2,7 @@
 //! control flow, and compound command execution.
 
 use super::*;
-use pattern::{
-    trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix,
-};
+use pattern::{trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix};
 
 #[test]
 fn pattern_match_literal() {
@@ -36,7 +34,7 @@ fn pattern_match_bracket() {
     assert!(shell_pattern_match("hello", "[!A-Z]ello"));
 }
 
-// --- Trim prefix/suffix tests ---
+// Trim prefix/suffix tests --------------------------------------------------------------------------------------------
 
 #[test]
 fn trim_smallest_prefix_star_slash() {

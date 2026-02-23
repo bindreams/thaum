@@ -50,9 +50,7 @@ impl Executor {
                 }
             }
 
-            CompoundCommand::WhileClause {
-                condition, body, ..
-            } => {
+            CompoundCommand::WhileClause { condition, body, .. } => {
                 let mut status = 0;
                 loop {
                     let cond_status = self.execute_lines(condition, io)?;
@@ -75,9 +73,7 @@ impl Executor {
                 Ok(status)
             }
 
-            CompoundCommand::UntilClause {
-                condition, body, ..
-            } => {
+            CompoundCommand::UntilClause { condition, body, .. } => {
                 let mut status = 0;
                 loop {
                     let cond_status = self.execute_lines(condition, io)?;
@@ -101,10 +97,7 @@ impl Executor {
             }
 
             CompoundCommand::ForClause {
-                variable,
-                words,
-                body,
-                ..
+                variable, words, body, ..
             } => {
                 let word_list = if let Some(words) = words {
                     let mut list = Vec::new();
@@ -170,12 +163,10 @@ impl Executor {
                 // 1 (failure) if expression is zero.
                 Ok(if value != 0 { 0 } else { 1 })
             }
-            CompoundCommand::BashSelectClause { .. } => Err(ExecError::UnsupportedFeature(
-                "bash select clause".to_string(),
-            )),
-            CompoundCommand::BashCoproc { .. } => {
-                Err(ExecError::UnsupportedFeature("bash coproc".to_string()))
+            CompoundCommand::BashSelectClause { .. } => {
+                Err(ExecError::UnsupportedFeature("bash select clause".to_string()))
             }
+            CompoundCommand::BashCoproc { .. } => Err(ExecError::UnsupportedFeature("bash coproc".to_string())),
             CompoundCommand::BashArithmeticFor {
                 init,
                 condition,

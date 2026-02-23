@@ -10,13 +10,7 @@ pub fn parse_ok(input: &str) -> Program {
 }
 
 pub fn first_expr(input: &str) -> Expression {
-    parse_ok(input)
-        .lines
-        .into_iter()
-        .flatten()
-        .next()
-        .unwrap()
-        .expression
+    parse_ok(input).lines.into_iter().flatten().next().unwrap().expression
 }
 
 pub fn first_cmd(input: &str) -> Command {
@@ -34,8 +28,7 @@ pub fn first_compound(input: &str) -> CompoundCommand {
 }
 
 pub fn first_compound_bash(input: &str) -> CompoundCommand {
-    let prog = parse_with(input, Dialect::Bash)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", input, e));
+    let prog = parse_with(input, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", input, e));
     let expr = prog.lines.into_iter().flatten().next().unwrap().expression;
     match expr {
         Expression::Compound { body, .. } => body,

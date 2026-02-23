@@ -79,9 +79,7 @@ pub fn run_in_reference_shell(script: &str, shell: &str) -> DockerResult {
         .expect("failed to start docker");
 
     if let Some(ref mut stdin) = child.stdin {
-        stdin
-            .write_all(script.as_bytes())
-            .expect("write to docker stdin");
+        stdin.write_all(script.as_bytes()).expect("write to docker stdin");
     }
     child.stdin.take();
 

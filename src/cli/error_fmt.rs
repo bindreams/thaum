@@ -13,12 +13,7 @@ fn print_error_header(msg: &str) {
     }
 }
 
-pub(super) fn print_error(
-    error: &thaum::ParseError,
-    source: &str,
-    filename: &str,
-    mapper: &SourceMapper,
-) {
+pub(super) fn print_error(error: &thaum::ParseError, source: &str, filename: &str, mapper: &SourceMapper) {
     let colorize = colored::control::SHOULD_COLORIZE.should_colorize();
     print_error_header(&error.to_string());
 

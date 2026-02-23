@@ -26,17 +26,14 @@ fn thaum_exe() -> std::path::PathBuf {
 /// Create an executor configured for tests (controlled PATH, thaum exe path).
 fn test_executor() -> Executor {
     let mut executor = Executor::new();
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
     executor.set_exe_path(thaum_exe());
     executor
 }
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 fn exec_ok(script: &str) -> (String, i32) {
-    let program =
-        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = test_executor();
 
@@ -56,8 +53,7 @@ fn exec_status(script: &str) -> i32 {
 /// Parse and execute a script, returning the exit status or 1 on error.
 /// Unlike `exec_ok`, this does not panic on execution errors.
 fn exec_result(script: &str) -> i32 {
-    let program =
-        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = test_executor();
 
@@ -69,7 +65,7 @@ fn exec_result(script: &str) -> i32 {
     }
 }
 
-// --- Basic command execution ---
+// Basic command execution ---------------------------------------------------------------------------------------------
 
 #[test]
 fn true_command() {
@@ -96,7 +92,7 @@ fn exit_nonzero() {
     assert_eq!(exec_status("exit 42"), 42);
 }
 
-// --- Variable assignment ---
+// Variable assignment -------------------------------------------------------------------------------------------------
 
 #[test]
 fn variable_assignment_and_echo() {
@@ -115,7 +111,7 @@ fn variable_used_in_later_command() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
-// --- AND/OR lists ---
+// AND/OR lists --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn and_list_both_true() {
@@ -137,7 +133,7 @@ fn or_list_first_true() {
     assert_eq!(exec_status("true || false"), 0);
 }
 
-// --- Not ---
+// Not -----------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn not_true() {
@@ -149,7 +145,7 @@ fn not_false() {
     assert_eq!(exec_status("! false"), 0);
 }
 
-// --- Multiple statements ---
+// Multiple statements -------------------------------------------------------------------------------------------------
 
 #[test]
 fn multiple_statements_last_status() {
@@ -157,7 +153,7 @@ fn multiple_statements_last_status() {
     assert_eq!(exec_status("false; true"), 0);
 }
 
-// --- exit status propagation ---
+// exit status propagation ---------------------------------------------------------------------------------------------
 
 #[test]
 fn exit_status_variable() {
@@ -170,7 +166,7 @@ fn exit_status_variable() {
     assert_eq!(status, 0);
 }
 
-// --- If statements ---
+// If statements -------------------------------------------------------------------------------------------------------
 
 #[test]
 fn if_true_branch() {
@@ -200,7 +196,7 @@ fn if_no_else_false() {
     assert_eq!(status, 0);
 }
 
-// --- While loop ---
+// While loop ----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn while_loop_counts() {
@@ -213,7 +209,7 @@ fn while_loop_counts() {
     assert_eq!(executor.env().get_var("X"), Some("done"));
 }
 
-// --- For loop ---
+// For loop ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn for_loop_over_words() {
@@ -224,7 +220,7 @@ fn for_loop_over_words() {
     assert_eq!(executor.env().get_var("RESULT"), Some("abc"));
 }
 
-// --- Case statement ---
+// Case statement ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn case_exact_match() {
@@ -260,7 +256,7 @@ esac
     assert_eq!(executor.env().get_var("X"), Some("default"));
 }
 
-// --- Brace group ---
+// Brace group ---------------------------------------------------------------------------------------------------------
 
 #[test]
 fn brace_group() {
@@ -271,7 +267,7 @@ fn brace_group() {
     assert_eq!(executor.env().get_var("X"), Some("inside"));
 }
 
-// --- Function definition and call ---
+// Function definition and call ----------------------------------------------------------------------------------------
 
 #[test]
 fn function_define_and_call() {
@@ -282,7 +278,7 @@ fn function_define_and_call() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
-// --- Export ---
+// Export --------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn export_builtin() {
@@ -294,7 +290,7 @@ fn export_builtin() {
     assert!(executor.env().is_exported("FOO"));
 }
 
-// --- Unset ---
+// Unset ---------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn unset_builtin() {
@@ -305,7 +301,7 @@ fn unset_builtin() {
     assert_eq!(executor.env().get_var("X"), None);
 }
 
-// --- External command (basic smoke test) ---
+// External command (basic smoke test) ---------------------------------------------------------------------------------
 
 #[test]
 fn external_command_true() {
@@ -323,7 +319,7 @@ fn external_command_not_found() {
     assert_eq!(exec_status("nonexistent_command_xyz_123"), 127);
 }
 
-// --- Test builtin ---
+// Test builtin --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn test_builtin_string() {
@@ -343,7 +339,7 @@ fn bracket_test_syntax() {
     assert_eq!(exec_status("[ 3 -gt 2 ]"), 0);
 }
 
-// --- Break/continue ---
+// Break/continue ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn break_in_while() {
@@ -384,7 +380,7 @@ done
     assert_eq!(executor.env().get_var("RESULT"), Some("ab"));
 }
 
-// --- Command substitution ---
+// Command substitution ------------------------------------------------------------------------------------------------
 
 #[test]
 fn command_substitution_builtin() {
@@ -437,15 +433,12 @@ fn command_substitution_exit_status() {
     assert_eq!(executor.env().get_var("X"), Some(""));
 }
 
-// --- Unsupported features produce explicit errors ---
+// Unsupported features produce explicit errors ------------------------------------------------------------------------
 
 fn expect_unsupported(script: &str) {
-    let program =
-        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
     let mut captured = CapturedIo::new();
     let err = executor
         .execute(&program, &mut captured.context())
@@ -460,8 +453,8 @@ fn expect_unsupported(script: &str) {
 
 #[allow(dead_code)]
 fn expect_unsupported_bash(script: &str) {
-    let program = thaum::parse_with(script, Dialect::Bash)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     let err = executor
@@ -478,8 +471,8 @@ fn expect_unsupported_bash(script: &str) {
 /// Parse and execute a Bash-dialect script, returning the exit status or 1 on error.
 /// Unlike `bash_exec_ok`, this does not panic on execution errors.
 fn bash_exec_result(script: &str) -> i32 {
-    let program = thaum::parse_with(script, Dialect::Bash)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = test_executor();
 
@@ -493,8 +486,8 @@ fn bash_exec_result(script: &str) -> i32 {
 
 /// Parse and execute a Bash-dialect script, capturing stdout. Returns (stdout, exit_status).
 fn bash_exec_ok(script: &str) -> (String, i32) {
-    let program = thaum::parse_with(script, Dialect::Bash)
-        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program =
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = test_executor();
 
@@ -511,7 +504,7 @@ fn unsupported_background() {
     expect_unsupported("echo hello &");
 }
 
-// --- Arithmetic expansion $((expr)) ---
+// Arithmetic expansion $((expr)) --------------------------------------------------------------------------------------
 
 #[test]
 fn arith_expansion_simple() {
@@ -555,9 +548,7 @@ fn arith_expansion_division_by_zero() {
     let program = thaum::parse("X=$((1/0))").unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    let err = executor
-        .execute(&program, &mut captured.context())
-        .unwrap_err();
+    let err = executor.execute(&program, &mut captured.context()).unwrap_err();
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
@@ -579,17 +570,14 @@ fn arith_expansion_unset_var_is_zero() {
     assert_eq!(executor.env().get_var("X"), Some("1"));
 }
 
-// --- Bash (( )) arithmetic command ---
+// Bash (( )) arithmetic command ---------------------------------------------------------------------------------------
 
 #[test]
 fn bash_arith_command_nonzero_is_success() {
     let program = thaum::parse_with("(( 5 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    assert_eq!(
-        executor.execute(&program, &mut captured.context()).unwrap(),
-        0
-    );
+    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 0);
 }
 
 #[test]
@@ -597,10 +585,7 @@ fn bash_arith_command_zero_is_failure() {
     let program = thaum::parse_with("(( 0 ))", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
-    assert_eq!(
-        executor.execute(&program, &mut captured.context()).unwrap(),
-        1
-    );
+    assert_eq!(executor.execute(&program, &mut captured.context()).unwrap(), 1);
 }
 
 #[test]
@@ -613,7 +598,7 @@ fn bash_arith_command_with_assignment() {
     assert_eq!(executor.env().get_var("x"), Some("42"));
 }
 
-// --- Bash for (( )) arithmetic for loop ---
+// Bash for (( )) arithmetic for loop ----------------------------------------------------------------------------------
 
 #[test]
 fn bash_arith_for_basic() {
@@ -626,11 +611,7 @@ fn bash_arith_for_basic() {
 
 #[test]
 fn bash_arith_for_sum() {
-    let program = thaum::parse_with(
-        "sum=0\nfor ((i=1; i<=10; i++)); do sum=$((sum+i)); done",
-        Dialect::Bash,
-    )
-    .unwrap();
+    let program = thaum::parse_with("sum=0\nfor ((i=1; i<=10; i++)); do sum=$((sum+i)); done", Dialect::Bash).unwrap();
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
@@ -675,7 +656,7 @@ fn unsupported_set_options() {
 
 // eval is now implemented — see eval_* tests below.
 
-// --- DefaultAssign (${var:=default}) ---
+// DefaultAssign (${var:=default}) -------------------------------------------------------------------------------------
 
 #[test]
 fn default_assign_when_unset() {
@@ -691,7 +672,7 @@ fn default_assign_when_set() {
     assert_eq!(out, "existing\nexisting\n");
 }
 
-// --- Pattern trimming ---
+// Pattern trimming ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn trim_small_suffix() {
@@ -718,7 +699,7 @@ fn trim_large_prefix() {
     assert_eq!(out, "c.txt\n");
 }
 
-// --- readonly builtin ---
+// readonly builtin ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn readonly_set_and_read() {
@@ -733,7 +714,7 @@ fn readonly_prevents_assignment() {
     assert_ne!(status, 0);
 }
 
-// --- local builtin ---
+// local builtin -------------------------------------------------------------------------------------------------------
 
 #[test]
 fn local_scopes_variable_in_function() {
@@ -753,7 +734,7 @@ fn local_outside_function_fails() {
     assert_ne!(status, 0);
 }
 
-// --- Redirect tests ---
+// Redirect tests ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn redirect_builtin_stdout_to_file() {
@@ -861,7 +842,7 @@ fn external_command_inherits_fd3() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-// --- Bash indexed arrays ---
+// Bash indexed arrays -------------------------------------------------------------------------------------------------
 
 #[test]
 fn array_literal_assignment() {
@@ -958,7 +939,7 @@ fn array_for_loop() {
     assert_eq!(out, "x y z\n");
 }
 
-// --- Bash alias expansion ---
+// Bash alias expansion ------------------------------------------------------------------------------------------------
 
 #[test]
 fn alias_basic() {
@@ -1009,8 +990,7 @@ fn alias_unalias_same_line() {
 
 #[test]
 fn alias_recursive() {
-    let (out, _) =
-        bash_exec_ok("shopt -s expand_aliases\nalias hi='e_ hello'\nalias e_='echo __'\nhi");
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias hi='e_ hello'\nalias e_='echo __'\nhi");
     assert_eq!(out, "__ hello\n");
 }
 
@@ -1039,8 +1019,7 @@ fn alias_redefine_then_unalias() {
     // Line 2: alias a="touch"  → defines a=touch
     // Line 3: alias a="echo"; unalias a  → redefines then removes
     // Line 4: a hello  → not found (unalias took effect)
-    let (_, status) =
-        bash_exec_ok("shopt -s expand_aliases\nalias a=touch\nalias a=echo; unalias a\na hello");
+    let (_, status) = bash_exec_ok("shopt -s expand_aliases\nalias a=touch\nalias a=echo; unalias a\na hello");
     assert_ne!(status, 0);
 }
 
@@ -1052,8 +1031,7 @@ fn alias_snapshot_uses_previous_line() {
     //   → so "a hello" expands to "echo hello" (not "touch hello")
     //   → then alias a is redefined to touch, then unaliased — both during execution
     // Line 4: a hello  → not found (unalias from line 3 took effect)
-    let (out, _) =
-        bash_exec_ok("shopt -s expand_aliases\nalias a=echo\nalias a=touch; a hello; unalias a");
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias a=echo\nalias a=touch; a hello; unalias a");
     assert_eq!(out, "hello\n");
 }
 
@@ -1079,7 +1057,7 @@ fn alias_snapshot_touch_file() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-// --- Subshell execution ---
+// Subshell execution --------------------------------------------------------------------------------------------------
 
 #[test]
 fn subshell_basic() {
@@ -1134,7 +1112,7 @@ fn subshell_with_redirect() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-// --- Associative arrays ---
+// Associative arrays --------------------------------------------------------------------------------------------------
 
 #[test]
 fn assoc_array_basic() {
@@ -1166,7 +1144,7 @@ fn assoc_array_unset_whole() {
     assert_eq!(out, "\n");
 }
 
-// --- declare/typeset builtin ---
+// declare/typeset builtin ---------------------------------------------------------------------------------------------
 
 #[test]
 fn declare_indexed_array() {
@@ -1247,7 +1225,7 @@ fn declare_uppercase() {
     assert_eq!(out, "HELLO\n");
 }
 
-// --- printf builtin ---
+// printf builtin ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn printf_basic_string() {
@@ -1445,7 +1423,7 @@ fn printf_strftime_current() {
     assert!((2024..=2030).contains(&year));
 }
 
-// --- eval builtin ---
+// eval builtin --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_basic() {
@@ -1485,7 +1463,7 @@ fn eval_exit_status() {
     assert_eq!(out, "1\n");
 }
 
-// --- source builtin ---
+// source builtin ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn source_basic() {
@@ -1529,7 +1507,7 @@ fn source_with_args() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-// --- exec builtin ---
+// exec builtin --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn exec_command() {
@@ -1546,7 +1524,7 @@ fn exec_not_found() {
     assert!(out.trim() != "0");
 }
 
-// --- Bash [[ ]] conditional ---
+// Bash [[ ]] conditional ----------------------------------------------------------------------------------------------
 
 #[test]
 fn bash_cond_string_equals() {

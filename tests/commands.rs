@@ -84,7 +84,7 @@ echo "Done""#;
     assert!(total >= 3);
 }
 
-// --- Line boundary tests ---
+// Line boundary tests -------------------------------------------------------------------------------------------------
 
 #[test]
 fn line_boundary_semicolon_same_line() {
@@ -150,10 +150,7 @@ fn posix_function_definition() {
     let e = first_expr("myfunc() { echo hello; }");
     if let Expression::FunctionDef(f) = &e {
         assert_eq!(f.name, "myfunc");
-        assert!(matches!(
-            f.body.as_ref(),
-            CompoundCommand::BraceGroup { .. }
-        ));
+        assert!(matches!(f.body.as_ref(), CompoundCommand::BraceGroup { .. }));
     } else {
         panic!("expected FunctionDef, got {:?}", e);
     }

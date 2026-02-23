@@ -5,7 +5,7 @@ fn parse_bash(input: &str) -> Program {
     crate::parse_with(input, Dialect::Bash).unwrap()
 }
 
-// -- Identity fold -------------------------------------------------------
+// Identity fold -------------------------------------------------------------------------------------------------------
 
 struct Identity;
 impl Fold for Identity {}
@@ -18,7 +18,7 @@ fn fold_identity_preserves_ast() {
     assert_eq!(folded, original);
 }
 
-// -- Uppercaser ----------------------------------------------------------
+// Uppercaser ----------------------------------------------------------------------------------------------------------
 
 struct Uppercaser;
 impl Fold for Uppercaser {
@@ -41,14 +41,8 @@ fn fold_uppercases_literals() {
         _ => panic!("expected command"),
     };
     assert_eq!(cmd.arguments[0].try_to_static_string(), Some("ECHO".into()));
-    assert_eq!(
-        cmd.arguments[1].try_to_static_string(),
-        Some("HELLO".into())
-    );
-    assert_eq!(
-        cmd.arguments[2].try_to_static_string(),
-        Some("WORLD".into())
-    );
+    assert_eq!(cmd.arguments[1].try_to_static_string(), Some("HELLO".into()));
+    assert_eq!(cmd.arguments[2].try_to_static_string(), Some("WORLD".into()));
 }
 
 #[test]
@@ -65,10 +59,7 @@ fn fold_descends_into_compound() {
             Expression::Command(c) => c,
             _ => panic!("expected command"),
         };
-        assert_eq!(
-            cmd.arguments[1].try_to_static_string(),
-            Some("INNER".into())
-        );
+        assert_eq!(cmd.arguments[1].try_to_static_string(), Some("INNER".into()));
     } else {
         panic!("expected if clause");
     }

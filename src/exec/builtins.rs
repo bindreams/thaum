@@ -107,11 +107,7 @@ fn builtin_echo(args: &[String], stdout: &mut dyn Write) -> Result<i32, ExecErro
     Ok(0)
 }
 
-fn builtin_printf(
-    args: &[String],
-    env: &mut Environment,
-    stdout: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_printf(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {
     if args.is_empty() {
         return Ok(0);
     }
@@ -160,11 +156,7 @@ fn builtin_exit(args: &[String]) -> Result<i32, ExecError> {
     Err(ExecError::ExitRequested(code))
 }
 
-fn builtin_cd(
-    args: &[String],
-    env: &mut Environment,
-    stderr: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
     let target = if let Some(dir) = args.first() {
         if dir == "-" {
             // cd - : go to previous directory ($OLDPWD)
@@ -246,11 +238,7 @@ fn builtin_unset(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
     Ok(0)
 }
 
-fn builtin_alias(
-    args: &[String],
-    env: &mut Environment,
-    stdout: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_alias(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {
     if args.is_empty() {
         // List all aliases
         let aliases = env.aliases();
@@ -282,11 +270,7 @@ fn builtin_alias(
     Ok(status)
 }
 
-fn builtin_unalias(
-    args: &[String],
-    env: &mut Environment,
-    stderr: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_unalias(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
     if args.is_empty() {
         let _ = writeln!(stderr, "unalias: usage: unalias [-a] name [name ...]");
         return Ok(2);
@@ -304,11 +288,7 @@ fn builtin_unalias(
     Ok(status)
 }
 
-fn builtin_shopt(
-    args: &[String],
-    env: &mut Environment,
-    stderr: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_shopt(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
     // Minimal shopt: only supports expand_aliases
     if args.len() == 2 {
         let flag = &args[0];
@@ -327,10 +307,7 @@ fn builtin_shopt(
             }
         }
     }
-    let _ = writeln!(
-        stderr,
-        "shopt: only 'shopt -s/-u expand_aliases' is supported"
-    );
+    let _ = writeln!(stderr, "shopt: only 'shopt -s/-u expand_aliases' is supported");
     Ok(1)
 }
 
@@ -361,11 +338,7 @@ fn builtin_continue(args: &[String]) -> Result<i32, ExecError> {
     Err(ExecError::ContinueRequested(n))
 }
 
-fn builtin_shift(
-    args: &[String],
-    env: &mut Environment,
-    stderr: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
     let n = if let Some(arg) = args.first() {
         match arg.parse::<usize>() {
             Ok(n) => n,
@@ -388,11 +361,7 @@ fn builtin_shift(
     Ok(0)
 }
 
-fn builtin_read(
-    args: &[String],
-    env: &mut Environment,
-    stdin: &mut dyn Read,
-) -> Result<i32, ExecError> {
+fn builtin_read(args: &[String], env: &mut Environment, stdin: &mut dyn Read) -> Result<i32, ExecError> {
     use std::io::BufRead;
     // Minimal `read VAR` implementation: read one line from stdin.
     let var_name = args.first().map(|s| s.as_str()).unwrap_or("REPLY");
@@ -485,9 +454,7 @@ fn evaluate_test(args: &[String]) -> bool {
                         std::path::Path::new(&args[1]).exists()
                     }
                 }
-                "-s" => std::fs::metadata(&args[1])
-                    .map(|m| m.len() > 0)
-                    .unwrap_or(false),
+                "-s" => std::fs::metadata(&args[1]).map(|m| m.len() > 0).unwrap_or(false),
                 "-L" | "-h" => std::fs::symlink_metadata(&args[1])
                     .map(|m| m.file_type().is_symlink())
                     .unwrap_or(false),
@@ -586,11 +553,7 @@ fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
 /// Supports flags: `-a` (indexed array), `-A` (associative array),
 /// `-r` (readonly), `-x` (export), `-i` (integer), `-l` (lowercase),
 /// `-u` (uppercase), `-g` (global), `-p` (print), `-f` / `-F` (functions).
-fn builtin_declare(
-    args: &[String],
-    env: &mut Environment,
-    stdout: &mut dyn Write,
-) -> Result<i32, ExecError> {
+fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {
     use crate::exec::environment::DeclareAttrs;
 
     let mut attrs = DeclareAttrs::default();

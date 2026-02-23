@@ -40,10 +40,7 @@ impl Parser {
                         self.lexer.advance()?; // consume the Literal("name=value...")
 
                         // Array assignment: name=( ... ) (Bash)
-                        if value_prefix.is_empty()
-                            && self.options.arrays
-                            && self.lexer.peek()?.token == Token::LParen
-                        {
+                        if value_prefix.is_empty() && self.options.arrays && self.lexer.peek()?.token == Token::LParen {
                             self.lexer.advance()?; // consume (
                             let mut elements = Vec::new();
                             loop {
@@ -71,8 +68,7 @@ impl Parser {
                             });
                             end_span = rparen_span;
                         } else {
-                            let value_word =
-                                self.collect_assignment_value(&value_prefix, word_span)?;
+                            let value_word = self.collect_assignment_value(&value_prefix, word_span)?;
                             assignments.push(Assignment {
                                 name,
                                 index: None,

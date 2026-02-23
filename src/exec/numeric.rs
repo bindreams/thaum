@@ -29,22 +29,15 @@ pub(crate) fn parse_shell_int(s: &str) -> Result<i64, ()> {
     };
 
     // Radix detection
-    let abs = if let Some(hex) = digits
-        .strip_prefix("0x")
-        .or_else(|| digits.strip_prefix("0X"))
-    {
+    let abs = if let Some(hex) = digits.strip_prefix("0x").or_else(|| digits.strip_prefix("0X")) {
         i64::from_str_radix(hex, 16)
-    } else if digits.starts_with('0')
-        && digits.len() > 1
-        && digits.bytes().all(|b| b.is_ascii_digit())
-    {
+    } else if digits.starts_with('0') && digits.len() > 1 && digits.bytes().all(|b| b.is_ascii_digit()) {
         i64::from_str_radix(digits, 8)
     } else {
         digits.parse::<i64>()
     };
 
-    abs.map(|v| if negative { v.wrapping_neg() } else { v })
-        .map_err(|_| ())
+    abs.map(|v| if negative { v.wrapping_neg() } else { v }).map_err(|_| ())
 }
 
 #[cfg(test)]

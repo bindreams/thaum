@@ -7,9 +7,7 @@
 
 use std::io::Write;
 
-// ---------------------------------------------------------------------------
-// Public entry point
-// ---------------------------------------------------------------------------
+// Public entry point ==================================================================================================
 
 /// Format `fmt` with `args` into `out`, cycling through the format string
 /// until all arguments are consumed. Returns 0 on success, 1 on any error.
@@ -39,12 +37,7 @@ pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write) -> i32 {
 
 /// Run through the format string once.  Returns (status, stop_early).
 /// `stop_early` is true if `\c` was encountered.
-fn format_once(
-    fmt: &str,
-    args: &[String],
-    arg_idx: &mut usize,
-    out: &mut dyn Write,
-) -> (i32, bool) {
+fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> (i32, bool) {
     let mut status = 0;
     let chars: Vec<char> = fmt.chars().collect();
     let len = chars.len();
@@ -103,9 +96,7 @@ fn format_once(
     (status, false)
 }
 
-// ---------------------------------------------------------------------------
-// Format spec
-// ---------------------------------------------------------------------------
+// Format spec =========================================================================================================
 
 struct FormatSpec {
     left_align: bool,
@@ -198,16 +189,9 @@ fn parse_decimal_digits(chars: &[char]) -> (usize, usize) {
     (val, count)
 }
 
-// ---------------------------------------------------------------------------
-// Apply a format spec
-// ---------------------------------------------------------------------------
+// Apply a format spec =================================================================================================
 
-fn apply_format_spec(
-    spec: &FormatSpec,
-    args: &[String],
-    arg_idx: &mut usize,
-    out: &mut dyn Write,
-) -> i32 {
+fn apply_format_spec(spec: &FormatSpec, args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> i32 {
     match spec.conversion {
         's' => {
             let arg = get_arg_str(args, arg_idx);
@@ -265,9 +249,7 @@ fn apply_format_spec(
     }
 }
 
-// ---------------------------------------------------------------------------
-// Argument access
-// ---------------------------------------------------------------------------
+// Argument access =====================================================================================================
 
 /// Get the next argument as a string, advancing the index.
 /// Returns "" if arguments are exhausted (bash default for missing args).
@@ -281,9 +263,7 @@ fn get_arg_str(args: &[String], idx: &mut usize) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Numeric argument parsing
-// ---------------------------------------------------------------------------
+// Numeric argument parsing ============================================================================================
 
 /// Parse an argument as an integer, handling hex (0x), octal (leading 0),
 /// character code ('A), signs, and leading whitespace.
@@ -321,9 +301,7 @@ fn parse_float_arg(s: &str) -> (f64, bool) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Escape interpretation (shared by format string and %b)
-// ---------------------------------------------------------------------------
+// Escape interpretation (shared by format string and %b) ==============================================================
 
 /// Interpret a single escape sequence starting at chars[0] (the char after '\').
 /// Returns (bytes_to_write, chars_consumed, stop_processing).
@@ -418,17 +396,9 @@ fn interpret_escapes(input: &str, out: &mut dyn Write) -> bool {
     true // no \c
 }
 
-// ---------------------------------------------------------------------------
-// Padding helper
-// ---------------------------------------------------------------------------
+// Padding helper ======================================================================================================
 
-fn pad_and_write(
-    content: &str,
-    width: Option<usize>,
-    left_align: bool,
-    pad_char: char,
-    out: &mut dyn Write,
-) {
+fn pad_and_write(content: &str, width: Option<usize>, left_align: bool, pad_char: char, out: &mut dyn Write) {
     let w = width.unwrap_or(0);
     let content_len = content.len();
     if content_len >= w {
@@ -446,9 +416,7 @@ fn pad_and_write(
     }
 }
 
-// ---------------------------------------------------------------------------
-// String formatting (%s)
-// ---------------------------------------------------------------------------
+// String formatting (%s) ==============================================================================================
 
 fn format_string(spec: &FormatSpec, arg: &str, out: &mut dyn Write) {
     let truncated = match spec.precision {
@@ -458,9 +426,7 @@ fn format_string(spec: &FormatSpec, arg: &str, out: &mut dyn Write) {
     pad_and_write(truncated, spec.width, spec.left_align, ' ', out);
 }
 
-// ---------------------------------------------------------------------------
-// Shared integer formatting core
-// ---------------------------------------------------------------------------
+// Shared integer formatting core ======================================================================================
 
 /// Shared formatting for integer-family specifiers (%d, %u, %x, %o).
 ///
@@ -488,9 +454,7 @@ fn format_int_core(prefix: &str, digits: &str, spec: &FormatSpec, out: &mut dyn 
     }
 }
 
-// ---------------------------------------------------------------------------
-// Signed integer formatting (%d, %i)
-// ---------------------------------------------------------------------------
+// Signed integer formatting (%d, %i) ==================================================================================
 
 fn format_signed_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     let (val, had_error) = parse_int_arg(arg);
@@ -518,9 +482,7 @@ fn format_signed_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     status
 }
 
-// ---------------------------------------------------------------------------
-// Unsigned integer formatting (%u)
-// ---------------------------------------------------------------------------
+// Unsigned integer formatting (%u) ====================================================================================
 
 fn format_unsigned_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     let (val, had_error) = parse_int_arg(arg);
@@ -533,9 +495,7 @@ fn format_unsigned_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32
     status
 }
 
-// ---------------------------------------------------------------------------
-// Hex formatting (%x, %X)
-// ---------------------------------------------------------------------------
+// Hex formatting (%x, %X) =============================================================================================
 
 fn format_hex(spec: &FormatSpec, arg: &str, uppercase: bool, out: &mut dyn Write) -> i32 {
     let (val, had_error) = parse_int_arg(arg);
@@ -562,9 +522,7 @@ fn format_hex(spec: &FormatSpec, arg: &str, uppercase: bool, out: &mut dyn Write
     status
 }
 
-// ---------------------------------------------------------------------------
-// Octal formatting (%o)
-// ---------------------------------------------------------------------------
+// Octal formatting (%o) ===============================================================================================
 
 fn format_octal(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     let (val, had_error) = parse_int_arg(arg);
@@ -576,17 +534,14 @@ fn format_octal(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     // # prefix for octal is "0" (not "0o" like Rust!).
     // Precision zero-padding guarantees a leading '0', so the prefix is only
     // needed when digits don't already start with '0' AND precision won't pad.
-    let needs_hash_prefix =
-        spec.hash && !digits.starts_with('0') && spec.precision.is_none_or(|p| p <= digits.len());
+    let needs_hash_prefix = spec.hash && !digits.starts_with('0') && spec.precision.is_none_or(|p| p <= digits.len());
     let prefix = if needs_hash_prefix { "0" } else { "" };
 
     format_int_core(prefix, &digits, spec, out);
     status
 }
 
-// ---------------------------------------------------------------------------
-// Float formatting (%f, %e, %E, %g, %G)
-// ---------------------------------------------------------------------------
+// Float formatting (%f, %e, %E, %g, %G) ===============================================================================
 
 fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write) -> i32 {
     let (val, had_error) = parse_float_arg(arg);
@@ -643,11 +598,7 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write) -
 fn format_scientific(val: f64, prec: usize, upper: bool) -> String {
     if val == 0.0 {
         let zeros = "0".repeat(prec);
-        let frac = if prec > 0 {
-            format!(".{}", zeros)
-        } else {
-            String::new()
-        };
+        let frac = if prec > 0 { format!(".{}", zeros) } else { String::new() };
         let e = if upper { 'E' } else { 'e' };
         return format!("0{}{}+00", frac, e);
     }
@@ -714,9 +665,7 @@ fn strip_trailing_zeros(s: &str) -> String {
     trimmed.to_string()
 }
 
-// ---------------------------------------------------------------------------
-// Character formatting (%c)
-// ---------------------------------------------------------------------------
+// Character formatting (%c) ===========================================================================================
 
 fn format_char(spec: &FormatSpec, arg: &str, out: &mut dyn Write) {
     let ch = if arg.is_empty() {
@@ -727,9 +676,7 @@ fn format_char(spec: &FormatSpec, arg: &str, out: &mut dyn Write) {
     pad_and_write(&ch, spec.width, spec.left_align, ' ', out);
 }
 
-// ---------------------------------------------------------------------------
-// Shell quoting (%q)
-// ---------------------------------------------------------------------------
+// Shell quoting (%q) ==================================================================================================
 
 fn format_shell_quote(arg: &str, out: &mut dyn Write) {
     if arg.is_empty() {
@@ -738,9 +685,9 @@ fn format_shell_quote(arg: &str, out: &mut dyn Write) {
     }
 
     // Check if arg contains only safe chars
-    let safe = arg.bytes().all(|b| {
-        b.is_ascii_alphanumeric() || b == b'_' || b == b'/' || b == b'.' || b == b'-' || b == b':'
-    });
+    let safe = arg
+        .bytes()
+        .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'/' || b == b'.' || b == b'-' || b == b':');
 
     if safe {
         let _ = out.write_all(arg.as_bytes());
@@ -790,9 +737,7 @@ fn format_shell_quote(arg: &str, out: &mut dyn Write) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// %b — interpret escapes in argument
-// ---------------------------------------------------------------------------
+// %b -- interpret escapes in argument =================================================================================
 
 /// Format with %b: interpret backslash escapes in the argument value.
 /// Returns `true` if `\c` was encountered (early stop signal).
@@ -800,18 +745,11 @@ fn format_backslash_b(arg: &str, out: &mut dyn Write) -> bool {
     !interpret_escapes(arg, out)
 }
 
-// ---------------------------------------------------------------------------
-// %(strftime)T
-// ---------------------------------------------------------------------------
+// %(strftime)T ========================================================================================================
 
 /// Handle `%(...)T` starting at the `(` after `%`.
 /// Returns (status, chars_consumed).
-fn handle_strftime(
-    chars: &[char],
-    args: &[String],
-    arg_idx: &mut usize,
-    out: &mut dyn Write,
-) -> (i32, usize) {
+fn handle_strftime(chars: &[char], args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> (i32, usize) {
     debug_assert!(chars[0] == '(');
 
     // Find closing )T

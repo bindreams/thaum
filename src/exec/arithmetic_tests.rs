@@ -2,7 +2,7 @@ use super::*;
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use crate::exec::environment::Environment;
 
-// --- Helpers ---
+// Helpers -------------------------------------------------------------------------------------------------------------
 
 fn num(n: i64) -> ArithExpr {
     ArithExpr::Number(n)
@@ -61,7 +61,7 @@ fn group(inner: ArithExpr) -> ArithExpr {
     ArithExpr::Group(Box::new(inner))
 }
 
-// --- Number literals ---
+// Number literals -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_number_positive() {
@@ -81,7 +81,7 @@ fn eval_number_zero() {
     assert_eq!(evaluate_arith_expr(&num(0), &mut env).unwrap(), 0);
 }
 
-// --- Variable lookup ---
+// Variable lookup -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_variable_unset_is_zero() {
@@ -118,7 +118,7 @@ fn eval_variable_non_numeric_is_error() {
     assert!(matches!(err, ExecError::InvalidNumber(_, _)));
 }
 
-// --- Basic arithmetic ---
+// Basic arithmetic ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_add() {
@@ -178,7 +178,7 @@ fn eval_add_wrapping_overflow() {
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), i64::MIN);
 }
 
-// --- Exponentiation ---
+// Exponentiation ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_exp_positive() {
@@ -209,7 +209,7 @@ fn eval_exp_one() {
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
 }
 
-// --- Comparison ---
+// Comparison ----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_eq_true() {
@@ -290,7 +290,7 @@ fn eval_ge() {
     );
 }
 
-// --- Logical operators with short-circuit ---
+// Logical operators with short-circuit --------------------------------------------------------------------------------
 
 #[test]
 fn eval_log_and_true() {
@@ -323,16 +323,12 @@ fn eval_log_or_false() {
 fn eval_log_or_short_circuit() {
     let mut env = Environment::new();
     // 1 || (x=5) should not assign x
-    let expr = binary(
-        num(1),
-        ArithBinaryOp::LogOr,
-        assign("x", ArithAssignOp::Assign, num(5)),
-    );
+    let expr = binary(num(1), ArithBinaryOp::LogOr, assign("x", ArithAssignOp::Assign, num(5)));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
     assert_eq!(env.get_var("x"), None);
 }
 
-// --- Bitwise operators ---
+// Bitwise operators ---------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_bit_and() {
@@ -369,7 +365,7 @@ fn eval_shift_right() {
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 4);
 }
 
-// --- Unary prefix ---
+// Unary prefix --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_negate() {
@@ -425,7 +421,7 @@ fn eval_prefix_decrement() {
     assert_eq!(env.get_var("x"), Some("4"));
 }
 
-// --- Unary postfix ---
+// Unary postfix -------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_postfix_increment() {
@@ -446,7 +442,7 @@ fn eval_postfix_decrement() {
     assert_eq!(env.get_var("x"), Some("4"));
 }
 
-// --- Ternary ---
+// Ternary -------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_ternary_true_branch() {
@@ -475,7 +471,7 @@ fn eval_ternary_lazy() {
     assert_eq!(env.get_var("x"), Some("10"));
 }
 
-// --- Assignment ---
+// Assignment ----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_assign_simple() {
@@ -540,7 +536,7 @@ fn eval_assign_readonly_error() {
     assert!(matches!(err, ExecError::ReadonlyVariable(_)));
 }
 
-// --- Group ---
+// Group ---------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_group() {
@@ -549,7 +545,7 @@ fn eval_group() {
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 5);
 }
 
-// --- Comma ---
+// Comma ---------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_comma_returns_right() {
@@ -566,7 +562,7 @@ fn eval_comma_evaluates_left_side_effect() {
     assert_eq!(env.get_var("x"), Some("42"));
 }
 
-// --- Variable with expression ---
+// Variable with expression --------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_variable_in_expression() {
@@ -577,7 +573,7 @@ fn eval_variable_in_expression() {
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 30);
 }
 
-// --- parse_i64 edge cases ---
+// parse_i64 edge cases ------------------------------------------------------------------------------------------------
 
 #[test]
 fn eval_variable_hex() {

@@ -43,14 +43,11 @@ struct ShellResult {
 
 /// Run a script in our executor, capturing stdout.
 fn run_ours(script: &str) -> ShellResult {
-    let program =
-        thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
     // Set a minimal PATH
-    let _ = executor
-        .env_mut()
-        .set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
 
     let mut captured = CapturedIo::new();
     let exit_code = match executor.execute(&program, &mut captured.context()) {
@@ -87,9 +84,7 @@ fn run_in_docker(script: &str, shell: &str) -> ShellResult {
 
     // Write script to stdin
     if let Some(ref mut stdin) = child.stdin {
-        stdin
-            .write_all(script.as_bytes())
-            .expect("write to docker stdin");
+        stdin.write_all(script.as_bytes()).expect("write to docker stdin");
     }
     child.stdin.take(); // Close stdin
 
@@ -211,7 +206,7 @@ fn assert_shells_agree(script: &str) {
     );
 }
 
-// --- Conformance tests ---
+// Conformance tests ---------------------------------------------------------------------------------------------------
 // Each test verifies that our executor matches real shell behavior.
 
 #[test]

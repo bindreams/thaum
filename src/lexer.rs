@@ -60,14 +60,14 @@ pub(super) enum LastScanned {
 /// Word collection code deliberately uses neither to see `Whitespace` tokens
 /// as word boundaries.
 pub struct Lexer {
-    // --- Constants (never change after construction) ---
+    // Constants (never change after construction) ---------------------------------------------------------------------
     pub(crate) options: ParseOptions,
     mode: LexerMode,
 
-    // --- Character source (forward-only) ---
+    // Character source (forward-only) ---------------------------------------------------------------------------------
     pub(super) chars: CharSource,
 
-    // --- Scanning state (only matters at cursor, not touched by speculation) ---
+    // Scanning state (only matters at cursor, not touched by speculation) ---------------------------------------------
     pending_heredocs: Vec<PendingHereDoc>,
     expecting_heredoc_delimiter: bool,
     pending_strip_tabs: bool,
@@ -77,10 +77,10 @@ pub struct Lexer {
     /// `BashDblRBracket` when this flag is true; otherwise `]]` is literal.
     pub(crate) inside_double_bracket: bool,
 
-    // --- Heredoc bodies (read during newline scan, consumed post-parse) ---
+    // Heredoc bodies (read during newline scan, consumed post-parse) --------------------------------------------------
     completed_bodies: VecDeque<String>,
 
-    // --- Stream infrastructure ---
+    // Stream infrastructure -------------------------------------------------------------------------------------------
     buffer: VecDeque<SpannedToken>,
     buf_pos: usize,
     speculation_depth: usize,
@@ -100,11 +100,7 @@ impl Lexer {
     /// Create a lexer in double-quote mode for parsing the inner content
     /// of a double-quoted string.
     pub(crate) fn new_double_quote_mode(source: &str, options: ParseOptions) -> Self {
-        Self::build(
-            CharSource::from_str(source),
-            options,
-            LexerMode::DoubleQuote,
-        )
+        Self::build(CharSource::from_str(source), options, LexerMode::DoubleQuote)
     }
 
     fn build(chars: CharSource, options: ParseOptions, mode: LexerMode) -> Self {
@@ -124,9 +120,7 @@ impl Lexer {
         }
     }
 
-    // ================================================================
-    // Character-level helpers (delegate to CharSource)
-    // ================================================================
+    // Character-level helpers (delegate to CharSource) ----------------------------------------------------------------
 
     pub(super) fn peek_char(&self) -> Option<char> {
         self.chars.peek()
@@ -148,9 +142,7 @@ impl Lexer {
         self.chars.is_eof()
     }
 
-    // ================================================================
-    // Token-level buffered API (merged from TokenStream)
-    // ================================================================
+    // Token-level buffered API (merged from TokenStream) --------------------------------------------------------------
 
     /// Consume a `Whitespace` token that must be present at the current position.
     /// Panics (debug) if the current token is not `Whitespace`.
@@ -288,9 +280,7 @@ impl Lexer {
         Ok(())
     }
 
-    // ================================================================
-    // Raw token scanning
-    // ================================================================
+    // Raw token scanning ----------------------------------------------------------------------------------------------
 
     /// Get the next token from the source. Scans into the buffer, then
     /// returns the next buffered token.
@@ -332,8 +322,7 @@ impl Lexer {
                 if was_fragment {
                     // Significant: word boundary between fragments — emit token.
                     debug_assert!(
-                        self.buffer.is_empty()
-                            || self.buffer.back().map(|t| &t.token) != Some(&Token::Whitespace),
+                        self.buffer.is_empty() || self.buffer.back().map(|t| &t.token) != Some(&Token::Whitespace),
                         "consecutive Whitespace tokens must not be emitted"
                     );
                     self.buffer.push_back(SpannedToken {
@@ -376,8 +365,7 @@ impl Lexer {
                     // into HereDoc redirects via a post-parse Fold pass.
                     let pending = std::mem::take(&mut self.pending_heredocs);
                     for heredoc in &pending {
-                        let body =
-                            self.read_single_heredoc(&heredoc.delimiter, heredoc.strip_tabs)?;
+                        let body = self.read_single_heredoc(&heredoc.delimiter, heredoc.strip_tabs)?;
                         self.completed_bodies.push_back(body);
                     }
                 }

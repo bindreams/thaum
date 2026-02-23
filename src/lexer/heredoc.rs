@@ -15,11 +15,7 @@ pub(super) struct PendingHereDoc {
 
 impl Lexer {
     /// Read a single here-document body until the delimiter line is found.
-    pub(super) fn read_single_heredoc(
-        &mut self,
-        delimiter: &str,
-        strip_tabs: bool,
-    ) -> Result<String, LexError> {
+    pub(super) fn read_single_heredoc(&mut self, delimiter: &str, strip_tabs: bool) -> Result<String, LexError> {
         let start = self.cursor_pos().0;
         let mut body = String::new();
 

@@ -10,9 +10,7 @@ use yaml_rust2::Yaml;
 /// Checked once at startup; cached to avoid repeated docker calls.
 static DOCKER_AVAILABLE: AtomicBool = AtomicBool::new(false);
 
-// ---------------------------------------------------------------------------
-// Test spec schema
-// ---------------------------------------------------------------------------
+// Test spec schema ----------------------------------------------------------------------------------------------------
 
 /// Supports `disabled: true` or `disabled: { reason: "..." }`. Default: false.
 #[derive(Deserialize)]
@@ -133,11 +131,9 @@ impl OutputMatcher {
             OutputMatcher::Pattern(pat) => {
                 if let Some(substr) = &pat.contains {
                     if !actual.contains(substr.as_str()) {
-                        return Err(format!(
-                            "{field_name} does not contain {:?}:\n  actual: {:?}",
-                            substr, actual
-                        )
-                        .into());
+                        return Err(
+                            format!("{field_name} does not contain {:?}:\n  actual: {:?}", substr, actual).into(),
+                        );
                     }
                 }
                 if let Some(re_str) = &pat.regex {
@@ -157,9 +153,7 @@ impl OutputMatcher {
     }
 }
 
-// ---------------------------------------------------------------------------
-// YAML subset matching (using yaml_rust2::Yaml)
-// ---------------------------------------------------------------------------
+// YAML subset matching (using yaml_rust2::Yaml) -----------------------------------------------------------------------
 
 /// Compare YAML scalars that may differ in type due to YAML's implicit typing.
 /// E.g., `9` (Integer) should equal `"9"` (String) since our YAML emitter
@@ -220,10 +214,7 @@ fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), Stri
             if expected == actual || scalars_equivalent(expected, actual) {
                 Ok(())
             } else {
-                Err(format!(
-                    "{}: expected {:?}, got {:?}",
-                    path, expected, actual
-                ))
+                Err(format!("{}: expected {:?}, got {:?}", path, expected, actual))
             }
         }
     }
@@ -231,16 +222,11 @@ fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), Stri
 
 /// Parse a YAML string into a yaml_rust2::Yaml value (first document).
 fn parse_yaml(s: &str) -> Result<Yaml, String> {
-    let docs =
-        yaml_rust2::YamlLoader::load_from_str(s).map_err(|e| format!("YAML parse error: {}", e))?;
-    docs.into_iter()
-        .next()
-        .ok_or_else(|| "empty YAML document".to_string())
+    let docs = yaml_rust2::YamlLoader::load_from_str(s).map_err(|e| format!("YAML parse error: {}", e))?;
+    docs.into_iter().next().ok_or_else(|| "empty YAML document".to_string())
 }
 
-// ---------------------------------------------------------------------------
-// File parsing
-// ---------------------------------------------------------------------------
+// File parsing --------------------------------------------------------------------------------------------------------
 
 struct ParsedTestFile {
     spec: TestSpec,
@@ -249,8 +235,7 @@ struct ParsedTestFile {
 }
 
 fn parse_test_file(path: &Path) -> Result<ParsedTestFile, String> {
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| format!("cannot read {}: {}", path.display(), e))?;
+    let content = std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {}", path.display(), e))?;
 
     let separator_pos = content
         .find("\n---\n")
@@ -271,18 +256,14 @@ fn parse_test_file(path: &Path) -> Result<ParsedTestFile, String> {
         content[shell_start..].to_string()
     };
 
-    let spec: TestSpec = serde_yaml2::from_str(yaml_header)
-        .map_err(|e| format!("{}: invalid YAML header: {}", path.display(), e))?;
+    let spec: TestSpec =
+        serde_yaml2::from_str(yaml_header).map_err(|e| format!("{}: invalid YAML header: {}", path.display(), e))?;
 
     // Parse `ast:` field separately using yaml_rust2 (YAML 1.2) to get
     // a dynamic Yaml value for subset matching.
     let ast = extract_ast_field(yaml_header)?;
 
-    Ok(ParsedTestFile {
-        spec,
-        ast,
-        shell_input,
-    })
+    Ok(ParsedTestFile { spec, ast, shell_input })
 }
 
 /// Extract the `ast:` field from the YAML header as a yaml_rust2::Yaml value.
@@ -295,9 +276,7 @@ fn extract_ast_field(yaml_header: &str) -> Result<Option<Yaml>, String> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Test execution
-// ---------------------------------------------------------------------------
+// Test execution ------------------------------------------------------------------------------------------------------
 
 /// Convert a byte offset in `source` to a 1-based (line, col) pair.
 fn byte_offset_to_line_col(source: &str, offset: usize) -> (usize, usize) {
@@ -318,11 +297,7 @@ fn byte_offset_to_line_col(source: &str, offset: usize) -> (usize, usize) {
     (line, col)
 }
 
-fn check_parse_error(
-    spec: &ParseErrorSpec,
-    err: &thaum::ParseError,
-    source: &str,
-) -> Result<(), Failed> {
+fn check_parse_error(spec: &ParseErrorSpec, err: &thaum::ParseError, source: &str) -> Result<(), Failed> {
     let msg = err.to_string();
     match spec {
         ParseErrorSpec::Bool(true) => { /* just assert failure — already done by caller */ }
@@ -341,22 +316,14 @@ fn check_parse_error(
         ParseErrorSpec::Pattern(pat) => {
             if let Some(substr) = &pat.contains {
                 if !msg.contains(substr.as_str()) {
-                    return Err(format!(
-                        "parse-error does not contain {:?}:\n  actual: {:?}",
-                        substr, msg
-                    )
-                    .into());
+                    return Err(format!("parse-error does not contain {:?}:\n  actual: {:?}", substr, msg).into());
                 }
             }
             if let Some(re_str) = &pat.regex {
-                let re = regex::Regex::new(re_str)
-                    .map_err(|e| format!("parse-error invalid regex {:?}: {}", re_str, e))?;
+                let re =
+                    regex::Regex::new(re_str).map_err(|e| format!("parse-error invalid regex {:?}: {}", re_str, e))?;
                 if !re.is_match(&msg) {
-                    return Err(format!(
-                        "parse-error does not match regex {:?}:\n  actual: {:?}",
-                        re_str, msg
-                    )
-                    .into());
+                    return Err(format!("parse-error does not match regex {:?}:\n  actual: {:?}", re_str, msg).into());
                 }
             }
             if let Some(expected_at) = &pat.at {
@@ -399,26 +366,17 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     }
 
     if spec.is_valid {
-        let program =
-            parse_result.map_err(|e| format!("expected parse: ok, but got error: {}", e))?;
+        let program = parse_result.map_err(|e| format!("expected parse: ok, but got error: {}", e))?;
 
         // 2. AST assertion (optional)
         if let Some(expected_yaml) = &parsed.ast {
             let mapper = thaum::format::SourceMapper::new(input);
             let writer = thaum::format::YamlWriter::new_verbose(&mapper, "<test>");
             let actual_yaml_str = writer.write_program(&program);
-            let actual_yaml = parse_yaml(&actual_yaml_str).map_err(|e| {
-                format!(
-                    "failed to re-parse verbose YAML: {}\n---\n{}",
-                    e, actual_yaml_str
-                )
-            })?;
-            yaml_is_subset(expected_yaml, &actual_yaml, "").map_err(|msg| {
-                format!(
-                    "AST mismatch: {}\n\nActual verbose YAML:\n{}",
-                    msg, actual_yaml_str
-                )
-            })?;
+            let actual_yaml = parse_yaml(&actual_yaml_str)
+                .map_err(|e| format!("failed to re-parse verbose YAML: {}\n---\n{}", e, actual_yaml_str))?;
+            yaml_is_subset(expected_yaml, &actual_yaml, "")
+                .map_err(|msg| format!("AST mismatch: {}\n\nActual verbose YAML:\n{}", msg, actual_yaml_str))?;
         }
 
         // 3. Execution assertions (optional, requires Docker)
@@ -454,11 +412,7 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
         if let Some(ref substr) = spec.error_contains {
             let msg = err.to_string();
             if !msg.contains(substr.as_str()) {
-                return Err(format!(
-                    "error message does not contain {:?}:\n  actual: {:?}",
-                    substr, msg
-                )
-                .into());
+                return Err(format!("error message does not contain {:?}:\n  actual: {:?}", substr, msg).into());
             }
         }
     }
@@ -466,9 +420,7 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
-// Test discovery and harness
-// ---------------------------------------------------------------------------
+// Test discovery and harness ------------------------------------------------------------------------------------------
 
 fn discover_corpus_files(dir: &Path) -> Vec<PathBuf> {
     let mut files = Vec::new();
@@ -506,9 +458,7 @@ fn main() {
     let docker_ok = common::docker::docker_image_available("thaum-corpus-exec");
     DOCKER_AVAILABLE.store(docker_ok, std::sync::atomic::Ordering::Relaxed);
     if !docker_ok {
-        eprintln!(
-            "note: thaum-corpus-exec Docker image not found; execution assertions will be skipped"
-        );
+        eprintln!("note: thaum-corpus-exec Docker image not found; execution assertions will be skipped");
         eprintln!("      run scripts/build-corpus-docker.sh to enable them");
     }
 

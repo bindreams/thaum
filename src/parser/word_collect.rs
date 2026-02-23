@@ -125,8 +125,8 @@ impl Parser {
             }
             Token::ArithSub(raw) => {
                 #[allow(clippy::unnecessary_lazy_evaluations)]
-                let arith = crate::parser::arith_expr::parse_arith_expr(&raw)
-                    .unwrap_or_else(|_| ArithExpr::Variable(raw));
+                let arith =
+                    crate::parser::arith_expr::parse_arith_expr(&raw).unwrap_or_else(|_| ArithExpr::Variable(raw));
                 Ok(Fragment::ArithmeticExpansion(arith))
             }
             Token::Glob(kind) => {
@@ -160,10 +160,7 @@ impl Parser {
                 let stmts = crate::word::parse_command_substitution(&content);
                 Ok(Fragment::CommandSubstitution(stmts))
             }
-            _ => unreachable!(
-                "token_to_fragment called with non-fragment token: {:?}",
-                st.token
-            ),
+            _ => unreachable!("token_to_fragment called with non-fragment token: {:?}", st.token),
         }
     }
 
@@ -183,9 +180,7 @@ impl Parser {
     }
 }
 
-// ================================================================
-// Private helpers
-// ================================================================
+// Private helpers =====================================================================================================
 
 /// Merge adjacent Literal fragments for cleaner ASTs.
 fn merge_adjacent_literals(fragments: Vec<Fragment>) -> Vec<Fragment> {

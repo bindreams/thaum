@@ -5,7 +5,7 @@ fn parse_bash(input: &str) -> Program {
     crate::parse_with(input, Dialect::Bash).unwrap()
 }
 
-// -- Statement counter --------------------------------------------------
+// Statement counter ---------------------------------------------------------------------------------------------------
 
 struct StmtCounter(usize);
 
@@ -33,7 +33,7 @@ fn count_statements_nested() {
     assert_eq!(c.0, 4);
 }
 
-// -- Command name collector ---------------------------------------------
+// Command name collector ----------------------------------------------------------------------------------------------
 
 struct CmdNames(Vec<String>);
 
@@ -110,7 +110,7 @@ fn collect_negated_command() {
     assert_eq!(v.0, vec!["false"]);
 }
 
-// -- Override without walk stops descent ---------------------------------
+// Override without walk stops descent ---------------------------------------------------------------------------------
 
 struct TopLevelOnly(Vec<String>);
 

@@ -113,11 +113,7 @@ impl Executor {
     ///
     /// Takes an alias table snapshot before each line so that alias
     /// definitions within a line only take effect for subsequent lines.
-    pub fn execute_lines(
-        &mut self,
-        lines: &[crate::ast::Line],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub fn execute_lines(&mut self, lines: &[crate::ast::Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let mut status = 0;
         for line in lines {
             self.alias_snapshot = self.env.alias_snapshot();
@@ -132,17 +128,12 @@ impl Executor {
     /// pipes it to the child's stdin, and captures stdout/stderr.  The child
     /// is a real separate process, so `$BASHPID` and signal isolation work
     /// correctly on all platforms.
-    pub(crate) fn execute_subshell(
-        &mut self,
-        body: &[Line],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub(crate) fn execute_subshell(&mut self, body: &[Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let payload = subshell::SubshellPayload {
             env: self.env.serialize(),
             body: body.to_vec(),
         };
-        let json =
-            serde_json::to_string(&payload).map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
+        let json = serde_json::to_string(&payload).map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
 
         let exe = match &self.exe_path {
             Some(p) => p.clone(),
@@ -172,11 +163,7 @@ impl Executor {
     }
 
     /// Execute a list of statements, returning the last exit status.
-    pub fn execute_statements(
-        &mut self,
-        stmts: &[Statement],
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub fn execute_statements(&mut self, stmts: &[Statement], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let mut status = 0;
         for stmt in stmts {
             status = self.execute_statement(stmt, io)?;
@@ -185,15 +172,9 @@ impl Executor {
     }
 
     /// Execute a single statement.
-    fn execute_statement(
-        &mut self,
-        stmt: &Statement,
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    fn execute_statement(&mut self, stmt: &Statement, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match stmt.mode {
-            ExecutionMode::Background => Err(ExecError::UnsupportedFeature(
-                "background execution (&)".to_string(),
-            )),
+            ExecutionMode::Background => Err(ExecError::UnsupportedFeature("background execution (&)".to_string())),
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
                 let status = self.execute_expression(&stmt.expression, io)?;
                 self.env.set_last_exit_status(status);
@@ -203,11 +184,7 @@ impl Executor {
     }
 
     /// Execute an expression, returning its exit status.
-    pub fn execute_expression(
-        &mut self,
-        expr: &Expression,
-        io: &mut IoContext<'_>,
-    ) -> Result<i32, ExecError> {
+    pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match expr {
             Expression::Command(cmd) => {
                 // Try alias expansion before normal execution
@@ -272,11 +249,9 @@ impl Executor {
                 expand::expand_word_to_fields(&resolved, &mut self.env)
             }
             crate::ast::Argument::Atom(atom) => match atom {
-                crate::ast::Atom::BashProcessSubstitution { .. } => {
-                    Err(ExecError::BadSubstitution(
-                        "process substitution not supported in POSIX mode".to_string(),
-                    ))
-                }
+                crate::ast::Atom::BashProcessSubstitution { .. } => Err(ExecError::BadSubstitution(
+                    "process substitution not supported in POSIX mode".to_string(),
+                )),
             },
         }
     }
@@ -289,10 +264,7 @@ impl Executor {
 
     /// Pre-process a Word, executing command substitutions and replacing
     /// them with Literal fragments containing the captured output.
-    fn resolve_cmd_subs_in_word(
-        &mut self,
-        word: &crate::ast::Word,
-    ) -> Result<crate::ast::Word, ExecError> {
+    fn resolve_cmd_subs_in_word(&mut self, word: &crate::ast::Word) -> Result<crate::ast::Word, ExecError> {
         let new_parts = self.resolve_cmd_subs_in_fragments(&word.parts)?;
         Ok(crate::ast::Word {
             parts: new_parts,
@@ -507,8 +479,7 @@ impl Executor {
         let mut status = 0;
         for line in &program.lines {
             for stmt in line {
-                status =
-                    self.execute_expression_with_alias_guard(&stmt.expression, io, &expanded)?;
+                status = self.execute_expression_with_alias_guard(&stmt.expression, io, &expanded)?;
                 self.env.set_last_exit_status(status);
             }
         }
@@ -625,16 +596,10 @@ impl Executor {
 
             // Write captured output to the (possibly redirected) io context
             if !stdout_buf.is_empty() {
-                cmd_io
-                    .stdout
-                    .write_all(&stdout_buf)
-                    .map_err(ExecError::Io)?;
+                cmd_io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
             }
             if !stderr_buf.is_empty() {
-                cmd_io
-                    .stderr
-                    .write_all(&stderr_buf)
-                    .map_err(ExecError::Io)?;
+                cmd_io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
             }
 
             self.restore_prefix_assignments(saved);
@@ -648,20 +613,15 @@ impl Executor {
     }
 
     /// Execute a full assignment (scalar, indexed, or array).
-    pub(crate) fn execute_assignment(
-        &mut self,
-        assignment: &crate::ast::Assignment,
-    ) -> Result<(), ExecError> {
+    pub(crate) fn execute_assignment(&mut self, assignment: &crate::ast::Assignment) -> Result<(), ExecError> {
         if let Some(ref subscript) = assignment.index {
             // Indexed or associative assignment: name[subscript]=value
             let value = self.expand_word(assignment.value.as_scalar())?;
             if self.env.is_assoc_array(&assignment.name) {
-                self.env
-                    .set_assoc_element(&assignment.name, subscript, &value)?;
+                self.env.set_assoc_element(&assignment.name, subscript, &value)?;
             } else {
                 let index: usize = subscript.parse().unwrap_or(0);
-                self.env
-                    .set_array_element(&assignment.name, index, &value)?;
+                self.env.set_array_element(&assignment.name, index, &value)?;
             }
         } else {
             match &assignment.value {
@@ -728,8 +688,7 @@ impl Default for Executor {
 
 /// Convenience: parse and execute a script string.
 pub fn run(input: &str) -> Result<i32, ExecError> {
-    let program = crate::parse(input)
-        .map_err(|e| ExecError::BadSubstitution(format!("parse error: {}", e)))?;
+    let program = crate::parse(input).map_err(|e| ExecError::BadSubstitution(format!("parse error: {}", e)))?;
     let mut executor = Executor::new();
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {

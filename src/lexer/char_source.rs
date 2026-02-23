@@ -100,10 +100,7 @@ fn fill(inner: &mut CharSourceInner, n: usize) {
 
 /// Read and decode one UTF-8 character from the BufReader.
 fn read_char(inner: &mut CharSourceInner) -> Result<Option<char>, LexError> {
-    let buf = inner
-        .reader
-        .fill_buf()
-        .map_err(|e| LexError::Io(e.to_string()))?;
+    let buf = inner.reader.fill_buf().map_err(|e| LexError::Io(e.to_string()))?;
     if buf.is_empty() {
         return Ok(None);
     }
@@ -129,10 +126,7 @@ fn read_char(inner: &mut CharSourceInner) -> Result<Option<char>, LexError> {
         bytes[0] = first;
         inner.reader.consume(1);
         for byte in bytes.iter_mut().take(char_len).skip(1) {
-            let b = inner
-                .reader
-                .fill_buf()
-                .map_err(|e| LexError::Io(e.to_string()))?;
+            let b = inner.reader.fill_buf().map_err(|e| LexError::Io(e.to_string()))?;
             if b.is_empty() {
                 return Err(LexError::Io("truncated UTF-8 sequence".to_string()));
             }

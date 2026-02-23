@@ -48,15 +48,10 @@ impl<'a> YamlWriter<'a> {
         self.mapper.format_span(span, self.filename)
     }
 
-    // --- AST nodes ---
+    // AST nodes -------------------------------------------------------------------------------------------------------
 
     fn build_program(&self, prog: &Program) -> YamlValue {
-        let stmts: Vec<YamlValue> = prog
-            .lines
-            .iter()
-            .flatten()
-            .map(|s| self.build_statement(s))
-            .collect();
+        let stmts: Vec<YamlValue> = prog.lines.iter().flatten().map(|s| self.build_statement(s)).collect();
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(prog.span));
         m.value("statements", YamlValue::Sequence(stmts));
@@ -122,8 +117,7 @@ impl<'a> YamlWriter<'a> {
             Expression::Compound { body, redirects } => {
                 m.value("body", self.build_compound_command(body));
                 if !redirects.is_empty() {
-                    let items: Vec<YamlValue> =
-                        redirects.iter().map(|r| self.build_redirect(r)).collect();
+                    let items: Vec<YamlValue> = redirects.iter().map(|r| self.build_redirect(r)).collect();
                     m.value("redirects", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.empty_seq("redirects");
@@ -140,11 +134,7 @@ impl<'a> YamlWriter<'a> {
                 m.value("left", self.build_inner_expression(left));
                 m.value("right", self.build_inner_expression(right));
             }
-            Expression::Pipe {
-                left,
-                right,
-                stderr,
-            } => {
+            Expression::Pipe { left, right, stderr } => {
                 if *stderr || self.verbose {
                     m.scalar("stderr", if *stderr { "true" } else { "false" });
                 }
@@ -159,27 +149,15 @@ impl<'a> YamlWriter<'a> {
 
     fn extend_command(&self, m: &mut MappingBuilder, cmd: &Command) {
         if !cmd.assignments.is_empty() {
-            let items: Vec<YamlValue> = cmd
-                .assignments
-                .iter()
-                .map(|a| self.build_assignment(a))
-                .collect();
+            let items: Vec<YamlValue> = cmd.assignments.iter().map(|a| self.build_assignment(a)).collect();
             m.value("assignments", YamlValue::Sequence(items));
         } else if self.verbose {
             m.empty_seq("assignments");
         }
-        let args: Vec<YamlValue> = cmd
-            .arguments
-            .iter()
-            .map(|a| self.build_argument(a))
-            .collect();
+        let args: Vec<YamlValue> = cmd.arguments.iter().map(|a| self.build_argument(a)).collect();
         m.value("arguments", YamlValue::Sequence(args));
         if !cmd.redirects.is_empty() {
-            let items: Vec<YamlValue> = cmd
-                .redirects
-                .iter()
-                .map(|r| self.build_redirect(r))
-                .collect();
+            let items: Vec<YamlValue> = cmd.redirects.iter().map(|r| self.build_redirect(r)).collect();
             m.value("redirects", YamlValue::Sequence(items));
         } else if self.verbose {
             m.empty_seq("redirects");
@@ -197,10 +175,7 @@ impl<'a> YamlWriter<'a> {
             AssignmentValue::BashArray(elements) => {
                 m.raw("value_type", "BashArray");
                 if !elements.is_empty() {
-                    let items: Vec<YamlValue> = elements
-                        .iter()
-                        .map(|w| self.build_word_list_item(w))
-                        .collect();
+                    let items: Vec<YamlValue> = elements.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("elements", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.empty_seq("elements");
@@ -215,8 +190,7 @@ impl<'a> YamlWriter<'a> {
         m.scalar("name", &f.name);
         m.value("body", self.build_compound_command(&f.body));
         if !f.redirects.is_empty() {
-            let items: Vec<YamlValue> =
-                f.redirects.iter().map(|r| self.build_redirect(r)).collect();
+            let items: Vec<YamlValue> = f.redirects.iter().map(|r| self.build_redirect(r)).collect();
             m.value("redirects", YamlValue::Sequence(items));
         } else if self.verbose {
             m.empty_seq("redirects");
@@ -246,10 +220,7 @@ impl<'a> YamlWriter<'a> {
                 m.raw("type", "ForClause");
                 m.scalar("variable", variable);
                 if let Some(word_list) = words {
-                    let items: Vec<YamlValue> = word_list
-                        .iter()
-                        .map(|w| self.build_word_list_item(w))
-                        .collect();
+                    let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.null("words");
@@ -260,8 +231,7 @@ impl<'a> YamlWriter<'a> {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "CaseClause");
                 m.value("word", self.build_word_value(word));
-                let items: Vec<YamlValue> =
-                    arms.iter().map(|arm| self.build_case_arm(arm)).collect();
+                let items: Vec<YamlValue> = arms.iter().map(|arm| self.build_case_arm(arm)).collect();
                 m.value("arms", YamlValue::Sequence(items));
             }
             CompoundCommand::IfClause {
@@ -287,21 +257,13 @@ impl<'a> YamlWriter<'a> {
                     m.null("else_body");
                 }
             }
-            CompoundCommand::WhileClause {
-                condition,
-                body,
-                span,
-            } => {
+            CompoundCommand::WhileClause { condition, body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "WhileClause");
                 self.extend_lines(&mut m, "condition", condition);
                 self.extend_lines(&mut m, "body", body);
             }
-            CompoundCommand::UntilClause {
-                condition,
-                body,
-                span,
-            } => {
+            CompoundCommand::UntilClause { condition, body, span } => {
                 m.raw("source", &self.source(*span));
                 m.raw("type", "UntilClause");
                 self.extend_lines(&mut m, "condition", condition);
@@ -327,10 +289,7 @@ impl<'a> YamlWriter<'a> {
                 m.raw("type", "BashSelectClause");
                 m.scalar("variable", variable);
                 if let Some(word_list) = words {
-                    let items: Vec<YamlValue> = word_list
-                        .iter()
-                        .map(|w| self.build_word_list_item(w))
-                        .collect();
+                    let items: Vec<YamlValue> = word_list.iter().map(|w| self.build_word_list_item(w)).collect();
                     m.value("words", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.null("words");
@@ -381,22 +340,14 @@ impl<'a> YamlWriter<'a> {
 
     /// Helper: add a named statement list to a mapping, flattening lines.
     fn extend_lines(&self, m: &mut MappingBuilder, key: &str, lines: &[Line]) {
-        let items: Vec<YamlValue> = lines
-            .iter()
-            .flatten()
-            .map(|s| self.build_statement(s))
-            .collect();
+        let items: Vec<YamlValue> = lines.iter().flatten().map(|s| self.build_statement(s)).collect();
         m.value(key, YamlValue::Sequence(items));
     }
 
     fn build_case_arm(&self, arm: &CaseArm) -> YamlValue {
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(arm.span));
-        let patterns: Vec<YamlValue> = arm
-            .patterns
-            .iter()
-            .map(|p| self.build_word_list_item(p))
-            .collect();
+        let patterns: Vec<YamlValue> = arm.patterns.iter().map(|p| self.build_word_list_item(p)).collect();
         m.value("patterns", YamlValue::Sequence(patterns));
         if !arm.body.is_empty() {
             self.extend_lines(&mut m, "body", &arm.body);
@@ -497,11 +448,7 @@ impl<'a> YamlWriter<'a> {
 
     fn build_atom(&self, atom: &Atom) -> YamlValue {
         match atom {
-            Atom::BashProcessSubstitution {
-                direction,
-                body,
-                span,
-            } => {
+            Atom::BashProcessSubstitution { direction, body, span } => {
                 let dir = match direction {
                     ProcessDirection::In => "<",
                     ProcessDirection::Out => ">",
@@ -511,8 +458,7 @@ impl<'a> YamlWriter<'a> {
                 m.raw("source", &self.source(*span));
                 m.scalar("direction", dir);
                 if !body.is_empty() {
-                    let stmts: Vec<YamlValue> =
-                        body.iter().map(|s| self.build_inner_statement(s)).collect();
+                    let stmts: Vec<YamlValue> = body.iter().map(|s| self.build_inner_statement(s)).collect();
                     m.value("statements", YamlValue::Sequence(stmts));
                 } else if self.verbose {
                     m.empty_seq("statements");
@@ -563,10 +509,7 @@ impl<'a> YamlWriter<'a> {
             Fragment::CommandSubstitution(stmts) => {
                 m.raw("type", "CommandSubstitution");
                 if !stmts.is_empty() {
-                    let items: Vec<YamlValue> = stmts
-                        .iter()
-                        .map(|s| self.build_inner_statement(s))
-                        .collect();
+                    let items: Vec<YamlValue> = stmts.iter().map(|s| self.build_inner_statement(s)).collect();
                     m.value("statements", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.empty_seq("statements");
@@ -615,8 +558,7 @@ impl<'a> YamlWriter<'a> {
                                         return YamlValue::scalar(s.clone());
                                     }
                                 }
-                                let parts: Vec<YamlValue> =
-                                    item.iter().map(|p| self.build_fragment(p)).collect();
+                                let parts: Vec<YamlValue> = item.iter().map(|p| self.build_fragment(p)).collect();
                                 let mut im = MappingBuilder::new();
                                 im.value("parts", YamlValue::Sequence(parts));
                                 im.build()

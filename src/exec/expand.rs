@@ -46,11 +46,7 @@ pub fn expand_argument(arg: &Argument, env: &mut Environment) -> Result<Vec<Stri
 }
 
 /// Expand a single fragment, appending to `out`.
-fn expand_fragment(
-    fragment: &Fragment,
-    env: &mut Environment,
-    out: &mut String,
-) -> Result<(), ExecError> {
+fn expand_fragment(fragment: &Fragment, env: &mut Environment, out: &mut String) -> Result<(), ExecError> {
     match fragment {
         Fragment::Literal(s) => {
             out.push_str(s);
@@ -94,14 +90,10 @@ fn expand_fragment(
             }
         }
         Fragment::BashExtGlob { .. } => {
-            return Err(ExecError::UnsupportedFeature(
-                "bash extended glob".to_string(),
-            ));
+            return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
         }
         Fragment::BashBraceExpansion(_) => {
-            return Err(ExecError::UnsupportedFeature(
-                "bash brace expansion".to_string(),
-            ));
+            return Err(ExecError::UnsupportedFeature("bash brace expansion".to_string()));
         }
     }
     Ok(())
@@ -148,14 +140,10 @@ fn expand_fragment_in_double_quotes(
             }
         }
         Fragment::BashExtGlob { .. } => {
-            return Err(ExecError::UnsupportedFeature(
-                "bash extended glob".to_string(),
-            ));
+            return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
         }
         Fragment::BashBraceExpansion(_) => {
-            return Err(ExecError::UnsupportedFeature(
-                "bash brace expansion".to_string(),
-            ));
+            return Err(ExecError::UnsupportedFeature("bash brace expansion".to_string()));
         }
     }
     Ok(())
@@ -200,11 +188,7 @@ fn resolve_var(name: &str, env: &Environment) -> Option<String> {
 }
 
 /// Expand a parameter expansion.
-fn expand_parameter(
-    param: &ParameterExpansion,
-    env: &mut Environment,
-    out: &mut String,
-) -> Result<(), ExecError> {
+fn expand_parameter(param: &ParameterExpansion, env: &mut Environment, out: &mut String) -> Result<(), ExecError> {
     match param {
         ParameterExpansion::Simple(name) => {
             if let Some(val) = resolve_var(name, env) {

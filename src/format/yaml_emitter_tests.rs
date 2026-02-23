@@ -1,10 +1,10 @@
 use super::*;
 use crate::format::yaml_value::YamlValue;
 
-// ---------------------------------------------------------------------------
-// Round-trip safety: emitted YAML must parse back as strings (not numbers,
-// booleans, or null) when string values are used.
-// ---------------------------------------------------------------------------
+// Round-trip safety ---------------------------------------------------------------------------------------------------
+//
+// Emitted YAML must parse back as strings (not numbers, booleans, or null)
+// when string values are used.
 
 /// Parse emitted YAML and extract a scalar value by key, verifying it's a
 /// String in the yaml_rust2 data model.
@@ -103,10 +103,7 @@ fn yaml_reader_is_1_2() {
 
 #[test]
 fn emit_simple_mapping() {
-    let value = YamlValue::mapping()
-        .raw("type", "Command")
-        .raw("name", "echo")
-        .build();
+    let value = YamlValue::mapping().raw("type", "Command").raw("name", "echo").build();
     assert_eq!(emit(&value), "type: Command\nname: echo\n");
 }
 
@@ -207,8 +204,7 @@ fn emit_yaml_escape_backslash() {
 
 #[test]
 fn emit_nested_indentation() {
-    let inner_seq =
-        YamlValue::Sequence(vec![YamlValue::scalar("echo"), YamlValue::scalar("hello")]);
+    let inner_seq = YamlValue::Sequence(vec![YamlValue::scalar("echo"), YamlValue::scalar("hello")]);
     let stmt = YamlValue::mapping()
         .raw("source", "<stdin>:1:1")
         .raw("type", "Command")
@@ -232,10 +228,7 @@ statements:
 
 #[test]
 fn emit_escaped_scalar_in_sequence() {
-    let seq = YamlValue::Sequence(vec![
-        YamlValue::scalar("true"),
-        YamlValue::scalar("hello:world"),
-    ]);
+    let seq = YamlValue::Sequence(vec![YamlValue::scalar("true"), YamlValue::scalar("hello:world")]);
     let value = YamlValue::mapping().value("items", seq).build();
     assert_eq!(emit(&value), "items:\n  - \"true\"\n  - \"hello:world\"\n");
 }

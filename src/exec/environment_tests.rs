@@ -113,10 +113,7 @@ fn scope_push_pop_restores_positional() {
     assert_eq!(env.positional_params(), &["func_arg".to_string()]);
 
     env.pop_scope();
-    assert_eq!(
-        env.positional_params(),
-        &["orig1".to_string(), "orig2".to_string()]
-    );
+    assert_eq!(env.positional_params(), &["orig1".to_string(), "orig2".to_string()]);
 }
 
 #[test]

@@ -41,7 +41,7 @@ pub enum ExtGlobTokenKind {
 /// All token types recognized by the shell lexer.
 #[derive(Debug, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Token {
-    // === Fragment tokens ===
+    // Fragment tokens -------------------------------------------------------------------------------------------------
     /// Unquoted literal text. Carries RAW characters including backslash escapes.
     /// De-escaping happens during AST construction, not here.
     Literal(String),
@@ -86,14 +86,14 @@ pub enum Token {
     /// Unquoted whitespace between words (word boundary marker).
     Whitespace,
 
-    // === Other value-carrying tokens ===
+    // Other value-carrying tokens -------------------------------------------------------------------------------------
     /// An IO_NUMBER: a digit sequence immediately preceding `<` or `>`.
     IoNumber(i32),
 
-    // === Newline (semantically significant in shell) ===
+    // Newline (semantically significant in shell) ---------------------------------------------------------------------
     Newline,
 
-    // === Multi-character operators ===
+    // Multi-character operators ---------------------------------------------------------------------------------------
     /// `&&` — logical AND (POSIX: `AND_IF`).
     AndIf,
     /// `||` — logical OR (POSIX: `OR_IF`).
@@ -115,7 +115,7 @@ pub enum Token {
     /// `<<-` — here-document with leading tab stripping (POSIX: `DLESSDASH`).
     HereDocStripOp,
 
-    // === Bash extension operators ===
+    // Bash extension operators ----------------------------------------------------------------------------------------
     /// `<<<` — here-string (Bash).
     BashHereStringOp,
     /// `&>` — redirect stdout+stderr to file (Bash).
@@ -133,7 +133,7 @@ pub enum Token {
     /// `|&` — pipe stdout+stderr (Bash).
     BashPipeAmpersand,
 
-    // === Single-character operators ===
+    // Single-character operators --------------------------------------------------------------------------------------
     /// `|` — pipeline.
     Pipe,
     /// `;` — command terminator.
@@ -149,7 +149,7 @@ pub enum Token {
     /// `)` — subshell/grouping close.
     RParen,
 
-    // === Special ===
+    // Special ---------------------------------------------------------------------------------------------------------
     /// Here-document body — emitted by the lexer after reading the body.
     /// Appears in the token stream after the `Newline` that triggered the read.
     HereDocBody(String),
@@ -255,13 +255,11 @@ impl Token {
         }
     }
 
-    // ================================================================
-    // Grammar-level queries
+    // Grammar-level queries -------------------------------------------------------------------------------------------
     //
     // These are pure functions on token values. The caller is responsible
     // for peeking the token(s) from the lexer — these methods never
     // interact with the lexer or its buffer.
-    // ================================================================
 
     /// Can a redirect start with this token? (redirect operator or IO number)
     pub fn is_redirect_start(&self) -> bool {
@@ -308,9 +306,7 @@ impl Token {
     /// `select_enabled` controls whether `select` is recognized.
     pub fn is_compound_start(&self, next: &Token, select_enabled: bool) -> bool {
         match self {
-            Token::Literal(w) if Self::is_compound_keyword(w, select_enabled) => {
-                !next.is_fragment()
-            }
+            Token::Literal(w) if Self::is_compound_keyword(w, select_enabled) => !next.is_fragment(),
             Token::LParen | Token::BashDblLBracket => true,
             _ => false,
         }
@@ -328,16 +324,12 @@ impl Token {
 
     /// Is this word a closing reserved keyword that cannot start a command?
     pub fn is_closing_keyword(w: &str) -> bool {
-        matches!(
-            w,
-            "then" | "else" | "elif" | "fi" | "do" | "done" | "esac" | "}" | "in"
-        )
+        matches!(w, "then" | "else" | "elif" | "fi" | "do" | "done" | "esac" | "}" | "in")
     }
 
     /// Is this word a compound-command keyword?
     pub fn is_compound_keyword(w: &str, select_enabled: bool) -> bool {
-        matches!(w, "if" | "while" | "until" | "for" | "case" | "{")
-            || (select_enabled && w == "select")
+        matches!(w, "if" | "while" | "until" | "for" | "case" | "{") || (select_enabled && w == "select")
     }
 
     fn word_as_binary_test_op(s: &str) -> Option<BinaryTestOp> {

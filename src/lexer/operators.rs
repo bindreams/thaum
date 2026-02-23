@@ -9,10 +9,7 @@ use super::{LastScanned, Lexer};
 impl Lexer {
     /// Try to scan a multi-char or single-char operator. Returns `None` if the
     /// current character doesn't start an operator.
-    pub(super) fn try_scan_operator(
-        &mut self,
-        start: usize,
-    ) -> Result<Option<SpannedToken>, LexError> {
+    pub(super) fn try_scan_operator(&mut self, start: usize) -> Result<Option<SpannedToken>, LexError> {
         let ch = match self.peek_char() {
             Some(c) => c,
             None => return Ok(None),
@@ -68,10 +65,7 @@ impl Lexer {
                         (Token::HereDocOp, 2)
                     }
                 }
-                Some('(')
-                    if self.options.process_substitution
-                        && self.last_scanned == LastScanned::Whitespace =>
-                {
+                Some('(') if self.options.process_substitution && self.last_scanned == LastScanned::Whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectFromFile, 1),
@@ -80,10 +74,7 @@ impl Lexer {
                 Some('>') => (Token::Append, 2),
                 Some('&') => (Token::RedirectToFd, 2),
                 Some('|') => (Token::Clobber, 2),
-                Some('(')
-                    if self.options.process_substitution
-                        && self.last_scanned == LastScanned::Whitespace =>
-                {
+                Some('(') if self.options.process_substitution && self.last_scanned == LastScanned::Whitespace => {
                     return Ok(None);
                 }
                 _ => (Token::RedirectToFile, 1),
@@ -97,10 +88,7 @@ impl Lexer {
             {
                 (Token::BashDblLBracket, 2)
             }
-            ']' if self.options.double_brackets
-                && self.inside_double_bracket
-                && self.chars.peek_at(1) == Some(']') =>
-            {
+            ']' if self.options.double_brackets && self.inside_double_bracket && self.chars.peek_at(1) == Some(']') => {
                 (Token::BashDblRBracket, 2)
             }
             _ => return Ok(None),

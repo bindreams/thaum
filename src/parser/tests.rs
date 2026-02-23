@@ -30,7 +30,7 @@ fn first_compound(input: &str) -> CompoundCommand {
     }
 }
 
-// === Simple commands ===
+// Simple commands -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_single_word_command() {
@@ -75,14 +75,11 @@ fn parse_multiple_assignments() {
     assert_eq!(cmd.arguments.len(), 1);
 }
 
-// === Pipelines ===
+// Pipelines -----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_simple_pipeline() {
-    assert!(matches!(
-        first_expr("ls | grep foo"),
-        Expression::Pipe { .. }
-    ));
+    assert!(matches!(first_expr("ls | grep foo"), Expression::Pipe { .. }));
 }
 
 #[test]
@@ -113,7 +110,7 @@ fn parse_negated_pipe() {
     }
 }
 
-// === And-Or ===
+// And-Or --------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_and() {
@@ -144,7 +141,7 @@ fn parse_pipe_binds_tighter_than_and() {
     }
 }
 
-// === Execution modes ===
+// Execution modes -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_semicolon_list() {
@@ -176,7 +173,7 @@ fn parse_newline_separator() {
     assert_eq!(prog.lines.len(), 2);
 }
 
-// === Redirections ===
+// Redirections --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_input_redirect() {
@@ -206,7 +203,7 @@ fn parse_multiple_redirects() {
     assert_eq!(cmd.redirects.len(), 3);
 }
 
-// === Compound commands ===
+// Compound commands ---------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_if_then_fi() {
@@ -218,9 +215,7 @@ fn parse_if_then_fi() {
 
 #[test]
 fn parse_if_then_else_fi() {
-    if let CompoundCommand::IfClause { else_body, .. } =
-        first_compound("if true; then echo yes; else echo no; fi")
-    {
+    if let CompoundCommand::IfClause { else_body, .. } = first_compound("if true; then echo yes; else echo no; fi") {
         assert!(else_body.is_some());
     } else {
         panic!("expected if clause");
@@ -229,9 +224,8 @@ fn parse_if_then_else_fi() {
 
 #[test]
 fn parse_if_elif_else_fi() {
-    if let CompoundCommand::IfClause {
-        elifs, else_body, ..
-    } = first_compound("if a; then b; elif c; then d; elif e; then f; else g; fi")
+    if let CompoundCommand::IfClause { elifs, else_body, .. } =
+        first_compound("if a; then b; elif c; then d; elif e; then f; else g; fi")
     {
         assert_eq!(elifs.len(), 2);
         assert!(else_body.is_some());
@@ -258,10 +252,7 @@ fn parse_until_loop() {
 
 #[test]
 fn parse_for_loop_with_list() {
-    if let CompoundCommand::ForClause {
-        variable, words, ..
-    } = &first_compound("for i in a b c; do echo $i; done")
-    {
+    if let CompoundCommand::ForClause { variable, words, .. } = &first_compound("for i in a b c; do echo $i; done") {
         assert_eq!(variable, "i");
         assert_eq!(words.as_ref().unwrap().len(), 3);
     } else {
@@ -285,16 +276,13 @@ fn parse_subshell() {
     ));
 }
 
-// === Here-documents ===
+// Here-documents ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_heredoc() {
     let cmd = first_cmd("cat <<EOF\nhello world\nEOF\n");
     assert_eq!(cmd.redirects.len(), 1);
-    if let RedirectKind::HereDoc {
-        delimiter, body, ..
-    } = &cmd.redirects[0].kind
-    {
+    if let RedirectKind::HereDoc { delimiter, body, .. } = &cmd.redirects[0].kind {
         assert_eq!(delimiter, "EOF");
         assert_eq!(body, "hello world\n");
     } else {
@@ -302,7 +290,7 @@ fn parse_heredoc() {
     }
 }
 
-// === Error cases ===
+// Error cases ---------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_error_unexpected_token() {
@@ -324,7 +312,7 @@ fn parse_error_unclosed_brace() {
     assert!(parse("{ echo hello").is_err());
 }
 
-// === Edge cases ===
+// Edge cases ----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_reserved_word_as_argument() {
@@ -344,9 +332,7 @@ fn parse_only_newlines() {
 
 #[test]
 fn parse_compound_redirect() {
-    if let Expression::Compound { redirects, .. } =
-        &first_expr("if true; then echo yes; fi > output")
-    {
+    if let Expression::Compound { redirects, .. } = &first_expr("if true; then echo yes; fi > output") {
         assert_eq!(redirects.len(), 1);
     } else {
         panic!("expected compound");
@@ -355,18 +341,12 @@ fn parse_compound_redirect() {
 
 #[test]
 fn parse_pipeline_with_newlines() {
-    assert!(matches!(
-        first_expr("echo hello |\ngrep h"),
-        Expression::Pipe { .. }
-    ));
+    assert!(matches!(first_expr("echo hello |\ngrep h"), Expression::Pipe { .. }));
 }
 
 #[test]
 fn parse_and_or_with_newlines() {
-    assert!(matches!(
-        first_expr("true &&\necho yes"),
-        Expression::And { .. }
-    ));
+    assert!(matches!(first_expr("true &&\necho yes"), Expression::And { .. }));
 }
 
 #[test]

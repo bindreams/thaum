@@ -99,7 +99,7 @@ impl CommandEx {
     }
 }
 
-// --- Unix implementation ---
+// Unix implementation -------------------------------------------------------------------------------------------------
 
 #[cfg(unix)]
 impl CommandEx {
@@ -121,7 +121,7 @@ impl CommandEx {
     }
 }
 
-// --- Windows implementation ---
+// Windows implementation ----------------------------------------------------------------------------------------------
 
 #[cfg(windows)]
 impl CommandEx {
@@ -144,7 +144,7 @@ impl CommandEx {
     }
 }
 
-// --- Fallback for other platforms ---
+// Fallback for other platforms ----------------------------------------------------------------------------------------
 
 #[cfg(not(any(unix, windows)))]
 impl CommandEx {

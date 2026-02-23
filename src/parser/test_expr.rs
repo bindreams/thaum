@@ -59,8 +59,8 @@ impl Parser {
         let peeked = self.lexer.peek()?.clone();
 
         // Grouped expression: ( expr )
-        let is_lparen = matches!(&peeked.token, Token::LParen)
-            || matches!(&peeked.token, Token::Literal(w) if w == "(");
+        let is_lparen =
+            matches!(&peeked.token, Token::LParen) || matches!(&peeked.token, Token::Literal(w) if w == "(");
         if is_lparen {
             self.lexer.advance()?;
             let saved = self.in_test_group;
@@ -68,8 +68,8 @@ impl Parser {
             let inner = self.parse_test_or()?;
             self.in_test_group = saved;
             let close = self.lexer.peek()?;
-            let is_rparen = matches!(&close.token, Token::RParen)
-                || matches!(&close.token, Token::Literal(w) if w == ")");
+            let is_rparen =
+                matches!(&close.token, Token::RParen) || matches!(&close.token, Token::Literal(w) if w == ")");
             if is_rparen {
                 self.lexer.advance()?;
             } else {

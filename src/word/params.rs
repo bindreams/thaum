@@ -8,11 +8,7 @@ use crate::span::Span;
 /// Handles `${name}`, `${name:-default}`, `${#name}`, `${name%%pattern}`, etc.
 pub(crate) fn parse_brace_param_content(content: &str) -> ParameterExpansion {
     // Check for ${#name} (length)
-    if content.starts_with('#')
-        && content.len() > 1
-        && !content.contains(':')
-        && !content.contains('%')
-    {
+    if content.starts_with('#') && content.len() > 1 && !content.contains(':') && !content.contains('%') {
         let name = content[1..].to_string();
         return ParameterExpansion::Complex {
             name,

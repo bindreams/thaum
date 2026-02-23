@@ -27,7 +27,7 @@ fn lex_all_skip_whitespace(input: &str) -> Result<Vec<Token>, LexError> {
         .collect())
 }
 
-// === Empty / EOF ===
+// Empty / EOF ---------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_empty_input() {
@@ -42,7 +42,7 @@ fn lex_only_whitespace() {
     assert_eq!(tokens, vec![]);
 }
 
-// === Words (now fragment tokens) ===
+// Words (now fragment tokens) -----------------------------------------------------------------------------------------
 
 #[test]
 fn lex_single_word() {
@@ -71,22 +71,18 @@ fn lex_word_with_numbers() {
     assert_eq!(tokens, vec![Token::Literal("file123".into())]);
 }
 
-// === Newlines ===
+// Newlines ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_newline() {
     let tokens = lex_all("a\nb").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Literal("a".into()),
-            Token::Newline,
-            Token::Literal("b".into()),
-        ]
+        vec![Token::Literal("a".into()), Token::Newline, Token::Literal("b".into()),]
     );
 }
 
-// === Single-character operators ===
+// Single-character operators ------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_single_char_operators() {
@@ -105,7 +101,7 @@ fn lex_single_char_operators() {
     );
 }
 
-// === Multi-character operators ===
+// Multi-character operators -------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_multi_char_operators() {
@@ -144,7 +140,7 @@ fn lex_operator_disambiguation() {
     assert_eq!(tokens, vec![Token::Clobber]);
 }
 
-// === IO_NUMBER ===
+// IO_NUMBER -----------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_io_number_before_great() {
@@ -163,24 +159,17 @@ fn lex_number_with_space_is_word() {
     let tokens = lex_all("2 >").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Literal("2".into()),
-            Token::Whitespace,
-            Token::RedirectToFile
-        ]
+        vec![Token::Literal("2".into()), Token::Whitespace, Token::RedirectToFile]
     );
 }
 
 #[test]
 fn lex_non_number_before_redirect_is_word() {
     let tokens = lex_all("abc>").unwrap();
-    assert_eq!(
-        tokens,
-        vec![Token::Literal("abc".into()), Token::RedirectToFile]
-    );
+    assert_eq!(tokens, vec![Token::Literal("abc".into()), Token::RedirectToFile]);
 }
 
-// === Comments ===
+// Comments ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_comment_skipped() {
@@ -194,10 +183,7 @@ fn lex_comment_after_word() {
     let tokens = lex_all_skip_whitespace("echo hello # comment").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Literal("echo".into()),
-            Token::Literal("hello".into())
-        ]
+        vec![Token::Literal("echo".into()), Token::Literal("hello".into())]
     );
 }
 
@@ -207,7 +193,7 @@ fn lex_hash_inside_word_not_comment() {
     assert_eq!(tokens, vec![Token::Literal("foo#bar".into())]);
 }
 
-// === Whitespace suppression ===
+// Whitespace suppression ----------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_leading_whitespace_suppressed() {
@@ -219,10 +205,7 @@ fn lex_leading_whitespace_suppressed() {
 #[test]
 fn lex_whitespace_after_operator_suppressed() {
     let tokens = lex_all("; echo").unwrap();
-    assert_eq!(
-        tokens,
-        vec![Token::Semicolon, Token::Literal("echo".into())]
-    );
+    assert_eq!(tokens, vec![Token::Semicolon, Token::Literal("echo".into())]);
 }
 
 #[test]
@@ -261,7 +244,7 @@ fn lex_process_sub_after_suppressed_whitespace() {
     );
 }
 
-// === Quoting ===
+// Quoting -------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_single_quoted_word() {
@@ -310,19 +293,13 @@ fn lex_mixed_quoting() {
 #[test]
 fn lex_unterminated_single_quote() {
     let result = lex_all("'hello");
-    assert!(matches!(
-        result,
-        Err(LexError::UnterminatedSingleQuote { .. })
-    ));
+    assert!(matches!(result, Err(LexError::UnterminatedSingleQuote { .. })));
 }
 
 #[test]
 fn lex_unterminated_double_quote() {
     let result = lex_all("\"hello");
-    assert!(matches!(
-        result,
-        Err(LexError::UnterminatedDoubleQuote { .. })
-    ));
+    assert!(matches!(result, Err(LexError::UnterminatedDoubleQuote { .. })));
 }
 
 #[test]
@@ -334,13 +311,10 @@ fn lex_backtick_command_substitution() {
 #[test]
 fn lex_unterminated_backtick() {
     let result = lex_all("`echo hi");
-    assert!(matches!(
-        result,
-        Err(LexError::UnterminatedBackquote { .. })
-    ));
+    assert!(matches!(result, Err(LexError::UnterminatedBackquote { .. })));
 }
 
-// === Reserved words are NOT promoted by the lexer ===
+// Reserved words are NOT promoted by the lexer ------------------------------------------------------------------------
 
 #[test]
 fn lex_reserved_words_are_just_words() {
@@ -359,10 +333,7 @@ fn lex_reserved_words_are_just_words() {
 #[test]
 fn lex_braces_are_just_words() {
     let tokens = lex_all_skip_whitespace("{ }").unwrap();
-    assert_eq!(
-        tokens,
-        vec![Token::Literal("{".into()), Token::Literal("}".into())]
-    );
+    assert_eq!(tokens, vec![Token::Literal("{".into()), Token::Literal("}".into())]);
 }
 
 #[test]
@@ -371,7 +342,7 @@ fn lex_bang_is_just_a_word() {
     assert_eq!(tokens, vec![Token::Literal("!".into())]);
 }
 
-// === Spans ===
+// Spans ---------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_span_tracking() {
@@ -398,23 +369,17 @@ fn lex_span_operators() {
     assert_eq!(t2.span, Span::new(2, 4));
 }
 
-// === Here-documents ===
+// Here-documents ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_heredoc_basic() {
     let input = "cat <<EOF\nhello world\nEOF\n";
     let mut lexer = Lexer::from_str(input, ParseOptions::default());
 
-    assert_eq!(
-        lexer.next_token().unwrap().token,
-        Token::Literal("cat".into())
-    );
+    assert_eq!(lexer.next_token().unwrap().token, Token::Literal("cat".into()));
     assert_eq!(lexer.next_token().unwrap().token, Token::Whitespace);
     assert_eq!(lexer.next_token().unwrap().token, Token::HereDocOp);
-    assert_eq!(
-        lexer.next_token().unwrap().token,
-        Token::Literal("EOF".into())
-    );
+    assert_eq!(lexer.next_token().unwrap().token, Token::Literal("EOF".into()));
 
     // Newline triggers heredoc body reading into side queue (not buffer).
     assert_eq!(lexer.next_token().unwrap().token, Token::Newline);
@@ -449,7 +414,7 @@ fn lex_heredoc_unterminated() {
     assert!(matches!(result, Err(LexError::UnterminatedHereDoc { .. })));
 }
 
-// === New fragment token tests ===
+// New fragment token tests --------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_simple_param() {
@@ -481,10 +446,7 @@ fn lex_word_with_expansion() {
     let tokens = lex_all("test-${VAR}").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::Literal("test-".into()),
-            Token::BraceParam("VAR".into()),
-        ]
+        vec![Token::Literal("test-".into()), Token::BraceParam("VAR".into()),]
     );
 }
 
@@ -508,23 +470,17 @@ fn lex_tilde_bare() {
     let tokens = lex_all_skip_whitespace("~ /home").unwrap();
     assert_eq!(
         tokens,
-        vec![
-            Token::TildePrefix(String::new()),
-            Token::Literal("/home".into()),
-        ]
+        vec![Token::TildePrefix(String::new()), Token::Literal("/home".into()),]
     );
 }
 
 #[test]
 fn lex_lone_dollar() {
     let tokens = lex_all_skip_whitespace("$ foo").unwrap();
-    assert_eq!(
-        tokens,
-        vec![Token::Literal("$".into()), Token::Literal("foo".into()),]
-    );
+    assert_eq!(tokens, vec![Token::Literal("$".into()), Token::Literal("foo".into()),]);
 }
 
-// === Token-level buffered API (migrated from token_stream_tests) ===
+// Token-level buffered API (migrated from token_stream_tests) ---------------------------------------------------------
 
 fn make_lexer(input: &str) -> Lexer {
     Lexer::from_str(input, ParseOptions::default())
@@ -618,7 +574,7 @@ fn empty_input_peek() {
     assert_eq!(s.peek().unwrap().token, Token::Eof);
 }
 
-// === Speculation keeps tokens in buffer ===
+// Speculation keeps tokens in buffer ----------------------------------------------------------------------------------
 
 #[test]
 fn speculate_tokens_stay_in_buffer() {

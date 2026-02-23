@@ -15,16 +15,8 @@ pub struct IoContext<'io> {
 
 impl<'io> IoContext<'io> {
     /// Create an I/O context from arbitrary Read/Write implementations.
-    pub fn new(
-        stdin: &'io mut dyn Read,
-        stdout: &'io mut dyn Write,
-        stderr: &'io mut dyn Write,
-    ) -> Self {
-        IoContext {
-            stdin,
-            stdout,
-            stderr,
-        }
+    pub fn new(stdin: &'io mut dyn Read, stdout: &'io mut dyn Write, stderr: &'io mut dyn Write) -> Self {
+        IoContext { stdin, stdout, stderr }
     }
 }
 

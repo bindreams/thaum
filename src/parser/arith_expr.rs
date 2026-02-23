@@ -28,9 +28,7 @@ mod lexer;
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use lexer::{ArithLexer, ArithToken};
 
-// ============================================================================
-// Arithmetic parser
-// ============================================================================
+// Arithmetic parser ===================================================================================================
 
 struct ArithParser {
     lexer: ArithLexer,
@@ -448,17 +446,12 @@ impl ArithParser {
                 self.expect(&ArithToken::RParen)?;
                 Ok(ArithExpr::Group(Box::new(expr)))
             }
-            _ => Err(format!(
-                "unexpected token {:?} in arithmetic expression",
-                self.peek()
-            )),
+            _ => Err(format!("unexpected token {:?} in arithmetic expression", self.peek())),
         }
     }
 }
 
-// ============================================================================
-// Public API
-// ============================================================================
+// Public API ==========================================================================================================
 
 /// Parse a bash arithmetic expression from a raw string.
 ///
@@ -482,9 +475,7 @@ pub(crate) fn parse_arith_expr(input: &str) -> Result<ArithExpr, String> {
     Ok(expr)
 }
 
-// ============================================================================
-// Tests
-// ============================================================================
+// Tests ===============================================================================================================
 
 #[cfg(test)]
 #[path = "arith_expr/tests.rs"]

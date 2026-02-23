@@ -12,9 +12,7 @@ use thaum::format::{SourceMapper, YamlWriter};
 
 use thaum::exec::{ExecError, Executor, ProcessIo};
 
-// ---------------------------------------------------------------------------
-// Clap argument definitions
-// ---------------------------------------------------------------------------
+// Clap argument definitions ===========================================================================================
 
 /// Shell script parser and executor
 #[derive(Parser)]
@@ -74,9 +72,7 @@ struct ExecArgs {
     args: Vec<String>,
 }
 
-// ---------------------------------------------------------------------------
-// Internal resolved args (kept from the original code)
-// ---------------------------------------------------------------------------
+// Internal resolved args (kept from the original code) ================================================================
 
 #[derive(Clone, Copy, PartialEq)]
 enum Subcommand {
@@ -108,21 +104,15 @@ impl CliArgs {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Resolve clap output into CliArgs
-// ---------------------------------------------------------------------------
+// Resolve clap output into CliArgs ====================================================================================
 
 impl Cli {
     fn resolve(self) -> CliArgs {
         let bash_mode = self.bash;
         match self.subcmd {
             None => resolve_source(Subcommand::Parse, bash_mode, false, self.c, self.file),
-            Some(CliCommand::Lex(a)) => {
-                resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file)
-            }
-            Some(CliCommand::Parse(a)) => {
-                resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file)
-            }
+            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file),
+            Some(CliCommand::Parse(a)) => resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file),
             Some(CliCommand::Exec(a)) => resolve_exec(bash_mode, a.c, a.args),
             Some(CliCommand::ExecAst) => CliArgs {
                 subcommand: Subcommand::ExecAst,
@@ -187,9 +177,7 @@ fn resolve_exec(bash_mode: bool, c: Option<String>, args: Vec<String>) -> CliArg
     }
 }
 
-// ---------------------------------------------------------------------------
-// Entry point
-// ---------------------------------------------------------------------------
+// Entry point =========================================================================================================
 
 /// Determine the source text and display filename from CLI args.
 fn load_source(cli: &CliArgs) -> (String, String) {
@@ -295,18 +283,8 @@ fn do_lex(cli: &CliArgs) {
     }
 
     // Compute column widths
-    let loc_width = rows
-        .iter()
-        .map(|(l, _, _)| l.len())
-        .max()
-        .unwrap_or(8)
-        .max(8);
-    let name_width = rows
-        .iter()
-        .map(|(_, n, _)| n.len())
-        .max()
-        .unwrap_or(5)
-        .max(5);
+    let loc_width = rows.iter().map(|(l, _, _)| l.len()).max().unwrap_or(8).max(8);
+    let name_width = rows.iter().map(|(_, n, _)| n.len()).max().unwrap_or(5).max(5);
 
     // Print header
     println!(
@@ -377,9 +355,7 @@ fn do_exec(cli: &CliArgs) {
 
     let mut executor = Executor::new();
     executor.env_mut().set_program_name(filename);
-    executor
-        .env_mut()
-        .set_positional_params(cli.script_args.clone());
+    executor.env_mut().set_positional_params(cli.script_args.clone());
 
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {

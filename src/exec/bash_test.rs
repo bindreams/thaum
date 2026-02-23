@@ -15,11 +15,7 @@ use crate::exec::Executor;
 ///
 /// The `_io` parameter is currently unused but reserved for future use
 /// (e.g., command substitution inside test expressions that needs IO).
-pub fn evaluate(
-    expr: &BashTestExpr,
-    executor: &mut Executor,
-    _io: &mut IoContext<'_>,
-) -> Result<bool, ExecError> {
+pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, _io: &mut IoContext<'_>) -> Result<bool, ExecError> {
     match expr {
         BashTestExpr::And { left, right } => {
             if !evaluate(left, executor, _io)? {
@@ -212,11 +208,7 @@ fn evaluate_binary(
 
 /// Match `text` against `pattern` as a POSIX extended regular expression.
 /// On success, sets `BASH_REMATCH` array: `[0]` = full match, `[1..n]` = capture groups.
-fn regex_match(
-    text: &str,
-    pattern: &str,
-    env: &mut crate::exec::Environment,
-) -> Result<bool, ExecError> {
+fn regex_match(text: &str, pattern: &str, env: &mut crate::exec::Environment) -> Result<bool, ExecError> {
     match regex::Regex::new(pattern) {
         Ok(re) => {
             if let Some(captures) = re.captures(text) {

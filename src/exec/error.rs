@@ -32,7 +32,7 @@ pub enum ExecError {
     #[error("unsupported feature: {0}")]
     UnsupportedFeature(String),
 
-    // --- Control flow signals (not real errors) ---
+    // Control flow signals (not real errors) --------------------------------------------------------------------------
     #[error("exit requested: {0}")]
     ExitRequested(i32),
 

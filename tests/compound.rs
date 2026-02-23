@@ -8,9 +8,7 @@ use thaum::parse;
 fn if_with_test_command() {
     let compound = first_compound(r#"if [ "$x" = "yes" ]; then echo matched; fi"#);
     if let CompoundCommand::IfClause {
-        condition,
-        then_body,
-        ..
+        condition, then_body, ..
     } = &compound
     {
         assert!(!condition.is_empty());
@@ -52,10 +50,7 @@ else
     echo "No config found"
 fi"#,
     );
-    if let CompoundCommand::IfClause {
-        elifs, else_body, ..
-    } = &compound
-    {
+    if let CompoundCommand::IfClause { elifs, else_body, .. } = &compound {
         assert_eq!(elifs.len(), 1);
         assert!(else_body.is_some());
     } else {
@@ -83,10 +78,7 @@ fn while_read_loop() {
 fn for_loop_with_glob() {
     let compound = first_compound("for f in *.txt; do echo $f; done");
     if let CompoundCommand::ForClause {
-        variable,
-        words,
-        body,
-        ..
+        variable, words, body, ..
     } = &compound
     {
         assert_eq!(variable, "f");
@@ -104,9 +96,7 @@ fn for_loop_with_glob() {
 
 #[test]
 fn for_loop_with_newline_instead_of_semicolon() {
-    if let CompoundCommand::ForClause { words, .. } =
-        &first_compound("for i in a b c\ndo\necho $i\ndone")
-    {
+    if let CompoundCommand::ForClause { words, .. } = &first_compound("for i in a b c\ndo\necho $i\ndone") {
         assert_eq!(words.as_ref().unwrap().len(), 3);
     } else {
         panic!("expected for clause");
@@ -185,10 +175,7 @@ fn until_loop() {
 fn for_without_in_clause() {
     // `for var; do ...; done` iterates over $@
     let compound = first_compound("for arg; do echo $arg; done");
-    if let CompoundCommand::ForClause {
-        variable, words, ..
-    } = &compound
-    {
+    if let CompoundCommand::ForClause { variable, words, .. } = &compound {
         assert_eq!(variable, "arg");
         assert!(words.is_none());
     } else {

@@ -272,9 +272,7 @@ impl Parser {
 
         // No eat_whitespace: skip_linebreak already ate
         let tok = self.lexer.peek()?.token.clone();
-        let body = if tok == Token::CaseBreak
-            || tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac")
-        {
+        let body = if tok == Token::CaseBreak || tok.is_keyword(&self.lexer.peek_at_offset(1)?.token, "esac") {
             Vec::new()
         } else {
             self.parse_compound_list()?
@@ -441,10 +439,7 @@ impl Parser {
         })
     }
 
-    pub(super) fn parse_required_compound_list(
-        &mut self,
-        context: &str,
-    ) -> Result<Vec<Line>, ParseError> {
+    pub(super) fn parse_required_compound_list(&mut self, context: &str) -> Result<Vec<Line>, ParseError> {
         let list = self.parse_compound_list()?;
         if list.is_empty() {
             return Err(ParseError::UnexpectedToken {
@@ -501,10 +496,7 @@ impl Parser {
         Ok(lines)
     }
 
-    fn parse_arithmetic_for(
-        &mut self,
-        start_span: crate::span::Span,
-    ) -> Result<CompoundCommand, ParseError> {
+    fn parse_arithmetic_for(&mut self, start_span: crate::span::Span) -> Result<CompoundCommand, ParseError> {
         // No eat_whitespace: caller (parse_for_clause line 123) already ate
         self.expect(&Token::LParen)?;
         // No eat_whitespace: after ( (operator → LastScanned::Other)

@@ -19,12 +19,7 @@ fn run(input: &str) -> String {
         .spawn()
         .and_then(|mut child| {
             use std::io::Write;
-            child
-                .stdin
-                .as_mut()
-                .unwrap()
-                .write_all(input.as_bytes())
-                .unwrap();
+            child.stdin.as_mut().unwrap().write_all(input.as_bytes()).unwrap();
             child.wait_with_output()
         })
         .expect("failed to run thaum");
@@ -109,9 +104,7 @@ fn assert_valid_output(output: &str) {
     assert_no_yaml_tags(output);
 }
 
-// ============================================================
-// Simple command output
-// ============================================================
+// Simple command output -----------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_simple_command() {
@@ -122,9 +115,7 @@ fn cli_simple_command() {
     assert!(output.contains("- hello"));
 }
 
-// ============================================================
-// Pipeline output
-// ============================================================
+// Pipeline output -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_pipeline_no_duplicate_source() {
@@ -134,9 +125,7 @@ fn cli_pipeline_no_duplicate_source() {
     assert!(output.contains("type: Command"));
 }
 
-// ============================================================
-// Command substitution
-// ============================================================
+// Command substitution ------------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_command_substitution_formatting() {
@@ -171,9 +160,7 @@ fn cli_command_substitution_with_semicolon() {
     assert!(output.contains("mode: Terminated"));
 }
 
-// ============================================================
-// Background & execution modes
-// ============================================================
+// Background & execution modes ----------------------------------------------------------------------------------------
 
 #[test]
 fn cli_background_mode() {
@@ -189,9 +176,7 @@ fn cli_terminated_mode() {
     assert!(output.contains("mode: Terminated"));
 }
 
-// ============================================================
-// Complex expressions
-// ============================================================
+// Complex expressions -------------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_and_or_pipe() {
@@ -209,9 +194,7 @@ fn cli_compound_command() {
     assert!(output.contains("type: IfClause"));
 }
 
-// ============================================================
-// Word parts — should use type: instead of YAML tags
-// ============================================================
+// Word parts — should use type: instead of YAML tags ------------------------------------------------------------------
 
 #[test]
 fn cli_word_parts_no_tags() {
@@ -225,9 +208,7 @@ fn cli_redirects_no_tags() {
     assert_valid_output(&output);
 }
 
-// ============================================================
-// Error output — compiler-style diagnostics
-// ============================================================
+// Error output — compiler-style diagnostics ---------------------------------------------------------------------------
 
 /// Run thaum on invalid input and return stderr.
 fn run_err(input: &str) -> String {
@@ -241,57 +222,33 @@ fn run_err(input: &str) -> String {
         .spawn()
         .and_then(|mut child| {
             use std::io::Write;
-            child
-                .stdin
-                .as_mut()
-                .unwrap()
-                .write_all(input.as_bytes())
-                .unwrap();
+            child.stdin.as_mut().unwrap().write_all(input.as_bytes()).unwrap();
             child.wait_with_output()
         })
         .expect("failed to run thaum");
 
-    assert!(
-        !output.status.success(),
-        "expected thaum to fail, but it succeeded"
-    );
+    assert!(!output.status.success(), "expected thaum to fail, but it succeeded");
     String::from_utf8(output.stderr).expect("non-utf8 stderr")
 }
 
 #[test]
 fn cli_error_shows_error_label() {
     let err = run_err("if true; then fi");
-    assert!(
-        err.contains("error:"),
-        "should start with 'error:': {}",
-        err
-    );
+    assert!(err.contains("error:"), "should start with 'error:': {}", err);
 }
 
 #[test]
 fn cli_error_shows_source_location() {
     let err = run_err("if true; then fi");
-    assert!(
-        err.contains("-->"),
-        "should contain ' --> ' location arrow: {}",
-        err
-    );
-    assert!(
-        err.contains("<stdin>:"),
-        "should reference the filename: {}",
-        err
-    );
+    assert!(err.contains("-->"), "should contain ' --> ' location arrow: {}", err);
+    assert!(err.contains("<stdin>:"), "should reference the filename: {}", err);
 }
 
 #[test]
 fn cli_error_shows_source_line() {
     let err = run_err("if true; then fi");
     // Should display the actual source code line
-    assert!(
-        err.contains("if true; then fi"),
-        "should show the source line: {}",
-        err
-    );
+    assert!(err.contains("if true; then fi"), "should show the source line: {}", err);
 }
 
 #[test]
@@ -337,9 +294,7 @@ fn cli_error_no_debug_token_names() {
     );
 }
 
-// ============================================================
-// Exec subcommand
-// ============================================================
+// Exec subcommand -----------------------------------------------------------------------------------------------------
 
 /// Run thaum exec on the given input and return (stdout, stderr, exit_code).
 fn run_exec(input: &str) -> (String, String, i32) {
@@ -357,12 +312,7 @@ fn run_exec_with_args(args: &[&str], input: &str) -> (String, String, i32) {
         .spawn()
         .and_then(|mut child| {
             use std::io::Write;
-            child
-                .stdin
-                .as_mut()
-                .unwrap()
-                .write_all(input.as_bytes())
-                .unwrap();
+            child.stdin.as_mut().unwrap().write_all(input.as_bytes()).unwrap();
             child.wait_with_output()
         })
         .expect("failed to run thaum exec");
@@ -413,11 +363,7 @@ fn cli_exec_unsupported_feature_error() {
 fn cli_exec_parse_error() {
     let (_, stderr, code) = run_exec("if true; then fi");
     assert_eq!(code, 1);
-    assert!(
-        stderr.contains("error:"),
-        "stderr should contain error: {}",
-        stderr,
-    );
+    assert!(stderr.contains("error:"), "stderr should contain error: {}", stderr,);
 }
 
 #[test]
@@ -439,9 +385,7 @@ fn cli_exec_variable_and_status() {
     assert_eq!(stdout.trim(), "hello");
 }
 
-// ============================================================
-// -c / --command flag
-// ============================================================
+// -c / --command flag -------------------------------------------------------------------------------------------------
 
 /// Run thaum with given args (no stdin needed) and return (stdout, stderr, exit_code).
 fn run_cli(args: &[&str]) -> (String, String, i32) {
@@ -514,9 +458,7 @@ fn cli_exec_command_long_flag() {
     assert_eq!(stdout.trim(), "ok");
 }
 
-// ============================================================
-// Explicit parse subcommand
-// ============================================================
+// Explicit parse subcommand -------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_parse_subcommand_stdin() {
@@ -535,9 +477,7 @@ fn cli_parse_subcommand_bash() {
     assert!(stdout.contains("type: BashDoubleBracket"));
 }
 
-// ============================================================
-// Lex subcommand
-// ============================================================
+// Lex subcommand ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn cli_lex_simple_command() {

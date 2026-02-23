@@ -155,7 +155,7 @@ impl Environment {
         env
     }
 
-    // --- Scalar variable access ---
+    // Scalar variable access ------------------------------------------------------------------------------------------
 
     /// Get the scalar value of a variable, or None if unset.
     ///
@@ -221,7 +221,7 @@ impl Environment {
         Ok(())
     }
 
-    // --- Indexed array access ---
+    // Indexed array access --------------------------------------------------------------------------------------------
 
     /// Get a single element from an indexed array variable.
     pub fn get_array_element(&self, name: &str, index: usize) -> Option<&str> {
@@ -242,12 +242,7 @@ impl Environment {
     ///
     /// If the variable does not exist, creates a new indexed array.
     /// If it exists as a scalar, promotes it to an array (element 0 = old value).
-    pub fn set_array_element(
-        &mut self,
-        name: &str,
-        index: usize,
-        value: &str,
-    ) -> Result<(), ExecError> {
+    pub fn set_array_element(&mut self, name: &str, index: usize, value: &str) -> Result<(), ExecError> {
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -372,7 +367,7 @@ impl Environment {
         Ok(())
     }
 
-    // --- Associative array access ---
+    // Associative array access ----------------------------------------------------------------------------------------
 
     /// Check if a variable is an associative array.
     pub fn is_assoc_array(&self, name: &str) -> bool {
@@ -412,12 +407,7 @@ impl Environment {
     /// If the variable exists as an associative array, inserts the key-value pair.
     /// If it exists as a non-assoc variable, falls back to `set_var`.
     /// If it does not exist, creates a new associative array.
-    pub fn set_assoc_element(
-        &mut self,
-        name: &str,
-        key: &str,
-        value: &str,
-    ) -> Result<(), ExecError> {
+    pub fn set_assoc_element(&mut self, name: &str, key: &str, value: &str) -> Result<(), ExecError> {
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -486,7 +476,7 @@ impl Environment {
         Ok(())
     }
 
-    // --- Combined element access (scalar + array subscript dispatch) ---
+    // Combined element access (scalar + array subscript dispatch) -----------------------------------------------------
 
     /// Read a variable element by name, handling array subscripts.
     ///
@@ -496,9 +486,7 @@ impl Environment {
         if let Some((base, subscript)) = crate::exec::expand::parse_array_subscript(name) {
             match subscript {
                 "@" | "*" => self.get_array_all(base).map(|v| v.join(" ")),
-                _ if self.is_assoc_array(base) => self
-                    .get_assoc_element(base, subscript)
-                    .map(|s| s.to_string()),
+                _ if self.is_assoc_array(base) => self.get_assoc_element(base, subscript).map(|s| s.to_string()),
                 _ => {
                     let index: usize = subscript.parse().unwrap_or(0);
                     self.get_array_element(base, index).map(|s| s.to_string())
@@ -526,7 +514,7 @@ impl Environment {
         }
     }
 
-    // --- Variable metadata ---
+    // Variable metadata -----------------------------------------------------------------------------------------------
 
     /// Mark a variable as exported. If it doesn't exist, create it with empty value.
     pub fn export_var(&mut self, name: &str) {
@@ -581,18 +569,12 @@ impl Environment {
 
     /// Returns whether a variable is readonly.
     pub fn is_readonly(&self, name: &str) -> bool {
-        self.variables
-            .get(name)
-            .map(|v| v.readonly)
-            .unwrap_or(false)
+        self.variables.get(name).map(|v| v.readonly).unwrap_or(false)
     }
 
     /// Returns whether a variable is exported.
     pub fn is_exported(&self, name: &str) -> bool {
-        self.variables
-            .get(name)
-            .map(|v| v.exported)
-            .unwrap_or(false)
+        self.variables.get(name).map(|v| v.exported).unwrap_or(false)
     }
 
     /// Returns all exported variables as (name, value) pairs.
@@ -614,7 +596,7 @@ impl Environment {
             .collect()
     }
 
-    // --- Special parameters ---
+    // Special parameters ----------------------------------------------------------------------------------------------
 
     /// Get a special parameter value: `$?`, `$#`, `$0`, `$$`, `$!`, `$@`, `$*`.
     /// Returns None if the name is not a special parameter.
@@ -657,7 +639,7 @@ impl Environment {
         self.program_name = name;
     }
 
-    // --- Exit status ---
+    // Exit status -----------------------------------------------------------------------------------------------------
 
     /// Returns `$?` (the exit status of the last completed command).
     pub fn last_exit_status(&self) -> i32 {
@@ -669,7 +651,7 @@ impl Environment {
         self.last_exit_status = status;
     }
 
-    // --- Working directory ---
+    // Working directory -----------------------------------------------------------------------------------------------
 
     /// Returns the current working directory.
     pub fn cwd(&self) -> &PathBuf {
@@ -689,7 +671,7 @@ impl Environment {
         Ok(())
     }
 
-    // --- Functions ---
+    // Functions -------------------------------------------------------------------------------------------------------
 
     /// Look up a shell function by name.
     pub fn get_function(&self, name: &str) -> Option<&StoredFunction> {
@@ -701,7 +683,7 @@ impl Environment {
         self.functions.insert(name, func);
     }
 
-    // --- Scope management (for function calls) ---
+    // Scope management (for function calls) ---------------------------------------------------------------------------
 
     /// Enter a function scope: saves positional parameters and pushes a new scope frame.
     ///
@@ -744,9 +726,10 @@ impl Environment {
     /// first `local` call per name per scope saves state -- subsequent calls are no-ops.
     /// Returns an error if called outside a function scope.
     pub fn declare_local(&mut self, name: &str) -> Result<(), ExecError> {
-        let scope = self.scope_stack.last_mut().ok_or_else(|| {
-            ExecError::BadSubstitution("local: can only be used in a function".to_string())
-        })?;
+        let scope = self
+            .scope_stack
+            .last_mut()
+            .ok_or_else(|| ExecError::BadSubstitution("local: can only be used in a function".to_string()))?;
 
         if !scope.saved.contains_key(name) {
             let current = self.variables.get(name).cloned();
@@ -776,7 +759,7 @@ impl Environment {
         Ok(())
     }
 
-    // --- Variable attribute queries ---
+    // Variable attribute queries --------------------------------------------------------------------------------------
 
     /// Returns whether a variable has the integer (`-i`) attribute.
     pub fn has_integer_attr(&self, name: &str) -> bool {
@@ -820,12 +803,8 @@ impl Environment {
         } else {
             // Variable does not exist yet — create it.
             let initial = value.unwrap_or("").to_string();
-            let final_value = self.apply_var_transforms(
-                &initial,
-                attrs.integer_set,
-                attrs.lowercase_set,
-                attrs.uppercase_set,
-            );
+            let final_value =
+                self.apply_var_transforms(&initial, attrs.integer_set, attrs.lowercase_set, attrs.uppercase_set);
             self.variables.insert(
                 name.to_string(),
                 ShellVar {
@@ -855,13 +834,7 @@ impl Environment {
     /// `*`, `/`, and variable references.  Full arithmetic evaluation
     /// (matching bash's `$((...))` semantics) requires the Executor, so
     /// complex expressions like nested ternaries are not supported here.
-    fn apply_var_transforms(
-        &self,
-        value: &str,
-        _integer: bool,
-        lowercase: bool,
-        uppercase: bool,
-    ) -> String {
+    fn apply_var_transforms(&self, value: &str, _integer: bool, lowercase: bool, uppercase: bool) -> String {
         // Note: the integer attribute is handled by the Executor, which has
         // access to the full arithmetic evaluator.  Environment only applies
         // case transforms.
@@ -879,7 +852,7 @@ impl Environment {
         self.get_var("IFS").unwrap_or(" \t\n")
     }
 
-    // --- Aliases ---
+    // Aliases ---------------------------------------------------------------------------------------------------------
 
     /// Define an alias. Takes effect immediately in the alias table.
     pub fn define_alias(&mut self, name: &str, value: &str) {

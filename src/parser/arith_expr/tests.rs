@@ -4,11 +4,10 @@
 use super::*;
 
 fn parse_ok(input: &str) -> ArithExpr {
-    parse_arith_expr(input)
-        .unwrap_or_else(|e| panic!("parse_arith_expr failed for {:?}: {}", input, e))
+    parse_arith_expr(input).unwrap_or_else(|e| panic!("parse_arith_expr failed for {:?}: {}", input, e))
 }
 
-// --- Tokenizer tests ---
+// Tokenizer tests -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn lex_decimal_number() {
@@ -35,7 +34,7 @@ fn lex_zero() {
     assert_eq!(parse_ok("0"), ArithExpr::Number(0));
 }
 
-// --- Variable tests ---
+// Variable tests ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn bare_variable() {
@@ -49,21 +48,15 @@ fn dollar_variable() {
 
 #[test]
 fn variable_with_underscores() {
-    assert_eq!(
-        parse_ok("my_var"),
-        ArithExpr::Variable("my_var".to_string())
-    );
+    assert_eq!(parse_ok("my_var"), ArithExpr::Variable("my_var".to_string()));
 }
 
 #[test]
 fn array_variable() {
-    assert_eq!(
-        parse_ok("arr[0]"),
-        ArithExpr::Variable("arr[0]".to_string())
-    );
+    assert_eq!(parse_ok("arr[0]"), ArithExpr::Variable("arr[0]".to_string()));
 }
 
-// --- Binary operator tests ---
+// Binary operator tests -----------------------------------------------------------------------------------------------
 
 #[test]
 fn addition() {
@@ -299,7 +292,7 @@ fn comparisons() {
     ));
 }
 
-// --- Unary operator tests ---
+// Unary operator tests ------------------------------------------------------------------------------------------------
 
 #[test]
 fn unary_negate() {
@@ -389,7 +382,7 @@ fn post_decrement() {
     );
 }
 
-// --- Assignment tests ---
+// Assignment tests ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn simple_assignment() {
@@ -476,7 +469,7 @@ fn assignment_right_associative() {
     }
 }
 
-// --- Ternary test ---
+// Ternary test --------------------------------------------------------------------------------------------------------
 
 #[test]
 fn ternary_expression() {
@@ -494,7 +487,7 @@ fn ternary_expression() {
     );
 }
 
-// --- Grouping ---
+// Grouping ------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn parenthesized_expression() {
@@ -512,7 +505,7 @@ fn parenthesized_expression() {
     );
 }
 
-// --- Comma ---
+// Comma ---------------------------------------------------------------------------------------------------------------
 
 #[test]
 fn comma_expression() {
@@ -533,7 +526,7 @@ fn comma_expression() {
     );
 }
 
-// --- Mixed expression ---
+// Mixed expression ----------------------------------------------------------------------------------------------------
 
 #[test]
 fn variable_plus_number() {
@@ -569,7 +562,7 @@ fn complex_precedence() {
     }
 }
 
-// --- Error cases ---
+// Error cases ---------------------------------------------------------------------------------------------------------
 
 #[test]
 fn empty_expression_is_zero() {

@@ -76,9 +76,8 @@ fn write_arith_var(name: &str, value: &str, env: &mut Environment) -> Result<(),
 
 /// Parse a string as i64, supporting decimal, hex (0x), and octal (0) prefixes.
 fn parse_i64(context: &str, s: &str) -> Result<i64, ExecError> {
-    super::numeric::parse_shell_int(s).map_err(|()| {
-        ExecError::InvalidNumber(format!("{}: expression", context), s.trim().to_string())
-    })
+    super::numeric::parse_shell_int(s)
+        .map_err(|()| ExecError::InvalidNumber(format!("{}: expression", context), s.trim().to_string()))
 }
 
 /// Evaluate a binary operation.
@@ -171,11 +170,7 @@ fn int_pow(base: i64, exp: i64) -> Result<i64, ExecError> {
 }
 
 /// Evaluate a unary prefix operation.
-fn eval_unary_prefix(
-    op: ArithUnaryOp,
-    operand: &ArithExpr,
-    env: &mut Environment,
-) -> Result<i64, ExecError> {
+fn eval_unary_prefix(op: ArithUnaryOp, operand: &ArithExpr, env: &mut Environment) -> Result<i64, ExecError> {
     match op {
         ArithUnaryOp::Negate => {
             let v = evaluate_arith_expr(operand, env)?;
@@ -208,11 +203,7 @@ fn eval_unary_prefix(
 }
 
 /// Evaluate a unary postfix operation.
-fn eval_unary_postfix(
-    operand: &ArithExpr,
-    op: ArithUnaryOp,
-    env: &mut Environment,
-) -> Result<i64, ExecError> {
+fn eval_unary_postfix(operand: &ArithExpr, op: ArithUnaryOp, env: &mut Environment) -> Result<i64, ExecError> {
     let name = expect_variable(operand)?;
     let old = read_var_as_i64(name, env)?;
 
@@ -221,9 +212,7 @@ fn eval_unary_postfix(
         ArithUnaryOp::Decrement => old.wrapping_sub(1),
         _ => {
             debug_assert!(false, "postfix operator must be Increment or Decrement");
-            return Err(ExecError::BadSubstitution(
-                "invalid postfix operator".to_string(),
-            ));
+            return Err(ExecError::BadSubstitution("invalid postfix operator".to_string()));
         }
     };
 
@@ -282,14 +271,8 @@ fn expect_variable(expr: &ArithExpr) -> Result<&str, ExecError> {
     match expr {
         ArithExpr::Variable(name) => Ok(name),
         _ => {
-            debug_assert!(
-                false,
-                "increment/decrement operand must be a Variable, got {:?}",
-                expr
-            );
-            Err(ExecError::BadSubstitution(
-                "operand requires a variable".to_string(),
-            ))
+            debug_assert!(false, "increment/decrement operand must be a Variable, got {:?}", expr);
+            Err(ExecError::BadSubstitution("operand requires a variable".to_string()))
         }
     }
 }

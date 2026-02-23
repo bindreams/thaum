@@ -222,7 +222,7 @@ pub enum CompoundCommand {
         body: Vec<Line>,
         span: Span,
     },
-    // --- Bash extensions ---
+    // Bash extensions -------------------------------------------------------------------------------------------------
     /// `[[ expression ]]` — extended test command (Bash).
     BashDoubleBracket {
         expression: BashTestExpr,
@@ -406,11 +406,7 @@ pub enum BashTestExpr {
     /// `-op arg` (unary file/string test).
     Unary { op: UnaryTestOp, arg: Word },
     /// `arg op arg` (binary comparison).
-    Binary {
-        left: Word,
-        op: BinaryTestOp,
-        right: Word,
-    },
+    Binary { left: Word, op: BinaryTestOp, right: Word },
     /// `expr && expr`.
     And {
         left: Box<BashTestExpr>,
@@ -498,15 +494,9 @@ pub enum ArithExpr {
         right: Box<ArithExpr>,
     },
     /// Unary prefix: `-x`, `!x`, `~x`, `++x`, `--x`.
-    UnaryPrefix {
-        op: ArithUnaryOp,
-        operand: Box<ArithExpr>,
-    },
+    UnaryPrefix { op: ArithUnaryOp, operand: Box<ArithExpr> },
     /// Unary postfix: `x++`, `x--`.
-    UnaryPostfix {
-        operand: Box<ArithExpr>,
-        op: ArithUnaryOp,
-    },
+    UnaryPostfix { operand: Box<ArithExpr>, op: ArithUnaryOp },
     /// Ternary: `cond ? then : else`.
     Ternary {
         condition: Box<ArithExpr>,
@@ -670,7 +660,7 @@ pub enum RedirectKind {
         strip_tabs: bool,
         quoted: bool,
     },
-    // --- Bash extensions ---
+    // Bash extensions -------------------------------------------------------------------------------------------------
     /// `<<<` here-string (Bash).
     BashHereString(Word),
     /// `&>` redirect stdout+stderr (Bash).

@@ -81,12 +81,10 @@ impl Parser {
         })
     }
 
-    // ================================================================
-    // Helper methods
+    // Helper methods --------------------------------------------------------------------------------------------------
     //
     // Word collection code (word_collect.rs) deliberately bypasses
     // these to see Whitespace tokens as word boundaries.
-    // ================================================================
 
     /// Consume the current token if it matches the expected operator token.
     fn eat(&mut self, expected: &Token) -> Result<bool, ParseError> {

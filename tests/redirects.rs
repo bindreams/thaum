@@ -79,10 +79,7 @@ fn heredoc_quoted_delimiter() {
 fn heredoc_strip_tabs() {
     let cmd = first_cmd("cat <<-EOF\n\thello\n\tworld\n\tEOF\n");
     assert_eq!(cmd.redirects.len(), 1);
-    if let RedirectKind::HereDoc {
-        strip_tabs, body, ..
-    } = &cmd.redirects[0].kind
-    {
+    if let RedirectKind::HereDoc { strip_tabs, body, .. } = &cmd.redirects[0].kind {
         assert!(strip_tabs);
         assert_eq!(body, "hello\nworld\n");
     } else {
@@ -186,10 +183,7 @@ fn heredoc_with_or_rhs_after_body() {
     // Source: /usr/share/doc/git/contrib/vscode/init.sh
     let input = "cat <<EOF ||\nhello world\nEOF\necho \"heredoc failed\"";
     let prog = parse_ok(input);
-    assert!(matches!(
-        &prog.lines[0][0].expression,
-        Expression::Or { .. }
-    ));
+    assert!(matches!(&prog.lines[0][0].expression, Expression::Or { .. }));
 }
 
 #[test]
@@ -197,10 +191,7 @@ fn heredoc_with_or_rhs_same_line() {
     // Sanity check: when the RHS is on the same line as ||, it works.
     let input = "cat <<EOF || echo \"heredoc failed\"\nhello world\nEOF";
     let prog = parse_ok(input);
-    assert!(matches!(
-        &prog.lines[0][0].expression,
-        Expression::Or { .. }
-    ));
+    assert!(matches!(&prog.lines[0][0].expression, Expression::Or { .. }));
 }
 
 #[test]
@@ -208,10 +199,7 @@ fn heredoc_with_and_rhs_after_body() {
     // Same issue with && instead of ||.
     let input = "cat <<EOF &&\nhello world\nEOF\necho \"next\"";
     let prog = parse_ok(input);
-    assert!(matches!(
-        &prog.lines[0][0].expression,
-        Expression::And { .. }
-    ));
+    assert!(matches!(&prog.lines[0][0].expression, Expression::And { .. }));
 }
 
 #[test]
@@ -222,12 +210,9 @@ fn heredoc_in_if_condition() {
     // The program should parse and the heredoc body should be filled.
     let expr = &prog.lines[0][0].expression;
     if let Expression::Compound {
-        body:
-            CompoundCommand::IfClause {
-                condition,
-                then_body,
-                ..
-            },
+        body: CompoundCommand::IfClause {
+            condition, then_body, ..
+        },
         ..
     } = expr
     {

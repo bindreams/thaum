@@ -112,9 +112,7 @@ pub trait Fold {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fold_* free functions
-// ---------------------------------------------------------------------------
+// fold_* free functions ===============================================================================================
 
 fn fold_stmts<F: Fold + ?Sized>(f: &mut F, stmts: Vec<Statement>) -> Vec<Statement> {
     stmts.into_iter().map(|s| f.fold_statement(s)).collect()
@@ -166,11 +164,7 @@ pub fn fold_expression<F: Fold + ?Sized>(f: &mut F, expr: Expression) -> Express
             left: Box::new(f.fold_expression(*left)),
             right: Box::new(f.fold_expression(*right)),
         },
-        Expression::Pipe {
-            left,
-            right,
-            stderr,
-        } => Expression::Pipe {
+        Expression::Pipe { left, right, stderr } => Expression::Pipe {
             left: Box::new(f.fold_expression(*left)),
             right: Box::new(f.fold_expression(*right)),
             stderr,
@@ -182,26 +176,15 @@ pub fn fold_expression<F: Fold + ?Sized>(f: &mut F, expr: Expression) -> Express
 /// Fold assignments, arguments, and redirects. Call from [`Fold::fold_command`] overrides.
 pub fn fold_command<F: Fold + ?Sized>(f: &mut F, cmd: Command) -> Command {
     Command {
-        assignments: cmd
-            .assignments
-            .into_iter()
-            .map(|a| f.fold_assignment(a))
-            .collect(),
-        arguments: cmd
-            .arguments
-            .into_iter()
-            .map(|a| f.fold_argument(a))
-            .collect(),
+        assignments: cmd.assignments.into_iter().map(|a| f.fold_assignment(a)).collect(),
+        arguments: cmd.arguments.into_iter().map(|a| f.fold_argument(a)).collect(),
         redirects: fold_redirects(f, cmd.redirects),
         span: cmd.span,
     }
 }
 
 /// Fold all body/sub-structure in a compound command. Call from [`Fold::fold_compound_command`] overrides.
-pub fn fold_compound_command<F: Fold + ?Sized>(
-    f: &mut F,
-    compound: CompoundCommand,
-) -> CompoundCommand {
+pub fn fold_compound_command<F: Fold + ?Sized>(f: &mut F, compound: CompoundCommand) -> CompoundCommand {
     match compound {
         CompoundCommand::BraceGroup { body, span } => CompoundCommand::BraceGroup {
             body: fold_lines(f, body),
@@ -240,20 +223,12 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
             else_body: else_body.map(|b| fold_lines(f, b)),
             span,
         },
-        CompoundCommand::WhileClause {
-            condition,
-            body,
-            span,
-        } => CompoundCommand::WhileClause {
+        CompoundCommand::WhileClause { condition, body, span } => CompoundCommand::WhileClause {
             condition: fold_lines(f, condition),
             body: fold_lines(f, body),
             span,
         },
-        CompoundCommand::UntilClause {
-            condition,
-            body,
-            span,
-        } => CompoundCommand::UntilClause {
+        CompoundCommand::UntilClause { condition, body, span } => CompoundCommand::UntilClause {
             condition: fold_lines(f, condition),
             body: fold_lines(f, body),
             span,

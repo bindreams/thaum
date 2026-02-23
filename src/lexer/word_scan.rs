@@ -266,9 +266,7 @@ impl Lexer {
                 })
             }
             // $"..." — locale translation (Bash, only in normal mode)
-            Some('"')
-                if self.mode == super::LexerMode::Normal && self.options.locale_translation =>
-            {
+            Some('"') if self.mode == super::LexerMode::Normal && self.options.locale_translation => {
                 self.advance_char(); // consume "
                 let mut content = String::new();
                 loop {
@@ -378,9 +376,7 @@ impl Lexer {
                         }
                     }
                 }
-                Some(' ' | '\t' | '\n' | '|' | '&' | ';' | '<' | '>' | '(' | ')') | None => {
-                    return false
-                }
+                Some(' ' | '\t' | '\n' | '|' | '&' | ';' | '<' | '>' | '(' | ')') | None => return false,
                 _ => i += 1,
             }
         }
@@ -478,14 +474,7 @@ impl Lexer {
                 break;
             }
             // Stop at operator characters
-            if ch == '|'
-                || ch == '&'
-                || ch == ';'
-                || ch == '<'
-                || ch == '>'
-                || ch == '('
-                || ch == ')'
-            {
+            if ch == '|' || ch == '&' || ch == ';' || ch == '<' || ch == '>' || ch == '(' || ch == ')' {
                 break;
             }
             user.push(ch);
@@ -599,11 +588,7 @@ impl Lexer {
     }
 
     /// Scan a process substitution: <(cmd) or >(cmd).
-    fn scan_process_sub(
-        &mut self,
-        start: usize,
-        direction: char,
-    ) -> Result<SpannedToken, LexError> {
+    fn scan_process_sub(&mut self, start: usize, direction: char) -> Result<SpannedToken, LexError> {
         self.advance_char(); // consume < or >
         self.advance_char(); // consume (
         let content = self.read_balanced_content('(', ')', 1, start)?;
@@ -616,10 +601,7 @@ impl Lexer {
     /// Scan a heredoc delimiter as a single raw Literal token.
     /// Uses the same logic as the old scan_word — collects everything including
     /// quotes into one flat string so strip_heredoc_quotes can process it.
-    pub(super) fn scan_heredoc_delimiter(
-        &mut self,
-        start: usize,
-    ) -> Result<SpannedToken, LexError> {
+    pub(super) fn scan_heredoc_delimiter(&mut self, start: usize) -> Result<SpannedToken, LexError> {
         let mut word = String::new();
 
         while let Some(ch) = self.peek_char() {

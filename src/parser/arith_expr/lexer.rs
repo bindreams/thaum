@@ -372,10 +372,7 @@ impl ArithLexer {
                 let content: String = self.chars[start..self.pos].iter().collect();
                 Ok(ArithToken::Ident(content))
             }
-            _ => Err(format!(
-                "unexpected character '{}' in arithmetic expression",
-                ch
-            )),
+            _ => Err(format!("unexpected character '{}' in arithmetic expression", ch)),
         }
     }
 
@@ -401,8 +398,7 @@ impl ArithLexer {
                         return Err("invalid hex literal: no digits after 0x".to_string());
                     }
                     let hex_str: String = self.chars[hex_start..self.pos].iter().collect();
-                    let value = i64::from_str_radix(&hex_str, 16)
-                        .map_err(|e| format!("invalid hex literal: {}", e))?;
+                    let value = i64::from_str_radix(&hex_str, 16).map_err(|e| format!("invalid hex literal: {}", e))?;
                     return Ok(ArithToken::Number(value));
                 }
                 Some(c) if c.is_ascii_digit() => {
@@ -415,8 +411,8 @@ impl ArithLexer {
                         }
                     }
                     let oct_str: String = self.chars[start + 1..self.pos].iter().collect();
-                    let value = i64::from_str_radix(&oct_str, 8)
-                        .map_err(|e| format!("invalid octal literal: {}", e))?;
+                    let value =
+                        i64::from_str_radix(&oct_str, 8).map_err(|e| format!("invalid octal literal: {}", e))?;
                     return Ok(ArithToken::Number(value));
                 }
                 _ => {

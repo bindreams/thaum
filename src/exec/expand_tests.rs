@@ -79,9 +79,7 @@ fn expand_unset_variable() {
 fn expand_special_param_question_mark() {
     let mut env = Environment::new();
     env.set_last_exit_status(42);
-    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Simple(
-        "?".into(),
-    ))]);
+    let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Simple("?".into()))]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "42");
 }
 
@@ -91,9 +89,7 @@ fn expand_param_default() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
         operator: Some(ParamOp::Default),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "fallback".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "fallback");
 }
@@ -105,9 +101,7 @@ fn expand_param_default_when_set() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "SET".into(),
         operator: Some(ParamOp::Default),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "fallback".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "actual");
 }
@@ -118,9 +112,7 @@ fn expand_param_error_when_unset() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "MISSING".into(),
         operator: Some(ParamOp::Error),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "var is required".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("var is required".into())]))),
     })]);
     let err = expand_word(&word, &mut env).unwrap_err();
     assert!(matches!(err, ExecError::BadSubstitution(_)));
@@ -164,19 +156,14 @@ fn expand_param_length() {
 #[test]
 fn expand_glob_literal_outside_quotes() {
     let mut env = Environment::new();
-    let word = make_word(vec![
-        Fragment::Glob(GlobChar::Star),
-        Fragment::Literal(".txt".into()),
-    ]);
+    let word = make_word(vec![Fragment::Glob(GlobChar::Star), Fragment::Literal(".txt".into())]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "*.txt");
 }
 
 #[test]
 fn expand_glob_literal_inside_double_quotes() {
     let mut env = Environment::new();
-    let word = make_word(vec![Fragment::DoubleQuoted(vec![Fragment::Glob(
-        GlobChar::Star,
-    )])]);
+    let word = make_word(vec![Fragment::DoubleQuoted(vec![Fragment::Glob(GlobChar::Star)])]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "*");
 }
 
@@ -186,9 +173,7 @@ fn expand_param_default_assign_when_unset() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
         operator: Some(ParamOp::DefaultAssign),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "assigned".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("assigned".into())]))),
     })]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "assigned");
     assert_eq!(env.get_var("UNSET"), Some("assigned"));
@@ -201,9 +186,7 @@ fn expand_param_default_assign_when_set() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "SET".into(),
         operator: Some(ParamOp::DefaultAssign),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "fallback".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "existing");
     assert_eq!(env.get_var("SET"), Some("existing"));
@@ -216,9 +199,7 @@ fn expand_param_default_assign_when_empty() {
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "EMPTY".into(),
         operator: Some(ParamOp::DefaultAssign),
-        argument: Some(Box::new(make_word(vec![Fragment::Literal(
-            "filled".into(),
-        )]))),
+        argument: Some(Box::new(make_word(vec![Fragment::Literal("filled".into())]))),
     })]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "filled");
     assert_eq!(env.get_var("EMPTY"), Some("filled"));
@@ -234,10 +215,7 @@ fn expand_param_trim_small_prefix() {
         argument: Some(Box::new(make_word(vec![Fragment::Literal("*/".into())]))),
     })]);
     // Shortest prefix matching */: "/" matches, so result is "usr/bin:/usr/local/bin"
-    assert_eq!(
-        expand_word(&word, &mut env).unwrap(),
-        "usr/bin:/usr/local/bin"
-    );
+    assert_eq!(expand_word(&word, &mut env).unwrap(), "usr/bin:/usr/local/bin");
 }
 
 #[test]

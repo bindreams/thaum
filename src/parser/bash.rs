@@ -81,8 +81,7 @@ impl Parser {
                 }
             }
 
-            let cmd_span =
-                start_span.merge(arguments.last().map(argument_span).unwrap_or(word_span));
+            let cmd_span = start_span.merge(arguments.last().map(argument_span).unwrap_or(word_span));
             let body_expr = Expression::Command(Command {
                 assignments: Vec::new(),
                 arguments,
@@ -216,10 +215,7 @@ impl Parser {
             redirects.push(self.parse_redirect()?);
         }
 
-        let end_span = redirects
-            .last()
-            .map(|r| r.span)
-            .unwrap_or(compound_command_span(&body));
+        let end_span = redirects.last().map(|r| r.span).unwrap_or(compound_command_span(&body));
 
         Ok(Expression::FunctionDef(FunctionDef {
             name,

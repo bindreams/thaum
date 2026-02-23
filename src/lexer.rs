@@ -1,3 +1,11 @@
+//! Context-free shell tokenizer with a buffered token stream.
+//!
+//! The lexer is intentionally context-free: it emits fragment tokens (`Literal`,
+//! `SimpleParam`, `DoubleQuoted`, etc.) and operators, but never promotes words
+//! to reserved-word tokens -- that is the parser's job. A `CharSource` provides
+//! forward-only character I/O with arbitrary lookahead, and `speculate()` enables
+//! the parser to tentatively consume tokens and rewind on failure.
+
 pub(crate) mod char_source;
 pub(crate) mod heredoc;
 mod operators;

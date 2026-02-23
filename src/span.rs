@@ -1,3 +1,5 @@
+//! Byte-offset source spans attached to every AST node and token.
+
 /// A byte offset into the source string.
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize,

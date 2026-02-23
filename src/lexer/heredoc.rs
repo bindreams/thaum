@@ -1,3 +1,6 @@
+//! Here-document body reading and delimiter quote stripping. Bodies are read
+//! autonomously by the lexer on newline and queued for the parser to consume.
+
 use crate::error::LexError;
 use crate::span::Span;
 

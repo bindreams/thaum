@@ -1,3 +1,6 @@
+//! CLI argument parsing (via clap) and dispatch to `lex`, `parse`, `exec`, and
+//! `exec-ast` subcommands.
+
 mod color;
 mod error_fmt;
 

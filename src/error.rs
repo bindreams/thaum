@@ -1,3 +1,7 @@
+//! Lexer and parser error types. `LexError` covers unterminated quotes and
+//! invalid characters; `ParseError` covers unexpected tokens and unclosed
+//! constructs. Both carry optional `Span`s for source-location reporting.
+
 use crate::span::Span;
 use thiserror::Error;
 

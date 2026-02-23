@@ -1,3 +1,7 @@
+//! Execution errors and control-flow signals (`ExitRequested`, `BreakRequested`,
+//! `ReturnRequested`). Control-flow variants are not real errors -- they unwind
+//! the call stack to the nearest loop or function boundary.
+
 use std::io;
 use thiserror::Error;
 

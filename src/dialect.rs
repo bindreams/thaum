@@ -1,3 +1,10 @@
+//! Feature-flag system for shell dialect differences.
+//!
+//! `ParseOptions` holds one bool per syntax extension (here-strings, `[[ ]]`,
+//! process substitution, etc.). `Dialect` provides named presets (`Posix`,
+//! `Bash`). The lexer and parser read these flags to decide which constructs
+//! to recognize.
+
 /// Individual syntax features that can be toggled independently.
 ///
 /// Each field corresponds to a specific shell syntax extension beyond POSIX.

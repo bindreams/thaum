@@ -1,3 +1,7 @@
+//! Fragment scanning: literals, quoting, dollar expansions, globs, extglobs,
+//! tilde prefixes, process substitutions, and bracket expressions. Each
+//! `scan_*` method produces one fragment token from the character stream.
+
 use crate::error::LexError;
 use crate::span::Span;
 use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};

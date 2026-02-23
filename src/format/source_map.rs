@@ -1,3 +1,5 @@
+//! Byte-offset to line/column mapper for source-location display.
+
 use crate::span::Span;
 
 pub struct SourceMapper {

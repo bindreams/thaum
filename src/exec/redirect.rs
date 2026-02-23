@@ -1,3 +1,6 @@
+//! Redirect resolution: opens files, sets up FD overrides, and applies them
+//! to an `IoContext` for the duration of a single command.
+
 use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};

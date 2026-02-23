@@ -1,3 +1,7 @@
+//! POSIX word expansion: tilde, parameter, quote removal. Command substitution
+//! and arithmetic are pre-resolved by the `Executor` before calling into this
+//! module. Field splitting and pathname expansion are not yet implemented.
+
 use crate::ast::{Argument, Atom, Fragment, ParameterExpansion, Word};
 use crate::exec::environment::Environment;
 use crate::exec::error::ExecError;

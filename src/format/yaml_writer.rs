@@ -1,3 +1,6 @@
+//! Converts AST nodes into `YamlValue` trees, then emits them as YAML text.
+//! Handles both compact (default) and verbose output modes.
+
 use crate::ast::*;
 use crate::span::Span;
 

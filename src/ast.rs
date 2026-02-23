@@ -1,3 +1,9 @@
+//! Typed abstract syntax tree for POSIX sh and Bash.
+//!
+//! Every node carries a `Span` for error reporting. Bash-only constructs are
+//! prefixed with `Bash` so callers can distinguish them at the type level.
+//! There is no string-soup: operators, modes, and test-ops are all enums.
+
 use serde::{Deserialize, Serialize};
 
 use crate::span::Span;

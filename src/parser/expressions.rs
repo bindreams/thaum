@@ -1,3 +1,7 @@
+//! Top-level expression parsing: programs, lists, pipelines, `&&`/`||`,
+//! and `!` negation. Implements the operator-precedence layers above
+//! individual commands.
+
 use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;

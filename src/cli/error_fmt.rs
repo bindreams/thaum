@@ -1,3 +1,5 @@
+//! Human-readable error formatting with source context and caret highlighting.
+
 use colored::Colorize;
 use thaum::exec::ExecError;
 

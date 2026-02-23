@@ -1,3 +1,5 @@
+//! CLI binary entry point. Delegates immediately to `cli::run()`.
+
 #[cfg(feature = "cli")]
 mod cli;
 

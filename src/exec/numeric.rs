@@ -1,3 +1,9 @@
+//! Shell-style integer parsing with hex, octal, and character-code support.
+//!
+//! Bash accepts `0xff`, `077`, and `'A` as integer arguments. This module
+//! provides the canonical `parse_shell_int` used by both arithmetic evaluation
+//! and printf.
+
 /// Shell-style integer parsing: decimal, hex (0x/0X), octal (leading 0),
 /// character code ('A / "A), optional sign, leading whitespace.
 ///

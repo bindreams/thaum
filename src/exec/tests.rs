@@ -1,3 +1,6 @@
+//! Executor unit tests: pattern matching, word expansion, builtins, variables,
+//! control flow, and compound command execution.
+
 use super::*;
 use pattern::{
     trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix,

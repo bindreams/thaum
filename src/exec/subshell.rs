@@ -1,3 +1,6 @@
+//! Subshell serialization payload. The parent serializes `Environment` + body
+//! as JSON and pipes it to a child `thaum exec-ast` process.
+
 use serde::{Deserialize, Serialize};
 
 use crate::ast::Line;

@@ -1,3 +1,7 @@
+//! Runtime evaluator for `[[ ]]` bash conditional expressions. Recursively
+//! evaluates `BashTestExpr` nodes into `bool`, handling logical connectives,
+//! string/integer comparisons, and file-test operators.
+
 /// Evaluator for `[[ ]]` bash conditional expressions.
 ///
 /// Recursively evaluates `BashTestExpr` AST nodes, returning `true`/`false`.

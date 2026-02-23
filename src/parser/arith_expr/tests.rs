@@ -1,3 +1,6 @@
+//! Arithmetic expression parser tests: literals, variables, all operators,
+//! precedence, associativity, assignment, ternary, comma expressions.
+
 use super::*;
 
 fn parse_ok(input: &str) -> ArithExpr {

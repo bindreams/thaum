@@ -1,3 +1,6 @@
+//! Shared parser utilities: span extraction, name validation, fragment-to-AST
+//! conversion, keyword display names, and literal de-escaping.
+
 use crate::ast::*;
 use crate::span::Span;
 use crate::token::{GlobKind, Token};

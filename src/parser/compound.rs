@@ -1,3 +1,6 @@
+//! Compound command parsing: `if`/`while`/`until`/`for`/`case`/brace-group/
+//! subshell/`select`, plus `[[ ]]` and `(( ))` dispatch.
+
 use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;

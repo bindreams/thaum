@@ -1,3 +1,9 @@
+//! Shell state: variables (scalar, indexed-array, associative-array), exported
+//! vars, functions, aliases, positional parameters, CWD, and `$?`.  Supports
+//! `declare`/`typeset` attribute flags (`-i`, `-r`, `-l`, `-u`, `-x`), scoped
+//! positional parameters for function calls, and serialization for subshell
+//! spawning.
+
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
 

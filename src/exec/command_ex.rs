@@ -1,3 +1,7 @@
+//! Extended child-process builder that supports passing file descriptors 3+.
+//! Platform-specific FD inheritance (`dup2` on Unix, CRT reserved bytes on
+//! Windows) is encapsulated in `spawn()`.
+
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io;

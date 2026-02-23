@@ -1,3 +1,6 @@
+//! Parser integration tests covering commands, pipelines, compound statements,
+//! redirections, word expansion, and Bash extensions.
+
 use super::*;
 use pretty_assertions::assert_eq;
 

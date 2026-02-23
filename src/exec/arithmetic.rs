@@ -1,3 +1,7 @@
+//! Runtime evaluation of `ArithExpr` AST nodes (the parsed form of `(( ))`,
+//! `$(( ))`, and `for (( ; ; ))`). All values are `i64` with C-style wrapping;
+//! assignments and `++`/`--` modify variables in the `Environment`.
+
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use crate::exec::environment::Environment;
 use crate::exec::error::ExecError;

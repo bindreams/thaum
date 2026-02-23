@@ -1,3 +1,6 @@
+//! Pipeline execution: flattens the left-associative `Pipe` tree, spawns each
+//! stage with piped stdin/stdout, and returns the exit status of the last stage.
+
 use std::io::Write;
 use std::process::{Child, Command, Stdio};
 

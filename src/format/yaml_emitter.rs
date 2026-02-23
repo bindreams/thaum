@@ -1,3 +1,5 @@
+//! Converts `YamlValue` trees into indented YAML text.
+
 use std::fmt::Write;
 
 use super::yaml_value::YamlValue;

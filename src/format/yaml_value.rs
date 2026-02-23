@@ -1,3 +1,7 @@
+//! Lightweight YAML data model (mapping, sequence, scalar, null) for the
+//! AST output. Not a general-purpose YAML type -- covers only the subset
+//! needed by `YamlWriter`.
+
 /// A lightweight YAML data model for structured emission.
 ///
 /// This is not a general-purpose YAML type — it models exactly the subset

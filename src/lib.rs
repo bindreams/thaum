@@ -1,3 +1,7 @@
+//! Crate entry point. Exposes `parse()` and `parse_with()` for converting shell
+//! source text into a typed AST, plus the `exec`, `lexer`, and `parser` modules
+//! for lower-level access.
+
 pub mod ast;
 pub mod dialect;
 pub mod error;

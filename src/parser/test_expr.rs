@@ -1,3 +1,7 @@
+//! Recursive-descent parser for `[[ ]]` conditional expressions. Handles
+//! `||`, `&&`, `!`, grouping with `( )`, unary/binary test operators, and
+//! bare-word implicit `-n` tests.
+
 use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;

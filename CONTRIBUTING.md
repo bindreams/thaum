@@ -84,6 +84,75 @@ tests/
   corpus_runner.rs  — oils corpus test runner (custom harness)
 ```
 
+## Documentation style
+Follow [Rust API Guidelines C-CRATE-DOC](https://rust-lang.github.io/api-guidelines/documentation.html)
+and [the rustdoc book](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html).
+
+### Comment types
+| Syntax | Scope                      | Use for                                           |
+| ------ | -------------------------- | ------------------------------------------------- |
+| `//!`  | Parent item (module/crate) | File-level docs at the top of every `.rs` file    |
+| `///`  | Next item                  | Public functions, structs, enums, traits, methods |
+| `//`   | None (not rendered)        | Implementation notes, TODOs, non-doc remarks      |
+
+### File-level docs (`//!`)
+Every `.rs` file starts with a `//!` block describing the module's purpose.
+Place it before any `use` statements. One sentence is enough for small modules;
+larger ones benefit from a paragraph and cross-references.
+
+```rust
+//! Shell-style glob pattern matching.
+//!
+//! Supports `*` (any chars), `?` (single char), and `[...]` (char class).
+//! Used by `case` pattern matching and `[[ == ]]` string comparison.
+
+use crate::...;
+```
+
+### Item docs (`///`)
+All public items (`pub fn`, `pub struct`, `pub enum`, `pub trait`, `pub type`)
+must have a `///` doc comment. Internal items should have them when the logic
+is non-obvious.
+
+The **first paragraph** (before the first blank line) is the summary. It shows
+in module indexes and search results. Keep it to **one sentence** in third-person
+present tense:
+
+```rust
+/// Returns the scalar string value of this variable.
+///
+/// For indexed arrays, returns element 0 (bash: `$a` == `${a[0]}`).
+/// For associative arrays, returns element with key `"0"`, or `""`.
+pub fn scalar_str(&self) -> &str { ... }
+```
+
+### Standard sections
+
+Use these headings when applicable (order: summary, details, sections, examples):
+
+| Heading      | When to include                                                   |
+| ------------ | ----------------------------------------------------------------- |
+| `# Panics`   | The function can panic under certain conditions                   |
+| `# Errors`   | The function returns `Result` — list error variants               |
+| `# Safety`   | The function is `unsafe` — list invariants the caller must uphold |
+| `# Examples` | Always on public items; encouraged on complex internal items      |
+
+### Cross-references
+
+Link to other types with backtick-bracket syntax. rustdoc resolves them
+automatically:
+
+```rust
+/// Expands a [`Word`] into a string, handling [`ParameterExpansion`]
+/// and [`CommandSubstitution`] fragments.
+```
+
+### What NOT to document
+
+- Don't restate the type signature (`/// Takes a &str and returns an i64`).
+- Don't add `///` to trivially-named enum variants where the variant name says it all.
+- Don't use doc comments for implementation notes — use `//` instead.
+
 ## Architecture
 
 ### AST naming

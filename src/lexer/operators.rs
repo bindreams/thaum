@@ -1,3 +1,5 @@
+//! Multi-character operator scanning using `peek_at(n)` lookahead (up to 3 chars).
+
 use crate::error::LexError;
 use crate::span::Span;
 use crate::token::{SpannedToken, Token};

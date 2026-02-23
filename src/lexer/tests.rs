@@ -1,3 +1,6 @@
+//! Lexer unit tests covering fragments, operators, whitespace significance,
+//! heredocs, quoting, spans, and the buffered peek/advance/speculate API.
+
 use super::*;
 use crate::token::GlobKind;
 

@@ -1,3 +1,6 @@
+//! External (non-builtin) command execution via fork/exec. Sets up redirections,
+//! exported environment variables, and extra FD mappings before spawning.
+
 use std::process::Stdio;
 
 use crate::exec::command_ex::CommandEx;

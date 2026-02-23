@@ -1,3 +1,5 @@
+//! Syntax-highlighted YAML output for the `parse` subcommand.
+
 use colored::Colorize;
 
 pub(super) fn print_colored_yaml(yaml: &str) {

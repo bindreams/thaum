@@ -1,3 +1,6 @@
+//! Bash-specific compound commands: `coproc`, `(( ))` arithmetic command,
+//! and `for (( ; ; ))` C-style loops.
+
 use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;

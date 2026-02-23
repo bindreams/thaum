@@ -1,3 +1,6 @@
+//! Simple command parsing: assignments, arguments, redirections, and
+//! function definitions (`name() body`).
+
 use crate::ast::*;
 use crate::error::ParseError;
 use crate::token::Token;

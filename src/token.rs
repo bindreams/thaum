@@ -1,3 +1,10 @@
+//! Token types emitted by the lexer.
+//!
+//! Variant names are semantic (`RedirectFromFile`, not `Less`). POSIX spec
+//! names appear in doc comments. Grammar-level query methods (`is_keyword`,
+//! `can_start_command`, etc.) live directly on `Token` so the parser never
+//! wraps peek+query into its own helpers.
+
 use crate::ast::BinaryTestOp;
 use crate::span::Span;
 

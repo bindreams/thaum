@@ -1,3 +1,9 @@
+//! Shell builtins that only need `Environment` (not the full `Executor`):
+//! `echo`, `printf`, `true`, `false`, `exit`, `cd`, `export`, `unset`,
+//! `read`, `shift`, `set`, `shopt`, `alias`, `test`/`[`, `declare`, etc.
+//! Builtins requiring `Executor` access (`eval`, `source`, `exec`) live in
+//! `special_builtins.rs` instead.
+
 use std::io::{Read, Write};
 
 use crate::exec::environment::Environment;

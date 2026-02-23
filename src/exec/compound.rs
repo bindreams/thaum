@@ -1,3 +1,6 @@
+//! Execution of compound commands: `if`/`while`/`until`/`for`/`case`/
+//! brace-group/subshell/`select`/`[[ ]]`/`(( ))` and C-style `for`.
+
 use crate::ast::{CompoundCommand, Redirect};
 use crate::exec::arithmetic;
 use crate::exec::error::ExecError;

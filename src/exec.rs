@@ -1,3 +1,10 @@
+//! Shell executor: walks the AST and runs commands.
+//!
+//! The `Executor` owns an `Environment` (variables, functions, aliases, CWD)
+//! and dispatches to builtins, external processes, and compound-command
+//! handlers. Alias expansion happens here at execution time -- the parser
+//! never sees aliases.
+
 pub mod arithmetic;
 pub(crate) mod bash_test;
 pub mod builtins;

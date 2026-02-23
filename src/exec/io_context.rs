@@ -1,3 +1,6 @@
+//! Pluggable I/O context for stdin/stdout/stderr. `ProcessIo` wraps the real
+//! process streams; `CapturedIo` uses in-memory buffers for testing.
+
 use std::io::{self, Cursor, Read, Write};
 
 /// I/O context for shell execution.

@@ -1,3 +1,6 @@
+//! Shell glob-pattern matching for `case` arms and `${var%pattern}` trimming.
+//! Supports `*`, `?`, and character classes `[...]`; no extglobs.
+
 /// Simple shell pattern matching for `case` arms.
 ///
 /// Supports `*`, `?`, and character classes `[...]`.

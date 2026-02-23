@@ -1,3 +1,7 @@
+//! Forward-only character source backed by `Box<dyn Read>` with arbitrary
+//! lookahead via `peek_at(n)`. Uses `RefCell` for interior mutability so
+//! peek operations take `&self`.
+
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::io::{BufRead, BufReader, Cursor, Read};

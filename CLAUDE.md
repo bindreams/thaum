@@ -5,11 +5,17 @@
   - Write tests before implementing functionality of fixing bugs;
   - Write tests instead of or in addition to manually verifying.
 - Avoid letting files grow too large. If tempted to add section comments in the file, always consider breaking it up into several, perhaps organized into a folder.
+  - If a section comment is inevitable, use this style: `// Section name ======` with equal signs up to the 120th column, or `// Inner name -----` for a second level of sectioning.
 - Use `foo.rs` + `foo/` module style instead of `mod.rs`.
 - Debug asserts and contracts are encouraged and should be considered zero-cost.
 - Adding a new crate to dependencies is always preferable to implementing functionality manually.
 - Place unit tests in a separate file (e.g. `dir/foo_tests.rs` for `dir/foo.rs`).
 - Group integration tests by the functionality they test, not by current task, origin, or failure state.
+- Follow the documentation style in [CONTRIBUTING.md](/CONTRIBUTING.md#documentation-style). When writing comments and docstrings, think carefully about the context that the reader will have:
+  - For module-level docstrings, the reader already knows about the file location within the project, and has read README.md;
+  - For file-level docstrings, in addition to the above, the reader knows which module this file is in;
+  - For function-level docstrings, in addition to the above, the reader has read the function name and argument names. Avoid duplicating obvious information, but include otherwise hidden knowledge.
+  - The reader does not know what task you were accomplishing while writing this comment/docstring. Avoid including unnecessary task-related details.
 
 ## Correctness
 - **Tests must match shell specification.** When writing tests, verify that the expected AST matches what bash/POSIX sh would actually execute. When in doubt, test in a real shell first.

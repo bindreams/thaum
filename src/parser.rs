@@ -1,3 +1,8 @@
+//! Recursive-descent parser. Promotes `Literal` tokens to keywords based on
+//! grammatical context (the lexer is context-free). Holds the `Lexer` directly
+//! with no intermediate token-stream layer. A post-parse `HereDocFiller` fold
+//! patches heredoc bodies from the lexer's side queue into the AST.
+
 pub(crate) mod arith_expr;
 mod bash;
 mod commands;

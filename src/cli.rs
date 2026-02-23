@@ -342,6 +342,7 @@ fn do_parse(cli: &CliArgs) {
 
 fn do_exec(cli: &CliArgs) {
     let dialect = cli.dialect();
+    let options = dialect.options();
     let (source, filename) = load_source(cli);
     let mapper = SourceMapper::new(&source);
 
@@ -353,7 +354,7 @@ fn do_exec(cli: &CliArgs) {
         }
     };
 
-    let mut executor = Executor::new();
+    let mut executor = Executor::with_options(options);
     executor.env_mut().set_program_name(filename);
     executor.env_mut().set_positional_params(cli.script_args.clone());
 
@@ -388,7 +389,7 @@ fn do_exec_ast() {
     });
 
     let env = Environment::from_serialized(payload.env);
-    let mut executor = Executor::with_env(env);
+    let mut executor = Executor::with_env_and_options(env, payload.options);
 
     let mut process_io = ProcessIo::new();
     match executor.execute_lines(&payload.body, &mut process_io.context()) {

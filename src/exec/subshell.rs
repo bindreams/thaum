@@ -11,4 +11,6 @@ use crate::exec::environment::SerializedEnvironment;
 pub struct SubshellPayload {
     pub env: SerializedEnvironment,
     pub body: Vec<Line>,
+    /// Shell options inherited from the parent executor.
+    pub options: crate::dialect::ShellOptions,
 }

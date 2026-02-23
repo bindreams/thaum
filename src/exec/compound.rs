@@ -166,10 +166,18 @@ impl Executor {
             }
 
             CompoundCommand::BashDoubleBracket { expression, .. } => {
+                debug_assert!(
+                    self.options.double_brackets,
+                    "BashDoubleBracket in executor without double_brackets enabled"
+                );
                 let result = super::bash_test::evaluate(expression, self, io)?;
                 Ok(if result { 0 } else { 1 })
             }
             CompoundCommand::BashArithmeticCommand { expression, .. } => {
+                debug_assert!(
+                    self.options.arithmetic_command,
+                    "BashArithmeticCommand in executor without arithmetic_command enabled"
+                );
                 let value = arithmetic::evaluate_arith_expr(expression, &mut self.env)?;
                 // (( )) returns 0 (success) if expression is non-zero,
                 // 1 (failure) if expression is zero.
@@ -186,6 +194,10 @@ impl Executor {
                 body,
                 ..
             } => {
+                debug_assert!(
+                    self.options.arithmetic_for,
+                    "BashArithmeticFor in executor without arithmetic_for enabled"
+                );
                 if let Some(init_expr) = init {
                     arithmetic::evaluate_arith_expr(init_expr, &mut self.env)?;
                 }

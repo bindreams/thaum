@@ -1822,3 +1822,74 @@ fn nameref_self_reference() {
     let (out, _) = bash_exec_ok("declare -n a=a; echo ${a:-safe}");
     assert_eq!(out, "safe\n");
 }
+
+// Dialect gating -----------------------------------------------------------------------------------------------------
+
+#[test]
+fn posix_rejects_declare() {
+    // declare is bash-only — POSIX mode should not recognize it as a builtin.
+    // Use "declare x=1" alone (no trailing echo) so the exit status reflects
+    // the failed declare, not a subsequent successful echo.
+    let prog = thaum::parse("declare x=1").unwrap();
+    let options = thaum::Dialect::Posix.options();
+    let mut exec = thaum::exec::Executor::with_options(options);
+    exec.set_exe_path(thaum_exe());
+    let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut io = thaum::exec::CapturedIo::new();
+    let result = exec.execute(&prog, &mut io.context());
+    // declare should fail (command not found) in POSIX mode
+    match result {
+        Ok(status) => assert_ne!(status, 0),
+        Err(thaum::exec::ExecError::CommandNotFound(_)) => {} // expected
+        Err(e) => panic!("unexpected error: {:?}", e),
+    }
+}
+
+#[test]
+fn posix_rejects_shopt() {
+    let prog = thaum::parse("shopt -s expand_aliases").unwrap();
+    let options = thaum::Dialect::Posix.options();
+    let mut exec = thaum::exec::Executor::with_options(options);
+    exec.set_exe_path(thaum_exe());
+    let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut io = thaum::exec::CapturedIo::new();
+    let result = exec.execute(&prog, &mut io.context());
+    match result {
+        Ok(status) => assert_ne!(status, 0),
+        Err(thaum::exec::ExecError::CommandNotFound(_)) => {}
+        Err(e) => panic!("unexpected error: {:?}", e),
+    }
+}
+
+#[test]
+fn posix_allows_alias() {
+    // alias is POSIX — should work in POSIX mode
+    let prog = thaum::parse("alias").unwrap();
+    let options = thaum::Dialect::Posix.options();
+    let mut exec = thaum::exec::Executor::with_options(options);
+    exec.set_exe_path(thaum_exe());
+    let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut io = thaum::exec::CapturedIo::new();
+    let status = exec.execute(&prog, &mut io.context()).unwrap();
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn posix_allows_test_builtin() {
+    let prog = thaum::parse("test -n hello").unwrap();
+    let options = thaum::Dialect::Posix.options();
+    let mut exec = thaum::exec::Executor::with_options(options);
+    exec.set_exe_path(thaum_exe());
+    let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut io = thaum::exec::CapturedIo::new();
+    let status = exec.execute(&prog, &mut io.context()).unwrap();
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_allows_declare() {
+    // Bash mode — declare should work
+    let (out, status) = bash_exec_ok("declare x=hello; echo $x");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
+}

@@ -18,8 +18,7 @@ impl Executor {
         if text.is_empty() {
             return Ok(0);
         }
-        let dialect = crate::Dialect::Bash;
-        match crate::parse_with(&text, dialect) {
+        match crate::parse_with_options(&text, self.options.clone()) {
             Ok(program) => self.execute_lines(&program.lines, io),
             Err(_) => Ok(2),
         }
@@ -55,8 +54,7 @@ impl Executor {
             ))
         })?;
 
-        let dialect = crate::Dialect::Bash;
-        let program = match crate::parse_with(&source, dialect) {
+        let program = match crate::parse_with_options(&source, self.options.clone()) {
             Ok(p) => p,
             Err(_) => return Ok(2),
         };

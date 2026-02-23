@@ -62,10 +62,14 @@ pub struct Executor {
     /// Suppresses errexit (`set -e`) in guarded contexts: `if`/`while`/`until`
     /// conditions, and the left-hand side of `&&`/`||` and `!` operands.
     errexit_suppressed: bool,
+    /// Shell options (dialect features) controlling which builtins and syntax
+    /// extensions are available at execution time.
+    options: crate::dialect::ShellOptions,
 }
 
 impl Executor {
-    /// Create a new executor with default environment.
+    /// Create a new executor with default environment (Bash mode for backwards
+    /// compatibility).
     pub fn new() -> Self {
         let mut env = Environment::new();
         env.inherit_from_process();
@@ -75,10 +79,25 @@ impl Executor {
             alias_snapshot: HashMap::new(),
             exe_path: None,
             errexit_suppressed: false,
+            options: crate::Dialect::Bash.options(),
         }
     }
 
-    /// Create an executor with a specific environment.
+    /// Create an executor with specific shell options (dialect features).
+    pub fn with_options(options: crate::dialect::ShellOptions) -> Self {
+        let mut env = Environment::new();
+        env.inherit_from_process();
+        Executor {
+            env,
+            fd_table: HashMap::new(),
+            alias_snapshot: HashMap::new(),
+            exe_path: None,
+            errexit_suppressed: false,
+            options,
+        }
+    }
+
+    /// Create an executor with a specific environment (Bash mode).
     pub fn with_env(env: Environment) -> Self {
         Executor {
             env,
@@ -86,6 +105,19 @@ impl Executor {
             alias_snapshot: HashMap::new(),
             exe_path: None,
             errexit_suppressed: false,
+            options: crate::Dialect::Bash.options(),
+        }
+    }
+
+    /// Create an executor with a specific environment and shell options.
+    pub fn with_env_and_options(env: Environment, options: crate::dialect::ShellOptions) -> Self {
+        Executor {
+            env,
+            fd_table: HashMap::new(),
+            alias_snapshot: HashMap::new(),
+            exe_path: None,
+            errexit_suppressed: false,
+            options,
         }
     }
 
@@ -102,6 +134,11 @@ impl Executor {
     /// Get a reference to the environment.
     pub fn env(&self) -> &Environment {
         &self.env
+    }
+
+    /// The shell options (dialect features) this executor was configured with.
+    pub fn options(&self) -> &crate::dialect::ShellOptions {
+        &self.options
     }
 
     /// Get a reference to the persistent FD table.
@@ -137,6 +174,7 @@ impl Executor {
         let payload = subshell::SubshellPayload {
             env: self.env.serialize(),
             body: body.to_vec(),
+            options: self.options.clone(),
         };
         let json = serde_json::to_string(&payload).map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
 
@@ -487,9 +525,8 @@ impl Executor {
             full_line.push_str(&remaining_source);
         }
 
-        // Re-parse the expanded line
-        let dialect = crate::Dialect::Bash;
-        let program = match crate::parse_with(&full_line, dialect) {
+        // Re-parse the expanded line using the executor's options
+        let program = match crate::parse_with_options(&full_line, self.options.clone()) {
             Ok(prog) => prog,
             Err(_) => return Ok(None), // parse failure → treat as no expansion
         };
@@ -611,8 +648,21 @@ impl Executor {
             };
         }
 
-        // Check for builtins
-        if builtins::is_builtin(cmd_name) {
+        // Check if this builtin is enabled in the current dialect.
+        // Bash-only builtins are skipped when their feature flag is off,
+        // falling through to external command lookup (command-not-found).
+        let is_active_builtin = if builtins::is_builtin(cmd_name) {
+            match cmd_name.as_str() {
+                "declare" | "typeset" => self.options.declare_builtin,
+                "shopt" => self.options.shopt_builtin,
+                "local" => self.options.local_builtin,
+                _ => true, // All other builtins are always available
+            }
+        } else {
+            false
+        };
+
+        if is_active_builtin {
             let saved = self.apply_prefix_assignments(&cmd.assignments)?;
 
             let cmd_io = active.apply_to_io(io);

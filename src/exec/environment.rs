@@ -25,6 +25,12 @@ pub struct ShellVar {
     value: VarValue,
     exported: bool,
     readonly: bool,
+    /// `-i` flag: evaluate RHS as arithmetic on assignment.
+    integer: bool,
+    /// `-l` flag: convert value to lowercase on assignment.
+    lowercase: bool,
+    /// `-u` flag: convert value to uppercase on assignment.
+    uppercase: bool,
 }
 
 impl ShellVar {
@@ -40,6 +46,33 @@ impl ShellVar {
             VarValue::AssocArray(map) => map.get("0").map(|s| s.as_str()).unwrap_or(""),
         }
     }
+}
+
+/// Attributes parsed from `declare`/`typeset` flags.
+#[derive(Clone, Default, Debug)]
+pub struct DeclareAttrs {
+    /// `-a`: create indexed array.
+    pub indexed_array: bool,
+    /// `-A`: create associative array.
+    pub assoc_array: bool,
+    /// `-r`: mark readonly.
+    pub readonly_set: bool,
+    /// `-x`: mark exported.
+    pub exported_set: bool,
+    /// `-i`: integer attribute (arithmetic evaluation on assignment).
+    pub integer_set: bool,
+    /// `-l`: lowercase on assignment.
+    pub lowercase_set: bool,
+    /// `-u`: uppercase on assignment.
+    pub uppercase_set: bool,
+    /// `-g`: force global scope (even inside a function).
+    pub global: bool,
+    /// `-p`: print variable declarations.
+    pub print: bool,
+    /// `-f`: list functions.
+    pub list_functions: bool,
+    /// `-F`: list function names only.
+    pub list_function_names: bool,
 }
 
 /// A saved scope frame for function calls.
@@ -129,6 +162,10 @@ impl Environment {
     ///
     /// If the variable is already an indexed array, sets element 0 (bash compat).
     /// Otherwise creates or overwrites a scalar variable.
+    ///
+    /// Applies variable attributes: integer (`-i`) evaluates the value as an
+    /// arithmetic expression, lowercase (`-l`) / uppercase (`-u`) transform
+    /// the case.
     pub fn set_var(&mut self, name: &str, value: &str) -> Result<(), ExecError> {
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
@@ -138,6 +175,9 @@ impl Environment {
 
         let prev = self.variables.get(name);
         let exported = prev.map(|v| v.exported).unwrap_or(false);
+        let integer = prev.map(|v| v.integer).unwrap_or(false);
+        let lowercase = prev.map(|v| v.lowercase).unwrap_or(false);
+        let uppercase = prev.map(|v| v.uppercase).unwrap_or(false);
         let is_indexed_array = prev
             .map(|v| matches!(v.value, VarValue::IndexedArray(_)))
             .unwrap_or(false);
@@ -145,25 +185,30 @@ impl Environment {
             .map(|v| matches!(v.value, VarValue::AssocArray(_)))
             .unwrap_or(false);
 
+        let final_value = self.apply_var_transforms(value, integer, lowercase, uppercase);
+
         if is_indexed_array {
             if let Some(var) = self.variables.get_mut(name) {
                 if let VarValue::IndexedArray(ref mut map) = var.value {
-                    map.insert(0, value.to_string());
+                    map.insert(0, final_value);
                 }
             }
         } else if is_assoc_array {
             if let Some(var) = self.variables.get_mut(name) {
                 if let VarValue::AssocArray(ref mut map) = var.value {
-                    map.insert("0".to_string(), value.to_string());
+                    map.insert("0".to_string(), final_value);
                 }
             }
         } else {
             self.variables.insert(
                 name.to_string(),
                 ShellVar {
-                    value: VarValue::Scalar(value.to_string()),
+                    value: VarValue::Scalar(final_value),
                     exported,
                     readonly: false,
+                    integer,
+                    lowercase,
+                    uppercase,
                 },
             );
         }
@@ -203,31 +248,41 @@ impl Environment {
             }
         }
 
+        // Apply case transforms from existing variable attributes.
+        let final_value = if let Some(var) = self.variables.get(name) {
+            self.apply_var_transforms(value, false, var.lowercase, var.uppercase)
+        } else {
+            value.to_string()
+        };
+
         match self.variables.get_mut(name) {
             Some(var) => match var.value {
                 VarValue::IndexedArray(ref mut map) => {
-                    map.insert(index, value.to_string());
+                    map.insert(index, final_value);
                 }
                 VarValue::AssocArray(ref mut map) => {
-                    map.insert(index.to_string(), value.to_string());
+                    map.insert(index.to_string(), final_value);
                 }
                 VarValue::Scalar(ref s) => {
                     let old = s.clone();
                     let mut map = BTreeMap::new();
                     map.insert(0, old);
-                    map.insert(index, value.to_string());
+                    map.insert(index, final_value);
                     var.value = VarValue::IndexedArray(map);
                 }
             },
             None => {
                 let mut map = BTreeMap::new();
-                map.insert(index, value.to_string());
+                map.insert(index, final_value);
                 self.variables.insert(
                     name.to_string(),
                     ShellVar {
                         value: VarValue::IndexedArray(map),
                         exported: false,
                         readonly: false,
+                        integer: false,
+                        lowercase: false,
+                        uppercase: false,
                     },
                 );
             }
@@ -243,11 +298,11 @@ impl Environment {
             }
         }
 
-        let exported = self
-            .variables
-            .get(name)
-            .map(|v| v.exported)
-            .unwrap_or(false);
+        let prev = self.variables.get(name);
+        let exported = prev.map(|v| v.exported).unwrap_or(false);
+        let integer = prev.map(|v| v.integer).unwrap_or(false);
+        let lowercase = prev.map(|v| v.lowercase).unwrap_or(false);
+        let uppercase = prev.map(|v| v.uppercase).unwrap_or(false);
 
         let map: BTreeMap<usize, String> = elements.into_iter().enumerate().collect();
         self.variables.insert(
@@ -256,6 +311,9 @@ impl Environment {
                 value: VarValue::IndexedArray(map),
                 exported,
                 readonly: false,
+                integer,
+                lowercase,
+                uppercase,
             },
         );
         Ok(())
@@ -325,17 +383,19 @@ impl Environment {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
             }
         }
-        let exported = self
-            .variables
-            .get(name)
-            .map(|v| v.exported)
-            .unwrap_or(false);
+        let prev = self.variables.get(name);
+        let exported = prev.map(|v| v.exported).unwrap_or(false);
+        let lowercase = prev.map(|v| v.lowercase).unwrap_or(false);
+        let uppercase = prev.map(|v| v.uppercase).unwrap_or(false);
         self.variables.insert(
             name.to_string(),
             ShellVar {
                 value: VarValue::AssocArray(HashMap::new()),
                 exported,
                 readonly: false,
+                integer: false,
+                lowercase,
+                uppercase,
             },
         );
         Ok(())
@@ -357,10 +417,18 @@ impl Environment {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
             }
         }
+
+        // Apply case transforms from existing variable attributes.
+        let final_value = if let Some(var) = self.variables.get(name) {
+            self.apply_var_transforms(value, false, var.lowercase, var.uppercase)
+        } else {
+            value.to_string()
+        };
+
         match self.variables.get_mut(name) {
             Some(var) => match var.value {
                 VarValue::AssocArray(ref mut map) => {
-                    map.insert(key.to_string(), value.to_string());
+                    map.insert(key.to_string(), final_value);
                 }
                 _ => {
                     // If not assoc, treat key as index 0 for scalar compat
@@ -369,13 +437,16 @@ impl Environment {
             },
             None => {
                 let mut map = HashMap::new();
-                map.insert(key.to_string(), value.to_string());
+                map.insert(key.to_string(), final_value);
                 self.variables.insert(
                     name.to_string(),
                     ShellVar {
                         value: VarValue::AssocArray(map),
                         exported: false,
                         readonly: false,
+                        integer: false,
+                        lowercase: false,
+                        uppercase: false,
                     },
                 );
             }
@@ -422,6 +493,9 @@ impl Environment {
                         value: VarValue::Scalar(String::new()),
                         exported: true,
                         readonly: false,
+                        integer: false,
+                        lowercase: false,
+                        uppercase: false,
                     },
                 );
             }
@@ -439,6 +513,9 @@ impl Environment {
                         value: VarValue::Scalar(String::new()),
                         exported: false,
                         readonly: true,
+                        integer: false,
+                        lowercase: false,
+                        uppercase: false,
                     },
                 );
             }
@@ -614,17 +691,153 @@ impl Environment {
                 .map(|v| v.value.clone())
                 .unwrap_or(VarValue::Scalar(String::new()));
             let exported = current.as_ref().map(|v| v.exported).unwrap_or(false);
+            let integer = current.as_ref().map(|v| v.integer).unwrap_or(false);
+            let lowercase = current.as_ref().map(|v| v.lowercase).unwrap_or(false);
+            let uppercase = current.as_ref().map(|v| v.uppercase).unwrap_or(false);
             self.variables.insert(
                 name.to_string(),
                 ShellVar {
                     value,
                     exported,
                     readonly: false,
+                    integer,
+                    lowercase,
+                    uppercase,
                 },
             );
         }
 
         Ok(())
+    }
+
+    // --- Variable attribute queries ---
+
+    /// Returns whether a variable has the integer (`-i`) attribute.
+    pub fn has_integer_attr(&self, name: &str) -> bool {
+        self.variables.get(name).map(|v| v.integer).unwrap_or(false)
+    }
+
+    /// Declare a variable with attributes from `declare`/`typeset`.
+    ///
+    /// If in a function scope and not `global`, the variable is made local
+    /// first.  Then attributes and an optional initial value are applied.
+    pub fn declare_with_attrs(
+        &mut self,
+        name: &str,
+        value: Option<&str>,
+        attrs: &DeclareAttrs,
+    ) -> Result<(), ExecError> {
+        // If in function scope and not global, declare local first.
+        if self.in_function_scope() && !attrs.global {
+            self.declare_local(name)?;
+        }
+
+        if let Some(var) = self.variables.get_mut(name) {
+            // Apply attribute flags to existing variable.
+            if attrs.readonly_set {
+                var.readonly = true;
+            }
+            if attrs.exported_set {
+                var.exported = true;
+            }
+            if attrs.integer_set {
+                var.integer = true;
+            }
+            if attrs.lowercase_set {
+                var.lowercase = true;
+                var.uppercase = false;
+            }
+            if attrs.uppercase_set {
+                var.uppercase = true;
+                var.lowercase = false;
+            }
+        } else {
+            // Variable does not exist yet — create it.
+            let initial = value.unwrap_or("").to_string();
+            let final_value = self.apply_var_transforms(
+                &initial,
+                attrs.integer_set,
+                attrs.lowercase_set,
+                attrs.uppercase_set,
+            );
+            self.variables.insert(
+                name.to_string(),
+                ShellVar {
+                    value: VarValue::Scalar(final_value),
+                    exported: attrs.exported_set,
+                    readonly: attrs.readonly_set,
+                    integer: attrs.integer_set,
+                    lowercase: attrs.lowercase_set && !attrs.uppercase_set,
+                    uppercase: attrs.uppercase_set,
+                },
+            );
+            return Ok(());
+        }
+
+        // Set value if provided (attributes are already applied above).
+        if let Some(val) = value {
+            self.set_var(name, val)?;
+        }
+
+        Ok(())
+    }
+
+    /// Apply integer / lowercase / uppercase transforms to a value string.
+    ///
+    /// For the integer attribute, evaluates the string as an arithmetic
+    /// expression using a simple recursive parser that handles `+`, `-`,
+    /// `*`, `/`, and variable references.  Full arithmetic evaluation
+    /// (matching bash's `$((...))` semantics) requires the Executor, so
+    /// complex expressions like nested ternaries are not supported here.
+    fn apply_var_transforms(
+        &self,
+        value: &str,
+        integer: bool,
+        lowercase: bool,
+        uppercase: bool,
+    ) -> String {
+        if integer {
+            let trimmed = value.trim();
+            if trimmed.is_empty() {
+                return "0".to_string();
+            }
+            // Try simple integer parse first.
+            if let Ok(n) = trimmed.parse::<i64>() {
+                return n.to_string();
+            }
+            // Fall back to a mini arithmetic evaluator for common expressions
+            // like "2+3", "x+5", etc.
+            match self.eval_integer_attr_expr(trimmed) {
+                Ok(n) => return n.to_string(),
+                Err(_) => return "0".to_string(),
+            }
+        }
+
+        if lowercase {
+            value.to_lowercase()
+        } else if uppercase {
+            value.to_uppercase()
+        } else {
+            value.to_string()
+        }
+    }
+
+    /// Mini arithmetic evaluator for the integer attribute.
+    ///
+    /// Parses a simple arithmetic expression (integers, variable names,
+    /// `+`, `-`, `*`, `/`, parentheses) and evaluates it.  This is used
+    /// by `set_var` when the `-i` attribute is set, so that assignments
+    /// like `x='2+3'` evaluate to `5`.
+    fn eval_integer_attr_expr(&self, expr: &str) -> Result<i64, ()> {
+        // Tokenize: numbers, identifiers (variable names), operators
+        let tokens = tokenize_arith(expr)?;
+        let mut pos = 0;
+        let result = parse_additive(&tokens, &mut pos, self)?;
+        if pos == tokens.len() {
+            Ok(result)
+        } else {
+            Err(())
+        }
     }
 
     pub fn ifs(&self) -> &str {
@@ -681,6 +894,9 @@ impl Environment {
                     value: VarValue::Scalar(value),
                     exported: true,
                     readonly: false,
+                    integer: false,
+                    lowercase: false,
+                    uppercase: false,
                 },
             );
         }
@@ -737,6 +953,213 @@ pub struct SerializedEnvironment {
 impl Default for Environment {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// --- Mini arithmetic evaluator for the integer (`-i`) attribute ---
+//
+// This is a self-contained recursive-descent parser that handles:
+//   integers, variable names, +, -, *, /, %, parentheses.
+// It is intentionally simple — full arithmetic (ternary, bitwise, etc.)
+// is handled by the Executor's arithmetic module.  This evaluator
+// exists so that `set_var` (which has no access to the Executor) can
+// evaluate common expressions like "2+3" or "x+5" when the integer
+// attribute is set.
+
+#[derive(Debug, Clone)]
+enum ArithToken {
+    Num(i64),
+    Var(String),
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Percent,
+    LParen,
+    RParen,
+}
+
+fn tokenize_arith(input: &str) -> Result<Vec<ArithToken>, ()> {
+    let mut tokens = Vec::new();
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        let ch = bytes[i] as char;
+        match ch {
+            ' ' | '\t' => {
+                i += 1;
+            }
+            '+' => {
+                tokens.push(ArithToken::Plus);
+                i += 1;
+            }
+            '-' => {
+                tokens.push(ArithToken::Minus);
+                i += 1;
+            }
+            '*' => {
+                tokens.push(ArithToken::Star);
+                i += 1;
+            }
+            '/' => {
+                tokens.push(ArithToken::Slash);
+                i += 1;
+            }
+            '%' => {
+                tokens.push(ArithToken::Percent);
+                i += 1;
+            }
+            '(' => {
+                tokens.push(ArithToken::LParen);
+                i += 1;
+            }
+            ')' => {
+                tokens.push(ArithToken::RParen);
+                i += 1;
+            }
+            '0'..='9' => {
+                let start = i;
+                while i < bytes.len() && (bytes[i] as char).is_ascii_digit() {
+                    i += 1;
+                }
+                let n: i64 = input[start..i].parse().map_err(|_| ())?;
+                tokens.push(ArithToken::Num(n));
+            }
+            c if c == '_' || c.is_ascii_alphabetic() => {
+                let start = i;
+                while i < bytes.len() {
+                    let c2 = bytes[i] as char;
+                    if c2 == '_' || c2.is_ascii_alphanumeric() {
+                        i += 1;
+                    } else {
+                        break;
+                    }
+                }
+                tokens.push(ArithToken::Var(input[start..i].to_string()));
+            }
+            _ => return Err(()),
+        }
+    }
+    Ok(tokens)
+}
+
+/// Parse additive expression: term (('+' | '-') term)*
+fn parse_additive(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
+    let mut left = parse_multiplicative(tokens, pos, env)?;
+    loop {
+        if *pos >= tokens.len() {
+            break;
+        }
+        match tokens[*pos] {
+            ArithToken::Plus => {
+                *pos += 1;
+                let right = parse_multiplicative(tokens, pos, env)?;
+                left = left.wrapping_add(right);
+            }
+            ArithToken::Minus => {
+                *pos += 1;
+                let right = parse_multiplicative(tokens, pos, env)?;
+                left = left.wrapping_sub(right);
+            }
+            _ => break,
+        }
+    }
+    Ok(left)
+}
+
+/// Parse multiplicative expression: unary (('*' | '/' | '%') unary)*
+fn parse_multiplicative(
+    tokens: &[ArithToken],
+    pos: &mut usize,
+    env: &Environment,
+) -> Result<i64, ()> {
+    let mut left = parse_unary(tokens, pos, env)?;
+    loop {
+        if *pos >= tokens.len() {
+            break;
+        }
+        match tokens[*pos] {
+            ArithToken::Star => {
+                *pos += 1;
+                let right = parse_unary(tokens, pos, env)?;
+                left = left.wrapping_mul(right);
+            }
+            ArithToken::Slash => {
+                *pos += 1;
+                let right = parse_unary(tokens, pos, env)?;
+                if right == 0 {
+                    return Err(());
+                }
+                left = left.wrapping_div(right);
+            }
+            ArithToken::Percent => {
+                *pos += 1;
+                let right = parse_unary(tokens, pos, env)?;
+                if right == 0 {
+                    return Err(());
+                }
+                left = left.wrapping_rem(right);
+            }
+            _ => break,
+        }
+    }
+    Ok(left)
+}
+
+/// Parse unary: ['-' | '+'] primary
+fn parse_unary(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
+    if *pos >= tokens.len() {
+        return Err(());
+    }
+    match tokens[*pos] {
+        ArithToken::Minus => {
+            *pos += 1;
+            let val = parse_primary(tokens, pos, env)?;
+            Ok(val.wrapping_neg())
+        }
+        ArithToken::Plus => {
+            *pos += 1;
+            parse_primary(tokens, pos, env)
+        }
+        _ => parse_primary(tokens, pos, env),
+    }
+}
+
+/// Parse primary: number | variable | '(' expr ')'
+fn parse_primary(tokens: &[ArithToken], pos: &mut usize, env: &Environment) -> Result<i64, ()> {
+    if *pos >= tokens.len() {
+        return Err(());
+    }
+    match &tokens[*pos] {
+        ArithToken::Num(n) => {
+            let n = *n;
+            *pos += 1;
+            Ok(n)
+        }
+        ArithToken::Var(name) => {
+            *pos += 1;
+            let val_str = env.get_var(name).unwrap_or("");
+            if val_str.is_empty() {
+                Ok(0)
+            } else {
+                val_str.parse::<i64>().map_err(|_| ())
+            }
+        }
+        ArithToken::LParen => {
+            *pos += 1;
+            let val = parse_additive(tokens, pos, env)?;
+            if *pos >= tokens.len() {
+                return Err(());
+            }
+            match tokens[*pos] {
+                ArithToken::RParen => {
+                    *pos += 1;
+                    Ok(val)
+                }
+                _ => Err(()),
+            }
+        }
+        _ => Err(()),
     }
 }
 

@@ -474,6 +474,22 @@ fn expect_unsupported_bash(script: &str) {
     );
 }
 
+/// Parse and execute a Bash-dialect script, returning the exit status or 1 on error.
+/// Unlike `bash_exec_ok`, this does not panic on execution errors.
+fn bash_exec_result(script: &str) -> i32 {
+    let program = thaum::parse_with(script, Dialect::Bash)
+        .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+
+    let mut executor = test_executor();
+
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => status,
+        Err(ExecError::ExitRequested(code)) => code,
+        Err(_) => 1,
+    }
+}
+
 /// Parse and execute a Bash-dialect script, capturing stdout. Returns (stdout, exit_status).
 fn bash_exec_ok(script: &str) -> (String, i32) {
     let program = thaum::parse_with(script, Dialect::Bash)
@@ -1153,4 +1169,85 @@ fn assoc_array_unset_element() {
 fn assoc_array_unset_whole() {
     let (out, _) = bash_exec_ok("declare -A m; m[a]=1; unset m; echo \"${m[@]}\"");
     assert_eq!(out, "\n");
+}
+
+// --- declare/typeset builtin ---
+
+#[test]
+fn declare_indexed_array() {
+    // NOTE: `declare -a a=(1 2 3)` is not yet supported because the parser
+    // does not handle compound array assignment in argument position.
+    // Use separate assignment instead.
+    let (out, _) = bash_exec_ok("declare -a a; a=(1 2 3); echo ${a[1]}");
+    assert_eq!(out, "2\n");
+}
+
+#[test]
+fn declare_assoc_array_inline() {
+    // Note: declare -A m=([k]=v) requires the parser to handle compound assignment
+    // For now test the simpler form
+    let (out, _) = bash_exec_ok("declare -A m; m[k]=v; echo ${m[k]}");
+    assert_eq!(out, "v\n");
+}
+
+#[test]
+fn declare_readonly() {
+    let status = bash_exec_result("declare -r x=42; x=99");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn declare_export() {
+    let (out, _) = bash_exec_ok("declare -x MYVAR=hello; echo $MYVAR");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn declare_integer() {
+    let (out, _) = bash_exec_ok("declare -i x; x='2+3'; echo $x");
+    assert_eq!(out, "5\n");
+}
+
+#[test]
+fn declare_integer_assign() {
+    // TODO: x+=5 requires parser support for += variable assignment.
+    // For now, test integer arithmetic via plain assignment.
+    let (out, _) = bash_exec_ok("declare -i x=10; x='x+5'; echo $x");
+    assert_eq!(out, "15\n");
+}
+
+#[test]
+fn declare_local_in_function() {
+    let (out, _) = bash_exec_ok("f() { declare x=inner; echo $x; }; x=outer; f; echo $x");
+    assert_eq!(out, "inner\nouter\n");
+}
+
+#[test]
+fn declare_global_in_function() {
+    let (out, _) = bash_exec_ok("f() { declare -g x=global; }; f; echo $x");
+    assert_eq!(out, "global\n");
+}
+
+#[test]
+fn typeset_is_synonym() {
+    let (out, _) = bash_exec_ok("typeset -i x=5; echo $x");
+    assert_eq!(out, "5\n");
+}
+
+#[test]
+fn declare_print_scalar() {
+    let (out, _) = bash_exec_ok("x=hello; declare -p x");
+    assert!(out.contains("declare") && out.contains("x=") && out.contains("hello"));
+}
+
+#[test]
+fn declare_lowercase() {
+    let (out, _) = bash_exec_ok("declare -l x; x=HELLO; echo $x");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn declare_uppercase() {
+    let (out, _) = bash_exec_ok("declare -u x; x=hello; echo $x");
+    assert_eq!(out, "HELLO\n");
 }

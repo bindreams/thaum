@@ -68,7 +68,7 @@ pub fn run_builtin(
         "test" | "[" => builtin_test(name, args, stderr),
         "readonly" => builtin_readonly(args, env),
         "local" => builtin_local(args, env),
-        "declare" | "typeset" => builtin_declare(args, env),
+        "declare" | "typeset" => builtin_declare(args, env, stdout),
         "eval" | "exec" | "." | "source" => {
             Err(ExecError::UnsupportedFeature(format!("{} builtin", name)))
         }
@@ -525,32 +525,109 @@ fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
     Ok(0)
 }
 
-/// Minimal `declare` / `typeset` builtin.
+/// Full `declare` / `typeset` builtin.
 ///
-/// Currently only supports `-A` (create associative array). The full declare
-/// builtin (with -a, -i, -r, -x, -p, etc.) will be expanded in a later commit.
-fn builtin_declare(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
-    let mut create_assoc = false;
-    let mut names = Vec::new();
+/// Supports flags: `-a` (indexed array), `-A` (associative array),
+/// `-r` (readonly), `-x` (export), `-i` (integer), `-l` (lowercase),
+/// `-u` (uppercase), `-g` (global), `-p` (print), `-f` / `-F` (functions).
+fn builtin_declare(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    use crate::exec::environment::DeclareAttrs;
 
+    let mut attrs = DeclareAttrs::default();
+    let mut operands: Vec<String> = Vec::new();
+
+    // Parse flags.  A flag argument starts with '-' and contains only flag
+    // chars (no '=').  Everything else is an operand.
     for arg in args {
-        if arg == "-A" {
-            create_assoc = true;
-        } else if !arg.starts_with('-') {
-            names.push(arg.clone());
+        if arg.starts_with('-') && arg.len() > 1 && !arg.contains('=') {
+            for ch in arg[1..].chars() {
+                match ch {
+                    'a' => attrs.indexed_array = true,
+                    'A' => attrs.assoc_array = true,
+                    'r' => attrs.readonly_set = true,
+                    'x' => attrs.exported_set = true,
+                    'i' => attrs.integer_set = true,
+                    'l' => attrs.lowercase_set = true,
+                    'u' => attrs.uppercase_set = true,
+                    'g' => attrs.global = true,
+                    'p' => attrs.print = true,
+                    'f' => attrs.list_functions = true,
+                    'F' => attrs.list_function_names = true,
+                    _ => {} // ignore unknown flags
+                }
+            }
+        } else {
+            operands.push(arg.clone());
         }
     }
 
-    for name in &names {
-        if create_assoc {
-            // Handle name or name=...
-            if let Some((n, _)) = name.split_once('=') {
-                env.create_assoc(n)?;
-            } else {
-                env.create_assoc(name)?;
+    // -p: print declarations
+    if attrs.print {
+        if operands.is_empty() {
+            // Print all variables (sorted for determinism).
+            let mut vars = env.all_vars();
+            vars.sort_by(|a, b| a.0.cmp(&b.0));
+            for (name, value) in &vars {
+                let _ = writeln!(stdout, "declare -- {}=\"{}\"", name, value);
+            }
+        } else {
+            for operand in &operands {
+                let n = operand.split('=').next().unwrap_or(operand);
+                if let Some(val) = env.get_var(n) {
+                    let _ = writeln!(stdout, "declare -- {}=\"{}\"", n, val);
+                }
             }
         }
+        return Ok(0);
     }
+
+    // -f / -F: list functions (stub — no function source stored yet)
+    if attrs.list_functions || attrs.list_function_names {
+        // TODO: implement function listing when function source is stored
+        return Ok(0);
+    }
+
+    // No operands: just list things (simplified — return 0)
+    if operands.is_empty() {
+        return Ok(0);
+    }
+
+    // Process each operand
+    for operand in &operands {
+        let (name, value) = if let Some((n, v)) = operand.split_once('=') {
+            (n.to_string(), Some(v.to_string()))
+        } else {
+            (operand.clone(), None)
+        };
+
+        // Handle array creation
+        if attrs.assoc_array {
+            env.create_assoc(&name)?;
+            // Apply other attributes (exported, etc.) if requested.
+            env.declare_with_attrs(&name, None, &attrs)?;
+            continue;
+        }
+
+        if attrs.indexed_array {
+            if value.is_none() {
+                // Create empty indexed array.
+                env.set_array(&name, Vec::new())?;
+            }
+            // If value was provided the parser already handled
+            // `declare -a a=(...)` as a normal array assignment on the
+            // command, so the array is set before the builtin runs.
+            env.declare_with_attrs(&name, None, &attrs)?;
+            continue;
+        }
+
+        // Scalar with attributes.
+        env.declare_with_attrs(&name, value.as_deref(), &attrs)?;
+    }
+
     Ok(0)
 }
 

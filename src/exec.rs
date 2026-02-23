@@ -661,7 +661,15 @@ impl Executor {
             match &assignment.value {
                 crate::ast::AssignmentValue::Scalar(word) => {
                     let value = self.expand_word(word)?;
-                    self.env.set_var(&assignment.name, &value)?;
+                    if self.env.has_integer_attr(&assignment.name) {
+                        let arith_value = match crate::parser::arith_expr::parse_arith_expr(&value) {
+                            Ok(expr) => arithmetic::evaluate_arith_expr(&expr, &mut self.env)?,
+                            Err(_) => 0,
+                        };
+                        self.env.set_var(&assignment.name, &arith_value.to_string())?;
+                    } else {
+                        self.env.set_var(&assignment.name, &value)?;
+                    }
                 }
                 crate::ast::AssignmentValue::BashArray(words) => {
                     let mut elements = Vec::new();

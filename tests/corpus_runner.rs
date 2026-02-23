@@ -417,6 +417,27 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
         }
     }
 
+    // 4. POSIX-rejection check: bash tests that also parse+execute in POSIX mode
+    //    may indicate ungated bash features or misclassified dialect.
+    //    Controlled by POSIX_REJECTION_CHECK=1 env var (off by default).
+    if spec.dialect.as_str() == "bash" && spec.is_valid && std::env::var("POSIX_REJECTION_CHECK").is_ok() {
+        if let Ok(posix_program) = thaum::parse_with(input, thaum::Dialect::Posix) {
+            let posix_options = thaum::Dialect::Posix.options();
+            let mut posix_exec = thaum::exec::Executor::with_options(posix_options);
+            let _ = posix_exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+            let mut posix_io = thaum::exec::CapturedIo::new();
+            let posix_result = posix_exec.execute(&posix_program, &mut posix_io.context());
+            if let Ok(status) = posix_result {
+                if status == 0 {
+                    eprintln!(
+                        "POSIX-COMPAT: bash test '{}' also passes in POSIX mode (status 0)",
+                        spec.name
+                    );
+                }
+            }
+        }
+    }
+
     Ok(())
 }
 

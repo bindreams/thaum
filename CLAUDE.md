@@ -1,7 +1,15 @@
 # Shell Parser Development Guidelines
 
-## Test-Driven Development
-Write tests before or alongside implementation. Do not verify things by manually running them — write tests instead. When adding a new feature, write a failing test first, then implement until it passes.
+## Important rules
+- **Important!** Follow TDD - test-driven development! In particular:
+  - Write tests before implementing functionality of fixing bugs;
+  - Write tests instead of or in addition to manually verifying.
+- Avoid letting files grow too large. If tempted to add section comments in the file, always consider breaking it up into several, perhaps organized into a folder.
+- Use `foo.rs` + `foo/` module style instead of `mod.rs`.
+- Debug asserts and contracts are encouraged and should be considered zero-cost.
+- Adding a new crate to dependencies is always preferable to implementing functionality manually.
+- Place unit tests in a separate file (e.g. `dir/foo_tests.rs` for `dir/foo.rs`).
+- Group integration tests by the functionality they test, not by current task, origin, or failure state.
 
 ## Correctness
 - **Tests must match shell specification.** When writing tests, verify that the expected AST matches what bash/POSIX sh would actually execute. When in doubt, test in a real shell first.
@@ -25,14 +33,15 @@ Place contracts on every function where there is a meaningful invariant to check
 
 ## Pre-commit checklist
 Before every commit, run these three commands and fix any issues they report:
-```sh
-cargo test --features cli       # all tests must pass (including CLI output tests)
-cargo clippy --all-targets --features cli -- -D warnings   # zero warnings
-cargo fmt                       # auto-format; commit the result
-```
+1. Run `cargo test --features cli`: all tests pass
+2. Run `cargo clippy --all-targets --features cli -- -D warnings`: no linter warnings
+3. Run `cargo fmt`: formatting is correct
+4. Update stale information in documentation:
+   - `README.md`: General information for new users
+   - `CONTRIBUTING.md`: Guidance for contributors (people and LLMs)
+   - `CLAUDE.md`: Instructions specifically for LLM agents
 
 ## Architecture
-
 See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, dialect system, adding new features).
 
 ### Lexer/Parser pipeline
@@ -53,6 +62,23 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
 - `src/lexer/` — context-free tokenizer (char_source, heredoc, operators, word_scan)
 - `src/parser/` — recursive descent (expressions, commands, compound, bash, helpers)
 - `src/word/` — word expansion parsing (fragments, params, substitution)
-- `src/exec/` — runtime evaluation (arithmetic)
+- `src/exec/` — runtime execution engine:
+  - `exec.rs` — Executor struct, main dispatch, alias expansion
+  - `environment.rs` — variables, functions, scoping, arrays, aliases, declare attrs
+  - `builtins.rs` — builtin commands (echo, cd, test, declare, printf, etc.)
+  - `special_builtins.rs` — eval, exec, source (need Executor access)
+  - `arithmetic.rs` — arithmetic expression evaluation
+  - `bash_test.rs` — `[[ ]]` conditional evaluator
+  - `printf.rs` — printf builtin formatter (custom, not Rust format!)
+  - `expand.rs` — word expansion (parameters, tilde, substitution)
+  - `compound.rs` — compound command execution (if/while/for/case)
+  - `pipeline.rs` — pipeline execution
+  - `external.rs` + `command_ex.rs` — external process spawning
+  - `redirect.rs` — I/O redirection
+  - `subshell.rs` — subshell payload types
+  - `numeric.rs` — shared shell-style numeric parsing
+  - `pattern.rs` — shell glob pattern matching
+  - `io_context.rs` — I/O context abstraction
+  - `error.rs` — ExecError types
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
 - `tests/` — split by topic: commands, pipelines, compound, redirects, errors, word_expansion, bash_features, cli_output, exec_basic, exec_conformance

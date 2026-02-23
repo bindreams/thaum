@@ -9,16 +9,6 @@ cargo clippy --features cli   # lint
 cargo fmt                     # format
 ```
 
-## Test-driven development
-
-Write tests before or alongside implementation. When adding a feature:
-
-1. Write a failing test that describes the expected behavior
-2. Implement until the test passes
-3. Run `cargo clippy` and `cargo fmt`
-
-Do not verify things by manually running them — write tests instead.
-
 ## Project structure
 
 ```
@@ -52,8 +42,24 @@ src/
     subst.rs           — command substitution, arithmetic expansion
 
   exec/
-    mod.rs             — runtime evaluation entry point
+    mod.rs             — Executor struct, main dispatch, alias expansion
+    environment.rs     — Environment: variables, functions, scoping, arrays, aliases
+    builtins.rs        — builtin commands (echo, cd, test, declare, printf, etc.)
+    special_builtins.rs — eval, exec, source (need Executor access)
     arithmetic.rs      — arithmetic expression evaluator
+    bash_test.rs       — [[ ]] conditional evaluator
+    printf.rs          — printf builtin formatter
+    expand.rs          — word expansion (parameters, tilde, substitution)
+    compound.rs        — compound command execution (if/while/for/case)
+    pipeline.rs        — pipeline execution
+    external.rs        — external process spawning
+    command_ex.rs      — cross-platform Command wrapper (FD mapping)
+    redirect.rs        — I/O redirection handling
+    subshell.rs        — subshell payload types (serialized state)
+    numeric.rs         — shared shell-style numeric parsing (hex, octal, char)
+    pattern.rs         — shell glob pattern matching
+    io_context.rs      — I/O context abstraction (stdin/stdout/stderr)
+    error.rs           — ExecError type definitions
 
   cli/
     mod.rs             — CLI arg parsing and dispatch
@@ -75,22 +81,24 @@ tests/
   cli_output.rs     — CLI output format regression tests (requires --features cli)
   exec_basic.rs     — basic execution tests
   exec_conformance.rs — execution conformance tests
+  corpus_runner.rs  — oils corpus test runner (custom harness)
+  parse_known_failures.rs — known parser failures tracking
 ```
 
 ## Architecture
 
 ### AST naming
 
-| Type | Role |
-|------|------|
-| `Statement` | Top-level wrapper: `Expression` + `ExecutionMode`. Only at list boundaries. |
-| `Expression` | Inner command tree: `Command`, `Compound`, `FunctionDef`, `And`, `Or`, `Pipe`, `Not`. |
-| `Command` | Simple command: `arguments`, assignments, redirects. |
-| `Argument` | One slot in a command's argument list: `Word(Word)` or `Atom(Atom)`. |
-| `Word` | Composed argument: `Vec<Fragment>` — concatenated pieces forming one shell word. |
-| `Fragment` | Concatenable piece within a word: `Literal`, `SingleQuoted`, `Parameter`, etc. |
-| `Atom` | Standalone argument that cannot be concatenated (e.g. `BashProcessSubstitution`). |
-| `AssignmentValue` | Right side of `=`: `Scalar(Word)` or `BashArray(Vec<Word>)`. |
+| Type              | Role                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| `Statement`       | Top-level wrapper: `Expression` + `ExecutionMode`. Only at list boundaries.           |
+| `Expression`      | Inner command tree: `Command`, `Compound`, `FunctionDef`, `And`, `Or`, `Pipe`, `Not`. |
+| `Command`         | Simple command: `arguments`, assignments, redirects.                                  |
+| `Argument`        | One slot in a command's argument list: `Word(Word)` or `Atom(Atom)`.                  |
+| `Word`            | Composed argument: `Vec<Fragment>` — concatenated pieces forming one shell word.      |
+| `Fragment`        | Concatenable piece within a word: `Literal`, `SingleQuoted`, `Parameter`, etc.        |
+| `Atom`            | Standalone argument that cannot be concatenated (e.g. `BashProcessSubstitution`).     |
+| `AssignmentValue` | Right side of `=`: `Scalar(Word)` or `BashArray(Vec<Word>)`.                          |
 
 `ExecutionMode` has three variants:
 - `Sequential` — newline-terminated or last in list

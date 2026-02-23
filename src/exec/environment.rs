@@ -111,6 +111,9 @@ pub struct Environment {
     scope_stack: Vec<Scope>,
     aliases: HashMap<String, String>,
     expand_aliases: bool,
+    errexit: bool,
+    nounset: bool,
+    xtrace: bool,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -149,6 +152,9 @@ impl Environment {
             scope_stack: Vec::new(),
             aliases: HashMap::new(),
             expand_aliases: false,
+            errexit: false,
+            nounset: false,
+            xtrace: false,
         };
 
         let _ = env.set_var("IFS", " \t\n");
@@ -894,6 +900,36 @@ impl Environment {
         self.expand_aliases = enabled;
     }
 
+    /// Whether `set -e` (errexit) is enabled.
+    pub fn errexit_enabled(&self) -> bool {
+        self.errexit
+    }
+
+    /// Enable or disable `set -e` (errexit).
+    pub fn set_errexit(&mut self, enabled: bool) {
+        self.errexit = enabled;
+    }
+
+    /// Whether `set -u` (nounset) is enabled.
+    pub fn nounset_enabled(&self) -> bool {
+        self.nounset
+    }
+
+    /// Enable or disable `set -u` (nounset).
+    pub fn set_nounset(&mut self, enabled: bool) {
+        self.nounset = enabled;
+    }
+
+    /// Whether `set -x` (xtrace) is enabled.
+    pub fn xtrace_enabled(&self) -> bool {
+        self.xtrace
+    }
+
+    /// Enable or disable `set -x` (xtrace).
+    pub fn set_xtrace(&mut self, enabled: bool) {
+        self.xtrace = enabled;
+    }
+
     /// Import all environment variables from the current OS process, marking them exported.
     pub fn inherit_from_process(&mut self) {
         for (key, value) in std::env::vars() {
@@ -924,6 +960,9 @@ impl Environment {
             last_exit_status: self.last_exit_status,
             aliases: self.aliases.clone(),
             expand_aliases: self.expand_aliases,
+            errexit: self.errexit,
+            nounset: self.nounset,
+            xtrace: self.xtrace,
             cwd: self.cwd.clone(),
         }
     }
@@ -945,6 +984,9 @@ impl Environment {
             scope_stack: Vec::new(),
             aliases: s.aliases,
             expand_aliases: s.expand_aliases,
+            errexit: s.errexit,
+            nounset: s.nounset,
+            xtrace: s.xtrace,
         }
     }
 }
@@ -959,6 +1001,9 @@ pub struct SerializedEnvironment {
     pub last_exit_status: i32,
     pub aliases: HashMap<String, String>,
     pub expand_aliases: bool,
+    pub errexit: bool,
+    pub nounset: bool,
+    pub xtrace: bool,
     pub cwd: PathBuf,
 }
 

@@ -29,6 +29,9 @@ pub enum ExecError {
     #[error("{0}: {1}")]
     InvalidNumber(String, String),
 
+    #[error("{0}: unbound variable")]
+    UnboundVariable(String),
+
     #[error("unsupported feature: {0}")]
     UnsupportedFeature(String),
 

@@ -33,12 +33,18 @@ impl Executor {
                 else_body,
                 ..
             } => {
+                let saved = self.errexit_suppressed;
+                self.errexit_suppressed = true;
                 let cond_status = self.execute_lines(condition, io)?;
+                self.errexit_suppressed = saved;
                 if cond_status == 0 {
                     return self.execute_lines(then_body, io);
                 }
                 for elif in elifs {
+                    let saved = self.errexit_suppressed;
+                    self.errexit_suppressed = true;
                     let elif_status = self.execute_lines(&elif.condition, io)?;
+                    self.errexit_suppressed = saved;
                     if elif_status == 0 {
                         return self.execute_lines(&elif.body, io);
                     }
@@ -53,7 +59,10 @@ impl Executor {
             CompoundCommand::WhileClause { condition, body, .. } => {
                 let mut status = 0;
                 loop {
+                    let saved = self.errexit_suppressed;
+                    self.errexit_suppressed = true;
                     let cond_status = self.execute_lines(condition, io)?;
+                    self.errexit_suppressed = saved;
                     if cond_status != 0 {
                         break;
                     }
@@ -76,7 +85,10 @@ impl Executor {
             CompoundCommand::UntilClause { condition, body, .. } => {
                 let mut status = 0;
                 loop {
+                    let saved = self.errexit_suppressed;
+                    self.errexit_suppressed = true;
                     let cond_status = self.execute_lines(condition, io)?;
+                    self.errexit_suppressed = saved;
                     if cond_status == 0 {
                         break;
                     }

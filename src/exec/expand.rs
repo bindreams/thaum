@@ -187,11 +187,21 @@ fn resolve_var(name: &str, env: &Environment) -> Option<String> {
     env.resolve_element(name)
 }
 
+/// Returns true if a parameter name refers to a special parameter that is
+/// always defined (`?`, `#`, `0`, `$`, `!`, `@`, `*`, or a numeric positional).
+fn is_special_param(name: &str) -> bool {
+    matches!(name, "?" | "#" | "0" | "$" | "!" | "@" | "*") || name.parse::<usize>().is_ok()
+}
+
 /// Expand a parameter expansion.
 fn expand_parameter(param: &ParameterExpansion, env: &mut Environment, out: &mut String) -> Result<(), ExecError> {
     match param {
         ParameterExpansion::Simple(name) => {
-            if let Some(val) = resolve_var(name, env) {
+            let value = resolve_var(name, env);
+            if value.is_none() && env.nounset_enabled() && !is_special_param(name) {
+                return Err(ExecError::UnboundVariable(name.clone()));
+            }
+            if let Some(val) = value {
                 out.push_str(&val);
             }
         }
@@ -220,6 +230,9 @@ fn expand_complex_parameter(
 
     match operator {
         None => {
+            if value.is_none() && env.nounset_enabled() && !is_special_param(name) {
+                return Err(ExecError::UnboundVariable(name.to_string()));
+            }
             if let Some(val) = value {
                 out.push_str(&val);
             }

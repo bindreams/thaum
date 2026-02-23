@@ -647,10 +647,7 @@ fn unsupported_compound_redirect() {
 
 // subshell is now supported — see subshell_* tests below
 
-#[test]
-fn unsupported_set_options() {
-    expect_unsupported("set -e");
-}
+// set -e is now supported — see set_e_* tests below.
 
 // [[ ]] is now implemented — see bash_cond_* tests below.
 
@@ -1658,4 +1655,97 @@ fn bash_cond_bare_empty() {
     // Empty string is false
     let (_, status) = bash_exec_ok("[[ '' ]]");
     assert_eq!(status, 1);
+}
+
+// set -x (xtrace) -----------------------------------------------------------------------------------------------------
+
+#[test]
+fn set_x_basic() {
+    // xtrace goes to stderr; stdout should only contain the echo output
+    let (out, status) = exec_ok("set -x; echo hello");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn set_x_off() {
+    let (out, _) = exec_ok("set -x; set +x; echo hello");
+    assert_eq!(out, "hello\n");
+}
+
+// set -u (nounset) ----------------------------------------------------------------------------------------------------
+
+#[test]
+fn set_u_unset_var() {
+    let status = exec_result("set -u; echo $nonexistent_xyz");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn set_u_set_var() {
+    let (out, _) = exec_ok("set -u; x=hi; echo $x");
+    assert_eq!(out, "hi\n");
+}
+
+#[test]
+fn set_u_default() {
+    let (out, _) = exec_ok("set -u; echo ${nonexistent_xyz:-fallback}");
+    assert_eq!(out, "fallback\n");
+}
+
+#[test]
+fn set_u_special() {
+    let (out, _) = exec_ok("set -u; echo $?");
+    assert_eq!(out, "0\n");
+}
+
+#[test]
+fn set_u_off() {
+    let (out, _) = exec_ok("set -u; set +u; echo ${nonexistent_xyz}done");
+    assert_eq!(out, "done\n");
+}
+
+// set -e (errexit) ----------------------------------------------------------------------------------------------------
+
+#[test]
+fn set_e_basic() {
+    // false triggers errexit — "nope" is never printed
+    let (out, status) = exec_ok("set -e; false; echo nope");
+    assert_eq!(out, "");
+    assert_ne!(status, 0);
+}
+
+#[test]
+fn set_e_if_condition() {
+    // false in if condition does NOT trigger errexit
+    let (out, _) = exec_ok("set -e; if false; then echo then; fi; echo ok");
+    assert_eq!(out, "ok\n");
+}
+
+#[test]
+fn set_e_and_chain() {
+    // false on left side of && does NOT trigger errexit
+    let (out, _) = exec_ok("set -e; false && true; echo ok");
+    assert_eq!(out, "ok\n");
+}
+
+#[test]
+fn set_e_or_chain() {
+    // false on left side of || does NOT trigger errexit
+    let (out, _) = exec_ok("set -e; false || true; echo ok");
+    assert_eq!(out, "ok\n");
+}
+
+#[test]
+fn set_e_not() {
+    // ! false (negation) does NOT trigger errexit
+    let (out, _) = exec_ok("set -e; ! false; echo ok");
+    assert_eq!(out, "ok\n");
+}
+
+#[test]
+fn set_e_off() {
+    // set +e disables errexit
+    let (out, _) = exec_ok("set -e; set +e; false; echo ok");
+    assert_eq!(out, "ok\n");
 }

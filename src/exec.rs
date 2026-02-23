@@ -59,6 +59,9 @@ pub struct Executor {
     /// Path to the thaum binary for subshell spawning.  Defaults to
     /// `std::env::current_exe()`.  Override for testing.
     exe_path: Option<std::path::PathBuf>,
+    /// Suppresses errexit (`set -e`) in guarded contexts: `if`/`while`/`until`
+    /// conditions, and the left-hand side of `&&`/`||` and `!` operands.
+    errexit_suppressed: bool,
 }
 
 impl Executor {
@@ -71,6 +74,7 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            errexit_suppressed: false,
         }
     }
 
@@ -81,6 +85,7 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            errexit_suppressed: false,
         }
     }
 
@@ -176,8 +181,17 @@ impl Executor {
         match stmt.mode {
             ExecutionMode::Background => Err(ExecError::UnsupportedFeature("background execution (&)".to_string())),
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
+                let saved = self.errexit_suppressed;
                 let status = self.execute_expression(&stmt.expression, io)?;
                 self.env.set_last_exit_status(status);
+                // Errexit check: if command failed and -e is active and not suppressed.
+                // execute_expression may have set errexit_suppressed=true during
+                // And/Or short-circuiting to signal that this result is expected.
+                if status != 0 && self.env.errexit_enabled() && !self.errexit_suppressed {
+                    return Err(ExecError::ExitRequested(status));
+                }
+                // Restore the flag to what it was before this statement.
+                self.errexit_suppressed = saved;
                 Ok(status)
             }
         }
@@ -204,17 +218,27 @@ impl Executor {
             }
 
             Expression::And { left, right } => {
+                let saved = self.errexit_suppressed;
+                self.errexit_suppressed = true;
                 let left_status = self.execute_expression(left, io)?;
+                self.errexit_suppressed = saved;
                 self.env.set_last_exit_status(left_status);
                 if left_status == 0 {
                     self.execute_expression(right, io)
                 } else {
+                    // Short-circuit: left failed, skip right.  The non-zero
+                    // status is an expected control-flow outcome of the &&
+                    // chain, so suppress errexit for this result.
+                    self.errexit_suppressed = true;
                     Ok(left_status)
                 }
             }
 
             Expression::Or { left, right } => {
+                let saved = self.errexit_suppressed;
+                self.errexit_suppressed = true;
                 let left_status = self.execute_expression(left, io)?;
+                self.errexit_suppressed = saved;
                 self.env.set_last_exit_status(left_status);
                 if left_status != 0 {
                     self.execute_expression(right, io)
@@ -229,8 +253,12 @@ impl Executor {
             }
 
             Expression::Not(inner) => {
+                let saved = self.errexit_suppressed;
+                self.errexit_suppressed = true;
                 let status = self.execute_expression(inner, io)?;
-                Ok(if status == 0 { 1 } else { 0 })
+                self.errexit_suppressed = saved;
+                let negated = if status == 0 { 1 } else { 0 };
+                Ok(negated)
             }
         }
     }
@@ -521,6 +549,12 @@ impl Executor {
         // without a command). Redirect handles are dropped when `active` goes
         // out of scope.
         let mut active = self.resolve_redirects(&cmd.redirects)?;
+
+        // Xtrace: print expanded command to stderr before dispatch.
+        if self.env.xtrace_enabled() && !expanded_args.is_empty() {
+            let ps4 = self.env.get_var("PS4").unwrap_or("+ ").to_string();
+            let _ = writeln!(io.stderr, "{}{}", ps4, expanded_args.join(" "));
+        }
 
         // If no command name, just process assignments
         if expanded_args.is_empty() {

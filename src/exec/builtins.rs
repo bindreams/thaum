@@ -391,16 +391,65 @@ fn builtin_set(args: &[String], env: &mut Environment) -> Result<i32, ExecError>
         return Ok(0);
     }
 
-    if args[0] == "--" {
-        // `set -- arg1 arg2 ...` sets positional parameters
-        env.set_positional_params(args[1..].to_vec());
-        return Ok(0);
+    let mut i = 0;
+    while i < args.len() {
+        let arg = &args[i];
+        if arg == "--" {
+            // `set -- arg1 arg2 ...` sets positional parameters
+            env.set_positional_params(args[i + 1..].to_vec());
+            return Ok(0);
+        } else if arg.starts_with('-') && arg.len() > 1 {
+            // Parse -e, -u, -x, -eux, -o optname
+            if arg == "-o" {
+                i += 1;
+                if i < args.len() {
+                    match args[i].as_str() {
+                        "errexit" => env.set_errexit(true),
+                        "nounset" => env.set_nounset(true),
+                        "xtrace" => env.set_xtrace(true),
+                        _ => {}
+                    }
+                }
+            } else {
+                for ch in arg[1..].chars() {
+                    match ch {
+                        'e' => env.set_errexit(true),
+                        'u' => env.set_nounset(true),
+                        'x' => env.set_xtrace(true),
+                        _ => {}
+                    }
+                }
+            }
+        } else if arg.starts_with('+') && arg.len() > 1 {
+            // Parse +e, +u, +x etc. (disable)
+            if arg == "+o" {
+                i += 1;
+                if i < args.len() {
+                    match args[i].as_str() {
+                        "errexit" => env.set_errexit(false),
+                        "nounset" => env.set_nounset(false),
+                        "xtrace" => env.set_xtrace(false),
+                        _ => {}
+                    }
+                }
+            } else {
+                for ch in arg[1..].chars() {
+                    match ch {
+                        'e' => env.set_errexit(false),
+                        'u' => env.set_nounset(false),
+                        'x' => env.set_xtrace(false),
+                        _ => {}
+                    }
+                }
+            }
+        } else {
+            // Positional params (set arg1 arg2 ...)
+            env.set_positional_params(args[i..].to_vec());
+            return Ok(0);
+        }
+        i += 1;
     }
-
-    Err(ExecError::UnsupportedFeature(format!(
-        "shell option: {}",
-        args.join(" ")
-    )))
+    Ok(0)
 }
 
 fn builtin_test(name: &str, args: &[String], stderr: &mut dyn Write) -> Result<i32, ExecError> {

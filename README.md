@@ -1,6 +1,6 @@
 # thaum
 
-A POSIX shell syntax parser written in Rust, with optional Bash extensions.
+A POSIX shell parser and executor written in Rust, with Bash extensions.
 
 ## Library
 
@@ -17,7 +17,8 @@ let program = parse_with("cat <<< hello", Dialect::Bash).unwrap();
 ### AST structure
 
 ```
-Program → Vec<Statement>
+Program → Vec<Line>
+Line = Vec<Statement>   (newline-delimited group)
 Statement = Expression + ExecutionMode (Sequential | Terminated | Background)
 Expression = Command | Compound | FunctionDef | And | Or | Pipe | Not
 
@@ -51,7 +52,35 @@ Currently implemented Bash extensions:
 - `select` loop (`select`)
 - `function` keyword (`function_keyword`)
 
-Planned: brace expansion `{n..m}`, `=~` regex match.
+Planned: brace expansion `{n..m}`.
+
+## Executor
+
+thaum includes a runtime executor that can evaluate parsed ASTs:
+
+```rust
+use thaum::exec::{Executor, CapturedIo};
+
+let program = thaum::parse("x=hello; echo $x").unwrap();
+let mut executor = Executor::new();
+let mut io = CapturedIo::new();
+let status = executor.execute(&program, &mut io.context()).unwrap();
+assert_eq!(io.stdout_string(), "hello\n");
+assert_eq!(status, 0);
+```
+
+Supported features:
+- Variables (scalars, indexed arrays, associative arrays)
+- Functions with local scoping
+- All compound commands (if/while/until/for/case/brace groups)
+- Subshells via cross-platform process spawning
+- Pipelines and I/O redirection
+- Alias expansion with correct newline-boundary semantics
+- `[[ ]]` conditional with all operators including `=~` regex
+- Arithmetic commands `(( ))` and expansion `$(( ))`
+- Builtins: echo, printf, cd, test/[, eval, exec, source, declare/typeset,
+  export, unset, read, set, shopt, alias/unalias, local, readonly, shift,
+  return, break, continue, exit, true, false, :
 
 ## CLI tool
 

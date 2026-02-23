@@ -675,10 +675,7 @@ fn unsupported_bash_double_bracket() {
     expect_unsupported_bash("[[ -n hello ]]");
 }
 
-#[test]
-fn unsupported_eval_builtin() {
-    expect_unsupported("eval echo hello");
-}
+// eval is now implemented — see eval_* tests below.
 
 // --- DefaultAssign (${var:=default}) ---
 
@@ -1448,4 +1445,105 @@ fn printf_strftime_current() {
     let (out, _) = exec_ok("printf '%(%Y)T\\n' -1");
     let year: i32 = out.trim().parse().unwrap();
     assert!((2024..=2030).contains(&year));
+}
+
+// --- eval builtin ---
+
+#[test]
+fn eval_basic() {
+    let (out, status) = exec_ok("eval echo hello");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn eval_variable_persists() {
+    let (out, _) = exec_ok("eval 'x=42'; echo $x");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn eval_function_persists() {
+    let (out, _) = exec_ok("eval 'f() { echo hi; }'; f");
+    assert_eq!(out, "hi\n");
+}
+
+#[test]
+fn eval_concatenation() {
+    // eval joins arguments with spaces
+    let (out, _) = exec_ok("eval echo he llo");
+    assert_eq!(out, "he llo\n");
+}
+
+#[test]
+fn eval_empty() {
+    let (_, status) = exec_ok("eval ''");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn eval_exit_status() {
+    let (out, _) = exec_ok("eval false; echo $?");
+    assert_eq!(out, "1\n");
+}
+
+// --- source builtin ---
+
+#[test]
+fn source_basic() {
+    let dir = std::path::PathBuf::from("/tmp/claude/source-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("test.sh");
+    std::fs::write(&file, "x=sourced_value\n").unwrap();
+
+    let script = format!("source {}; echo $x", file.display());
+    let (out, _) = exec_ok(&script);
+    assert_eq!(out, "sourced_value\n");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn source_dot_synonym() {
+    let dir = std::path::PathBuf::from("/tmp/claude/source-dot-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("test.sh");
+    std::fs::write(&file, "y=dotted\n").unwrap();
+
+    let script = format!(". {}; echo $y", file.display());
+    let (out, _) = exec_ok(&script);
+    assert_eq!(out, "dotted\n");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn source_with_args() {
+    let dir = std::path::PathBuf::from("/tmp/claude/source-args-test");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("test.sh");
+    std::fs::write(&file, "echo $1 $2\n").unwrap();
+
+    let script = format!("source {} hello world", file.display());
+    let (out, _) = exec_ok(&script);
+    assert_eq!(out, "hello world\n");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+// --- exec builtin ---
+
+#[test]
+fn exec_command() {
+    // exec replaces the shell -- wrap in a subshell so the test runner
+    // is not replaced.
+    let (out, _) = exec_ok("(exec echo hello)");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn exec_not_found() {
+    // exec with nonexistent command -- the subshell exits 127.
+    let (out, _) = exec_ok("(exec /nonexistent/command/xyz 2>/dev/null); echo $?");
+    assert!(out.trim() != "0");
 }

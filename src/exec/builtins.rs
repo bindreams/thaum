@@ -71,8 +71,12 @@ pub fn run_builtin(
         "readonly" => builtin_readonly(args, env),
         "local" => builtin_local(args, env),
         "declare" | "typeset" => builtin_declare(args, env, stdout),
+        // eval, exec, source, and . are handled as special builtins in
+        // execute_command (they need Executor access, not just Environment).
+        // They should never reach run_builtin.
         "eval" | "exec" | "." | "source" => {
-            Err(ExecError::UnsupportedFeature(format!("{} builtin", name)))
+            debug_assert!(false, "{} should be intercepted in execute_command", name);
+            Err(ExecError::CommandNotFound(name.to_string()))
         }
         _ => Err(ExecError::CommandNotFound(name.to_string())),
     }

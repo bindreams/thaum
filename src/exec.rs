@@ -12,6 +12,7 @@ mod pattern;
 pub mod pipeline;
 pub(crate) mod printf;
 mod redirect;
+mod special_builtins;
 pub mod subshell;
 
 pub use environment::Environment;
@@ -544,6 +545,32 @@ impl Executor {
 
         let cmd_name = &expanded_args[0];
         let cmd_args = &expanded_args[1..];
+
+        // Check for special builtins (need Executor access, not just Environment).
+        match cmd_name.as_str() {
+            "eval" => {
+                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+                let mut cmd_io = active.apply_to_io(io);
+                let result = self.builtin_eval(cmd_args, &mut cmd_io);
+                self.restore_prefix_assignments(saved);
+                return result;
+            }
+            "source" | "." => {
+                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+                let mut cmd_io = active.apply_to_io(io);
+                let result = self.builtin_source(cmd_args, &mut cmd_io);
+                self.restore_prefix_assignments(saved);
+                return result;
+            }
+            "exec" => {
+                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+                let mut cmd_io = active.apply_to_io(io);
+                let result = self.builtin_exec(cmd_args, &mut cmd_io);
+                self.restore_prefix_assignments(saved);
+                return result;
+            }
+            _ => {}
+        }
 
         // Check for functions first
         if let Some(func) = self.env.get_function(cmd_name).cloned() {

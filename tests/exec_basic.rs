@@ -1251,3 +1251,201 @@ fn declare_uppercase() {
     let (out, _) = bash_exec_ok("declare -u x; x=hello; echo $x");
     assert_eq!(out, "HELLO\n");
 }
+
+// --- printf builtin ---
+
+#[test]
+fn printf_basic_string() {
+    let (out, _) = exec_ok("printf '%s\\n' hello");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn printf_basic_integer() {
+    let (out, _) = exec_ok("printf '%d\\n' 42");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn printf_hex() {
+    let (out, _) = exec_ok("printf '%x\\n' 255");
+    assert_eq!(out, "ff\n");
+}
+
+#[test]
+fn printf_hex_upper() {
+    let (out, _) = exec_ok("printf '%X\\n' 255");
+    assert_eq!(out, "FF\n");
+}
+
+#[test]
+fn printf_octal() {
+    let (out, _) = exec_ok("printf '%o\\n' 8");
+    assert_eq!(out, "10\n");
+}
+
+#[test]
+fn printf_unsigned() {
+    let (out, _) = exec_ok("printf '%u\\n' 42");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn printf_width_string() {
+    let (out, _) = exec_ok("printf '[%10s]\\n' hi");
+    assert_eq!(out, "[        hi]\n");
+}
+
+#[test]
+fn printf_left_align() {
+    let (out, _) = exec_ok("printf '[%-10s]\\n' hi");
+    assert_eq!(out, "[hi        ]\n");
+}
+
+#[test]
+fn printf_zero_pad() {
+    let (out, _) = exec_ok("printf '[%05d]\\n' 42");
+    assert_eq!(out, "[00042]\n");
+}
+
+#[test]
+fn printf_precision_string() {
+    let (out, _) = exec_ok("printf '[%.3s]\\n' hello");
+    assert_eq!(out, "[hel]\n");
+}
+
+#[test]
+fn printf_precision_integer() {
+    let (out, _) = exec_ok("printf '[%6.4d]\\n' 42");
+    assert_eq!(out, "[  0042]\n");
+}
+
+#[test]
+fn printf_float() {
+    let (out, _) = exec_ok("printf '[%.2f]\\n' 3.14159");
+    assert_eq!(out, "[3.14]\n");
+}
+
+#[test]
+fn printf_escape_newline() {
+    let (out, _) = exec_ok("printf 'a\\nb\\n'");
+    assert_eq!(out, "a\nb\n");
+}
+
+#[test]
+fn printf_escape_tab() {
+    let (out, _) = exec_ok("printf 'a\\tb\\n'");
+    assert_eq!(out, "a\tb\n");
+}
+
+#[test]
+fn printf_escape_hex() {
+    let (out, _) = exec_ok("printf '\\x41\\n'");
+    assert_eq!(out, "A\n");
+}
+
+#[test]
+fn printf_percent_literal() {
+    let (out, _) = exec_ok("printf '%%\\n'");
+    assert_eq!(out, "%\n");
+}
+
+#[test]
+fn printf_missing_arg_string() {
+    let (out, _) = exec_ok("printf '%s|%s\\n' hello");
+    assert_eq!(out, "hello|\n");
+}
+
+#[test]
+fn printf_missing_arg_int() {
+    let (out, _) = exec_ok("printf '%d\\n'");
+    assert_eq!(out, "0\n");
+}
+
+#[test]
+fn printf_cyclic_args() {
+    let (out, _) = exec_ok("printf '%s\\n' a b c");
+    assert_eq!(out, "a\nb\nc\n");
+}
+
+#[test]
+fn printf_var() {
+    let (out, _) = exec_ok("printf -v x '%d' 42; echo $x");
+    assert_eq!(out, "42\n");
+}
+
+#[test]
+fn printf_shell_quote() {
+    let (out, _) = exec_ok("printf '%q\\n' 'hello world'");
+    // Should contain some form of quoting
+    assert!(out.contains("hello") && out.contains("world"));
+    assert!(out.trim() != "hello world"); // must be quoted somehow
+}
+
+#[test]
+fn printf_backslash_b() {
+    let (out, _) = exec_ok("printf '%b\\n' 'a\\nb'");
+    assert_eq!(out, "a\nb\n");
+}
+
+#[test]
+fn printf_no_trailing_newline() {
+    let (out, _) = exec_ok("printf '%s' hello");
+    assert_eq!(out, "hello");
+}
+
+#[test]
+fn printf_hex_arg() {
+    let (out, _) = exec_ok("printf '%d\\n' 0xff");
+    assert_eq!(out, "255\n");
+}
+
+#[test]
+fn printf_octal_arg() {
+    let (out, _) = exec_ok("printf '%d\\n' 077");
+    assert_eq!(out, "63\n");
+}
+
+#[test]
+fn printf_char_arg() {
+    let (out, _) = exec_ok("printf '%d\\n' \"'A\"");
+    assert_eq!(out, "65\n");
+}
+
+#[test]
+fn printf_hash_hex() {
+    let (out, _) = exec_ok("printf '%#x\\n' 255");
+    assert_eq!(out, "0xff\n");
+}
+
+#[test]
+fn printf_hash_octal() {
+    let (out, _) = exec_ok("printf '%#o\\n' 8");
+    assert_eq!(out, "010\n");
+}
+
+#[test]
+fn printf_char_conversion() {
+    let (out, _) = exec_ok("printf '%c\\n' hello");
+    assert_eq!(out, "h\n");
+}
+
+#[test]
+fn printf_negative_zero_pad() {
+    let (out, _) = exec_ok("printf '[%010d]\\n' -42");
+    assert_eq!(out, "[-000000042]\n");
+}
+
+#[test]
+fn printf_strftime_epoch() {
+    // Epoch 0 in UTC is 1970
+    let (out, _) = exec_ok("TZ=UTC printf '%(%Y)T\\n' 0");
+    assert_eq!(out, "1970\n");
+}
+
+#[test]
+fn printf_strftime_current() {
+    let (out, _) = exec_ok("printf '%(%Y)T\\n' -1");
+    let year: i32 = out.trim().parse().unwrap();
+    assert!((2024..=2030).contains(&year));
+}

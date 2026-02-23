@@ -8,6 +8,7 @@ pub fn is_builtin(name: &str) -> bool {
     matches!(
         name,
         "echo"
+            | "printf"
             | "true"
             | "false"
             | "exit"
@@ -50,6 +51,7 @@ pub fn run_builtin(
 ) -> Result<i32, ExecError> {
     match name {
         "echo" => builtin_echo(args, stdout),
+        "printf" => builtin_printf(args, env, stdout),
         "true" | ":" => Ok(0),
         "false" => Ok(1),
         "exit" => builtin_exit(args),
@@ -93,6 +95,50 @@ fn builtin_echo(args: &[String], stdout: &mut dyn Write) -> Result<i32, ExecErro
     }
 
     Ok(0)
+}
+
+fn builtin_printf(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    if args.is_empty() {
+        return Ok(0);
+    }
+
+    let mut arg_iter = args.iter();
+    let mut var_name: Option<&str> = None;
+
+    // Check for -v VAR option
+    let first = arg_iter.next().unwrap();
+    let fmt_str;
+
+    if first == "-v" {
+        match arg_iter.next() {
+            Some(name) => var_name = Some(name.as_str()),
+            None => return Ok(1), // -v without variable name
+        }
+        match arg_iter.next() {
+            Some(f) => fmt_str = f.as_str(),
+            None => return Ok(0), // -v VAR without format
+        }
+    } else {
+        fmt_str = first.as_str();
+    }
+
+    let remaining: Vec<String> = arg_iter.cloned().collect();
+
+    if let Some(vname) = var_name {
+        // Write to buffer, then assign to variable
+        let mut buf: Vec<u8> = Vec::new();
+        let status = super::printf::printf_format(fmt_str, &remaining, &mut buf);
+        let output = String::from_utf8_lossy(&buf).into_owned();
+        env.set_var(vname, &output)?;
+        Ok(status)
+    } else {
+        let status = super::printf::printf_format(fmt_str, &remaining, stdout);
+        Ok(status)
+    }
 }
 
 fn builtin_exit(args: &[String]) -> Result<i32, ExecError> {

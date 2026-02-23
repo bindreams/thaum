@@ -9,6 +9,7 @@ mod external;
 pub mod io_context;
 mod pattern;
 pub mod pipeline;
+pub(crate) mod printf;
 mod redirect;
 pub mod subshell;
 

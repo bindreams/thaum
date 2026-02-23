@@ -188,25 +188,11 @@ pub(crate) fn parse_array_subscript(name: &str) -> Option<(&str, &str)> {
 
 /// Resolve a parameter name to its string value, handling array subscripts.
 fn resolve_var(name: &str, env: &Environment) -> Option<String> {
+    // Special parameters ($?, $#, $0, $$, etc.) take priority.
     if let Some(val) = env.get_special(name) {
         return Some(val);
     }
-    if let Some((base, subscript)) = parse_array_subscript(name) {
-        match subscript {
-            "@" | "*" => env.get_array_all(base).map(|elems| elems.join(" ")),
-            _ => {
-                if env.is_assoc_array(base) {
-                    env.get_assoc_element(base, subscript)
-                        .map(|s| s.to_string())
-                } else {
-                    let index: usize = subscript.parse().unwrap_or(0);
-                    env.get_array_element(base, index).map(|s| s.to_string())
-                }
-            }
-        }
-    } else {
-        env.get_var(name).map(|s| s.to_string())
-    }
+    env.resolve_element(name)
 }
 
 /// Expand a parameter expansion.

@@ -480,6 +480,46 @@ impl Environment {
         Ok(())
     }
 
+    // --- Combined element access (scalar + array subscript dispatch) ---
+
+    /// Read a variable element by name, handling array subscripts.
+    ///
+    /// Handles `"a[0]"` (indexed), `"a[key]"` (assoc), `"a[@]"` / `"a[*]"` (all),
+    /// and plain `"a"` (scalar).
+    pub fn resolve_element(&self, name: &str) -> Option<String> {
+        if let Some((base, subscript)) = crate::exec::expand::parse_array_subscript(name) {
+            match subscript {
+                "@" | "*" => self.get_array_all(base).map(|v| v.join(" ")),
+                _ if self.is_assoc_array(base) => self
+                    .get_assoc_element(base, subscript)
+                    .map(|s| s.to_string()),
+                _ => {
+                    let index: usize = subscript.parse().unwrap_or(0);
+                    self.get_array_element(base, index).map(|s| s.to_string())
+                }
+            }
+        } else {
+            self.get_var(name).map(|s| s.to_string())
+        }
+    }
+
+    /// Write a variable element by name, handling array subscripts.
+    ///
+    /// Dispatches to `set_assoc_element`, `set_array_element`, or `set_var`
+    /// based on the subscript and variable type.
+    pub fn set_element(&mut self, name: &str, value: &str) -> Result<(), ExecError> {
+        if let Some((base, subscript)) = crate::exec::expand::parse_array_subscript(name) {
+            if self.is_assoc_array(base) {
+                self.set_assoc_element(base, subscript, value)
+            } else {
+                let index: usize = subscript.parse().unwrap_or(0);
+                self.set_array_element(base, index, value)
+            }
+        } else {
+            self.set_var(name, value)
+        }
+    }
+
     // --- Variable metadata ---
 
     /// Mark a variable as exported. If it doesn't exist, create it with empty value.

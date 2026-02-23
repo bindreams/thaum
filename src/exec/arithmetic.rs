@@ -62,70 +62,19 @@ fn read_var_as_i64(name: &str, env: &Environment) -> Result<i64, ExecError> {
 
 /// Read a variable value for arithmetic, handling array subscripts.
 fn read_arith_var(name: &str, env: &Environment) -> Option<String> {
-    if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
-        if env.is_assoc_array(base) {
-            env.get_assoc_element(base, subscript)
-                .map(|s| s.to_string())
-        } else {
-            let index: usize = subscript.parse().unwrap_or(0);
-            env.get_array_element(base, index).map(|s| s.to_string())
-        }
-    } else {
-        env.get_var(name).map(|s| s.to_string())
-    }
+    env.resolve_element(name)
 }
 
 /// Write a variable value for arithmetic, handling array subscripts.
 fn write_arith_var(name: &str, value: &str, env: &mut Environment) -> Result<(), ExecError> {
-    if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
-        if env.is_assoc_array(base) {
-            env.set_assoc_element(base, subscript, value)
-        } else {
-            let index: usize = subscript.parse().unwrap_or(0);
-            env.set_array_element(base, index, value)
-        }
-    } else {
-        env.set_var(name, value)
-    }
+    env.set_element(name, value)
 }
 
 /// Parse a string as i64, supporting decimal, hex (0x), and octal (0) prefixes.
 fn parse_i64(context: &str, s: &str) -> Result<i64, ExecError> {
-    let s = s.trim();
-    if s.is_empty() {
-        return Ok(0);
-    }
-
-    // Handle optional leading sign
-    let (negative, digits) = if let Some(rest) = s.strip_prefix('-') {
-        (true, rest.trim_start())
-    } else if let Some(rest) = s.strip_prefix('+') {
-        (false, rest.trim_start())
-    } else {
-        (false, s)
-    };
-
-    let abs = if let Some(hex) = digits
-        .strip_prefix("0x")
-        .or_else(|| digits.strip_prefix("0X"))
-    {
-        i64::from_str_radix(hex, 16)
-    } else if digits.starts_with('0')
-        && digits.len() > 1
-        && digits.bytes().all(|b| b.is_ascii_digit())
-    {
-        i64::from_str_radix(digits, 8)
-    } else {
-        digits.parse::<i64>()
-    };
-
-    match abs {
-        Ok(v) => Ok(if negative { v.wrapping_neg() } else { v }),
-        Err(_) => Err(ExecError::InvalidNumber(
-            format!("{}: expression", context),
-            s.to_string(),
-        )),
-    }
+    super::numeric::parse_shell_int(s).map_err(|()| {
+        ExecError::InvalidNumber(format!("{}: expression", context), s.trim().to_string())
+    })
 }
 
 /// Evaluate a binary operation.

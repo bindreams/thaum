@@ -7,6 +7,7 @@ pub mod error;
 pub mod expand;
 mod external;
 pub mod io_context;
+pub(crate) mod numeric;
 mod pattern;
 pub mod pipeline;
 pub(crate) mod printf;

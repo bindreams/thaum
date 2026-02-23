@@ -289,46 +289,9 @@ fn get_arg_str(args: &[String], idx: &mut usize) -> String {
 /// character code ('A), signs, and leading whitespace.
 /// Returns (value, had_error).
 fn parse_int_arg(s: &str) -> (i64, bool) {
-    let s = s.trim();
-    if s.is_empty() {
-        return (0, false);
-    }
-
-    // Character code: 'X or "X
-    if (s.starts_with('\'') || s.starts_with('"')) && s.len() >= 2 {
-        let ch = s.as_bytes()[1];
-        return (ch as i64, false);
-    }
-
-    // Determine sign
-    let (negative, digits) = if let Some(rest) = s.strip_prefix('-') {
-        (true, rest)
-    } else if let Some(rest) = s.strip_prefix('+') {
-        (false, rest)
-    } else {
-        (false, s)
-    };
-
-    let result = if let Some(hex) = digits
-        .strip_prefix("0x")
-        .or_else(|| digits.strip_prefix("0X"))
-    {
-        i64::from_str_radix(hex, 16)
-    } else if digits.starts_with('0')
-        && digits.len() > 1
-        && digits.bytes().all(|b| b.is_ascii_digit())
-    {
-        i64::from_str_radix(digits, 8)
-    } else {
-        digits.parse::<i64>()
-    };
-
-    match result {
-        Ok(v) => {
-            let v = if negative { -v } else { v };
-            (v, false)
-        }
-        Err(_) => (0, true),
+    match super::numeric::parse_shell_int(s) {
+        Ok(v) => (v, false),
+        Err(()) => (0, true),
     }
 }
 
@@ -496,6 +459,36 @@ fn format_string(spec: &FormatSpec, arg: &str, out: &mut dyn Write) {
 }
 
 // ---------------------------------------------------------------------------
+// Shared integer formatting core
+// ---------------------------------------------------------------------------
+
+/// Shared formatting for integer-family specifiers (%d, %u, %x, %o).
+///
+/// Takes pre-computed `prefix` (sign or radix marker) and `digits` (absolute
+/// value in the appropriate radix), applies precision zero-padding and width
+/// padding, and writes the result.
+fn format_int_core(prefix: &str, digits: &str, spec: &FormatSpec, out: &mut dyn Write) {
+    // Precision: minimum number of digits (zero-padded)
+    let padded_digits = match spec.precision {
+        Some(p) if p > digits.len() => format!("{}{}", "0".repeat(p - digits.len()), digits),
+        _ => digits.to_string(),
+    };
+
+    let total = prefix.len() + padded_digits.len();
+    let width = spec.width.unwrap_or(0);
+
+    if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
+        // Zero-pad between prefix and digits
+        let zeros = "0".repeat(width - total);
+        let content = format!("{}{}{}", prefix, zeros, padded_digits);
+        let _ = out.write_all(content.as_bytes());
+    } else {
+        let content = format!("{}{}", prefix, padded_digits);
+        pad_and_write(&content, spec.width, spec.left_align, ' ', out);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Signed integer formatting (%d, %i)
 // ---------------------------------------------------------------------------
 
@@ -511,16 +504,6 @@ fn format_signed_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
         val.unsigned_abs().to_string()
     };
 
-    // Apply precision: minimum number of digits
-    let digits = match spec.precision {
-        Some(p) if p > abs_str.len() => {
-            let zeros = "0".repeat(p - abs_str.len());
-            format!("{}{}", zeros, abs_str)
-        }
-        _ => abs_str,
-    };
-
-    // Build sign prefix
     let sign = if is_negative {
         "-"
     } else if spec.plus_sign {
@@ -531,20 +514,7 @@ fn format_signed_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
         ""
     };
 
-    // Determine effective padding
-    let total = sign.len() + digits.len();
-    let width = spec.width.unwrap_or(0);
-
-    if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
-        // Zero-pad between sign and digits
-        let zeros = "0".repeat(width - total);
-        let content = format!("{}{}{}", sign, zeros, digits);
-        let _ = out.write_all(content.as_bytes());
-    } else {
-        let content = format!("{}{}", sign, digits);
-        pad_and_write(&content, spec.width, spec.left_align, ' ', out);
-    }
-
+    format_int_core(sign, &abs_str, spec, out);
     status
 }
 
@@ -556,30 +526,10 @@ fn format_unsigned_int(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32
     let (val, had_error) = parse_int_arg(arg);
     let status = if had_error { 1 } else { 0 };
 
-    // Cast to u64 — negative wraps around
     let uval = val as u64;
-    let abs_str = uval.to_string();
+    let digits = uval.to_string();
 
-    // Apply precision
-    let digits = match spec.precision {
-        Some(p) if p > abs_str.len() => {
-            let zeros = "0".repeat(p - abs_str.len());
-            format!("{}{}", zeros, abs_str)
-        }
-        _ => abs_str,
-    };
-
-    let total = digits.len();
-    let width = spec.width.unwrap_or(0);
-
-    if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
-        let zeros = "0".repeat(width - total);
-        let content = format!("{}{}", zeros, digits);
-        let _ = out.write_all(content.as_bytes());
-    } else {
-        pad_and_write(&digits, spec.width, spec.left_align, ' ', out);
-    }
-
+    format_int_core("", &digits, spec, out);
     status
 }
 
@@ -592,19 +542,10 @@ fn format_hex(spec: &FormatSpec, arg: &str, uppercase: bool, out: &mut dyn Write
     let status = if had_error { 1 } else { 0 };
 
     let uval = val as u64;
-    let hex_str = if uppercase {
+    let digits = if uppercase {
         format!("{:X}", uval)
     } else {
         format!("{:x}", uval)
-    };
-
-    // Apply precision (minimum digits)
-    let digits = match spec.precision {
-        Some(p) if p > hex_str.len() => {
-            let zeros = "0".repeat(p - hex_str.len());
-            format!("{}{}", zeros, hex_str)
-        }
-        _ => hex_str,
     };
 
     let prefix = if spec.hash && uval != 0 {
@@ -617,18 +558,7 @@ fn format_hex(spec: &FormatSpec, arg: &str, uppercase: bool, out: &mut dyn Write
         ""
     };
 
-    let total = prefix.len() + digits.len();
-    let width = spec.width.unwrap_or(0);
-
-    if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
-        let zeros = "0".repeat(width - total);
-        let content = format!("{}{}{}", prefix, zeros, digits);
-        let _ = out.write_all(content.as_bytes());
-    } else {
-        let content = format!("{}{}", prefix, digits);
-        pad_and_write(&content, spec.width, spec.left_align, ' ', out);
-    }
-
+    format_int_core(prefix, &digits, spec, out);
     status
 }
 
@@ -641,36 +571,16 @@ fn format_octal(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     let status = if had_error { 1 } else { 0 };
 
     let uval = val as u64;
-    let oct_str = format!("{:o}", uval);
+    let digits = format!("{:o}", uval);
 
-    // Apply precision
-    let digits = match spec.precision {
-        Some(p) if p > oct_str.len() => {
-            let zeros = "0".repeat(p - oct_str.len());
-            format!("{}{}", zeros, oct_str)
-        }
-        _ => oct_str,
-    };
+    // # prefix for octal is "0" (not "0o" like Rust!).
+    // Precision zero-padding guarantees a leading '0', so the prefix is only
+    // needed when digits don't already start with '0' AND precision won't pad.
+    let needs_hash_prefix =
+        spec.hash && !digits.starts_with('0') && spec.precision.is_none_or(|p| p <= digits.len());
+    let prefix = if needs_hash_prefix { "0" } else { "" };
 
-    // # prefix for octal is "0" (not "0o" like Rust!)
-    let prefix = if spec.hash && !digits.starts_with('0') {
-        "0"
-    } else {
-        ""
-    };
-
-    let total = prefix.len() + digits.len();
-    let width = spec.width.unwrap_or(0);
-
-    if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
-        let zeros = "0".repeat(width - total);
-        let content = format!("{}{}{}", prefix, zeros, digits);
-        let _ = out.write_all(content.as_bytes());
-    } else {
-        let content = format!("{}{}", prefix, digits);
-        pad_and_write(&content, spec.width, spec.left_align, ' ', out);
-    }
-
+    format_int_core(prefix, &digits, spec, out);
     status
 }
 

@@ -1,9 +1,9 @@
 use thaum::ast::*;
-use thaum::{parse, parse_with, Dialect, ParseOptions};
+use thaum::{parse, parse_with, Dialect, ShellOptions};
 
 #[test]
 fn bash_here_string() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         here_strings: true,
         ..Default::default()
     };
@@ -56,7 +56,7 @@ fn posix_ampersand_is_background() {
 
 #[test]
 fn bash_double_brackets() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         double_brackets: true,
         ..Default::default()
     };
@@ -130,7 +130,7 @@ fn posix_rejects_double_brackets() {
 
 #[test]
 fn bash_arithmetic_command() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arithmetic_command: true,
         ..Default::default()
     };
@@ -217,7 +217,7 @@ fn posix_rejects_function_keyword() {
 
 #[test]
 fn bash_process_substitution_input() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         process_substitution: true,
         ..Default::default()
     };
@@ -246,7 +246,7 @@ fn bash_process_substitution_input() {
 
 #[test]
 fn bash_process_substitution_output() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         process_substitution: true,
         ..Default::default()
     };
@@ -272,7 +272,7 @@ fn process_substitution_requires_whitespace() {
     // `foo<(sort a)` has no space before `<`, so `<` is treated as a redirect
     // operator. Since `(sort a)` is not a valid filename (starts with `(`),
     // this is a parse error — matching bash behavior.
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         process_substitution: true,
         ..Default::default()
     };
@@ -338,7 +338,7 @@ fn bash_extended_case_continue() {
 
 #[test]
 fn bash_select_loop() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         select: true,
         ..Default::default()
     };
@@ -361,7 +361,7 @@ fn bash_select_loop() {
 
 #[test]
 fn bash_select_no_in() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         select: true,
         ..Default::default()
     };
@@ -389,7 +389,7 @@ fn posix_rejects_select() {
 
 #[test]
 fn bash_coproc_simple() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         coproc: true,
         ..Default::default()
     };
@@ -409,7 +409,7 @@ fn bash_coproc_simple() {
 
 #[test]
 fn bash_coproc_named() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         coproc: true,
         ..Default::default()
     };
@@ -443,7 +443,7 @@ fn posix_rejects_coproc() {
 
 #[test]
 fn bash_array_assignment() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arrays: true,
         ..Default::default()
     };
@@ -464,7 +464,7 @@ fn bash_array_assignment() {
 
 #[test]
 fn bash_array_assignment_empty() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arrays: true,
         ..Default::default()
     };
@@ -484,7 +484,7 @@ fn bash_array_assignment_empty() {
 
 #[test]
 fn bash_array_assignment_with_command() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arrays: true,
         ..Default::default()
     };
@@ -503,7 +503,7 @@ fn bash_array_assignment_with_command() {
 #[test]
 fn bash_pipe_stderr() {
     // cmd1 |& cmd2 — pipe both stdout and stderr
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         pipe_stderr: true,
         ..Default::default()
     };
@@ -521,7 +521,7 @@ fn bash_pipe_stderr() {
 #[test]
 fn bash_pipe_stderr_in_chain() {
     // a |& b | c — first pipe has stderr, second doesn't
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         pipe_stderr: true,
         ..Default::default()
     };
@@ -569,7 +569,7 @@ fn posix_pipe_ampersand_is_background() {
 
 #[test]
 fn bash_ansi_c_quoting() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         ansi_c_quoting: true,
         ..Default::default()
     };
@@ -593,7 +593,7 @@ fn bash_ansi_c_quoting() {
 #[test]
 fn bash_ansi_c_quoting_concatenated() {
     // prefix$'\n'suffix — three fragments
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         ansi_c_quoting: true,
         ..Default::default()
     };
@@ -630,7 +630,7 @@ fn posix_dollar_single_quote_is_dollar_plus_string() {
 
 #[test]
 fn bash_locale_quoted() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         locale_translation: true,
         ..Default::default()
     };
@@ -668,7 +668,7 @@ fn posix_dollar_double_quote_is_dollar_plus_string() {
 
 #[test]
 fn bash_extglob_zero_or_more() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         extglob: true,
         ..Default::default()
     };
@@ -693,7 +693,7 @@ fn bash_extglob_zero_or_more() {
 
 #[test]
 fn bash_extglob_not() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         extglob: true,
         ..Default::default()
     };
@@ -719,7 +719,7 @@ fn bash_extglob_not() {
 #[test]
 fn bash_extglob_in_word() {
     // file.@(txt|md) — extglob after a literal prefix
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         extglob: true,
         ..Default::default()
     };
@@ -1207,7 +1207,7 @@ fn test_expr_binary_eq_single_equals() {
 
 #[test]
 fn test_expr_unclosed_double_bracket_is_error() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         double_brackets: true,
         ..Default::default()
     };
@@ -1324,7 +1324,7 @@ fn test_expr_all_binary_word_ops() {
 
 /// Helper: parse input in Bash mode (arithmetic_command enabled) and extract ArithExpr.
 fn parse_arith_cmd(input: &str) -> ArithExpr {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arithmetic_command: true,
         ..Default::default()
     };
@@ -1493,7 +1493,7 @@ fn arith_in_word_context() {
 
 #[test]
 fn bash_arithmetic_for_basic() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arithmetic_for: true,
         arithmetic_command: true,
         ..Default::default()
@@ -1523,7 +1523,7 @@ fn bash_arithmetic_for_basic() {
 
 #[test]
 fn bash_arithmetic_for_empty_parts() {
-    let opts = ParseOptions {
+    let opts = ShellOptions {
         arithmetic_for: true,
         arithmetic_command: true,
         ..Default::default()

@@ -1,6 +1,6 @@
 //! Feature-flag system for shell dialect differences.
 //!
-//! `ParseOptions` holds one bool per syntax extension (here-strings, `[[ ]]`,
+//! `ShellOptions` holds one bool per syntax extension (here-strings, `[[ ]]`,
 //! process substitution, etc.). `Dialect` provides named presets (`Posix`,
 //! `Bash`). The lexer and parser read these flags to decide which constructs
 //! to recognize.
@@ -8,9 +8,9 @@
 /// Individual syntax features that can be toggled independently.
 ///
 /// Each field corresponds to a specific shell syntax extension beyond POSIX.
-/// `ParseOptions::default()` gives POSIX-only (all `false`).
-#[derive(Debug, Clone, Default)]
-pub struct ParseOptions {
+/// `ShellOptions::default()` gives POSIX-only (all `false`).
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct ShellOptions {
     /// `<<<` here-strings.
     pub here_strings: bool,
     /// `&>` and `&>>` redirects (redirect stdout+stderr).
@@ -47,9 +47,25 @@ pub struct ParseOptions {
     pub arithmetic_for: bool,
     /// Allow empty compound bodies (`if true; then fi`, `while false; do done`).
     pub empty_compound_body: bool,
+
+    // Execution-specific flags --------------------------------------------------------
+    /// `declare` / `typeset` builtins (Bash).
+    pub declare_builtin: bool,
+    /// `shopt` builtin (Bash).
+    pub shopt_builtin: bool,
+    /// `local` builtin (non-POSIX but universal — dash, bash, zsh all have it).
+    pub local_builtin: bool,
+    /// `declare -A` associative arrays (Bash).
+    pub assoc_arrays: bool,
+    /// `declare -n` namerefs (Bash 4.3+).
+    pub nameref: bool,
+    /// `declare -i` integer attribute (Bash).
+    pub integer_attr: bool,
+    /// `declare -l` / `declare -u` case conversion attributes (Bash 4+).
+    pub case_attrs: bool,
 }
 
-/// A named set of parse options.
+/// A named set of shell options.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Dialect {
     /// POSIX sh — no extensions.
@@ -59,11 +75,11 @@ pub enum Dialect {
 }
 
 impl Dialect {
-    /// Get the `ParseOptions` for this dialect.
-    pub fn options(&self) -> ParseOptions {
+    /// Get the `ShellOptions` for this dialect.
+    pub fn options(&self) -> ShellOptions {
         match self {
-            Dialect::Posix => ParseOptions::default(),
-            Dialect::Bash => ParseOptions {
+            Dialect::Posix => ShellOptions::default(),
+            Dialect::Bash => ShellOptions {
                 here_strings: true,
                 ampersand_redirect: true,
                 double_brackets: true,
@@ -82,6 +98,13 @@ impl Dialect {
                 extglob: true,
                 arithmetic_for: true,
                 empty_compound_body: true,
+                declare_builtin: true,
+                shopt_builtin: true,
+                local_builtin: true,
+                assoc_arrays: true,
+                nameref: true,
+                integer_attr: true,
+                case_attrs: true,
             },
         }
     }

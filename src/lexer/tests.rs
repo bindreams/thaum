@@ -6,7 +6,7 @@ use crate::token::GlobKind;
 
 /// Helper: lex all tokens from input, including Whitespace tokens.
 fn lex_all(input: &str) -> Result<Vec<Token>, LexError> {
-    let mut lexer = Lexer::from_str(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ShellOptions::default());
     let mut tokens = Vec::new();
     loop {
         let st = lexer.next_token()?;
@@ -346,7 +346,7 @@ fn lex_bang_is_just_a_word() {
 
 #[test]
 fn lex_span_tracking() {
-    let mut lexer = Lexer::from_str("echo hello", ParseOptions::default());
+    let mut lexer = Lexer::from_str("echo hello", ShellOptions::default());
     let t1 = lexer.next_token().unwrap();
     assert_eq!(t1.span, Span::new(0, 4));
     assert_eq!(t1.token, Token::Literal("echo".into()));
@@ -361,7 +361,7 @@ fn lex_span_tracking() {
 
 #[test]
 fn lex_span_operators() {
-    let mut lexer = Lexer::from_str("&&||", ParseOptions::default());
+    let mut lexer = Lexer::from_str("&&||", ShellOptions::default());
     let t1 = lexer.next_token().unwrap();
     assert_eq!(t1.span, Span::new(0, 2));
 
@@ -374,7 +374,7 @@ fn lex_span_operators() {
 #[test]
 fn lex_heredoc_basic() {
     let input = "cat <<EOF\nhello world\nEOF\n";
-    let mut lexer = Lexer::from_str(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ShellOptions::default());
 
     assert_eq!(lexer.next_token().unwrap().token, Token::Literal("cat".into()));
     assert_eq!(lexer.next_token().unwrap().token, Token::Whitespace);
@@ -389,7 +389,7 @@ fn lex_heredoc_basic() {
 #[test]
 fn lex_heredoc_strip_tabs() {
     let input = "cat <<-EOF\n\thello\n\tworld\n\tEOF\n";
-    let mut lexer = Lexer::from_str(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ShellOptions::default());
 
     lexer.next_token().unwrap(); // cat
     lexer.next_token().unwrap(); // Whitespace
@@ -403,7 +403,7 @@ fn lex_heredoc_strip_tabs() {
 #[test]
 fn lex_heredoc_unterminated() {
     let input = "cat <<EOF\nhello world\n";
-    let mut lexer = Lexer::from_str(input, ParseOptions::default());
+    let mut lexer = Lexer::from_str(input, ShellOptions::default());
 
     lexer.next_token().unwrap(); // cat
     lexer.next_token().unwrap(); // Whitespace
@@ -483,7 +483,7 @@ fn lex_lone_dollar() {
 // Token-level buffered API (migrated from token_stream_tests) ---------------------------------------------------------
 
 fn make_lexer(input: &str) -> Lexer {
-    Lexer::from_str(input, ParseOptions::default())
+    Lexer::from_str(input, ShellOptions::default())
 }
 
 #[test]

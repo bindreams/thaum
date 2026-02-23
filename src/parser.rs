@@ -13,7 +13,7 @@ mod test_expr;
 mod word_collect;
 
 use crate::ast::*;
-use crate::dialect::ParseOptions;
+use crate::dialect::ShellOptions;
 use crate::error::ParseError;
 use crate::fold::Fold;
 use crate::lexer::Lexer;
@@ -26,11 +26,11 @@ pub use helpers::expr_span;
 
 /// Parse a complete shell program from source text (POSIX mode).
 pub fn parse(input: &str) -> Result<Program, ParseError> {
-    parse_with_options(input, ParseOptions::default())
+    parse_with_options(input, ShellOptions::default())
 }
 
 /// Parse a complete shell program with the given options.
-pub fn parse_with_options(input: &str, options: ParseOptions) -> Result<Program, ParseError> {
+pub fn parse_with_options(input: &str, options: ShellOptions) -> Result<Program, ParseError> {
     let mut parser = Parser::new(input, options)?;
     let program = parser.parse_program()?;
     // Post-parse: fill heredoc bodies that were side-queued during lexing.
@@ -65,14 +65,14 @@ fn stmt(expression: Expression, span: Span) -> Statement {
 
 pub(crate) struct Parser {
     pub(super) lexer: Lexer,
-    pub(super) options: ParseOptions,
+    pub(super) options: ShellOptions,
     /// Set inside `( ... )` groups in `[[ ]]`. Tells `consume_regex_pattern`
     /// that an unmatched `)` closes the group rather than being regex content.
     pub(super) in_test_group: bool,
 }
 
 impl Parser {
-    pub fn new(input: &str, options: ParseOptions) -> Result<Self, ParseError> {
+    pub fn new(input: &str, options: ShellOptions) -> Result<Self, ParseError> {
         let lexer = Lexer::from_str(input, options.clone());
         Ok(Parser {
             lexer,

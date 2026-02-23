@@ -14,7 +14,7 @@ mod word_scan;
 use std::collections::VecDeque;
 use std::io::Read;
 
-use crate::dialect::ParseOptions;
+use crate::dialect::ShellOptions;
 use crate::error::{LexError, ParseError};
 use crate::span::{BytePos, Span};
 use crate::token::{SpannedToken, Token};
@@ -61,7 +61,7 @@ pub(super) enum LastScanned {
 /// as word boundaries.
 pub struct Lexer {
     // Constants (never change after construction) ---------------------------------------------------------------------
-    pub(crate) options: ParseOptions,
+    pub(crate) options: ShellOptions,
     mode: LexerMode,
 
     // Character source (forward-only) ---------------------------------------------------------------------------------
@@ -88,22 +88,22 @@ pub struct Lexer {
 
 impl Lexer {
     /// Create a lexer from a string source.
-    pub fn from_str(source: &str, options: ParseOptions) -> Self {
+    pub fn from_str(source: &str, options: ShellOptions) -> Self {
         Self::build(CharSource::from_str(source), options, LexerMode::Normal)
     }
 
     /// Create a lexer from any Read source.
-    pub fn from_reader(reader: impl Read + 'static, options: ParseOptions) -> Self {
+    pub fn from_reader(reader: impl Read + 'static, options: ShellOptions) -> Self {
         Self::build(CharSource::from_reader(reader), options, LexerMode::Normal)
     }
 
     /// Create a lexer in double-quote mode for parsing the inner content
     /// of a double-quoted string.
-    pub(crate) fn new_double_quote_mode(source: &str, options: ParseOptions) -> Self {
+    pub(crate) fn new_double_quote_mode(source: &str, options: ShellOptions) -> Self {
         Self::build(CharSource::from_str(source), options, LexerMode::DoubleQuote)
     }
 
-    fn build(chars: CharSource, options: ParseOptions, mode: LexerMode) -> Self {
+    fn build(chars: CharSource, options: ShellOptions, mode: LexerMode) -> Self {
         Lexer {
             options,
             mode,

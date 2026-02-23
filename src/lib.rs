@@ -28,7 +28,7 @@ pub mod visit;
 pub mod word;
 
 pub use ast::Program;
-pub use dialect::{Dialect, ParseOptions};
+pub use dialect::{Dialect, ShellOptions};
 pub use error::ParseError;
 
 /// Parse a complete shell program from source text (POSIX mode).
@@ -38,5 +38,10 @@ pub fn parse(input: &str) -> Result<Program, ParseError> {
 
 /// Parse a complete shell program with the given dialect.
 pub fn parse_with(input: &str, dialect: Dialect) -> Result<Program, ParseError> {
-    parser::parse_with_options(input, dialect.options())
+    parse_with_options(input, dialect.options())
+}
+
+/// Parse with explicit shell options (not a named dialect).
+pub fn parse_with_options(input: &str, options: ShellOptions) -> Result<Program, ParseError> {
+    parser::parse_with_options(input, options)
 }

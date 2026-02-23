@@ -17,7 +17,7 @@ src/
   main.rs              — CLI entry point (thin dispatch)
   ast.rs               — AST types: Program, Statement, Expression, Command, ...
   token.rs             — Token enum with doc comments
-  dialect.rs           — ParseOptions, Dialect (Posix/Bash)
+  dialect.rs           — ShellOptions, Dialect (Posix/Bash)
   span.rs              — byte offset spans for source locations
   error.rs             — LexError, ParseError with spans
 
@@ -226,15 +226,15 @@ shrinks from the front (on commit), never from the back.
 
 ### Dialect system
 
-- `ParseOptions` has boolean flags for individual Bash features
+- `ShellOptions` has boolean flags for individual Bash features
 - `Dialect::Posix` = all false, `Dialect::Bash` = all true
-- The lexer uses `ParseOptions` to conditionally recognize Bash-specific operator tokens (e.g., `<<<`, `&>`)
-- The parser checks `ParseOptions` before accepting Bash keywords (`function`, `select`, `coproc`)
+- The lexer uses `ShellOptions` to conditionally recognize Bash-specific operator tokens (e.g., `<<<`, `&>`)
+- The parser checks `ShellOptions` before accepting Bash keywords (`function`, `select`, `coproc`)
 - In tests, enable only the specific flag being tested
 
 ### Adding a new Bash feature
 
-1. Add a flag to `ParseOptions` in `dialect.rs`
+1. Add a flag to `ShellOptions` in `dialect.rs`
 2. Set it to `true` in `Dialect::Bash`
 3. If the feature needs new tokens, add them to `token.rs` with `Bash` prefix (e.g. `BashHereStringOp`) and `display_name()`
 4. Update the lexer in `lexer/mod.rs` to recognize them conditionally on the flag
@@ -242,7 +242,7 @@ shrinks from the front (on commit), never from the back.
 6. Standalone argument types go in `Atom`, concatenable pieces in `Fragment`, assignment-only types in `AssignmentValue`
 7. Update the parser (likely `parser/compound.rs` or `parser/bash.rs`)
 8. Update the CLI emitter in `cli/yaml_writer.rs`
-9. Write tests with a `ParseOptions` that only enables the new flag
+9. Write tests with a `ShellOptions` that only enables the new flag
 10. Write a test that POSIX mode rejects the new syntax
 
 ### Error messages

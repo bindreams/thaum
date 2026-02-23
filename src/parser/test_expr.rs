@@ -114,6 +114,9 @@ impl Parser {
         let mut text = String::new();
         let mut end_span = start_span;
         let mut paren_depth = 0i32;
+        // Deferred space: set when we see Whitespace; only emitted when more
+        // content follows. This avoids a trailing space before `]]`.
+        let mut pending_space = false;
 
         loop {
             let peeked = self.lexer.peek()?.clone();
@@ -122,20 +125,44 @@ impl Parser {
                 // ) at depth 0 inside a grouped expression (e.g., [[ (foo =~ bar) ]])
                 // closes the group, not the regex. Outside a group, ) is regex content.
                 Token::RParen if in_group && paren_depth <= 0 => break,
-                tok if tok.is_fragment() => {
+                Token::Whitespace => {
+                    // Word boundary: mark a deferred space.
                     if !text.is_empty() {
+                        pending_space = true;
+                    }
+                    self.lexer.advance()?;
+                }
+                tok if tok.is_fragment() => {
+                    if pending_space {
                         text.push(' ');
+                        pending_space = false;
                     }
                     match tok {
                         Token::Literal(s) => text.push_str(s),
                         Token::SingleQuoted(s) => text.push_str(s),
                         Token::DoubleQuoted(s) => text.push_str(s),
-                        _ => text.push_str(tok.display_name().trim_matches('\'')),
+                        Token::Glob(crate::token::GlobKind::Star) => text.push('*'),
+                        Token::Glob(crate::token::GlobKind::Question) => text.push('?'),
+                        Token::Glob(crate::token::GlobKind::BracketOpen) => text.push('['),
+                        Token::SimpleParam(s) => {
+                            text.push('$');
+                            text.push_str(s);
+                        }
+                        _ => {
+                            // Other fragment types (BraceParam, CommandSub, etc.)
+                            // are uncommon in regex patterns; fall back to
+                            // literal representation.
+                            text.push_str(tok.display_name().trim_matches('\''));
+                        }
                     }
                     end_span = peeked.span;
                     self.lexer.advance()?;
                 }
                 _ => {
+                    if pending_space {
+                        text.push(' ');
+                        pending_space = false;
+                    }
                     match &peeked.token {
                         Token::LParen => paren_depth += 1,
                         Token::RParen => paren_depth -= 1,

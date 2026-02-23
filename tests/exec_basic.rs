@@ -458,6 +458,7 @@ fn expect_unsupported(script: &str) {
     );
 }
 
+#[allow(dead_code)]
 fn expect_unsupported_bash(script: &str) {
     let program = thaum::parse_with(script, Dialect::Bash)
         .unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
@@ -670,10 +671,7 @@ fn unsupported_set_options() {
     expect_unsupported("set -e");
 }
 
-#[test]
-fn unsupported_bash_double_bracket() {
-    expect_unsupported_bash("[[ -n hello ]]");
-}
+// [[ ]] is now implemented — see bash_cond_* tests below.
 
 // eval is now implemented — see eval_* tests below.
 
@@ -1546,4 +1544,140 @@ fn exec_not_found() {
     // exec with nonexistent command -- the subshell exits 127.
     let (out, _) = exec_ok("(exec /nonexistent/command/xyz 2>/dev/null); echo $?");
     assert!(out.trim() != "0");
+}
+
+// --- Bash [[ ]] conditional ---
+
+#[test]
+fn bash_cond_string_equals() {
+    let (_, status) = bash_exec_ok("[[ hello == hello ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_string_not_equals() {
+    let (_, status) = bash_exec_ok("[[ a != b ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_false() {
+    let (_, status) = bash_exec_ok("[[ a == b ]]");
+    assert_eq!(status, 1);
+}
+
+#[test]
+fn bash_cond_string_empty() {
+    let (_, status) = bash_exec_ok("[[ -z '' ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_string_nonempty() {
+    let (_, status) = bash_exec_ok("[[ -n hello ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_file_exists() {
+    let (_, status) = bash_exec_ok("[[ -e /tmp ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_file_is_dir() {
+    let (_, status) = bash_exec_ok("[[ -d /tmp ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_file_not_exists() {
+    let (_, status) = bash_exec_ok("[[ -e /nonexistent_path_xyz ]]");
+    assert_eq!(status, 1);
+}
+
+#[test]
+fn bash_cond_int_eq() {
+    let (_, status) = bash_exec_ok("[[ 42 -eq 42 ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_int_lt() {
+    let (_, status) = bash_exec_ok("[[ 1 -lt 2 ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_and() {
+    let (_, status) = bash_exec_ok("[[ -n a && -n b ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_or() {
+    let (_, status) = bash_exec_ok("[[ -z '' || -n b ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_not() {
+    let (_, status) = bash_exec_ok("[[ ! -z hello ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_variable() {
+    let (_, status) = bash_exec_ok("x=hi; [[ -n $x ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_regex() {
+    let (_, status) = bash_exec_ok("[[ abc123 =~ [0-9]+ ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_regex_no_match() {
+    let (_, status) = bash_exec_ok("[[ abcdef =~ [0-9]+ ]]");
+    assert_eq!(status, 1);
+}
+
+#[test]
+fn bash_cond_lexical_lt() {
+    let (_, status) = bash_exec_ok("[[ apple < banana ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_var_set() {
+    let (_, status) = bash_exec_ok("x=1; [[ -v x ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_var_unset() {
+    let (_, status) = bash_exec_ok("[[ -v nonexistent_var ]]");
+    assert_eq!(status, 1);
+}
+
+#[test]
+fn bash_cond_in_if() {
+    let (out, _) = bash_exec_ok("if [[ 1 -eq 1 ]]; then echo yes; fi");
+    assert_eq!(out, "yes\n");
+}
+
+#[test]
+fn bash_cond_bare_word() {
+    // Bare non-empty word is true (implicit -n)
+    let (_, status) = bash_exec_ok("[[ hello ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn bash_cond_bare_empty() {
+    // Empty string is false
+    let (_, status) = bash_exec_ok("[[ '' ]]");
+    assert_eq!(status, 1);
 }

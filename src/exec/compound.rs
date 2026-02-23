@@ -157,9 +157,10 @@ impl Executor {
                 Ok(status)
             }
 
-            CompoundCommand::BashDoubleBracket { .. } => Err(ExecError::UnsupportedFeature(
-                "bash [[ ]] conditional".to_string(),
-            )),
+            CompoundCommand::BashDoubleBracket { expression, .. } => {
+                let result = super::bash_test::evaluate(expression, self, io)?;
+                Ok(if result { 0 } else { 1 })
+            }
             CompoundCommand::BashArithmeticCommand { expression, .. } => {
                 let value = arithmetic::evaluate_arith_expr(expression, &mut self.env)?;
                 // (( )) returns 0 (success) if expression is non-zero,

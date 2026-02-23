@@ -1,4 +1,5 @@
 pub mod arithmetic;
+pub(crate) mod bash_test;
 pub mod builtins;
 pub(crate) mod command_ex;
 mod compound;

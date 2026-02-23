@@ -207,6 +207,7 @@ fn load_source(cli: &CliArgs) -> (String, String) {
     }
 }
 
+/// CLI entry point: parses clap args and dispatches to the selected subcommand.
 pub fn run() {
     let cli = Cli::parse();
     let args = cli.resolve();

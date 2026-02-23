@@ -145,6 +145,7 @@ pub enum Atom {
     },
 }
 
+/// A variable assignment: `name=value`, `name[idx]=value`, or `name=(array)`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Assignment {
     pub name: String,
@@ -266,6 +267,10 @@ pub enum CaseTerminator {
     BashContinue,
 }
 
+/// A single arm of a `case` statement: `pattern) body ;;`.
+///
+/// `terminator` is `None` for the last arm when no `;;` / `;&` / `;;&` appears
+/// before `esac`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CaseArm {
     pub patterns: Vec<Word>,
@@ -274,6 +279,7 @@ pub struct CaseArm {
     pub span: Span,
 }
 
+/// An `elif` branch within an `if` clause.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ElifClause {
     pub condition: Vec<Line>,
@@ -582,9 +588,12 @@ pub enum ProcessDirection {
     Out,
 }
 
+/// A parameter expansion: `$VAR`, `${VAR}`, `${VAR:-default}`, etc.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ParameterExpansion {
+    /// `$VAR` — simple expansion with no braces or operator.
     Simple(String),
+    /// `${name}` or `${name op argument}` — braced expansion with optional operator.
     Complex {
         name: String,
         operator: Option<ParamOp>,
@@ -592,23 +601,37 @@ pub enum ParameterExpansion {
     },
 }
 
+/// Operator in a complex parameter expansion `${name op argument}`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ParamOp {
+    /// `${var:-word}` — use default if unset or null.
     Default,
+    /// `${var:=word}` — assign default if unset or null.
     DefaultAssign,
+    /// `${var:?word}` — error if unset or null.
     Error,
+    /// `${var:+word}` — use alternative if set and non-null.
     Alternative,
+    /// `${#var}` — string length (or array length for `${#arr[@]}`).
     Length,
+    /// `${var%pattern}` — remove shortest suffix match.
     TrimSmallSuffix,
+    /// `${var%%pattern}` — remove longest suffix match.
     TrimLargeSuffix,
+    /// `${var#pattern}` — remove shortest prefix match.
     TrimSmallPrefix,
+    /// `${var##pattern}` — remove longest prefix match.
     TrimLargePrefix,
 }
 
+/// A glob metacharacter within a word.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum GlobChar {
+    /// `*` — match any string.
     Star,
+    /// `?` — match any single character.
     Question,
+    /// `[` — open a bracket expression (character class).
     BracketOpen,
 }
 
@@ -620,15 +643,27 @@ pub struct Redirect {
     pub span: Span,
 }
 
+/// The kind and target of a redirection.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RedirectKind {
+    /// `< file` — redirect input from file.
     Input(Word),
+    /// `> file` — redirect output to file (truncates).
     Output(Word),
+    /// `>> file` — append output to file.
     Append(Word),
+    /// `>| file` — force-overwrite output, ignoring `noclobber`.
     Clobber(Word),
+    /// `<> file` — open for read-write.
     ReadWrite(Word),
+    /// `<& fd` — duplicate input file descriptor.
     DupInput(Word),
+    /// `>& fd` — duplicate output file descriptor.
     DupOutput(Word),
+    /// `<< DELIM` or `<<- DELIM` — here-document.
+    ///
+    /// `body` is filled post-parse by `HereDocFiller`; it starts empty during
+    /// parsing because heredoc content appears after the command line.
     HereDoc {
         delimiter: String,
         body: String,

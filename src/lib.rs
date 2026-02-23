@@ -2,17 +2,29 @@
 //! source text into a typed AST, plus the `exec`, `lexer`, and `parser` modules
 //! for lower-level access.
 
+/// Typed abstract syntax tree for POSIX sh and Bash.
 pub mod ast;
+/// Feature-flag system for shell dialect differences (POSIX vs. Bash).
 pub mod dialect;
+/// Lexer and parser error types with source spans.
 pub mod error;
+/// Shell executor: walks the AST and runs commands.
 pub mod exec;
+/// Ownership-based AST rewriting (fold / catamorphism).
 pub mod fold;
+/// AST formatting as YAML for structured output.
 pub mod format;
+/// Context-free shell tokenizer with buffered token stream.
 pub mod lexer;
+/// Recursive-descent parser that promotes keywords from grammatical context.
 pub mod parser;
+/// Byte-offset source spans for error reporting.
 pub mod span;
+/// Token types emitted by the lexer.
 pub mod token;
+/// Immutable AST visitor (walk the tree without modifying it).
 pub mod visit;
+/// Word expansion helpers (brace-param parsing, command substitution).
 pub mod word;
 
 pub use ast::Program;

@@ -24,14 +24,17 @@ pub enum YamlValue {
 }
 
 impl YamlValue {
+    /// Convenience constructor for an escaped scalar value.
     pub fn scalar(s: impl Into<String>) -> Self {
         YamlValue::Scalar(s.into())
     }
 
+    /// Convenience constructor for a block scalar (literal `|` style).
     pub fn block_scalar(s: impl Into<String>) -> Self {
         YamlValue::BlockScalar(s.into())
     }
 
+    /// Start building a YAML mapping incrementally.
     pub fn mapping() -> MappingBuilder {
         MappingBuilder::new()
     }
@@ -49,6 +52,7 @@ impl Default for MappingBuilder {
 }
 
 impl MappingBuilder {
+    /// Create an empty mapping builder.
     pub fn new() -> Self {
         MappingBuilder {
             entries: Vec::new(),

@@ -36,6 +36,7 @@ pub struct ProcessIo {
 }
 
 impl ProcessIo {
+    /// Capture the real process stdin/stdout/stderr handles.
     pub fn new() -> Self {
         ProcessIo {
             stdin: io::stdin(),
@@ -44,6 +45,7 @@ impl ProcessIo {
         }
     }
 
+    /// Borrow the process streams as an `IoContext` for executor use.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
@@ -73,6 +75,7 @@ impl Default for CapturedIo {
 }
 
 impl CapturedIo {
+    /// Create empty capture buffers (stdin is empty, stdout/stderr start empty).
     pub fn new() -> Self {
         CapturedIo {
             stdin: Cursor::new(Vec::new()),
@@ -90,6 +93,7 @@ impl CapturedIo {
         }
     }
 
+    /// Borrow the capture buffers as an `IoContext` for executor use.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
@@ -98,10 +102,12 @@ impl CapturedIo {
         }
     }
 
+    /// Return captured stdout as a string (lossy UTF-8 conversion).
     pub fn stdout_string(&self) -> String {
         String::from_utf8_lossy(&self.stdout).into_owned()
     }
 
+    /// Return captured stderr as a string (lossy UTF-8 conversion).
     pub fn stderr_string(&self) -> String {
         String::from_utf8_lossy(&self.stderr).into_owned()
     }

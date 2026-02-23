@@ -637,38 +637,46 @@ impl Environment {
         }
     }
 
+    /// Returns `$1`, `$2`, ... as a slice (0-indexed: `[0]` is `$1`).
     pub fn positional_params(&self) -> &[String] {
         &self.positional_params
     }
 
+    /// Replace all positional parameters. Used by the `set` and `shift` builtins.
     pub fn set_positional_params(&mut self, params: Vec<String>) {
         self.positional_params = params;
     }
 
+    /// Returns `$0` (the shell or script name).
     pub fn program_name(&self) -> &str {
         &self.program_name
     }
 
+    /// Override `$0`. Called when the shell is invoked with an explicit script name.
     pub fn set_program_name(&mut self, name: String) {
         self.program_name = name;
     }
 
     // --- Exit status ---
 
+    /// Returns `$?` (the exit status of the last completed command).
     pub fn last_exit_status(&self) -> i32 {
         self.last_exit_status
     }
 
+    /// Update `$?`. Called by the executor after each command completes.
     pub fn set_last_exit_status(&mut self, status: i32) {
         self.last_exit_status = status;
     }
 
     // --- Working directory ---
 
+    /// Returns the current working directory.
     pub fn cwd(&self) -> &PathBuf {
         &self.cwd
     }
 
+    /// Change the working directory. Canonicalizes the path and verifies it exists.
     pub fn set_cwd(&mut self, path: PathBuf) -> Result<(), ExecError> {
         if !path.is_dir() {
             return Err(ExecError::Io(std::io::Error::new(
@@ -683,16 +691,21 @@ impl Environment {
 
     // --- Functions ---
 
+    /// Look up a shell function by name.
     pub fn get_function(&self, name: &str) -> Option<&StoredFunction> {
         self.functions.get(name)
     }
 
+    /// Register a shell function. Overwrites any previous definition with the same name.
     pub fn set_function(&mut self, name: String, func: StoredFunction) {
         self.functions.insert(name, func);
     }
 
     // --- Scope management (for function calls) ---
 
+    /// Enter a function scope: saves positional parameters and pushes a new scope frame.
+    ///
+    /// `local` declarations within the scope are tracked and restored on `pop_scope`.
     #[debug_ensures(self.scope_stack.len() == old(self.scope_stack.len()) + 1)]
     pub fn push_scope(&mut self, new_positional: Vec<String>) {
         let saved_positional = std::mem::replace(&mut self.positional_params, new_positional);
@@ -702,6 +715,7 @@ impl Environment {
         });
     }
 
+    /// Leave a function scope: restores positional parameters and all `local` variables.
     #[debug_ensures(self.scope_stack.len() == old(self.scope_stack.len()) - 1)]
     pub fn pop_scope(&mut self) {
         if let Some(scope) = self.scope_stack.pop() {
@@ -719,10 +733,16 @@ impl Environment {
         }
     }
 
+    /// Returns whether execution is inside a function call (scope stack is non-empty).
     pub fn in_function_scope(&self) -> bool {
         !self.scope_stack.is_empty()
     }
 
+    /// Mark a variable as function-local (Bash `local` builtin).
+    ///
+    /// Saves the variable's current state so `pop_scope` can restore it. Only the
+    /// first `local` call per name per scope saves state -- subsequent calls are no-ops.
+    /// Returns an error if called outside a function scope.
     pub fn declare_local(&mut self, name: &str) -> Result<(), ExecError> {
         let scope = self.scope_stack.last_mut().ok_or_else(|| {
             ExecError::BadSubstitution("local: can only be used in a function".to_string())
@@ -854,6 +874,7 @@ impl Environment {
         }
     }
 
+    /// Returns the current `$IFS` value, defaulting to `" \t\n"` if unset.
     pub fn ifs(&self) -> &str {
         self.get_var("IFS").unwrap_or(" \t\n")
     }
@@ -900,6 +921,7 @@ impl Environment {
         self.expand_aliases = enabled;
     }
 
+    /// Import all environment variables from the current OS process, marking them exported.
     pub fn inherit_from_process(&mut self) {
         for (key, value) in std::env::vars() {
             self.variables.insert(
@@ -933,7 +955,10 @@ impl Environment {
         }
     }
 
-    /// Reconstruct an environment from serialized state (subshell child).
+    /// Reconstruct an environment from serialized state.
+    ///
+    /// Used by the `exec-ast` child process. The scope stack and FD table are
+    /// not transferred -- the child starts with a fresh PID and no open FDs.
     pub fn from_serialized(s: SerializedEnvironment) -> Self {
         Environment {
             variables: s.variables,

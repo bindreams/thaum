@@ -40,50 +40,63 @@ use crate::ast::*;
 ///
 /// See the [module-level documentation](self) for usage.
 pub trait Visit<'ast> {
+    /// Visit a complete program. Default: walks all lines.
     fn visit_program(&mut self, program: &'ast Program) {
         walk_program(self, program);
     }
 
+    /// Visit a statement. Default: visits the inner expression.
     fn visit_statement(&mut self, statement: &'ast Statement) {
         walk_statement(self, statement);
     }
 
+    /// Visit an expression tree. Default: recurses into children.
     fn visit_expression(&mut self, expression: &'ast Expression) {
         walk_expression(self, expression);
     }
 
+    /// Visit a simple command. Default: visits assignments, arguments, redirects.
     fn visit_command(&mut self, command: &'ast Command) {
         walk_command(self, command);
     }
 
+    /// Visit a compound command. Default: visits body and sub-structures.
     fn visit_compound_command(&mut self, compound: &'ast CompoundCommand) {
         walk_compound_command(self, compound);
     }
 
+    /// Visit a function definition. Default: visits body and redirects.
     fn visit_function_def(&mut self, function_def: &'ast FunctionDef) {
         walk_function_def(self, function_def);
     }
 
+    /// Visit a redirect. Default: visits the target word.
     fn visit_redirect(&mut self, redirect: &'ast Redirect) {
         walk_redirect(self, redirect);
     }
 
+    /// Visit an assignment. Default: visits the value word(s).
     fn visit_assignment(&mut self, assignment: &'ast Assignment) {
         walk_assignment(self, assignment);
     }
 
+    /// Visit a case arm. Default: visits patterns and body.
     fn visit_case_arm(&mut self, arm: &'ast CaseArm) {
         walk_case_arm(self, arm);
     }
 
+    /// Visit an elif clause. Default: visits condition and body.
     fn visit_elif_clause(&mut self, elif: &'ast ElifClause) {
         walk_elif_clause(self, elif);
     }
 
+    /// Visit an argument. Default: visits the inner word (atoms are not entered).
     fn visit_argument(&mut self, argument: &'ast Argument) {
         walk_argument(self, argument);
     }
 
+    /// Visit a word. Default is a **no-op** (leaf node). Override to enter
+    /// word-level nesting (fragments, command substitutions, etc.).
     fn visit_word(&mut self, _word: &'ast Word) {
         // Leaf by default. Word-level traversal is opt-in.
     }
@@ -101,14 +114,17 @@ fn walk_lines<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, lines: &'ast [Line]) {
     }
 }
 
+/// Walk all statements in all lines of a program. Call from [`Visit::visit_program`] overrides.
 pub fn walk_program<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, program: &'ast Program) {
     walk_lines(v, &program.lines);
 }
 
+/// Visit the expression inside a statement. Call from [`Visit::visit_statement`] overrides.
 pub fn walk_statement<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, stmt: &'ast Statement) {
     v.visit_expression(&stmt.expression);
 }
 
+/// Recurse into child expressions. Call from [`Visit::visit_expression`] overrides.
 pub fn walk_expression<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, expr: &'ast Expression) {
     match expr {
         Expression::Command(cmd) => v.visit_command(cmd),
@@ -133,6 +149,7 @@ pub fn walk_expression<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, expr: &'ast Exp
     }
 }
 
+/// Visit assignments, arguments, and redirects. Call from [`Visit::visit_command`] overrides.
 pub fn walk_command<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, cmd: &'ast Command) {
     for assignment in &cmd.assignments {
         v.visit_assignment(assignment);
@@ -145,6 +162,7 @@ pub fn walk_command<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, cmd: &'ast Command
     }
 }
 
+/// Visit body and sub-structures of a compound command. Call from [`Visit::visit_compound_command`] overrides.
 pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
     v: &mut V,
     compound: &'ast CompoundCommand,
@@ -204,6 +222,7 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(
     }
 }
 
+/// Visit body and redirects of a function definition. Call from [`Visit::visit_function_def`] overrides.
 pub fn walk_function_def<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, fndef: &'ast FunctionDef) {
     v.visit_compound_command(&fndef.body);
     for r in &fndef.redirects {
@@ -211,6 +230,7 @@ pub fn walk_function_def<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, fndef: &'ast 
     }
 }
 
+/// Visit the target word inside a redirect. Call from [`Visit::visit_redirect`] overrides.
 pub fn walk_redirect<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, redirect: &'ast Redirect) {
     match &redirect.kind {
         RedirectKind::Input(w)
@@ -229,6 +249,7 @@ pub fn walk_redirect<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, redirect: &'ast R
     }
 }
 
+/// Visit the value word(s) in an assignment. Call from [`Visit::visit_assignment`] overrides.
 pub fn walk_assignment<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, assignment: &'ast Assignment) {
     match &assignment.value {
         AssignmentValue::Scalar(w) => v.visit_word(w),
@@ -240,6 +261,7 @@ pub fn walk_assignment<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, assignment: &'a
     }
 }
 
+/// Visit patterns and body in a case arm. Call from [`Visit::visit_case_arm`] overrides.
 pub fn walk_case_arm<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, arm: &'ast CaseArm) {
     for pattern in &arm.patterns {
         v.visit_word(pattern);
@@ -247,11 +269,13 @@ pub fn walk_case_arm<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, arm: &'ast CaseAr
     walk_lines(v, &arm.body);
 }
 
+/// Visit condition and body of an elif clause. Call from [`Visit::visit_elif_clause`] overrides.
 pub fn walk_elif_clause<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, elif: &'ast ElifClause) {
     walk_lines(v, &elif.condition);
     walk_lines(v, &elif.body);
 }
 
+/// Visit the word inside an argument (atoms are not entered). Call from [`Visit::visit_argument`] overrides.
 pub fn walk_argument<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, argument: &'ast Argument) {
     match argument {
         Argument::Word(w) => v.visit_word(w),

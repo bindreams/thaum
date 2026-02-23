@@ -5,22 +5,30 @@
 //! handlers. Alias expansion happens here at execution time -- the parser
 //! never sees aliases.
 
+/// Runtime evaluation of `ArithExpr` nodes (`(( ))`, `$(( ))`, `for (( ; ; ))`).
 pub mod arithmetic;
 pub(crate) mod bash_test;
+/// Shell builtins that only need `Environment` (not the full `Executor`).
 pub mod builtins;
 pub(crate) mod command_ex;
 mod compound;
+/// Shell state: variables, functions, aliases, positional parameters, CWD, `$?`.
 pub mod environment;
+/// Execution errors and control-flow signals (`exit`, `break`, `return`).
 pub mod error;
+/// POSIX word expansion: tilde, parameter, quote removal.
 pub mod expand;
 mod external;
+/// Pluggable I/O context for stdin/stdout/stderr (live or captured).
 pub mod io_context;
 pub(crate) mod numeric;
 mod pattern;
+/// Pipeline execution: flatten pipe trees, spawn stages with piped I/O.
 pub mod pipeline;
 pub(crate) mod printf;
 mod redirect;
 mod special_builtins;
+/// Subshell serialization payload for cross-process `thaum exec-ast`.
 pub mod subshell;
 
 pub use environment::Environment;

@@ -49,50 +49,63 @@ use crate::ast::*;
 ///
 /// See the [module-level documentation](self) for usage.
 pub trait Fold {
+    /// Rewrite a complete program. Default: folds each line.
     fn fold_program(&mut self, program: Program) -> Program {
         fold_program(self, program)
     }
 
+    /// Rewrite a statement. Default: folds the inner expression.
     fn fold_statement(&mut self, statement: Statement) -> Statement {
         fold_statement(self, statement)
     }
 
+    /// Rewrite an expression tree. Default: recurses into children.
     fn fold_expression(&mut self, expression: Expression) -> Expression {
         fold_expression(self, expression)
     }
 
+    /// Rewrite a simple command. Default: folds assignments, arguments, redirects.
     fn fold_command(&mut self, command: Command) -> Command {
         fold_command(self, command)
     }
 
+    /// Rewrite a compound command. Default: folds body and sub-structures.
     fn fold_compound_command(&mut self, compound: CompoundCommand) -> CompoundCommand {
         fold_compound_command(self, compound)
     }
 
+    /// Rewrite a function definition. Default: folds body and redirects.
     fn fold_function_def(&mut self, function_def: FunctionDef) -> FunctionDef {
         fold_function_def(self, function_def)
     }
 
+    /// Rewrite a redirect. Default: folds the target word.
     fn fold_redirect(&mut self, redirect: Redirect) -> Redirect {
         fold_redirect(self, redirect)
     }
 
+    /// Rewrite an assignment. Default: folds the value word(s).
     fn fold_assignment(&mut self, assignment: Assignment) -> Assignment {
         fold_assignment(self, assignment)
     }
 
+    /// Rewrite a case arm. Default: folds patterns and body.
     fn fold_case_arm(&mut self, arm: CaseArm) -> CaseArm {
         fold_case_arm(self, arm)
     }
 
+    /// Rewrite an elif clause. Default: folds condition and body.
     fn fold_elif_clause(&mut self, elif: ElifClause) -> ElifClause {
         fold_elif_clause(self, elif)
     }
 
+    /// Rewrite an argument. Default: folds the inner word (atoms pass through).
     fn fold_argument(&mut self, argument: Argument) -> Argument {
         fold_argument(self, argument)
     }
 
+    /// Rewrite a word. Default is a **no-op** (leaf node). Override to enter
+    /// word-level nesting (fragments, command substitutions, etc.).
     fn fold_word(&mut self, word: Word) -> Word {
         // Leaf by default. Word-level rewriting is opt-in.
         word
@@ -119,6 +132,7 @@ fn fold_redirects<F: Fold + ?Sized>(f: &mut F, redirects: Vec<Redirect>) -> Vec<
     redirects.into_iter().map(|r| f.fold_redirect(r)).collect()
 }
 
+/// Recursively fold all lines in a program. Call from [`Fold::fold_program`] overrides.
 pub fn fold_program<F: Fold + ?Sized>(f: &mut F, program: Program) -> Program {
     Program {
         lines: fold_lines(f, program.lines),
@@ -126,6 +140,7 @@ pub fn fold_program<F: Fold + ?Sized>(f: &mut F, program: Program) -> Program {
     }
 }
 
+/// Fold the expression inside a statement. Call from [`Fold::fold_statement`] overrides.
 pub fn fold_statement<F: Fold + ?Sized>(f: &mut F, stmt: Statement) -> Statement {
     Statement {
         expression: f.fold_expression(stmt.expression),
@@ -134,6 +149,7 @@ pub fn fold_statement<F: Fold + ?Sized>(f: &mut F, stmt: Statement) -> Statement
     }
 }
 
+/// Recursively fold child expressions. Call from [`Fold::fold_expression`] overrides.
 pub fn fold_expression<F: Fold + ?Sized>(f: &mut F, expr: Expression) -> Expression {
     match expr {
         Expression::Command(cmd) => Expression::Command(f.fold_command(cmd)),
@@ -163,6 +179,7 @@ pub fn fold_expression<F: Fold + ?Sized>(f: &mut F, expr: Expression) -> Express
     }
 }
 
+/// Fold assignments, arguments, and redirects. Call from [`Fold::fold_command`] overrides.
 pub fn fold_command<F: Fold + ?Sized>(f: &mut F, cmd: Command) -> Command {
     Command {
         assignments: cmd
@@ -180,6 +197,7 @@ pub fn fold_command<F: Fold + ?Sized>(f: &mut F, cmd: Command) -> Command {
     }
 }
 
+/// Fold all body/sub-structure in a compound command. Call from [`Fold::fold_compound_command`] overrides.
 pub fn fold_compound_command<F: Fold + ?Sized>(
     f: &mut F,
     compound: CompoundCommand,
@@ -278,6 +296,7 @@ pub fn fold_compound_command<F: Fold + ?Sized>(
     }
 }
 
+/// Fold body and redirects of a function definition. Call from [`Fold::fold_function_def`] overrides.
 pub fn fold_function_def<F: Fold + ?Sized>(f: &mut F, fndef: FunctionDef) -> FunctionDef {
     FunctionDef {
         name: fndef.name,
@@ -287,6 +306,7 @@ pub fn fold_function_def<F: Fold + ?Sized>(f: &mut F, fndef: FunctionDef) -> Fun
     }
 }
 
+/// Fold the target word inside a redirect. Call from [`Fold::fold_redirect`] overrides.
 pub fn fold_redirect<F: Fold + ?Sized>(f: &mut F, redirect: Redirect) -> Redirect {
     let kind = match redirect.kind {
         RedirectKind::Input(w) => RedirectKind::Input(f.fold_word(w)),
@@ -308,6 +328,7 @@ pub fn fold_redirect<F: Fold + ?Sized>(f: &mut F, redirect: Redirect) -> Redirec
     }
 }
 
+/// Fold the value word(s) in an assignment. Call from [`Fold::fold_assignment`] overrides.
 pub fn fold_assignment<F: Fold + ?Sized>(f: &mut F, assignment: Assignment) -> Assignment {
     let value = match assignment.value {
         AssignmentValue::Scalar(w) => AssignmentValue::Scalar(f.fold_word(w)),
@@ -321,6 +342,7 @@ pub fn fold_assignment<F: Fold + ?Sized>(f: &mut F, assignment: Assignment) -> A
     }
 }
 
+/// Fold patterns and body in a case arm. Call from [`Fold::fold_case_arm`] overrides.
 pub fn fold_case_arm<F: Fold + ?Sized>(f: &mut F, arm: CaseArm) -> CaseArm {
     CaseArm {
         patterns: fold_words(f, arm.patterns),
@@ -330,6 +352,7 @@ pub fn fold_case_arm<F: Fold + ?Sized>(f: &mut F, arm: CaseArm) -> CaseArm {
     }
 }
 
+/// Fold condition and body in an elif clause. Call from [`Fold::fold_elif_clause`] overrides.
 pub fn fold_elif_clause<F: Fold + ?Sized>(f: &mut F, elif: ElifClause) -> ElifClause {
     ElifClause {
         condition: fold_lines(f, elif.condition),
@@ -338,6 +361,7 @@ pub fn fold_elif_clause<F: Fold + ?Sized>(f: &mut F, elif: ElifClause) -> ElifCl
     }
 }
 
+/// Fold the word inside an argument (atoms pass through unchanged). Call from [`Fold::fold_argument`] overrides.
 pub fn fold_argument<F: Fold + ?Sized>(f: &mut F, argument: Argument) -> Argument {
     match argument {
         Argument::Word(w) => Argument::Word(f.fold_word(w)),

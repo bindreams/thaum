@@ -16,6 +16,7 @@ pub struct Span {
 }
 
 impl Span {
+    /// Create a span from byte offsets (inclusive start, exclusive end).
     pub fn new(start: usize, end: usize) -> Self {
         Span {
             start: BytePos(start),
@@ -31,6 +32,7 @@ impl Span {
         }
     }
 
+    /// Create a zero-width span at a single byte position.
     pub fn empty(pos: usize) -> Self {
         Span::new(pos, pos)
     }

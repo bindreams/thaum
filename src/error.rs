@@ -30,6 +30,7 @@ pub enum LexError {
 }
 
 impl LexError {
+    /// Extract the source span, if available. `Io` errors have no span.
     pub fn span(&self) -> Option<Span> {
         match self {
             LexError::UnexpectedChar { span, .. }

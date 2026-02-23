@@ -2,12 +2,16 @@
 
 use crate::span::Span;
 
+/// Maps byte offsets to line/column positions for human-readable error messages.
+///
+/// Pre-computes line-start offsets in a single pass over the source text.
 pub struct SourceMapper {
     /// Byte offset of the start of each line (0-indexed).
     line_starts: Vec<usize>,
 }
 
 impl SourceMapper {
+    /// Build a mapper by scanning the source for newline positions.
     pub fn new(source: &str) -> Self {
         let mut line_starts = vec![0];
         for (i, ch) in source.char_indices() {
@@ -28,6 +32,7 @@ impl SourceMapper {
         (line + 1, col + 1)
     }
 
+    /// Format a span as `filename:line:col` for use in YAML source annotations.
     pub fn format_span(&self, span: Span, filename: &str) -> String {
         let (line, col) = self.offset_to_line_col(span.start.0);
         format!("{}:{}:{}", filename, line, col)

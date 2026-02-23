@@ -8,6 +8,11 @@ use super::source_map::SourceMapper;
 use super::yaml_emitter;
 use super::yaml_value::{MappingBuilder, YamlValue};
 
+/// Converts AST nodes into YAML text.
+///
+/// In compact mode (default), omits absent optional fields and uses inline
+/// scalars for single-literal words. Verbose mode includes all fields with
+/// explicit null/empty values.
 pub struct YamlWriter<'a> {
     mapper: &'a SourceMapper,
     filename: &'a str,
@@ -15,6 +20,7 @@ pub struct YamlWriter<'a> {
 }
 
 impl<'a> YamlWriter<'a> {
+    /// Create a compact YAML writer (omits absent optional fields).
     pub fn new(mapper: &'a SourceMapper, filename: &'a str) -> Self {
         YamlWriter {
             mapper,
@@ -23,6 +29,7 @@ impl<'a> YamlWriter<'a> {
         }
     }
 
+    /// Create a verbose YAML writer (includes all fields with explicit null/empty values).
     pub fn new_verbose(mapper: &'a SourceMapper, filename: &'a str) -> Self {
         YamlWriter {
             mapper,
@@ -31,6 +38,7 @@ impl<'a> YamlWriter<'a> {
         }
     }
 
+    /// Render a complete program as YAML text.
     pub fn write_program(&self, prog: &Program) -> String {
         let value = self.build_program(prog);
         yaml_emitter::emit(&value)

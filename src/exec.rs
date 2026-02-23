@@ -608,11 +608,16 @@ impl Executor {
         assignment: &crate::ast::Assignment,
     ) -> Result<(), ExecError> {
         if let Some(ref subscript) = assignment.index {
-            // Indexed assignment: name[subscript]=value
+            // Indexed or associative assignment: name[subscript]=value
             let value = self.expand_word(assignment.value.as_scalar())?;
-            let index: usize = subscript.parse().unwrap_or(0);
-            self.env
-                .set_array_element(&assignment.name, index, &value)?;
+            if self.env.is_assoc_array(&assignment.name) {
+                self.env
+                    .set_assoc_element(&assignment.name, subscript, &value)?;
+            } else {
+                let index: usize = subscript.parse().unwrap_or(0);
+                self.env
+                    .set_array_element(&assignment.name, index, &value)?;
+            }
         } else {
             match &assignment.value {
                 crate::ast::AssignmentValue::Scalar(word) => {

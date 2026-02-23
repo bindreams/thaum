@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::ast::{CompoundCommand, FunctionDef};
 use crate::exec::error::ExecError;
 
-/// The value of a shell variable — scalar or indexed array.
+/// The value of a shell variable — scalar, indexed array, or associative array.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum VarValue {
     /// A single string value (POSIX).
@@ -15,6 +15,8 @@ pub enum VarValue {
     /// A sparse indexed array (Bash).  Uses `BTreeMap` so iteration is in
     /// index order, matching bash's `${a[@]}` behaviour.
     IndexedArray(BTreeMap<usize, String>),
+    /// An associative array (Bash `declare -A`).  String-keyed.
+    AssocArray(HashMap<String, String>),
 }
 
 /// A shell variable with metadata.
@@ -29,11 +31,13 @@ impl ShellVar {
     /// Return the scalar string for this variable.
     ///
     /// For scalars, returns the value directly. For indexed arrays, returns
-    /// element 0 (bash compatibility: `$a` == `${a[0]}`).
+    /// element 0 (bash compatibility: `$a` == `${a[0]}`). For associative
+    /// arrays, returns element with key "0" or empty string.
     fn scalar_str(&self) -> &str {
         match &self.value {
             VarValue::Scalar(s) => s,
             VarValue::IndexedArray(map) => map.get(&0).map(|s| s.as_str()).unwrap_or(""),
+            VarValue::AssocArray(map) => map.get("0").map(|s| s.as_str()).unwrap_or(""),
         }
     }
 }
@@ -134,14 +138,23 @@ impl Environment {
 
         let prev = self.variables.get(name);
         let exported = prev.map(|v| v.exported).unwrap_or(false);
-        let is_array = prev
+        let is_indexed_array = prev
             .map(|v| matches!(v.value, VarValue::IndexedArray(_)))
             .unwrap_or(false);
+        let is_assoc_array = prev
+            .map(|v| matches!(v.value, VarValue::AssocArray(_)))
+            .unwrap_or(false);
 
-        if is_array {
+        if is_indexed_array {
             if let Some(var) = self.variables.get_mut(name) {
                 if let VarValue::IndexedArray(ref mut map) = var.value {
                     map.insert(0, value.to_string());
+                }
+            }
+        } else if is_assoc_array {
+            if let Some(var) = self.variables.get_mut(name) {
+                if let VarValue::AssocArray(ref mut map) = var.value {
+                    map.insert("0".to_string(), value.to_string());
                 }
             }
         } else {
@@ -170,6 +183,7 @@ impl Environment {
                 }
             }
             VarValue::IndexedArray(ref map) => map.get(&index).map(|s| s.as_str()),
+            VarValue::AssocArray(ref map) => map.get(&index.to_string()).map(|s| s.as_str()),
         }
     }
 
@@ -193,6 +207,9 @@ impl Environment {
             Some(var) => match var.value {
                 VarValue::IndexedArray(ref mut map) => {
                     map.insert(index, value.to_string());
+                }
+                VarValue::AssocArray(ref mut map) => {
+                    map.insert(index.to_string(), value.to_string());
                 }
                 VarValue::Scalar(ref s) => {
                     let old = s.clone();
@@ -244,21 +261,23 @@ impl Environment {
         Ok(())
     }
 
-    /// Get all elements of an indexed array, in index order.
+    /// Get all elements of an array, in index order (indexed) or arbitrary order (assoc).
     pub fn get_array_all(&self, name: &str) -> Option<Vec<&str>> {
         match self.variables.get(name)?.value {
             VarValue::Scalar(ref s) => Some(vec![s.as_str()]),
             VarValue::IndexedArray(ref map) => Some(map.values().map(|s| s.as_str()).collect()),
+            VarValue::AssocArray(ref map) => Some(map.values().map(|s| s.as_str()).collect()),
         }
     }
 
-    /// Get the number of set elements in an indexed array.
+    /// Get the number of set elements in an array.
     pub fn get_array_length(&self, name: &str) -> usize {
         match self.variables.get(name) {
             None => 0,
             Some(var) => match var.value {
                 VarValue::Scalar(_) => 1,
                 VarValue::IndexedArray(ref map) => map.len(),
+                VarValue::AssocArray(ref map) => map.len(),
             },
         }
     }
@@ -276,11 +295,115 @@ impl Environment {
                 VarValue::IndexedArray(ref mut map) => {
                     map.remove(&index);
                 }
+                VarValue::AssocArray(ref mut map) => {
+                    map.remove(&index.to_string());
+                }
                 VarValue::Scalar(_) => {
                     if index == 0 {
                         self.variables.remove(name);
                     }
                 }
+            }
+        }
+        Ok(())
+    }
+
+    // --- Associative array access ---
+
+    /// Check if a variable is an associative array.
+    pub fn is_assoc_array(&self, name: &str) -> bool {
+        self.variables
+            .get(name)
+            .map(|v| matches!(v.value, VarValue::AssocArray(_)))
+            .unwrap_or(false)
+    }
+
+    /// Create an empty associative array variable, or reset an existing one.
+    pub fn create_assoc(&mut self, name: &str) -> Result<(), ExecError> {
+        if let Some(existing) = self.variables.get(name) {
+            if existing.readonly {
+                return Err(ExecError::ReadonlyVariable(name.to_string()));
+            }
+        }
+        let exported = self
+            .variables
+            .get(name)
+            .map(|v| v.exported)
+            .unwrap_or(false);
+        self.variables.insert(
+            name.to_string(),
+            ShellVar {
+                value: VarValue::AssocArray(HashMap::new()),
+                exported,
+                readonly: false,
+            },
+        );
+        Ok(())
+    }
+
+    /// Set a single element in an associative array variable.
+    ///
+    /// If the variable exists as an associative array, inserts the key-value pair.
+    /// If it exists as a non-assoc variable, falls back to `set_var`.
+    /// If it does not exist, creates a new associative array.
+    pub fn set_assoc_element(
+        &mut self,
+        name: &str,
+        key: &str,
+        value: &str,
+    ) -> Result<(), ExecError> {
+        if let Some(existing) = self.variables.get(name) {
+            if existing.readonly {
+                return Err(ExecError::ReadonlyVariable(name.to_string()));
+            }
+        }
+        match self.variables.get_mut(name) {
+            Some(var) => match var.value {
+                VarValue::AssocArray(ref mut map) => {
+                    map.insert(key.to_string(), value.to_string());
+                }
+                _ => {
+                    // If not assoc, treat key as index 0 for scalar compat
+                    return self.set_var(name, value);
+                }
+            },
+            None => {
+                let mut map = HashMap::new();
+                map.insert(key.to_string(), value.to_string());
+                self.variables.insert(
+                    name.to_string(),
+                    ShellVar {
+                        value: VarValue::AssocArray(map),
+                        exported: false,
+                        readonly: false,
+                    },
+                );
+            }
+        }
+        Ok(())
+    }
+
+    /// Get a single element from an associative array by string key.
+    ///
+    /// For scalars, returns the value if the key is "0".
+    pub fn get_assoc_element(&self, name: &str, key: &str) -> Option<&str> {
+        match self.variables.get(name)?.value {
+            VarValue::AssocArray(ref map) => map.get(key).map(|s| s.as_str()),
+            VarValue::Scalar(ref s) if key == "0" => Some(s.as_str()),
+            _ => None,
+        }
+    }
+
+    /// Unset a single element of an associative array by string key.
+    pub fn unset_assoc_element(&mut self, name: &str, key: &str) -> Result<(), ExecError> {
+        if let Some(existing) = self.variables.get(name) {
+            if existing.readonly {
+                return Err(ExecError::ReadonlyVariable(name.to_string()));
+            }
+        }
+        if let Some(var) = self.variables.get_mut(name) {
+            if let VarValue::AssocArray(ref mut map) = var.value {
+                map.remove(key);
             }
         }
         Ok(())

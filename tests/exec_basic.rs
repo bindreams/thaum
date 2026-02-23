@@ -1122,3 +1122,35 @@ fn subshell_with_redirect() {
 
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+// --- Associative arrays ---
+
+#[test]
+fn assoc_array_basic() {
+    let (out, _) = bash_exec_ok("declare -A m; m[foo]=bar; echo ${m[foo]}");
+    assert_eq!(out, "bar\n");
+}
+
+#[test]
+fn assoc_array_all_elements() {
+    let (out, _) = bash_exec_ok("declare -A m; m[a]=1; m[b]=2; echo ${#m[@]}");
+    assert_eq!(out, "2\n");
+}
+
+#[test]
+fn assoc_array_overwrite() {
+    let (out, _) = bash_exec_ok("declare -A m; m[k]=old; m[k]=new; echo ${m[k]}");
+    assert_eq!(out, "new\n");
+}
+
+#[test]
+fn assoc_array_unset_element() {
+    let (out, _) = bash_exec_ok("declare -A m; m[a]=1; m[b]=2; unset m[a]; echo ${#m[@]}");
+    assert_eq!(out, "1\n");
+}
+
+#[test]
+fn assoc_array_unset_whole() {
+    let (out, _) = bash_exec_ok("declare -A m; m[a]=1; unset m; echo \"${m[@]}\"");
+    assert_eq!(out, "\n");
+}

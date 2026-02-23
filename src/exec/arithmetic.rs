@@ -63,8 +63,13 @@ fn read_var_as_i64(name: &str, env: &Environment) -> Result<i64, ExecError> {
 /// Read a variable value for arithmetic, handling array subscripts.
 fn read_arith_var(name: &str, env: &Environment) -> Option<String> {
     if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
-        let index: usize = subscript.parse().unwrap_or(0);
-        env.get_array_element(base, index).map(|s| s.to_string())
+        if env.is_assoc_array(base) {
+            env.get_assoc_element(base, subscript)
+                .map(|s| s.to_string())
+        } else {
+            let index: usize = subscript.parse().unwrap_or(0);
+            env.get_array_element(base, index).map(|s| s.to_string())
+        }
     } else {
         env.get_var(name).map(|s| s.to_string())
     }
@@ -73,8 +78,12 @@ fn read_arith_var(name: &str, env: &Environment) -> Option<String> {
 /// Write a variable value for arithmetic, handling array subscripts.
 fn write_arith_var(name: &str, value: &str, env: &mut Environment) -> Result<(), ExecError> {
     if let Some((base, subscript)) = super::expand::parse_array_subscript(name) {
-        let index: usize = subscript.parse().unwrap_or(0);
-        env.set_array_element(base, index, value)
+        if env.is_assoc_array(base) {
+            env.set_assoc_element(base, subscript, value)
+        } else {
+            let index: usize = subscript.parse().unwrap_or(0);
+            env.set_array_element(base, index, value)
+        }
     } else {
         env.set_var(name, value)
     }

@@ -32,6 +32,8 @@ pub fn is_builtin(name: &str) -> bool {
             | "["
             | "readonly"
             | "local"
+            | "declare"
+            | "typeset"
     )
 }
 
@@ -66,6 +68,7 @@ pub fn run_builtin(
         "test" | "[" => builtin_test(name, args, stderr),
         "readonly" => builtin_readonly(args, env),
         "local" => builtin_local(args, env),
+        "declare" | "typeset" => builtin_declare(args, env),
         "eval" | "exec" | "." | "source" => {
             Err(ExecError::UnsupportedFeature(format!("{} builtin", name)))
         }
@@ -174,6 +177,8 @@ fn builtin_unset(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
             if subscript == "@" || subscript == "*" {
                 // unset a[@] / unset a[*] — unset the whole array
                 env.unset_var(base)?;
+            } else if env.is_assoc_array(base) {
+                env.unset_assoc_element(base, subscript)?;
             } else {
                 let index: usize = subscript.parse().unwrap_or(0);
                 env.unset_array_element(base, index)?;
@@ -514,6 +519,35 @@ fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
             // If the variable doesn't exist yet, create it with empty value.
             if env.get_var(arg).is_none() {
                 env.set_var(arg, "")?;
+            }
+        }
+    }
+    Ok(0)
+}
+
+/// Minimal `declare` / `typeset` builtin.
+///
+/// Currently only supports `-A` (create associative array). The full declare
+/// builtin (with -a, -i, -r, -x, -p, etc.) will be expanded in a later commit.
+fn builtin_declare(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+    let mut create_assoc = false;
+    let mut names = Vec::new();
+
+    for arg in args {
+        if arg == "-A" {
+            create_assoc = true;
+        } else if !arg.starts_with('-') {
+            names.push(arg.clone());
+        }
+    }
+
+    for name in &names {
+        if create_assoc {
+            // Handle name or name=...
+            if let Some((n, _)) = name.split_once('=') {
+                env.create_assoc(n)?;
+            } else {
+                env.create_assoc(name)?;
             }
         }
     }

@@ -195,8 +195,13 @@ fn resolve_var(name: &str, env: &Environment) -> Option<String> {
         match subscript {
             "@" | "*" => env.get_array_all(base).map(|elems| elems.join(" ")),
             _ => {
-                let index: usize = subscript.parse().unwrap_or(0);
-                env.get_array_element(base, index).map(|s| s.to_string())
+                if env.is_assoc_array(base) {
+                    env.get_assoc_element(base, subscript)
+                        .map(|s| s.to_string())
+                } else {
+                    let index: usize = subscript.parse().unwrap_or(0);
+                    env.get_array_element(base, index).map(|s| s.to_string())
+                }
             }
         }
     } else {

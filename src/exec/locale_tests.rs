@@ -254,3 +254,275 @@ fn numeric_locale_resolution() {
     let locale = numeric_locale(&env);
     assert_eq!(decimal_separator(&locale), ',');
 }
+
+// -- Character class tests (POSIX [:class:]) ----------------------------------
+
+fn c() -> Locale {
+    parse_posix_locale("C")
+}
+fn utf8() -> Locale {
+    parse_posix_locale("en_US.UTF-8")
+}
+fn tr() -> Locale {
+    parse_posix_locale("tr_TR.UTF-8")
+}
+
+// C locale: upper (ASCII only) ------------------------------------------------
+
+#[test]
+fn char_class_upper_ascii_a() {
+    assert!(is_char_class('A', "upper", &c()));
+}
+
+#[test]
+fn char_class_upper_ascii_z() {
+    assert!(is_char_class('Z', "upper", &c()));
+}
+
+#[test]
+fn char_class_upper_ascii_a_lower() {
+    assert!(!is_char_class('a', "upper", &c()));
+}
+
+#[test]
+fn char_class_upper_accent_c() {
+    assert!(!is_char_class('\u{00c9}', "upper", &c())); // É
+}
+
+// C locale: lower (ASCII only) ------------------------------------------------
+
+#[test]
+fn char_class_lower_ascii_a() {
+    assert!(is_char_class('a', "lower", &c()));
+}
+
+#[test]
+fn char_class_lower_ascii_z() {
+    assert!(is_char_class('z', "lower", &c()));
+}
+
+#[test]
+fn char_class_lower_ascii_upper_a() {
+    assert!(!is_char_class('A', "lower", &c()));
+}
+
+#[test]
+fn char_class_lower_accent_c() {
+    assert!(!is_char_class('\u{00e9}', "lower", &c())); // é
+}
+
+// C locale: alpha (ASCII only) ------------------------------------------------
+
+#[test]
+fn char_class_alpha_ascii() {
+    assert!(is_char_class('m', "alpha", &c()));
+}
+
+#[test]
+fn char_class_alpha_digit_no() {
+    assert!(!is_char_class('5', "alpha", &c()));
+}
+
+#[test]
+fn char_class_alpha_accent_c() {
+    assert!(!is_char_class('\u{00e9}', "alpha", &c())); // é
+}
+
+// C locale: digit (locale-invariant) ------------------------------------------
+
+#[test]
+fn char_class_digit_5() {
+    assert!(is_char_class('5', "digit", &c()));
+}
+
+#[test]
+fn char_class_digit_a_no() {
+    assert!(!is_char_class('a', "digit", &c()));
+}
+
+// C locale: alnum -------------------------------------------------------------
+
+#[test]
+fn char_class_alnum_letter() {
+    assert!(is_char_class('A', "alnum", &c()));
+}
+
+#[test]
+fn char_class_alnum_digit() {
+    assert!(is_char_class('9', "alnum", &c()));
+}
+
+#[test]
+fn char_class_alnum_punct_no() {
+    assert!(!is_char_class('!', "alnum", &c()));
+}
+
+// C locale: space -------------------------------------------------------------
+
+#[test]
+fn char_class_space_space() {
+    assert!(is_char_class(' ', "space", &c()));
+}
+
+#[test]
+fn char_class_space_tab() {
+    assert!(is_char_class('\t', "space", &c()));
+}
+
+#[test]
+fn char_class_space_newline() {
+    assert!(is_char_class('\n', "space", &c()));
+}
+
+#[test]
+fn char_class_space_a_no() {
+    assert!(!is_char_class('a', "space", &c()));
+}
+
+// C locale: blank -------------------------------------------------------------
+
+#[test]
+fn char_class_blank_space() {
+    assert!(is_char_class(' ', "blank", &c()));
+}
+
+#[test]
+fn char_class_blank_tab() {
+    assert!(is_char_class('\t', "blank", &c()));
+}
+
+#[test]
+fn char_class_blank_newline_no() {
+    assert!(!is_char_class('\n', "blank", &c()));
+}
+
+// C locale: punct -------------------------------------------------------------
+
+#[test]
+fn char_class_punct_bang() {
+    assert!(is_char_class('!', "punct", &c()));
+}
+
+#[test]
+fn char_class_punct_dot() {
+    assert!(is_char_class('.', "punct", &c()));
+}
+
+#[test]
+fn char_class_punct_a_no() {
+    assert!(!is_char_class('a', "punct", &c()));
+}
+
+// C locale: cntrl (locale-invariant) ------------------------------------------
+
+#[test]
+fn char_class_cntrl_null() {
+    assert!(is_char_class('\0', "cntrl", &c()));
+}
+
+#[test]
+fn char_class_cntrl_bel() {
+    assert!(is_char_class('\x07', "cntrl", &c()));
+}
+
+#[test]
+fn char_class_cntrl_a_no() {
+    assert!(!is_char_class('a', "cntrl", &c()));
+}
+
+// C locale: xdigit (locale-invariant) -----------------------------------------
+
+#[test]
+fn char_class_xdigit_0() {
+    assert!(is_char_class('0', "xdigit", &c()));
+}
+
+#[test]
+fn char_class_xdigit_f() {
+    assert!(is_char_class('f', "xdigit", &c()));
+}
+
+#[test]
+fn char_class_xdigit_upper_f() {
+    assert!(is_char_class('F', "xdigit", &c()));
+}
+
+#[test]
+fn char_class_xdigit_g_no() {
+    assert!(!is_char_class('g', "xdigit", &c()));
+}
+
+// C locale: graph -------------------------------------------------------------
+
+#[test]
+fn char_class_graph_a() {
+    assert!(is_char_class('a', "graph", &c()));
+}
+
+#[test]
+fn char_class_graph_bang() {
+    assert!(is_char_class('!', "graph", &c()));
+}
+
+#[test]
+fn char_class_graph_space_no() {
+    assert!(!is_char_class(' ', "graph", &c()));
+}
+
+// C locale: print -------------------------------------------------------------
+
+#[test]
+fn char_class_print_a() {
+    assert!(is_char_class('a', "print", &c()));
+}
+
+#[test]
+fn char_class_print_space() {
+    assert!(is_char_class(' ', "print", &c()));
+}
+
+#[test]
+fn char_class_print_cntrl_no() {
+    assert!(!is_char_class('\x07', "print", &c()));
+}
+
+// UTF-8 locale: Unicode classification ----------------------------------------
+
+#[test]
+fn char_class_upper_accent_utf8() {
+    assert!(is_char_class('\u{00c9}', "upper", &utf8())); // É
+}
+
+#[test]
+fn char_class_lower_accent_utf8() {
+    assert!(is_char_class('\u{00e9}', "lower", &utf8())); // é
+}
+
+#[test]
+fn char_class_alpha_accent_utf8() {
+    assert!(is_char_class('\u{00f1}', "alpha", &utf8())); // ñ
+}
+
+#[test]
+fn char_class_alpha_cjk_utf8() {
+    assert!(is_char_class('\u{65e5}', "alpha", &utf8())); // 日
+}
+
+// Turkish locale --------------------------------------------------------------
+
+#[test]
+fn char_class_upper_dotted_i_turkish() {
+    assert!(is_char_class('\u{0130}', "upper", &tr())); // İ
+}
+
+#[test]
+fn char_class_lower_dotless_i_turkish() {
+    assert!(is_char_class('\u{0131}', "lower", &tr())); // ı
+}
+
+// Unknown class returns false -------------------------------------------------
+
+#[test]
+fn char_class_unknown() {
+    assert!(!is_char_class('A', "bogus", &c()));
+}

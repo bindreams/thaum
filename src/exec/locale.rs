@@ -113,6 +113,96 @@ pub fn decimal_separator(locale: &Locale) -> char {
     '.'
 }
 
+/// Check if a character belongs to a POSIX character class, respecting locale.
+///
+/// In C/POSIX locale, only ASCII characters match locale-sensitive classes
+/// (`upper`, `lower`, `alpha`, `alnum`, `punct`, `graph`, `print`).
+/// In UTF-8 locales, full Unicode classification applies via ICU4X.
+/// Locale-invariant classes (`digit`, `xdigit`, `space`, `blank`, `cntrl`)
+/// always use the same rules regardless of locale.
+#[allow(dead_code)] // Called by pattern.rs in a follow-up commit
+pub fn is_char_class(ch: char, class: &str, locale: &Locale) -> bool {
+    match class {
+        "upper" => is_upper(ch, locale),
+        "lower" => is_lower(ch, locale),
+        "alpha" => is_upper(ch, locale) || is_lower(ch, locale) || is_title_or_other_letter(ch, locale),
+        "digit" => ch.is_ascii_digit(),
+        "alnum" => is_char_class(ch, "alpha", locale) || ch.is_ascii_digit(),
+        "space" => ch.is_ascii_whitespace() || (!is_c_locale(locale) && ch.is_whitespace()),
+        "blank" => ch == ' ' || ch == '\t',
+        "punct" => is_punct(ch, locale),
+        "graph" => is_char_class(ch, "alnum", locale) || is_char_class(ch, "punct", locale),
+        "print" => is_char_class(ch, "graph", locale) || ch == ' ',
+        "cntrl" => ch.is_ascii_control(),
+        "xdigit" => ch.is_ascii_hexdigit(),
+        _ => false,
+    }
+}
+
+fn is_c_locale(locale: &Locale) -> bool {
+    locale == &Locale::UNKNOWN || locale.id.language.is_unknown()
+}
+
+fn is_upper(ch: char, locale: &Locale) -> bool {
+    if is_c_locale(locale) {
+        ch.is_ascii_uppercase()
+    } else {
+        use icu::properties::props::GeneralCategory;
+        use icu::properties::CodePointMapData;
+        let gc = CodePointMapData::<GeneralCategory>::new();
+        gc.get(ch) == GeneralCategory::UppercaseLetter
+    }
+}
+
+fn is_lower(ch: char, locale: &Locale) -> bool {
+    if is_c_locale(locale) {
+        ch.is_ascii_lowercase()
+    } else {
+        use icu::properties::props::GeneralCategory;
+        use icu::properties::CodePointMapData;
+        let gc = CodePointMapData::<GeneralCategory>::new();
+        gc.get(ch) == GeneralCategory::LowercaseLetter
+    }
+}
+
+fn is_title_or_other_letter(ch: char, locale: &Locale) -> bool {
+    if is_c_locale(locale) {
+        false // C locale: only ASCII letters count
+    } else {
+        use icu::properties::props::GeneralCategory;
+        use icu::properties::CodePointMapData;
+        let gc = CodePointMapData::<GeneralCategory>::new();
+        matches!(
+            gc.get(ch),
+            GeneralCategory::TitlecaseLetter | GeneralCategory::ModifierLetter | GeneralCategory::OtherLetter
+        )
+    }
+}
+
+fn is_punct(ch: char, locale: &Locale) -> bool {
+    if is_c_locale(locale) {
+        ch.is_ascii_punctuation()
+    } else {
+        use icu::properties::props::GeneralCategory;
+        use icu::properties::CodePointMapData;
+        let gc = CodePointMapData::<GeneralCategory>::new();
+        matches!(
+            gc.get(ch),
+            GeneralCategory::DashPunctuation
+                | GeneralCategory::OpenPunctuation
+                | GeneralCategory::ClosePunctuation
+                | GeneralCategory::ConnectorPunctuation
+                | GeneralCategory::OtherPunctuation
+                | GeneralCategory::InitialPunctuation
+                | GeneralCategory::FinalPunctuation
+                | GeneralCategory::MathSymbol
+                | GeneralCategory::CurrencySymbol
+                | GeneralCategory::ModifierSymbol
+                | GeneralCategory::OtherSymbol
+        )
+    }
+}
+
 /// Parse a POSIX locale string (e.g., "en_US.UTF-8", "tr_TR", "C") into an ICU Locale.
 ///
 /// Handles common formats:

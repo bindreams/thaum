@@ -2418,6 +2418,19 @@ fn declare_dash_big_f_lists_function_names() {
 }
 
 #[test]
+fn declare_dash_f_prints_function_body() {
+    let (out, _) = bash_exec_ok("greet() { echo hello; }; declare -f greet");
+    assert!(
+        out.contains("greet ()"),
+        "declare -f should print function header; got: {out}"
+    );
+    assert!(
+        out.contains("echo hello"),
+        "declare -f should print function body; got: {out}"
+    );
+}
+
+#[test]
 #[ignore] // TODO: arithmetic.rs:21 — recursive variable expansion in arithmetic
 fn arith_recursive_variable_expansion() {
     let (out, _) = bash_exec_ok("a=b; b=5; echo $((a))");

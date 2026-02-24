@@ -688,7 +688,14 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
     }
     // -f: list full function definitions
     if attrs.list_functions {
-        // TODO: declare -f needs AST-to-source printing
+        let mut names = env.function_names();
+        names.sort();
+        for name in names {
+            if let Some(func) = env.get_function(name) {
+                let source = crate::format::SourceWriter::format_function(name, func);
+                let _ = write!(stdout, "{}", source);
+            }
+        }
         return Ok(0);
     }
 

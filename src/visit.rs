@@ -5,11 +5,9 @@
 //! Override a method to intercept a node; call the `walk_*` function
 //! inside your override to continue descending.
 //!
-//! The visitor covers the statement / expression / command tree. It does
-//! **not** automatically descend into word-level nesting such as
-//! [`Fragment::CommandSubstitution`] or [`Atom::BashProcessSubstitution`].
-//! Override [`Visit::visit_word`] or [`Visit::visit_argument`] to enter
-//! those manually.
+//! The visitor covers the full AST: statements, expressions, compound
+//! commands, words, fragments, parameter expansions, arithmetic
+//! expressions, and test expressions.
 //!
 //! # Example
 //!
@@ -95,16 +93,41 @@ pub trait Visit<'ast> {
         walk_argument(self, argument);
     }
 
-    /// Visit a word. Default is a **no-op** (leaf node). Override to enter
-    /// word-level nesting (fragments, command substitutions, etc.).
-    fn visit_word(&mut self, _word: &'ast Word) {
-        // Leaf by default. Word-level traversal is opt-in.
+    /// Visit a word. Default: visits each fragment.
+    fn visit_word(&mut self, word: &'ast Word) {
+        walk_word(self, word);
+    }
+
+    /// Visit a standalone atom (e.g., process substitution). Default: visits body statements.
+    fn visit_atom(&mut self, atom: &'ast Atom) {
+        walk_atom(self, atom);
+    }
+
+    /// Visit a word fragment. Default: descends into nested structures.
+    fn visit_fragment(&mut self, fragment: &'ast Fragment) {
+        walk_fragment(self, fragment);
+    }
+
+    /// Visit a parameter expansion. Default: visits the argument word if present.
+    fn visit_parameter_expansion(&mut self, expansion: &'ast ParameterExpansion) {
+        walk_parameter_expansion(self, expansion);
+    }
+
+    /// Visit an arithmetic expression. Default: recurses into sub-expressions.
+    fn visit_arith_expr(&mut self, expr: &'ast ArithExpr) {
+        walk_arith_expr(self, expr);
+    }
+
+    /// Visit a `[[ ]]` test expression. Default: recurses into sub-expressions.
+    fn visit_bash_test_expr(&mut self, expr: &'ast BashTestExpr) {
+        walk_bash_test_expr(self, expr);
     }
 }
 
 // walk_* free functions ===============================================================================================
 
-fn walk_lines<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, lines: &'ast [Line]) {
+/// Walk all statements in all lines. Call from overrides that need to visit line lists.
+pub fn walk_lines<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, lines: &'ast [Line]) {
     for line in lines {
         for stmt in line {
             v.visit_statement(stmt);
@@ -200,7 +223,12 @@ pub fn walk_compound_command<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, compound:
             walk_lines(v, condition);
             walk_lines(v, body);
         }
-        CompoundCommand::BashDoubleBracket { .. } | CompoundCommand::BashArithmeticCommand { .. } => {}
+        CompoundCommand::BashDoubleBracket { expression, .. } => {
+            v.visit_bash_test_expr(expression);
+        }
+        CompoundCommand::BashArithmeticCommand { expression, .. } => {
+            v.visit_arith_expr(expression);
+        }
         CompoundCommand::BashCoproc { body, .. } => {
             v.visit_expression(body);
         }
@@ -263,13 +291,109 @@ pub fn walk_elif_clause<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, elif: &'ast El
     walk_lines(v, &elif.body);
 }
 
-/// Visit the word inside an argument (atoms are not entered). Call from [`Visit::visit_argument`] overrides.
+/// Visit the inner word or atom. Call from [`Visit::visit_argument`] overrides.
 pub fn walk_argument<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, argument: &'ast Argument) {
     match argument {
         Argument::Word(w) => v.visit_word(w),
-        Argument::Atom(_) => {
-            // Process substitution body is not traversed by default.
+        Argument::Atom(a) => v.visit_atom(a),
+    }
+}
+
+/// Visit the body statements inside a process substitution atom.
+pub fn walk_atom<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, atom: &'ast Atom) {
+    match atom {
+        Atom::BashProcessSubstitution { body, .. } => {
+            for stmt in body {
+                v.visit_statement(stmt);
+            }
         }
+    }
+}
+
+/// Visit each fragment in a word.
+pub fn walk_word<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, word: &'ast Word) {
+    for fragment in &word.parts {
+        v.visit_fragment(fragment);
+    }
+}
+
+/// Descend into nested structures within a fragment. Call from [`Visit::visit_fragment`] overrides.
+pub fn walk_fragment<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, fragment: &'ast Fragment) {
+    match fragment {
+        Fragment::Literal(_) | Fragment::SingleQuoted(_) | Fragment::BashAnsiCQuoted(_) => {}
+        Fragment::DoubleQuoted(parts) => {
+            for part in parts {
+                v.visit_fragment(part);
+            }
+        }
+        Fragment::Parameter(expansion) => v.visit_parameter_expansion(expansion),
+        Fragment::CommandSubstitution(stmts) => {
+            for stmt in stmts {
+                v.visit_statement(stmt);
+            }
+        }
+        Fragment::ArithmeticExpansion(expr) => v.visit_arith_expr(expr),
+        Fragment::Glob(_) | Fragment::TildePrefix(_) => {}
+        Fragment::BashLocaleQuoted { parts, .. } => {
+            for part in parts {
+                v.visit_fragment(part);
+            }
+        }
+        Fragment::BashExtGlob { .. } | Fragment::BashBraceExpansion(_) => {}
+    }
+}
+
+/// Visit the argument word inside a parameter expansion if present.
+pub fn walk_parameter_expansion<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, expansion: &'ast ParameterExpansion) {
+    match expansion {
+        ParameterExpansion::Simple(_) => {}
+        ParameterExpansion::Complex { argument, .. } => {
+            if let Some(arg) = argument {
+                v.visit_word(arg);
+            }
+        }
+    }
+}
+
+/// Recurse into sub-expressions of an arithmetic expression.
+pub fn walk_arith_expr<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, expr: &'ast ArithExpr) {
+    match expr {
+        ArithExpr::Number(_) | ArithExpr::Variable(_) => {}
+        ArithExpr::Binary { left, right, .. } | ArithExpr::Comma { left, right } => {
+            v.visit_arith_expr(left);
+            v.visit_arith_expr(right);
+        }
+        ArithExpr::UnaryPrefix { operand, .. } | ArithExpr::UnaryPostfix { operand, .. } => {
+            v.visit_arith_expr(operand);
+        }
+        ArithExpr::Ternary {
+            condition,
+            then_expr,
+            else_expr,
+        } => {
+            v.visit_arith_expr(condition);
+            v.visit_arith_expr(then_expr);
+            v.visit_arith_expr(else_expr);
+        }
+        ArithExpr::Assignment { value, .. } => v.visit_arith_expr(value),
+        ArithExpr::Group(inner) => v.visit_arith_expr(inner),
+    }
+}
+
+/// Recurse into sub-expressions of a `[[ ]]` test expression.
+pub fn walk_bash_test_expr<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, expr: &'ast BashTestExpr) {
+    match expr {
+        BashTestExpr::Unary { arg, .. } => v.visit_word(arg),
+        BashTestExpr::Binary { left, right, .. } => {
+            v.visit_word(left);
+            v.visit_word(right);
+        }
+        BashTestExpr::And { left, right } | BashTestExpr::Or { left, right } => {
+            v.visit_bash_test_expr(left);
+            v.visit_bash_test_expr(right);
+        }
+        BashTestExpr::Not(inner) | BashTestExpr::Group(inner) => v.visit_bash_test_expr(inner),
+        BashTestExpr::Word(w) => v.visit_word(w),
     }
 }
 

@@ -1,6 +1,10 @@
 name: ${!var[@]@X}
 dialect: bash
 source: oils:spec/var-op-bash#varx
+# TODO: This test requires $SH (oils convention for shell-under-test) and
+# ${var@P}/${var@Q}/${var@a} parameter transformation operators (not yet
+# implemented). Expected output from oils is three empty lines.
+stdout: "\n\n\n"
 ---
 # note: "y z" causes a bug!
 $SH -c 'declare -A A=(["x"]="y"); echo ${!A[@]@P}'

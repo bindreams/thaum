@@ -77,6 +77,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `bash_test.rs` — `[[ ]]` conditional evaluator
   - `printf.rs` — printf builtin formatter (custom, not Rust format!)
   - `expand.rs` — word expansion (parameters, tilde, substitution)
+  - `gettext.rs` — GNU gettext catalog lookup for `$"..."` locale translation
   - `compound.rs` — compound command execution (if/while/for/case)
   - `pipeline.rs` — pipeline execution
   - `external.rs` + `command_ex.rs` — external process spawning

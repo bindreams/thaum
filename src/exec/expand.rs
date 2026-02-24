@@ -84,10 +84,8 @@ fn expand_fragment(fragment: &Fragment, env: &mut Environment, out: &mut String)
         Fragment::BashAnsiCQuoted(s) => {
             out.push_str(s);
         }
-        Fragment::BashLocaleQuoted(parts) => {
-            for part in parts {
-                expand_fragment_in_double_quotes(part, env, out)?;
-            }
+        Fragment::BashLocaleQuoted { raw, parts } => {
+            expand_locale_quoted(raw, parts, env, out)?;
         }
         Fragment::BashExtGlob { .. } => {
             return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
@@ -97,6 +95,105 @@ fn expand_fragment(fragment: &Fragment, env: &mut Environment, out: &mut String)
         }
     }
     Ok(())
+}
+
+/// Expand a `$"..."` locale-quoted fragment via gettext lookup.
+///
+/// Looks up `raw` as a msgid in the current gettext catalog. If a translation
+/// is found, re-parses the translated string as double-quoted content and
+/// expands the result. If no translation exists, expands the original `parts`.
+fn expand_locale_quoted(
+    raw: &str,
+    parts: &[Fragment],
+    env: &mut Environment,
+    out: &mut String,
+) -> Result<(), ExecError> {
+    let translated = super::gettext::translate(raw, env);
+    if translated == *raw {
+        // No translation — expand original fragments
+        for part in parts {
+            expand_fragment_in_double_quotes(part, env, out)?;
+        }
+    } else {
+        // Translation found — re-parse as double-quoted content and expand
+        let options = crate::dialect::ShellOptions {
+            locale_translation: true,
+            ..Default::default()
+        };
+        let mut lexer = crate::lexer::Lexer::new_double_quote_mode(&translated, options);
+        let mut translated_parts = Vec::new();
+        loop {
+            let tok = lexer
+                .next_token()
+                .map_err(|e| ExecError::BadSubstitution(format!("gettext re-parse: {}", e)))?;
+            if tok.token == crate::token::Token::Eof {
+                break;
+            }
+            translated_parts.push(tok);
+        }
+        // Convert tokens to fragments via a temporary parser-like path.
+        // We only need fragment conversion, so we use a minimal approach:
+        // re-parse the translated string as a full double-quoted word.
+        // Simpler: just build fragments from the spanned tokens directly.
+        // Actually, we can use the same approach as the parser's lex_double_quoted_content:
+        // create a parser for the translated string and collect the word.
+        // But that's heavyweight. Instead, we expand token-level fragments directly.
+        for st in translated_parts {
+            expand_dq_token_fragment(&st.token, env, out)?;
+        }
+    }
+    Ok(())
+}
+
+/// Expand a double-quoted-context token directly, without building a Fragment AST node.
+fn expand_dq_token_fragment(
+    token: &crate::token::Token,
+    env: &mut Environment,
+    out: &mut String,
+) -> Result<(), ExecError> {
+    use crate::token::Token;
+    match token {
+        Token::Literal(s) => {
+            out.push_str(&de_escape_literal(s));
+        }
+        Token::SimpleParam(name) => {
+            expand_parameter(&ParameterExpansion::Simple(name.clone()), env, out)?;
+        }
+        Token::BraceParam(raw) => {
+            let expansion = crate::word::parse_brace_param_content(raw, true);
+            expand_parameter(&expansion, env, out)?;
+        }
+        Token::CommandSub(_) | Token::BacktickSub(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "unresolved command substitution in gettext translation".to_string(),
+            ));
+        }
+        Token::ArithSub(_) => {
+            return Err(ExecError::UnsupportedFeature(
+                "arithmetic expansion in gettext translation".to_string(),
+            ));
+        }
+        _ => {
+            // Other tokens in double-quote mode are unlikely but pass through
+        }
+    }
+    Ok(())
+}
+
+/// Remove backslash escaping from a raw literal: `\\c` becomes `c`.
+fn de_escape_literal(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut chars = s.chars();
+    while let Some(c) = chars.next() {
+        if c == '\\' {
+            if let Some(next) = chars.next() {
+                result.push(next);
+            }
+        } else {
+            result.push(c);
+        }
+    }
+    result
 }
 
 /// Expand a fragment inside double quotes (no field splitting, no glob).
@@ -134,10 +231,8 @@ fn expand_fragment_in_double_quotes(
             out.push_str(user);
         }
         Fragment::BashAnsiCQuoted(s) => out.push_str(s),
-        Fragment::BashLocaleQuoted(parts) => {
-            for part in parts {
-                expand_fragment_in_double_quotes(part, env, out)?;
-            }
+        Fragment::BashLocaleQuoted { raw, parts } => {
+            expand_locale_quoted(raw, parts, env, out)?;
         }
         Fragment::BashExtGlob { .. } => {
             return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));

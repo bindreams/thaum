@@ -18,6 +18,7 @@ clap = { version = "4", features = ["derive"], optional = true }
 regex = "1"
 icu = "2"
 jiff = "0.2"
+gettext = "0.4"
 
 [target.'cfg(unix)'.dependencies]
 command-fds = "0.3"

@@ -2098,3 +2098,84 @@ fn case_char_class_upper_accent_utf8_locale() {
     let (out, _) = bash_exec_ok("LC_CTYPE=en_US.UTF-8; case É in [[:upper:]]) echo y;; *) echo n;; esac");
     assert_eq!(out, "y\n");
 }
+
+// Locale translation ($"...") =========================================================================================
+
+fn fixture_dir() -> String {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/locale")
+        .to_str()
+        .unwrap()
+        .to_string()
+}
+
+#[test]
+fn locale_quoted_no_domain() {
+    // Without TEXTDOMAIN, $"..." just expands like double quotes
+    let (out, _) = bash_exec_ok("echo $\"hello world\"");
+    assert_eq!(out, "hello world\n");
+}
+
+#[test]
+fn locale_quoted_with_variable_no_domain() {
+    // $"..." expands variables even without translation
+    let (out, _) = bash_exec_ok("x=test; echo $\"hello $x\"");
+    assert_eq!(out, "hello test\n");
+}
+
+#[test]
+fn locale_quoted_basic_translation() {
+    let script = format!(
+        "TEXTDOMAIN=testdomain\nTEXTDOMAINDIR={}\nLC_MESSAGES=de\necho $\"hello world\"",
+        fixture_dir()
+    );
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(out, "hallo welt\n");
+}
+
+#[test]
+fn locale_quoted_with_variable_translation() {
+    let script = format!(
+        "USER=Claude\nTEXTDOMAIN=testdomain\nTEXTDOMAINDIR={}\nLC_MESSAGES=de\necho $\"hello $USER\"",
+        fixture_dir()
+    );
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(out, "hallo Claude\n");
+}
+
+#[test]
+fn locale_quoted_missing_msgid() {
+    let script = format!(
+        "TEXTDOMAIN=testdomain\nTEXTDOMAINDIR={}\nLC_MESSAGES=de\necho $\"not in catalog\"",
+        fixture_dir()
+    );
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(out, "not in catalog\n");
+}
+
+#[test]
+fn locale_quoted_c_locale_no_translation() {
+    let script = format!(
+        "TEXTDOMAIN=testdomain\nTEXTDOMAINDIR={}\nLC_MESSAGES=C\necho $\"hello world\"",
+        fixture_dir()
+    );
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(out, "hello world\n");
+}
+
+#[test]
+fn locale_quoted_empty_string() {
+    let (out, _) = bash_exec_ok("echo $\"\"");
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn locale_quoted_fallback_locale() {
+    // LANG=de_DE.UTF-8 with .mo only in de/ directory -- should fall back
+    let script = format!(
+        "TEXTDOMAIN=testdomain\nTEXTDOMAINDIR={}\nLANG=de_DE.UTF-8\necho $\"goodbye\"",
+        fixture_dir()
+    );
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(out, "auf wiedersehen\n");
+}

@@ -50,6 +50,7 @@ src/
     bash_test.rs       — [[ ]] conditional evaluator
     printf.rs          — printf builtin formatter
     expand.rs          — word expansion (parameters, tilde, substitution)
+    gettext.rs         — GNU gettext catalog lookup for $"..." locale translation
     compound.rs        — compound command execution (if/while/for/case)
     pipeline.rs        — pipeline execution
     external.rs        — external process spawning

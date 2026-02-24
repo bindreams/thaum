@@ -51,6 +51,7 @@ Currently implemented Bash extensions:
 - `coproc` command (`coproc`)
 - `select` loop (`select`)
 - `function` keyword (`function_keyword`)
+- `$"..."` locale translation via gettext (`locale_translation`)
 
 Planned: brace expansion `{n..m}`.
 
@@ -78,6 +79,7 @@ Supported features:
 - Alias expansion with correct newline-boundary semantics
 - `[[ ]]` conditional with all operators including `=~` regex
 - Arithmetic commands `(( ))` and expansion `$(( ))`
+- `$"..."` locale translation via GNU gettext `.mo` catalogs
 - Builtins: echo, printf, cd, test/[, eval, exec, source, declare/typeset,
   export, unset, read, set, shopt, alias/unalias, local, readonly, shift,
   return, break, continue, exit, true, false, :

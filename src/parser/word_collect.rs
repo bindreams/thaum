@@ -141,7 +141,7 @@ impl Parser {
             Token::BashAnsiCQuoted(content) => Ok(Fragment::BashAnsiCQuoted(content)),
             Token::BashLocaleQuoted(raw) => {
                 let inner = self.lex_double_quoted_content(&raw)?;
-                Ok(Fragment::BashLocaleQuoted(inner))
+                Ok(Fragment::BashLocaleQuoted { raw, parts: inner })
             }
             Token::BashExtGlob { kind, pattern } => {
                 let ast_kind = match kind {

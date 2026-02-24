@@ -540,9 +540,9 @@ impl<'a> YamlWriter<'a> {
                 m.raw("type", "BashAnsiCQuoted");
                 m.scalar("value", s);
             }
-            Fragment::BashLocaleQuoted(inner) => {
+            Fragment::BashLocaleQuoted { parts, .. } => {
                 m.raw("type", "BashLocaleQuoted");
-                let items: Vec<YamlValue> = inner.iter().map(|p| self.build_fragment(p)).collect();
+                let items: Vec<YamlValue> = parts.iter().map(|p| self.build_fragment(p)).collect();
                 m.value("parts", YamlValue::Sequence(items));
             }
             Fragment::BashBraceExpansion(brace) => {

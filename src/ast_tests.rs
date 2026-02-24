@@ -100,7 +100,10 @@ fn extglob_is_none() {
 
 #[test]
 fn locale_quoted_is_none() {
-    let frag = Fragment::BashLocaleQuoted(vec![literal("hi")]);
+    let frag = Fragment::BashLocaleQuoted {
+        raw: "hi".into(),
+        parts: vec![literal("hi")],
+    };
     assert_eq!(frag.try_to_static_string(), None);
 }
 

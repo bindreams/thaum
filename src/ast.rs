@@ -325,8 +325,13 @@ pub enum Fragment {
     /// `$'...'` — ANSI-C quoting (Bash). Escapes stored literally, not interpreted.
     BashAnsiCQuoted(String),
     /// `$"..."` — locale translation quoting (Bash). Inner fragments undergo
-    /// the same expansion as double quotes.
-    BashLocaleQuoted(Vec<Fragment>),
+    /// the same expansion as double quotes after gettext lookup.
+    BashLocaleQuoted {
+        /// Original text between `$"` and `"` — used as the gettext msgid.
+        raw: String,
+        /// Parsed inner fragments (same as `DoubleQuoted`).
+        parts: Vec<Fragment>,
+    },
     /// Extended glob pattern (Bash extglob): `?(pat)`, `*(pat)`, etc.
     BashExtGlob {
         kind: ExtGlobKind,
@@ -364,7 +369,7 @@ impl Fragment {
             | Fragment::ArithmeticExpansion(_)
             | Fragment::Glob(_)
             | Fragment::TildePrefix(_)
-            | Fragment::BashLocaleQuoted(_)
+            | Fragment::BashLocaleQuoted { .. }
             | Fragment::BashExtGlob { .. }
             | Fragment::BashBraceExpansion(_) => return None,
         }

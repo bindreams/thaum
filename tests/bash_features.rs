@@ -638,11 +638,12 @@ fn bash_locale_quoted() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            assert!(matches!(&w.parts[0], Fragment::BashLocaleQuoted(_)));
-            if let Fragment::BashLocaleQuoted(inner) = &w.parts[0] {
+            assert!(matches!(&w.parts[0], Fragment::BashLocaleQuoted { .. }));
+            if let Fragment::BashLocaleQuoted { raw, parts } = &w.parts[0] {
+                assert_eq!(raw, "hello $USER");
                 // Should contain at least a Literal and a Parameter
-                assert!(inner.iter().any(|p| matches!(p, Fragment::Literal(_))));
-                assert!(inner.iter().any(|p| matches!(p, Fragment::Parameter(_))));
+                assert!(parts.iter().any(|p| matches!(p, Fragment::Literal(_))));
+                assert!(parts.iter().any(|p| matches!(p, Fragment::Parameter(_))));
             }
         } else {
             panic!("expected Word");
@@ -659,7 +660,7 @@ fn posix_dollar_double_quote_is_dollar_plus_string() {
     let stmt = &prog.lines[0][0];
     if let Expression::Command(cmd) = &stmt.expression {
         if let Argument::Word(w) = &cmd.arguments[1] {
-            assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashLocaleQuoted(_))));
+            assert!(!w.parts.iter().any(|p| matches!(p, Fragment::BashLocaleQuoted { .. })));
         }
     }
 }

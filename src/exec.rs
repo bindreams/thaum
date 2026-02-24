@@ -19,6 +19,8 @@ pub mod error;
 /// POSIX word expansion: tilde, parameter, quote removal.
 pub mod expand;
 mod external;
+/// GNU gettext catalog lookup for `$"..."` locale translation.
+pub(crate) mod gettext;
 /// Pluggable I/O context for stdin/stdout/stderr (live or captured).
 pub mod io_context;
 /// Locale-aware string operations (case conversion) via ICU4X.
@@ -362,6 +364,13 @@ impl Executor {
                 Fragment::DoubleQuoted(parts) => {
                     let resolved = self.resolve_cmd_subs_in_fragments(parts)?;
                     result.push(Fragment::DoubleQuoted(resolved));
+                }
+                Fragment::BashLocaleQuoted { raw, parts } => {
+                    let resolved = self.resolve_cmd_subs_in_fragments(parts)?;
+                    result.push(Fragment::BashLocaleQuoted {
+                        raw: raw.clone(),
+                        parts: resolved,
+                    });
                 }
                 // All other fragments pass through unchanged
                 other => result.push(other.clone()),

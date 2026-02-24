@@ -2368,3 +2368,88 @@ fn bash51_allows_transform_lower() {
     let (out, _) = dialect_exec_ok("x=HELLO; echo ${x@L}", Dialect::Bash51);
     assert_eq!(out, "hello\n");
 }
+
+// Ignored tests confirming known TODO items ===========================================================================
+//
+// Each test asserts the *correct* behavior. They are #[ignore]d because the
+// corresponding feature or fix is not yet implemented. Run them with:
+//   cargo test --features cli -- --ignored
+// When a TODO is resolved, remove #[ignore] and the test becomes part of CI.
+
+// heredoc_at_eof (lexer.rs:379): the TODO describes unclean internal lexer
+// state, but the observable behavior (parse error) is already correct.
+// No failing test can be written for this — the TODO is a code-quality note
+// about clearing an internal flag, not a user-visible bug.
+
+#[test]
+#[cfg(unix)]
+fn test_dash_big_o_checks_ownership_not_existence() {
+    // /etc/passwd exists but is owned by root, not the test user.
+    // -O should return false; the bug makes it return true (file exists).
+    let (out, _) = bash_exec_ok("[[ -O /etc/passwd ]] && echo yes || echo no");
+    assert_eq!(out, "no\n", "-O should fail for files not owned by current user");
+}
+
+#[test]
+#[cfg(unix)]
+fn test_dash_big_g_checks_group_not_existence() {
+    // /etc/passwd is typically group-owned by root/wheel, not the test user's group.
+    let (out, _) = bash_exec_ok("[[ -G /etc/passwd ]] && echo yes || echo no");
+    assert_eq!(out, "no\n", "-G should fail for files not owned by current group");
+}
+
+#[test]
+#[ignore] // TODO: bash_test.rs:143 — -t only checks if string parses as int
+fn test_dash_t_checks_terminal_not_just_int() {
+    // In the test harness, FD 0 (stdin) is not a terminal.
+    // -t 0 should return false; the bug makes it return true.
+    let (out, _) = bash_exec_ok("[[ -t 0 ]] && echo terminal || echo not-terminal");
+    assert_eq!(out, "not-terminal\n");
+}
+
+#[test]
+#[ignore] // TODO: builtins.rs:564 — readonly with no args should list vars
+fn readonly_no_args_lists_variables() {
+    let (out, _) = bash_exec_ok("readonly x=42; readonly");
+    assert!(out.contains("x"), "readonly should list readonly variables; got: {out}");
+}
+
+#[test]
+#[ignore] // TODO: builtins.rs:679 — declare -f/-F not implemented
+fn declare_dash_big_f_lists_function_names() {
+    let (out, _) = bash_exec_ok("foo() { echo bar; }; declare -F");
+    assert!(out.contains("foo"), "declare -F should list function names; got: {out}");
+}
+
+#[test]
+#[ignore] // TODO: arithmetic.rs:21 — recursive variable expansion in arithmetic
+fn arith_recursive_variable_expansion() {
+    let (out, _) = bash_exec_ok("a=b; b=5; echo $((a))");
+    assert_eq!(out, "5\n", "arithmetic should recursively expand variable names");
+}
+
+#[test]
+#[ignore] // TODO: expand.rs:257 — ~user expansion needs getpwnam
+#[cfg(unix)]
+fn tilde_user_expansion() {
+    // ~root should expand to root's home directory, not stay literal
+    let (out, _) = exec_ok("echo ~root");
+    assert!(!out.starts_with("~root"), "~root should expand; got: {out}");
+}
+
+#[test]
+#[ignore] // TODO: expand.rs:524 — @K transform for arrays not implemented
+fn transform_at_big_k_shows_key_value_pairs() {
+    let (out, _) = bash_exec_ok(r#"declare -A m=([foo]=1 [bar]=2); for kv in "${m[@]@K}"; do echo "$kv"; done"#);
+    assert!(out.contains("foo"), "@K should produce key=value pairs; got: {out}");
+}
+
+#[test]
+#[ignore] // TODO: exec_basic.rs:936 — field splitting not implemented
+fn field_splitting_array_for_loop() {
+    let (out, _) = bash_exec_ok(r#"a=(x y z); for i in ${a[@]}; do echo $i; done"#);
+    assert_eq!(
+        out, "x\ny\nz\n",
+        "unquoted ${{a[@]}} should field-split into separate words"
+    );
+}

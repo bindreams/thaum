@@ -1,6 +1,6 @@
 mod common;
 
-use thaum::exec::{CapturedIo, ExecError, Executor};
+use thaum::exec::{CapturedIo, Environment, ExecError, Executor};
 use thaum::Dialect;
 
 /// Find the thaum binary for subshell tests.
@@ -24,9 +24,13 @@ fn thaum_exe() -> std::path::PathBuf {
 }
 
 /// Create an executor configured for tests (controlled PATH, thaum exe path).
+///
+/// Uses a clean environment (no process inheritance) so tests are not affected
+/// by the host's locale variables (`LC_ALL`, `LANG`, etc.).
 fn test_executor() -> Executor {
-    let mut executor = Executor::new();
-    let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut env = Environment::new();
+    let _ = env.set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let mut executor = Executor::with_env(env);
     executor.set_exe_path(thaum_exe());
     executor
 }

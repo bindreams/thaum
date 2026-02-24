@@ -1,6 +1,7 @@
 name: Locals don't leak
-dialect: bash
+dialect: dash
 source: oils:spec/sh-func#locals-dont-leak
+stdout: "\n"
 ---
 f() {
   local f_var=f_var

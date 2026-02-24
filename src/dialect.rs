@@ -70,6 +70,8 @@ pub struct ShellOptions {
 pub enum Dialect {
     /// POSIX sh — no extensions.
     Posix,
+    /// Debian Almquist Shell — POSIX plus `local`.
+    Dash,
     /// GNU Bash — all extensions enabled.
     Bash,
 }
@@ -79,6 +81,10 @@ impl Dialect {
     pub fn options(&self) -> ShellOptions {
         match self {
             Dialect::Posix => ShellOptions::default(),
+            Dialect::Dash => ShellOptions {
+                local_builtin: true,
+                ..ShellOptions::default()
+            },
             Dialect::Bash => ShellOptions {
                 here_strings: true,
                 ampersand_redirect: true,

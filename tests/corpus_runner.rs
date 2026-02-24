@@ -97,6 +97,7 @@ impl TestSpec {
     fn dialect(&self) -> Result<thaum::Dialect, String> {
         match self.dialect.as_str() {
             "posix" => Ok(thaum::Dialect::Posix),
+            "dash" => Ok(thaum::Dialect::Dash),
             "bash" => Ok(thaum::Dialect::Bash),
             other => Err(format!("unknown dialect: {:?}", other)),
         }

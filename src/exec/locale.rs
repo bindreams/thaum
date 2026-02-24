@@ -85,6 +85,34 @@ pub fn uncapitalize(s: &str, locale: &Locale) -> String {
     result
 }
 
+/// Resolve LC_NUMERIC (decimal separator, grouping).
+pub fn numeric_locale(env: &Environment) -> Locale {
+    resolve_locale(env, "LC_NUMERIC")
+}
+
+/// Return the decimal separator character for the given locale.
+///
+/// Formats `1.5` with ICU4X and extracts the non-digit character
+/// between `1` and `5`. Falls back to `'.'`.
+pub fn decimal_separator(locale: &Locale) -> char {
+    use icu::decimal::input::Decimal;
+    use icu::decimal::DecimalFormatter;
+
+    let prefs = icu::decimal::DecimalFormatterPreferences::from(&locale.id);
+    if let Ok(fmt) = DecimalFormatter::try_new(prefs, Default::default()) {
+        // Build 1.5 as a Decimal
+        let dec = "1.5".parse::<Decimal>().unwrap();
+        let s = fmt.format_to_string(&dec);
+        // Extract the separator (the non-digit between '1' and '5')
+        for ch in s.chars() {
+            if !ch.is_ascii_digit() {
+                return ch;
+            }
+        }
+    }
+    '.'
+}
+
 /// Parse a POSIX locale string (e.g., "en_US.UTF-8", "tr_TR", "C") into an ICU Locale.
 ///
 /// Handles common formats:

@@ -134,15 +134,19 @@ fn builtin_printf(args: &[String], env: &mut Environment, stdout: &mut dyn Write
 
     let remaining: Vec<String> = arg_iter.cloned().collect();
 
+    // Resolve LC_NUMERIC decimal separator for float formatting
+    let locale = super::locale::numeric_locale(env);
+    let decimal_sep = super::locale::decimal_separator(&locale);
+
     if let Some(vname) = var_name {
         // Write to buffer, then assign to variable
         let mut buf: Vec<u8> = Vec::new();
-        let status = super::printf::printf_format(fmt_str, &remaining, &mut buf);
+        let status = super::printf::printf_format(fmt_str, &remaining, &mut buf, decimal_sep);
         let output = String::from_utf8_lossy(&buf).into_owned();
         env.set_var(vname, &output)?;
         Ok(status)
     } else {
-        let status = super::printf::printf_format(fmt_str, &remaining, stdout);
+        let status = super::printf::printf_format(fmt_str, &remaining, stdout, decimal_sep);
         Ok(status)
     }
 }

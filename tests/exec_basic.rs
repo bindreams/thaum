@@ -1418,6 +1418,29 @@ fn printf_strftime_current() {
     assert!((2024..=2030).contains(&year));
 }
 
+// printf LC_NUMERIC ---------------------------------------------------------------------------------------------------
+
+#[test]
+fn printf_lc_numeric_output() {
+    // German locale: decimal separator is comma. Integer arg avoids input ambiguity.
+    let (out, _) = exec_ok("LC_NUMERIC=de_DE.UTF-8 printf '%.1f\\n' 3");
+    assert_eq!(out, "3,0\n");
+}
+
+#[test]
+fn printf_lc_numeric_input_comma() {
+    // In German locale, "3,14" is a valid float (comma is decimal sep).
+    let (out, _) = exec_ok("LC_NUMERIC=de_DE.UTF-8 printf '%.2f\\n' '3,14'");
+    assert_eq!(out, "3,14\n");
+}
+
+#[test]
+fn printf_lc_numeric_c_locale() {
+    // C locale uses '.' — default behaviour should be unchanged.
+    let (out, _) = exec_ok("LC_NUMERIC=C printf '%.2f\\n' 3.14");
+    assert_eq!(out, "3.14\n");
+}
+
 // eval builtin --------------------------------------------------------------------------------------------------------
 
 #[test]

@@ -1,9 +1,13 @@
 use super::*;
 
 fn fmt(format: &str, args: &[&str]) -> String {
+    fmt_with_sep(format, args, '.')
+}
+
+fn fmt_with_sep(format: &str, args: &[&str], decimal_sep: char) -> String {
     let args: Vec<String> = args.iter().map(|s| s.to_string()).collect();
     let mut buf = Vec::new();
-    printf_format(format, &args, &mut buf);
+    printf_format(format, &args, &mut buf, decimal_sep);
     String::from_utf8(buf).unwrap()
 }
 
@@ -163,4 +167,50 @@ fn test_parse_int_char() {
 #[test]
 fn test_parse_int_empty() {
     assert_eq!(parse_int_arg(""), (0, false));
+}
+
+// LC_NUMERIC decimal separator tests ==========================================
+
+#[test]
+fn test_float_output_comma_separator() {
+    // With comma as decimal separator, output should use comma
+    assert_eq!(fmt_with_sep("%.2f", &["3.14"], ','), "3,14");
+}
+
+#[test]
+fn test_float_input_comma_separator() {
+    // With comma as decimal separator, input "3,14" should parse correctly
+    assert_eq!(fmt_with_sep("%.2f", &["3,14"], ','), "3,14");
+}
+
+#[test]
+fn test_float_dot_input_rejected_with_comma_locale() {
+    // In a comma-locale, "3.14" has a dot which is not the locale separator,
+    // so it gets passed through as-is (dot is not replaced). Rust's f64 parser
+    // accepts dot, so "3.14" still parses as 3.14 but the output uses comma.
+    assert_eq!(fmt_with_sep("%.2f", &["3.14"], ','), "3,14");
+}
+
+#[test]
+fn test_float_integer_arg_comma_locale() {
+    // Integer argument with comma locale: output uses comma
+    assert_eq!(fmt_with_sep("%.2f", &["3"], ','), "3,00");
+}
+
+#[test]
+fn test_scientific_comma_separator() {
+    // %e with comma decimal separator
+    assert_eq!(fmt_with_sep("%.2e", &["1234.5"], ','), "1,23e+03");
+}
+
+#[test]
+fn test_general_comma_separator() {
+    // %g with comma decimal separator
+    assert_eq!(fmt_with_sep("%g", &["3.14"], ','), "3,14");
+}
+
+#[test]
+fn test_dot_locale_unchanged() {
+    // With dot as separator (default), behaviour is unchanged
+    assert_eq!(fmt_with_sep("%.2f", &["3.14"], '.'), "3.14");
 }

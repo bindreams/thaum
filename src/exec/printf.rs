@@ -11,14 +11,17 @@ use std::io::Write;
 
 /// Format `fmt` with `args` into `out`, cycling through the format string
 /// until all arguments are consumed. Returns 0 on success, 1 on any error.
-pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write) -> i32 {
+///
+/// `decimal_sep` is the LC_NUMERIC decimal separator character used for
+/// float output (%f, %e, %g) and float input parsing.
+pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write, decimal_sep: char) -> i32 {
     let mut status = 0;
     let mut arg_idx: usize = 0;
     let args_len = args.len();
 
     loop {
         let start_idx = arg_idx;
-        let (st, stop) = format_once(fmt, args, &mut arg_idx, out);
+        let (st, stop) = format_once(fmt, args, &mut arg_idx, out, decimal_sep);
         if st != 0 {
             status = st;
         }
@@ -37,7 +40,7 @@ pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write) -> i32 {
 
 /// Run through the format string once.  Returns (status, stop_early).
 /// `stop_early` is true if `\c` was encountered.
-fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> (i32, bool) {
+fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Write, decimal_sep: char) -> (i32, bool) {
     let mut status = 0;
     let chars: Vec<char> = fmt.chars().collect();
     let len = chars.len();
@@ -80,7 +83,7 @@ fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Wr
                 }
                 let (spec, advance) = parse_format_spec(&chars[i..], args, arg_idx);
                 i += advance;
-                let st = apply_format_spec(&spec, args, arg_idx, out);
+                let st = apply_format_spec(&spec, args, arg_idx, out, decimal_sep);
                 if st != 0 {
                     status = st;
                 }
@@ -191,7 +194,13 @@ fn parse_decimal_digits(chars: &[char]) -> (usize, usize) {
 
 // Apply a format spec =================================================================================================
 
-fn apply_format_spec(spec: &FormatSpec, args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> i32 {
+fn apply_format_spec(
+    spec: &FormatSpec,
+    args: &[String],
+    arg_idx: &mut usize,
+    out: &mut dyn Write,
+    decimal_sep: char,
+) -> i32 {
     match spec.conversion {
         's' => {
             let arg = get_arg_str(args, arg_idx);
@@ -220,7 +229,7 @@ fn apply_format_spec(spec: &FormatSpec, args: &[String], arg_idx: &mut usize, ou
         }
         'f' | 'e' | 'E' | 'g' | 'G' => {
             let arg = get_arg_str(args, arg_idx);
-            format_float(spec, &arg, spec.conversion, out)
+            format_float(spec, &arg, spec.conversion, out, decimal_sep)
         }
         'c' => {
             let arg = get_arg_str(args, arg_idx);
@@ -277,7 +286,10 @@ fn parse_int_arg(s: &str) -> (i64, bool) {
 
 /// Parse an argument as a float. Same prefix handling as int but falls
 /// through to f64 parsing.
-fn parse_float_arg(s: &str) -> (f64, bool) {
+///
+/// `decimal_sep` is the locale decimal separator; if not `'.'`, occurrences
+/// in `s` are replaced with `'.'` before Rust's `f64::parse`.
+fn parse_float_arg(s: &str, decimal_sep: char) -> (f64, bool) {
     let s = s.trim();
     if s.is_empty() {
         return (0.0, false);
@@ -295,7 +307,14 @@ fn parse_float_arg(s: &str) -> (f64, bool) {
         return (v as f64, err);
     }
 
-    match s.parse::<f64>() {
+    // Normalize locale decimal separator to '.' for Rust's parser
+    let normalized = if decimal_sep != '.' {
+        std::borrow::Cow::Owned(s.replace(decimal_sep, "."))
+    } else {
+        std::borrow::Cow::Borrowed(s)
+    };
+
+    match normalized.parse::<f64>() {
         Ok(v) => (v, false),
         Err(_) => (0.0, true),
     }
@@ -543,8 +562,8 @@ fn format_octal(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
 
 // Float formatting (%f, %e, %E, %g, %G) ===============================================================================
 
-fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write) -> i32 {
-    let (val, had_error) = parse_float_arg(arg);
+fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write, decimal_sep: char) -> i32 {
+    let (val, had_error) = parse_float_arg(arg, decimal_sep);
     let status = if had_error { 1 } else { 0 };
 
     let prec = spec.precision.unwrap_or(6);
@@ -556,6 +575,13 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write) -
         'g' => format_general(val, prec, false),
         'G' => format_general(val, prec, true),
         _ => unreachable!(),
+    };
+
+    // Replace Rust's '.' with the locale decimal separator
+    let formatted = if decimal_sep != '.' {
+        formatted.replace('.', &decimal_sep.to_string())
+    } else {
+        formatted
     };
 
     // Build sign prefix for positive values

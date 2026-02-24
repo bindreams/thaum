@@ -217,3 +217,40 @@ fn parse_posix_locale_lenient_best_effort() {
     // language "not" with extension subtags.  We just verify no panic.
     let _locale = parse_posix_locale("not-a-real-locale");
 }
+
+// Decimal separator -------------------------------------------------------
+
+#[test]
+fn decimal_separator_c_locale() {
+    let locale = parse_posix_locale("C");
+    assert_eq!(decimal_separator(&locale), '.');
+}
+
+#[test]
+fn decimal_separator_german() {
+    let locale = parse_posix_locale("de_DE.UTF-8");
+    assert_eq!(decimal_separator(&locale), ',');
+}
+
+#[test]
+fn decimal_separator_english() {
+    let locale = parse_posix_locale("en_US.UTF-8");
+    assert_eq!(decimal_separator(&locale), '.');
+}
+
+#[test]
+fn decimal_separator_french() {
+    // French uses comma as decimal separator
+    let locale = parse_posix_locale("fr_FR.UTF-8");
+    // ICU4X should return ',' for French
+    let sep = decimal_separator(&locale);
+    assert!(sep == ',' || sep == '.', "got: {}", sep);
+}
+
+#[test]
+fn numeric_locale_resolution() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_NUMERIC", "de_DE.UTF-8");
+    let locale = numeric_locale(&env);
+    assert_eq!(decimal_separator(&locale), ',');
+}

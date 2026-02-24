@@ -704,6 +704,15 @@ impl Environment {
             .collect()
     }
 
+    /// Returns all readonly variables as (name, value) pairs.
+    pub fn readonly_vars(&self) -> Vec<(String, String)> {
+        self.variables
+            .iter()
+            .filter(|(_, v)| v.readonly)
+            .map(|(k, v)| (k.clone(), v.scalar_str().to_string()))
+            .collect()
+    }
+
     /// Returns all variables as (name, value) pairs (scalar view).
     pub fn all_vars(&self) -> Vec<(String, String)> {
         self.variables

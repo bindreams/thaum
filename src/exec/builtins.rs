@@ -74,7 +74,7 @@ pub fn run_builtin(
         "alias" => builtin_alias(args, env, stdout),
         "unalias" => builtin_unalias(args, env, stderr),
         "test" | "[" => builtin_test(name, args, stderr),
-        "readonly" => builtin_readonly(args, env),
+        "readonly" => builtin_readonly(args, env, stdout),
         "local" => builtin_local(args, env),
         "declare" | "typeset" => builtin_declare(args, env, stdout),
         // eval, exec, source, and . are handled as special builtins in
@@ -558,10 +558,13 @@ fn parse_int(s: &str) -> i64 {
     s.parse().unwrap_or(0)
 }
 
-fn builtin_readonly(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
+fn builtin_readonly(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {
     if args.is_empty() {
-        // `readonly` with no args: list readonly vars (simplified — just return 0).
-        // TODO: implement readonly variable listing
+        let mut vars = env.readonly_vars();
+        vars.sort_by(|a, b| a.0.cmp(&b.0));
+        for (name, value) in &vars {
+            let _ = writeln!(stdout, "declare -r {}=\"{}\"", name, value);
+        }
         return Ok(0);
     }
 

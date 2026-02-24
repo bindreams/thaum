@@ -2406,7 +2406,6 @@ fn test_dash_t_nonexistent_fd_is_false() {
 }
 
 #[test]
-#[ignore] // TODO: builtins.rs:564 — readonly with no args should list vars
 fn readonly_no_args_lists_variables() {
     let (out, _) = bash_exec_ok("readonly x=42; readonly");
     assert!(out.contains("x"), "readonly should list readonly variables; got: {out}");

@@ -120,7 +120,6 @@ pub fn decimal_separator(locale: &Locale) -> char {
 /// In UTF-8 locales, full Unicode classification applies via ICU4X.
 /// Locale-invariant classes (`digit`, `xdigit`, `space`, `blank`, `cntrl`)
 /// always use the same rules regardless of locale.
-#[allow(dead_code)] // Called by pattern.rs in a follow-up commit
 pub fn is_char_class(ch: char, class: &str, locale: &Locale) -> bool {
     match class {
         "upper" => is_upper(ch, locale),

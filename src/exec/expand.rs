@@ -302,7 +302,8 @@ fn expand_complex_parameter(
             } else {
                 String::new()
             };
-            out.push_str(super::pattern::trim_smallest_prefix(val, &pat));
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(super::pattern::trim_smallest_prefix(val, &pat, &locale));
         }
         Some(ParamOp::TrimLargePrefix) => {
             let val = value.as_deref().unwrap_or("");
@@ -311,7 +312,8 @@ fn expand_complex_parameter(
             } else {
                 String::new()
             };
-            out.push_str(super::pattern::trim_largest_prefix(val, &pat));
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(super::pattern::trim_largest_prefix(val, &pat, &locale));
         }
         Some(ParamOp::TrimSmallSuffix) => {
             let val = value.as_deref().unwrap_or("");
@@ -320,7 +322,8 @@ fn expand_complex_parameter(
             } else {
                 String::new()
             };
-            out.push_str(super::pattern::trim_smallest_suffix(val, &pat));
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(super::pattern::trim_smallest_suffix(val, &pat, &locale));
         }
         Some(ParamOp::TrimLargeSuffix) => {
             let val = value.as_deref().unwrap_or("");
@@ -329,7 +332,8 @@ fn expand_complex_parameter(
             } else {
                 String::new()
             };
-            out.push_str(super::pattern::trim_largest_suffix(val, &pat));
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(super::pattern::trim_largest_suffix(val, &pat, &locale));
         }
         Some(ParamOp::UpperFirst) => {
             let val = value.as_deref().unwrap_or("");

@@ -1960,3 +1960,104 @@ fn case_mod_unset() {
     let (out, _) = bash_exec_ok("echo \"${unset_var^^}\"");
     assert_eq!(out, "\n");
 }
+
+// POSIX character classes in case =================================================================================
+
+#[test]
+fn case_char_class_upper() {
+    let (out, _) = bash_exec_ok("case A in [[:upper:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_lower() {
+    let (out, _) = bash_exec_ok("case a in [[:lower:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_digit() {
+    let (out, _) = bash_exec_ok("case 5 in [[:digit:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_space() {
+    let (out, _) = exec_ok("case ' ' in [[:space:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_alpha_negated() {
+    let (out, _) = bash_exec_ok("case 5 in [![:alpha:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_mixed_bracket() {
+    // Class + literal in same bracket
+    let (out, _) = bash_exec_ok("case _ in [[:alpha:]_]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+#[test]
+fn case_char_class_alnum_with_star() {
+    let (out, _) = bash_exec_ok("case hello123 in [[:alnum:]]*) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}
+
+// Character classes in parameter expansion ========================================================================
+
+#[test]
+fn trim_char_class_alpha_prefix() {
+    let (out, _) = bash_exec_ok("x=hello123; echo ${x##[[:alpha:]]*}");
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn trim_char_class_digit_suffix() {
+    let (out, _) = bash_exec_ok("x=hello123; echo ${x%%[[:digit:]]*}");
+    assert_eq!(out, "hello\n");
+}
+
+// Regex =~ with character classes =================================================================================
+
+#[test]
+fn regex_char_class_digit() {
+    let (_, status) = bash_exec_ok("[[ abc123 =~ [[:digit:]]+ ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn regex_char_class_alpha() {
+    let (_, status) = bash_exec_ok("[[ hello =~ ^[[:alpha:]]+$ ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn regex_char_class_space() {
+    let (_, status) = bash_exec_ok("[[ 'hello world' =~ [[:space:]] ]]");
+    assert_eq!(status, 0);
+}
+
+#[test]
+fn regex_char_class_upper() {
+    let (_, status) = bash_exec_ok("[[ Hello =~ ^[[:upper:]] ]]");
+    assert_eq!(status, 0);
+}
+
+// Locale sensitivity of character classes =========================================================================
+
+#[test]
+fn case_char_class_upper_accent_c_locale() {
+    // In C locale, É is NOT [[:upper:]]
+    let (out, _) = bash_exec_ok("LC_CTYPE=C; case É in [[:upper:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "n\n");
+}
+
+#[test]
+fn case_char_class_upper_accent_utf8_locale() {
+    // In UTF-8 locale, É IS [[:upper:]]
+    let (out, _) = bash_exec_ok("LC_CTYPE=en_US.UTF-8; case É in [[:upper:]]) echo y;; *) echo n;; esac");
+    assert_eq!(out, "y\n");
+}

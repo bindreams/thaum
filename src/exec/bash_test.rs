@@ -158,10 +158,15 @@ fn evaluate_binary(
     env: &mut crate::exec::Environment,
 ) -> Result<bool, ExecError> {
     Ok(match op {
-        // String comparison
-        // TODO: pattern matching (glob) when RHS is unquoted
-        BinaryTestOp::StringEquals => left == right,
-        BinaryTestOp::StringNotEquals => left != right,
+        // String/pattern comparison: RHS is treated as a glob pattern
+        BinaryTestOp::StringEquals => {
+            let locale = super::locale::ctype_locale(env);
+            super::pattern::shell_pattern_match(left, right, &locale)
+        }
+        BinaryTestOp::StringNotEquals => {
+            let locale = super::locale::ctype_locale(env);
+            !super::pattern::shell_pattern_match(left, right, &locale)
+        }
         BinaryTestOp::StringLessThan => {
             let locale = super::locale::collate_locale(env);
             super::locale::compare_strings(left, right, &locale) == std::cmp::Ordering::Less

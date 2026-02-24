@@ -5,7 +5,6 @@ use crate::ast::{CompoundCommand, Redirect};
 use crate::exec::arithmetic;
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
-use crate::exec::pattern::shell_pattern_match;
 use crate::exec::Executor;
 
 impl Executor {
@@ -148,9 +147,10 @@ impl Executor {
 
                 for arm in arms {
                     let mut matched = false;
+                    let locale = super::locale::ctype_locale(&self.env);
                     for pattern in &arm.patterns {
                         let pat = self.expand_word(pattern)?;
-                        if shell_pattern_match(&expanded, &pat) {
+                        if super::pattern::shell_pattern_match(&expanded, &pat, &locale) {
                             matched = true;
                             break;
                         }

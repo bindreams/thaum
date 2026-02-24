@@ -2,8 +2,12 @@ name: 'typeset +r removes read-only attribute (TODO: documented in bash to do no
 dialect: bash
 source: 
   oils:spec/assign-extended#typeset-r-removes-read-only-attribute-todo-documented-in-bash-to-do-nothing
+# Bash behavior: typeset +r does NOT remove readonly (documented to do nothing).
+# Oils implements the "correct" behavior where +r works. For bash compatibility,
+# we expect the bash-like output where all assignments fail silently.
+# TODO: add a ShellOption (typeset_unset_readonly_bug) for oils-compatible behavior.
 status: 0
-stdout: "r=r1\nr=r2\nr=r3\n"
+stdout: "r=r1\nr=r1\nr=r1\n"
 ---
 readonly r=r1
 echo r=$r

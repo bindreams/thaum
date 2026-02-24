@@ -18,9 +18,6 @@ pub fn evaluate_arith_expr(expr: &ArithExpr, env: &mut Environment) -> Result<i6
     match expr {
         ArithExpr::Number(n) => Ok(*n),
 
-        // TODO: Bash supports recursive variable expansion in arithmetic:
-        // `a=b; b=5; echo $((a))` evaluates to 5. We currently treat
-        // non-numeric variable values as errors.
         ArithExpr::Variable(name) => read_var_as_i64(name, env),
 
         ArithExpr::Binary { left, op, right } => eval_binary(left, *op, right, env),
@@ -55,12 +52,17 @@ pub fn evaluate_arith_expr(expr: &ArithExpr, env: &mut Environment) -> Result<i6
 
 /// Read a variable's value as i64. Unset or empty → 0.
 ///
+/// Supports recursive variable expansion: if the value of `name` is
+/// another variable name (non-numeric), follows the chain until a
+/// numeric value or unset variable is found.
+///
 /// Handles array subscripts: `"a[0]"` reads element 0 of array `a`.
 fn read_var_as_i64(name: &str, env: &Environment) -> Result<i64, ExecError> {
-    let s = read_arith_var(name, env);
+    let resolved = env.resolve_value_chain(name);
+    let s = read_arith_var(resolved, env);
     match s.as_deref() {
         None | Some("") => Ok(0),
-        Some(s) => parse_i64(name, s),
+        Some(s) => parse_i64(resolved, s),
     }
 }
 

@@ -2431,7 +2431,6 @@ fn declare_dash_f_prints_function_body() {
 }
 
 #[test]
-#[ignore] // TODO: arithmetic.rs:21 — recursive variable expansion in arithmetic
 fn arith_recursive_variable_expansion() {
     let (out, _) = bash_exec_ok("a=b; b=5; echo $((a))");
     assert_eq!(out, "5\n", "arithmetic should recursively expand variable names");

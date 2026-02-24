@@ -183,26 +183,54 @@ impl Environment {
         env
     }
 
-    // Nameref resolution -------------------------------------------------------------------------------------------------
+    // Variable chain resolution -------------------------------------------------------------------------------------------
 
-    /// Follow nameref chain to the ultimate target variable name.
-    /// Uses a `HashSet` to detect cycles of any shape.
-    fn resolve_nameref<'a>(&'a self, name: &'a str) -> &'a str {
+    /// Follow a chain of variable lookups with cycle detection.
+    ///
+    /// Starting from `start`, calls `follow(var)` at each step. If it returns
+    /// `Some(next_name)`, follows to the next variable. If `None`, returns
+    /// the current name. Stops on cycles (returns the last non-cyclic name).
+    fn resolve_var_chain<'a, F>(&'a self, start: &'a str, follow: F) -> &'a str
+    where
+        F: Fn(&ShellVar) -> Option<&str>,
+    {
         let mut seen = HashSet::new();
-        seen.insert(name);
-        let mut current = name;
+        seen.insert(start);
+        let mut current = start;
         loop {
-            match self.variables.get(current) {
-                Some(var) if var.nameref.is_some() => {
-                    let target = var.nameref.as_ref().unwrap().as_str();
+            match self.variables.get(current).and_then(&follow) {
+                Some(target) => {
                     if !seen.insert(target) {
                         return current; // cycle detected
                     }
                     current = target;
                 }
-                _ => return current,
+                None => return current,
             }
         }
+    }
+
+    /// Follow nameref chain to the ultimate target variable name.
+    fn resolve_nameref<'a>(&'a self, name: &'a str) -> &'a str {
+        self.resolve_var_chain(name, |v| v.nameref.as_deref())
+    }
+
+    /// Follow a chain where each variable's scalar value is treated as a
+    /// variable name, stopping when the value is absent, empty, or not a
+    /// valid identifier. Used by arithmetic evaluation.
+    pub fn resolve_value_chain<'a>(&'a self, name: &'a str) -> &'a str {
+        self.resolve_var_chain(name, |v| {
+            let s = v.scalar_str();
+            if s.is_empty()
+                || s.as_bytes()
+                    .first()
+                    .is_none_or(|b| b.is_ascii_digit() || *b == b'-' || *b == b'+')
+            {
+                None
+            } else {
+                Some(s)
+            }
+        })
     }
 
     /// Create or update a nameref variable pointing to `target`.

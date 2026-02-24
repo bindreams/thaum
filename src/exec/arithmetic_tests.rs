@@ -111,11 +111,12 @@ fn eval_variable_negative() {
 }
 
 #[test]
-fn eval_variable_non_numeric_is_error() {
+fn eval_variable_non_numeric_follows_chain() {
+    // In bash, `x=abc` makes `$((x))` resolve through `abc` (as a variable
+    // name). Since `abc` is unset, the result is 0.
     let mut env = Environment::new();
     env.set_var("x", "abc").unwrap();
-    let err = evaluate_arith_expr(&var("x"), &mut env).unwrap_err();
-    assert!(matches!(err, ExecError::InvalidNumber(_, _)));
+    assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), 0);
 }
 
 // Basic arithmetic ----------------------------------------------------------------------------------------------------

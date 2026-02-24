@@ -5,7 +5,7 @@ fn make_env() -> Environment {
     Environment::new()
 }
 
-// -- Locale resolution tests --------------------------------------------------
+// Locale resolution tests ---------------------------------------------------------------------------------------------
 
 #[test]
 fn locale_resolution_lc_all_overrides() {
@@ -53,7 +53,7 @@ fn collate_locale_resolves() {
     assert_eq!(locale.id.language, icu::locale::subtags::language!("de"));
 }
 
-// -- Case conversion tests ----------------------------------------------------
+// Case conversion tests -----------------------------------------------------------------------------------------------
 
 #[test]
 fn uppercase_ascii() {
@@ -105,7 +105,7 @@ fn empty_string_lowercase() {
     assert_eq!(to_lowercase("", &locale), "");
 }
 
-// -- Capitalize / uncapitalize tests ------------------------------------------
+// Capitalize / uncapitalize tests -------------------------------------------------------------------------------------
 
 #[test]
 fn capitalize_ascii() {
@@ -156,7 +156,7 @@ fn capitalize_turkish() {
     assert_eq!(capitalize("istanbul", &locale), "\u{0130}stanbul");
 }
 
-// -- parse_posix_locale tests -------------------------------------------------
+// parse_posix_locale tests --------------------------------------------------------------------------------------------
 
 #[test]
 fn parse_posix_locale_c() {
@@ -218,7 +218,7 @@ fn parse_posix_locale_lenient_best_effort() {
     let _locale = parse_posix_locale("not-a-real-locale");
 }
 
-// Decimal separator -------------------------------------------------------
+// Decimal separator ---------------------------------------------------------------------------------------------------
 
 #[test]
 fn decimal_separator_c_locale() {
@@ -255,7 +255,7 @@ fn numeric_locale_resolution() {
     assert_eq!(decimal_separator(&locale), ',');
 }
 
-// -- Character class tests (POSIX [:class:]) ----------------------------------
+// Character class tests (POSIX [:class:]) -----------------------------------------------------------------------------
 
 fn c() -> Locale {
     parse_posix_locale("C")
@@ -267,7 +267,7 @@ fn tr() -> Locale {
     parse_posix_locale("tr_TR.UTF-8")
 }
 
-// C locale: upper (ASCII only) ------------------------------------------------
+// C locale: upper (ASCII only) ----------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_upper_ascii_a() {
@@ -289,7 +289,7 @@ fn char_class_upper_accent_c() {
     assert!(!is_char_class('\u{00c9}', "upper", &c())); // É
 }
 
-// C locale: lower (ASCII only) ------------------------------------------------
+// C locale: lower (ASCII only) ----------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_lower_ascii_a() {
@@ -311,7 +311,7 @@ fn char_class_lower_accent_c() {
     assert!(!is_char_class('\u{00e9}', "lower", &c())); // é
 }
 
-// C locale: alpha (ASCII only) ------------------------------------------------
+// C locale: alpha (ASCII only) ----------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_alpha_ascii() {
@@ -328,7 +328,7 @@ fn char_class_alpha_accent_c() {
     assert!(!is_char_class('\u{00e9}', "alpha", &c())); // é
 }
 
-// C locale: digit (locale-invariant) ------------------------------------------
+// C locale: digit (locale-invariant) ----------------------------------------------------------------------------------
 
 #[test]
 fn char_class_digit_5() {
@@ -340,7 +340,7 @@ fn char_class_digit_a_no() {
     assert!(!is_char_class('a', "digit", &c()));
 }
 
-// C locale: alnum -------------------------------------------------------------
+// C locale: alnum -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_alnum_letter() {
@@ -357,7 +357,7 @@ fn char_class_alnum_punct_no() {
     assert!(!is_char_class('!', "alnum", &c()));
 }
 
-// C locale: space -------------------------------------------------------------
+// C locale: space -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_space_space() {
@@ -379,7 +379,7 @@ fn char_class_space_a_no() {
     assert!(!is_char_class('a', "space", &c()));
 }
 
-// C locale: blank -------------------------------------------------------------
+// C locale: blank -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_blank_space() {
@@ -396,7 +396,7 @@ fn char_class_blank_newline_no() {
     assert!(!is_char_class('\n', "blank", &c()));
 }
 
-// C locale: punct -------------------------------------------------------------
+// C locale: punct -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_punct_bang() {
@@ -413,7 +413,7 @@ fn char_class_punct_a_no() {
     assert!(!is_char_class('a', "punct", &c()));
 }
 
-// C locale: cntrl (locale-invariant) ------------------------------------------
+// C locale: cntrl (locale-invariant) ----------------------------------------------------------------------------------
 
 #[test]
 fn char_class_cntrl_null() {
@@ -430,7 +430,7 @@ fn char_class_cntrl_a_no() {
     assert!(!is_char_class('a', "cntrl", &c()));
 }
 
-// C locale: xdigit (locale-invariant) -----------------------------------------
+// C locale: xdigit (locale-invariant) ---------------------------------------------------------------------------------
 
 #[test]
 fn char_class_xdigit_0() {
@@ -452,7 +452,7 @@ fn char_class_xdigit_g_no() {
     assert!(!is_char_class('g', "xdigit", &c()));
 }
 
-// C locale: graph -------------------------------------------------------------
+// C locale: graph -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_graph_a() {
@@ -469,7 +469,7 @@ fn char_class_graph_space_no() {
     assert!(!is_char_class(' ', "graph", &c()));
 }
 
-// C locale: print -------------------------------------------------------------
+// C locale: print -----------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_print_a() {
@@ -486,7 +486,7 @@ fn char_class_print_cntrl_no() {
     assert!(!is_char_class('\x07', "print", &c()));
 }
 
-// UTF-8 locale: Unicode classification ----------------------------------------
+// UTF-8 locale: Unicode classification --------------------------------------------------------------------------------
 
 #[test]
 fn char_class_upper_accent_utf8() {
@@ -508,7 +508,7 @@ fn char_class_alpha_cjk_utf8() {
     assert!(is_char_class('\u{65e5}', "alpha", &utf8())); // 日
 }
 
-// Turkish locale --------------------------------------------------------------
+// Turkish locale ------------------------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_upper_dotted_i_turkish() {
@@ -520,14 +520,14 @@ fn char_class_lower_dotless_i_turkish() {
     assert!(is_char_class('\u{0131}', "lower", &tr())); // ı
 }
 
-// Unknown class returns false -------------------------------------------------
+// Unknown class returns false -----------------------------------------------------------------------------------------
 
 #[test]
 fn char_class_unknown() {
     assert!(!is_char_class('A', "bogus", &c()));
 }
 
-// -- Strftime locale tests ----------------------------------------------------
+// Strftime locale tests -----------------------------------------------------------------------------------------------
 
 #[test]
 fn time_locale_resolves_lc_time() {

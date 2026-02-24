@@ -1,5 +1,5 @@
 name: Until loop
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#until-loop
 ---
 until echo word_a

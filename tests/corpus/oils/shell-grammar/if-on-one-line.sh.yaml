@@ -1,5 +1,5 @@
 name: If on one line
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#if-on-one-line
 ---
 if echo; then echo; else echo; fi

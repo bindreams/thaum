@@ -1,5 +1,5 @@
 name: Case with 2 options
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-with-2-options
 ---
 case word_a in

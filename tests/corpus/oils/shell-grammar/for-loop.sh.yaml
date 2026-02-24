@@ -1,5 +1,5 @@
 name: For loop
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#for-loop
 ---
 # TODO: need to add variables

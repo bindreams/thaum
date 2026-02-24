@@ -1,5 +1,5 @@
 name: If
-dialect: bash
+dialect: posix
 source: oils:spec/if#if
 stdout: "if\n"
 ---

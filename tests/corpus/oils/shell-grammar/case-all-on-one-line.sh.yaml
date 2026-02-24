@@ -1,5 +1,5 @@
 name: Case all on one line
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-all-on-one-line
 ---
 case word_a in word_b) echo ;; word_c) echo ;; esac

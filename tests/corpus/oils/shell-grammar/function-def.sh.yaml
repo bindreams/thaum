@@ -1,5 +1,5 @@
 name: Function def
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#function-def
 ---
 name_a() {

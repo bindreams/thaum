@@ -1,5 +1,5 @@
 name: Subshell
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#subshell
 ---
 (echo word_a; echo word_b;)

@@ -1,5 +1,5 @@
 name: 'two args: -z with = ! ( ]'
-dialect: bash
+dialect: posix
 source: oils:spec/builtin-bracket#two-args--z-with
 ---
 [ -z = ]

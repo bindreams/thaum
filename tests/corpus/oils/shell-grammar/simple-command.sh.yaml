@@ -1,5 +1,5 @@
 name: Simple command
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#simple-command
 ---
 echo

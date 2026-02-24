@@ -1,5 +1,5 @@
 name: a && b || c
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#a-b-c
 ---
 echo word_a && echo word_b || echo

@@ -1,5 +1,5 @@
 name: Prefix redirect
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#prefix-redirect
 ---
 <filename echo 

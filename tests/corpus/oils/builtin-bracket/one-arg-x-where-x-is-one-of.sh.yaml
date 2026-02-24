@@ -1,5 +1,5 @@
 name: "one arg: [ x ] where x is one of '=' '!' '(' ']'"
-dialect: bash
+dialect: posix
 source: oils:spec/builtin-bracket#one-arg-x-where-x-is-one-of
 ---
 [ = ]

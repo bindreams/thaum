@@ -1,5 +1,5 @@
 name: While loop with empty lines
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#while-loop-with-empty-lines
 ---
 while ! echo word_a

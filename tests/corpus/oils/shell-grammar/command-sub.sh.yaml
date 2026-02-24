@@ -1,5 +1,5 @@
 name: Command sub
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#command-sub
 ---
 #echo $(echo word_a; echo word_b;)

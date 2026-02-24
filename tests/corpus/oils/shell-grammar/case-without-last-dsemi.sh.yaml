@@ -1,5 +1,5 @@
 name: Case without last dsemi
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-without-last-dsemi
 ---
 case word_a in

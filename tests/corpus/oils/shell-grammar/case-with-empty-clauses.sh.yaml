@@ -1,5 +1,5 @@
 name: Case with empty clauses
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-with-empty-clauses
 ---
 case word_a in

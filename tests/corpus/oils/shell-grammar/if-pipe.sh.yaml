@@ -1,5 +1,5 @@
 name: If pipe
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#if-pipe
 ---
 if echo | echo word_b; then

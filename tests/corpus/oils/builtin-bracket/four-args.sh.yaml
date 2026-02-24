@@ -1,5 +1,5 @@
 name: four args
-dialect: bash
+dialect: posix
 source: oils:spec/builtin-bracket#four-args
 ---
 [ ! foo = foo ]

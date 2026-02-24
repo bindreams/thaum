@@ -1,5 +1,5 @@
 name: == is alias for =
-dialect: bash
+dialect: posix
 source: oils:spec/builtin-bracket#is-alias-for
 ---
 [ a = a ] && echo true

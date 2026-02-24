@@ -1,5 +1,5 @@
 name: Var assignment
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#var-assignment
 ---
 NAME=foo echo >>filename

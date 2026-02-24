@@ -1,5 +1,5 @@
 name: Empty case
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#empty-case
 ---
 case word_a in

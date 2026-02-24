@@ -1,5 +1,5 @@
 name: Subshell on multiple lines
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#subshell-on-multiple-lines
 ---
 (echo

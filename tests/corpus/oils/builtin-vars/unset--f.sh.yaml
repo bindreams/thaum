@@ -1,5 +1,5 @@
 name: Unset -f
-dialect: bash
+dialect: posix
 source: oils:spec/builtin-vars#unset--f
 ---
 foo() {

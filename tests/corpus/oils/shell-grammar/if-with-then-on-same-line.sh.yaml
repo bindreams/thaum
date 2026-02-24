@@ -1,5 +1,5 @@
 name: If with then on same line
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#if-with-then-on-same-line
 ---
 if echo; then

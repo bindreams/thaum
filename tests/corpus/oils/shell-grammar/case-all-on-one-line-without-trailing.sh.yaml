@@ -1,5 +1,5 @@
 name: Case all on one line without trailing ;;
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-all-on-one-line-without-trailing
 ---
 case word_a in word_b) echo word_b;; word_c) echo word_c ;; esac

@@ -1,5 +1,5 @@
 name: Command with args
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#command-with-args
 ---
 echo word word

@@ -29,6 +29,7 @@ pub(crate) mod numeric;
 mod pattern;
 /// Pipeline execution: flatten pipe trees, spawn stages with piped I/O.
 pub mod pipeline;
+mod platform;
 pub(crate) mod printf;
 mod redirect;
 mod special_builtins;

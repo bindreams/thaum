@@ -1144,6 +1144,7 @@ dependencies = [
  "icu",
  "jiff",
  "libtest-mimic",
+ "nix",
  "pretty_assertions",
  "regex",
  "serde",

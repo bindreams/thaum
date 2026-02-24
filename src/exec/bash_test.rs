@@ -120,15 +120,8 @@ fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> b
             }
         }
 
-        // -O: file owned by effective user ID
-        // TODO: proper implementation with libc::getuid() or nix crate;
-        // approximated as "file exists" for now.
-        UnaryTestOp::FileIsOwnedByUser => Path::new(s).exists(),
-
-        // -G: file owned by effective group ID
-        // TODO: proper implementation with libc::getgid() or nix crate;
-        // approximated as "file exists" for now.
-        UnaryTestOp::FileIsOwnedByGroup => Path::new(s).exists(),
+        UnaryTestOp::FileIsOwnedByUser => super::platform::file_owned_by_current_user(s),
+        UnaryTestOp::FileIsOwnedByGroup => super::platform::file_owned_by_current_group(s),
 
         // -N: file modified since last read (mtime > atime)
         UnaryTestOp::FileModifiedSinceRead => std::fs::metadata(s)

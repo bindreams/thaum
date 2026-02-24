@@ -38,7 +38,7 @@ Key types: `Program`, `Statement`, `Expression`, `Command`, `CompoundCommand`, `
 
 ### Dialect system
 
-Individual Bash features are controlled by `ShellOptions` flags. `Dialect::Bash` enables all of them, `Dialect::Posix` enables none.
+Individual Bash features are controlled by `ShellOptions` flags. `Dialect::Bash` enables all of them, `Dialect::Posix` enables none. Versioned dialects (`Bash44`, `Bash50`, `Bash51`) model behavioral differences between Bash releases; `Dialect::Bash` aliases the latest (`Bash51`).
 
 Currently implemented Bash extensions:
 - `<<<` here-strings (`here_strings`)

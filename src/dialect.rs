@@ -9,7 +9,7 @@
 ///
 /// Each field corresponds to a specific shell syntax extension beyond POSIX.
 /// `ShellOptions::default()` gives POSIX-only (all `false`).
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ShellOptions {
     /// `<<<` here-strings.
     pub here_strings: bool,
@@ -67,6 +67,11 @@ pub struct ShellOptions {
     pub case_modification: bool,
     /// `${var@Q}`, `${var@a}`, etc. parameter transformation (Bash 4.4+).
     pub parameter_transform: bool,
+    /// `@L`/`@U`/`@u`/`@K`/`@k` parameter transformations (Bash 5.1+).
+    pub parameter_transform_51: bool,
+    /// Bash 4.x bug: `"${a[@]:+word}"` on array with single empty element
+    /// incorrectly returns word instead of empty. Fixed in bash 5.0.
+    pub array_empty_element_alternative_bug: bool,
 }
 
 /// A named set of shell options.
@@ -76,7 +81,13 @@ pub enum Dialect {
     Posix,
     /// Debian Almquist Shell — POSIX plus `local`.
     Dash,
-    /// GNU Bash — all extensions enabled.
+    /// Bash 4.4: `@Q`/`@a`/`@A`/`@E`/`@P` transforms, has array empty-element bug.
+    Bash44,
+    /// Bash 5.0: empty-element bug fixed, no `@L`/`@U`/`@u`/`@K`/`@k` yet.
+    Bash50,
+    /// Bash 5.1: adds `@L`/`@U`/`@u`/`@K`/`@k` transforms.
+    Bash51,
+    /// Alias for the latest supported Bash version (currently `Bash51`).
     Bash,
 }
 
@@ -89,7 +100,18 @@ impl Dialect {
                 local_builtin: true,
                 ..ShellOptions::default()
             },
-            Dialect::Bash => ShellOptions {
+            Dialect::Bash44 => {
+                let mut opts = Dialect::Bash51.options();
+                opts.array_empty_element_alternative_bug = true;
+                opts.parameter_transform_51 = false;
+                opts
+            }
+            Dialect::Bash50 => {
+                let mut opts = Dialect::Bash51.options();
+                opts.parameter_transform_51 = false;
+                opts
+            }
+            Dialect::Bash51 | Dialect::Bash => ShellOptions {
                 here_strings: true,
                 ampersand_redirect: true,
                 double_brackets: true,
@@ -117,6 +139,8 @@ impl Dialect {
                 case_attrs: true,
                 case_modification: true,
                 parameter_transform: true,
+                parameter_transform_51: true,
+                array_empty_element_alternative_bug: false,
             },
         }
     }

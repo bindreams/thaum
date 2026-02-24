@@ -9,11 +9,13 @@ use crate::span::Span;
 /// When `case_modification` is true, also recognizes `^`, `^^`, `,`, `,,` as
 /// operators (Bash 4.0+ `${var^}`, `${var^^}`, `${var,}`, `${var,,}`).
 /// When `parameter_transform` is true, also recognizes `@X` as operators
-/// (Bash 4.4+ `${var@Q}`, `${var@a}`, etc.).
+/// (Bash 4.4+ `${var@Q}`, `${var@a}`, etc.). The `parameter_transform_51`
+/// flag additionally enables `@L`/`@U`/`@u`/`@K`/`@k` (Bash 5.1+).
 pub(crate) fn parse_brace_param_content(
     content: &str,
     case_modification: bool,
     parameter_transform: bool,
+    parameter_transform_51: bool,
 ) -> ParameterExpansion {
     // Detect indirect expansion prefix `!`
     let (indirect, content) = if content.starts_with('!') && content.len() > 1 {
@@ -47,11 +49,11 @@ pub(crate) fn parse_brace_param_content(
                     b'P' => Some(ParamOp::TransformPrompt),
                     b'A' => Some(ParamOp::TransformAssignment),
                     b'a' => Some(ParamOp::TransformAttributes),
-                    b'L' => Some(ParamOp::TransformLower),
-                    b'U' => Some(ParamOp::TransformUpper),
-                    b'u' => Some(ParamOp::TransformCapitalize),
-                    b'K' => Some(ParamOp::TransformKeyValue),
-                    b'k' => Some(ParamOp::TransformKeys),
+                    b'L' if parameter_transform_51 => Some(ParamOp::TransformLower),
+                    b'U' if parameter_transform_51 => Some(ParamOp::TransformUpper),
+                    b'u' if parameter_transform_51 => Some(ParamOp::TransformCapitalize),
+                    b'K' if parameter_transform_51 => Some(ParamOp::TransformKeyValue),
+                    b'k' if parameter_transform_51 => Some(ParamOp::TransformKeys),
                     _ => None,
                 };
                 if let Some(op) = op {

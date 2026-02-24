@@ -160,7 +160,7 @@ fn expand_dq_token_fragment(
             expand_parameter(&ParameterExpansion::Simple(name.clone()), env, out)?;
         }
         Token::BraceParam(raw) => {
-            let expansion = crate::word::parse_brace_param_content(raw, true, true);
+            let expansion = crate::word::parse_brace_param_content(raw, true, true, true);
             expand_parameter(&expansion, env, out)?;
         }
         Token::CommandSub(_) | Token::BacktickSub(_) => {
@@ -388,15 +388,29 @@ fn expand_complex_parameter(
                 return Err(ExecError::BadSubstitution(msg));
             }
         },
-        Some(ParamOp::Alternative) => match value.as_deref() {
-            Some(v) if !v.is_empty() => {
+        Some(ParamOp::Alternative) => {
+            let is_non_empty = if env.array_empty_element_alternative_bug() {
+                // Bash 4.x bug: for array [@]/*] subscripts, any element
+                // (even empty) counts as "non-empty".
+                if let Some((base, subscript)) = parse_array_subscript(name) {
+                    if subscript == "@" || subscript == "*" {
+                        env.get_array_length(base) > 0
+                    } else {
+                        value.as_deref().is_some_and(|v| !v.is_empty())
+                    }
+                } else {
+                    value.as_deref().is_some_and(|v| !v.is_empty())
+                }
+            } else {
+                value.as_deref().is_some_and(|v| !v.is_empty())
+            };
+            if is_non_empty {
                 if let Some(arg) = argument {
                     let expanded = expand_word(arg, env)?;
                     out.push_str(&expanded);
                 }
             }
-            _ => {}
-        },
+        }
         Some(ParamOp::TrimSmallPrefix) => {
             let val = value.as_deref().unwrap_or("");
             let pat = if let Some(arg) = argument {

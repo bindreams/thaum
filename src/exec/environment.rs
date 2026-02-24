@@ -118,6 +118,8 @@ pub struct Environment {
     errexit: bool,
     nounset: bool,
     xtrace: bool,
+    /// Bash 4.x bug: `"${a[@]:+word}"` on array with empty element returns word.
+    array_empty_element_alternative_bug: bool,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -159,6 +161,7 @@ impl Environment {
             errexit: false,
             nounset: false,
             xtrace: false,
+            array_empty_element_alternative_bug: false,
         };
 
         let _ = env.set_var("IFS", " \t\n");
@@ -1076,6 +1079,16 @@ impl Environment {
         self.xtrace = enabled;
     }
 
+    /// Whether the bash 4.x array empty-element alternative bug is active.
+    pub fn array_empty_element_alternative_bug(&self) -> bool {
+        self.array_empty_element_alternative_bug
+    }
+
+    /// Set the bash 4.x array empty-element alternative bug flag.
+    pub fn set_array_empty_element_alternative_bug(&mut self, enabled: bool) {
+        self.array_empty_element_alternative_bug = enabled;
+    }
+
     /// Import all environment variables from the current OS process, marking them exported.
     pub fn inherit_from_process(&mut self) {
         for (key, value) in std::env::vars() {
@@ -1111,6 +1124,7 @@ impl Environment {
             nounset: self.nounset,
             xtrace: self.xtrace,
             cwd: self.cwd.clone(),
+            array_empty_element_alternative_bug: self.array_empty_element_alternative_bug,
         }
     }
 
@@ -1134,6 +1148,7 @@ impl Environment {
             errexit: s.errexit,
             nounset: s.nounset,
             xtrace: s.xtrace,
+            array_empty_element_alternative_bug: s.array_empty_element_alternative_bug,
         }
     }
 }
@@ -1152,6 +1167,8 @@ pub struct SerializedEnvironment {
     pub nounset: bool,
     pub xtrace: bool,
     pub cwd: PathBuf,
+    #[serde(default)]
+    pub array_empty_element_alternative_bug: bool,
 }
 
 impl Default for Environment {

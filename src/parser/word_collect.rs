@@ -116,6 +116,7 @@ impl Parser {
                     &raw,
                     self.options.case_modification,
                     self.options.parameter_transform,
+                    self.options.parameter_transform_51,
                 );
                 Ok(Fragment::Parameter(expansion))
             }

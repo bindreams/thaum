@@ -98,6 +98,9 @@ impl TestSpec {
         match self.dialect.as_str() {
             "posix" => Ok(thaum::Dialect::Posix),
             "dash" => Ok(thaum::Dialect::Dash),
+            "bash44" => Ok(thaum::Dialect::Bash44),
+            "bash50" => Ok(thaum::Dialect::Bash50),
+            "bash51" => Ok(thaum::Dialect::Bash51),
             "bash" => Ok(thaum::Dialect::Bash),
             other => Err(format!("unknown dialect: {:?}", other)),
         }
@@ -386,7 +389,7 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
                 return Ok(());
             }
 
-            let bash_flag = spec.dialect.as_str() == "bash";
+            let bash_flag = matches!(spec.dialect.as_str(), "bash" | "bash44" | "bash50" | "bash51");
             let result = common::docker::run_thaum_in_docker(input, bash_flag);
 
             if let Some(expected_status) = spec.status {
@@ -421,7 +424,10 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     // 4. POSIX-rejection check: bash tests that also parse+execute in POSIX mode
     //    may indicate ungated bash features or misclassified dialect.
     //    Controlled by POSIX_REJECTION_CHECK=1 env var (off by default).
-    if spec.dialect.as_str() == "bash" && spec.is_valid && std::env::var("POSIX_REJECTION_CHECK").is_ok() {
+    if matches!(spec.dialect.as_str(), "bash" | "bash44" | "bash50" | "bash51")
+        && spec.is_valid
+        && std::env::var("POSIX_REJECTION_CHECK").is_ok()
+    {
         if let Ok(posix_program) = thaum::parse_with(input, thaum::Dialect::Posix) {
             let posix_options = thaum::Dialect::Posix.options();
             let mut posix_exec = thaum::exec::Executor::with_options(posix_options);

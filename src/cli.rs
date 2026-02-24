@@ -18,9 +18,21 @@ use thaum::exec::{ExecError, Executor, ProcessIo};
 #[derive(Parser)]
 #[command(name = "thaum")]
 struct Cli {
-    /// Enable Bash dialect (default: POSIX)
+    /// Enable Bash dialect (default: POSIX, alias for --bash51)
     #[arg(long, global = true)]
     bash: bool,
+
+    /// Enable Bash 4.4 dialect
+    #[arg(long, global = true)]
+    bash44: bool,
+
+    /// Enable Bash 5.0 dialect
+    #[arg(long, global = true)]
+    bash50: bool,
+
+    /// Enable Bash 5.1 dialect
+    #[arg(long, global = true)]
+    bash51: bool,
 
     #[command(subcommand)]
     subcmd: Option<CliCommand>,
@@ -84,7 +96,7 @@ enum Subcommand {
 
 struct CliArgs {
     subcommand: Subcommand,
-    bash_mode: bool,
+    dialect: thaum::Dialect,
     verbose: bool,
     /// Source from -c/--command <string>.
     command_str: Option<String>,
@@ -96,11 +108,7 @@ struct CliArgs {
 
 impl CliArgs {
     fn dialect(&self) -> thaum::Dialect {
-        if self.bash_mode {
-            thaum::Dialect::Bash
-        } else {
-            thaum::Dialect::Posix
-        }
+        self.dialect
     }
 }
 
@@ -108,15 +116,15 @@ impl CliArgs {
 
 impl Cli {
     fn resolve(self) -> CliArgs {
-        let bash_mode = self.bash;
+        let dialect = resolve_dialect(self.bash, self.bash44, self.bash50, self.bash51);
         match self.subcmd {
-            None => resolve_source(Subcommand::Parse, bash_mode, false, self.c, self.file),
-            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, bash_mode, a.verbose, a.c, a.file),
-            Some(CliCommand::Parse(a)) => resolve_source(Subcommand::Parse, bash_mode, a.verbose, a.c, a.file),
-            Some(CliCommand::Exec(a)) => resolve_exec(bash_mode, a.c, a.args),
+            None => resolve_source(Subcommand::Parse, dialect, false, self.c, self.file),
+            Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, dialect, a.verbose, a.c, a.file),
+            Some(CliCommand::Parse(a)) => resolve_source(Subcommand::Parse, dialect, a.verbose, a.c, a.file),
+            Some(CliCommand::Exec(a)) => resolve_exec(dialect, a.c, a.args),
             Some(CliCommand::ExecAst) => CliArgs {
                 subcommand: Subcommand::ExecAst,
-                bash_mode,
+                dialect,
                 verbose: false,
                 command_str: None,
                 file_arg: None,
@@ -126,9 +134,28 @@ impl Cli {
     }
 }
 
+/// Resolve the dialect from mutually exclusive CLI flags. The most specific
+/// versioned flag wins; `--bash` alone means latest (Bash51).
+fn resolve_dialect(bash: bool, bash44: bool, bash50: bool, bash51: bool) -> thaum::Dialect {
+    let count = [bash, bash44, bash50, bash51].iter().filter(|&&b| b).count();
+    if count > 1 {
+        eprintln!("error: specify at most one of --bash, --bash44, --bash50, --bash51");
+        process::exit(2);
+    }
+    if bash44 {
+        thaum::Dialect::Bash44
+    } else if bash50 {
+        thaum::Dialect::Bash50
+    } else if bash51 || bash {
+        thaum::Dialect::Bash
+    } else {
+        thaum::Dialect::Posix
+    }
+}
+
 fn resolve_source(
     subcommand: Subcommand,
-    bash_mode: bool,
+    dialect: thaum::Dialect,
     verbose: bool,
     c: Option<String>,
     file: Option<String>,
@@ -143,7 +170,7 @@ fn resolve_source(
     }
     CliArgs {
         subcommand,
-        bash_mode,
+        dialect,
         verbose,
         command_str: c,
         file_arg: file,
@@ -151,7 +178,7 @@ fn resolve_source(
     }
 }
 
-fn resolve_exec(bash_mode: bool, c: Option<String>, args: Vec<String>) -> CliArgs {
+fn resolve_exec(dialect: thaum::Dialect, c: Option<String>, args: Vec<String>) -> CliArgs {
     if c.is_none() && args.is_empty() {
         eprintln!("error: provide either -c <script> or a file argument");
         process::exit(2);
@@ -169,7 +196,7 @@ fn resolve_exec(bash_mode: bool, c: Option<String>, args: Vec<String>) -> CliArg
 
     CliArgs {
         subcommand: Subcommand::Exec,
-        bash_mode,
+        dialect,
         verbose: false,
         command_str: c,
         file_arg,

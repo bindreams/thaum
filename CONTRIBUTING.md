@@ -17,7 +17,7 @@ src/
   main.rs              — CLI entry point (thin dispatch)
   ast.rs               — AST types: Program, Statement, Expression, Command, ...
   token.rs             — Token enum with doc comments
-  dialect.rs           — ShellOptions, Dialect (Posix/Bash)
+  dialect.rs           — ShellOptions, Dialect (Posix/Bash44/Bash50/Bash51/Bash)
   span.rs              — byte offset spans for source locations
   error.rs             — LexError, ParseError with spans
 
@@ -229,6 +229,7 @@ shrinks from the front (on commit), never from the back.
 
 - `ShellOptions` has boolean flags for individual Bash features
 - `Dialect::Posix` = all false, `Dialect::Bash` = all true
+- Versioned dialects (`Bash44`, `Bash50`, `Bash51`) model behavioral differences between Bash releases; `Dialect::Bash` aliases the latest (`Bash51`)
 - The lexer uses `ShellOptions` to conditionally recognize Bash-specific operator tokens (e.g., `<<<`, `&>`)
 - The parser checks `ShellOptions` before accepting Bash keywords (`function`, `select`, `coproc`)
 - In tests, enable only the specific flag being tested
@@ -236,7 +237,7 @@ shrinks from the front (on commit), never from the back.
 ### Adding a new Bash feature
 
 1. Add a flag to `ShellOptions` in `dialect.rs`
-2. Set it to `true` in `Dialect::Bash`
+2. Set it to `true` in the appropriate `Dialect` variants (and `Bash51`/`Bash` at minimum)
 3. If the feature needs new tokens, add them to `token.rs` with `Bash` prefix (e.g. `BashHereStringOp`) and `display_name()`
 4. Update the lexer in `lexer/mod.rs` to recognize them conditionally on the flag
 5. Add AST types to `ast.rs` if needed — use `Bash` prefix on Bash-specific variants (e.g. `BashDoubleBracket`, `BashProcessSubstitution`)

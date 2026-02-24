@@ -2265,3 +2265,66 @@ fn indirect_assoc_keys() {
     assert!(keys.contains(&"k"));
     assert!(keys.contains(&"j"));
 }
+
+// Versioned dialect tests -----------------------------------------------------------------------------------------
+
+/// Helper: parse and execute with a specific dialect, capturing stdout.
+fn dialect_exec_ok(script: &str, dialect: Dialect) -> (String, i32) {
+    let program = thaum::parse_with(script, dialect)
+        .unwrap_or_else(|e| panic!("parse failed for {:?} with {:?}: {}", script, dialect, e));
+    let options = dialect.options();
+    let mut exec = Executor::with_options(options);
+    exec.set_exe_path(thaum_exe());
+    let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin");
+    let mut io = CapturedIo::new();
+    match exec.execute(&program, &mut io.context()) {
+        Ok(status) => (io.stdout_string(), status),
+        Err(ExecError::ExitRequested(code)) => (io.stdout_string(), code),
+        Err(e) => panic!("exec failed for {:?} with {:?}: {}", script, dialect, e),
+    }
+}
+
+#[test]
+fn bash_is_bash51() {
+    // Dialect::Bash and Dialect::Bash51 produce identical options
+    assert_eq!(Dialect::Bash.options(), Dialect::Bash51.options());
+}
+
+#[test]
+fn bash44_has_array_empty_element_bug() {
+    // In bash 4.4, ${a[@]:+foo} on array with empty element returns "foo" (bug)
+    let (out, _) = dialect_exec_ok("a=(''); echo \"${a[@]:+foo}\"", Dialect::Bash44);
+    assert_eq!(out, "foo\n");
+}
+
+#[test]
+fn bash50_fixes_array_empty_element_bug() {
+    // In bash 5.0+, ${a[@]:+foo} on array with empty element returns "" (fixed)
+    let (out, _) = dialect_exec_ok("a=(''); echo \"${a[@]:+foo}\"", Dialect::Bash50);
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn bash44_rejects_transform_lower() {
+    // @L is bash 5.1+ — in bash 4.4, the parser does not recognize @L as a
+    // transform, so `x@L` is treated as a variable name containing `@` which
+    // expands to empty (no bad-substitution error at parse time, but the
+    // transform is not applied).
+    let (out, _) = dialect_exec_ok("x=HELLO; echo \"${x@L}\"", Dialect::Bash44);
+    // Without the transform, `x@L` is an undefined variable → empty
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn bash50_rejects_transform_lower() {
+    // @L is bash 5.1+ — same behavior as bash 4.4: not recognized
+    let (out, _) = dialect_exec_ok("x=HELLO; echo \"${x@L}\"", Dialect::Bash50);
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn bash51_allows_transform_lower() {
+    // @L works in bash 5.1+
+    let (out, _) = dialect_exec_ok("x=HELLO; echo ${x@L}", Dialect::Bash51);
+    assert_eq!(out, "hello\n");
+}

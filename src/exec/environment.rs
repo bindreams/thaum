@@ -83,6 +83,18 @@ pub struct DeclareAttrs {
     pub list_functions: bool,
     /// `-F`: list function names only.
     pub list_function_names: bool,
+
+    // Attribute removal flags (via `+` prefix) ----
+    /// `+x`: remove export attribute.
+    pub unexport: bool,
+    /// `+r`: remove readonly (only effective when `typeset_can_unset_readonly` is enabled).
+    pub unreadonly: bool,
+    /// `+i`: remove integer attribute.
+    pub uninteger: bool,
+    /// `+l`: remove lowercase attribute.
+    pub unlowercase: bool,
+    /// `+u`: remove uppercase attribute.
+    pub unuppercase: bool,
 }
 
 /// A saved scope frame for function calls.
@@ -120,6 +132,8 @@ pub struct Environment {
     xtrace: bool,
     /// Bash 4.x bug: `"${a[@]:+word}"` on array with empty element returns word.
     array_empty_element_alternative_bug: bool,
+    /// When true, `typeset +r` / `declare +r` removes the readonly attribute.
+    typeset_can_unset_readonly: bool,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -162,6 +176,7 @@ impl Environment {
             nounset: false,
             xtrace: false,
             array_empty_element_alternative_bug: false,
+            typeset_can_unset_readonly: false,
         };
 
         let _ = env.set_var("IFS", " \t\n");
@@ -949,6 +964,22 @@ impl Environment {
                 var.uppercase = true;
                 var.lowercase = false;
             }
+            // Apply attribute removal flags (+X).
+            if attrs.unexport {
+                var.exported = false;
+            }
+            if attrs.uninteger {
+                var.integer = false;
+            }
+            if attrs.unlowercase {
+                var.lowercase = false;
+            }
+            if attrs.unuppercase {
+                var.uppercase = false;
+            }
+            if attrs.unreadonly && self.typeset_can_unset_readonly {
+                var.readonly = false;
+            }
         } else {
             // Variable does not exist yet — create it.
             let initial = value.unwrap_or("").to_string();
@@ -1089,6 +1120,59 @@ impl Environment {
         self.array_empty_element_alternative_bug = enabled;
     }
 
+    /// Whether `typeset +r` / `declare +r` removes the readonly attribute.
+    pub fn typeset_can_unset_readonly(&self) -> bool {
+        self.typeset_can_unset_readonly
+    }
+
+    /// Set the `typeset_can_unset_readonly` flag.
+    pub fn set_typeset_can_unset_readonly(&mut self, enabled: bool) {
+        self.typeset_can_unset_readonly = enabled;
+    }
+
+    // Attribute removal (declare +X) ----------------------------------------------------------------------------------
+
+    /// Remove the exported attribute from a variable.
+    pub fn unset_exported(&mut self, name: &str) {
+        let name = self.resolve_nameref(name).to_string();
+        if let Some(var) = self.variables.get_mut(name.as_str()) {
+            var.exported = false;
+        }
+    }
+
+    /// Remove the integer attribute from a variable.
+    pub fn unset_integer(&mut self, name: &str) {
+        let name = self.resolve_nameref(name).to_string();
+        if let Some(var) = self.variables.get_mut(name.as_str()) {
+            var.integer = false;
+        }
+    }
+
+    /// Remove the lowercase attribute from a variable.
+    pub fn unset_lowercase(&mut self, name: &str) {
+        let name = self.resolve_nameref(name).to_string();
+        if let Some(var) = self.variables.get_mut(name.as_str()) {
+            var.lowercase = false;
+        }
+    }
+
+    /// Remove the uppercase attribute from a variable.
+    pub fn unset_uppercase(&mut self, name: &str) {
+        let name = self.resolve_nameref(name).to_string();
+        if let Some(var) = self.variables.get_mut(name.as_str()) {
+            var.uppercase = false;
+        }
+    }
+
+    /// Remove the readonly attribute. Only effective when `typeset_can_unset_readonly`
+    /// is enabled (Oils behavior); callers must gate on that flag.
+    pub fn unset_readonly(&mut self, name: &str) {
+        let name = self.resolve_nameref(name).to_string();
+        if let Some(var) = self.variables.get_mut(name.as_str()) {
+            var.readonly = false;
+        }
+    }
+
     /// Import all environment variables from the current OS process, marking them exported.
     pub fn inherit_from_process(&mut self) {
         for (key, value) in std::env::vars() {
@@ -1125,6 +1209,7 @@ impl Environment {
             xtrace: self.xtrace,
             cwd: self.cwd.clone(),
             array_empty_element_alternative_bug: self.array_empty_element_alternative_bug,
+            typeset_can_unset_readonly: self.typeset_can_unset_readonly,
         }
     }
 
@@ -1149,6 +1234,7 @@ impl Environment {
             nounset: s.nounset,
             xtrace: s.xtrace,
             array_empty_element_alternative_bug: s.array_empty_element_alternative_bug,
+            typeset_can_unset_readonly: s.typeset_can_unset_readonly,
         }
     }
 }
@@ -1169,6 +1255,8 @@ pub struct SerializedEnvironment {
     pub cwd: PathBuf,
     #[serde(default)]
     pub array_empty_element_alternative_bug: bool,
+    #[serde(default)]
+    pub typeset_can_unset_readonly: bool,
 }
 
 impl Default for Environment {

@@ -72,6 +72,10 @@ pub struct ShellOptions {
     /// Bash 4.x bug: `"${a[@]:+word}"` on array with single empty element
     /// incorrectly returns word instead of empty. Fixed in bash 5.0.
     pub array_empty_element_alternative_bug: bool,
+    /// When true, `typeset +r` / `declare +r` actually removes the readonly
+    /// attribute (Oils behavior). When false (Bash default), `+r` silently
+    /// fails -- readonly is permanent for the shell session.
+    pub typeset_can_unset_readonly: bool,
 }
 
 /// A named set of shell options.
@@ -141,6 +145,7 @@ impl Dialect {
                 parameter_transform: true,
                 parameter_transform_51: true,
                 array_empty_element_alternative_bug: false,
+                typeset_can_unset_readonly: false,
             },
         }
     }

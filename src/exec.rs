@@ -92,6 +92,7 @@ impl Executor {
         let mut env = Environment::new();
         env.inherit_from_process();
         env.set_array_empty_element_alternative_bug(options.array_empty_element_alternative_bug);
+        env.set_typeset_can_unset_readonly(options.typeset_can_unset_readonly);
         Executor {
             env,
             fd_table: HashMap::new(),
@@ -117,6 +118,7 @@ impl Executor {
     /// Create an executor with a specific environment and shell options.
     pub fn with_env_and_options(mut env: Environment, options: crate::dialect::ShellOptions) -> Self {
         env.set_array_empty_element_alternative_bug(options.array_empty_element_alternative_bug);
+        env.set_typeset_can_unset_readonly(options.typeset_can_unset_readonly);
         Executor {
             env,
             fd_table: HashMap::new(),

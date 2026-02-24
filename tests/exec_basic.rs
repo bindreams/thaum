@@ -1141,6 +1141,42 @@ fn assoc_array_unset_whole() {
     assert_eq!(out, "\n");
 }
 
+// typeset/declare + flags (attribute removal) -------------------------------------------------------------------------
+
+#[test]
+fn typeset_plus_r_bash_silently_fails() {
+    // Bash behavior: typeset +r does NOT remove readonly
+    let (out, _) = bash_exec_ok("readonly x=1; typeset +r x 2>/dev/null; echo $x");
+    assert_eq!(out, "1\n");
+}
+
+#[test]
+fn typeset_plus_x_unexports() {
+    // +x removes export attribute, value preserved
+    let (out, _) = bash_exec_ok("export x=hello; declare +x x; echo $x");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn typeset_plus_i_removes_integer() {
+    // +i removes integer attribute — subsequent assignment stores string
+    let (out, _) = bash_exec_ok("declare -i x=42; declare +i x; x=hello; echo $x");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn typeset_plus_l_removes_lowercase() {
+    // +l removes lowercase attribute — subsequent assignment preserves case
+    let (out, _) = bash_exec_ok("declare -l x=hello; declare +l x; x=WORLD; echo $x");
+    assert_eq!(out, "WORLD\n");
+}
+
+#[test]
+fn typeset_plus_u_removes_uppercase() {
+    let (out, _) = bash_exec_ok("declare -u x=HELLO; declare +u x; x=world; echo $x");
+    assert_eq!(out, "world\n");
+}
+
 // declare/typeset builtin ---------------------------------------------------------------------------------------------
 
 #[test]

@@ -633,6 +633,22 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
                     _ => {} // ignore unknown flags
                 }
             }
+        } else if arg.starts_with('+') && arg.len() > 1 && !arg.contains('=') {
+            // Attribute removal flags (+x, +r, +i, +l, +u)
+            for ch in arg[1..].chars() {
+                match ch {
+                    'x' => attrs.unexport = true,
+                    'r' => attrs.unreadonly = true,
+                    'i' => attrs.uninteger = true,
+                    'l' => attrs.unlowercase = true,
+                    'u' => attrs.unuppercase = true,
+                    'a' | 'A' => {
+                        // +a and +A cannot destroy array variables (bash behavior).
+                        // Silently ignore.
+                    }
+                    _ => {} // ignore unknown flags
+                }
+            }
         } else {
             operands.push(arg.clone());
         }

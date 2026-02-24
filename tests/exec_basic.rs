@@ -2412,7 +2412,6 @@ fn readonly_no_args_lists_variables() {
 }
 
 #[test]
-#[ignore] // TODO: builtins.rs:679 — declare -f/-F not implemented
 fn declare_dash_big_f_lists_function_names() {
     let (out, _) = bash_exec_ok("foo() { echo bar; }; declare -F");
     assert!(out.contains("foo"), "declare -F should list function names; got: {out}");

@@ -808,6 +808,11 @@ impl Environment {
         self.functions.insert(name, func);
     }
 
+    /// Return the names of all defined functions.
+    pub fn function_names(&self) -> Vec<&str> {
+        self.functions.keys().map(|k| k.as_str()).collect()
+    }
+
     // Scope management (for function calls) ---------------------------------------------------------------------------
 
     /// Enter a function scope: saves positional parameters and pushes a new scope frame.

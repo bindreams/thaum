@@ -677,9 +677,18 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
         return Ok(0);
     }
 
-    // -f / -F: list functions (stub — no function source stored yet)
-    if attrs.list_functions || attrs.list_function_names {
-        // TODO: implement function listing when function source is stored
+    // -F: list function names
+    if attrs.list_function_names {
+        let mut names = env.function_names();
+        names.sort();
+        for name in names {
+            let _ = writeln!(stdout, "declare -f {}", name);
+        }
+        return Ok(0);
+    }
+    // -f: list full function definitions
+    if attrs.list_functions {
+        // TODO: declare -f needs AST-to-source printing
         return Ok(0);
     }
 

@@ -17,6 +17,7 @@ colored = { version = "3", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 chrono = "0.4.44"
 regex = "1"
+icu = "2"
 
 [target.'cfg(unix)'.dependencies]
 command-fds = "0.3"

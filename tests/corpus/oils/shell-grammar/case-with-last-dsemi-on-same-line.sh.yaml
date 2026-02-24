@@ -1,5 +1,5 @@
 name: Case with last dsemi on same line
-dialect: bash
+dialect: posix
 source: oils:spec/shell-grammar#case-with-last-dsemi-on-same-line
 ---
 case word_a in

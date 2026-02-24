@@ -428,9 +428,18 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
             let mut posix_io = thaum::exec::CapturedIo::new();
             let posix_result = posix_exec.execute(&posix_program, &mut posix_io.context());
             if let Ok(status) = posix_result {
-                if status == 0 {
+                // Check both status AND stdout match expected values
+                let stdout_matches = match &spec.stdout {
+                    Some(matcher) => matcher.check(&posix_io.stdout_string(), "stdout").is_ok(),
+                    None => true,
+                };
+                let status_matches = match spec.status {
+                    Some(expected) => status == expected,
+                    None => status == 0,
+                };
+                if status_matches && stdout_matches {
                     eprintln!(
-                        "POSIX-COMPAT: bash test '{}' also passes in POSIX mode (status 0)",
+                        "POSIX-COMPAT: bash test '{}' also passes in POSIX mode (status + stdout match)",
                         spec.name
                     );
                 }

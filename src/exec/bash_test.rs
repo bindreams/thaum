@@ -162,8 +162,14 @@ fn evaluate_binary(
         // TODO: pattern matching (glob) when RHS is unquoted
         BinaryTestOp::StringEquals => left == right,
         BinaryTestOp::StringNotEquals => left != right,
-        BinaryTestOp::StringLessThan => left < right,
-        BinaryTestOp::StringGreaterThan => left > right,
+        BinaryTestOp::StringLessThan => {
+            let locale = super::locale::collate_locale(env);
+            super::locale::compare_strings(left, right, &locale) == std::cmp::Ordering::Less
+        }
+        BinaryTestOp::StringGreaterThan => {
+            let locale = super::locale::collate_locale(env);
+            super::locale::compare_strings(left, right, &locale) == std::cmp::Ordering::Greater
+        }
 
         // Regex match
         BinaryTestOp::RegexMatch => regex_match(left, right, env)?,

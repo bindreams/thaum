@@ -28,9 +28,18 @@ pub fn ctype_locale(env: &Environment) -> Locale {
 }
 
 /// Resolve LC_COLLATE (string comparison ordering).
-#[allow(dead_code)] // Used by future `[[ ]]` string comparison
 pub fn collate_locale(env: &Environment) -> Locale {
     resolve_locale(env, "LC_COLLATE")
+}
+
+/// Compare two strings using locale-aware collation (for `[[ a < b ]]`).
+pub fn compare_strings(a: &str, b: &str, locale: &Locale) -> std::cmp::Ordering {
+    use icu::collator::{Collator, CollatorPreferences};
+    let prefs = CollatorPreferences::from(&locale.id);
+    match Collator::try_new(prefs, Default::default()) {
+        Ok(collator) => collator.compare(a, b),
+        Err(_) => a.cmp(b), // fallback to byte order
+    }
 }
 
 /// Uppercase an entire string respecting locale (like bash `${var^^}`).

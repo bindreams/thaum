@@ -132,9 +132,7 @@ fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> b
             })
             .unwrap_or(false),
 
-        // -t FD: file descriptor is open and associated with a terminal
-        // TODO: proper isatty check
-        UnaryTestOp::FileDescriptorOpen => s.parse::<i32>().is_ok(),
+        UnaryTestOp::FileDescriptorOpen => s.parse::<i32>().map(super::platform::is_fd_terminal).unwrap_or(false),
 
         // -v: variable is set
         UnaryTestOp::VariableIsSet => env.get_var(s).is_some(),

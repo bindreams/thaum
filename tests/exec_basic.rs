@@ -2399,12 +2399,10 @@ fn test_dash_big_g_checks_group_not_existence() {
 }
 
 #[test]
-#[ignore] // TODO: bash_test.rs:143 — -t only checks if string parses as int
-fn test_dash_t_checks_terminal_not_just_int() {
-    // In the test harness, FD 0 (stdin) is not a terminal.
-    // -t 0 should return false; the bug makes it return true.
-    let (out, _) = bash_exec_ok("[[ -t 0 ]] && echo terminal || echo not-terminal");
-    assert_eq!(out, "not-terminal\n");
+fn test_dash_t_nonexistent_fd_is_false() {
+    // FD 99 doesn't exist — -t should return false.
+    let (out, _) = bash_exec_ok("[[ -t 99 ]] && echo yes || echo no");
+    assert_eq!(out, "no\n");
 }
 
 #[test]

@@ -22,10 +22,13 @@ gettext = "0.4"
 
 [target.'cfg(unix)'.dependencies]
 command-fds = "0.3"
-nix = { version = "0.30", features = ["user"] }
+nix = { version = "0.30", features = ["user", "term", "process"] }
 
 [target.'cfg(windows)'.dependencies]
 winspawn = "0.1"
+
+[target.'cfg(windows)'.dev-dependencies]
+windows = { version = "0.62", features = ["Win32_System_Console"] }
 
 [dev-dependencies]
 pretty_assertions = "1"

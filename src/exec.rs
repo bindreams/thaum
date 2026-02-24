@@ -758,26 +758,35 @@ impl Executor {
     }
 
     /// Apply prefix assignments temporarily, returning saved values.
+    ///
+    /// POSIX requires command-prefix assignments to be exported for the
+    /// duration of the command, so each variable is marked exported here.
+    /// The saved tuple captures (name, old_value, was_exported) for restore.
     fn apply_prefix_assignments(
         &mut self,
         assignments: &[crate::ast::Assignment],
-    ) -> Result<Vec<(String, Option<String>)>, ExecError> {
+    ) -> Result<Vec<(String, Option<String>, bool)>, ExecError> {
         let mut saved = Vec::new();
         for assignment in assignments {
-            let old = self.env.get_var(&assignment.name).map(|s| s.to_string());
+            let old_val = self.env.get_var(&assignment.name).map(|s| s.to_string());
+            let old_exported = self.env.is_exported(&assignment.name);
             let value = self.expand_scalar_assignment(assignment)?;
             self.env.set_var(&assignment.name, &value)?;
-            saved.push((assignment.name.clone(), old));
+            self.env.export_var(&assignment.name);
+            saved.push((assignment.name.clone(), old_val, old_exported));
         }
         Ok(saved)
     }
 
     /// Restore prefix assignments from saved values.
-    fn restore_prefix_assignments(&mut self, saved: Vec<(String, Option<String>)>) {
-        for (name, old_val) in saved {
+    fn restore_prefix_assignments(&mut self, saved: Vec<(String, Option<String>, bool)>) {
+        for (name, old_val, old_exported) in saved {
             match old_val {
                 Some(val) => {
                     let _ = self.env.set_var(&name, &val);
+                    if !old_exported {
+                        self.env.unexport_var(&name);
+                    }
                 }
                 None => {
                     let _ = self.env.unset_var(&name);

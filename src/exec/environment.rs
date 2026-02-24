@@ -640,6 +640,13 @@ impl Environment {
         }
     }
 
+    /// Remove the export attribute from a variable (no-op if variable doesn't exist).
+    pub fn unexport_var(&mut self, name: &str) {
+        if let Some(var) = self.variables.get_mut(name) {
+            var.exported = false;
+        }
+    }
+
     /// Mark a variable as readonly. If it doesn't exist, create it with empty value.
     pub fn set_readonly(&mut self, name: &str) {
         match self.variables.get_mut(name) {

@@ -118,6 +118,32 @@ pub fn time_locale(env: &Environment) -> Locale {
     resolve_locale(env, "LC_TIME")
 }
 
+/// Resolve the timezone from the shell's TZ variable.
+///
+/// Follows POSIX `tzset()` semantics: only an **exported** TZ is visible
+/// (matching bash, where printf calls C strftime which reads the process env).
+///
+/// - TZ unset or not exported → system default (`/etc/localtime`)
+/// - TZ="" (empty) → UTC
+/// - TZ=":path" → strip colon prefix, look up as IANA name
+/// - Otherwise → try IANA name, then POSIX TZ string, then system fallback
+fn resolve_timezone(env: &Environment) -> jiff::tz::TimeZone {
+    if !env.is_exported("TZ") {
+        return jiff::tz::TimeZone::system();
+    }
+    let tz_str = match env.get_var("TZ") {
+        Some(s) => s,
+        None => return jiff::tz::TimeZone::system(),
+    };
+    if tz_str.is_empty() {
+        return jiff::tz::TimeZone::fixed(jiff::tz::offset(0));
+    }
+    let tz_str = tz_str.strip_prefix(':').unwrap_or(tz_str);
+    jiff::tz::TimeZone::get(tz_str)
+        .or_else(|_| jiff::tz::TimeZone::posix(tz_str))
+        .unwrap_or_else(|_| jiff::tz::TimeZone::system())
+}
+
 /// Format a Unix timestamp using a strftime format string, respecting LC_TIME.
 ///
 /// Locale-sensitive codes (%A, %B, %a, %b, %h, %p) use ICU4X with the LC_TIME
@@ -126,7 +152,7 @@ pub fn time_locale(env: &Environment) -> Locale {
 pub fn strftime_locale(format: &str, timestamp: i64, env: &Environment) -> String {
     let locale = time_locale(env);
     let ts = jiff::Timestamp::from_second(timestamp).unwrap_or(jiff::Timestamp::UNIX_EPOCH);
-    let zdt = ts.to_zoned(jiff::tz::TimeZone::system());
+    let zdt = ts.to_zoned(resolve_timezone(env));
 
     // If locale is C/POSIX, just use jiff's English strftime directly
     if is_c_locale(&locale) {

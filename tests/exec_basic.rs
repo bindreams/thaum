@@ -1893,3 +1893,47 @@ fn bash_allows_declare() {
     assert_eq!(status, 0);
     assert_eq!(out, "hello\n");
 }
+
+// Case modification operators (${var^}, ${var^^}, ${var,}, ${var,,}) ---------------------------------------------------
+
+#[test]
+fn case_mod_upper_first() {
+    let (out, _) = bash_exec_ok("x=hello; echo ${x^}");
+    assert_eq!(out, "Hello\n");
+}
+
+#[test]
+fn case_mod_upper_all() {
+    let (out, _) = bash_exec_ok("x=hello; echo ${x^^}");
+    assert_eq!(out, "HELLO\n");
+}
+
+#[test]
+fn case_mod_lower_first() {
+    let (out, _) = bash_exec_ok("x=HELLO; echo ${x,}");
+    assert_eq!(out, "hELLO\n");
+}
+
+#[test]
+fn case_mod_lower_all() {
+    let (out, _) = bash_exec_ok("x=HELLO; echo ${x,,}");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn case_mod_unicode() {
+    let (out, _) = bash_exec_ok("x=café; echo ${x^^}");
+    assert_eq!(out, "CAFÉ\n");
+}
+
+#[test]
+fn case_mod_empty() {
+    let (out, _) = bash_exec_ok("x=''; echo \"${x^^}\"");
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn case_mod_unset() {
+    let (out, _) = bash_exec_ok("echo \"${unset_var^^}\"");
+    assert_eq!(out, "\n");
+}

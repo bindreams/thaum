@@ -331,6 +331,26 @@ fn expand_complex_parameter(
             };
             out.push_str(super::pattern::trim_largest_suffix(val, &pat));
         }
+        Some(ParamOp::UpperFirst) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::capitalize(val, &locale));
+        }
+        Some(ParamOp::UpperAll) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::to_uppercase(val, &locale));
+        }
+        Some(ParamOp::LowerFirst) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::uncapitalize(val, &locale));
+        }
+        Some(ParamOp::LowerAll) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::to_lowercase(val, &locale));
+        }
     }
     Ok(())
 }

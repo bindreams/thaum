@@ -813,6 +813,10 @@ impl<'a> YamlWriter<'a> {
                         ParamOp::TrimLargeSuffix => "%%",
                         ParamOp::TrimSmallPrefix => "#",
                         ParamOp::TrimLargePrefix => "##",
+                        ParamOp::UpperFirst => "^",
+                        ParamOp::UpperAll => "^^",
+                        ParamOp::LowerFirst => ",",
+                        ParamOp::LowerAll => ",,",
                     };
                     m.scalar("operator", op_str);
                 } else if self.verbose {

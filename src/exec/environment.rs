@@ -928,14 +928,19 @@ impl Environment {
     /// `*`, `/`, and variable references.  Full arithmetic evaluation
     /// (matching bash's `$((...))` semantics) requires the Executor, so
     /// complex expressions like nested ternaries are not supported here.
+    ///
+    /// Case transforms use ICU4X locale-aware conversion, respecting
+    /// `LC_CTYPE` / `LC_ALL` / `LANG` environment variables.
     fn apply_var_transforms(&self, value: &str, _integer: bool, lowercase: bool, uppercase: bool) -> String {
         // Note: the integer attribute is handled by the Executor, which has
         // access to the full arithmetic evaluator.  Environment only applies
         // case transforms.
         if lowercase {
-            value.to_lowercase()
+            let locale = super::locale::ctype_locale(self);
+            super::locale::to_lowercase(value, &locale)
         } else if uppercase {
-            value.to_uppercase()
+            let locale = super::locale::ctype_locale(self);
+            super::locale::to_uppercase(value, &locale)
         } else {
             value.to_string()
         }

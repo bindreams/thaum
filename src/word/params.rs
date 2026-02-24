@@ -6,7 +6,9 @@ use crate::span::Span;
 /// Parse the raw content of a brace parameter expansion (content between `${` and `}`).
 ///
 /// Handles `${name}`, `${name:-default}`, `${#name}`, `${name%%pattern}`, etc.
-pub(crate) fn parse_brace_param_content(content: &str) -> ParameterExpansion {
+/// When `case_modification` is true, also recognizes `^`, `^^`, `,`, `,,` as
+/// operators (Bash 4.0+ `${var^}`, `${var^^}`, `${var,}`, `${var,,}`).
+pub(crate) fn parse_brace_param_content(content: &str, case_modification: bool) -> ParameterExpansion {
     // Check for ${#name} (length)
     if content.starts_with('#') && content.len() > 1 && !content.contains(':') && !content.contains('%') {
         let name = content[1..].to_string();
@@ -17,10 +19,16 @@ pub(crate) fn parse_brace_param_content(content: &str) -> ParameterExpansion {
         };
     }
 
-    // Find the operator
-    let name_end = content
-        .find([':', '%', '#', '-', '=', '?', '+'])
-        .unwrap_or(content.len());
+    // Find the operator — the set of characters that terminate the name.
+    let name_end = if case_modification {
+        content
+            .find([':', '%', '#', '-', '=', '?', '+', '^', ','])
+            .unwrap_or(content.len())
+    } else {
+        content
+            .find([':', '%', '#', '-', '=', '?', '+'])
+            .unwrap_or(content.len())
+    };
 
     let name = content[..name_end].to_string();
 
@@ -84,6 +92,20 @@ fn parse_param_operator(s: &str) -> (Option<ParamOp>, usize) {
                 (Some(ParamOp::TrimLargePrefix), 2)
             } else {
                 (Some(ParamOp::TrimSmallPrefix), 1)
+            }
+        }
+        b'^' => {
+            if bytes.len() > 1 && bytes[1] == b'^' {
+                (Some(ParamOp::UpperAll), 2)
+            } else {
+                (Some(ParamOp::UpperFirst), 1)
+            }
+        }
+        b',' => {
+            if bytes.len() > 1 && bytes[1] == b',' {
+                (Some(ParamOp::LowerAll), 2)
+            } else {
+                (Some(ParamOp::LowerFirst), 1)
             }
         }
         _ => (None, 0),

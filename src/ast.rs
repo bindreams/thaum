@@ -612,6 +612,15 @@ pub enum ParamOp {
     TrimSmallPrefix,
     /// `${var##pattern}` — remove longest prefix match.
     TrimLargePrefix,
+    // Case modification (Bash 4.0+)
+    /// `${var^}` — uppercase first character.
+    UpperFirst,
+    /// `${var^^}` — uppercase all characters.
+    UpperAll,
+    /// `${var,}` — lowercase first character.
+    LowerFirst,
+    /// `${var,,}` — lowercase all characters.
+    LowerAll,
 }
 
 /// A glob metacharacter within a word.

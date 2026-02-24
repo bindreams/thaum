@@ -22,8 +22,6 @@ mod external;
 /// Pluggable I/O context for stdin/stdout/stderr (live or captured).
 pub mod io_context;
 /// Locale-aware string operations (case conversion) via ICU4X.
-// TODO: will be consumed by expand module for ${var^^}, ${var,,}, etc.
-#[allow(unused)]
 pub(crate) mod locale;
 pub(crate) mod numeric;
 mod pattern;

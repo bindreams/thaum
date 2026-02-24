@@ -63,6 +63,8 @@ pub struct ShellOptions {
     pub integer_attr: bool,
     /// `declare -l` / `declare -u` case conversion attributes (Bash 4+).
     pub case_attrs: bool,
+    /// `${var^}`, `${var^^}`, `${var,}`, `${var,,}` case modification (Bash 4+).
+    pub case_modification: bool,
 }
 
 /// A named set of shell options.
@@ -111,6 +113,7 @@ impl Dialect {
                 nameref: true,
                 integer_attr: true,
                 case_attrs: true,
+                case_modification: true,
             },
         }
     }

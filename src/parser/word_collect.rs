@@ -112,7 +112,7 @@ impl Parser {
             }
             Token::SimpleParam(name) => Ok(Fragment::Parameter(ParameterExpansion::Simple(name))),
             Token::BraceParam(raw) => {
-                let expansion = crate::word::parse_brace_param_content(&raw);
+                let expansion = crate::word::parse_brace_param_content(&raw, self.options.case_modification);
                 Ok(Fragment::Parameter(expansion))
             }
             Token::CommandSub(raw) => {

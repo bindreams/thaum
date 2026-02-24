@@ -28,6 +28,7 @@ pub fn ctype_locale(env: &Environment) -> Locale {
 }
 
 /// Resolve LC_COLLATE (string comparison ordering).
+#[allow(dead_code)] // Used by future `[[ ]]` string comparison
 pub fn collate_locale(env: &Environment) -> Locale {
     resolve_locale(env, "LC_COLLATE")
 }

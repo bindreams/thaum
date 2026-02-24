@@ -88,6 +88,7 @@ fn expand_param_default() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
+        indirect: false,
         operator: Some(ParamOp::Default),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
@@ -100,6 +101,7 @@ fn expand_param_default_when_set() {
     env.set_var("SET", "actual").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "SET".into(),
+        indirect: false,
         operator: Some(ParamOp::Default),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
@@ -111,6 +113,7 @@ fn expand_param_error_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "MISSING".into(),
+        indirect: false,
         operator: Some(ParamOp::Error),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("var is required".into())]))),
     })]);
@@ -124,6 +127,7 @@ fn expand_param_alternative() {
     env.set_var("SET", "anything").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "SET".into(),
+        indirect: false,
         operator: Some(ParamOp::Alternative),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("alt".into())]))),
     })]);
@@ -135,6 +139,7 @@ fn expand_param_alternative_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
+        indirect: false,
         operator: Some(ParamOp::Alternative),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("alt".into())]))),
     })]);
@@ -147,6 +152,7 @@ fn expand_param_length() {
     env.set_var("STR", "hello").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "STR".into(),
+        indirect: false,
         operator: Some(ParamOp::Length),
         argument: None,
     })]);
@@ -172,6 +178,7 @@ fn expand_param_default_assign_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
+        indirect: false,
         operator: Some(ParamOp::DefaultAssign),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("assigned".into())]))),
     })]);
@@ -185,6 +192,7 @@ fn expand_param_default_assign_when_set() {
     env.set_var("SET", "existing").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "SET".into(),
+        indirect: false,
         operator: Some(ParamOp::DefaultAssign),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("fallback".into())]))),
     })]);
@@ -198,6 +206,7 @@ fn expand_param_default_assign_when_empty() {
     env.set_var("EMPTY", "").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "EMPTY".into(),
+        indirect: false,
         operator: Some(ParamOp::DefaultAssign),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("filled".into())]))),
     })]);
@@ -211,6 +220,7 @@ fn expand_param_trim_small_prefix() {
     env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "PATH".into(),
+        indirect: false,
         operator: Some(ParamOp::TrimSmallPrefix),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("*/".into())]))),
     })]);
@@ -224,6 +234,7 @@ fn expand_param_trim_large_prefix() {
     env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "PATH".into(),
+        indirect: false,
         operator: Some(ParamOp::TrimLargePrefix),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("*/".into())]))),
     })]);
@@ -237,6 +248,7 @@ fn expand_param_trim_small_suffix() {
     env.set_var("FILE", "archive.tar.gz").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "FILE".into(),
+        indirect: false,
         operator: Some(ParamOp::TrimSmallSuffix),
         argument: Some(Box::new(make_word(vec![Fragment::Literal(".*".into())]))),
     })]);
@@ -250,6 +262,7 @@ fn expand_param_trim_large_suffix() {
     env.set_var("FILE", "archive.tar.gz").unwrap();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "FILE".into(),
+        indirect: false,
         operator: Some(ParamOp::TrimLargeSuffix),
         argument: Some(Box::new(make_word(vec![Fragment::Literal(".*".into())]))),
     })]);
@@ -262,6 +275,7 @@ fn expand_param_trim_unset_var() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
         name: "UNSET".into(),
+        indirect: false,
         operator: Some(ParamOp::TrimSmallPrefix),
         argument: Some(Box::new(make_word(vec![Fragment::Literal("*".into())]))),
     })]);

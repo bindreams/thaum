@@ -2179,3 +2179,89 @@ fn locale_quoted_fallback_locale() {
     let (out, _) = bash_exec_ok(&script);
     assert_eq!(out, "auf wiedersehen\n");
 }
+
+// Parameter transformation @Q/@a/@A -----------------------------------------------------------------------------------
+
+#[test]
+fn transform_quote_simple() {
+    let (out, _) = bash_exec_ok("x=hello; echo \"${x@Q}\"");
+    assert_eq!(out, "'hello'\n");
+}
+
+#[test]
+fn transform_attrs_plain() {
+    let (out, _) = bash_exec_ok("x=hello; echo \"${x@a}\"");
+    assert_eq!(out, "\n");
+}
+
+#[test]
+fn transform_attrs_integer() {
+    let (out, _) = bash_exec_ok("declare -i n=42; echo \"${n@a}\"");
+    assert_eq!(out, "i\n");
+}
+
+#[test]
+fn transform_attrs_exported_readonly() {
+    let (out, _) = bash_exec_ok("declare -rx e=test; echo \"${e@a}\"");
+    assert_eq!(out, "rx\n");
+}
+
+#[test]
+fn transform_attrs_array() {
+    let (out, _) = bash_exec_ok("declare -a a; a=(1 2); echo \"${a@a}\"");
+    assert_eq!(out, "a\n");
+}
+
+#[test]
+fn transform_attrs_assoc() {
+    let (out, _) = bash_exec_ok("declare -A m=([k]=v); echo \"${m@a}\"");
+    assert_eq!(out, "A\n");
+}
+
+#[test]
+fn transform_assign_scalar() {
+    let (out, _) = bash_exec_ok("x=hello; echo \"${x@A}\"");
+    assert_eq!(out, "x='hello'\n");
+}
+
+#[test]
+fn transform_assign_integer() {
+    let (out, _) = bash_exec_ok("declare -i n=42; echo \"${n@A}\"");
+    assert_eq!(out, "declare -i n='42'\n");
+}
+
+#[test]
+fn transform_lower() {
+    let (out, _) = bash_exec_ok("x=HELLO; echo \"${x@L}\"");
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn transform_upper() {
+    let (out, _) = bash_exec_ok("x=hello; echo \"${x@U}\"");
+    assert_eq!(out, "HELLO\n");
+}
+
+#[test]
+fn transform_capitalize() {
+    let (out, _) = bash_exec_ok("x=hello; echo \"${x@u}\"");
+    assert_eq!(out, "Hello\n");
+}
+
+// Indirect expansion ${!var[@]} ---------------------------------------------------------------------------------------
+
+#[test]
+fn indirect_array_keys() {
+    let (out, _) = bash_exec_ok("a=(x y z); echo ${!a[@]}");
+    assert_eq!(out, "0 1 2\n");
+}
+
+#[test]
+fn indirect_assoc_keys() {
+    // Assoc array keys are unordered, so just check we get both
+    let (out, _) = bash_exec_ok("declare -A m; m[k]=v; m[j]=w; echo ${!m[@]}");
+    let keys: Vec<&str> = out.split_whitespace().collect();
+    assert_eq!(keys.len(), 2);
+    assert!(keys.contains(&"k"));
+    assert!(keys.contains(&"j"));
+}

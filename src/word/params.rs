@@ -8,15 +8,63 @@ use crate::span::Span;
 /// Handles `${name}`, `${name:-default}`, `${#name}`, `${name%%pattern}`, etc.
 /// When `case_modification` is true, also recognizes `^`, `^^`, `,`, `,,` as
 /// operators (Bash 4.0+ `${var^}`, `${var^^}`, `${var,}`, `${var,,}`).
-pub(crate) fn parse_brace_param_content(content: &str, case_modification: bool) -> ParameterExpansion {
-    // Check for ${#name} (length)
-    if content.starts_with('#') && content.len() > 1 && !content.contains(':') && !content.contains('%') {
+/// When `parameter_transform` is true, also recognizes `@X` as operators
+/// (Bash 4.4+ `${var@Q}`, `${var@a}`, etc.).
+pub(crate) fn parse_brace_param_content(
+    content: &str,
+    case_modification: bool,
+    parameter_transform: bool,
+) -> ParameterExpansion {
+    // Detect indirect expansion prefix `!`
+    let (indirect, content) = if content.starts_with('!') && content.len() > 1 {
+        (true, &content[1..])
+    } else {
+        (false, content)
+    };
+
+    // Check for ${#name} (length) — only when not indirect
+    if !indirect && content.starts_with('#') && content.len() > 1 && !content.contains(':') && !content.contains('%') {
         let name = content[1..].to_string();
         return ParameterExpansion::Complex {
             name,
+            indirect: false,
             operator: Some(ParamOp::Length),
             argument: None,
         };
+    }
+
+    // Check for @X transformation operator at the end of the name.
+    // The `@` operator appears after the variable name: `${name@Q}`.
+    // We must NOT confuse `@` in array subscripts (`${arr[@]}`) with
+    // a transform operator.
+    if parameter_transform {
+        if let Some(at_pos) = content.rfind('@') {
+            let after_at = &content[at_pos + 1..];
+            if after_at.len() == 1 {
+                let op = match after_at.as_bytes()[0] {
+                    b'Q' => Some(ParamOp::TransformQuote),
+                    b'E' => Some(ParamOp::TransformEscape),
+                    b'P' => Some(ParamOp::TransformPrompt),
+                    b'A' => Some(ParamOp::TransformAssignment),
+                    b'a' => Some(ParamOp::TransformAttributes),
+                    b'L' => Some(ParamOp::TransformLower),
+                    b'U' => Some(ParamOp::TransformUpper),
+                    b'u' => Some(ParamOp::TransformCapitalize),
+                    b'K' => Some(ParamOp::TransformKeyValue),
+                    b'k' => Some(ParamOp::TransformKeys),
+                    _ => None,
+                };
+                if let Some(op) = op {
+                    let name = content[..at_pos].to_string();
+                    return ParameterExpansion::Complex {
+                        name,
+                        indirect,
+                        operator: Some(op),
+                        argument: None,
+                    };
+                }
+            }
+        }
     }
 
     // Find the operator — the set of characters that terminate the name.
@@ -35,6 +83,7 @@ pub(crate) fn parse_brace_param_content(content: &str, case_modification: bool) 
     if name_end >= content.len() {
         return ParameterExpansion::Complex {
             name,
+            indirect,
             operator: None,
             argument: None,
         };
@@ -55,6 +104,7 @@ pub(crate) fn parse_brace_param_content(content: &str, case_modification: bool) 
 
     ParameterExpansion::Complex {
         name,
+        indirect,
         operator: op,
         argument,
     }

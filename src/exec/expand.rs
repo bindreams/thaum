@@ -160,7 +160,7 @@ fn expand_dq_token_fragment(
             expand_parameter(&ParameterExpansion::Simple(name.clone()), env, out)?;
         }
         Token::BraceParam(raw) => {
-            let expansion = crate::word::parse_brace_param_content(raw, true);
+            let expansion = crate::word::parse_brace_param_content(raw, true, true);
             expand_parameter(&expansion, env, out)?;
         }
         Token::CommandSub(_) | Token::BacktickSub(_) => {
@@ -302,10 +302,11 @@ fn expand_parameter(param: &ParameterExpansion, env: &mut Environment, out: &mut
         }
         ParameterExpansion::Complex {
             name,
+            indirect,
             operator,
             argument,
         } => {
-            expand_complex_parameter(name, operator.as_ref(), argument.as_deref(), env, out)?;
+            expand_complex_parameter(name, *indirect, operator.as_ref(), argument.as_deref(), env, out)?;
         }
     }
     Ok(())
@@ -314,12 +315,18 @@ fn expand_parameter(param: &ParameterExpansion, env: &mut Environment, out: &mut
 /// Expand a complex parameter expansion like `${var:-default}`.
 fn expand_complex_parameter(
     name: &str,
+    indirect: bool,
     operator: Option<&crate::ast::ParamOp>,
     argument: Option<&Word>,
     env: &mut Environment,
     out: &mut String,
 ) -> Result<(), ExecError> {
     use crate::ast::ParamOp;
+
+    // Handle indirect expansion: ${!name...}
+    if indirect {
+        return expand_indirect(name, operator, argument, env, out);
+    }
 
     let value = resolve_var(name, env);
 
@@ -449,6 +456,108 @@ fn expand_complex_parameter(
             let val = value.as_deref().unwrap_or("");
             let locale = super::locale::ctype_locale(env);
             out.push_str(&super::locale::to_lowercase(val, &locale));
+        }
+        Some(ParamOp::TransformQuote) => {
+            let val = value.as_deref().unwrap_or("");
+            let quoted = format!("'{}'", val.replace('\'', "'\\''"));
+            out.push_str(&quoted);
+        }
+        Some(ParamOp::TransformAttributes) => {
+            let flags = env.get_var_attributes(name);
+            out.push_str(&flags);
+        }
+        Some(ParamOp::TransformAssignment) => {
+            let val = value.as_deref().unwrap_or("");
+            let flags = env.get_var_attributes(name);
+            // Strip array subscript from name for display: "a[@]" -> "a"
+            let base_name = if let Some((base, _)) = parse_array_subscript(name) {
+                base
+            } else {
+                name
+            };
+            if flags.is_empty() {
+                out.push_str(&format!("{}='{}'", base_name, val));
+            } else {
+                out.push_str(&format!("declare -{} {}='{}'", flags, base_name, val));
+            }
+        }
+        Some(ParamOp::TransformEscape) => {
+            // ANSI-C escape expansion (simplified — pass through for now)
+            let val = value.as_deref().unwrap_or("");
+            out.push_str(val);
+        }
+        Some(ParamOp::TransformPrompt) => {
+            // Prompt-string expansion (simplified — pass through for now)
+            let val = value.as_deref().unwrap_or("");
+            out.push_str(val);
+        }
+        Some(ParamOp::TransformLower) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::to_lowercase(val, &locale));
+        }
+        Some(ParamOp::TransformUpper) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::to_uppercase(val, &locale));
+        }
+        Some(ParamOp::TransformCapitalize) => {
+            let val = value.as_deref().unwrap_or("");
+            let locale = super::locale::ctype_locale(env);
+            out.push_str(&super::locale::capitalize(val, &locale));
+        }
+        Some(ParamOp::TransformKeyValue) | Some(ParamOp::TransformKeys) => {
+            // TODO: key=value formatting for arrays
+            let val = value.as_deref().unwrap_or("");
+            out.push_str(val);
+        }
+    }
+    Ok(())
+}
+
+/// Handle indirect expansion: `${!name}` or `${!name[@]}`.
+///
+/// - `${!name[@]}` / `${!name[*]}` — list the keys of the array named `name`.
+/// - `${!name}` — resolve the value of `$name`, use that string as a variable
+///   name, and expand that variable.
+fn expand_indirect(
+    name: &str,
+    operator: Option<&crate::ast::ParamOp>,
+    _argument: Option<&Word>,
+    env: &mut Environment,
+    out: &mut String,
+) -> Result<(), ExecError> {
+    // Check if name contains an array subscript like "a[@]" or "a[*]"
+    if let Some((base, subscript)) = parse_array_subscript(name) {
+        if subscript == "@" || subscript == "*" {
+            // ${!name[@]} — list array keys
+            if let Some(keys) = env.get_array_keys(base) {
+                out.push_str(&keys.join(" "));
+            }
+            return Ok(());
+        }
+    }
+
+    // ${!name} — indirect variable reference.
+    // Get the value of $name, use THAT as the variable name.
+    let target_name = match resolve_var(name, env) {
+        Some(val) => val,
+        None => return Ok(()),
+    };
+
+    // Now resolve the target variable, applying any operator
+    let target_value = resolve_var(&target_name, env);
+
+    match operator {
+        None => {
+            if let Some(val) = target_value {
+                out.push_str(&val);
+            }
+        }
+        _ => {
+            // For other operators applied to an indirect ref, recurse with the
+            // resolved target name and indirect=false.
+            return expand_complex_parameter(&target_name, false, operator, _argument, env, out);
         }
     }
     Ok(())

@@ -859,6 +859,59 @@ impl Environment {
         self.variables.get(name).map(|v| v.integer).unwrap_or(false)
     }
 
+    /// Return the `declare`-style attribute flag string for a variable.
+    ///
+    /// Flag letters follow bash ordering: `A` (assoc), `a` (indexed),
+    /// `i` (integer), `l` (lowercase), `n` (nameref), `r` (readonly),
+    /// `u` (uppercase), `x` (exported).
+    pub fn get_var_attributes(&self, name: &str) -> String {
+        let name = self.resolve_nameref(name);
+        match self.variables.get(name) {
+            Some(var) => {
+                let mut flags = String::new();
+                if matches!(var.value, VarValue::AssocArray(_)) {
+                    flags.push('A');
+                }
+                if matches!(var.value, VarValue::IndexedArray(_)) {
+                    flags.push('a');
+                }
+                if var.integer {
+                    flags.push('i');
+                }
+                if var.lowercase {
+                    flags.push('l');
+                }
+                if var.nameref.is_some() {
+                    flags.push('n');
+                }
+                if var.readonly {
+                    flags.push('r');
+                }
+                if var.uppercase {
+                    flags.push('u');
+                }
+                if var.exported {
+                    flags.push('x');
+                }
+                flags
+            }
+            None => String::new(),
+        }
+    }
+
+    /// Return the keys of an array variable, or `None` for scalars/unset.
+    ///
+    /// For indexed arrays, keys are stringified indices in sorted order.
+    /// For associative arrays, keys are in arbitrary order.
+    pub fn get_array_keys(&self, name: &str) -> Option<Vec<String>> {
+        let name = self.resolve_nameref(name);
+        match &self.variables.get(name)?.value {
+            VarValue::IndexedArray(map) => Some(map.keys().map(|k| k.to_string()).collect()),
+            VarValue::AssocArray(map) => Some(map.keys().cloned().collect()),
+            VarValue::Scalar(_) => None,
+        }
+    }
+
     /// Declare a variable with attributes from `declare`/`typeset`.
     ///
     /// If in a function scope and not `global`, the variable is made local

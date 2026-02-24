@@ -52,6 +52,7 @@ Currently implemented Bash extensions:
 - `select` loop (`select`)
 - `function` keyword (`function_keyword`)
 - `$"..."` locale translation via gettext (`locale_translation`)
+- `${var@Q}`, `${var@a}`, etc. parameter transformation (`parameter_transform`)
 
 Planned: brace expansion `{n..m}`.
 
@@ -80,6 +81,8 @@ Supported features:
 - `[[ ]]` conditional with all operators including `=~` regex
 - Arithmetic commands `(( ))` and expansion `$(( ))`
 - `$"..."` locale translation via GNU gettext `.mo` catalogs
+- Parameter transformation operators (`${var@Q}`, `${var@a}`, `${var@A}`, etc.)
+- Indirect expansion for array keys (`${!arr[@]}`)
 - Builtins: echo, printf, cd, test/[, eval, exec, source, declare/typeset,
   export, unset, read, set, shopt, alias/unalias, local, readonly, shift,
   return, break, continue, exit, true, false, :

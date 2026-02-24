@@ -65,6 +65,8 @@ pub struct ShellOptions {
     pub case_attrs: bool,
     /// `${var^}`, `${var^^}`, `${var,}`, `${var,,}` case modification (Bash 4+).
     pub case_modification: bool,
+    /// `${var@Q}`, `${var@a}`, etc. parameter transformation (Bash 4.4+).
+    pub parameter_transform: bool,
 }
 
 /// A named set of shell options.
@@ -114,6 +116,7 @@ impl Dialect {
                 integer_attr: true,
                 case_attrs: true,
                 case_modification: true,
+                parameter_transform: true,
             },
         }
     }

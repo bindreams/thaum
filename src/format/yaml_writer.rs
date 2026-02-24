@@ -798,10 +798,16 @@ impl<'a> YamlWriter<'a> {
             }
             ParameterExpansion::Complex {
                 name,
+                indirect,
                 operator,
                 argument,
             } => {
                 m.scalar("name", name);
+                if *indirect {
+                    m.scalar("indirect", "true");
+                } else if self.verbose {
+                    m.scalar("indirect", "false");
+                }
                 if let Some(op) = operator {
                     let op_str = match op {
                         ParamOp::Default => ":-",
@@ -817,6 +823,16 @@ impl<'a> YamlWriter<'a> {
                         ParamOp::UpperAll => "^^",
                         ParamOp::LowerFirst => ",",
                         ParamOp::LowerAll => ",,",
+                        ParamOp::TransformQuote => "@Q",
+                        ParamOp::TransformEscape => "@E",
+                        ParamOp::TransformPrompt => "@P",
+                        ParamOp::TransformAssignment => "@A",
+                        ParamOp::TransformAttributes => "@a",
+                        ParamOp::TransformLower => "@L",
+                        ParamOp::TransformUpper => "@U",
+                        ParamOp::TransformCapitalize => "@u",
+                        ParamOp::TransformKeyValue => "@K",
+                        ParamOp::TransformKeys => "@k",
                     };
                     m.scalar("operator", op_str);
                 } else if self.verbose {

@@ -589,8 +589,10 @@ pub enum ParameterExpansion {
     /// `$VAR` — simple expansion with no braces or operator.
     Simple(String),
     /// `${name}` or `${name op argument}` — braced expansion with optional operator.
+    /// When `indirect` is true, the `!` prefix was present (`${!name...}`).
     Complex {
         name: String,
+        indirect: bool,
         operator: Option<ParamOp>,
         argument: Option<Box<Word>>,
     },
@@ -626,6 +628,29 @@ pub enum ParamOp {
     LowerFirst,
     /// `${var,,}` — lowercase all characters.
     LowerAll,
+    // Parameter transformation (Bash 4.4+)
+    /// `${var@Q}` — shell-quoted for re-entry.
+    TransformQuote,
+    /// `${var@E}` — ANSI-C escape expansion.
+    TransformEscape,
+    /// `${var@P}` — prompt string expansion.
+    TransformPrompt,
+    /// `${var@A}` — declare/assignment format.
+    TransformAssignment,
+    /// `${var@a}` — variable attribute flags.
+    TransformAttributes,
+    // Case transformation via @ (Bash 5.1+)
+    /// `${var@L}` — lowercase (like `,,`).
+    TransformLower,
+    /// `${var@U}` — uppercase (like `^^`).
+    TransformUpper,
+    /// `${var@u}` — capitalize first (like `^`).
+    TransformCapitalize,
+    // Array formatting (Bash 5.1+)
+    /// `${arr[@]@K}` — key=value format.
+    TransformKeyValue,
+    /// `${arr[@]@k}` — key=value with word splitting.
+    TransformKeys,
 }
 
 /// A glob metacharacter within a word.

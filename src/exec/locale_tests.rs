@@ -526,3 +526,125 @@ fn char_class_lower_dotless_i_turkish() {
 fn char_class_unknown() {
     assert!(!is_char_class('A', "bogus", &c()));
 }
+
+// -- Strftime locale tests ----------------------------------------------------
+
+#[test]
+fn time_locale_resolves_lc_time() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
+    let locale = time_locale(&env);
+    assert_eq!(locale.id.language, icu::locale::subtags::language!("de"));
+}
+
+#[test]
+fn time_locale_lc_all_overrides_lc_time() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
+    let _ = env.set_var("LC_ALL", "fr_FR.UTF-8");
+    let locale = time_locale(&env);
+    assert_eq!(locale.id.language, icu::locale::subtags::language!("fr"));
+}
+
+#[test]
+fn strftime_year_c_locale() {
+    let env = make_env();
+    // Timestamp 1_000_000_000 is 2001-09-09 in UTC
+    let result = strftime_locale("%Y", 1_000_000_000, &env);
+    assert_eq!(result, "2001");
+}
+
+#[test]
+fn strftime_weekday_german() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    // 2001-09-09 (Sunday) in UTC — timestamp 1_000_000_000
+    let result = strftime_locale("%A", 1_000_000_000, &env);
+    // In German, Sunday is "Sonntag"
+    assert_eq!(result, "Sonntag", "got: {}", result);
+}
+
+#[test]
+fn strftime_weekday_abbreviated_german() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    let result = strftime_locale("%a", 1_000_000_000, &env);
+    assert!(result == "So" || result == "So.", "got: {}", result);
+}
+
+#[test]
+fn strftime_month_french() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    // 2001-09-09 — September in French is "septembre"
+    let result = strftime_locale("%B", 1_000_000_000, &env);
+    assert_eq!(result, "septembre", "got: {}", result);
+}
+
+#[test]
+fn strftime_month_abbreviated_french() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    let result = strftime_locale("%b", 1_000_000_000, &env);
+    assert_eq!(result, "sept.", "got: {}", result);
+}
+
+#[test]
+fn strftime_c_locale_english_weekday() {
+    let env = make_env();
+    // C locale should use English names via jiff
+    let result = strftime_locale("%A", 0, &env);
+    // Timestamp 0 is Thursday in UTC, but may differ by timezone.
+    // Just verify it's an English name (not empty or garbled).
+    assert!(!result.is_empty());
+    let english_days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ];
+    assert!(
+        english_days.contains(&result.as_str()),
+        "Expected English day name, got: {}",
+        result
+    );
+}
+
+#[test]
+fn strftime_mixed_codes() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    // Test mixing locale-aware and non-locale codes
+    let result = strftime_locale("%A %Y", 1_000_000_000, &env);
+    assert!(
+        result.starts_with("Sonntag"),
+        "Expected German weekday, got: {}",
+        result
+    );
+    assert!(result.ends_with("2001"), "Expected year 2001, got: {}", result);
+}
+
+#[test]
+fn strftime_literal_text_preserved() {
+    let env = make_env();
+    let result = strftime_locale("hello", 0, &env);
+    assert_eq!(result, "hello");
+}
+
+#[test]
+fn strftime_percent_h_is_month_abbreviated() {
+    let mut env = make_env();
+    let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
+    let _ = env.set_var("TZ", "UTC");
+    // %h is an alias for %b
+    let result = strftime_locale("%h", 1_000_000_000, &env);
+    assert_eq!(result, "sept.", "got: {}", result);
+}

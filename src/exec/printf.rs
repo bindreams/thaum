@@ -14,14 +14,20 @@ use std::io::Write;
 ///
 /// `decimal_sep` is the LC_NUMERIC decimal separator character used for
 /// float output (%f, %e, %g) and float input parsing.
-pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write, decimal_sep: char) -> i32 {
+pub fn printf_format(
+    fmt: &str,
+    args: &[String],
+    out: &mut dyn Write,
+    decimal_sep: char,
+    env: &crate::exec::Environment,
+) -> i32 {
     let mut status = 0;
     let mut arg_idx: usize = 0;
     let args_len = args.len();
 
     loop {
         let start_idx = arg_idx;
-        let (st, stop) = format_once(fmt, args, &mut arg_idx, out, decimal_sep);
+        let (st, stop) = format_once(fmt, args, &mut arg_idx, out, decimal_sep, env);
         if st != 0 {
             status = st;
         }
@@ -40,7 +46,14 @@ pub fn printf_format(fmt: &str, args: &[String], out: &mut dyn Write, decimal_se
 
 /// Run through the format string once.  Returns (status, stop_early).
 /// `stop_early` is true if `\c` was encountered.
-fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Write, decimal_sep: char) -> (i32, bool) {
+fn format_once(
+    fmt: &str,
+    args: &[String],
+    arg_idx: &mut usize,
+    out: &mut dyn Write,
+    decimal_sep: char,
+    env: &crate::exec::Environment,
+) -> (i32, bool) {
     let mut status = 0;
     let chars: Vec<char> = fmt.chars().collect();
     let len = chars.len();
@@ -74,7 +87,7 @@ fn format_once(fmt: &str, args: &[String], arg_idx: &mut usize, out: &mut dyn Wr
                 }
                 // Check for %(...)T strftime
                 if chars[i] == '(' {
-                    let (st, advance) = handle_strftime(&chars[i..], args, arg_idx, out);
+                    let (st, advance) = handle_strftime(&chars[i..], args, arg_idx, env, out);
                     if st != 0 {
                         status = st;
                     }
@@ -775,7 +788,13 @@ fn format_backslash_b(arg: &str, out: &mut dyn Write) -> bool {
 
 /// Handle `%(...)T` starting at the `(` after `%`.
 /// Returns (status, chars_consumed).
-fn handle_strftime(chars: &[char], args: &[String], arg_idx: &mut usize, out: &mut dyn Write) -> (i32, usize) {
+fn handle_strftime(
+    chars: &[char],
+    args: &[String],
+    arg_idx: &mut usize,
+    env: &crate::exec::Environment,
+    out: &mut dyn Write,
+) -> (i32, usize) {
     debug_assert!(chars[0] == '(');
 
     // Find closing )T
@@ -787,7 +806,7 @@ fn handle_strftime(chars: &[char], args: &[String], arg_idx: &mut usize, out: &m
             let consumed = i + 2; // past )T
 
             let arg = get_arg_str(args, arg_idx);
-            let st = format_strftime(&datefmt, &arg, out);
+            let st = format_strftime(&datefmt, &arg, env, out);
             return (st, consumed);
         }
         i += 1;
@@ -798,23 +817,15 @@ fn handle_strftime(chars: &[char], args: &[String], arg_idx: &mut usize, out: &m
     (1, 1) // consumed just the '('
 }
 
-fn format_strftime(datefmt: &str, arg: &str, out: &mut dyn Write) -> i32 {
+fn format_strftime(datefmt: &str, arg: &str, env: &crate::exec::Environment, out: &mut dyn Write) -> i32 {
     let timestamp = if arg.is_empty() || arg == "-1" || arg == "-2" {
-        chrono::Utc::now().timestamp()
+        jiff::Timestamp::now().as_second()
     } else {
         let (v, _) = parse_int_arg(arg);
         v
     };
 
-    let dt = match chrono::DateTime::from_timestamp(timestamp, 0) {
-        Some(utc) => utc.with_timezone(&chrono::Local),
-        None => {
-            let _ = out.write_all(b"");
-            return 1;
-        }
-    };
-
-    let formatted = dt.format(datefmt).to_string();
+    let formatted = super::locale::strftime_locale(datefmt, timestamp, env);
     let _ = out.write_all(formatted.as_bytes());
     0
 }

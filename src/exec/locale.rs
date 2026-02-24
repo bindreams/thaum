@@ -113,6 +113,161 @@ pub fn decimal_separator(locale: &Locale) -> char {
     '.'
 }
 
+/// Resolve LC_TIME locale.
+pub fn time_locale(env: &Environment) -> Locale {
+    resolve_locale(env, "LC_TIME")
+}
+
+/// Format a Unix timestamp using a strftime format string, respecting LC_TIME.
+///
+/// Locale-sensitive codes (%A, %B, %a, %b, %h, %p) use ICU4X with the LC_TIME
+/// locale for localized month/weekday names. All other codes use jiff's
+/// built-in strftime formatter.
+pub fn strftime_locale(format: &str, timestamp: i64, env: &Environment) -> String {
+    let locale = time_locale(env);
+    let ts = jiff::Timestamp::from_second(timestamp).unwrap_or(jiff::Timestamp::UNIX_EPOCH);
+    let zdt = ts.to_zoned(jiff::tz::TimeZone::system());
+
+    // If locale is C/POSIX, just use jiff's English strftime directly
+    if is_c_locale(&locale) {
+        return zdt.strftime(format).to_string();
+    }
+
+    // Walk the format string, intercepting locale-sensitive codes
+    let mut result = String::new();
+    let bytes = format.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 1 < bytes.len() {
+            let code = bytes[i + 1];
+            match code {
+                b'A' => {
+                    result.push_str(&locale_weekday_name(&zdt, &locale, false));
+                    i += 2;
+                }
+                b'a' => {
+                    result.push_str(&locale_weekday_name(&zdt, &locale, true));
+                    i += 2;
+                }
+                b'B' => {
+                    result.push_str(&locale_month_name(&zdt, &locale, false));
+                    i += 2;
+                }
+                b'b' | b'h' => {
+                    result.push_str(&locale_month_name(&zdt, &locale, true));
+                    i += 2;
+                }
+                b'p' => {
+                    result.push_str(&locale_ampm(&zdt, &locale));
+                    i += 2;
+                }
+                _ => {
+                    // Non-locale code: use jiff for this single code
+                    let single_fmt = format!("%{}", code as char);
+                    result.push_str(&zdt.strftime(&single_fmt).to_string());
+                    i += 2;
+                }
+            }
+        } else {
+            result.push(bytes[i] as char);
+            i += 1;
+        }
+    }
+    result
+}
+
+/// Format the weekday name for a zoned timestamp using ICU4X.
+fn locale_weekday_name(zdt: &jiff::Zoned, locale: &Locale, abbreviated: bool) -> String {
+    use icu::calendar::Date;
+    use icu::datetime::fieldsets::E;
+    use icu::datetime::DateTimeFormatter;
+
+    let date = zdt.date();
+    let iso_date = Date::try_new_iso(date.year() as i32, date.month() as u8, date.day() as u8)
+        .unwrap_or_else(|_| Date::try_new_iso(2000, 1, 1).unwrap());
+
+    let length = if abbreviated {
+        icu::datetime::options::Length::Medium
+    } else {
+        icu::datetime::options::Length::Long
+    };
+    let prefs = icu::datetime::DateTimeFormatterPreferences::from(&locale.id);
+
+    match DateTimeFormatter::try_new(prefs, E::for_length(length)) {
+        Ok(fmt) => fmt.format(&iso_date).to_string(),
+        Err(_) => zdt.strftime(if abbreviated { "%a" } else { "%A" }).to_string(),
+    }
+}
+
+/// Format the month name for a zoned timestamp using ICU4X.
+fn locale_month_name(zdt: &jiff::Zoned, locale: &Locale, abbreviated: bool) -> String {
+    use icu::calendar::Date;
+    use icu::datetime::fieldsets::M;
+    use icu::datetime::DateTimeFormatter;
+
+    let date = zdt.date();
+    let iso_date = Date::try_new_iso(date.year() as i32, date.month() as u8, date.day() as u8)
+        .unwrap_or_else(|_| Date::try_new_iso(2000, 1, 1).unwrap());
+
+    let length = if abbreviated {
+        icu::datetime::options::Length::Medium
+    } else {
+        icu::datetime::options::Length::Long
+    };
+    let prefs = icu::datetime::DateTimeFormatterPreferences::from(&locale.id);
+
+    match DateTimeFormatter::try_new(prefs, M::for_length(length)) {
+        Ok(fmt) => fmt.format(&iso_date).to_string(),
+        Err(_) => zdt.strftime(if abbreviated { "%b" } else { "%B" }).to_string(),
+    }
+}
+
+/// Format the AM/PM indicator for a zoned timestamp using ICU4X.
+fn locale_ampm(zdt: &jiff::Zoned, locale: &Locale) -> String {
+    use icu::datetime::fieldsets::T;
+    use icu::datetime::DateTimeFormatterPreferences;
+    use icu::datetime::NoCalendarFormatter;
+    use icu::time::Time;
+
+    let time = zdt.time();
+    let icu_time = Time::try_new(time.hour() as u8, time.minute() as u8, time.second() as u8, 0)
+        .unwrap_or_else(|_| Time::try_new(0, 0, 0, 0).unwrap());
+
+    // Force 12-hour clock to get AM/PM text, then extract the AM/PM portion
+    let locale_str = format!("{}-u-hc-h12", locale.id);
+    let forced_locale: Locale = locale_str.parse().unwrap_or(locale.clone());
+    let prefs = DateTimeFormatterPreferences::from(&forced_locale.id);
+
+    match NoCalendarFormatter::try_new(prefs, T::hm()) {
+        Ok(fmt) => {
+            let formatted = fmt.format(&icu_time).to_string();
+            // The formatted string is like "3:47 PM" or "3:47 nachm."
+            // Extract the AM/PM part: everything after the last digit + optional space
+            extract_ampm(&formatted)
+        }
+        Err(_) => {
+            if zdt.hour() < 12 {
+                "AM".to_string()
+            } else {
+                "PM".to_string()
+            }
+        }
+    }
+}
+
+/// Extract the AM/PM portion from a formatted time string like "3:47 PM".
+fn extract_ampm(formatted: &str) -> String {
+    // Find the last digit; everything after (trimmed) is the AM/PM indicator
+    if let Some(last_digit_pos) = formatted.rfind(|c: char| c.is_ascii_digit()) {
+        let after = &formatted[last_digit_pos + 1..];
+        let trimmed = after.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
+        }
+    }
+    String::new()
+}
+
 /// Check if a character belongs to a POSIX character class, respecting locale.
 ///
 /// In C/POSIX locale, only ASCII characters match locale-sensitive classes

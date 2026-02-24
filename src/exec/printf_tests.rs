@@ -1,13 +1,15 @@
 use super::*;
+use crate::exec::environment::Environment;
 
 fn fmt(format: &str, args: &[&str]) -> String {
     fmt_with_sep(format, args, '.')
 }
 
 fn fmt_with_sep(format: &str, args: &[&str], decimal_sep: char) -> String {
+    let env = Environment::new();
     let args: Vec<String> = args.iter().map(|s| s.to_string()).collect();
     let mut buf = Vec::new();
-    printf_format(format, &args, &mut buf, decimal_sep);
+    printf_format(format, &args, &mut buf, decimal_sep, &env);
     String::from_utf8(buf).unwrap()
 }
 

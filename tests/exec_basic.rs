@@ -1418,6 +1418,43 @@ fn printf_strftime_current() {
     assert!((2024..=2030).contains(&year));
 }
 
+// printf LC_TIME strftime ---------------------------------------------------------------------------------------------
+
+#[test]
+fn printf_strftime_weekday_german() {
+    // 2001-09-09 is a Sunday in UTC — "Sonntag" in German
+    let (out, _) = exec_ok("TZ=UTC LC_TIME=de_DE.UTF-8 printf '%(%A)T' 1000000000");
+    assert_eq!(out, "Sonntag");
+}
+
+#[test]
+fn printf_strftime_month_french() {
+    // 2001-09-09 — September in French is "septembre"
+    let (out, _) = exec_ok("TZ=UTC LC_TIME=fr_FR.UTF-8 printf '%(%B)T' 1000000000");
+    assert_eq!(out, "septembre");
+}
+
+#[test]
+fn printf_strftime_lc_time_overrides_lang() {
+    // LC_TIME should override LANG for strftime
+    let (out, _) = exec_ok("TZ=UTC LANG=en_US.UTF-8 LC_TIME=de_DE.UTF-8 printf '%(%A)T' 1000000000");
+    assert_eq!(out, "Sonntag");
+}
+
+#[test]
+fn printf_strftime_c_locale_english() {
+    // C locale should give English weekday names
+    let (out, _) = exec_ok("TZ=UTC LC_TIME=C printf '%(%A)T' 1000000000");
+    assert_eq!(out, "Sunday");
+}
+
+#[test]
+fn printf_strftime_mixed_locale_and_numeric_codes() {
+    // Mix locale-sensitive and numeric codes in the same format string
+    let (out, _) = exec_ok("TZ=UTC LC_TIME=de_DE.UTF-8 printf '%(%A %Y-%m-%d)T' 1000000000");
+    assert_eq!(out, "Sonntag 2001-09-09");
+}
+
 // printf LC_NUMERIC ---------------------------------------------------------------------------------------------------
 
 #[test]

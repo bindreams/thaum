@@ -2437,7 +2437,6 @@ fn arith_recursive_variable_expansion() {
 }
 
 #[test]
-#[ignore] // TODO: expand.rs:257 — ~user expansion needs getpwnam
 #[cfg(unix)]
 fn tilde_user_expansion() {
     // ~root should expand to root's home directory, not stay literal

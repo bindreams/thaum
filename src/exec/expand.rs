@@ -253,10 +253,13 @@ fn expand_tilde(user: &str, env: &mut Environment, out: &mut String) {
             out.push('~');
         }
     } else {
-        // `~user` → look up user's home directory.
-        // TODO: use getpwnam for ~user expansion
-        out.push('~');
-        out.push_str(user);
+        match homedir::home(user).ok().flatten() {
+            Some(dir) => out.push_str(&dir.to_string_lossy()),
+            None => {
+                out.push('~');
+                out.push_str(user);
+            }
+        }
     }
 }
 

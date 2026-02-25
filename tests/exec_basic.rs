@@ -933,11 +933,8 @@ fn array_arith_assign() {
 
 #[test]
 fn array_for_loop() {
-    // TODO: field splitting not yet implemented — ${a[@]} expands to a single
-    // "x y z" string instead of three separate fields.  Once field splitting
-    // lands, update this test to expect "x\ny\nz\n".
     let (out, _) = bash_exec_ok(r#"a=(x y z); for i in ${a[@]}; do echo $i; done"#);
-    assert_eq!(out, "x y z\n");
+    assert_eq!(out, "x\ny\nz\n");
 }
 
 // Bash alias expansion ------------------------------------------------------------------------------------------------
@@ -2475,7 +2472,6 @@ fn transform_at_big_k_shows_key_value_pairs() {
 }
 
 #[test]
-#[ignore] // TODO: exec_basic.rs:936 — field splitting not implemented
 fn field_splitting_array_for_loop() {
     let (out, _) = bash_exec_ok(r#"a=(x y z); for i in ${a[@]}; do echo $i; done"#);
     assert_eq!(

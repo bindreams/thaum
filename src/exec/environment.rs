@@ -753,6 +753,11 @@ impl Environment {
 
     /// Get a special parameter value: `$?`, `$#`, `$0`, `$$`, `$!`, `$@`, `$*`.
     /// Returns None if the name is not a special parameter.
+    /// Return the current IFS value, defaulting to space+tab+newline.
+    pub fn get_ifs(&self) -> &str {
+        self.get_var("IFS").unwrap_or(" \t\n")
+    }
+
     pub fn get_special(&self, name: &str) -> Option<String> {
         match name {
             "?" => Some(self.last_exit_status.to_string()),

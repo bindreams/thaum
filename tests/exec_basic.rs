@@ -2445,6 +2445,31 @@ fn tilde_user_expansion() {
 }
 
 #[test]
+fn tilde_user_expansion_current_user() {
+    // Look up the current user's name and verify ~username expands to the
+    // same directory that homedir::my_home() returns.
+    let expected = homedir::my_home().ok().flatten();
+    let username = std::env::var(if cfg!(windows) { "USERNAME" } else { "USER" });
+    if let (Some(expected_dir), Ok(user)) = (expected, username) {
+        let script = format!("echo ~{user}");
+        let (out, _) = exec_ok(&script);
+        let expected_str = expected_dir.to_string_lossy();
+        assert_eq!(
+            out.trim(),
+            expected_str.as_ref(),
+            "~{user} should expand to {expected_str}"
+        );
+    }
+    // If USER/USERNAME or homedir is unavailable, skip silently (e.g., containers).
+}
+
+#[test]
+fn tilde_nonexistent_user_stays_literal() {
+    let (out, _) = exec_ok("echo ~__no_such_user_99__");
+    assert_eq!(out, "~__no_such_user_99__\n");
+}
+
+#[test]
 #[ignore] // TODO: expand.rs:524 — @K transform for arrays not implemented
 fn transform_at_big_k_shows_key_value_pairs() {
     let (out, _) = bash_exec_ok(r#"declare -A m=([foo]=1 [bar]=2); for kv in "${m[@]@K}"; do echo "$kv"; done"#);

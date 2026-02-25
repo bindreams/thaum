@@ -524,9 +524,26 @@ fn expand_complex_parameter(
             out.push_str(&super::locale::capitalize(val, &locale));
         }
         Some(ParamOp::TransformKeyValue) | Some(ParamOp::TransformKeys) => {
-            // TODO: key=value formatting for arrays
-            let val = value.as_deref().unwrap_or("");
-            out.push_str(val);
+            let base_name = parse_array_subscript(name).map(|(base, _)| base).unwrap_or(name);
+            let quoted = matches!(operator, Some(ParamOp::TransformKeyValue));
+            if let Some(pairs) = env.get_array_key_value_pairs(base_name) {
+                let mut first = true;
+                for (key, val) in &pairs {
+                    if !first {
+                        out.push(' ');
+                    }
+                    out.push_str(key);
+                    out.push(' ');
+                    if quoted {
+                        out.push('"');
+                        out.push_str(val);
+                        out.push('"');
+                    } else {
+                        out.push_str(val);
+                    }
+                    first = false;
+                }
+            }
         }
     }
     Ok(())

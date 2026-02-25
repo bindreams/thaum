@@ -979,6 +979,19 @@ impl Environment {
         }
     }
 
+    /// Return all key-value pairs from an array (or `("0", value)` for scalars).
+    ///
+    /// Indexed arrays iterate in key order (BTreeMap). Associative arrays
+    /// iterate in arbitrary order (HashMap).
+    pub fn get_array_key_value_pairs(&self, name: &str) -> Option<Vec<(String, String)>> {
+        let name = self.resolve_nameref(name);
+        match &self.variables.get(name)?.value {
+            VarValue::IndexedArray(map) => Some(map.iter().map(|(k, v)| (k.to_string(), v.clone())).collect()),
+            VarValue::AssocArray(map) => Some(map.iter().map(|(k, v)| (k.clone(), v.clone())).collect()),
+            VarValue::Scalar(s) => Some(vec![("0".to_string(), s.clone())]),
+        }
+    }
+
     /// Declare a variable with attributes from `declare`/`typeset`.
     ///
     /// If in a function scope and not `global`, the variable is made local

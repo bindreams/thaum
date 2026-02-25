@@ -2468,10 +2468,10 @@ fn tilde_nonexistent_user_stays_literal() {
 }
 
 #[test]
-#[ignore] // TODO: expand.rs:524 — @K transform for arrays not implemented
 fn transform_at_big_k_shows_key_value_pairs() {
-    let (out, _) = bash_exec_ok(r#"declare -A m=([foo]=1 [bar]=2); for kv in "${m[@]@K}"; do echo "$kv"; done"#);
+    let (out, _) = bash_exec_ok(r#"declare -A m=([foo]=1 [bar]=2); echo "${m[@]@K}""#);
     assert!(out.contains("foo"), "@K should produce key=value pairs; got: {out}");
+    assert!(out.contains("bar"), "@K should include all keys; got: {out}");
 }
 
 #[test]

@@ -160,8 +160,17 @@ pub struct Assignment {
 pub enum AssignmentValue {
     /// A scalar value: `name=word`.
     Scalar(Word),
-    /// An array literal: `name=(word1 word2 ...)` (Bash).
-    BashArray(Vec<Word>),
+    /// An array literal: `name=(elem1 elem2 ...)` (Bash).
+    BashArray(Vec<ArrayElement>),
+}
+
+/// An element in a bash array literal: plain word or `[subscript]=word`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ArrayElement {
+    /// A plain word: positioned by insertion order (indexed arrays).
+    Plain(Word),
+    /// A subscripted element: `[index]=word` (associative or sparse indexed arrays).
+    Subscripted { index: String, value: Word },
 }
 
 impl AssignmentValue {

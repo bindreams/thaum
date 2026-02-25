@@ -50,8 +50,9 @@ impl Parser {
                                 }
                                 // No eat_whitespace: skip_linebreak already ate
                                 if self.lexer.peek()?.token.is_fragment() {
-                                    if let Some(w) = self.collect_word()? {
-                                        elements.push(w);
+                                    let elem = self.collect_array_element()?;
+                                    if let Some(e) = elem {
+                                        elements.push(e);
                                     }
                                 } else {
                                     break;
@@ -104,6 +105,13 @@ impl Parser {
                 arguments.push(arg);
             }
 
+            // Check if the command is a declare-family builtin that accepts
+            // `name=(...)` array assignment syntax in argument position.
+            let is_declare_like = arguments
+                .first()
+                .and_then(|a| a.try_to_static_string())
+                .is_some_and(|name| matches!(name.as_str(), "declare" | "typeset" | "local" | "export" | "readonly"));
+
             loop {
                 self.lexer.eat_whitespace()?;
 
@@ -112,6 +120,60 @@ impl Parser {
                     end_span = redir.span;
                     redirects.push(redir);
                     continue;
+                }
+
+                // In declare-family commands, try parsing `name=(...)` as an assignment.
+                if is_declare_like && self.options.arrays {
+                    if let Token::Literal(ref w) = self.lexer.peek()?.token {
+                        if let Some(eq_pos) = w.find('=') {
+                            let name = &w[..eq_pos];
+                            let value_prefix = &w[eq_pos + 1..];
+                            if is_valid_name(name) && !name.is_empty() && value_prefix.is_empty() {
+                                // Peek ahead: is the next-next token LParen?
+                                let name = name.to_string();
+                                let word_span = self.lexer.peek()?.span;
+
+                                let arr = self.lexer.speculate(|lex| {
+                                    lex.advance()?; // consume Literal("name=")
+                                    if lex.peek()?.token == Token::LParen {
+                                        lex.advance()?; // consume LParen
+                                        Ok(Some(()))
+                                    } else {
+                                        Ok(None)
+                                    }
+                                })?;
+
+                                if arr.is_some() {
+                                    // Speculation already consumed Literal("name=") and LParen
+                                    let mut elements = Vec::new();
+                                    loop {
+                                        self.skip_linebreak()?;
+                                        if self.lexer.peek()?.token == Token::RParen {
+                                            break;
+                                        }
+                                        if self.lexer.peek()?.token.is_fragment() {
+                                            if let Some(e) = self.collect_array_element()? {
+                                                elements.push(e);
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    let rparen_span = self.lexer.peek()?.span;
+                                    self.lexer.advance()?; // consume RParen
+                                    let arr_span = word_span.merge(rparen_span);
+                                    assignments.push(Assignment {
+                                        name,
+                                        index: None,
+                                        value: AssignmentValue::BashArray(elements),
+                                        span: arr_span,
+                                    });
+                                    end_span = rparen_span;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if self.lexer.peek()?.token.is_fragment() {
@@ -132,6 +194,74 @@ impl Parser {
             redirects,
             span: start_span.merge(end_span),
         })
+    }
+
+    /// Parse one element of an array literal: either a plain word or `[subscript]=value`.
+    ///
+    /// The `[subscript]=value` pattern is recognized via speculation:
+    /// `Glob(BracketOpen)`, `Literal("sub]")`, `Literal("=value...")`.
+    fn collect_array_element(&mut self) -> Result<Option<ArrayElement>, ParseError> {
+        use crate::token::{GlobKind, Token};
+
+        // Try subscripted element: [key]=value
+        let subscripted = self.lexer.speculate(|lex| {
+            // 1. Glob(BracketOpen)
+            if lex.peek()?.token != Token::Glob(GlobKind::BracketOpen) {
+                return Ok(None);
+            }
+            lex.advance()?;
+
+            // 2. Literal ending with ']'
+            let subscript = match &lex.peek()?.token {
+                Token::Literal(w) if w.ends_with(']') => w[..w.len() - 1].to_string(),
+                _ => return Ok(None),
+            };
+            lex.advance()?;
+
+            // 3. Literal starting with '='
+            let value_text = match &lex.peek()?.token {
+                Token::Literal(w) if w.starts_with('=') => w[1..].to_string(),
+                _ => return Ok(None),
+            };
+            let eq_span = lex.peek()?.span;
+            lex.advance()?;
+
+            // Collect remaining fragments of the value word
+            let mut fragments = Vec::new();
+            if !value_text.is_empty() {
+                fragments.push(Fragment::Literal(value_text));
+            }
+            while lex.peek()?.token.is_fragment() {
+                let st = lex.advance()?;
+                match st.token {
+                    Token::Literal(s) => fragments.push(Fragment::Literal(s)),
+                    Token::SingleQuoted(s) => fragments.push(Fragment::SingleQuoted(s)),
+                    Token::DoubleQuoted(s) => fragments.push(Fragment::Literal(s)),
+                    _ => break,
+                }
+            }
+
+            let value_word = Word {
+                parts: if fragments.is_empty() {
+                    vec![Fragment::Literal(String::new())]
+                } else {
+                    fragments
+                },
+                span: eq_span,
+            };
+
+            Ok(Some(ArrayElement::Subscripted {
+                index: subscript,
+                value: value_word,
+            }))
+        })?;
+
+        if let Some(elem) = subscripted {
+            return Ok(Some(elem));
+        }
+
+        // Fall back to plain word element
+        self.collect_word().map(|opt| opt.map(ArrayElement::Plain))
     }
 
     /// Try to parse an indexed array assignment `name[subscript]=value`.

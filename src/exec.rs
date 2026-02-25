@@ -685,14 +685,32 @@ impl Executor {
             let mut stdout_buf: Vec<u8> = Vec::new();
             let mut stderr_buf: Vec<u8> = Vec::new();
 
+            // For declare-family builtins, synthesize operands from array
+            // assignments so `declare -A m=([foo]=1)` creates `m` as assoc.
+            let mut extra_args: Vec<String> = Vec::new();
+            for assignment in &cmd.assignments {
+                if matches!(assignment.value, crate::ast::AssignmentValue::BashArray(_)) {
+                    extra_args.push(assignment.name.clone());
+                }
+            }
+            let all_args: Vec<String> = cmd_args.iter().cloned().chain(extra_args).collect();
+
             let result = builtins::run_builtin(
                 cmd_name,
-                cmd_args,
+                &all_args,
                 &mut self.env,
                 cmd_io.stdin,
                 &mut stdout_buf,
                 &mut stderr_buf,
             );
+
+            // Execute array assignments AFTER the builtin runs, so declare -A
+            // has created the associative array before we set subscripted elements.
+            for assignment in &cmd.assignments {
+                if matches!(assignment.value, crate::ast::AssignmentValue::BashArray(_)) {
+                    self.execute_assignment(assignment)?;
+                }
+            }
 
             // Write captured output to the (possibly redirected) io context
             if !stdout_buf.is_empty() {
@@ -737,12 +755,32 @@ impl Executor {
                         self.env.set_var(&assignment.name, &value)?;
                     }
                 }
-                crate::ast::AssignmentValue::BashArray(words) => {
-                    let mut elements = Vec::new();
-                    for word in words {
-                        elements.push(self.expand_word(word)?);
+                crate::ast::AssignmentValue::BashArray(elems) => {
+                    let mut plain_elements = Vec::new();
+                    for elem in elems {
+                        match elem {
+                            crate::ast::ArrayElement::Plain(word) => {
+                                plain_elements.push(self.expand_word(word)?);
+                            }
+                            crate::ast::ArrayElement::Subscripted { index, value } => {
+                                // Flush any accumulated plain elements first
+                                if !plain_elements.is_empty() {
+                                    self.env
+                                        .set_array(&assignment.name, std::mem::take(&mut plain_elements))?;
+                                }
+                                let val = self.expand_word(value)?;
+                                if self.env.is_assoc_array(&assignment.name) {
+                                    self.env.set_assoc_element(&assignment.name, index, &val)?;
+                                } else {
+                                    let idx: usize = index.parse().unwrap_or(0);
+                                    self.env.set_array_element(&assignment.name, idx, &val)?;
+                                }
+                            }
+                        }
                     }
-                    self.env.set_array(&assignment.name, elements)?;
+                    if !plain_elements.is_empty() {
+                        self.env.set_array(&assignment.name, plain_elements)?;
+                    }
                 }
             }
         }
@@ -769,6 +807,10 @@ impl Executor {
     ) -> Result<Vec<(String, Option<String>, bool)>, ExecError> {
         let mut saved = Vec::new();
         for assignment in assignments {
+            // Skip array assignments — they're handled separately by execute_assignment.
+            if !matches!(assignment.value, crate::ast::AssignmentValue::Scalar(_)) {
+                continue;
+            }
             let old_val = self.env.get_var(&assignment.name).map(|s| s.to_string());
             let old_exported = self.env.is_exported(&assignment.name);
             let value = self.expand_scalar_assignment(assignment)?;

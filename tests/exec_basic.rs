@@ -1194,10 +1194,8 @@ fn declare_indexed_array() {
 
 #[test]
 fn declare_assoc_array_inline() {
-    // Note: declare -A m=([k]=v) requires the parser to handle compound assignment
-    // For now test the simpler form
-    let (out, _) = bash_exec_ok("declare -A m; m[k]=v; echo ${m[k]}");
-    assert_eq!(out, "v\n");
+    let (out, _) = bash_exec_ok("declare -A m=([foo]=1 [bar]=2); echo ${m[foo]} ${m[bar]}");
+    assert_eq!(out, "1 2\n");
 }
 
 #[test]

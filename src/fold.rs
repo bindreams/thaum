@@ -307,7 +307,18 @@ pub fn fold_redirect<F: Fold + ?Sized>(f: &mut F, redirect: Redirect) -> Redirec
 pub fn fold_assignment<F: Fold + ?Sized>(f: &mut F, assignment: Assignment) -> Assignment {
     let value = match assignment.value {
         AssignmentValue::Scalar(w) => AssignmentValue::Scalar(f.fold_word(w)),
-        AssignmentValue::BashArray(words) => AssignmentValue::BashArray(fold_words(f, words)),
+        AssignmentValue::BashArray(elems) => AssignmentValue::BashArray(
+            elems
+                .into_iter()
+                .map(|e| match e {
+                    ArrayElement::Plain(w) => ArrayElement::Plain(f.fold_word(w)),
+                    ArrayElement::Subscripted { index, value } => ArrayElement::Subscripted {
+                        index,
+                        value: f.fold_word(value),
+                    },
+                })
+                .collect(),
+        ),
     };
     Assignment {
         name: assignment.name,

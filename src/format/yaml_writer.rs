@@ -175,7 +175,18 @@ impl<'a> YamlWriter<'a> {
             AssignmentValue::BashArray(elements) => {
                 m.raw("value_type", "BashArray");
                 if !elements.is_empty() {
-                    let items: Vec<YamlValue> = elements.iter().map(|w| self.build_word_list_item(w)).collect();
+                    let items: Vec<YamlValue> = elements
+                        .iter()
+                        .map(|e| match e {
+                            ArrayElement::Plain(w) => self.build_word_list_item(w),
+                            ArrayElement::Subscripted { index, value } => {
+                                let mut em = MappingBuilder::new();
+                                em.scalar("index", index);
+                                em.value("value", self.build_word_value(value));
+                                em.build()
+                            }
+                        })
+                        .collect();
                     m.value("elements", YamlValue::Sequence(items));
                 } else if self.verbose {
                     m.empty_seq("elements");

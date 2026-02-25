@@ -269,9 +269,12 @@ pub fn walk_redirect<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, redirect: &'ast R
 pub fn walk_assignment<'ast, V: Visit<'ast> + ?Sized>(v: &mut V, assignment: &'ast Assignment) {
     match &assignment.value {
         AssignmentValue::Scalar(w) => v.visit_word(w),
-        AssignmentValue::BashArray(words) => {
-            for w in words {
-                v.visit_word(w);
+        AssignmentValue::BashArray(elems) => {
+            for elem in elems {
+                match elem {
+                    ArrayElement::Plain(w) => v.visit_word(w),
+                    ArrayElement::Subscripted { value, .. } => v.visit_word(value),
+                }
             }
         }
     }

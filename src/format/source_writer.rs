@@ -583,13 +583,21 @@ impl<'ast> Visit<'ast> for SourceWriter {
         self.push("=");
         match &assignment.value {
             AssignmentValue::Scalar(w) => self.visit_word(w),
-            AssignmentValue::BashArray(words) => {
+            AssignmentValue::BashArray(elems) => {
                 self.push("(");
-                for (i, w) in words.iter().enumerate() {
+                for (i, elem) in elems.iter().enumerate() {
                     if i > 0 {
                         self.push(" ");
                     }
-                    self.visit_word(w);
+                    match elem {
+                        ArrayElement::Plain(w) => self.visit_word(w),
+                        ArrayElement::Subscripted { index, value } => {
+                            self.push("[");
+                            self.push(index);
+                            self.push("]=");
+                            self.visit_word(value);
+                        }
+                    }
                 }
                 self.push(")");
             }

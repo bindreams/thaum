@@ -1,4 +1,4 @@
-disabled: true  # alias expansion not implemented
+disabled: { reason: "funkiness level 5: partial-syntax aliases are unsupported by design" }
 name: alias for left brace
 dialect: bash
 source: oils:spec/alias#alias-for-left-brace

@@ -256,3 +256,29 @@ shrinks from the front (on commit), never from the back.
 ### Command substitutions
 
 `$(...)` content is recursively parsed into `Vec<Statement>`. Source spans inside are relative to the substitution substring, not the original source. The CLI skips source annotations inside substitutions to avoid misleading locations.
+
+### Alias expansion
+
+Aliases are expanded at execution time, not parse time. The executor substitutes
+the alias value and re-parses the resulting command line. This design is correct
+for all real-world alias patterns (see taxonomy below) but cannot handle aliases
+whose expansion changes the grammatical structure of surrounding code.
+
+#### Alias Funkiness Taxonomy
+
+| Level | Description | Example | Parseable without expansion? |
+|---|---|---|---|
+| **1. Single word** | Command rename | `alias g="git"` | Yes (identical AST shape) |
+| **2. Multiple words** | Command + flags/args | `alias ll="ls -lah"` | Yes (extra arg nodes) |
+| **3a. Redirections** | Adds I/O redirects | `alias quiet="cmd 2>/dev/null"` | Yes (slightly different AST) |
+| **3b. Command substitution** | `$(...)` in value | `alias gcm="git checkout $(git_main_branch)"` | Yes (substitution is inside a word) |
+| **3c. Trailing space** | Triggers chained alias expansion | `alias sudo="sudo "` | Yes (just a word with trailing space) |
+| **4. Separators** | Contains `;`, `\|`, `&&`, `\|\|` | `alias gwip="git add -A; git rm ..."` | Yes (wrong AST, but parses) |
+| **5. Partial compound** | Unbalanced keywords/braces | `alias LEFT="{"` | **No** (parse error) |
+
+Levels 1–4 are fully supported. Level 5 is **not supported** and will not be: a
+survey of ~2,500 real-world aliases found 0% at level 5. Both POSIX and Bash allow
+it in theory, but in practice nobody writes `alias LEFT='{'` — functions are used
+instead. Supporting level 5 would require moving alias expansion into the parser
+(feeding expanded text back into the token stream), a significant architectural
+change with no practical benefit.

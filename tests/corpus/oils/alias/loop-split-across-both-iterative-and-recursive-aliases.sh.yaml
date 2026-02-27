@@ -1,4 +1,4 @@
-disabled: true  # alias expansion not implemented
+disabled: { reason: "funkiness level 5: partial-syntax aliases are unsupported by design" }
 name: Loop split across both iterative and recursive aliases
 dialect: bash
 source: oils:spec/alias#loop-split-across-both-iterative-and-recursive-aliases

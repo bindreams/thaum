@@ -17,10 +17,7 @@ static DOCKER_AVAILABLE: AtomicBool = AtomicBool::new(false);
 #[serde(untagged)]
 enum Disabled {
     Bool(bool),
-    WithReason {
-        #[allow(dead_code)]
-        reason: String,
-    },
+    WithReason { reason: String },
 }
 
 /// Spec for the `parse-error` YAML field.
@@ -521,8 +518,13 @@ fn main() {
             };
 
             let test_name = parsed.spec.name.clone();
-            let display_name = format!("{} ({})", rel, test_name);
             let disabled = parsed.spec.disabled.is_disabled();
+            let display_name = match &parsed.spec.disabled {
+                Disabled::WithReason { reason } => {
+                    format!("{} ({}) [disabled: {}]", rel, test_name, reason)
+                }
+                _ => format!("{} ({})", rel, test_name),
+            };
 
             Some(Trial::test(display_name, move || run_test(&parsed)).with_ignored_flag(disabled))
         })

@@ -1055,6 +1055,67 @@ fn alias_snapshot_touch_file() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+// Alias funkiness levels (see CONTRIBUTING.md) ========================================================================
+//
+// Levels 1–4 must work. Level 5 (partial compound syntax) is unsupported by design.
+
+#[test]
+fn alias_funkiness_level2_multiple_words() {
+    // Level 2: alias value contains command + flags (multiple words)
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias greet='echo -n hello'\ngreet");
+    assert_eq!(out, "hello");
+}
+
+#[test]
+fn alias_funkiness_level3a_redirect_in_value() {
+    // Level 3a: alias value contains a redirect — verify the file is created.
+    // We check the file on disk instead of captured stdout because pipeline/redirect
+    // I/O goes through real file descriptors, not CapturedIo.
+    let dir = std::path::PathBuf::from("/tmp/claude/alias-funkiness-redir");
+    let _ = std::fs::create_dir_all(&dir);
+    let file = dir.join("out.txt");
+    let _ = std::fs::remove_file(&file);
+
+    let script = format!("shopt -s expand_aliases\nalias w='echo hello >'\nw {}", file.display(),);
+    bash_exec_ok(&script);
+    let contents = std::fs::read_to_string(&file).expect("redirect should have created file");
+    assert_eq!(contents.trim(), "hello");
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn alias_funkiness_level3b_command_sub_in_value() {
+    // Level 3b: alias value contains $() command substitution
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias greet='echo $(echo hi)'\ngreet");
+    assert_eq!(out, "hi\n");
+}
+
+#[test]
+fn alias_funkiness_level4a_pipe_in_value() {
+    // Level 4: alias value contains a pipe (creates a pipeline).
+    // The pipeline result feeds into a subsequent command via ; to verify it ran.
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias both='echo hello | cat; echo'\nboth done");
+    // After expansion: `echo hello | cat; echo done`
+    // Pipeline output goes through real FDs (not CapturedIo) but the second
+    // command `echo done` is a simple builtin that IS captured.
+    assert!(out.contains("done"), "commands after pipe should run; got: {out}");
+}
+
+#[test]
+fn alias_funkiness_level4b_semicolons_in_value() {
+    // Level 4: alias value contains ; (splits into multiple commands)
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias both='echo one; echo'\nboth two");
+    assert_eq!(out, "one\ntwo\n");
+}
+
+#[test]
+fn alias_funkiness_level4c_and_chain_in_value() {
+    // Level 4: alias value contains && (and-chain)
+    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias chk='true && echo'\nchk ok");
+    assert_eq!(out, "ok\n");
+}
+
 // Subshell execution --------------------------------------------------------------------------------------------------
 
 #[test]

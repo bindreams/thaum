@@ -1,4 +1,4 @@
-disabled: true  # YSH syntax not in scope
+disabled: { reason: "YSH syntax not in scope" }
 name: Control flow must be static in YSH (strict_control_flow)
 dialect: bash
 source: 

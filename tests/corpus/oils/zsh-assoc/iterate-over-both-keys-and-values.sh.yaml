@@ -1,4 +1,4 @@
-disabled: true  # zsh syntax not in scope
+disabled: { reason: "zsh syntax not in scope" }
 name: iterate over both keys and values
 dialect: bash
 source: oils:spec/zsh-assoc#iterate-over-both-keys-and-values

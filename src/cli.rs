@@ -34,6 +34,10 @@ struct Cli {
     #[arg(long, global = true)]
     bash51: bool,
 
+    /// Suppress normal output (lex: skip table, parse: skip YAML). Errors still reported.
+    #[arg(long, global = true)]
+    quiet: bool,
+
     #[command(subcommand)]
     subcmd: Option<CliCommand>,
 
@@ -56,7 +60,7 @@ enum CliCommand {
     Exec(ExecArgs),
     /// Execute a serialized AST from stdin (internal, used for subshells)
     #[command(hide = true)]
-    ExecAst,
+    ExecAst(ExecAstArgs),
 }
 
 #[derive(clap::Args)]
@@ -84,6 +88,19 @@ struct ExecArgs {
     args: Vec<String>,
 }
 
+#[derive(clap::Args)]
+struct ExecAstArgs {
+    /// Payload format: json (default) or binary (bincode).
+    #[arg(long, value_enum, default_value_t = PayloadFormat::Json)]
+    format: PayloadFormat,
+}
+
+#[derive(Clone, Copy, clap::ValueEnum)]
+enum PayloadFormat {
+    Json,
+    Binary,
+}
+
 // Internal resolved args (kept from the original code) ================================================================
 
 #[derive(Clone, Copy, PartialEq)]
@@ -98,12 +115,15 @@ struct CliArgs {
     subcommand: Subcommand,
     dialect: thaum::Dialect,
     verbose: bool,
+    quiet: bool,
     /// Source from -c/--command <string>.
     command_str: Option<String>,
     /// File argument (filename or "-" for stdin).
     file_arg: Option<String>,
     /// Extra positional args after the file (exec only).
     script_args: Vec<String>,
+    /// Payload format for exec-ast (json or binary).
+    payload_format: PayloadFormat,
 }
 
 impl CliArgs {
@@ -117,20 +137,25 @@ impl CliArgs {
 impl Cli {
     fn resolve(self) -> CliArgs {
         let dialect = resolve_dialect(self.bash, self.bash44, self.bash50, self.bash51);
-        match self.subcmd {
+        let quiet = self.quiet;
+        let mut args = match self.subcmd {
             None => resolve_source(Subcommand::Parse, dialect, false, self.c, self.file),
             Some(CliCommand::Lex(a)) => resolve_source(Subcommand::Lex, dialect, a.verbose, a.c, a.file),
             Some(CliCommand::Parse(a)) => resolve_source(Subcommand::Parse, dialect, a.verbose, a.c, a.file),
             Some(CliCommand::Exec(a)) => resolve_exec(dialect, a.c, a.args),
-            Some(CliCommand::ExecAst) => CliArgs {
+            Some(CliCommand::ExecAst(a)) => CliArgs {
                 subcommand: Subcommand::ExecAst,
                 dialect,
                 verbose: false,
+                quiet: false,
                 command_str: None,
                 file_arg: None,
                 script_args: Vec::new(),
+                payload_format: a.format,
             },
-        }
+        };
+        args.quiet = quiet;
+        args
     }
 }
 
@@ -172,9 +197,11 @@ fn resolve_source(
         subcommand,
         dialect,
         verbose,
+        quiet: false,
         command_str: c,
         file_arg: file,
         script_args: Vec::new(),
+        payload_format: PayloadFormat::Json,
     }
 }
 
@@ -198,9 +225,11 @@ fn resolve_exec(dialect: thaum::Dialect, c: Option<String>, args: Vec<String>) -
         subcommand: Subcommand::Exec,
         dialect,
         verbose: false,
+        quiet: false,
         command_str: c,
         file_arg,
         script_args,
+        payload_format: PayloadFormat::Json,
     }
 }
 
@@ -231,7 +260,7 @@ pub fn run() {
         Subcommand::Lex => do_lex(&args),
         Subcommand::Parse => do_parse(&args),
         Subcommand::Exec => do_exec(&args),
-        Subcommand::ExecAst => do_exec_ast(),
+        Subcommand::ExecAst => do_exec_ast(&args),
     }
 }
 
@@ -241,9 +270,25 @@ fn do_lex(cli: &CliArgs) {
 
     let options = cli.dialect().options();
     let (source, filename) = load_source(cli);
-    let mapper = SourceMapper::new(&source);
     let mut lexer = Lexer::from_str(&source, options);
 
+    if cli.quiet {
+        loop {
+            match lexer.next_token() {
+                Ok(spanned) if spanned.token == Token::Eof => break,
+                Ok(_) => {}
+                Err(e) => {
+                    let mapper = SourceMapper::new(&source);
+                    let parse_err = thaum::ParseError::from(e);
+                    error_fmt::print_error(&parse_err, &source, &filename, &mapper);
+                    process::exit(1);
+                }
+            }
+        }
+        return;
+    }
+
+    let mapper = SourceMapper::new(&source);
     let mut rows: Vec<(String, &'static str, String)> = Vec::new();
 
     loop {
@@ -354,6 +399,11 @@ fn do_parse(cli: &CliArgs) {
         }
     };
 
+    if cli.quiet {
+        drop(program);
+        return;
+    }
+
     let w = if cli.verbose {
         YamlWriter::new_verbose(&mapper, &filename)
     } else {
@@ -400,20 +450,30 @@ fn do_exec(cli: &CliArgs) {
     }
 }
 
-fn do_exec_ast() {
+fn do_exec_ast(cli: &CliArgs) {
     use thaum::exec::environment::Environment;
     use thaum::exec::subshell::SubshellPayload;
 
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap_or_else(|e| {
-        eprintln!("exec-ast: error reading stdin: {}", e);
-        process::exit(2);
-    });
-
-    let payload: SubshellPayload = serde_json::from_str(&input).unwrap_or_else(|e| {
-        eprintln!("exec-ast: invalid payload: {}", e);
-        process::exit(2);
-    });
+    let payload: SubshellPayload = match cli.payload_format {
+        PayloadFormat::Json => {
+            let mut input = String::new();
+            io::stdin().read_to_string(&mut input).unwrap_or_else(|e| {
+                eprintln!("exec-ast: error reading stdin: {e}");
+                process::exit(2);
+            });
+            serde_json::from_str(&input).unwrap_or_else(|e| {
+                eprintln!("exec-ast: invalid JSON payload: {e}");
+                process::exit(2);
+            })
+        }
+        PayloadFormat::Binary => {
+            let stdin = io::stdin();
+            bincode::deserialize_from(stdin.lock()).unwrap_or_else(|e| {
+                eprintln!("exec-ast: invalid binary payload: {e}");
+                process::exit(2);
+            })
+        }
+    };
 
     let env = Environment::from_serialized(payload.env);
     let mut executor = Executor::with_env_and_options(env, payload.options);

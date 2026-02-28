@@ -558,3 +558,46 @@ fn cli_lex_from_stdin() {
     assert!(stdout.contains("true"));
     assert!(stdout.contains("false"));
 }
+
+// --quiet flag --------------------------------------------------------------------------------------------------------
+
+#[test]
+fn cli_quiet_lex_no_output() {
+    let (stdout, _, code) = run_exec_with_args(&["--quiet", "lex", "-"], "echo hello");
+    assert_eq!(code, 0);
+    assert!(stdout.is_empty(), "quiet lex should produce no stdout, got: {stdout}");
+}
+
+#[test]
+fn cli_quiet_parse_no_output() {
+    let (stdout, _, code) = run_exec_with_args(&["--quiet", "parse", "-"], "echo hello");
+    assert_eq!(code, 0);
+    assert!(stdout.is_empty(), "quiet parse should produce no stdout, got: {stdout}");
+}
+
+#[test]
+fn cli_quiet_parse_still_reports_errors() {
+    let (_, stderr, code) = run_cli(&["--quiet", "parse", "-c", "if"]);
+    assert_ne!(code, 0);
+    assert!(
+        stderr.contains("error:"),
+        "quiet parse should still report errors: {stderr}"
+    );
+}
+
+#[test]
+fn cli_quiet_lex_still_reports_errors() {
+    let (_, stderr, code) = run_cli(&["--quiet", "lex", "-c", "echo 'unterminated"]);
+    assert_ne!(code, 0);
+    assert!(
+        stderr.contains("error:"),
+        "quiet lex should still report errors: {stderr}"
+    );
+}
+
+#[test]
+fn cli_quiet_exec_is_noop() {
+    let (stdout, _, code) = run_cli(&["--quiet", "exec", "-c", "echo hello"]);
+    assert_eq!(code, 0);
+    assert_eq!(stdout.trim(), "hello", "quiet should not affect exec output");
+}

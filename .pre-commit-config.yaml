@@ -2,7 +2,7 @@ repos:
   - repo: local
     hooks:
       - id: no-std-test
-        name: no stray #[test] attribute
+        name: "no stray #[test] attribute"
         entry: '^#\[test\]$'
         language: pygrep
         types: [rust]

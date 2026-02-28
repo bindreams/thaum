@@ -6,6 +6,7 @@ edition = "2021"
 [features]
 default = []
 cli = ["dep:colored", "dep:clap"]
+bench = ["dep:clap"]
 
 [dependencies]
 thiserror = "2"
@@ -52,3 +53,8 @@ harness = false
 name = "thaum"
 path = "src/main.rs"
 required-features = ["cli"]
+
+[[bin]]
+name = "thaum-bench"
+path = "benches/bench.rs"
+required-features = ["bench"]

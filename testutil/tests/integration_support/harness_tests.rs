@@ -1,8 +1,6 @@
-//! Tests for the `#[requires]` macro and the testutil harness.
+//! Tests for the `#[testutil::test]` macro and the testutil harness.
 
 use std::sync::atomic::{AtomicBool, Ordering};
-
-use testutil::requires;
 
 fn always_ok() -> Result<(), String> {
     Ok(())
@@ -14,7 +12,7 @@ fn always_fail() -> Result<(), String> {
 
 static SATISFIED_TEST_RAN: AtomicBool = AtomicBool::new(false);
 
-#[requires(always_ok)]
+#[testutil::test(requires = [always_ok])]
 fn requires_satisfied_runs_body() {
     SATISFIED_TEST_RAN.store(true, Ordering::Relaxed);
 }
@@ -27,12 +25,12 @@ pub fn assert_satisfied_test_ran() {
     );
 }
 
-#[requires(always_fail)]
+#[testutil::test(requires = [always_fail])]
 fn requires_unsatisfied_skips_body() {
     panic!("this body should never execute");
 }
 
-#[requires(always_ok, always_fail)]
+#[testutil::test(requires = [always_ok, always_fail])]
 fn requires_partial_failure_skips_body() {
     panic!("this body should never execute when any requirement fails");
 }

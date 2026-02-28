@@ -2,7 +2,7 @@
 
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use testutil::{requires, Fixture, Scope};
+use testutil::{Fixture, Scope};
 
 // A simple fixture that tracks setup/teardown calls.
 
@@ -46,13 +46,13 @@ impl Fixture for UnavailableFixture {
 
 // Tests -----------------------------------------------------------------------
 
-#[requires()]
+#[testutil::test]
 fn fixture_static_is_shared(#[fixture] c1: &Counter, #[fixture] c2: &Counter) {
     // Both references should point to the same value (setup called once).
     assert_eq!(c1.value, c2.value, "static fixture should be shared");
 }
 
-#[requires()]
+#[testutil::test]
 fn fixture_setup_called_once(#[fixture] _c: &Counter) {
     // Setup should have been called exactly once across all tests.
     assert_eq!(
@@ -64,7 +64,7 @@ fn fixture_setup_called_once(#[fixture] _c: &Counter) {
 
 /// Fixture requirements propagate: a test using `UnavailableFixture` should be
 /// skipped (not panicked) even without listing `unavailable_dep` in `#[requires]`.
-#[requires()]
+#[testutil::test]
 fn fixture_requirement_propagation(#[fixture] _f: &UnavailableFixture) {
     panic!("should never run — UnavailableFixture has an unmet requirement");
 }

@@ -1,9 +1,12 @@
-//! Runtime test preconditions with unavailability reporting.
+//! Unified test harness with runtime preconditions and unavailability reporting.
 //!
-//! Provides `#[requires(...)]` for annotating test functions with runtime
-//! preconditions (e.g. "valgrind must be installed"). Tests whose preconditions
-//! are not met show as `ignored` in the test output, and an unavailability
-//! summary is printed after all tests complete.
+//! Provides `#[testutil::test]` for annotating test functions. Tests can declare
+//! runtime preconditions (e.g. "valgrind must be installed"), fixture injection,
+//! custom display names, and labels for filtering. Tests whose preconditions are
+//! not met show as `ignored` with an unavailability summary after all tests run.
+//!
+//! For dynamic test generation (e.g. from data files), use [`TestRunner::add`]
+//! to register tests at runtime alongside attribute-registered ones.
 //!
 //! See the [README](../README.md) for usage instructions.
 
@@ -17,7 +20,9 @@ use libtest_mimic::{Arguments, Trial};
 
 // Re-export proc macros for consumers.
 pub use testutil_macros::fixture;
+#[deprecated(note = "use #[testutil::test(requires = [...])] instead")]
 pub use testutil_macros::requires;
+pub use testutil_macros::test;
 
 // Re-export inventory so that macro-generated `inventory::submit!` calls resolve.
 pub use inventory;
@@ -70,72 +75,141 @@ pub struct FixtureTeardownDef {
 
 inventory::collect!(FixtureTeardownDef);
 
+// Ignore ======================================================================
+
+/// Whether a test is statically ignored.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Ignore {
+    No,
+    Yes,
+    WithReason(&'static str),
+}
+
 // Test definition =============================================================
 
-/// A test definition registered by `#[requires(...)]`.
+/// A test registered by `#[testutil::test(...)]` via inventory.
 pub struct TestDef {
     pub name: &'static str,
+    /// Display name (includes labels, custom name). `None` → use `name`.
+    pub display_name: Option<&'static str>,
     pub requires: &'static [RequireFn],
     /// Requirements inherited from `#[fixture]` parameters. Each entry is a
     /// fixture type's `FixtureStorage::REQUIRES` slice.
     pub fixture_requires: &'static [&'static [RequireFn]],
+    pub ignore: Ignore,
     pub body: fn(),
 }
 
 inventory::collect!(TestDef);
 
-/// Collect all `#[requires]`-registered tests, check preconditions, and run
-/// them via libtest-mimic. Prints an unavailability summary for skipped tests.
-///
-/// Calls `process::exit()` with the appropriate exit code.
-pub fn run_all() -> ! {
-    run_tests().exit();
+// Test runner =================================================================
+
+/// A dynamically-added test (registered at runtime, not via proc macro).
+struct DynTest {
+    name: String,
+    ignored: bool,
+    body: Box<dyn FnOnce() + Send + 'static>,
 }
 
-/// Like [`run_all`], but returns the conclusion instead of exiting. Useful when
-/// you need to run post-test assertions before exiting.
-pub fn run_tests() -> libtest_mimic::Conclusion {
-    let args = Arguments::from_args();
-    let mut trials = Vec::new();
-    let mut unavailable: Vec<(&str, String)> = Vec::new();
+/// Collects tests from both `#[testutil::test]` (inventory) and runtime
+/// [`add`](TestRunner::add) calls, then runs them via libtest-mimic.
+#[derive(Default)]
+pub struct TestRunner {
+    dynamic: Vec<DynTest>,
+}
 
-    for def in inventory::iter::<TestDef> {
-        let reasons: Vec<String> = def
-            .requires
-            .iter()
-            .chain(def.fixture_requires.iter().flat_map(|s| s.iter()))
-            .filter_map(|check| check().err())
-            .collect();
+impl TestRunner {
+    pub fn new() -> Self {
+        Self::default()
+    }
 
-        if reasons.is_empty() {
-            let body = def.body;
-            trials.push(Trial::test(def.name, move || {
+    /// Add a test that was generated at runtime (e.g. from a data file).
+    ///
+    /// The `body` closure should panic on failure (like a normal `#[test]`).
+    pub fn add(&mut self, name: impl Into<String>, ignored: bool, body: impl FnOnce() + Send + 'static) {
+        self.dynamic.push(DynTest {
+            name: name.into(),
+            ignored,
+            body: Box::new(body),
+        });
+    }
+
+    /// Run all tests (inventory-registered + dynamic) and exit.
+    pub fn run(self) -> ! {
+        self.run_tests().exit();
+    }
+
+    /// Run all tests and return the conclusion for post-run assertions.
+    pub fn run_tests(self) -> libtest_mimic::Conclusion {
+        let args = Arguments::from_args();
+        let mut trials = Vec::new();
+        let mut unavailable: Vec<(String, String)> = Vec::new();
+
+        // Inventory-registered tests (from #[testutil::test]).
+        for def in inventory::iter::<TestDef> {
+            let trial_name = def.display_name.unwrap_or(def.name);
+
+            // Static ignore — don't check preconditions, don't report as unavailable.
+            if !matches!(def.ignore, Ignore::No) {
+                trials.push(Trial::test(trial_name, || Ok(())).with_ignored_flag(true));
+                continue;
+            }
+
+            let reasons: Vec<String> = def
+                .requires
+                .iter()
+                .chain(def.fixture_requires.iter().flat_map(|s| s.iter()))
+                .filter_map(|check| check().err())
+                .collect();
+
+            if reasons.is_empty() {
+                let body = def.body;
+                trials.push(Trial::test(trial_name, move || {
+                    body();
+                    Ok(())
+                }));
+            } else {
+                let reason = reasons.join("; ");
+                unavailable.push((trial_name.to_string(), reason));
+                trials.push(Trial::test(trial_name, || Ok(())).with_ignored_flag(true));
+            }
+        }
+
+        // Dynamic tests (from TestRunner::add).
+        for dyn_test in self.dynamic {
+            let body = dyn_test.body;
+            let trial = Trial::test(dyn_test.name, move || {
                 body();
                 Ok(())
-            }));
-        } else {
-            let reason = reasons.join("; ");
-            unavailable.push((def.name, reason));
-            trials.push(Trial::test(def.name, || Ok(())).with_ignored_flag(true));
+            })
+            .with_ignored_flag(dyn_test.ignored);
+            trials.push(trial);
         }
-    }
 
-    let conclusion = libtest_mimic::run(&args, trials);
+        let conclusion = libtest_mimic::run(&args, trials);
 
-    if !unavailable.is_empty() {
-        eprintln!("\n--- Unavailable ({}) ---", unavailable.len());
-        for (name, reason) in &unavailable {
-            eprintln!("  {name}: {reason}");
+        if !unavailable.is_empty() {
+            eprintln!("\n--- Unavailable ({}) ---", unavailable.len());
+            for (name, reason) in &unavailable {
+                eprintln!("  {name}: {reason}");
+            }
         }
-    }
 
-    // Teardown static fixtures.
-    for def in inventory::iter::<FixtureTeardownDef> {
-        (def.teardown_if_initialized)();
-    }
+        // Teardown static fixtures.
+        for def in inventory::iter::<FixtureTeardownDef> {
+            (def.teardown_if_initialized)();
+        }
 
-    conclusion
+        conclusion
+    }
 }
+
+/// Shorthand: run only inventory-registered tests and exit.
+pub fn run_all() -> ! {
+    TestRunner::new().run();
+}
+
+// Precondition helpers ========================================================
 
 /// Precondition: check that an executable is on PATH.
 ///

@@ -46,12 +46,15 @@ clap = { version = "4", features = ["derive"] }
 
 [[test]]
 name = "corpus"
-path = "tests/corpus_runner.rs"
 harness = false
 
 [[test]]
-name = "bench_smoke"
-path = "tests/bench_smoke.rs"
+name = "bench"
+path = "tests/bench.rs"
+harness = false
+
+[[test]]
+name = "exec_conformance"
 harness = false
 
 [[bench]]

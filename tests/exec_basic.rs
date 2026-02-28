@@ -2429,7 +2429,7 @@ fn bash51_allows_transform_lower() {
 //
 // Each test asserts the *correct* behavior. They are #[ignore]d because the
 // corresponding feature or fix is not yet implemented. Run them with:
-//   cargo test --features cli -- --ignored
+//   cargo nextest run --features cli --run-ignored ignored-only
 // When a TODO is resolved, remove #[ignore] and the test becomes part of CI.
 
 // heredoc_at_eof (lexer.rs:379): the TODO describes unclean internal lexer

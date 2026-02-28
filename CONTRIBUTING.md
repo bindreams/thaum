@@ -3,10 +3,10 @@
 ## Development setup
 
 ```sh
-cargo test                    # library tests only
-cargo test --features cli     # all tests including CLI output tests
-cargo clippy --features cli   # lint
-cargo fmt                     # format
+cargo nextest run --features cli               # all tests (excludes conformance)
+cargo nextest run -P conformance --features cli # conformance tests (requires Docker image)
+cargo clippy --features cli                    # lint
+cargo fmt                                      # format
 ```
 
 ### Benchmarks

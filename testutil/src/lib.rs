@@ -7,6 +7,8 @@
 //!
 //! See the [README](../README.md) for usage instructions.
 
+pub mod docker;
+
 use std::path::Path;
 use std::process::{Command, Stdio};
 

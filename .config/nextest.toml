@@ -1,0 +1,8 @@
+[profile.default]
+slow-timeout = { period = "30s", terminate-after = 2 }
+# Exclude conformance tests by default (they require Docker + a built image).
+default-filter = "not binary(exec_conformance)"
+
+# Explicit profile for running conformance tests.
+[profile.conformance]
+slow-timeout = { period = "60s", terminate-after = 2 }

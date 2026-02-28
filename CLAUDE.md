@@ -39,7 +39,7 @@ Place contracts on every function where there is a meaningful invariant to check
 
 ## Pre-commit checklist
 Before every commit, run these three commands and fix any issues they report:
-1. Run `cargo test --features cli`: all tests pass
+1. Run `cargo nextest run --features cli`: all tests pass
 2. Run `cargo clippy --all-targets --features cli -- -D warnings`: no linter warnings
 3. Run `cargo fmt`: formatting is correct
 4. Update stale information in documentation:

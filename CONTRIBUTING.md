@@ -3,11 +3,25 @@
 ## Development setup
 
 ```sh
+pip install pre-commit && pre-commit install   # one-time setup
 cargo nextest run --features cli               # all tests (excludes conformance)
 cargo nextest run -P conformance --features cli # conformance tests (requires Docker image)
-cargo clippy --features cli                    # lint
-cargo fmt                                      # format
+cargo test --features cli                      # also works (same harness)
+pre-commit run --all-files                     # lint + format + #[test] guard
 ```
+
+### Test macro
+
+Use `#[testutil::test]` instead of `#[test]`. All test binaries use `harness = false`
+with the `testutil` custom harness. A bare `#[test]` compiles but silently never runs.
+
+```rust
+#[testutil::test]                                     // simple test
+#[testutil::test(requires = [preconditions::docker])]  // runtime precondition
+#[testutil::test(labels = [slow])]                     // label for filtering
+```
+
+For dynamic tests (e.g. corpus YAML files), use `testutil::TestRunner::add()`.
 
 ### Benchmarks
 

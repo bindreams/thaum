@@ -37,12 +37,26 @@ Place contracts on every function where there is a meaningful invariant to check
 3. **Query logic belongs on the data, not the consumer.** Token-level queries (is this a keyword? can a command start here?) are methods on `Token`. The parser peeks tokens itself and calls Token methods — it does not wrap peek+query in its own methods.
 4. **Token ownership.** A parsing function consumes only the tokens that constitute the AST node it creates. Leading whitespace is the caller's responsibility to skip; trailing whitespace is the next consumer's responsibility. For example, `collect_word()` does not skip whitespace before or after — the caller handles word boundaries. Helper methods (`eat`, `expect`, `expect_keyword`, `expect_closing_keyword`) skip whitespace internally because they are boundary utilities, not AST-building functions.
 
+## Test macro
+Use `#[testutil::test]` instead of `#[test]` everywhere. All test binaries use `harness = false` with the testutil custom harness. Do NOT use bare `#[test]` — it compiles but silently never runs.
+
+Optional arguments:
+- `requires = [f1, f2]` — runtime preconditions (`fn() -> Result<(), String>`)
+- `name = "display name"` — custom name in test output
+- `labels = [docker, slow]` — prepended as `[docker][slow]` for nextest filtering
+- `ignore` or `ignore = "reason"` — statically ignore the test
+
+For dynamic test generation (e.g. corpus tests from data files), use `testutil::TestRunner::add()`.
+
 ## Pre-commit checklist
-Before every commit, run these three commands and fix any issues they report:
-1. Run `cargo nextest run --features cli`: all tests pass
-2. Run `cargo clippy --all-targets --features cli -- -D warnings`: no linter warnings
-3. Run `cargo fmt`: formatting is correct
-4. Update stale information in documentation:
+Before every commit, run `pre-commit run --all-files` and fix any issues. This checks:
+1. No stray `#[test]` — use `#[testutil::test]` instead
+2. `cargo fmt` — formatting is correct
+3. `cargo clippy` — no linter warnings
+
+Additionally:
+4. Run `cargo nextest run --features cli`: all tests pass
+5. Update stale information in documentation:
    - `README.md`: General information for new users
    - `CONTRIBUTING.md`: Guidance for contributors (people and LLMs)
    - `CLAUDE.md`: Instructions specifically for LLM agents

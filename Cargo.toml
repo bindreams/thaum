@@ -44,6 +44,7 @@ libtest-mimic = "0.8"
 testutil = { path = "testutil" }
 clap = { version = "4", features = ["derive"] }
 base64 = "0.22.1"
+tempfile = "3.26.0"
 
 [[test]]
 name = "corpus"

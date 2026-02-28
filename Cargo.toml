@@ -1,3 +1,6 @@
+[workspace]
+members = [".", "testutil", "testutil/macros"]
+
 [package]
 name = "thaum"
 version = "0.1.0"
@@ -38,11 +41,17 @@ pretty_assertions = "1"
 serde_yaml2 = "0.1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
+testutil = { path = "testutil" }
 clap = { version = "4", features = ["derive"] }
 
 [[test]]
 name = "corpus"
 path = "tests/corpus_runner.rs"
+harness = false
+
+[[test]]
+name = "bench_smoke"
+path = "tests/bench_smoke.rs"
 harness = false
 
 [[bench]]

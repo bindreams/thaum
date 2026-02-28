@@ -151,10 +151,9 @@ fn metric_for(m: &callgrind_parser::CallgrindMetrics, metric: Metric) -> Option<
 }
 
 #[cfg(test)]
-#[allow(dead_code)] // Bench target (harness=false) sees these as dead code; bin target runs them.
+#[allow(dead_code, unused_imports)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
 
     #[test]
     fn stage_to_subcommand_mapping() {
@@ -169,93 +168,5 @@ mod tests {
         assert_eq!(dialect_to_flags("bash44"), &["--bash44"]);
         assert_eq!(dialect_to_flags("posix"), &[] as &[&str]);
         assert_eq!(dialect_to_flags("unknown"), &[] as &[&str]);
-    }
-
-    fn has_valgrind() -> bool {
-        Command::new("valgrind")
-            .arg("--version")
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .is_ok_and(|s| s.success())
-    }
-
-    fn thaum_binary() -> PathBuf {
-        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/debug/thaum");
-        assert!(
-            path.exists(),
-            "thaum binary not found at {}. Run: cargo test --features cli,bench",
-            path.display()
-        );
-        path
-    }
-
-    fn scripts_dir() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/scripts")
-    }
-
-    #[test]
-    fn callgrind_trivial_lex() {
-        if !has_valgrind() {
-            eprintln!("skipping: valgrind not found");
-            return;
-        }
-
-        let scripts = super::super::types::load_scripts(&scripts_dir().join("trivial.sh.yaml"));
-        assert_eq!(scripts.len(), 1);
-
-        let kinds = vec![Kind {
-            stage: Stage::Lex,
-            metric: Metric::Instructions,
-        }];
-        let results = run(&thaum_binary(), &scripts, &kinds);
-
-        assert_eq!(results.len(), 1, "expected one result");
-        assert_eq!(results[0].name, "trivial");
-        let val = results[0]
-            .measurements
-            .get(&kinds[0])
-            .expect("missing lex.instructions");
-        match val {
-            Value::Count(n) => assert!(*n > 0, "instruction count should be positive"),
-            _ => panic!("expected Count, got Time"),
-        }
-    }
-
-    #[test]
-    fn callgrind_all_stages() {
-        if !has_valgrind() {
-            eprintln!("skipping: valgrind not found");
-            return;
-        }
-
-        let scripts = super::super::types::load_scripts(&scripts_dir().join("trivial.sh.yaml"));
-        let kinds = vec![
-            Kind {
-                stage: Stage::Lex,
-                metric: Metric::Instructions,
-            },
-            Kind {
-                stage: Stage::Parse,
-                metric: Metric::Instructions,
-            },
-            Kind {
-                stage: Stage::Exec,
-                metric: Metric::Instructions,
-            },
-        ];
-        let results = run(&thaum_binary(), &scripts, &kinds);
-
-        assert_eq!(results.len(), 1);
-        for kind in &kinds {
-            let val = results[0]
-                .measurements
-                .get(kind)
-                .unwrap_or_else(|| panic!("missing {}", kind));
-            match val {
-                Value::Count(n) => assert!(*n > 0, "{} should be positive", kind),
-                _ => panic!("expected Count for {}", kind),
-            }
-        }
     }
 }

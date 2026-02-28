@@ -95,18 +95,11 @@ src/
     source_map.rs      — byte offset → line:col mapping
     color.rs           — colored terminal output
 tests/
-  common/mod.rs     — shared test helpers (parse_ok, first_cmd, etc.)
-  commands.rs       — simple commands, assignments, execution modes
-  pipelines.rs      — pipelines, and-or chains, operator precedence
-  compound.rs       — if/while/for/case/brace/subshell
-  redirects.rs      — redirections, here-documents
-  errors.rs         — error handling (unclosed, stray operators, etc.)
-  word_expansion.rs — parameter expansion, command substitution, globs
-  bash_features.rs  — all Bash extensions with POSIX rejection tests
-  cli_output.rs     — CLI output format regression tests (requires --features cli)
-  exec_basic.rs     — basic execution tests
-  exec_conformance.rs — execution conformance tests
-  corpus_runner.rs  — oils corpus test runner (custom harness)
+  common/           — shared test helpers (parse_ok, first_cmd, docker)
+  parse.rs + parse/ — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
+  exec.rs + exec/   — execution tests (basic, expansion, arrays, printf, bash)
+  cli.rs + cli/     — CLI output format regression tests (requires --features cli)
+  corpus.rs         — oils corpus test runner (custom harness)
 benches/
   bench.rs        — unified benchmark binary (callgrind + hyperfine backends)
   bench/          — backend modules (callgrind, hyperfine, types, format, docker)

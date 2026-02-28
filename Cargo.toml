@@ -46,44 +46,19 @@ yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
 testutil = { path = "testutil" }
 clap = { version = "4", features = ["derive"] }
-base64 = "0.22.1"
 tempfile = "3.26.0"
 
 [[test]]
-name = "commands"
+name = "parse"
 harness = false
 
 [[test]]
-name = "pipelines"
-harness = false
-
-[[test]]
-name = "redirects"
-harness = false
-
-[[test]]
-name = "compound"
-harness = false
-
-[[test]]
-name = "errors"
-harness = false
-
-[[test]]
-name = "word_expansion"
-harness = false
-
-[[test]]
-name = "bash_features"
-harness = false
-
-[[test]]
-name = "cli_output"
+name = "cli"
 harness = false
 required-features = ["cli"]
 
 [[test]]
-name = "exec_basic"
+name = "exec"
 harness = false
 
 [[test]]
@@ -93,10 +68,6 @@ harness = false
 [[test]]
 name = "bench"
 path = "tests/bench.rs"
-harness = false
-
-[[test]]
-name = "exec_conformance"
 harness = false
 
 [[bench]]

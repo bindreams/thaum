@@ -1,13 +1,5 @@
-mod common;
-
-use common::*;
+use crate::common::*;
 use thaum::ast::*;
-
-fn main() {
-    testutil::run_all();
-}
-
-testutil::default_labels!(lex, parse);
 
 #[testutil::test]
 fn tilde_expansion_in_assignment() {

@@ -102,4 +102,6 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `io_context.rs` — I/O context abstraction
   - `error.rs` — ExecError types
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
-- `tests/` — split by topic: commands, pipelines, compound, redirects, errors, word_expansion, bash_features, cli_output, exec_basic, exec_conformance
+- `tests/parse.rs` + `tests/parse/` — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
+- `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash)
+- `tests/cli.rs` + `tests/cli/` — CLI output tests

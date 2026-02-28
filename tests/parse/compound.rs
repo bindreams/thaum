@@ -1,14 +1,6 @@
-mod common;
-
-use common::*;
+use crate::common::*;
 use thaum::ast::*;
 use thaum::parse;
-
-fn main() {
-    testutil::run_all();
-}
-
-testutil::default_labels!(lex, parse);
 
 #[testutil::test]
 fn if_with_test_command() {

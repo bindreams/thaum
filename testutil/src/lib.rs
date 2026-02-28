@@ -22,6 +22,10 @@ pub use testutil_macros::requires;
 // Re-export inventory so that macro-generated `inventory::submit!` calls resolve.
 pub use inventory;
 
+/// A precondition check function. Returns `Ok(())` if the requirement is met,
+/// or `Err(reason)` if not.
+pub type RequireFn = fn() -> Result<(), String>;
+
 // Fixture system ==============================================================
 
 /// Fixture lifetime scope.
@@ -30,6 +34,11 @@ pub enum Scope {
     /// Created once, shared across all tests. Teardown after all tests complete.
     Static,
     /// Fresh instance per test invocation. Teardown after each test.
+    ///
+    // TODO: Not yet implemented — currently behaves like `Static` because
+    // `#[fixture]` always uses `OnceLock::get_or_init`. When needed, the
+    // generated body should call `setup()` directly and `teardown()` after
+    // the test function returns.
     PerTest,
 }
 
@@ -48,7 +57,7 @@ pub trait Fixture: Send + Sync + Sized + 'static {
 /// metadata for a fixture type.
 pub trait FixtureStorage: Fixture {
     /// Requirements inherited by any test using this fixture.
-    const REQUIRES: &'static [fn() -> Result<(), String>];
+    const REQUIRES: &'static [RequireFn];
     /// The `OnceLock` holding the fixture instance (for `Static` scope).
     fn storage() -> &'static OnceLock<Result<Self, String>>;
 }
@@ -66,7 +75,10 @@ inventory::collect!(FixtureTeardownDef);
 /// A test definition registered by `#[requires(...)]`.
 pub struct TestDef {
     pub name: &'static str,
-    pub requires: &'static [fn() -> Result<(), String>],
+    pub requires: &'static [RequireFn],
+    /// Requirements inherited from `#[fixture]` parameters. Each entry is a
+    /// fixture type's `FixtureStorage::REQUIRES` slice.
+    pub fixture_requires: &'static [&'static [RequireFn]],
     pub body: fn(),
 }
 
@@ -88,7 +100,12 @@ pub fn run_tests() -> libtest_mimic::Conclusion {
     let mut unavailable: Vec<(&str, String)> = Vec::new();
 
     for def in inventory::iter::<TestDef> {
-        let reasons: Vec<String> = def.requires.iter().filter_map(|check| check().err()).collect();
+        let reasons: Vec<String> = def
+            .requires
+            .iter()
+            .chain(def.fixture_requires.iter().flat_map(|s| s.iter()))
+            .filter_map(|check| check().err())
+            .collect();
 
         if reasons.is_empty() {
             let body = def.body;

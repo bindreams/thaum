@@ -62,6 +62,13 @@ fn fixture_setup_called_once(#[fixture] _c: &Counter) {
     );
 }
 
+/// Fixture requirements propagate: a test using `UnavailableFixture` should be
+/// skipped (not panicked) even without listing `unavailable_dep` in `#[requires]`.
+#[requires()]
+fn fixture_requirement_propagation(#[fixture] _f: &UnavailableFixture) {
+    panic!("should never run — UnavailableFixture has an unmet requirement");
+}
+
 pub fn assert_fixture_teardown_called() {
     assert!(
         COUNTER_TEARDOWN_CALLED.load(Ordering::Relaxed),

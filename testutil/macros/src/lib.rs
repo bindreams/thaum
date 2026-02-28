@@ -84,6 +84,7 @@ pub fn requires(attr: TokenStream, item: TokenStream) -> TokenStream {
             ::testutil::inventory::submit!(::testutil::TestDef {
                 name: #name_str,
                 requires: &[#(#req_exprs),*],
+                fixture_requires: &[#(<#fixture_req_exprs as ::testutil::FixtureStorage>::REQUIRES),*],
                 body: || {
                     #(#fixture_setup)*
                     #name(#(#call_args),*);
@@ -100,6 +101,7 @@ pub fn requires(attr: TokenStream, item: TokenStream) -> TokenStream {
             ::testutil::inventory::submit!(::testutil::TestDef {
                 name: #name_str,
                 requires: &[#(#req_exprs),*],
+                fixture_requires: &[],
                 body: || { #name(); },
             });
         };

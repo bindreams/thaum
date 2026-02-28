@@ -6,6 +6,9 @@ name = "thaum"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+harness = false
+
 [features]
 default = []
 cli = ["dep:colored", "dep:clap"]
@@ -45,6 +48,43 @@ testutil = { path = "testutil" }
 clap = { version = "4", features = ["derive"] }
 base64 = "0.22.1"
 tempfile = "3.26.0"
+
+[[test]]
+name = "commands"
+harness = false
+
+[[test]]
+name = "pipelines"
+harness = false
+
+[[test]]
+name = "redirects"
+harness = false
+
+[[test]]
+name = "compound"
+harness = false
+
+[[test]]
+name = "errors"
+harness = false
+
+[[test]]
+name = "word_expansion"
+harness = false
+
+[[test]]
+name = "bash_features"
+harness = false
+
+[[test]]
+name = "cli_output"
+harness = false
+required-features = ["cli"]
+
+[[test]]
+name = "exec_basic"
+harness = false
 
 [[test]]
 name = "corpus"

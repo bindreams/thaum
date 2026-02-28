@@ -13,21 +13,21 @@ fn make_word(parts: Vec<Fragment>) -> Word {
     }
 }
 
-#[test]
+#[testutil::test]
 fn expand_literal() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Literal("hello".into())]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "hello");
 }
 
-#[test]
+#[testutil::test]
 fn expand_single_quoted() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::SingleQuoted("don't expand $VAR".into())]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "don't expand $VAR");
 }
 
-#[test]
+#[testutil::test]
 fn expand_concatenated_fragments() {
     let mut env = Environment::new();
     env.set_var("NAME", "world").unwrap();
@@ -38,7 +38,7 @@ fn expand_concatenated_fragments() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "hello_world");
 }
 
-#[test]
+#[testutil::test]
 fn expand_double_quoted_with_param() {
     let mut env = Environment::new();
     env.set_var("X", "value").unwrap();
@@ -50,7 +50,7 @@ fn expand_double_quoted_with_param() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "pre_value_post");
 }
 
-#[test]
+#[testutil::test]
 fn expand_tilde_alone() {
     let mut env = Environment::new();
     env.set_var("HOME", "/home/user").unwrap();
@@ -58,7 +58,7 @@ fn expand_tilde_alone() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "/home/user");
 }
 
-#[test]
+#[testutil::test]
 fn expand_tilde_no_home() {
     let mut env = Environment::new();
     env.unset_var("HOME").unwrap();
@@ -66,7 +66,7 @@ fn expand_tilde_no_home() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "~");
 }
 
-#[test]
+#[testutil::test]
 fn expand_unset_variable() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Simple(
@@ -75,7 +75,7 @@ fn expand_unset_variable() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "");
 }
 
-#[test]
+#[testutil::test]
 fn expand_special_param_question_mark() {
     let mut env = Environment::new();
     env.set_last_exit_status(42);
@@ -83,7 +83,7 @@ fn expand_special_param_question_mark() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "42");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_default() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
@@ -95,7 +95,7 @@ fn expand_param_default() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "fallback");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_default_when_set() {
     let mut env = Environment::new();
     env.set_var("SET", "actual").unwrap();
@@ -108,7 +108,7 @@ fn expand_param_default_when_set() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "actual");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_error_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
@@ -121,7 +121,7 @@ fn expand_param_error_when_unset() {
     assert!(matches!(err, ExecError::BadSubstitution(_)));
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_alternative() {
     let mut env = Environment::new();
     env.set_var("SET", "anything").unwrap();
@@ -134,7 +134,7 @@ fn expand_param_alternative() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "alt");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_alternative_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
@@ -146,7 +146,7 @@ fn expand_param_alternative_when_unset() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_length() {
     let mut env = Environment::new();
     env.set_var("STR", "hello").unwrap();
@@ -159,21 +159,21 @@ fn expand_param_length() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "5");
 }
 
-#[test]
+#[testutil::test]
 fn expand_glob_literal_outside_quotes() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Glob(GlobChar::Star), Fragment::Literal(".txt".into())]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "*.txt");
 }
 
-#[test]
+#[testutil::test]
 fn expand_glob_literal_inside_double_quotes() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::DoubleQuoted(vec![Fragment::Glob(GlobChar::Star)])]);
     assert_eq!(expand_word(&word, &mut env).unwrap(), "*");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_default_assign_when_unset() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {
@@ -186,7 +186,7 @@ fn expand_param_default_assign_when_unset() {
     assert_eq!(env.get_var("UNSET"), Some("assigned"));
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_default_assign_when_set() {
     let mut env = Environment::new();
     env.set_var("SET", "existing").unwrap();
@@ -200,7 +200,7 @@ fn expand_param_default_assign_when_set() {
     assert_eq!(env.get_var("SET"), Some("existing"));
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_default_assign_when_empty() {
     let mut env = Environment::new();
     env.set_var("EMPTY", "").unwrap();
@@ -214,7 +214,7 @@ fn expand_param_default_assign_when_empty() {
     assert_eq!(env.get_var("EMPTY"), Some("filled"));
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_trim_small_prefix() {
     let mut env = Environment::new();
     env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
@@ -228,7 +228,7 @@ fn expand_param_trim_small_prefix() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "usr/bin:/usr/local/bin");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_trim_large_prefix() {
     let mut env = Environment::new();
     env.set_var("PATH", "/usr/bin:/usr/local/bin").unwrap();
@@ -242,7 +242,7 @@ fn expand_param_trim_large_prefix() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "bin");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_trim_small_suffix() {
     let mut env = Environment::new();
     env.set_var("FILE", "archive.tar.gz").unwrap();
@@ -256,7 +256,7 @@ fn expand_param_trim_small_suffix() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "archive.tar");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_trim_large_suffix() {
     let mut env = Environment::new();
     env.set_var("FILE", "archive.tar.gz").unwrap();
@@ -270,7 +270,7 @@ fn expand_param_trim_large_suffix() {
     assert_eq!(expand_word(&word, &mut env).unwrap(), "archive");
 }
 
-#[test]
+#[testutil::test]
 fn expand_param_trim_unset_var() {
     let mut env = Environment::new();
     let word = make_word(vec![Fragment::Parameter(ParameterExpansion::Complex {

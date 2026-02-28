@@ -49,3 +49,8 @@ pub fn parse_with(input: &str, dialect: Dialect) -> Result<Program, ParseError> 
 pub fn parse_with_options(input: &str, options: ShellOptions) -> Result<Program, ParseError> {
     parser::parse_with_options(input, options)
 }
+
+#[cfg(test)]
+fn main() {
+    testutil::run_all();
+}

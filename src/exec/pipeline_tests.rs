@@ -1,7 +1,7 @@
 use super::*;
 use crate::ast::Expression;
 
-#[test]
+#[testutil::test]
 fn flatten_single() {
     let expr = Expression::Command(crate::ast::Command {
         assignments: vec![],
@@ -13,7 +13,7 @@ fn flatten_single() {
     assert_eq!(stages.len(), 1);
 }
 
-#[test]
+#[testutil::test]
 fn flatten_two_stage() {
     let a = Expression::Command(crate::ast::Command {
         assignments: vec![],
@@ -36,7 +36,7 @@ fn flatten_two_stage() {
     assert_eq!(stages.len(), 2);
 }
 
-#[test]
+#[testutil::test]
 fn flatten_three_stage() {
     let a = Expression::Command(crate::ast::Command {
         assignments: vec![],

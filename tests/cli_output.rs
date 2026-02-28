@@ -4,9 +4,11 @@
 //! is correct. They catch formatting regressions like duplicate keys,
 //! empty lines, wrong source locations, YAML tags, etc.
 
-#![cfg(feature = "cli")]
-
 use std::process::Command;
+
+fn main() {
+    testutil::run_all();
+}
 
 /// Run thaum on the given input and return stdout.
 fn run(input: &str) -> String {
@@ -106,7 +108,7 @@ fn assert_valid_output(output: &str) {
 
 // Simple command output -----------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_simple_command() {
     let output = run("echo hello");
     assert_valid_output(&output);
@@ -117,7 +119,7 @@ fn cli_simple_command() {
 
 // Pipeline output -----------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_pipeline_no_duplicate_source() {
     let output = run("echo hello | grep h");
     assert_valid_output(&output);
@@ -127,7 +129,7 @@ fn cli_pipeline_no_duplicate_source() {
 
 // Command substitution ------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_command_substitution_formatting() {
     let output = run("echo $(echo test)");
     assert_valid_output(&output);
@@ -145,7 +147,7 @@ fn cli_command_substitution_formatting() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_command_substitution_with_pipeline() {
     let output = run("echo $(ls | grep foo)");
     assert_valid_output(&output);
@@ -153,7 +155,7 @@ fn cli_command_substitution_with_pipeline() {
     assert!(output.contains("statements:"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_command_substitution_with_semicolon() {
     let output = run("echo hello | grep $(echo test) ;");
     assert_valid_output(&output);
@@ -162,14 +164,14 @@ fn cli_command_substitution_with_semicolon() {
 
 // Background & execution modes ----------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_background_mode() {
     let output = run("cmd &");
     assert_valid_output(&output);
     assert!(output.contains("mode: Background"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_terminated_mode() {
     let output = run("a; b");
     assert_valid_output(&output);
@@ -178,7 +180,7 @@ fn cli_terminated_mode() {
 
 // Complex expressions -------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_and_or_pipe() {
     let output = run("a | b && c || d");
     assert_valid_output(&output);
@@ -187,7 +189,7 @@ fn cli_and_or_pipe() {
     assert!(output.contains("type: Pipe"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_compound_command() {
     let output = run("if true; then echo yes; fi");
     assert_valid_output(&output);
@@ -196,13 +198,13 @@ fn cli_compound_command() {
 
 // Word parts — should use type: instead of YAML tags ------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_word_parts_no_tags() {
     let output = run(r#"echo "hello $name" '${x}' *.txt ~/bin $((1+2))"#);
     assert_valid_output(&output);
 }
 
-#[test]
+#[testutil::test]
 fn cli_redirects_no_tags() {
     let output = run("cmd < input > output 2>&1 >> log");
     assert_valid_output(&output);
@@ -231,34 +233,34 @@ fn run_err(input: &str) -> String {
     String::from_utf8(output.stderr).expect("non-utf8 stderr")
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_shows_error_label() {
     let err = run_err("if true; then fi");
     assert!(err.contains("error:"), "should start with 'error:': {}", err);
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_shows_source_location() {
     let err = run_err("if true; then fi");
     assert!(err.contains("-->"), "should contain ' --> ' location arrow: {}", err);
     assert!(err.contains("<stdin>:"), "should reference the filename: {}", err);
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_shows_source_line() {
     let err = run_err("if true; then fi");
     // Should display the actual source code line
     assert!(err.contains("if true; then fi"), "should show the source line: {}", err);
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_shows_underline() {
     let err = run_err("if true; then fi");
     // Should have carets/underline pointing at the error
     assert!(err.contains('^'), "should contain '^' underline: {}", err);
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_unterminated_subst() {
     let err = run_err("echo $(test");
     assert!(err.contains("error:"));
@@ -272,7 +274,7 @@ fn cli_error_unterminated_subst() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_no_internal_names() {
     // Error messages should use shell syntax, not Rust debug names
     let err = run_err("if true; then fi");
@@ -284,7 +286,7 @@ fn cli_error_no_internal_names() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_error_no_debug_token_names() {
     let err = run_err("if true; then done");
     assert!(
@@ -323,32 +325,32 @@ fn run_exec_with_args(args: &[&str], input: &str) -> (String, String, i32) {
     (stdout, stderr, code)
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_true() {
     let (_, _, code) = run_exec("true");
     assert_eq!(code, 0);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_false() {
     let (_, _, code) = run_exec("false");
     assert_eq!(code, 1);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_echo() {
     let (stdout, _, code) = run_exec("echo hello world");
     assert_eq!(code, 0);
     assert_eq!(stdout.trim(), "hello world");
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_exit_code() {
     let (_, _, code) = run_exec("exit 42");
     assert_eq!(code, 42);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_unsupported_feature_error() {
     let (_, stderr, code) = run_exec("echo hello &");
     assert_ne!(code, 0);
@@ -359,26 +361,26 @@ fn cli_exec_unsupported_feature_error() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_parse_error() {
     let (_, stderr, code) = run_exec("if true; then fi");
     assert_eq!(code, 1);
     assert!(stderr.contains("error:"), "stderr should contain error: {}", stderr,);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_with_bash_flag() {
     let (_, _, code) = run_exec_with_args(&["exec", "--bash", "-"], "true");
     assert_eq!(code, 0);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_bash_flag_before_exec() {
     let (_, _, code) = run_exec_with_args(&["--bash", "exec", "-"], "true");
     assert_eq!(code, 0);
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_variable_and_status() {
     let (stdout, _, code) = run_exec("X=hello; echo $X");
     assert_eq!(code, 0);
@@ -404,7 +406,7 @@ fn run_cli(args: &[&str]) -> (String, String, i32) {
     (stdout, stderr, code)
 }
 
-#[test]
+#[testutil::test]
 fn cli_parse_c_flag() {
     let (stdout, _, code) = run_cli(&["-c", "echo hello"]);
     assert_eq!(code, 0);
@@ -413,7 +415,7 @@ fn cli_parse_c_flag() {
     assert!(stdout.contains("- echo"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_parse_command_long_flag() {
     let (stdout, _, code) = run_cli(&["--command", "echo hello"]);
     assert_eq!(code, 0);
@@ -421,7 +423,7 @@ fn cli_parse_command_long_flag() {
     assert!(stdout.contains("type: Command"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_parse_subcommand_with_c() {
     let (stdout, _, code) = run_cli(&["parse", "-c", "true"]);
     assert_eq!(code, 0);
@@ -429,7 +431,7 @@ fn cli_parse_subcommand_with_c() {
     assert!(stdout.contains("type: Command"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_parse_subcommand_with_bash_c() {
     let (stdout, _, code) = run_cli(&["parse", "--bash", "-c", "[[ -n hello ]]"]);
     assert_eq!(code, 0);
@@ -437,21 +439,21 @@ fn cli_parse_subcommand_with_bash_c() {
     assert!(stdout.contains("type: BashDoubleBracket"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_c_flag() {
     let (stdout, _, code) = run_cli(&["exec", "-c", "echo hello world"]);
     assert_eq!(code, 0);
     assert_eq!(stdout.trim(), "hello world");
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_c_with_script_args() {
     let (stdout, _, code) = run_cli(&["exec", "-c", "echo $1 $2", "foo", "bar"]);
     assert_eq!(code, 0);
     assert_eq!(stdout.trim(), "foo bar");
 }
 
-#[test]
+#[testutil::test]
 fn cli_exec_command_long_flag() {
     let (stdout, _, code) = run_cli(&["exec", "--command", "echo ok"]);
     assert_eq!(code, 0);
@@ -460,7 +462,7 @@ fn cli_exec_command_long_flag() {
 
 // Explicit parse subcommand -------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_parse_subcommand_stdin() {
     let (stdout, _, code) = run_exec_with_args(&["parse", "-"], "echo hello");
     assert_eq!(code, 0);
@@ -469,7 +471,7 @@ fn cli_parse_subcommand_stdin() {
     assert!(stdout.contains("- echo"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_parse_subcommand_bash() {
     let (stdout, _, code) = run_exec_with_args(&["parse", "--bash", "-"], "[[ -n x ]]");
     assert_eq!(code, 0);
@@ -479,7 +481,7 @@ fn cli_parse_subcommand_bash() {
 
 // Lex subcommand ------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_lex_simple_command() {
     let (stdout, _, code) = run_cli(&["lex", "-c", "echo hello"]);
     assert_eq!(code, 0);
@@ -493,7 +495,7 @@ fn cli_lex_simple_command() {
     assert!(stdout.contains("hello"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_operators() {
     let (stdout, _, code) = run_cli(&["lex", "-c", "a && b || c | d"]);
     assert_eq!(code, 0);
@@ -502,7 +504,7 @@ fn cli_lex_operators() {
     assert!(stdout.contains("Pipe"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_redirects() {
     let (stdout, _, code) = run_cli(&["lex", "-c", "cat < in > out >> log"]);
     assert_eq!(code, 0);
@@ -511,7 +513,7 @@ fn cli_lex_redirects() {
     assert!(stdout.contains("Append"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_semicolon_and_amp() {
     let (stdout, _, code) = run_cli(&["lex", "-c", "a; b &"]);
     assert_eq!(code, 0);
@@ -519,7 +521,7 @@ fn cli_lex_semicolon_and_amp() {
     assert!(stdout.contains("Ampersand"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_newlines() {
     let (stdout, _, code) = run_exec_with_args(&["lex", "-"], "a\nb");
     assert_eq!(code, 0);
@@ -527,7 +529,7 @@ fn cli_lex_newlines() {
     assert!(stdout.contains("\\n"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_io_number() {
     let (stdout, _, code) = run_cli(&["lex", "-c", "cmd 2>&1"]);
     assert_eq!(code, 0);
@@ -535,21 +537,21 @@ fn cli_lex_io_number() {
     assert!(stdout.contains("RedirectToFd"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_with_bash_flag() {
     let (stdout, _, code) = run_cli(&["lex", "--bash", "-c", "cmd |& cat"]);
     assert_eq!(code, 0);
     assert!(stdout.contains("BashPipeAmpersand"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_error() {
     let (_, stderr, code) = run_cli(&["lex", "-c", "echo 'unterminated"]);
     assert_ne!(code, 0);
     assert!(stderr.contains("error:"));
 }
 
-#[test]
+#[testutil::test]
 fn cli_lex_from_stdin() {
     let (stdout, _, code) = run_exec_with_args(&["lex", "-"], "true; false");
     assert_eq!(code, 0);
@@ -561,21 +563,21 @@ fn cli_lex_from_stdin() {
 
 // --quiet flag --------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn cli_quiet_lex_no_output() {
     let (stdout, _, code) = run_exec_with_args(&["--quiet", "lex", "-"], "echo hello");
     assert_eq!(code, 0);
     assert!(stdout.is_empty(), "quiet lex should produce no stdout, got: {stdout}");
 }
 
-#[test]
+#[testutil::test]
 fn cli_quiet_parse_no_output() {
     let (stdout, _, code) = run_exec_with_args(&["--quiet", "parse", "-"], "echo hello");
     assert_eq!(code, 0);
     assert!(stdout.is_empty(), "quiet parse should produce no stdout, got: {stdout}");
 }
 
-#[test]
+#[testutil::test]
 fn cli_quiet_parse_still_reports_errors() {
     let (_, stderr, code) = run_cli(&["--quiet", "parse", "-c", "if"]);
     assert_ne!(code, 0);
@@ -585,7 +587,7 @@ fn cli_quiet_parse_still_reports_errors() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_quiet_lex_still_reports_errors() {
     let (_, stderr, code) = run_cli(&["--quiet", "lex", "-c", "echo 'unterminated"]);
     assert_ne!(code, 0);
@@ -595,7 +597,7 @@ fn cli_quiet_lex_still_reports_errors() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn cli_quiet_exec_is_noop() {
     let (stdout, _, code) = run_cli(&["--quiet", "exec", "-c", "echo hello"]);
     assert_eq!(code, 0);

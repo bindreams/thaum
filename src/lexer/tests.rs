@@ -29,13 +29,13 @@ fn lex_all_skip_whitespace(input: &str) -> Result<Vec<Token>, LexError> {
 
 // Empty / EOF ---------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_empty_input() {
     let tokens = lex_all("").unwrap();
     assert!(tokens.is_empty());
 }
 
-#[test]
+#[testutil::test]
 fn lex_only_whitespace() {
     // All whitespace at start of input — no preceding fragment, so suppressed.
     let tokens = lex_all("   \t  ").unwrap();
@@ -44,13 +44,13 @@ fn lex_only_whitespace() {
 
 // Words (now fragment tokens) -----------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_single_word() {
     let tokens = lex_all("hello").unwrap();
     assert_eq!(tokens, vec![Token::Literal("hello".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_multiple_words() {
     let tokens = lex_all("echo hello world").unwrap();
     assert_eq!(
@@ -65,7 +65,7 @@ fn lex_multiple_words() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_word_with_numbers() {
     let tokens = lex_all("file123").unwrap();
     assert_eq!(tokens, vec![Token::Literal("file123".into())]);
@@ -73,7 +73,7 @@ fn lex_word_with_numbers() {
 
 // Newlines ------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_newline() {
     let tokens = lex_all("a\nb").unwrap();
     assert_eq!(
@@ -84,7 +84,7 @@ fn lex_newline() {
 
 // Single-character operators ------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_single_char_operators() {
     let tokens = lex_all_skip_whitespace("| ; & < > ( )").unwrap();
     assert_eq!(
@@ -103,7 +103,7 @@ fn lex_single_char_operators() {
 
 // Multi-character operators -------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_multi_char_operators() {
     let tokens = lex_all_skip_whitespace("&& || ;; << >> <& >& <> >|").unwrap();
     assert_eq!(
@@ -122,19 +122,19 @@ fn lex_multi_char_operators() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_dlessdash() {
     let tokens = lex_all("<<-").unwrap();
     assert_eq!(tokens, vec![Token::HereDocStripOp]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_operator_longest_prefix() {
     let tokens = lex_all("<<EOF").unwrap();
     assert_eq!(tokens, vec![Token::HereDocOp, Token::Literal("EOF".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_operator_disambiguation() {
     let tokens = lex_all(">|").unwrap();
     assert_eq!(tokens, vec![Token::Clobber]);
@@ -142,19 +142,19 @@ fn lex_operator_disambiguation() {
 
 // IO_NUMBER -----------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_io_number_before_great() {
     let tokens = lex_all("2>").unwrap();
     assert_eq!(tokens, vec![Token::IoNumber(2), Token::RedirectToFile]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_io_number_before_less() {
     let tokens = lex_all("0<").unwrap();
     assert_eq!(tokens, vec![Token::IoNumber(0), Token::RedirectFromFile]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_number_with_space_is_word() {
     let tokens = lex_all("2 >").unwrap();
     assert_eq!(
@@ -163,7 +163,7 @@ fn lex_number_with_space_is_word() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_non_number_before_redirect_is_word() {
     let tokens = lex_all("abc>").unwrap();
     assert_eq!(tokens, vec![Token::Literal("abc".into()), Token::RedirectToFile]);
@@ -171,14 +171,14 @@ fn lex_non_number_before_redirect_is_word() {
 
 // Comments ------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_comment_skipped() {
     // Comment at start of input — no preceding fragment, so suppressed.
     let tokens = lex_all("# this is a comment").unwrap();
     assert_eq!(tokens, vec![]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_comment_after_word() {
     let tokens = lex_all_skip_whitespace("echo hello # comment").unwrap();
     assert_eq!(
@@ -187,7 +187,7 @@ fn lex_comment_after_word() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_hash_inside_word_not_comment() {
     let tokens = lex_all("foo#bar").unwrap();
     assert_eq!(tokens, vec![Token::Literal("foo#bar".into())]);
@@ -195,26 +195,26 @@ fn lex_hash_inside_word_not_comment() {
 
 // Whitespace suppression ----------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_leading_whitespace_suppressed() {
     // No preceding fragment → suppressed.
     let tokens = lex_all("  echo").unwrap();
     assert_eq!(tokens, vec![Token::Literal("echo".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_whitespace_after_operator_suppressed() {
     let tokens = lex_all("; echo").unwrap();
     assert_eq!(tokens, vec![Token::Semicolon, Token::Literal("echo".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_whitespace_after_newline_suppressed() {
     let tokens = lex_all("\n echo").unwrap();
     assert_eq!(tokens, vec![Token::Newline, Token::Literal("echo".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_whitespace_between_words_emitted() {
     let tokens = lex_all("a b").unwrap();
     assert_eq!(
@@ -227,7 +227,7 @@ fn lex_whitespace_between_words_emitted() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_process_sub_after_suppressed_whitespace() {
     // Whitespace after `;` is suppressed (no token emitted), but
     // last_scanned is still Whitespace, so `<(` is recognized as
@@ -246,19 +246,19 @@ fn lex_process_sub_after_suppressed_whitespace() {
 
 // Quoting -------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_single_quoted_word() {
     let tokens = lex_all("'hello world'").unwrap();
     assert_eq!(tokens, vec![Token::SingleQuoted("hello world".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_double_quoted_word() {
     let tokens = lex_all("\"hello world\"").unwrap();
     assert_eq!(tokens, vec![Token::DoubleQuoted("hello world".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_backslash_escape() {
     // \<space> in unquoted context: the backslash escapes the space,
     // making it part of the word, not a delimiter.
@@ -275,7 +275,7 @@ fn lex_backslash_escape() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_mixed_quoting() {
     // he'llo '"wor"ld — one word with mixed quoting
     let tokens = lex_all("he'llo '\"wor\"ld").unwrap();
@@ -290,25 +290,25 @@ fn lex_mixed_quoting() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_unterminated_single_quote() {
     let result = lex_all("'hello");
     assert!(matches!(result, Err(LexError::UnterminatedSingleQuote { .. })));
 }
 
-#[test]
+#[testutil::test]
 fn lex_unterminated_double_quote() {
     let result = lex_all("\"hello");
     assert!(matches!(result, Err(LexError::UnterminatedDoubleQuote { .. })));
 }
 
-#[test]
+#[testutil::test]
 fn lex_backtick_command_substitution() {
     let tokens = lex_all("`echo hi`").unwrap();
     assert_eq!(tokens, vec![Token::BacktickSub("echo hi".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_unterminated_backtick() {
     let result = lex_all("`echo hi");
     assert!(matches!(result, Err(LexError::UnterminatedBackquote { .. })));
@@ -316,7 +316,7 @@ fn lex_unterminated_backtick() {
 
 // Reserved words are NOT promoted by the lexer ------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_reserved_words_are_just_words() {
     let tokens = lex_all_skip_whitespace("if then else fi").unwrap();
     assert_eq!(
@@ -330,13 +330,13 @@ fn lex_reserved_words_are_just_words() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_braces_are_just_words() {
     let tokens = lex_all_skip_whitespace("{ }").unwrap();
     assert_eq!(tokens, vec![Token::Literal("{".into()), Token::Literal("}".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_bang_is_just_a_word() {
     let tokens = lex_all("!").unwrap();
     assert_eq!(tokens, vec![Token::Literal("!".into())]);
@@ -344,7 +344,7 @@ fn lex_bang_is_just_a_word() {
 
 // Spans ---------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_span_tracking() {
     let mut lexer = Lexer::from_str("echo hello", ShellOptions::default());
     let t1 = lexer.next_token().unwrap();
@@ -359,7 +359,7 @@ fn lex_span_tracking() {
     assert_eq!(t3.token, Token::Literal("hello".into()));
 }
 
-#[test]
+#[testutil::test]
 fn lex_span_operators() {
     let mut lexer = Lexer::from_str("&&||", ShellOptions::default());
     let t1 = lexer.next_token().unwrap();
@@ -371,7 +371,7 @@ fn lex_span_operators() {
 
 // Here-documents ------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_heredoc_basic() {
     let input = "cat <<EOF\nhello world\nEOF\n";
     let mut lexer = Lexer::from_str(input, ShellOptions::default());
@@ -386,7 +386,7 @@ fn lex_heredoc_basic() {
     assert_eq!(lexer.take_heredoc_body().unwrap(), "hello world\n");
 }
 
-#[test]
+#[testutil::test]
 fn lex_heredoc_strip_tabs() {
     let input = "cat <<-EOF\n\thello\n\tworld\n\tEOF\n";
     let mut lexer = Lexer::from_str(input, ShellOptions::default());
@@ -400,7 +400,7 @@ fn lex_heredoc_strip_tabs() {
     assert_eq!(lexer.take_heredoc_body().unwrap(), "hello\nworld\n");
 }
 
-#[test]
+#[testutil::test]
 fn lex_heredoc_unterminated() {
     let input = "cat <<EOF\nhello world\n";
     let mut lexer = Lexer::from_str(input, ShellOptions::default());
@@ -416,31 +416,31 @@ fn lex_heredoc_unterminated() {
 
 // New fragment token tests --------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_simple_param() {
     let tokens = lex_all("$VAR").unwrap();
     assert_eq!(tokens, vec![Token::SimpleParam("VAR".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_brace_param() {
     let tokens = lex_all("${VAR:-default}").unwrap();
     assert_eq!(tokens, vec![Token::BraceParam("VAR:-default".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_command_sub() {
     let tokens = lex_all("$(echo hello)").unwrap();
     assert_eq!(tokens, vec![Token::CommandSub("echo hello".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_arith_sub() {
     let tokens = lex_all("$((1 + 2))").unwrap();
     assert_eq!(tokens, vec![Token::ArithSub("1 + 2".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_word_with_expansion() {
     // test-${VAR} should be two adjacent fragment tokens with no Whitespace
     let tokens = lex_all("test-${VAR}").unwrap();
@@ -450,7 +450,7 @@ fn lex_word_with_expansion() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_glob_star() {
     let tokens = lex_all("*.txt").unwrap();
     assert_eq!(
@@ -459,13 +459,13 @@ fn lex_glob_star() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_tilde_prefix() {
     let tokens = lex_all("~user").unwrap();
     assert_eq!(tokens, vec![Token::TildePrefix("user".into())]);
 }
 
-#[test]
+#[testutil::test]
 fn lex_tilde_bare() {
     let tokens = lex_all_skip_whitespace("~ /home").unwrap();
     assert_eq!(
@@ -474,7 +474,7 @@ fn lex_tilde_bare() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn lex_lone_dollar() {
     let tokens = lex_all_skip_whitespace("$ foo").unwrap();
     assert_eq!(tokens, vec![Token::Literal("$".into()), Token::Literal("foo".into()),]);
@@ -486,13 +486,13 @@ fn make_lexer(input: &str) -> Lexer {
     Lexer::from_str(input, ShellOptions::default())
 }
 
-#[test]
+#[testutil::test]
 fn peek_returns_first_token() {
     let mut s = make_lexer("echo hello");
     assert_eq!(s.peek().unwrap().token, Token::Literal("echo".into()));
 }
 
-#[test]
+#[testutil::test]
 fn peek_is_idempotent() {
     let mut s = make_lexer("echo hello");
     let t1 = s.peek().unwrap().token.clone();
@@ -500,7 +500,7 @@ fn peek_is_idempotent() {
     assert_eq!(t1, t2);
 }
 
-#[test]
+#[testutil::test]
 fn advance_returns_peeked() {
     let mut s = make_lexer("echo hello");
     let peeked = s.peek().unwrap().token.clone();
@@ -508,7 +508,7 @@ fn advance_returns_peeked() {
     assert_eq!(peeked, advanced);
 }
 
-#[test]
+#[testutil::test]
 fn advance_then_skip_whitespace() {
     let mut s = make_lexer("echo hello");
     s.advance().unwrap();
@@ -516,7 +516,7 @@ fn advance_then_skip_whitespace() {
     assert_eq!(s.peek().unwrap().token, Token::Literal("hello".into()));
 }
 
-#[test]
+#[testutil::test]
 fn advance_past_eof() {
     let mut s = make_lexer("x");
     s.advance().unwrap();
@@ -524,14 +524,14 @@ fn advance_past_eof() {
     assert_eq!(s.advance().unwrap().token, Token::Eof);
 }
 
-#[test]
+#[testutil::test]
 fn peek_sees_whitespace_without_skip() {
     let mut s = make_lexer("a b");
     s.advance().unwrap();
     assert_eq!(s.peek().unwrap().token, Token::Whitespace);
 }
 
-#[test]
+#[testutil::test]
 fn skip_whitespace_then_peek() {
     let mut s = make_lexer("a b");
     s.advance().unwrap();
@@ -539,7 +539,7 @@ fn skip_whitespace_then_peek() {
     assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }
 
-#[test]
+#[testutil::test]
 fn speculate_rewinds_on_none() {
     let mut s = make_lexer("a b c");
     let result: Option<()> = s
@@ -554,7 +554,7 @@ fn speculate_rewinds_on_none() {
     assert_eq!(s.peek().unwrap().token, Token::Literal("a".into()));
 }
 
-#[test]
+#[testutil::test]
 fn speculate_keeps_position_on_some() {
     let mut s = make_lexer("a b c");
     let result = s
@@ -568,7 +568,7 @@ fn speculate_keeps_position_on_some() {
     assert_eq!(s.peek().unwrap().token, Token::Literal("b".into()));
 }
 
-#[test]
+#[testutil::test]
 fn empty_input_peek() {
     let mut s = make_lexer("");
     assert_eq!(s.peek().unwrap().token, Token::Eof);
@@ -576,7 +576,7 @@ fn empty_input_peek() {
 
 // Speculation keeps tokens in buffer ----------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn speculate_tokens_stay_in_buffer() {
     // Speculate past a << operator and heredoc. On rewind, buf_pos moves
     // back but the scanned tokens stay in the buffer. Re-reading gives

@@ -9,56 +9,56 @@ fn parse_ok(input: &str) -> ArithExpr {
 
 // Tokenizer tests -----------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn lex_decimal_number() {
     assert_eq!(parse_ok("42"), ArithExpr::Number(42));
 }
 
-#[test]
+#[testutil::test]
 fn lex_hex_number() {
     assert_eq!(parse_ok("0x1F"), ArithExpr::Number(0x1F));
 }
 
-#[test]
+#[testutil::test]
 fn lex_hex_number_uppercase() {
     assert_eq!(parse_ok("0XFF"), ArithExpr::Number(0xFF));
 }
 
-#[test]
+#[testutil::test]
 fn lex_octal_number() {
     assert_eq!(parse_ok("077"), ArithExpr::Number(0o77));
 }
 
-#[test]
+#[testutil::test]
 fn lex_zero() {
     assert_eq!(parse_ok("0"), ArithExpr::Number(0));
 }
 
 // Variable tests ------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn bare_variable() {
     assert_eq!(parse_ok("x"), ArithExpr::Variable("x".to_string()));
 }
 
-#[test]
+#[testutil::test]
 fn dollar_variable() {
     assert_eq!(parse_ok("$x"), ArithExpr::Variable("x".to_string()));
 }
 
-#[test]
+#[testutil::test]
 fn variable_with_underscores() {
     assert_eq!(parse_ok("my_var"), ArithExpr::Variable("my_var".to_string()));
 }
 
-#[test]
+#[testutil::test]
 fn array_variable() {
     assert_eq!(parse_ok("arr[0]"), ArithExpr::Variable("arr[0]".to_string()));
 }
 
 // Binary operator tests -----------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn addition() {
     assert_eq!(
         parse_ok("1 + 2"),
@@ -70,7 +70,7 @@ fn addition() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn subtraction() {
     assert_eq!(
         parse_ok("5 - 3"),
@@ -82,7 +82,7 @@ fn subtraction() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn multiplication_binds_tighter_than_addition() {
     // 2 + 3 * 4 → Binary(Add, 2, Binary(Mul, 3, 4))
     assert_eq!(
@@ -99,7 +99,7 @@ fn multiplication_binds_tighter_than_addition() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn division() {
     assert_eq!(
         parse_ok("10 / 2"),
@@ -111,7 +111,7 @@ fn division() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn modulo() {
     assert_eq!(
         parse_ok("10 % 3"),
@@ -123,7 +123,7 @@ fn modulo() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn exponentiation() {
     assert_eq!(
         parse_ok("2 ** 10"),
@@ -135,7 +135,7 @@ fn exponentiation() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn exponentiation_right_associative() {
     // 2 ** 3 ** 2 → Binary(Exp, 2, Binary(Exp, 3, 2))
     assert_eq!(
@@ -152,7 +152,7 @@ fn exponentiation_right_associative() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn shift_left() {
     assert_eq!(
         parse_ok("1 << 4"),
@@ -164,7 +164,7 @@ fn shift_left() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn shift_right() {
     assert_eq!(
         parse_ok("16 >> 2"),
@@ -176,7 +176,7 @@ fn shift_right() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn bitwise_and() {
     assert_eq!(
         parse_ok("0xFF & 0x0F"),
@@ -188,7 +188,7 @@ fn bitwise_and() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn bitwise_or() {
     assert_eq!(
         parse_ok("1 | 2"),
@@ -200,7 +200,7 @@ fn bitwise_or() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn bitwise_xor() {
     assert_eq!(
         parse_ok("5 ^ 3"),
@@ -212,7 +212,7 @@ fn bitwise_xor() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn logical_and() {
     assert_eq!(
         parse_ok("1 && 0"),
@@ -224,7 +224,7 @@ fn logical_and() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn logical_or() {
     assert_eq!(
         parse_ok("0 || 1"),
@@ -236,7 +236,7 @@ fn logical_or() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn equality() {
     assert_eq!(
         parse_ok("x == 5"),
@@ -248,7 +248,7 @@ fn equality() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn inequality() {
     assert_eq!(
         parse_ok("x != 5"),
@@ -260,7 +260,7 @@ fn inequality() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn comparisons() {
     assert!(matches!(
         parse_ok("a < b"),
@@ -294,7 +294,7 @@ fn comparisons() {
 
 // Unary operator tests ------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn unary_negate() {
     assert_eq!(
         parse_ok("-x"),
@@ -305,7 +305,7 @@ fn unary_negate() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn unary_plus() {
     assert_eq!(
         parse_ok("+x"),
@@ -316,7 +316,7 @@ fn unary_plus() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn logical_not() {
     assert_eq!(
         parse_ok("!x"),
@@ -327,7 +327,7 @@ fn logical_not() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn bitwise_not() {
     assert_eq!(
         parse_ok("~x"),
@@ -338,7 +338,7 @@ fn bitwise_not() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn pre_increment() {
     assert_eq!(
         parse_ok("++x"),
@@ -349,7 +349,7 @@ fn pre_increment() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn pre_decrement() {
     assert_eq!(
         parse_ok("--x"),
@@ -360,7 +360,7 @@ fn pre_decrement() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn post_increment() {
     assert_eq!(
         parse_ok("x++"),
@@ -371,7 +371,7 @@ fn post_increment() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn post_decrement() {
     assert_eq!(
         parse_ok("x--"),
@@ -384,7 +384,7 @@ fn post_decrement() {
 
 // Assignment tests ----------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn simple_assignment() {
     assert_eq!(
         parse_ok("x = 5"),
@@ -396,7 +396,7 @@ fn simple_assignment() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn compound_add_assign() {
     assert_eq!(
         parse_ok("x += 3"),
@@ -408,7 +408,7 @@ fn compound_add_assign() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn compound_sub_assign() {
     assert_eq!(
         parse_ok("x -= 1"),
@@ -420,7 +420,7 @@ fn compound_sub_assign() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn compound_mul_assign() {
     assert_eq!(
         parse_ok("x *= 2"),
@@ -432,7 +432,7 @@ fn compound_mul_assign() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn compound_all_assign_ops() {
     let cases: Vec<(&str, ArithAssignOp)> = vec![
         ("x = 1", ArithAssignOp::Assign),
@@ -457,7 +457,7 @@ fn compound_all_assign_ops() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn assignment_right_associative() {
     // x = y = 5 → Assignment(x, Assign, Assignment(y, Assign, 5))
     let expr = parse_ok("x = y = 5");
@@ -471,7 +471,7 @@ fn assignment_right_associative() {
 
 // Ternary test --------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn ternary_expression() {
     assert_eq!(
         parse_ok("x > 0 ? 1 : 0"),
@@ -489,7 +489,7 @@ fn ternary_expression() {
 
 // Grouping ------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn parenthesized_expression() {
     assert_eq!(
         parse_ok("(1 + 2) * 3"),
@@ -507,7 +507,7 @@ fn parenthesized_expression() {
 
 // Comma ---------------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn comma_expression() {
     assert_eq!(
         parse_ok("x = 1, y = 2"),
@@ -528,7 +528,7 @@ fn comma_expression() {
 
 // Mixed expression ----------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn variable_plus_number() {
     assert_eq!(
         parse_ok("x + 1"),
@@ -540,7 +540,7 @@ fn variable_plus_number() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn complex_precedence() {
     // a + b * c - d → Sub(Add(a, Mul(b, c)), d)
     let expr = parse_ok("a + b * c - d");
@@ -564,32 +564,32 @@ fn complex_precedence() {
 
 // Error cases ---------------------------------------------------------------------------------------------------------
 
-#[test]
+#[testutil::test]
 fn empty_expression_is_zero() {
     assert_eq!(parse_arith_expr("").unwrap(), ArithExpr::Number(0));
 }
 
-#[test]
+#[testutil::test]
 fn whitespace_only_expression_is_zero() {
     assert_eq!(parse_arith_expr("   ").unwrap(), ArithExpr::Number(0));
 }
 
-#[test]
+#[testutil::test]
 fn error_unclosed_paren() {
     assert!(parse_arith_expr("(1 + 2").is_err());
 }
 
-#[test]
+#[testutil::test]
 fn error_unexpected_token() {
     assert!(parse_arith_expr(")").is_err());
 }
 
-#[test]
+#[testutil::test]
 fn error_trailing_operator() {
     assert!(parse_arith_expr("1 +").is_err());
 }
 
-#[test]
+#[testutil::test]
 fn error_assignment_to_number() {
     assert!(parse_arith_expr("5 = 3").is_err());
 }

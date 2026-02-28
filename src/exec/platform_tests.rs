@@ -2,21 +2,21 @@
 use std::os::fd::AsRawFd;
 
 #[cfg(unix)]
-#[test]
+#[testutil::test]
 fn is_fd_terminal_true_for_pty() {
     let pty = nix::pty::openpty(None, None).unwrap();
     assert!(super::is_fd_terminal(pty.slave.as_raw_fd()));
 }
 
 #[cfg(unix)]
-#[test]
+#[testutil::test]
 fn is_fd_terminal_false_for_pipe() {
     let (r, _w) = nix::unistd::pipe().unwrap();
     assert!(!super::is_fd_terminal(r.as_raw_fd()));
 }
 
 #[cfg(windows)]
-#[test]
+#[testutil::test]
 fn is_fd_terminal_true_for_console() {
     use std::fs::OpenOptions;
     use std::io::IsTerminal;
@@ -28,7 +28,7 @@ fn is_fd_terminal_true_for_console() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn is_fd_terminal_false_for_invalid_fd() {
     assert!(!super::is_fd_terminal(999));
 }

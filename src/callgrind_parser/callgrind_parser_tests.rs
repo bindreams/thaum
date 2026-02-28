@@ -22,7 +22,7 @@ fn=(1) main
 1 100 50 30 1 1 1 0 0 0
 ";
 
-#[test]
+#[testutil::test]
 fn parse_full_output() {
     let m = parse(FULL_OUTPUT).unwrap();
     assert_eq!(m.ir, 6028);
@@ -36,7 +36,7 @@ fn parse_full_output() {
     assert_eq!(m.dlmw, 6);
 }
 
-#[test]
+#[testutil::test]
 fn derived_metrics() {
     let m = parse(FULL_OUTPUT).unwrap();
     // L1 hits = (6028+1715+1195) - (120+16+12) = 8938 - 148 = 8790
@@ -49,7 +49,7 @@ fn derived_metrics() {
     assert_eq!(m.est_cycles(), 22510);
 }
 
-#[test]
+#[testutil::test]
 fn instructions_only() {
     // When --cache-sim is not used, callgrind only reports Ir.
     let text = "\
@@ -63,19 +63,19 @@ summary: 42000
     assert_eq!(m.ram_hits(), 0);
 }
 
-#[test]
+#[testutil::test]
 fn missing_events_line() {
     let text = "summary: 100\n";
     assert!(parse(text).is_err());
 }
 
-#[test]
+#[testutil::test]
 fn missing_summary_line() {
     let text = "events: Ir\n";
     assert!(parse(text).is_err());
 }
 
-#[test]
+#[testutil::test]
 fn extra_events_ignored() {
     // If callgrind adds new events, we ignore them gracefully.
     let text = "\

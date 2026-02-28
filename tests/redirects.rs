@@ -4,7 +4,11 @@ use common::*;
 use thaum::ast::*;
 use thaum::parse;
 
-#[test]
+fn main() {
+    testutil::run_all();
+}
+
+#[testutil::test]
 fn stderr_redirect() {
     let cmd = first_cmd("cmd 2>/dev/null");
     assert_eq!(cmd.redirects.len(), 1);
@@ -12,7 +16,7 @@ fn stderr_redirect() {
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::Output(_)));
 }
 
-#[test]
+#[testutil::test]
 fn dup_stderr_to_stdout() {
     let cmd = first_cmd("cmd 2>&1");
     assert_eq!(cmd.redirects.len(), 1);
@@ -20,7 +24,7 @@ fn dup_stderr_to_stdout() {
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::DupOutput(_)));
 }
 
-#[test]
+#[testutil::test]
 fn input_and_output_redirect() {
     let cmd = first_cmd("sort < input.txt > output.txt");
     assert_eq!(cmd.redirects.len(), 2);
@@ -28,7 +32,7 @@ fn input_and_output_redirect() {
     assert!(matches!(&cmd.redirects[1].kind, RedirectKind::Output(_)));
 }
 
-#[test]
+#[testutil::test]
 fn multiple_redirects_on_one_command() {
     let cmd = first_cmd("cmd < input > output 2>> errors");
     assert_eq!(cmd.redirects.len(), 3);
@@ -38,14 +42,14 @@ fn multiple_redirects_on_one_command() {
     assert!(matches!(&cmd.redirects[2].kind, RedirectKind::Append(_)));
 }
 
-#[test]
+#[testutil::test]
 fn clobber_redirect() {
     let cmd = first_cmd("cmd >| file");
     assert_eq!(cmd.redirects.len(), 1);
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::Clobber(_)));
 }
 
-#[test]
+#[testutil::test]
 fn read_write_redirect() {
     let cmd = first_cmd("cmd 3<> /dev/tcp/host/80");
     assert_eq!(cmd.redirects.len(), 1);
@@ -53,7 +57,7 @@ fn read_write_redirect() {
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::ReadWrite(_)));
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_basic() {
     let cmd = first_cmd("cat <<EOF\nhello\nworld\nEOF\n");
     assert_eq!(cmd.redirects.len(), 1);
@@ -64,7 +68,7 @@ fn heredoc_basic() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_quoted_delimiter() {
     let cmd = first_cmd("cat <<'END'\n$var\n$(cmd)\nEND\n");
     if let RedirectKind::HereDoc { quoted, body, .. } = &cmd.redirects[0].kind {
@@ -75,7 +79,7 @@ fn heredoc_quoted_delimiter() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_strip_tabs() {
     let cmd = first_cmd("cat <<-EOF\n\thello\n\tworld\n\tEOF\n");
     assert_eq!(cmd.redirects.len(), 1);
@@ -87,7 +91,7 @@ fn heredoc_strip_tabs() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_separate_lines() {
     // Heredoc where the body is on a separate line from the command
     let prog = parse_ok("cat <<EOF\nhello\nEOF\necho after\n");
@@ -103,7 +107,7 @@ fn heredoc_with_separate_lines() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_inside_if() {
     // Heredocs inside compound commands must work — the body is consumed
     // as part of statement termination, not by parse_compound_list.
@@ -128,7 +132,7 @@ fn heredoc_inside_if() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_inside_while() {
     let prog = parse_ok("while true; do\ncat <<EOF\nhello\nEOF\nbreak\ndone\n");
     if let Expression::Compound {
@@ -142,7 +146,7 @@ fn heredoc_inside_while() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_redirect_inside_function() {
     // The pattern from dockerd-rootless-setuptool.sh
     let input = "f() {\n\tcat <<- EOT > /tmp/out\n\t\thello\n\tEOT\n\techo done\n}\n";
@@ -158,7 +162,7 @@ fn heredoc_with_redirect_inside_function() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn multiple_heredocs_on_one_line() {
     let input = "cmd <<A <<B\nbody1\nA\nbody2\nB\n";
     let cmd = first_cmd(input);
@@ -175,7 +179,7 @@ fn multiple_heredocs_on_one_line() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_or_rhs_after_body() {
     // When `||` appears on the same line as `<<EOF`, the RHS command may
     // follow after the heredoc body. The heredoc body should be transparent
@@ -186,7 +190,7 @@ fn heredoc_with_or_rhs_after_body() {
     assert!(matches!(&prog.lines[0][0].expression, Expression::Or { .. }));
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_or_rhs_same_line() {
     // Sanity check: when the RHS is on the same line as ||, it works.
     let input = "cat <<EOF || echo \"heredoc failed\"\nhello world\nEOF";
@@ -194,7 +198,7 @@ fn heredoc_with_or_rhs_same_line() {
     assert!(matches!(&prog.lines[0][0].expression, Expression::Or { .. }));
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_and_rhs_after_body() {
     // Same issue with && instead of ||.
     let input = "cat <<EOF &&\nhello world\nEOF\necho \"next\"";
@@ -202,7 +206,7 @@ fn heredoc_with_and_rhs_after_body() {
     assert!(matches!(&prog.lines[0][0].expression, Expression::And { .. }));
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_in_if_condition() {
     // Heredoc body appears between the condition line and `then`.
     let input = "if cat <<EOF; then\nhello\nEOF\necho yes\nfi";
@@ -233,7 +237,7 @@ fn heredoc_in_if_condition() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn heredoc_with_pipe_on_last_line() {
     // Pipe on the heredoc-triggering line.
     let input = "cat <<EOF |\n1\n2\nEOF\ntac";
@@ -253,7 +257,7 @@ fn heredoc_with_pipe_on_last_line() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn multiple_heredocs_in_pipeline() {
     let input = "cat <<A |\na\nA\ncat <<B\nb\nB";
     let prog = parse(input).unwrap();

@@ -4,7 +4,11 @@ use common::*;
 use thaum::ast::*;
 use thaum::parse;
 
-#[test]
+fn main() {
+    testutil::run_all();
+}
+
+#[testutil::test]
 fn if_with_test_command() {
     let compound = first_compound(r#"if [ "$x" = "yes" ]; then echo matched; fi"#);
     if let CompoundCommand::IfClause {
@@ -18,7 +22,7 @@ fn if_with_test_command() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn nested_if() {
     let input = r#"if true; then
     if false; then
@@ -39,7 +43,7 @@ fi"#;
     }
 }
 
-#[test]
+#[testutil::test]
 fn if_elif_else() {
     let compound = first_compound(
         r#"if [ -f /etc/config ]; then
@@ -58,7 +62,7 @@ fi"#,
     }
 }
 
-#[test]
+#[testutil::test]
 fn if_with_newlines() {
     assert!(matches!(
         first_compound("if\ntrue\nthen\necho yes\nfi"),
@@ -66,7 +70,7 @@ fn if_with_newlines() {
     ));
 }
 
-#[test]
+#[testutil::test]
 fn while_read_loop() {
     assert!(matches!(
         first_compound("while read line; do\n    echo \"$line\"\ndone"),
@@ -74,7 +78,7 @@ fn while_read_loop() {
     ));
 }
 
-#[test]
+#[testutil::test]
 fn for_loop_with_glob() {
     let compound = first_compound("for f in *.txt; do echo $f; done");
     if let CompoundCommand::ForClause {
@@ -94,7 +98,7 @@ fn for_loop_with_glob() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn for_loop_with_newline_instead_of_semicolon() {
     if let CompoundCommand::ForClause { words, .. } = &first_compound("for i in a b c\ndo\necho $i\ndone") {
         assert_eq!(words.as_ref().unwrap().len(), 3);
@@ -103,7 +107,7 @@ fn for_loop_with_newline_instead_of_semicolon() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn case_with_multiple_patterns() {
     let input = r#"case "$1" in
     start|begin)
@@ -125,7 +129,7 @@ esac"#;
     }
 }
 
-#[test]
+#[testutil::test]
 fn empty_case_arms() {
     let compound = first_compound("case x in\na) ;;\nb) ;;\nesac");
     if let CompoundCommand::CaseClause { arms, .. } = &compound {
@@ -136,7 +140,7 @@ fn empty_case_arms() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn case_pattern_backslash_newline_with_indent() {
     // Case pattern continued across lines with `\<newline>` and indentation.
     // Source: /usr/bin/gzexe, /usr/bin/nroff, /usr/bin/xzgrep, /usr/bin/zgrep,
@@ -148,7 +152,7 @@ fn case_pattern_backslash_newline_with_indent() {
     );
 }
 
-#[test]
+#[testutil::test]
 fn brace_group_with_redirect() {
     let e = first_expr("{ echo hello; echo world; } > output.txt");
     if let Expression::Compound {
@@ -163,7 +167,7 @@ fn brace_group_with_redirect() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn until_loop() {
     assert!(matches!(
         first_compound("until false; do echo waiting; done"),
@@ -171,7 +175,7 @@ fn until_loop() {
     ));
 }
 
-#[test]
+#[testutil::test]
 fn for_without_in_clause() {
     // `for var; do ...; done` iterates over $@
     let compound = first_compound("for arg; do echo $arg; done");
@@ -183,7 +187,7 @@ fn for_without_in_clause() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn deeply_nested_compound() {
     let input = r#"if true; then
     while true; do
@@ -198,7 +202,7 @@ fi"#;
     assert!(!prog.lines.is_empty());
 }
 
-#[test]
+#[testutil::test]
 fn bash_empty_then_fi() {
     let compound = first_compound_bash("if true; then\nfi");
     if let CompoundCommand::IfClause { then_body, .. } = &compound {
@@ -208,7 +212,7 @@ fn bash_empty_then_fi() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn bash_empty_do_done() {
     let compound = first_compound_bash("while false; do\ndone");
     if let CompoundCommand::WhileClause { body, .. } = &compound {
@@ -218,7 +222,7 @@ fn bash_empty_do_done() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn bash_empty_for_body() {
     let compound = first_compound_bash("for i in a b; do\ndone");
     if let CompoundCommand::ForClause { body, .. } = &compound {
@@ -228,12 +232,12 @@ fn bash_empty_for_body() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn posix_rejects_empty_then_fi() {
     assert!(parse("if true; then\nfi").is_err());
 }
 
-#[test]
+#[testutil::test]
 fn posix_rejects_empty_do_done() {
     assert!(parse("while false; do\ndone").is_err());
 }

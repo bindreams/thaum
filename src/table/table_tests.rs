@@ -1,6 +1,6 @@
 use super::*;
 
-#[test]
+#[testutil::test]
 fn basic_table() {
     let table = Table::new()
         .col("NAME", Align::Left)
@@ -17,7 +17,7 @@ beta      23
     assert_eq!(table.to_string(), expected);
 }
 
-#[test]
+#[testutil::test]
 fn row_grouping() {
     let table = Table::new()
         .col("GROUP", Align::Left)
@@ -36,7 +36,7 @@ b      z
     assert_eq!(table.to_string(), expected);
 }
 
-#[test]
+#[testutil::test]
 fn missing_cells() {
     let table = Table::new()
         .col("A", Align::Left)

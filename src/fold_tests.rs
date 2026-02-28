@@ -10,7 +10,7 @@ fn parse_bash(input: &str) -> Program {
 struct Identity;
 impl Fold for Identity {}
 
-#[test]
+#[testutil::test]
 fn fold_identity_preserves_ast() {
     let prog = parse_bash("echo hello; if true; then echo yes; fi");
     let original = prog.clone();
@@ -32,7 +32,7 @@ impl Fold for Uppercaser {
     }
 }
 
-#[test]
+#[testutil::test]
 fn fold_uppercases_literals() {
     let prog = parse_bash("echo hello world");
     let prog = Uppercaser.fold_program(prog);
@@ -45,7 +45,7 @@ fn fold_uppercases_literals() {
     assert_eq!(cmd.arguments[2].try_to_static_string(), Some("WORLD".into()));
 }
 
-#[test]
+#[testutil::test]
 fn fold_descends_into_compound() {
     let prog = parse_bash("if true; then echo inner; fi");
     let prog = Uppercaser.fold_program(prog);
@@ -65,7 +65,7 @@ fn fold_descends_into_compound() {
     }
 }
 
-#[test]
+#[testutil::test]
 fn fold_descends_into_pipeline() {
     let prog = parse_bash("echo a | grep b");
     let prog = Uppercaser.fold_program(prog);

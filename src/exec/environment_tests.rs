@@ -1,6 +1,6 @@
 use super::*;
 
-#[test]
+#[testutil::test]
 fn get_set_var() {
     let mut env = Environment::new();
     assert_eq!(env.get_var("FOO"), None);
@@ -12,7 +12,7 @@ fn get_set_var() {
     assert_eq!(env.get_var("FOO"), Some("baz"));
 }
 
-#[test]
+#[testutil::test]
 fn unset_var() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -20,7 +20,7 @@ fn unset_var() {
     assert_eq!(env.get_var("FOO"), None);
 }
 
-#[test]
+#[testutil::test]
 fn readonly_prevents_set() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -33,7 +33,7 @@ fn readonly_prevents_set() {
     assert_eq!(env.get_var("FOO"), Some("bar"));
 }
 
-#[test]
+#[testutil::test]
 fn readonly_prevents_unset() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -43,7 +43,7 @@ fn readonly_prevents_unset() {
     assert!(matches!(err, ExecError::ReadonlyVariable(_)));
 }
 
-#[test]
+#[testutil::test]
 fn export_var() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -56,7 +56,7 @@ fn export_var() {
     assert!(exported.iter().any(|(k, v)| k == "FOO" && v == "bar"));
 }
 
-#[test]
+#[testutil::test]
 fn export_nonexistent_creates_empty() {
     let mut env = Environment::new();
     env.export_var("NEW");
@@ -64,7 +64,7 @@ fn export_nonexistent_creates_empty() {
     assert!(env.is_exported("NEW"));
 }
 
-#[test]
+#[testutil::test]
 fn special_params() {
     let mut env = Environment::new();
     env.set_last_exit_status(42);
@@ -81,7 +81,7 @@ fn special_params() {
     assert_eq!(env.get_special("0"), Some("sh".to_string()));
 }
 
-#[test]
+#[testutil::test]
 fn scope_push_pop_does_not_restore_vars_in_posix() {
     let mut env = Environment::new();
     env.set_var("X", "outer").unwrap();
@@ -104,7 +104,7 @@ fn scope_push_pop_does_not_restore_vars_in_posix() {
     assert_eq!(env.get_special("1"), None);
 }
 
-#[test]
+#[testutil::test]
 fn scope_push_pop_restores_positional() {
     let mut env = Environment::new();
     env.set_positional_params(vec!["orig1".into(), "orig2".into()]);
@@ -116,19 +116,19 @@ fn scope_push_pop_restores_positional() {
     assert_eq!(env.positional_params(), &["orig1".to_string(), "orig2".to_string()]);
 }
 
-#[test]
+#[testutil::test]
 fn default_ifs() {
     let env = Environment::new();
     assert_eq!(env.ifs(), " \t\n");
 }
 
-#[test]
+#[testutil::test]
 fn cwd_is_set() {
     let env = Environment::new();
     assert!(env.cwd().is_absolute());
 }
 
-#[test]
+#[testutil::test]
 fn pid_is_set() {
     let env = Environment::new();
     assert_eq!(env.get_special("$"), Some(std::process::id().to_string()));

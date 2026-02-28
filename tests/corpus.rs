@@ -3,7 +3,7 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
 
-use libtest_mimic::{Arguments, Failed, Trial};
+use libtest_mimic::Failed;
 use serde::Deserialize;
 use yaml_rust2::Yaml;
 
@@ -486,9 +486,7 @@ fn collect_files_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 fn main() {
-    let args = Arguments::from_args();
-
-    // Check Docker availability once at startup
+    // Check Docker availability once at startup.
     let docker_ok = common::docker::docker_image_available("thaum-corpus-exec");
     DOCKER_AVAILABLE.store(docker_ok, std::sync::atomic::Ordering::Relaxed);
     if !docker_ok {
@@ -499,36 +497,39 @@ fn main() {
     let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");
     let files = discover_corpus_files(&corpus_dir);
 
-    let tests: Vec<Trial> = files
-        .into_iter()
-        .filter_map(|path| {
-            let rel = path
-                .strip_prefix(&corpus_dir)
-                .unwrap_or(&path)
-                .to_string_lossy()
-                .replace(".sh.yaml", "")
-                .replace('\\', "/");
+    let mut runner = testutil::TestRunner::new();
 
-            let parsed = match parse_test_file(&path) {
-                Ok(p) => p,
-                Err(e) => {
-                    eprintln!("warning: skipping {}: {}", rel, e);
-                    return None;
-                }
-            };
+    for path in files {
+        let rel = path
+            .strip_prefix(&corpus_dir)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace(".sh.yaml", "")
+            .replace('\\', "/");
 
-            let test_name = parsed.spec.name.clone();
-            let disabled = parsed.spec.disabled.is_disabled();
-            let display_name = match &parsed.spec.disabled {
-                Disabled::WithReason { reason } => {
-                    format!("{} ({}) [disabled: {}]", rel, test_name, reason)
-                }
-                _ => format!("{} ({})", rel, test_name),
-            };
+        let parsed = match parse_test_file(&path) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("warning: skipping {}: {}", rel, e);
+                continue;
+            }
+        };
 
-            Some(Trial::test(display_name, move || run_test(&parsed)).with_ignored_flag(disabled))
-        })
-        .collect();
+        let test_name = parsed.spec.name.clone();
+        let disabled = parsed.spec.disabled.is_disabled();
+        let display_name = match &parsed.spec.disabled {
+            Disabled::WithReason { reason } => {
+                format!("{} ({}) [disabled: {}]", rel, test_name, reason)
+            }
+            _ => format!("{} ({})", rel, test_name),
+        };
 
-    libtest_mimic::run(&args, tests).exit();
+        runner.add(display_name, disabled, move || {
+            if let Err(e) = run_test(&parsed) {
+                panic!("{}", e.message().unwrap_or("test failed"));
+            }
+        });
+    }
+
+    runner.run();
 }

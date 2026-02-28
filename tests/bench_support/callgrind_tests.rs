@@ -4,8 +4,6 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
-use testutil::requires;
-
 use super::preconditions;
 
 fn scripts_dir() -> PathBuf {
@@ -50,7 +48,7 @@ fn run_callgrind(subcmd: &str, script_body: &str) -> thaum::callgrind_parser::Ca
     thaum::callgrind_parser::parse(&text).expect("cannot parse callgrind output")
 }
 
-#[requires(preconditions::valgrind, preconditions::thaum)]
+#[testutil::test(requires = [preconditions::valgrind, preconditions::thaum])]
 fn callgrind_trivial_lex() {
     let body = read_script_body("trivial.sh.yaml");
     let metrics = run_callgrind("lex", &body);
@@ -62,7 +60,7 @@ fn callgrind_trivial_lex() {
     );
 }
 
-#[requires(preconditions::valgrind, preconditions::thaum)]
+#[testutil::test(requires = [preconditions::valgrind, preconditions::thaum])]
 fn callgrind_all_stages() {
     let body = read_script_body("trivial.sh.yaml");
 

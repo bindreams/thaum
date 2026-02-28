@@ -524,7 +524,7 @@ fn main() {
             _ => format!("{} ({})", rel, test_name),
         };
 
-        runner.add(display_name, disabled, move || {
+        runner.add(display_name, &[], disabled, move || {
             if let Err(e) = run_test(&parsed) {
                 panic!("{}", e.message().unwrap_or("test failed"));
             }

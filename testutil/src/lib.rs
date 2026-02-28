@@ -16,6 +16,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
+use clap::Parser;
 use libtest_mimic::{Arguments, Trial};
 
 // Re-export proc macros for consumers.
@@ -90,17 +91,103 @@ pub enum Ignore {
 /// A test registered by `#[testutil::test(...)]` via inventory.
 pub struct TestDef {
     pub name: &'static str,
-    /// Display name (includes labels, custom name). `None` → use `name`.
+    /// Display name (custom name). `None` → use `name`.
     pub display_name: Option<&'static str>,
     pub requires: &'static [RequireFn],
     /// Requirements inherited from `#[fixture]` parameters. Each entry is a
     /// fixture type's `FixtureStorage::REQUIRES` slice.
     pub fixture_requires: &'static [&'static [RequireFn]],
     pub ignore: Ignore,
+    /// Labels for filtering. Stored in libtest-mimic's `kind` field joined by `:`.
+    pub labels: &'static [&'static str],
     pub body: fn(),
 }
 
 inventory::collect!(TestDef);
+
+// Label filtering =============================================================
+
+enum LabelSelector {
+    Include(String),
+    Exclude(String),
+}
+
+/// Extract label selectors from `--label` CLI args and the `TESTUTIL_LABEL`
+/// env var. Returns the selectors and the remaining CLI args (for libtest-mimic).
+///
+/// Sources (combined):
+/// - `--label docker` / `--label=docker,!slow` on the command line
+/// - `TESTUTIL_LABEL=docker,!slow` environment variable
+///
+/// The env var is the portable mechanism (works with `cargo test`, `cargo nextest`,
+/// or direct binary invocation). `--label` only works when running a specific
+/// test binary directly.
+fn extract_label_filters() -> (Vec<LabelSelector>, Vec<String>) {
+    let args: Vec<String> = std::env::args().collect();
+    let mut selectors = Vec::new();
+    let mut remaining = Vec::new();
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--label" {
+            i += 1;
+            if i < args.len() {
+                parse_label_arg(&args[i], &mut selectors);
+            }
+        } else if let Some(val) = args[i].strip_prefix("--label=") {
+            parse_label_arg(val, &mut selectors);
+        } else {
+            remaining.push(args[i].clone());
+        }
+        i += 1;
+    }
+
+    // Also read from TESTUTIL_LABEL env var.
+    if let Ok(val) = std::env::var("TESTUTIL_LABEL") {
+        parse_label_arg(&val, &mut selectors);
+    }
+
+    (selectors, remaining)
+}
+
+fn parse_label_arg(val: &str, selectors: &mut Vec<LabelSelector>) {
+    for part in val.split(',') {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
+        }
+        if let Some(label) = part.strip_prefix('!') {
+            selectors.push(LabelSelector::Exclude(label.to_string()));
+        } else {
+            selectors.push(LabelSelector::Include(part.to_string()));
+        }
+    }
+}
+
+/// Check whether a test with the given labels passes the label filter.
+///
+/// - Includes form a union: test must match ANY include.
+/// - Excludes subtract: test must not match ANY exclude.
+/// - No includes → all tests included by default.
+/// - No selectors → all tests pass.
+fn label_matches(test_labels: &[&str], selectors: &[LabelSelector]) -> bool {
+    let has_includes = selectors.iter().any(|s| matches!(s, LabelSelector::Include(_)));
+
+    let included = if has_includes {
+        selectors.iter().any(|s| match s {
+            LabelSelector::Include(l) => test_labels.contains(&l.as_str()),
+            LabelSelector::Exclude(_) => false,
+        })
+    } else {
+        true
+    };
+
+    let excluded = selectors.iter().any(|s| match s {
+        LabelSelector::Exclude(l) => test_labels.contains(&l.as_str()),
+        LabelSelector::Include(_) => false,
+    });
+
+    included && !excluded
+}
 
 // Test runner =================================================================
 
@@ -108,6 +195,7 @@ inventory::collect!(TestDef);
 struct DynTest {
     name: String,
     ignored: bool,
+    labels: Vec<String>,
     body: Box<dyn FnOnce() + Send + 'static>,
 }
 
@@ -125,11 +213,18 @@ impl TestRunner {
 
     /// Add a test that was generated at runtime (e.g. from a data file).
     ///
-    /// The `body` closure should panic on failure (like a normal `#[test]`).
-    pub fn add(&mut self, name: impl Into<String>, ignored: bool, body: impl FnOnce() + Send + 'static) {
+    /// The `body` closure should panic on failure (like a normal test).
+    pub fn add(
+        &mut self,
+        name: impl Into<String>,
+        labels: &[&str],
+        ignored: bool,
+        body: impl FnOnce() + Send + 'static,
+    ) {
         self.dynamic.push(DynTest {
             name: name.into(),
             ignored,
+            labels: labels.iter().map(|s| s.to_string()).collect(),
             body: Box::new(body),
         });
     }
@@ -141,17 +236,26 @@ impl TestRunner {
 
     /// Run all tests and return the conclusion for post-run assertions.
     pub fn run_tests(self) -> libtest_mimic::Conclusion {
-        let args = Arguments::from_args();
+        let (label_selectors, remaining_args) = extract_label_filters();
+        let args = Arguments::parse_from(remaining_args);
         let mut trials = Vec::new();
         let mut unavailable: Vec<(String, String)> = Vec::new();
 
         // Inventory-registered tests (from #[testutil::test]).
         for def in inventory::iter::<TestDef> {
+            // Label filtering — skip entirely (not ignored, just absent).
+            if !label_selectors.is_empty() && !label_matches(def.labels, &label_selectors) {
+                continue;
+            }
+
             let trial_name = def.display_name.unwrap_or(def.name);
+            let kind = def.labels.join(":");
 
             // Static ignore — don't check preconditions, don't report as unavailable.
             if !matches!(def.ignore, Ignore::No) {
-                trials.push(Trial::test(trial_name, || Ok(())).with_ignored_flag(true));
+                let trial = Trial::test(trial_name, || Ok(())).with_ignored_flag(true);
+                let trial = if kind.is_empty() { trial } else { trial.with_kind(kind) };
+                trials.push(trial);
                 continue;
             }
 
@@ -164,25 +268,36 @@ impl TestRunner {
 
             if reasons.is_empty() {
                 let body = def.body;
-                trials.push(Trial::test(trial_name, move || {
+                let trial = Trial::test(trial_name, move || {
                     body();
                     Ok(())
-                }));
+                });
+                let trial = if kind.is_empty() { trial } else { trial.with_kind(kind) };
+                trials.push(trial);
             } else {
                 let reason = reasons.join("; ");
                 unavailable.push((trial_name.to_string(), reason));
-                trials.push(Trial::test(trial_name, || Ok(())).with_ignored_flag(true));
+                let trial = Trial::test(trial_name, || Ok(())).with_ignored_flag(true);
+                let trial = if kind.is_empty() { trial } else { trial.with_kind(kind) };
+                trials.push(trial);
             }
         }
 
         // Dynamic tests (from TestRunner::add).
         for dyn_test in self.dynamic {
+            let dyn_labels: Vec<&str> = dyn_test.labels.iter().map(|s| s.as_str()).collect();
+            if !label_selectors.is_empty() && !label_matches(&dyn_labels, &label_selectors) {
+                continue;
+            }
+
+            let kind = dyn_test.labels.join(":");
             let body = dyn_test.body;
             let trial = Trial::test(dyn_test.name, move || {
                 body();
                 Ok(())
             })
             .with_ignored_flag(dyn_test.ignored);
+            let trial = if kind.is_empty() { trial } else { trial.with_kind(kind) };
             trials.push(trial);
         }
 

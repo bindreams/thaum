@@ -140,8 +140,11 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
     let name = &func.sig.ident;
     let name_str = name.to_string();
 
-    // Build display_name from labels + name arg.
-    let display_name_expr = build_display_name(&name_str, &args.name, &args.labels);
+    // Build display_name from custom name (labels go in `kind`, not in the name).
+    let display_name_expr = build_display_name(&args.name);
+
+    // Build labels as string slices.
+    let label_strs: Vec<String> = args.labels.iter().map(|id| id.to_string()).collect();
 
     // Build ignore expression.
     let ignore_expr = match &args.ignore {
@@ -226,6 +229,7 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
             requires: &[#(#req_exprs),*],
             fixture_requires: #fixture_requires_expr,
             ignore: #ignore_expr,
+            labels: &[#(#label_strs),*],
             body: #body_expr,
         });
     };
@@ -234,27 +238,13 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
 
 /// Build the `display_name: Option<&'static str>` expression.
 ///
-/// - No labels, no name → `None`
-/// - Labels and/or name → `Some("[label1][label2] display name")`
-fn build_display_name(fn_name: &str, custom_name: &Option<String>, labels: &[Ident]) -> proc_macro2::TokenStream {
-    if labels.is_empty() && custom_name.is_none() {
-        return quote! { None };
-    }
-
-    let mut display = String::new();
-    for label in labels {
-        display.push('[');
-        display.push_str(&label.to_string());
-        display.push(']');
-    }
-    if !labels.is_empty() {
-        display.push(' ');
-    }
+/// - No custom name → `None` (runner uses function name)
+/// - Custom name → `Some("display name")`
+fn build_display_name(custom_name: &Option<String>) -> proc_macro2::TokenStream {
     match custom_name {
-        Some(n) => display.push_str(n),
-        None => display.push_str(fn_name),
+        Some(n) => quote! { Some(#n) },
+        None => quote! { None },
     }
-    quote! { Some(#display) }
 }
 
 // #[testutil::fixture] ========================================================

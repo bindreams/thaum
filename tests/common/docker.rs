@@ -1,7 +1,7 @@
-#![allow(dead_code)]
-
 use std::io::Write;
 use std::process::{Command, Stdio};
+
+use base64::Engine;
 
 /// Result from running a script in Docker.
 #[derive(Debug)]
@@ -85,8 +85,26 @@ pub fn run_in_reference_shell(script: &str, shell: &str) -> DockerResult {
 
     let output = child.wait_with_output().expect("docker wait");
 
-    // Parse the base64-encoded output format from conformance_runner.sh
-    let out = String::from_utf8_lossy(&output.stdout);
+    if !output.status.success() && output.stdout.is_empty() {
+        panic!(
+            "Docker runner failed for shell={shell}, script={script:?}\nstderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    parse_conformance_runner_output(&output.stdout)
+}
+
+/// Parse the base64-encoded output format produced by `conformance_runner.sh`.
+///
+/// The runner outputs lines like:
+/// ```text
+/// EXIT:<code>
+/// STDOUT:<base64>
+/// STDERR:<base64>
+/// ```
+fn parse_conformance_runner_output(raw: &[u8]) -> DockerResult {
+    let out = String::from_utf8_lossy(raw);
     let mut exit_code = 0;
     let mut stdout_b64 = String::new();
     let mut stderr_b64 = String::new();
@@ -108,26 +126,13 @@ pub fn run_in_reference_shell(script: &str, shell: &str) -> DockerResult {
     }
 }
 
-/// Decode base64 using the system `base64` command.
+/// Decode a base64 string, panicking on invalid input.
 fn decode_base64(input: &str) -> String {
     if input.is_empty() {
         return String::new();
     }
-    let output = Command::new("base64")
-        .arg("-d")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .and_then(|mut child| {
-            if let Some(ref mut stdin) = child.stdin {
-                stdin.write_all(input.as_bytes()).ok();
-            }
-            child.stdin.take();
-            child.wait_with_output()
-        });
-    match output {
-        Ok(o) => String::from_utf8_lossy(&o.stdout).to_string(),
-        Err(_) => String::new(),
-    }
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(input)
+        .unwrap_or_else(|e| panic!("invalid base64 in conformance output: {e}"));
+    String::from_utf8(bytes).unwrap_or_else(|e| panic!("non-UTF-8 in conformance output: {e}"))
 }

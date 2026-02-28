@@ -43,6 +43,7 @@ yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
 testutil = { path = "testutil" }
 clap = { version = "4", features = ["derive"] }
+base64 = "0.22.1"
 
 [[test]]
 name = "corpus"

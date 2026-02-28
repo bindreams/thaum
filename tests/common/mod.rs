@@ -1,3 +1,5 @@
+//! Shared helpers included by multiple test binaries via `mod common;`.
+//! Not every binary uses every function, so unused warnings are expected.
 #![allow(dead_code)]
 
 pub mod docker;

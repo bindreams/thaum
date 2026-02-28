@@ -1,24 +1,31 @@
 //! Shared helpers for conformance tests.
 
-use std::io::Write;
-use std::process::{Command, Stdio};
-
+use crate::common::docker::DockerResult;
 use thaum::exec::{CapturedIo, ExecError, Executor};
 
-#[derive(Debug)]
-#[allow(dead_code)]
-pub struct ShellResult {
-    pub stdout: String,
-    pub stderr: String,
-    pub exit_code: i32,
+/// Find the thaum binary for subshell tests.
+fn thaum_exe() -> std::path::PathBuf {
+    let mut path = std::env::current_exe()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    path.push("thaum");
+    if cfg!(windows) {
+        path.set_extension("exe");
+    }
+    path
 }
 
 /// Run a script in our executor, capturing stdout.
-pub fn run_ours(script: &str) -> ShellResult {
+pub fn run_ours(script: &str) -> DockerResult {
     let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
     let mut executor = Executor::new();
     let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    executor.set_exe_path(thaum_exe());
 
     let mut captured = CapturedIo::new();
     let exit_code = match executor.execute(&program, &mut captured.context()) {
@@ -27,7 +34,7 @@ pub fn run_ours(script: &str) -> ShellResult {
         Err(e) => panic!("exec failed for {:?}: {}", script, e),
     };
 
-    ShellResult {
+    DockerResult {
         stdout: captured.stdout_string(),
         stderr: captured.stderr_string(),
         exit_code,
@@ -35,83 +42,8 @@ pub fn run_ours(script: &str) -> ShellResult {
 }
 
 /// Run a script in a Docker container with the given shell.
-pub fn run_in_docker(script: &str, shell: &str) -> ShellResult {
-    let mut child = Command::new("docker")
-        .args([
-            "run",
-            "--rm",
-            "-i",
-            "--network=none",
-            "--read-only",
-            "--tmpfs=/tmp:size=1m",
-            "shell-exec-test",
-            shell,
-        ])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .expect("failed to start docker");
-
-    if let Some(ref mut stdin) = child.stdin {
-        stdin.write_all(script.as_bytes()).expect("write to docker stdin");
-    }
-    child.stdin.take();
-
-    let output = child.wait_with_output().expect("docker wait");
-
-    if !output.status.success() && output.stdout.is_empty() {
-        panic!(
-            "Docker runner failed for shell={}, script={:?}\nstderr: {}",
-            shell,
-            script,
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    let out = String::from_utf8_lossy(&output.stdout);
-    let mut exit_code = 0;
-    let mut stdout_b64 = String::new();
-    let mut stderr_b64 = String::new();
-
-    for line in out.lines() {
-        if let Some(code) = line.strip_prefix("EXIT:") {
-            exit_code = code.trim().parse().unwrap_or(0);
-        } else if let Some(b64) = line.strip_prefix("STDOUT:") {
-            stdout_b64 = b64.trim().to_string();
-        } else if let Some(b64) = line.strip_prefix("STDERR:") {
-            stderr_b64 = b64.trim().to_string();
-        }
-    }
-
-    ShellResult {
-        stdout: decode_base64(&stdout_b64),
-        stderr: decode_base64(&stderr_b64),
-        exit_code,
-    }
-}
-
-fn decode_base64(input: &str) -> String {
-    if input.is_empty() {
-        return String::new();
-    }
-    let output = Command::new("base64")
-        .arg("-d")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .and_then(|mut child| {
-            if let Some(ref mut stdin) = child.stdin {
-                stdin.write_all(input.as_bytes()).ok();
-            }
-            child.stdin.take();
-            child.wait_with_output()
-        });
-    match output {
-        Ok(o) => String::from_utf8_lossy(&o.stdout).to_string(),
-        Err(_) => String::new(),
-    }
+fn run_in_docker(script: &str, shell: &str) -> DockerResult {
+    crate::common::docker::run_in_reference_shell(script, shell)
 }
 
 /// Assert our executor produces the same exit code as both reference shells.

@@ -11,6 +11,8 @@
 //!
 //! Excluded from the default nextest profile (see .config/nextest.toml).
 
+mod common;
+
 #[path = "exec_conformance_support/mod.rs"]
 mod support;
 

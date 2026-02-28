@@ -87,6 +87,69 @@ Supported features:
   export, unset, read, set, shopt, alias/unalias, local, readonly, shift,
   return, break, continue, exit, true, false, :
 
+## Benchmarks
+
+Unified benchmark binary with pluggable backends (callgrind for instruction counts, hyperfine for wall-clock times). By default runs inside Docker; use `--no-sandbox` for local execution.
+
+### Prerequisites
+
+```sh
+# For --no-sandbox: instruction counts
+sudo apt install valgrind
+
+# For --no-sandbox: wall-clock comparison
+cargo install hyperfine
+
+# For Docker mode (default): just docker
+```
+
+### Available kinds
+
+Kinds use `<stage>.<metric>` format with glob support. Only the needed backends are invoked.
+
+**Stages**: `lex`, `parse`, `exec`, `total`
+
+| Metric | Backend | Description |
+|--------|---------|-------------|
+| `instructions` | callgrind | CPU instructions executed (deterministic) |
+| `data-reads` | callgrind | Data cache read accesses |
+| `data-writes` | callgrind | Data cache write accesses |
+| `l1-hits` | callgrind | L1 cache hits (accesses that did not miss L1) |
+| `ll-hits` | callgrind | Last-level cache hits (L1 misses served by LL) |
+| `ram-hits` | callgrind | RAM accesses (LL cache misses) |
+| `est-cycles` | callgrind | Estimated CPU cycles (1/10/100 cost model) |
+| `walltime` | hyperfine | Wall-clock time (thaum only, or vs bash/dash for `total`) |
+
+Default: `*` (everything). Callgrind metrics are available for `lex`, `parse`, `exec`. Walltime is available for all stages including `total`.
+
+### Running benchmarks
+
+```sh
+# Everything (default)
+cargo bench --bench bench -- --no-sandbox
+
+# Single kind
+cargo bench --bench bench -- --no-sandbox --kind lex.instructions
+
+# Glob patterns
+cargo bench --bench bench -- --no-sandbox --kind '*.instructions'    # all stages
+cargo bench --bench bench -- --no-sandbox --kind 'exec.*'            # all exec metrics
+cargo bench --bench bench -- --no-sandbox --kind '*.walltime'        # all walltime stages
+
+# Multiple patterns
+cargo bench --bench bench -- --no-sandbox --kind 'lex.instructions,exec.walltime'
+
+# Save baseline and compare
+cargo bench --bench bench -- --no-sandbox --format json > before.json
+# ... make changes ...
+cargo bench --bench bench -- --no-sandbox --baseline-file before.json
+
+# Docker sandbox (default, requires docker)
+cargo bench --bench bench
+```
+
+On pull requests, CI automatically runs instruction-count benchmarks and posts a comparison table as a PR comment.
+
 ## CLI tool
 
 ```sh

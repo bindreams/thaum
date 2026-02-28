@@ -1,0 +1,22 @@
+{
+  "scopeName": "source.sh-yaml",
+  "name": "Shell YAML Frontmatter",
+  "patterns": [
+    { "include": "#frontmatter" },
+    { "include": "source.shell" }
+  ],
+  "repository": {
+    "frontmatter": {
+      "begin": "\\A",
+      "end": "^---$",
+      "name": "meta.frontmatter.sh-yaml",
+      "contentName": "meta.embedded.block.yaml",
+      "patterns": [
+        { "include": "source.yaml" }
+      ],
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.frontmatter.end" }
+      }
+    }
+  }
+}

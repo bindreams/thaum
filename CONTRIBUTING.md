@@ -9,6 +9,16 @@ cargo clippy --features cli   # lint
 cargo fmt                     # format
 ```
 
+### Benchmarks
+
+Benchmarks (requires Docker, or `valgrind`/`hyperfine` for `--no-sandbox`):
+
+```sh
+cargo bench --bench bench                                         # Docker (default)
+cargo bench --bench bench -- --no-sandbox --kind instructions     # local callgrind
+cargo bench --bench bench -- --no-sandbox --kind walltime         # local hyperfine
+```
+
 ## Project structure
 
 ```
@@ -83,6 +93,11 @@ tests/
   exec_basic.rs     — basic execution tests
   exec_conformance.rs — execution conformance tests
   corpus_runner.rs  — oils corpus test runner (custom harness)
+benches/
+  bench.rs        — unified benchmark binary (callgrind + hyperfine backends)
+  bench/          — backend modules (callgrind, hyperfine, types, format, docker)
+  scripts/        — benchmark scripts (.sh.yaml format, auto-discovered by build.rs)
+  docker/         — Dockerfile for sandboxed benchmark execution
 ```
 
 ## Documentation style

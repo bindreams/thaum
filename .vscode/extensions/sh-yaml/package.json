@@ -1,0 +1,26 @@
+{
+  "name": "sh-yaml",
+  "displayName": "Shell YAML Frontmatter",
+  "description": "Syntax highlighting for .sh.yaml files (YAML header + shell body)",
+  "version": "0.1.0",
+  "publisher": "thaum",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "sh-yaml",
+        "aliases": ["Shell (YAML frontmatter)"],
+        "extensions": [".sh.yaml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sh-yaml",
+        "scopeName": "source.sh-yaml",
+        "path": "./syntaxes/sh-yaml.tmLanguage.json"
+      }
+    ]
+  }
+}

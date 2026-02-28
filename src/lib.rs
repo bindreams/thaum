@@ -4,6 +4,8 @@
 
 /// Typed abstract syntax tree for POSIX sh and Bash.
 pub mod ast;
+/// Callgrind output file parser for instruction-count benchmarks.
+pub mod callgrind_parser;
 /// Feature-flag system for shell dialect differences (POSIX vs. Bash).
 pub mod dialect;
 /// Lexer and parser error types with source spans.
@@ -20,6 +22,8 @@ pub mod lexer;
 pub mod parser;
 /// Byte-offset source spans for error reporting.
 pub mod span;
+/// Column-aligned table formatter for terminal output.
+pub mod table;
 /// Token types emitted by the lexer.
 pub mod token;
 /// Immutable AST visitor (walk the tree without modifying it).

@@ -13,6 +13,7 @@ contracts = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+bincode = "1"
 colored = { version = "3", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 regex = "1"
@@ -36,10 +37,15 @@ pretty_assertions = "1"
 serde_yaml2 = "0.1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
+clap = { version = "4", features = ["derive"] }
 
 [[test]]
 name = "corpus"
 path = "tests/corpus_runner.rs"
+harness = false
+
+[[bench]]
+name = "bench"
 harness = false
 
 [[bin]]

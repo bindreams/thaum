@@ -12,7 +12,7 @@ use syn::{
 struct TestArgs {
     requires: Vec<Path>,
     name: Option<String>,
-    labels: Vec<Ident>,
+    labels: Option<Vec<Ident>>,
     ignore: IgnoreArg,
 }
 
@@ -52,9 +52,11 @@ impl Parse for TestArgs {
                     let _eq: Token![=] = input.parse()?;
                     let content;
                     bracketed!(content in input);
-                    args.labels = Punctuated::<Ident, Token![,]>::parse_terminated(&content)?
-                        .into_iter()
-                        .collect();
+                    args.labels = Some(
+                        Punctuated::<Ident, Token![,]>::parse_terminated(&content)?
+                            .into_iter()
+                            .collect(),
+                    );
                 }
                 "ignore" => {
                     if input.peek(Token![=]) {
@@ -143,8 +145,14 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
     // Build display_name from custom name (labels go in `kind`, not in the name).
     let display_name_expr = build_display_name(&args.name);
 
-    // Build labels as string slices.
-    let label_strs: Vec<String> = args.labels.iter().map(|id| id.to_string()).collect();
+    // Build labels. None = inherit module defaults; Some([]) = explicit opt-out.
+    let labels_explicit = args.labels.is_some();
+    let label_strs: Vec<String> = args
+        .labels
+        .unwrap_or_default()
+        .iter()
+        .map(|id| id.to_string())
+        .collect();
 
     // Build ignore expression.
     let ignore_expr = match &args.ignore {
@@ -225,11 +233,13 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
 
         ::testutil::inventory::submit!(::testutil::TestDef {
             name: #name_str,
+            module: ::core::module_path!(),
             display_name: #display_name_expr,
             requires: &[#(#req_exprs),*],
             fixture_requires: #fixture_requires_expr,
             ignore: #ignore_expr,
             labels: &[#(#label_strs),*],
+            labels_explicit: #labels_explicit,
             body: #body_expr,
         });
     };

@@ -91,6 +91,8 @@ pub enum Ignore {
 /// A test registered by `#[testutil::test(...)]` via inventory.
 pub struct TestDef {
     pub name: &'static str,
+    /// Module path (from `module_path!()`) for matching against `default_labels!`.
+    pub module: &'static str,
     /// Display name (custom name). `None` → use `name`.
     pub display_name: Option<&'static str>,
     pub requires: &'static [RequireFn],
@@ -100,10 +102,50 @@ pub struct TestDef {
     pub ignore: Ignore,
     /// Labels for filtering. Stored in libtest-mimic's `kind` field joined by `:`.
     pub labels: &'static [&'static str],
+    /// Whether `labels = [...]` was explicitly written (even if empty).
+    /// When false, module-level defaults from `default_labels!` apply.
+    pub labels_explicit: bool,
     pub body: fn(),
 }
 
 inventory::collect!(TestDef);
+
+// Module-level default labels =================================================
+
+/// Default labels for all tests in a module. Registered by [`default_labels!`].
+pub struct ModuleLabels {
+    pub module: &'static str,
+    pub labels: &'static [&'static str],
+}
+
+inventory::collect!(ModuleLabels);
+
+/// Set default labels for all `#[testutil::test]` functions in the current module.
+///
+/// Tests that explicitly specify `labels = [...]` (including `labels = []`) are
+/// not affected — explicit labels fully replace defaults.
+///
+/// ```ignore
+/// testutil::default_labels!(docker, conformance);
+///
+/// #[testutil::test]                    // inherits [docker, conformance]
+/// fn test_a() { ... }
+///
+/// #[testutil::test(labels = [slow])]   // gets [slow], not [docker, conformance, slow]
+/// fn test_b() { ... }
+///
+/// #[testutil::test(labels = [])]       // gets nothing — explicit opt-out
+/// fn test_c() { ... }
+/// ```
+#[macro_export]
+macro_rules! default_labels {
+    ($($label:ident),+ $(,)?) => {
+        $crate::inventory::submit!($crate::ModuleLabels {
+            module: ::core::module_path!(),
+            labels: &[$(::core::stringify!($label)),+],
+        });
+    };
+}
 
 // Label filtering =============================================================
 
@@ -189,6 +231,23 @@ fn label_matches(test_labels: &[&str], selectors: &[LabelSelector]) -> bool {
     included && !excluded
 }
 
+/// Resolve the effective labels for a test, applying module defaults if the test
+/// did not explicitly specify `labels = [...]`.
+fn resolve_labels(def: &TestDef, module_defaults: &[&ModuleLabels]) -> Vec<String> {
+    if def.labels_explicit {
+        return def.labels.iter().map(|s| s.to_string()).collect();
+    }
+    // Find the longest module prefix match.
+    let default = module_defaults
+        .iter()
+        .filter(|m| def.module.starts_with(m.module))
+        .max_by_key(|m| m.module.len());
+    match default {
+        Some(m) => m.labels.iter().map(|s| s.to_string()).collect(),
+        None => def.labels.iter().map(|s| s.to_string()).collect(),
+    }
+}
+
 // Test runner =================================================================
 
 /// A dynamically-added test (registered at runtime, not via proc macro).
@@ -241,15 +300,21 @@ impl TestRunner {
         let mut trials = Vec::new();
         let mut unavailable: Vec<(String, String)> = Vec::new();
 
+        // Collect module-level default labels.
+        let module_defaults: Vec<&ModuleLabels> = inventory::iter::<ModuleLabels>.into_iter().collect();
+
         // Inventory-registered tests (from #[testutil::test]).
         for def in inventory::iter::<TestDef> {
+            let resolved = resolve_labels(def, &module_defaults);
+            let resolved_refs: Vec<&str> = resolved.iter().map(|s| s.as_str()).collect();
+
             // Label filtering — skip entirely (not ignored, just absent).
-            if !label_selectors.is_empty() && !label_matches(def.labels, &label_selectors) {
+            if !label_selectors.is_empty() && !label_matches(&resolved_refs, &label_selectors) {
                 continue;
             }
 
             let trial_name = def.display_name.unwrap_or(def.name);
-            let kind = def.labels.join(":");
+            let kind = resolved.join(":");
 
             // Static ignore — don't check preconditions, don't report as unavailable.
             if !matches!(def.ignore, Ignore::No) {

@@ -6,9 +6,9 @@ mod support;
 fn main() {
     let conclusion = testutil::run_tests();
 
-    // Post-run assertion: verify that the satisfied-precondition test actually
-    // executed its body (not silently skipped as "ok").
+    // Post-run assertions: verify test bodies and teardowns actually ran.
     support::harness_tests::assert_satisfied_test_ran();
+    support::fixture_tests::assert_fixture_teardown_called();
 
     conclusion.exit();
 }

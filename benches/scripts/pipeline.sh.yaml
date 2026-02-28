@@ -1,0 +1,33 @@
+dialect: posix
+---
+true && echo "and-ok"
+false || echo "or-ok"
+true && false || echo "chain-ok"
+
+(
+    x=42
+    echo "subshell: $x"
+)
+
+result=$(echo "from command sub")
+echo "$result"
+
+echo "a" | { read -r line; echo "pipe: $line"; }
+
+(echo "sub1") && (echo "sub2") || (echo "sub3")
+
+x=1
+{ x=2; echo "brace: $x"; }
+echo "after brace: $x"
+
+true && true && true && echo "all true"
+false || false || true && echo "short circuit"
+
+# Longer and-or chains.
+a=1; b=2; c=3
+[ "$a" -lt "$b" ] && [ "$b" -lt "$c" ] && echo "ordered"
+[ "$a" -eq 99 ] || [ "$b" -eq 2 ] && echo "found b"
+
+# Subshell does not leak variables.
+(y=999; echo "inner: $y")
+echo "outer: ${y:-unset}"

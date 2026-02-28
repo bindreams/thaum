@@ -1,0 +1,38 @@
+dialect: posix
+---
+x=10
+
+if [ "$x" -gt 5 ]; then
+    echo "big"
+elif [ "$x" -eq 5 ]; then
+    echo "five"
+else
+    echo "small"
+fi
+
+i=0
+while [ "$i" -lt 20 ]; do
+    i=$((i + 1))
+done
+echo "while done: $i"
+
+sum=0
+for n in 1 2 3 4 5 6 7 8 9 10; do
+    sum=$((sum + n))
+done
+echo "sum: $sum"
+
+fruit="banana"
+case "$fruit" in
+    apple)   echo "red" ;;
+    banana)  echo "yellow" ;;
+    grape)   echo "purple" ;;
+    *)       echo "unknown" ;;
+esac
+
+for letter in a b c d e; do
+    if [ "$letter" = "c" ]; then
+        continue
+    fi
+    echo "$letter"
+done

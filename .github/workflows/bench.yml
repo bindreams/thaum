@@ -1,0 +1,111 @@
+name: Benchmarks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  bench:
+    name: Performance regression check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install valgrind
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq valgrind
+
+      - name: Benchmark base branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git checkout ${{ github.event.pull_request.base.sha }}
+          cargo bench --bench bench -- --no-sandbox --kind instructions --format json > base.json
+          git checkout ${{ github.event.pull_request.head.sha }}
+
+      - name: Benchmark PR
+        if: github.event_name == 'pull_request'
+        run: |
+          cargo bench --bench bench -- --no-sandbox --kind instructions --format json > head.json
+
+      - name: Benchmark push to main
+        if: github.event_name == 'push'
+        run: cargo bench --bench bench -- --no-sandbox --kind instructions
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Parse our JSON format: one BenchResult per line.
+            const parse = (path) => {
+              try {
+                return fs.readFileSync(path, 'utf8').trim().split('\n')
+                  .map(l => JSON.parse(l));
+              } catch { return []; }
+            };
+
+            const base = parse('base.json');
+            const head = parse('head.json');
+            const baseMap = {};
+            for (const b of base) {
+              baseMap[b.name] = b.measurements?.instructions ?? 0;
+            }
+
+            const rows = [];
+            for (const h of head) {
+              const ir = h.measurements?.instructions ?? 0;
+              const baseIr = baseMap[h.name];
+              let pctStr = 'N/A';
+              let status = '-';
+              if (baseIr != null && baseIr > 0) {
+                const pct = ((ir - baseIr) / baseIr) * 100;
+                pctStr = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+                if (Math.abs(pct) > 10)     status = ':red_circle: REGRESSION';
+                else if (Math.abs(pct) > 5) status = ':yellow_circle: warn';
+                else                         status = ':green_circle: ok';
+              }
+              rows.push(`| ${h.name} | ${ir.toLocaleString()} | ${pctStr} | ${status} |`);
+            }
+
+            const marker = '<!-- thaum-bench -->';
+            let body = `${marker}\n## Benchmark Results\n\n`;
+            if (rows.length > 0) {
+              body += '| Benchmark | Instructions | vs. base | Status |\n';
+              body += '|-----------|-------------|----------|--------|\n';
+              body += rows.join('\n') + '\n';
+            } else {
+              body += '_No benchmark data produced._\n';
+            }
+            body += `\n<sub>Commit: \`${context.sha.slice(0,7)}\`</sub>`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number, body,
+              });
+            }

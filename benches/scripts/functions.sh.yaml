@@ -1,0 +1,56 @@
+dialect: posix
+---
+greet() {
+    local who="$1"
+    echo "hello, $who"
+}
+
+greet "world"
+greet "bench"
+
+# Iterative factorial (avoids recursive command substitution).
+factorial() {
+    local n="$1"
+    local result=1
+    local i=1
+    while [ "$i" -le "$n" ]; do
+        result=$((result * i))
+        i=$((i + 1))
+    done
+    echo "$result"
+}
+
+echo "5! = $(factorial 5)"
+echo "8! = $(factorial 8)"
+
+# Iterative fibonacci.
+fib() {
+    local n="$1"
+    local a=0 b=1 tmp
+    local i=0
+    while [ "$i" -lt "$n" ]; do
+        tmp=$((a + b))
+        a=$b
+        b=$tmp
+        i=$((i + 1))
+    done
+    echo "$a"
+}
+
+echo "fib(10) = $(fib 10)"
+echo "fib(15) = $(fib 15)"
+
+counter=0
+bump() {
+    counter=$((counter + 1))
+}
+bump; bump; bump; bump; bump
+echo "counter: $counter"
+
+# Nested function calls (non-recursive).
+double() { echo $(( $1 * 2 )); }
+add_one() { echo $(( $1 + 1 )); }
+
+val=$(double 5)
+val=$(add_one "$val")
+echo "double(5)+1 = $val"

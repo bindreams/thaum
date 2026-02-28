@@ -1,0 +1,17 @@
+dialect: bash
+---
+greeting="hello"
+name="world"
+msg="${greeting}, ${name}!"
+echo "$msg"
+
+path="/usr/local/bin/thaum"
+echo "dir: ${path%/*}"
+echo "base: ${path##*/}"
+echo "len: ${#greeting}"
+
+default_val="${UNSET_VAR:-fallback}"
+echo "$default_val"
+
+upper="${greeting^^}"
+echo "$upper"

@@ -7,6 +7,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn simple_ls() {
     let cmd = first_cmd("ls -la /tmp");

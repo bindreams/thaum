@@ -107,8 +107,10 @@ harness = false
 name = "thaum"
 path = "src/main.rs"
 required-features = ["cli"]
+test = false
 
 [[bin]]
 name = "thaum-bench"
 path = "benches/bench.rs"
 required-features = ["bench"]
+test = false

@@ -1,5 +1,7 @@
 use super::*;
 
+testutil::default_labels!(exec);
+
 #[testutil::test]
 fn get_set_var() {
     let mut env = Environment::new();

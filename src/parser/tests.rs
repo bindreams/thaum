@@ -4,6 +4,8 @@
 use super::*;
 use pretty_assertions::assert_eq;
 
+testutil::default_labels!(lex, parse);
+
 fn parse_ok(input: &str) -> Program {
     parse(input).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", input, e))
 }

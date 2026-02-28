@@ -5,6 +5,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn bash_here_string() {
     let opts = ShellOptions {

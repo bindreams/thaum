@@ -154,16 +154,11 @@ enum LabelSelector {
     Exclude(String),
 }
 
-/// Extract label selectors from `--label` CLI args and the `TESTUTIL_LABEL`
-/// env var. Returns the selectors and the remaining CLI args (for libtest-mimic).
+/// Extract `--label` arguments from the process args, returning the selectors
+/// and the remaining args (for libtest-mimic).
 ///
-/// Sources (combined):
-/// - `--label docker` / `--label=docker,!slow` on the command line
-/// - `TESTUTIL_LABEL=docker,!slow` environment variable
-///
-/// The env var is the portable mechanism (works with `cargo test`, `cargo nextest`,
-/// or direct binary invocation). `--label` only works when running a specific
-/// test binary directly.
+/// Supports `--label docker`, `--label=docker,!slow`, and comma-separated values.
+/// Use `!label` to exclude.
 fn extract_label_filters() -> (Vec<LabelSelector>, Vec<String>) {
     let args: Vec<String> = std::env::args().collect();
     let mut selectors = Vec::new();
@@ -181,11 +176,6 @@ fn extract_label_filters() -> (Vec<LabelSelector>, Vec<String>) {
             remaining.push(args[i].clone());
         }
         i += 1;
-    }
-
-    // Also read from TESTUTIL_LABEL env var.
-    if let Ok(val) = std::env::var("TESTUTIL_LABEL") {
-        parse_label_arg(&val, &mut selectors);
     }
 
     (selectors, remaining)

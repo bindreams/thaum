@@ -1,5 +1,7 @@
 use super::*;
 
+testutil::default_labels!(exec);
+
 #[testutil::test]
 fn test_empty() {
     assert_eq!(parse_shell_int(""), Ok(0));

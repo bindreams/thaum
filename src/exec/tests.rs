@@ -5,6 +5,8 @@ use super::*;
 use icu::locale::Locale;
 use pattern::{trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix};
 
+testutil::default_labels!(exec);
+
 fn c() -> Locale {
     locale::parse_posix_locale("C")
 }

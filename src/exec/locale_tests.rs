@@ -1,6 +1,8 @@
 use super::*;
 use crate::exec::environment::Environment;
 
+testutil::default_labels!(exec);
+
 fn make_env() -> Environment {
     Environment::new()
 }

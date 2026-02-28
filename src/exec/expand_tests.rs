@@ -2,6 +2,8 @@ use super::*;
 use crate::ast::{Fragment, GlobChar, ParamOp, ParameterExpansion, Word};
 use crate::span::Span;
 
+testutil::default_labels!(exec);
+
 fn dummy_span() -> Span {
     Span::new(0, 0)
 }

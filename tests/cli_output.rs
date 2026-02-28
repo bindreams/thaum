@@ -10,6 +10,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse, cli);
+
 /// Run thaum on the given input and return stdout.
 fn run(input: &str) -> String {
     let bin = env!("CARGO_BIN_EXE_thaum");

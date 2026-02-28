@@ -7,6 +7,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn tilde_expansion_in_assignment() {
     let cmd = first_cmd("HOME=~user");

@@ -1,5 +1,7 @@
 use super::*;
 
+testutil::default_labels!(exec);
+
 #[testutil::test]
 fn echo_simple() {
     let mut env = Environment::new();

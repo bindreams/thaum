@@ -4,6 +4,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn error_unclosed_if() {
     assert!(parse("if true; then echo yes").is_err());

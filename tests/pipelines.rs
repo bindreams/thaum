@@ -8,6 +8,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn pipeline_two_commands() {
     assert!(matches!(first_expr("ls | grep foo"), Expression::Pipe { .. }));

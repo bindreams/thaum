@@ -524,7 +524,14 @@ fn main() {
             _ => format!("{} ({})", rel, test_name),
         };
 
-        runner.add(display_name, &[], disabled, move || {
+        let has_exec = parsed.spec.status.is_some() || parsed.spec.stdout.is_some() || parsed.spec.stderr.is_some();
+        let labels: Vec<&str> = if has_exec {
+            vec!["corpus", "lex", "parse", "exec"]
+        } else {
+            vec!["corpus", "lex", "parse"]
+        };
+
+        runner.add(display_name, &labels, disabled, move || {
             if let Err(e) = run_test(&parsed) {
                 panic!("{}", e.message().unwrap_or("test failed"));
             }

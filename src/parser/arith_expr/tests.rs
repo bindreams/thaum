@@ -3,6 +3,8 @@
 
 use super::*;
 
+testutil::default_labels!(parse);
+
 fn parse_ok(input: &str) -> ArithExpr {
     parse_arith_expr(input).unwrap_or_else(|e| panic!("parse_arith_expr failed for {:?}: {}", input, e))
 }

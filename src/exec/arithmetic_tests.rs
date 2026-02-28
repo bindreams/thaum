@@ -2,6 +2,8 @@ use super::*;
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use crate::exec::environment::Environment;
 
+testutil::default_labels!(exec);
+
 // Helpers -------------------------------------------------------------------------------------------------------------
 
 fn num(n: i64) -> ArithExpr {

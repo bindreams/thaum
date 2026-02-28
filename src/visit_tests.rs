@@ -1,6 +1,8 @@
 use super::*;
 use crate::dialect::Dialect;
 
+testutil::default_labels!(lex, parse);
+
 fn parse_bash(input: &str) -> Program {
     crate::parse_with(input, Dialect::Bash).unwrap()
 }

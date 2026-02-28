@@ -1,6 +1,8 @@
 #[cfg(unix)]
 use std::os::fd::AsRawFd;
 
+testutil::default_labels!(exec);
+
 #[cfg(unix)]
 #[testutil::test]
 fn is_fd_terminal_true_for_pty() {

@@ -28,7 +28,15 @@ fn label_optout() {
 }
 
 pub fn assert_all_ran() {
-    assert_eq!(INHERITED_RAN.load(Ordering::Relaxed), 1, "label_inherited should have run");
-    assert_eq!(EXPLICIT_RAN.load(Ordering::Relaxed), 1, "label_explicit should have run");
+    assert_eq!(
+        INHERITED_RAN.load(Ordering::Relaxed),
+        1,
+        "label_inherited should have run"
+    );
+    assert_eq!(
+        EXPLICIT_RAN.load(Ordering::Relaxed),
+        1,
+        "label_explicit should have run"
+    );
     assert_eq!(OPTOUT_RAN.load(Ordering::Relaxed), 1, "label_optout should have run");
 }

@@ -1,6 +1,8 @@
 use super::*;
 use crate::exec::environment::Environment;
 
+testutil::default_labels!(exec);
+
 fn fixture_dir() -> String {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("tests/fixtures/locale")

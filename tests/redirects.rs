@@ -8,6 +8,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse);
+
 #[testutil::test]
 fn stderr_redirect() {
     let cmd = first_cmd("cmd 2>/dev/null");

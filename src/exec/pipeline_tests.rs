@@ -1,6 +1,8 @@
 use super::*;
 use crate::ast::Expression;
 
+testutil::default_labels!(exec);
+
 #[testutil::test]
 fn flatten_single() {
     let expr = Expression::Command(crate::ast::Command {

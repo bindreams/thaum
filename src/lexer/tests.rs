@@ -4,6 +4,8 @@
 use super::*;
 use crate::token::GlobKind;
 
+testutil::default_labels!(lex);
+
 /// Helper: lex all tokens from input, including Whitespace tokens.
 fn lex_all(input: &str) -> Result<Vec<Token>, LexError> {
     let mut lexer = Lexer::from_str(input, ShellOptions::default());

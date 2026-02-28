@@ -3,6 +3,8 @@
 use super::helpers::{assert_exit_matches_both, assert_shells_agree};
 use super::preconditions;
 
+testutil::default_labels!(lex, parse, exec);
+
 // Exit code conformance -------------------------------------------------------
 
 #[testutil::test(requires = [preconditions::docker_conformance_image])]

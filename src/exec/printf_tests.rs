@@ -1,6 +1,8 @@
 use super::*;
 use crate::exec::environment::Environment;
 
+testutil::default_labels!(exec);
+
 fn fmt(format: &str, args: &[&str]) -> String {
     fmt_with_sep(format, args, '.')
 }

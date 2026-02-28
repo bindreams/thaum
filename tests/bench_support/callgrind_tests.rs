@@ -6,6 +6,8 @@ use std::process::{Command, Stdio};
 
 use super::preconditions;
 
+testutil::default_labels!(bench);
+
 fn scripts_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/scripts")
 }

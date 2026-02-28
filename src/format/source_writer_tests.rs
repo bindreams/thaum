@@ -1,5 +1,7 @@
 use super::SourceWriter;
 
+testutil::default_labels!(lex, parse);
+
 fn fmt(source: &str) -> String {
     let program = crate::parse(source).unwrap_or_else(|e| panic!("parse failed: {e}"));
     SourceWriter::format_program(&program)

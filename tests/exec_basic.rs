@@ -7,6 +7,8 @@ fn main() {
     testutil::run_all();
 }
 
+testutil::default_labels!(lex, parse, exec);
+
 /// Find the thaum binary for subshell tests.
 ///
 /// During `cargo test`, the test binary is NOT the thaum CLI. We need the

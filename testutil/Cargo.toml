@@ -1,0 +1,14 @@
+[package]
+name = "testutil"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+testutil-macros = { path = "macros" }
+inventory = "0.3"
+libtest-mimic = "0.8"
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"
+harness = false

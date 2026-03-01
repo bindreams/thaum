@@ -2,7 +2,7 @@
 FROM rust:alpine AS builder
 RUN apk add --no-cache musl-dev
 WORKDIR /src
-COPY Cargo.toml Cargo.lock build.rs ./
+COPY Cargo.toml Cargo.lock ./
 COPY src/ src/
 COPY benches/ benches/
 RUN cargo build --features cli --release

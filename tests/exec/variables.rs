@@ -637,17 +637,20 @@ fn dirs_shows_current_dir() {
 
 #[testutil::test]
 fn pushd_and_popd_basic() {
+    // Canonicalize because /tmp may be a symlink (e.g. /private/tmp on macOS).
+    let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; echo $PWD; popd > /dev/null; echo $PWD");
     let lines: Vec<&str> = out.trim().lines().collect();
-    assert_eq!(lines[0], "/tmp", "pushd should cd to /tmp");
+    assert_eq!(lines[0], real_tmp, "pushd should cd to /tmp");
     // After popd, we should be back to original dir.
-    assert_ne!(lines[1], "/tmp", "popd should restore original dir");
+    assert_ne!(lines[1], real_tmp, "popd should restore original dir");
 }
 
 #[testutil::test]
 fn dirstack_tracks_pushd() {
+    let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; echo ${DIRSTACK[0]}");
-    assert_eq!(out.trim(), "/tmp");
+    assert_eq!(out.trim(), real_tmp);
 }
 
 #[testutil::test]
@@ -658,8 +661,9 @@ fn popd_empty_stack_fails() {
 
 #[testutil::test]
 fn pushd_no_args_swaps_top_two() {
+    let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; pushd /var > /dev/null; pushd > /dev/null; echo $PWD");
-    assert_eq!(out.trim(), "/tmp", "pushd with no args should swap top two");
+    assert_eq!(out.trim(), real_tmp, "pushd with no args should swap top two");
 }
 
 #[testutil::test]

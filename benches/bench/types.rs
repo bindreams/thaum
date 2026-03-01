@@ -15,6 +15,15 @@ pub enum Stage {
 
 impl Stage {
     pub const ALL: &[Stage] = &[Stage::Lex, Stage::Parse, Stage::Exec, Stage::Total];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Stage::Lex => "lex",
+            Stage::Parse => "parse",
+            Stage::Exec => "exec",
+            Stage::Total => "total",
+        }
+    }
 }
 
 impl fmt::Display for Stage {
@@ -70,6 +79,19 @@ impl Metric {
     /// Whether this metric comes from the callgrind backend.
     pub fn is_callgrind(self) -> bool {
         !matches!(self, Metric::Walltime)
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Metric::Instructions => "instructions",
+            Metric::DataReads => "data-reads",
+            Metric::DataWrites => "data-writes",
+            Metric::L1Hits => "l1-hits",
+            Metric::LlHits => "ll-hits",
+            Metric::RamHits => "ram-hits",
+            Metric::EstCycles => "est-cycles",
+            Metric::Walltime => "walltime",
+        }
     }
 }
 
@@ -134,13 +156,31 @@ impl fmt::Display for Kind {
 /// Resolve a comma-separated glob pattern into concrete Kind values.
 ///
 /// Each element is matched against all valid `stage.metric` pairs using simple
-/// glob semantics (`*` matches any sequence of characters).
+/// glob semantics (`*` matches any sequence of characters).  A bare stage name
+/// (e.g. `lex`) is treated as `lex.*`, and a bare metric name (e.g.
+/// `instructions`) is treated as `*.instructions`.
 pub fn resolve_kinds(pattern: &str) -> Vec<Kind> {
     let all = Kind::all();
+    let stage_names: Vec<&str> = Stage::ALL.iter().map(|s| s.as_str()).collect();
+    let metric_names: Vec<&str> = Metric::ALL.iter().map(|m| m.as_str()).collect();
+
     let mut result = Vec::new();
     for glob in pattern.split(',').map(str::trim) {
+        // Expand bare stage/metric names to wildcard patterns.
+        let expanded: std::borrow::Cow<'_, str> = if !glob.contains('.') && !glob.contains('*') {
+            if stage_names.contains(&glob) {
+                format!("{glob}.*").into()
+            } else if metric_names.contains(&glob) {
+                format!("*.{glob}").into()
+            } else {
+                glob.into()
+            }
+        } else {
+            glob.into()
+        };
+
         for kind in &all {
-            if glob_matches(glob, &kind.to_string()) && !result.contains(kind) {
+            if glob_matches(&expanded, &kind.to_string()) && !result.contains(kind) {
                 result.push(*kind);
             }
         }
@@ -338,5 +378,19 @@ mod tests {
             .filter(|k| k.stage == Stage::Lex && k.metric == Metric::Instructions)
             .count();
         assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn resolve_bare_metric_name() {
+        let kinds = resolve_kinds("instructions");
+        assert!(kinds.iter().all(|k| k.metric == Metric::Instructions));
+        assert_eq!(kinds.len(), Stage::ALL.len());
+    }
+
+    #[test]
+    fn resolve_bare_stage_name() {
+        let kinds = resolve_kinds("lex");
+        assert!(kinds.iter().all(|k| k.stage == Stage::Lex));
+        assert_eq!(kinds.len(), Metric::ALL.len());
     }
 }

@@ -623,3 +623,63 @@ fn bash_lineno_cannot_be_unset() {
     let status = bash_exec_result("unset BASH_LINENO 2>/dev/null");
     assert_ne!(status, 0, "unset BASH_LINENO should fail");
 }
+
+// pushd/popd/dirs + DIRSTACK ==========================================================================================
+
+#[testutil::test]
+fn dirs_shows_current_dir() {
+    let (out, _) = bash_exec_ok("dirs");
+    assert!(
+        !out.trim().is_empty(),
+        "dirs should show at least the current directory"
+    );
+}
+
+#[testutil::test]
+fn pushd_and_popd_basic() {
+    let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; echo $PWD; popd > /dev/null; echo $PWD");
+    let lines: Vec<&str> = out.trim().lines().collect();
+    assert_eq!(lines[0], "/tmp", "pushd should cd to /tmp");
+    // After popd, we should be back to original dir.
+    assert_ne!(lines[1], "/tmp", "popd should restore original dir");
+}
+
+#[testutil::test]
+fn dirstack_tracks_pushd() {
+    let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; echo ${DIRSTACK[0]}");
+    assert_eq!(out.trim(), "/tmp");
+}
+
+#[testutil::test]
+fn popd_empty_stack_fails() {
+    let status = bash_exec_result("popd 2>/dev/null");
+    assert_ne!(status, 0, "popd with empty stack should fail");
+}
+
+#[testutil::test]
+fn pushd_no_args_swaps_top_two() {
+    let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; pushd /var > /dev/null; pushd > /dev/null; echo $PWD");
+    assert_eq!(out.trim(), "/tmp", "pushd with no args should swap top two");
+}
+
+#[testutil::test]
+fn dirs_c_clears_stack() {
+    let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; dirs -c; dirs -p");
+    let lines: Vec<&str> = out.trim().lines().collect();
+    // After dirs -c, only the current dir should remain.
+    assert_eq!(lines.len(), 1);
+}
+
+#[testutil::test]
+fn dirs_v_shows_indices() {
+    let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; dirs -v");
+    // Should have indices like " 0  /tmp"
+    assert!(out.contains(" 0"), "dirs -v should show index 0");
+}
+
+#[testutil::test]
+fn pushd_n_no_cd() {
+    let (out, _) = bash_exec_ok("pushd -n /tmp > /dev/null; echo $PWD");
+    // With -n, pushd should NOT change directory.
+    assert_ne!(out.trim(), "/tmp", "pushd -n should not change directory");
+}

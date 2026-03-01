@@ -42,6 +42,9 @@ pub fn is_builtin(name: &str) -> bool {
             | "declare"
             | "typeset"
             | "getopts"
+            | "pushd"
+            | "popd"
+            | "dirs"
     )
 }
 
@@ -79,6 +82,9 @@ pub fn run_builtin(
         "local" => builtin_local(args, env),
         "declare" | "typeset" => builtin_declare(args, env, stdout),
         "getopts" => builtin_getopts(args, env, stderr),
+        "pushd" => builtin_pushd(args, env, stdout, stderr),
+        "popd" => builtin_popd(args, env, stdout, stderr),
+        "dirs" => builtin_dirs(args, env, stdout, stderr),
         // eval, exec, source, and . are handled as special builtins in
         // execute_command (they need Executor access, not just Environment).
         // They should never reach run_builtin.
@@ -200,6 +206,7 @@ fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) ->
             let _ = env.set_var("OLDPWD", &old_cwd.to_string_lossy());
             let pwd = env.cwd().to_string_lossy().into_owned();
             let _ = env.set_var("PWD", &pwd);
+            env.sync_dir_stack_cwd();
             Ok(0)
         }
         Err(e) => {
@@ -903,6 +910,180 @@ fn builtin_getopts(args: &[String], env: &mut Environment, stderr: &mut dyn Writ
             Ok(0)
         }
     }
+}
+
+// pushd/popd/dirs builtins ============================================================================================
+
+/// Helper: change directory within the environment (used by pushd/popd).
+fn do_cd(env: &mut Environment, dir: &std::path::Path, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+    let old_cwd = env.cwd().to_path_buf();
+    match env.set_cwd(dir.to_path_buf()) {
+        Ok(()) => {
+            let _ = env.set_var("OLDPWD", &old_cwd.to_string_lossy());
+            let pwd = env.cwd().to_string_lossy().into_owned();
+            let _ = env.set_var("PWD", &pwd);
+            env.sync_dir_stack_cwd();
+            Ok(0)
+        }
+        Err(e) => {
+            let _ = writeln!(stderr, "cd: {}: {e}", dir.display());
+            Ok(1)
+        }
+    }
+}
+
+/// Print the directory stack (used by dirs and after pushd/popd).
+fn print_dir_stack(env: &Environment, stdout: &mut dyn Write) {
+    let home = env.get_var("HOME").map(|s| s.to_string());
+    let parts: Vec<String> = env
+        .dir_stack()
+        .iter()
+        .map(|p| {
+            let s = p.to_string_lossy().to_string();
+            if let Some(ref h) = home {
+                if s == *h {
+                    return "~".to_string();
+                }
+                if let Some(rest) = s.strip_prefix(h.as_str()) {
+                    if rest.starts_with('/') {
+                        return format!("~{rest}");
+                    }
+                }
+            }
+            s
+        })
+        .collect();
+    let _ = writeln!(stdout, "{}", parts.join(" "));
+}
+
+fn builtin_pushd(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    let mut no_cd = false;
+    let mut operand: Option<&str> = None;
+
+    for arg in args {
+        if arg == "-n" {
+            no_cd = true;
+        } else {
+            operand = Some(arg);
+        }
+    }
+
+    match operand {
+        None => {
+            // pushd with no args: swap top two.
+            if !env.dir_stack_swap() {
+                let _ = writeln!(stderr, "pushd: no other directory");
+                return Ok(1);
+            }
+            if !no_cd {
+                let target = env.dir_stack()[0].clone();
+                do_cd(env, &target, stderr)?;
+            }
+        }
+        Some(dir) => {
+            let path = if std::path::Path::new(dir).is_relative() {
+                env.cwd().join(dir)
+            } else {
+                std::path::PathBuf::from(dir)
+            };
+            if no_cd {
+                // Insert at position 1 without cd.
+                env.dir_stack_insert(1, path);
+            } else {
+                env.dir_stack_push(path.clone());
+                do_cd(env, &path, stderr)?;
+            }
+        }
+    }
+
+    print_dir_stack(env, stdout);
+    Ok(0)
+}
+
+fn builtin_popd(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    let no_cd = args.iter().any(|a| a == "-n");
+
+    match env.dir_stack_pop() {
+        Some(_popped) => {
+            if !no_cd {
+                let new_top = env.dir_stack()[0].clone();
+                do_cd(env, &new_top, stderr)?;
+            }
+            print_dir_stack(env, stdout);
+            Ok(0)
+        }
+        None => {
+            let _ = writeln!(stderr, "popd: directory stack empty");
+            Ok(1)
+        }
+    }
+}
+
+fn builtin_dirs(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+    _stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
+    let clear = args.iter().any(|a| a == "-c");
+    let long = args.iter().any(|a| a == "-l");
+    let per_line = args.iter().any(|a| a == "-p");
+    let verbose = args.iter().any(|a| a == "-v");
+
+    if clear {
+        env.dir_stack_clear();
+        return Ok(0);
+    }
+
+    let home = if long {
+        None
+    } else {
+        env.get_var("HOME").map(|s| s.to_string())
+    };
+
+    let stack = env.dir_stack();
+
+    if verbose {
+        for (i, p) in stack.iter().enumerate() {
+            let s = format_dir(p, &home);
+            let _ = writeln!(stdout, " {i}\t{s}");
+        }
+    } else if per_line {
+        for p in stack {
+            let s = format_dir(p, &home);
+            let _ = writeln!(stdout, "{s}");
+        }
+    } else {
+        let parts: Vec<String> = stack.iter().map(|p| format_dir(p, &home)).collect();
+        let _ = writeln!(stdout, "{}", parts.join(" "));
+    }
+
+    Ok(0)
+}
+
+fn format_dir(path: &std::path::Path, home: &Option<String>) -> String {
+    let s = path.to_string_lossy().to_string();
+    if let Some(ref h) = home {
+        if s == *h {
+            return "~".to_string();
+        }
+        if let Some(rest) = s.strip_prefix(h.as_str()) {
+            if rest.starts_with('/') {
+                return format!("~{rest}");
+            }
+        }
+    }
+    s
 }
 
 #[cfg(test)]

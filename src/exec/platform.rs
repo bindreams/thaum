@@ -54,14 +54,21 @@ pub fn is_fd_terminal(fd: i32) -> bool {
         use std::io::IsTerminal;
         use std::os::windows::io::BorrowedHandle;
         extern "C" {
+            fn _isatty(fd: i32) -> i32;
             fn _get_osfhandle(fd: i32) -> isize;
         }
-        let handle = unsafe { _get_osfhandle(fd) };
-        if handle == -1 || handle == -2 {
+        // _isatty handles invalid fds gracefully (returns 0, sets errno to
+        // EBADF) without triggering the CRT invalid parameter handler.
+        // _get_osfhandle on an out-of-range fd would invoke __fastfail.
+        if unsafe { _isatty(fd) } == 0 {
             return false;
         }
-        // SAFETY: GetConsoleMode handles invalid handles gracefully (returns
-        // FALSE, no UB). The borrow does not outlive this call.
+        // fd is valid and points to a character device. Get the OS handle for
+        // the full is_terminal() check (covers MSYS/Cygwin PTYs too).
+        let handle = unsafe { _get_osfhandle(fd) };
+        debug_assert!(handle != -1 && handle != -2);
+        // SAFETY: _isatty confirmed the fd is valid, so the handle is valid.
+        // The borrow does not outlive this call.
         unsafe { BorrowedHandle::borrow_raw(handle as _) }.is_terminal()
     }
     #[cfg(not(any(unix, windows)))]

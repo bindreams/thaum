@@ -19,15 +19,9 @@ fn is_fd_terminal_false_for_pipe() {
 
 #[cfg(windows)]
 #[testutil::test]
-fn is_fd_terminal_true_for_console() {
-    use std::fs::OpenOptions;
-    use std::io::IsTerminal;
-    // CONOUT$ is a special Windows device for the active console output buffer.
-    // GetConsoleMode succeeds on this handle, so is_terminal() returns true.
-    // On headless CI without a console, the open fails — skip silently.
-    if let Ok(f) = OpenOptions::new().write(true).open("CONOUT$") {
-        assert!(f.is_terminal());
-    }
+fn is_fd_terminal_false_for_pipe_stdout() {
+    // Under nextest (or any piped context), stdout is not a terminal.
+    assert!(!super::is_fd_terminal(1));
 }
 
 #[testutil::test]

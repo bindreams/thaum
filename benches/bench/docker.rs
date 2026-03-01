@@ -14,7 +14,7 @@ pub fn available() -> bool {
 
 pub fn build_image() -> Option<String> {
     let project_root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let dockerfile = project_root.join("benches/docker/bench.Dockerfile");
+    let dockerfile = project_root.join("benches/docker/Dockerfile");
 
     eprintln!("Building Docker image...");
     let output = Command::new("docker")

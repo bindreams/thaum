@@ -1,10 +1,9 @@
 # syntax=docker/dockerfile:1
 FROM rust:alpine AS builder
-RUN apk add --no-cache musl-dev
+RUN apk add --no-cache musl-dev git
 WORKDIR /src
-COPY Cargo.toml Cargo.lock ./
-COPY src/ src/
-COPY benches/ benches/
+COPY ./ ./
+RUN git clean -fdx
 RUN cargo build --features cli --release
 
 FROM alpine:latest

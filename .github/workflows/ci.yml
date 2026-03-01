@@ -33,7 +33,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
       - name: Build Docker image
-        run: docker build -t thaum-corpus-exec -f tests/docker/Dockerfile.corpus .
+        run: docker build -t thaum-corpus-exec -f tests/docker/Dockerfile .
       - run: cargo nextest run --features cli -E 'binary(corpus)'
 
   lint:

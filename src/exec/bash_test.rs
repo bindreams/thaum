@@ -252,7 +252,7 @@ fn file_permission_check(path: &str, _mask: u32) -> bool {
                     .split(';')
                     .any(|pe| pe.strip_prefix('.').is_some_and(|pe| pe.eq_ignore_ascii_case(ext)))
             }
-            // readable: if file exists and is accessible, it's readable
+            // readable: stub — true if file exists. ACL-based check not implemented.
             _ => true,
         }
     }

@@ -73,7 +73,7 @@ pub fn execute_pipeline(
 
     // Store PIPESTATUS array.
     let status_strs: Vec<String> = statuses.iter().map(|s| s.to_string()).collect();
-    let _ = executor.env_mut().set_array("PIPESTATUS", status_strs);
+    debug_assert!(executor.env_mut().set_array("PIPESTATUS", status_strs).is_ok());
 
     Ok(last_status)
 }

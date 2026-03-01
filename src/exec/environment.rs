@@ -302,7 +302,9 @@ impl Environment {
         }
         #[cfg(target_vendor = "apple")]
         {
-            // nix crate doesn't expose getgroups() on Apple; call libc directly.
+            // nix crate doesn't expose getgroups() on Apple; call libc directly
+            // using the POSIX two-call idiom: first call with n=0 to get the
+            // count, then allocate and call again to fill the buffer.
             let ngroups = unsafe { nix::libc::getgroups(0, std::ptr::null_mut()) };
             if ngroups > 0 {
                 let mut gids: Vec<nix::libc::gid_t> = vec![0; ngroups as usize];
@@ -1009,6 +1011,7 @@ impl Environment {
     pub fn get_dynamic(&mut self, name: &str) -> Option<String> {
         match name {
             "RANDOM" if self.special_active.contains("RANDOM") => {
+                // POSIX/glibc LCG: next = (a * state + c), extract bits 16..30.
                 self.random_state = self.random_state.wrapping_mul(1103515245).wrapping_add(12345);
                 Some(((self.random_state >> 16) & 0x7fff).to_string())
             }
@@ -1935,18 +1938,8 @@ impl Default for Environment {
 #[path = "environment_tests.rs"]
 mod tests;
 
-// NOTE: The mini arithmetic evaluator that was here has been removed.
-// Integer attribute (-i) evaluation is handled by the Executor, which
-// has access to the full arithmetic module (src/exec/arithmetic.rs).
+// TODO: set_var() with integer=true only does i64::parse(). Full arithmetic
+// expression evaluation (e.g. "2+3") requires the Executor to intercept the
+// assignment. Tracked in the declare -i tests.
 //
-// For now, set_var() with integer=true does a simple i64::parse().
-// Full arithmetic expression evaluation (e.g. "2+3") requires the
-// Executor to intercept the assignment and evaluate before calling
-// set_var(). This is a TODO tracked in the declare -i tests.
-
-// REMOVED: ArithToken enum, tokenize_arith(), parse_additive(),
-// parse_multiplicative(), parse_unary(), parse_primary() — ~200 lines
-// of duplicated arithmetic parsing that belonged in exec/arithmetic.rs.
-//
-// DO NOT add arithmetic evaluation to Environment. Use the Executor.
-// (mini parser removed — was ~200 lines of duplicated arithmetic code)
+// DO NOT add arithmetic evaluation to Environment — use the Executor.

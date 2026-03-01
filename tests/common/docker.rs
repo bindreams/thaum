@@ -160,7 +160,9 @@ fn build_wrapper(script: &str, bash: bool, setup: Option<&str>, environment: &Ha
     w.push_str("workdir=$(mktemp -d)\n");
     w.push_str("cd \"$workdir\"\n");
 
-    // Export environment variables. Double-quoted so shell expansion works.
+    // Export environment variables. Double-quoted so $VAR and backticks in
+    // values undergo shell expansion — intentional for corpus test flexibility,
+    // but assumes trusted test data.
     for (key, value) in environment {
         let escaped = value.replace('\\', "\\\\").replace('"', "\\\"");
         w.push_str(&format!("export {key}=\"{escaped}\"\n"));

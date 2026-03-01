@@ -181,7 +181,7 @@ impl ChildEx {
 
 /// POSIX shell quoting: single-quote each argument, escaping embedded `'`.
 #[cfg(unix)]
-#[allow(dead_code)] // Tested via commandline(); will be used by Windows impl too.
+#[allow(dead_code)] // Only used on Unix; tested via unit tests.
 fn commandline_posix(argv: &[OsString]) -> OsString {
     use std::os::unix::ffi::OsStrExt;
     let mut result = Vec::<u8>::new();
@@ -264,7 +264,7 @@ fn debug_assert_commandline_roundtrips(cmdline: &OsStr, expected_argv: &[OsStrin
     let parsed: Vec<OsString> = (0..argc as usize)
         .map(|i| {
             let ptr = unsafe { *argv_ptr.add(i) };
-            let len = unsafe { (0..).take_while(|&j| *ptr.0.add(j) != 0).count() };
+            let len = unsafe { (0..65536).take_while(|&j| *ptr.0.add(j) != 0).count() };
             let slice = unsafe { std::slice::from_raw_parts(ptr.0, len) };
             OsString::from_wide(slice)
         })
@@ -278,6 +278,28 @@ fn debug_assert_commandline_roundtrips(cmdline: &OsStr, expected_argv: &[OsStrin
 }
 
 // Platform spawn ==================================================================
+
+/// RAII guard that restores the process CWD on drop.
+#[cfg(unix)]
+struct CwdGuard {
+    prev: std::path::PathBuf,
+}
+
+#[cfg(unix)]
+impl CwdGuard {
+    fn set(new_cwd: &std::path::Path) -> io::Result<Self> {
+        let prev = std::env::current_dir()?;
+        std::env::set_current_dir(new_cwd)?;
+        Ok(Self { prev })
+    }
+}
+
+#[cfg(unix)]
+impl Drop for CwdGuard {
+    fn drop(&mut self) {
+        let _ = std::env::set_current_dir(&self.prev);
+    }
+}
 
 /// Close a list of raw file descriptors, ignoring errors.
 #[cfg(unix)]
@@ -326,14 +348,14 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
 
     // Change directory before spawn if requested. We save and restore since
     // posix_spawn_file_actions_addchdir_np is not portable.
-    let saved_cwd = if cmd.cwd.is_some() {
-        std::env::current_dir().ok()
+    // NOTE: set_current_dir is process-global, so concurrent threads would
+    // observe the changed directory. This is safe because thaum is
+    // single-threaded, but would need revisiting if concurrency is added.
+    let _cwd_guard = if let Some(ref cwd) = cmd.cwd {
+        Some(CwdGuard::set(cwd)?)
     } else {
         None
     };
-    if let Some(ref cwd) = cmd.cwd {
-        std::env::set_current_dir(cwd)?;
-    }
 
     let argv_c: Vec<CString> = cmd
         .argv
@@ -368,10 +390,8 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     // Close raw FDs in the parent so readers get EOF.
     close_raw_fds(&raw_fds_to_close);
 
-    // Restore cwd.
-    if let Some(prev) = saved_cwd {
-        let _ = std::env::set_current_dir(prev);
-    }
+    // CWD is restored when _cwd_guard drops (here or on early return).
+    drop(_cwd_guard);
 
     let pid = result?;
     Ok(ChildEx {

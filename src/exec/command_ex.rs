@@ -105,8 +105,8 @@ pub(crate) struct ChildEx {
 
 #[allow(dead_code)] // Variants only constructed on their respective platform.
 enum ChildInner {
-    /// Wraps a std::process::Child (used for builtins-in-pipeline via `cat`).
-    Std(std::process::Child),
+    /// Already-finished pseudo-child (used for builtins in pipelines).
+    Completed(i32),
     #[cfg(unix)]
     Pid(nix::libc::pid_t),
     #[cfg(windows)]
@@ -114,11 +114,13 @@ enum ChildInner {
 }
 
 impl ChildEx {
-    /// Wrap a `std::process::Child` into a `ChildEx` with pre-built pipes.
-    /// Used by the pipeline builtin-via-`cat` hack.
-    pub fn from_std_child(child: std::process::Child, pipes: HashMap<i32, File>) -> Self {
+    /// Create a `ChildEx` that has already completed with the given exit code.
+    ///
+    /// Used for builtins in pipelines: the builtin ran in-process, its output
+    /// was written to a pipe, and this pseudo-child holds the read end.
+    pub fn completed(exit_code: i32, pipes: HashMap<i32, File>) -> Self {
         ChildEx {
-            inner: ChildInner::Std(child),
+            inner: ChildInner::Completed(exit_code),
             pipes,
         }
     }
@@ -126,7 +128,7 @@ impl ChildEx {
     /// Wait for the child to exit and return its exit code.
     pub fn wait(&mut self) -> io::Result<i32> {
         match &mut self.inner {
-            ChildInner::Std(child) => Ok(child.wait()?.code().unwrap_or(128)),
+            ChildInner::Completed(code) => Ok(*code),
             #[cfg(unix)]
             ChildInner::Pid(pid) => {
                 let mut status: nix::libc::c_int = 0;

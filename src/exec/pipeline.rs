@@ -2,7 +2,6 @@
 //! stage with piped stdin/stdout, and returns the exit status of the last stage.
 
 use std::io::Write;
-use std::process::{Command, Stdio};
 
 use crate::ast::Expression;
 use crate::exec::command_ex::{ChildEx, CommandEx, Fd};
@@ -123,39 +122,16 @@ fn spawn_pipeline_stage(
                 );
 
                 if pipe_stdout && !stdout_buf.is_empty() {
-                    // TODO: replace `cat` hack with proper pipe when CommandEx is used
-                    // for builtins-in-pipeline too.
-                    let mut child = Command::new("cat")
-                        .stdin(Stdio::piped())
-                        .stdout(Stdio::piped())
-                        .spawn()
-                        .map_err(ExecError::Io)?;
-
-                    if let Some(ref mut child_stdin) = child.stdin {
-                        let _ = child_stdin.write_all(&stdout_buf);
+                    let (read_end, write_end) = os_pipe()?;
+                    // Write builtin output and close the write end so the
+                    // next stage sees EOF.
+                    {
+                        let mut writer = write_end;
+                        let _ = writer.write_all(&stdout_buf);
                     }
-                    child.stdin.take();
-
-                    // Wrap the std::process::Child into a ChildEx.
-                    let stdout_file: Option<std::fs::File> = child.stdout.take().map(|s| {
-                        #[cfg(unix)]
-                        {
-                            use std::os::fd::FromRawFd;
-                            use std::os::unix::io::IntoRawFd;
-                            unsafe { std::fs::File::from_raw_fd(s.into_raw_fd()) }
-                        }
-                        #[cfg(windows)]
-                        {
-                            use std::os::windows::io::FromRawHandle;
-                            use std::os::windows::io::IntoRawHandle;
-                            unsafe { std::fs::File::from_raw_handle(s.into_raw_handle()) }
-                        }
-                    });
                     let mut pipes = std::collections::HashMap::new();
-                    if let Some(f) = stdout_file {
-                        pipes.insert(1, f);
-                    }
-                    return Ok(Some(ChildEx::from_std_child(child, pipes)));
+                    pipes.insert(1, read_end);
+                    return Ok(Some(ChildEx::completed(_status.unwrap_or(1), pipes)));
                 } else {
                     if !stdout_buf.is_empty() {
                         io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
@@ -216,6 +192,34 @@ fn spawn_pipeline_stage(
             executor.env_mut().set_last_exit_status(status);
             Ok(None)
         }
+    }
+}
+
+/// Create an OS pipe, returning `(read_end, write_end)` as `std::fs::File`.
+fn os_pipe() -> Result<(std::fs::File, std::fs::File), ExecError> {
+    #[cfg(unix)]
+    {
+        let (read, write) = nix::unistd::pipe().map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
+        Ok((std::fs::File::from(read), std::fs::File::from(write)))
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::io::FromRawHandle;
+        use windows::Win32::System::Pipes::CreatePipe;
+        let mut read_handle = windows::Win32::Foundation::HANDLE::default();
+        let mut write_handle = windows::Win32::Foundation::HANDLE::default();
+        unsafe { CreatePipe(&mut read_handle, &mut write_handle, None, 0) }
+            .map_err(|e| ExecError::Io(std::io::Error::new(std::io::ErrorKind::Other, e)))?;
+        Ok((unsafe { std::fs::File::from_raw_handle(read_handle.0 as _) }, unsafe {
+            std::fs::File::from_raw_handle(write_handle.0 as _)
+        }))
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        Err(ExecError::Io(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "pipes not supported on this platform",
+        )))
     }
 }
 

@@ -202,7 +202,9 @@ impl CommandEx {
                 Fd::File(file) => {
                     if let Ok(cloned) = file.try_clone() {
                         let raw = cloned.into_raw_fd();
+                        // SAFETY: raw is a valid fd from into_raw_fd; fd_num is from self.fds.
                         unsafe { nix::libc::dup2(raw, fd_num) };
+                        // SAFETY: raw is valid and no longer needed (dup2 made a copy).
                         unsafe { nix::libc::close(raw) };
                     }
                 }

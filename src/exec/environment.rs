@@ -1144,6 +1144,7 @@ impl Environment {
     }
 
     /// Leave a function scope: restores positional parameters and all `local` variables.
+    #[contracts::debug_requires(!self.scope_stack.is_empty(), "pop_scope requires non-empty scope stack")]
     #[debug_ensures(self.scope_stack.len() == old(self.scope_stack.len()) - 1)]
     pub fn pop_scope(&mut self) {
         if let Some(scope) = self.scope_stack.pop() {

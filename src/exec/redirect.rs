@@ -280,10 +280,12 @@ pub fn dup_process_fd(fd: i32) -> Option<File> {
         if fd < 0 {
             return None;
         }
+        // SAFETY: dup() is safe for any non-negative fd; returns -1 on invalid fd.
         let new_fd = unsafe { nix::libc::dup(fd) };
         if new_fd < 0 {
             return None;
         }
+        // SAFETY: new_fd is a valid open file descriptor (dup succeeded).
         Some(unsafe { File::from_raw_fd(new_fd) })
     }
     #[cfg(windows)]

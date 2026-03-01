@@ -873,7 +873,7 @@ impl Executor {
             if self.env.is_assoc_array(&assignment.name) {
                 self.env.set_assoc_element(&assignment.name, subscript, &value)?;
             } else {
-                let index: usize = subscript.parse().unwrap_or(0);
+                let index = self.eval_subscript_as_index(subscript)?;
                 self.env.set_array_element(&assignment.name, index, &value)?;
             }
         } else {
@@ -907,7 +907,7 @@ impl Executor {
                                 if self.env.is_assoc_array(&assignment.name) {
                                     self.env.set_assoc_element(&assignment.name, index, &val)?;
                                 } else {
-                                    let idx: usize = index.parse().unwrap_or(0);
+                                    let idx = self.eval_subscript_as_index(index)?;
                                     self.env.set_array_element(&assignment.name, idx, &val)?;
                                 }
                             }
@@ -920,6 +920,20 @@ impl Executor {
             }
         }
         Ok(())
+    }
+
+    /// Evaluate an array subscript as a usize index via arithmetic.
+    ///
+    /// In bash, array subscripts are arithmetic contexts: `a[1+1]`, `a[$i]`,
+    /// and `a[x]` (where x is a variable) are all valid.
+    fn eval_subscript_as_index(&mut self, subscript: &str) -> Result<usize, ExecError> {
+        match crate::parser::arith_expr::parse_arith_expr(subscript) {
+            Ok(expr) => {
+                let val = arithmetic::evaluate_arith_expr(&expr, &mut self.env)?;
+                Ok(val.max(0) as usize)
+            }
+            Err(_) => Ok(subscript.parse::<usize>().unwrap_or(0)),
+        }
     }
 
     /// Expand a scalar assignment value. Panics on BashArray (use for prefix

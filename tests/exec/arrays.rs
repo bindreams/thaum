@@ -59,6 +59,20 @@ fn array_sparse_assignment() {
 }
 
 #[testutil::test]
+fn array_subscript_arithmetic() {
+    // Array subscripts should be evaluated as arithmetic expressions.
+    let (out, _) = bash_exec_ok("a[1+1]=hello; echo ${a[2]}");
+    assert_eq!(out, "hello\n");
+}
+
+#[testutil::test]
+fn array_subscript_variable() {
+    // Variables in subscripts should be resolved in arithmetic context.
+    let (out, _) = bash_exec_ok("i=3; a[$i]=world; echo ${a[3]}");
+    assert_eq!(out, "world\n");
+}
+
+#[testutil::test]
 fn array_overwrite_element() {
     let (out, _) = bash_exec_ok("a=(x y z); a[1]=Y; echo ${a[@]}");
     assert_eq!(out, "x Y z\n");

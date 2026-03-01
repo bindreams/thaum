@@ -80,7 +80,7 @@ pub fn run_builtin(
         "test" | "[" => builtin_test(name, args, stderr),
         "readonly" => builtin_readonly(args, env, stdout),
         "local" => builtin_local(args, env),
-        "declare" | "typeset" => builtin_declare(args, env, stdout),
+        "declare" | "typeset" => builtin_declare(args, env, stdout, stderr),
         "getopts" => builtin_getopts(args, env, stderr),
         "pushd" => builtin_pushd(args, env, stdout, stderr),
         "popd" => builtin_popd(args, env, stdout, stderr),
@@ -627,7 +627,12 @@ fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
 /// Supports flags: `-a` (indexed array), `-A` (associative array),
 /// `-r` (readonly), `-x` (export), `-i` (integer), `-l` (lowercase),
 /// `-u` (uppercase), `-g` (global), `-p` (print), `-f` / `-F` (functions).
-fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {
+fn builtin_declare(
+    args: &[String],
+    env: &mut Environment,
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> Result<i32, ExecError> {
     use crate::exec::environment::DeclareAttrs;
 
     let mut attrs = DeclareAttrs::default();
@@ -767,12 +772,18 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
         // attribute AFTER this declare. Skip if +i is removing it.
         let will_be_integer = (attrs.integer_set || env.has_integer_attr(&name)) && !attrs.uninteger;
         let effective_value = if will_be_integer {
-            value.map(|v| {
-                crate::parser::arith_expr::parse_arith_expr(&v)
-                    .ok()
-                    .and_then(|expr| crate::exec::arithmetic::evaluate_arith_expr(&expr, env).ok())
-                    .unwrap_or(0)
-                    .to_string()
+            value.map(|v| match crate::parser::arith_expr::parse_arith_expr(&v) {
+                Ok(expr) => match crate::exec::arithmetic::evaluate_arith_expr(&expr, env) {
+                    Ok(n) => n.to_string(),
+                    Err(e) => {
+                        let _ = writeln!(stderr, "declare: {v}: {e}");
+                        "0".to_string()
+                    }
+                },
+                Err(_) => {
+                    let _ = writeln!(stderr, "declare: {v}: syntax error in expression");
+                    "0".to_string()
+                }
             })
         } else {
             value

@@ -70,11 +70,10 @@ fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> b
         UnaryTestOp::FileIsWritable => file_permission_check(s, 0o222),
         UnaryTestOp::FileIsExecutable => file_permission_check(s, 0o111),
 
-        // Special file types (Unix-specific)
-        UnaryTestOp::FileIsBlockDev
-        | UnaryTestOp::FileIsCharDev
-        | UnaryTestOp::FileIsPipe
-        | UnaryTestOp::FileIsSocket => {
+        UnaryTestOp::FileIsPipe => super::platform::is_named_pipe(s),
+
+        // Special file types (Unix-only: block/char devices, sockets)
+        UnaryTestOp::FileIsBlockDev | UnaryTestOp::FileIsCharDev | UnaryTestOp::FileIsSocket => {
             #[cfg(unix)]
             {
                 use std::os::unix::fs::FileTypeExt;
@@ -84,7 +83,6 @@ fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> b
                         match op {
                             UnaryTestOp::FileIsBlockDev => ft.is_block_device(),
                             UnaryTestOp::FileIsCharDev => ft.is_char_device(),
-                            UnaryTestOp::FileIsPipe => ft.is_fifo(),
                             UnaryTestOp::FileIsSocket => ft.is_socket(),
                             _ => false,
                         }
@@ -189,22 +187,7 @@ fn evaluate_binary(
             let b = std::fs::metadata(right).and_then(|m| m.modified()).ok();
             matches!((a, b), (Some(at), Some(bt)) if at < bt)
         }
-        BinaryTestOp::FileSameDevice => {
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::MetadataExt;
-                let a = std::fs::metadata(left).ok();
-                let b = std::fs::metadata(right).ok();
-                matches!(
-                    (a, b),
-                    (Some(ref am), Some(ref bm)) if am.dev() == bm.dev() && am.ino() == bm.ino()
-                )
-            }
-            #[cfg(not(unix))]
-            {
-                false
-            }
-        }
+        BinaryTestOp::FileSameDevice => super::platform::files_are_same(left, right),
     })
 }
 
@@ -245,7 +228,35 @@ fn file_permission_check(path: &str, _mask: u32) -> bool {
             .map(|m| m.permissions().mode() & _mask != 0)
             .unwrap_or(false)
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
+    {
+        use windows::Win32::Storage::FileSystem::{
+            GetFileAttributesW, FILE_ATTRIBUTE_READONLY, INVALID_FILE_ATTRIBUTES,
+        };
+        let wide: Vec<u16> = path.encode_utf16().chain(std::iter::once(0)).collect();
+        let attrs = unsafe { GetFileAttributesW(windows::core::PCWSTR(wide.as_ptr())) };
+        if attrs == INVALID_FILE_ATTRIBUTES {
+            return false;
+        }
+        match _mask {
+            // writable: check readonly attribute is NOT set
+            0o222 => attrs & FILE_ATTRIBUTE_READONLY.0 == 0,
+            // executable: check file extension against PATHEXT
+            0o111 => {
+                let ext = std::path::Path::new(path)
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .unwrap_or("");
+                let pathext = std::env::var("PATHEXT").unwrap_or_else(|_| ".COM;.EXE;.BAT;.CMD".to_string());
+                pathext
+                    .split(';')
+                    .any(|pe| pe.strip_prefix('.').is_some_and(|pe| pe.eq_ignore_ascii_case(ext)))
+            }
+            // readable: if file exists and is accessible, it's readable
+            _ => true,
+        }
+    }
+    #[cfg(not(any(unix, windows)))]
     {
         std::path::Path::new(path).exists()
     }

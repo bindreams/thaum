@@ -11,7 +11,11 @@ pub fn file_owned_by_current_user(path: &str) -> bool {
             .map(|m| m.uid() == nix::unistd::geteuid().as_raw())
             .unwrap_or(false)
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
+    {
+        win::file_owned_by_current_user(path)
+    }
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = path;
         false
@@ -27,10 +31,101 @@ pub fn file_owned_by_current_group(path: &str) -> bool {
             .map(|m| m.gid() == nix::unistd::getegid().as_raw())
             .unwrap_or(false)
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
+    {
+        win::file_group_matches_current_user(path)
+    }
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = path;
         false
+    }
+}
+
+/// Check whether two paths refer to the same file (same device + inode).
+pub fn files_are_same(path_a: &str, path_b: &str) -> bool {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let (Ok(a), Ok(b)) = (std::fs::metadata(path_a), std::fs::metadata(path_b)) else {
+            return false;
+        };
+        a.dev() == b.dev() && a.ino() == b.ino()
+    }
+    #[cfg(windows)]
+    {
+        win::files_are_same(path_a, path_b)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = (path_a, path_b);
+        false
+    }
+}
+
+/// Check whether a path is a named pipe (FIFO).
+pub fn is_named_pipe(path: &str) -> bool {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::FileTypeExt;
+        std::fs::metadata(path)
+            .map(|m| m.file_type().is_fifo())
+            .unwrap_or(false)
+    }
+    #[cfg(windows)]
+    {
+        win::is_named_pipe(path)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = path;
+        false
+    }
+}
+
+/// Get the current user's numeric ID.
+/// On Windows, returns the last sub-authority (RID) of the user's SID.
+#[cfg(not(unix))]
+pub fn current_uid() -> u32 {
+    #[cfg(windows)]
+    {
+        win::current_user_rid().unwrap_or(0)
+    }
+    #[cfg(not(windows))]
+    {
+        0
+    }
+}
+
+/// Get the current user's effective UID. On Windows, returns 0 if elevated
+/// (administrator), otherwise the user's RID.
+#[cfg(not(unix))]
+pub fn current_euid() -> u32 {
+    #[cfg(windows)]
+    {
+        if win::is_elevated() {
+            0
+        } else {
+            win::current_user_rid().unwrap_or(0)
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        0
+    }
+}
+
+/// Get the current user's group IDs. On Windows, returns the RIDs of the
+/// user's token groups.
+#[cfg(not(unix))]
+pub fn current_groups() -> Vec<u32> {
+    #[cfg(windows)]
+    {
+        win::current_group_rids()
+    }
+    #[cfg(not(windows))]
+    {
+        vec![0]
     }
 }
 
@@ -128,6 +223,10 @@ pub fn get_parent_pid() -> Option<u32> {
     unsafe { CloseHandle(snapshot) }.ok();
     found
 }
+
+#[cfg(windows)]
+#[path = "platform/windows.rs"]
+mod win;
 
 #[cfg(test)]
 #[path = "platform_tests.rs"]

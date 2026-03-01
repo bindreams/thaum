@@ -340,10 +340,10 @@ impl Environment {
         );
         self.set_readonly("BASH_VERSINFO");
 
-        // UID / EUID: no direct equivalent on Windows; use 0 (conventional).
-        let _ = self.set_var("UID", "0");
+        // UID / EUID: on Windows, use the user's SID RID (last sub-authority).
+        let _ = self.set_var("UID", &super::platform::current_uid().to_string());
         self.set_readonly("UID");
-        let _ = self.set_var("EUID", "0");
+        let _ = self.set_var("EUID", &super::platform::current_euid().to_string());
         self.set_readonly("EUID");
 
         // HOSTNAME: use COMPUTERNAME env var on Windows.
@@ -354,8 +354,10 @@ impl Environment {
         let _ = self.set_var("OSTYPE", ostype);
         let _ = self.set_var("MACHTYPE", &machtype);
 
-        // GROUPS: use a single group [0] on non-Unix.
-        let _ = self.set_array("GROUPS", vec!["0".to_string()]);
+        // GROUPS: enumerate token group RIDs on Windows.
+        let groups = super::platform::current_groups();
+        let group_strs: Vec<String> = groups.iter().map(|g| g.to_string()).collect();
+        let _ = self.set_array("GROUPS", group_strs);
         self.special_active.insert("GROUPS".to_string());
 
         let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");

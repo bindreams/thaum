@@ -36,7 +36,16 @@ nix = { version = "0.30", features = ["user", "term", "process", "hostname"] }
 
 [target.'cfg(windows)'.dependencies]
 winspawn = "0.1"
-windows = { version = "0.62", features = ["Win32_System_Diagnostics_ToolHelp", "Win32_Foundation"] }
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_IO",
+    "Win32_System_Pipes",
+    "Win32_System_Threading",
+] }
 
 [target.'cfg(windows)'.dev-dependencies]
 windows = { version = "0.62", features = ["Win32_System_Console"] }

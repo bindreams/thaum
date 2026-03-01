@@ -513,7 +513,16 @@ fn evaluate_test(args: &[String]) -> bool {
                     }
                     #[cfg(not(unix))]
                     {
+                        // Check PATHEXT on Windows for executable extensions.
+                        let ext = std::path::Path::new(&args[1])
+                            .extension()
+                            .and_then(|e| e.to_str())
+                            .unwrap_or("");
+                        let pathext = std::env::var("PATHEXT").unwrap_or_else(|_| ".COM;.EXE;.BAT;.CMD".to_string());
                         std::path::Path::new(&args[1]).exists()
+                            && pathext
+                                .split(';')
+                                .any(|pe| pe.strip_prefix('.').is_some_and(|pe| pe.eq_ignore_ascii_case(ext)))
                     }
                 }
                 "-s" => std::fs::metadata(&args[1]).map(|m| m.len() > 0).unwrap_or(false),

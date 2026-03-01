@@ -706,3 +706,42 @@ fn comp_vars_not_set_by_default() {
     let (out, _) = bash_exec_ok("echo \"x${COMP_WORDS}x\"");
     assert_eq!(out.trim(), "xx");
 }
+
+// declare -p attribute accuracy =======================================================================================
+
+#[testutil::test]
+fn declare_p_shows_readonly() {
+    let (out, _) = bash_exec_ok("readonly X=42; declare -p X");
+    assert!(out.contains("-r"), "declare -p should show -r for readonly: {out}");
+}
+
+#[testutil::test]
+fn declare_p_shows_exported() {
+    let (out, _) = bash_exec_ok("export Y=hi; declare -p Y");
+    assert!(out.contains("-x"), "declare -p should show -x for exported: {out}");
+}
+
+#[testutil::test]
+fn declare_p_shows_array() {
+    let (out, _) = bash_exec_ok("declare -a ARR=(a b c); declare -p ARR");
+    assert!(out.contains("-a"), "declare -p should show -a for array: {out}");
+    assert!(
+        out.contains("[0]=\"a\""),
+        "declare -p should show array elements: {out}"
+    );
+}
+
+#[testutil::test]
+fn declare_p_shows_assoc_array() {
+    let (out, _) = bash_exec_ok("declare -A MAP=([k]=v); declare -p MAP");
+    assert!(out.contains("-A"), "declare -p should show -A for assoc array: {out}");
+}
+
+#[testutil::test]
+fn declare_p_plain_var() {
+    let (out, _) = bash_exec_ok("Z=hello; declare -p Z");
+    assert!(
+        out.contains("declare -- Z=\"hello\""),
+        "declare -p should show -- for plain var: {out}"
+    );
+}

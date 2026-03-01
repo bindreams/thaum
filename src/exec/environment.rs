@@ -899,6 +899,11 @@ impl Environment {
             .collect()
     }
 
+    /// Return all variable names.
+    pub fn all_var_names(&self) -> Vec<String> {
+        self.variables.keys().cloned().collect()
+    }
+
     // Special parameters ----------------------------------------------------------------------------------------------
 
     /// Return the current IFS value, defaulting to space+tab+newline.
@@ -1421,6 +1426,36 @@ impl Environment {
     /// Flag letters follow bash ordering: `A` (assoc), `a` (indexed),
     /// `i` (integer), `l` (lowercase), `n` (nameref), `r` (readonly),
     /// `u` (uppercase), `x` (exported).
+    /// Format a variable declaration for `declare -p` output.
+    ///
+    /// Produces output like `declare -ir X="42"` or
+    /// `declare -a ARR=([0]="a" [1]="b")`.
+    pub fn format_declare_p(&self, name: &str) -> Option<String> {
+        let resolved = self.resolve_nameref(name);
+        let var = self.variables.get(resolved)?;
+        let attrs = self.get_var_attributes(resolved);
+        let flags = if attrs.is_empty() {
+            "--".to_string()
+        } else {
+            format!("-{attrs}")
+        };
+
+        let value_str = match &var.value {
+            VarValue::Scalar(s) => format!("\"{}\"", s),
+            VarValue::IndexedArray(map) => {
+                let parts: Vec<String> = map.iter().map(|(i, v)| format!("[{i}]=\"{v}\"")).collect();
+                format!("({})", parts.join(" "))
+            }
+            VarValue::AssocArray(map) => {
+                let mut parts: Vec<String> = map.iter().map(|(k, v)| format!("[\"{k}\"]=\"{v}\"")).collect();
+                parts.sort(); // deterministic output
+                format!("({})", parts.join(" "))
+            }
+        };
+
+        Some(format!("declare {flags} {name}={value_str}"))
+    }
+
     pub fn get_var_attributes(&self, name: &str) -> String {
         let name = self.resolve_nameref(name);
         match self.variables.get(name) {

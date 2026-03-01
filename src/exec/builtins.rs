@@ -670,16 +670,18 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
     if attrs.print {
         if operands.is_empty() {
             // Print all variables (sorted for determinism).
-            let mut vars = env.all_vars();
-            vars.sort_by(|a, b| a.0.cmp(&b.0));
-            for (name, value) in &vars {
-                let _ = writeln!(stdout, "declare -- {}=\"{}\"", name, value);
+            let mut names: Vec<String> = env.all_var_names();
+            names.sort();
+            for name in &names {
+                if let Some(decl) = env.format_declare_p(name) {
+                    let _ = writeln!(stdout, "{decl}");
+                }
             }
         } else {
             for operand in &operands {
                 let n = operand.split('=').next().unwrap_or(operand);
-                if let Some(val) = env.get_var(n) {
-                    let _ = writeln!(stdout, "declare -- {}=\"{}\"", n, val);
+                if let Some(decl) = env.format_declare_p(n) {
+                    let _ = writeln!(stdout, "{decl}");
                 }
             }
         }

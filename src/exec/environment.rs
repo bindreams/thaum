@@ -286,10 +286,27 @@ impl Environment {
         let _ = self.set_var("MACHTYPE", &machtype);
 
         // GROUPS: array of group IDs. Assign-silently-ignored (Category D).
-        if let Ok(groups) = nix::unistd::getgroups() {
-            let group_strs: Vec<String> = groups.iter().map(|g| g.as_raw().to_string()).collect();
-            let _ = self.set_array("GROUPS", group_strs);
-            self.special_active.insert("GROUPS".to_string());
+        #[cfg(not(target_vendor = "apple"))]
+        {
+            if let Ok(groups) = nix::unistd::getgroups() {
+                let group_strs: Vec<String> = groups.iter().map(|g| g.as_raw().to_string()).collect();
+                let _ = self.set_array("GROUPS", group_strs);
+                self.special_active.insert("GROUPS".to_string());
+            }
+        }
+        #[cfg(target_vendor = "apple")]
+        {
+            // nix crate doesn't expose getgroups() on Apple; call libc directly.
+            let ngroups = unsafe { nix::libc::getgroups(0, std::ptr::null_mut()) };
+            if ngroups > 0 {
+                let mut gids: Vec<nix::libc::gid_t> = vec![0; ngroups as usize];
+                let n = unsafe { nix::libc::getgroups(ngroups, gids.as_mut_ptr()) };
+                if n > 0 {
+                    let group_strs: Vec<String> = gids[..n as usize].iter().map(|g| g.to_string()).collect();
+                    let _ = self.set_array("GROUPS", group_strs);
+                    self.special_active.insert("GROUPS".to_string());
+                }
+            }
         }
 
         // COMP_WORDBREAKS: characters Readline treats as word separators during completion.

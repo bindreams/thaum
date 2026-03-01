@@ -182,3 +182,21 @@ fn special_param_dash_with_multiple_options() {
     assert!(flags.contains('u'));
     assert!(flags.contains('x'));
 }
+
+#[cfg(unix)]
+#[testutil::test]
+fn bash_vars_groups_is_populated() {
+    let mut env = Environment::new();
+    env.initialize_bash_vars();
+    let groups = env.get_array_all("GROUPS");
+    assert!(
+        groups.is_some(),
+        "GROUPS array should be set after initialize_bash_vars()"
+    );
+    let groups = groups.unwrap();
+    assert!(!groups.is_empty(), "GROUPS should contain at least one group ID");
+    // Every element should be a valid numeric group ID.
+    for gid in &groups {
+        assert!(gid.parse::<u32>().is_ok(), "GROUPS element {gid:?} is not a valid gid");
+    }
+}

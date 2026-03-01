@@ -1716,8 +1716,6 @@ mod dynamic_vars;
 #[path = "environment_tests.rs"]
 mod tests;
 
-// TODO: set_var() with integer=true only does i64::parse(). Full arithmetic
-// expression evaluation (e.g. "2+3") requires the Executor to intercept the
-// assignment. Tracked in the declare -i tests.
-//
-// DO NOT add arithmetic evaluation to Environment — use the Executor.
+// NOTE: Arithmetic evaluation for integer variables is handled by the
+// Executor (execute_assignment) and the declare builtin (builtin_declare),
+// not by Environment. DO NOT add arithmetic evaluation to Environment.

@@ -763,8 +763,23 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
             continue;
         }
 
+        // Evaluate value as arithmetic if the variable will have the integer
+        // attribute AFTER this declare. Skip if +i is removing it.
+        let will_be_integer = (attrs.integer_set || env.has_integer_attr(&name)) && !attrs.uninteger;
+        let effective_value = if will_be_integer {
+            value.map(|v| {
+                crate::parser::arith_expr::parse_arith_expr(&v)
+                    .ok()
+                    .and_then(|expr| crate::exec::arithmetic::evaluate_arith_expr(&expr, env).ok())
+                    .unwrap_or(0)
+                    .to_string()
+            })
+        } else {
+            value
+        };
+
         // Scalar with attributes.
-        env.declare_with_attrs(&name, value.as_deref(), &attrs)?;
+        env.declare_with_attrs(&name, effective_value.as_deref(), &attrs)?;
     }
 
     Ok(0)

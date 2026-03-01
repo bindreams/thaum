@@ -204,6 +204,27 @@ fn declare_integer_assign() {
 }
 
 #[testutil::test]
+fn declare_integer_inline_arithmetic() {
+    // declare -i x=2+3 should evaluate the arithmetic in the declare itself.
+    let (out, _) = bash_exec_ok("declare -i x=2+3; echo $x");
+    assert_eq!(out, "5\n");
+}
+
+#[testutil::test]
+fn declare_plus_i_removes_arithmetic() {
+    // declare +i removes the integer attribute; assignment should be literal.
+    let (out, _) = bash_exec_ok("declare -i x=10; declare +i x=2+3; echo $x");
+    assert_eq!(out, "2+3\n");
+}
+
+#[testutil::test]
+fn declare_integer_with_variable_ref() {
+    // declare -i y=x+5 should resolve x in arithmetic context.
+    let (out, _) = bash_exec_ok("declare -i x=10; declare -i y=x+5; echo $y");
+    assert_eq!(out, "15\n");
+}
+
+#[testutil::test]
 fn declare_local_in_function() {
     let (out, _) = bash_exec_ok("f() { declare x=inner; echo $x; }; x=outer; f; echo $x");
     assert_eq!(out, "inner\nouter\n");

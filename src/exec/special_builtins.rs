@@ -155,7 +155,8 @@ impl Executor {
     /// the command is not found.
     fn find_in_path(&self, name: &str) -> Result<std::path::PathBuf, ExecError> {
         let path_var = self.env.get_var("PATH").unwrap_or("");
-        for dir in path_var.split(':') {
+        let sep = if cfg!(windows) { ';' } else { ':' };
+        for dir in path_var.split(sep) {
             let candidate = std::path::Path::new(dir).join(name);
             if candidate.is_file() {
                 return Ok(candidate);

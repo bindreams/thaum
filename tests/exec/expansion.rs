@@ -288,6 +288,22 @@ fn source_with_args() {
     assert_eq!(out, "hello world\n");
 }
 
+#[testutil::test]
+fn source_finds_script_via_path_lookup() {
+    // Put a script in a temp directory, add that directory to PATH,
+    // and source by bare name (no slashes) to exercise find_in_path().
+    let dir = tempfile::tempdir().unwrap();
+    let script_path = dir.path().join("my_sourceable.sh");
+    std::fs::write(&script_path, "sourced_via_path=yes\n").unwrap();
+
+    let dir_str = shell_path(dir.path());
+    // Use the platform's PATH separator so the test validates the fix on all platforms.
+    let sep = if cfg!(windows) { ";" } else { ":" };
+    let script = format!("PATH=\"{dir_str}{sep}/usr/bin{sep}/bin\"; source my_sourceable.sh; echo $sourced_via_path");
+    let (out, _) = exec_ok(&script);
+    assert_eq!(out, "yes\n");
+}
+
 // exec builtin --------------------------------------------------------------------------------------------------------
 
 #[cfg(unix)]

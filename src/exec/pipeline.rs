@@ -72,12 +72,17 @@ pub fn execute_pipeline(
         }
     }
 
-    // Wait for all children and return the last one's exit status.
-    let mut last_status = 0;
+    // Wait for all children and collect exit statuses.
+    let mut statuses: Vec<i32> = Vec::new();
     for mut child in children {
         let status = child.wait().map_err(ExecError::Io)?;
-        last_status = status.code().unwrap_or(128);
+        statuses.push(status.code().unwrap_or(128));
     }
+    let last_status = statuses.last().copied().unwrap_or(0);
+
+    // Store PIPESTATUS array.
+    let status_strs: Vec<String> = statuses.iter().map(|s| s.to_string()).collect();
+    let _ = executor.env_mut().set_array("PIPESTATUS", status_strs);
 
     Ok(last_status)
 }

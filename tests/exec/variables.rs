@@ -509,3 +509,73 @@ fn groups_assign_silently_ignored() {
     let (out2, _) = bash_exec_ok("GROUPS=(999); echo ${GROUPS[0]}");
     assert_eq!(out1, out2, "GROUPS assignment should be silently ignored");
 }
+
+// PIPESTATUS ==========================================================================================================
+
+#[testutil::test]
+fn pipestatus_single_command() {
+    let (out, _) = bash_exec_ok("true; echo ${PIPESTATUS[0]}");
+    assert_eq!(out.trim(), "0");
+}
+
+#[testutil::test]
+fn pipestatus_failed_command() {
+    let (out, _) = bash_exec_ok("false; echo ${PIPESTATUS[0]}");
+    assert_eq!(out.trim(), "1");
+}
+
+#[testutil::test]
+fn pipestatus_unset_repopulates() {
+    // Category B: unset is temporary — next command repopulates.
+    let (out, _) = bash_exec_ok("unset PIPESTATUS; true; echo ${PIPESTATUS[0]}");
+    assert_eq!(out.trim(), "0");
+}
+
+// SHELLOPTS ===========================================================================================================
+
+#[testutil::test]
+fn shellopts_is_set() {
+    let (out, _) = bash_exec_ok("echo $SHELLOPTS");
+    let opts = out.trim();
+    assert!(!opts.is_empty(), "SHELLOPTS should be set");
+}
+
+#[testutil::test]
+fn shellopts_contains_errexit_after_set_e() {
+    let (out, _) = bash_exec_ok("set -e; echo $SHELLOPTS");
+    assert!(out.contains("errexit"), "SHELLOPTS should contain 'errexit'");
+}
+
+#[testutil::test]
+fn shellopts_is_readonly() {
+    let status = bash_exec_result("SHELLOPTS=x 2>/dev/null");
+    assert_ne!(status, 0, "SHELLOPTS should be readonly");
+}
+
+#[testutil::test]
+fn shellopts_cannot_be_unset() {
+    let status = bash_exec_result("unset SHELLOPTS 2>/dev/null");
+    assert_ne!(status, 0, "unset SHELLOPTS should fail");
+}
+
+// BASHOPTS ============================================================================================================
+
+#[testutil::test]
+fn bashopts_is_set() {
+    let (out, _) = bash_exec_ok("echo $BASHOPTS");
+    // Could be empty if no shopt options are enabled, but the variable should exist.
+    // Just check it doesn't error.
+    let _ = out.trim();
+}
+
+#[testutil::test]
+fn bashopts_is_readonly() {
+    let status = bash_exec_result("BASHOPTS=x 2>/dev/null");
+    assert_ne!(status, 0, "BASHOPTS should be readonly");
+}
+
+#[testutil::test]
+fn bashopts_cannot_be_unset() {
+    let status = bash_exec_result("unset BASHOPTS 2>/dev/null");
+    assert_ne!(status, 0, "unset BASHOPTS should fail");
+}

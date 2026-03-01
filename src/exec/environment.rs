@@ -962,6 +962,29 @@ impl Environment {
             "LINENO" if self.special_active.contains("LINENO") => {
                 Some(((self.lineno as isize + self.lineno_offset) as usize).to_string())
             }
+            "SHELLOPTS" => {
+                let mut opts = Vec::new();
+                if self.errexit {
+                    opts.push("errexit");
+                }
+                // hashall is always on
+                opts.push("hashall");
+                opts.push("interactive-comments");
+                if self.nounset {
+                    opts.push("nounset");
+                }
+                if self.xtrace {
+                    opts.push("xtrace");
+                }
+                Some(opts.join(":"))
+            }
+            "BASHOPTS" => {
+                let mut opts = Vec::new();
+                if self.expand_aliases {
+                    opts.push("expand_aliases");
+                }
+                Some(opts.join(":"))
+            }
             _ => None,
         }
     }
@@ -1007,6 +1030,8 @@ impl Environment {
                 self.lineno_offset = assigned - self.lineno as isize;
                 Some(Ok(()))
             }
+            // Category C: readonly, cannot assign.
+            "SHELLOPTS" | "BASHOPTS" => Some(Err(ExecError::ReadonlyVariable(name.to_string()))),
             // When OPTIND is set to 1, reset the getopts sub-index.
             "OPTIND" => {
                 if value == "1" {
@@ -1024,6 +1049,8 @@ impl Environment {
     /// `Some(Err(_))` if unset is forbidden, or `None` to fall through.
     pub fn unset_dynamic(&mut self, name: &str) -> Option<Result<(), ExecError>> {
         match name {
+            // Category C: cannot unset.
+            "SHELLOPTS" | "BASHOPTS" => Some(Err(ExecError::ReadonlyVariable(name.to_string()))),
             // Category A: unset kills special behavior forever.
             "RANDOM" | "SECONDS" | "EPOCHSECONDS" | "EPOCHREALTIME" | "SRANDOM" | "LINENO" => {
                 self.special_active.remove(name);

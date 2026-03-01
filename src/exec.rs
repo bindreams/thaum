@@ -238,6 +238,8 @@ impl Executor {
                 let saved = self.errexit_suppressed;
                 let status = self.execute_expression(&stmt.expression, io)?;
                 self.env.set_last_exit_status(status);
+                // Update PIPESTATUS for single commands (pipelines set it themselves).
+                let _ = self.env.set_array("PIPESTATUS", vec![status.to_string()]);
                 // Errexit check: if command failed and -e is active and not suppressed.
                 // execute_expression may have set errexit_suppressed=true during
                 // And/Or short-circuiting to signal that this result is expected.

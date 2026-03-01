@@ -305,3 +305,14 @@ fn exec_not_found() {
     let (out, _) = exec_ok("(exec /nonexistent/command/xyz 2>/dev/null); echo $?");
     assert!(out.trim() != "0");
 }
+
+#[cfg(unix)]
+#[testutil::test]
+fn exec_dash_a_sets_argv0() {
+    // exec -a custom_name uses a custom argv[0].
+    // We verify by having the child print $0 (which reflects argv[0]).
+    let (out, _) = exec_ok("(exec -a custom_name sh -c 'echo $0'); echo done");
+    let lines: Vec<&str> = out.trim().lines().collect();
+    assert_eq!(lines[0], "custom_name", "argv[0] should be 'custom_name'; got: {out}");
+    assert_eq!(lines[1], "done", "parent should continue after subshell");
+}

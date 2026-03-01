@@ -92,6 +92,7 @@ impl Executor {
         }
 
         // Parse flags.
+        let mut argv0_override: Option<&str> = None;
         let mut cmd_start = 0;
         let mut i = 0;
         while i < args.len() {
@@ -99,7 +100,7 @@ impl Executor {
                 cmd_start = i + 1;
                 break;
             } else if args[i] == "-a" && i + 1 < args.len() {
-                // -a name: set argv[0] (Unix only, ignored here for now).
+                argv0_override = Some(&args[i + 1]);
                 i += 2;
                 cmd_start = i;
                 continue;
@@ -120,36 +121,30 @@ impl Executor {
         let cmd_name = &args[cmd_start];
         let cmd_args = &args[cmd_start + 1..];
 
-        // Build the command.
-        let mut command = std::process::Command::new(cmd_name);
-        command.args(cmd_args);
-        command.current_dir(self.env.cwd());
+        // Build argv: [argv0, arg1, arg2, ...].
+        let mut argv: Vec<std::ffi::OsString> = Vec::with_capacity(1 + cmd_args.len());
+        argv.push(argv0_override.unwrap_or(cmd_name).into());
+        argv.extend(cmd_args.iter().map(std::ffi::OsString::from));
 
-        // Set up environment.
-        command.env_clear();
-        for (key, val) in self.env.exported_vars() {
-            command.env(&key, &val);
-        }
+        let mut cmd = super::command_ex::CommandEx::new(argv);
+        // If -a was used, argv[0] differs from the actual executable path.
+        cmd.path = cmd_name.into();
+        cmd.cwd = Some(self.env.cwd().to_path_buf());
+        cmd.env = self
+            .env
+            .exported_vars()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect();
 
-        // On Unix: use exec() to replace the process (never returns on success).
-        #[cfg(unix)]
-        {
-            use std::os::unix::process::CommandExt;
-            let err = command.exec();
-            // exec() only returns on error.
-            let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, err);
-            Err(ExecError::ExitRequested(127))
-        }
-
-        // On non-Unix: spawn + exit.
-        #[cfg(not(unix))]
-        {
-            match command.status() {
-                Ok(status) => Err(ExecError::ExitRequested(status.code().unwrap_or(128))),
-                Err(e) => {
-                    let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
-                    Err(ExecError::ExitRequested(127))
-                }
+        match cmd.spawn() {
+            Ok(mut child) => {
+                let code = child.wait().map_err(ExecError::Io)?;
+                Err(ExecError::ExitRequested(code))
+            }
+            Err(e) => {
+                let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+                Err(ExecError::ExitRequested(127))
             }
         }
     }

@@ -152,11 +152,20 @@ impl ChildEx {
             #[cfg(windows)]
             ChildInner::Handle(handle) => {
                 use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject, INFINITE};
-                unsafe { WaitForSingleObject(*handle, INFINITE) };
+                let wait_result = unsafe { WaitForSingleObject(*handle, INFINITE) };
+                // WAIT_EVENT(0) is WAIT_OBJECT_0 — the object was signaled.
+                if wait_result.0 != 0 {
+                    let err = io::Error::last_os_error();
+                    let _ = unsafe { windows::Win32::Foundation::CloseHandle(*handle) };
+                    return Err(err);
+                }
                 let mut code: u32 = 0;
                 unsafe { GetExitCodeProcess(*handle, &mut code) }
                     .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
-                let _ = unsafe { windows::Win32::Foundation::CloseHandle(*handle) };
+                debug_assert!(
+                    unsafe { windows::Win32::Foundation::CloseHandle(*handle) }.is_ok(),
+                    "CloseHandle failed — possible double-close"
+                );
                 Ok(code as i32)
             }
         }

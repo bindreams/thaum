@@ -14,6 +14,18 @@ use serde::{Deserialize, Serialize};
 use crate::ast::{CompoundCommand, FunctionDef};
 use crate::exec::error::ExecError;
 
+/// Dynamic variables whose special behavior is initially active and can be
+/// killed by `unset` (Category A), plus BASHPID (Category D).
+const DEFAULT_SPECIAL_VARS: &[&str] = &[
+    "RANDOM",
+    "SECONDS",
+    "EPOCHSECONDS",
+    "EPOCHREALTIME",
+    "SRANDOM",
+    "LINENO",
+    "BASHPID",
+];
+
 /// The value of a shell variable — scalar, indexed array, or associative array.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum VarValue {
@@ -1903,18 +1915,7 @@ pub struct SerializedEnvironment {
 }
 
 fn default_special_active() -> HashSet<String> {
-    [
-        "RANDOM",
-        "SECONDS",
-        "EPOCHSECONDS",
-        "EPOCHREALTIME",
-        "SRANDOM",
-        "LINENO",
-        "BASHPID",
-    ]
-    .into_iter()
-    .map(String::from)
-    .collect()
+    DEFAULT_SPECIAL_VARS.iter().map(|&s| String::from(s)).collect()
 }
 
 /// Current Unix epoch time in seconds.

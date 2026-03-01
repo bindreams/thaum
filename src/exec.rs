@@ -662,7 +662,11 @@ impl Executor {
         // Check for functions first
         if let Some(func) = self.env.get_function(cmd_name).cloned() {
             let saved = self.apply_prefix_assignments(&cmd.assignments)?;
-            self.env.push_scope(cmd_args.to_vec());
+            let call_info = environment::CallInfo {
+                function_name: cmd_name.to_string(),
+                ..Default::default()
+            };
+            self.env.push_scope_with_info(cmd_args.to_vec(), call_info);
 
             let mut cmd_io = active.apply_to_io(io);
             let result = self.execute_compound(&func.body, &func.redirects, &mut cmd_io);

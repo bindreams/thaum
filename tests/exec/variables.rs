@@ -579,3 +579,47 @@ fn bashopts_cannot_be_unset() {
     let status = bash_exec_result("unset BASHOPTS 2>/dev/null");
     assert_ne!(status, 0, "unset BASHOPTS should fail");
 }
+
+// FUNCNAME ============================================================================================================
+
+#[testutil::test]
+fn funcname_in_function() {
+    let (out, _) = bash_exec_ok("f() { echo ${FUNCNAME[0]}; }; f");
+    assert_eq!(out.trim(), "f");
+}
+
+#[testutil::test]
+fn funcname_nested() {
+    let (out, _) = bash_exec_ok("f() { g; }; g() { echo ${FUNCNAME[0]} ${FUNCNAME[1]}; }; f");
+    assert_eq!(out.trim(), "g f");
+}
+
+#[testutil::test]
+fn funcname_main_at_bottom() {
+    let (out, _) = bash_exec_ok("f() { echo ${FUNCNAME[@]}; }; f");
+    let parts: Vec<&str> = out.split_whitespace().collect();
+    assert_eq!(parts.first(), Some(&"f"), "FUNCNAME[0] should be 'f'");
+    assert_eq!(parts.last(), Some(&"main"), "bottom of FUNCNAME should be 'main'");
+}
+
+#[testutil::test]
+fn funcname_empty_outside_function() {
+    let (out, _) = bash_exec_ok("echo \"x${FUNCNAME[0]}x\"");
+    assert_eq!(out.trim(), "xx", "FUNCNAME should be empty outside a function");
+}
+
+// BASH_SOURCE =========================================================================================================
+
+#[testutil::test]
+fn bash_source_cannot_be_unset() {
+    let status = bash_exec_result("unset BASH_SOURCE 2>/dev/null");
+    assert_ne!(status, 0, "unset BASH_SOURCE should fail");
+}
+
+// BASH_LINENO =========================================================================================================
+
+#[testutil::test]
+fn bash_lineno_cannot_be_unset() {
+    let status = bash_exec_result("unset BASH_LINENO 2>/dev/null");
+    assert_ne!(status, 0, "unset BASH_LINENO should fail");
+}

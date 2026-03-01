@@ -109,6 +109,20 @@ struct Scope {
     saved: HashMap<String, Option<ShellVar>>,
     /// Positional parameters saved from the caller.
     saved_positional: Vec<String>,
+    /// Function name for this scope (used by FUNCNAME).
+    function_name: String,
+    /// Source file for this scope (used by BASH_SOURCE).
+    source_file: String,
+    /// Line number where this function was called (used by BASH_LINENO).
+    call_lineno: usize,
+}
+
+/// Metadata about a function/source call, used to populate call-stack variables.
+#[derive(Debug, Clone, Default)]
+pub struct CallInfo {
+    pub function_name: String,
+    pub source_file: String,
+    pub call_lineno: usize,
 }
 
 /// The shell execution environment.
@@ -1024,6 +1038,8 @@ impl Environment {
                 // Assignment silently ignored (Category D).
                 Some(Ok(()))
             }
+            // Call stack variables: assign silently ignored (Category C2/D).
+            "FUNCNAME" | "BASH_SOURCE" | "BASH_LINENO" if self.in_function_scope() => Some(Ok(())),
             "LINENO" if self.special_active.contains("LINENO") => {
                 // Assignment offsets subsequent line numbers.
                 let assigned: isize = value.parse().unwrap_or(0);
@@ -1051,6 +1067,8 @@ impl Environment {
         match name {
             // Category C: cannot unset.
             "SHELLOPTS" | "BASHOPTS" => Some(Err(ExecError::ReadonlyVariable(name.to_string()))),
+            // Category C2: cannot unset.
+            "BASH_SOURCE" | "BASH_LINENO" => Some(Err(ExecError::ReadonlyVariable(name.to_string()))),
             // Category A: unset kills special behavior forever.
             "RANDOM" | "SECONDS" | "EPOCHSECONDS" | "EPOCHREALTIME" | "SRANDOM" | "LINENO" => {
                 self.special_active.remove(name);
@@ -1177,11 +1195,21 @@ impl Environment {
     /// `local` declarations within the scope are tracked and restored on `pop_scope`.
     #[debug_ensures(self.scope_stack.len() == old(self.scope_stack.len()) + 1)]
     pub fn push_scope(&mut self, new_positional: Vec<String>) {
+        self.push_scope_with_info(new_positional, CallInfo::default());
+    }
+
+    /// Enter a function scope with call metadata for FUNCNAME/BASH_SOURCE/BASH_LINENO.
+    #[debug_ensures(self.scope_stack.len() == old(self.scope_stack.len()) + 1)]
+    pub fn push_scope_with_info(&mut self, new_positional: Vec<String>, info: CallInfo) {
         let saved_positional = std::mem::replace(&mut self.positional_params, new_positional);
         self.scope_stack.push(Scope {
             saved: HashMap::new(),
             saved_positional,
+            function_name: info.function_name,
+            source_file: info.source_file,
+            call_lineno: info.call_lineno,
         });
+        self.rebuild_call_stack_vars();
     }
 
     /// Leave a function scope: restores positional parameters and all `local` variables.
@@ -1199,7 +1227,51 @@ impl Environment {
                     }
                 }
             }
+            self.rebuild_call_stack_vars();
         }
+    }
+
+    /// Rebuild FUNCNAME, BASH_SOURCE, and BASH_LINENO arrays from the scope stack.
+    fn rebuild_call_stack_vars(&mut self) {
+        let depth = self.scope_stack.len();
+        if depth == 0 {
+            // Outside functions — clear the arrays.
+            self.variables.remove("FUNCNAME");
+            self.variables.remove("BASH_SOURCE");
+            self.variables.remove("BASH_LINENO");
+            return;
+        }
+
+        // Build arrays from innermost (top of stack) to outermost.
+        let mut funcnames = Vec::with_capacity(depth + 1);
+        let mut sources = Vec::with_capacity(depth + 1);
+        let mut linenos = Vec::with_capacity(depth);
+
+        for scope in self.scope_stack.iter().rev() {
+            funcnames.push(scope.function_name.clone());
+            sources.push(scope.source_file.clone());
+            linenos.push(scope.call_lineno.to_string());
+        }
+        // Bottom of the stack is "main".
+        funcnames.push("main".to_string());
+        sources.push(String::new());
+
+        // Store as arrays, bypassing readonly/dynamic checks by writing directly.
+        let make_array = |elems: Vec<String>| {
+            let map: std::collections::BTreeMap<usize, String> = elems.into_iter().enumerate().collect();
+            ShellVar {
+                value: VarValue::IndexedArray(map),
+                exported: false,
+                readonly: false,
+                integer: false,
+                lowercase: false,
+                uppercase: false,
+                nameref: None,
+            }
+        };
+        self.variables.insert("FUNCNAME".to_string(), make_array(funcnames));
+        self.variables.insert("BASH_SOURCE".to_string(), make_array(sources));
+        self.variables.insert("BASH_LINENO".to_string(), make_array(linenos));
     }
 
     /// Returns whether execution is inside a function call (scope stack is non-empty).

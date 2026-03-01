@@ -313,8 +313,8 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let argv_c: Vec<CString> = cmd
         .argv
         .iter()
-        .map(|a| CString::new(a.as_bytes()).unwrap_or_else(|_| CString::new("").unwrap()))
-        .collect();
+        .map(|a| CString::new(a.as_bytes()).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e)))
+        .collect::<io::Result<_>>()?;
 
     let envp_c: Vec<CString> = cmd
         .env
@@ -323,9 +323,9 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
             let mut s = k.as_bytes().to_vec();
             s.push(b'=');
             s.extend_from_slice(v.as_bytes());
-            CString::new(s).unwrap_or_else(|_| CString::new("").unwrap())
+            CString::new(s).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))
         })
-        .collect();
+        .collect::<io::Result<_>>()?;
 
     let path_c = CString::new(cmd.path.as_bytes()).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
 

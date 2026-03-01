@@ -98,6 +98,7 @@ fn alias_snapshot_uses_previous_line() {
     assert_eq!(out, "hello\n");
 }
 
+#[cfg(unix)]
 #[testutil::test]
 fn alias_snapshot_touch_file() {
     // Line 2: alias a="touch"
@@ -105,19 +106,15 @@ fn alias_snapshot_touch_file() {
     //   → snapshot for line 3 has a=touch (from line 2)
     //   → "a hello" expands to "touch hello" (creates file)
     // Line 4: a hello  → not found
-    let dir = std::path::PathBuf::from("/tmp/claude/alias-touch-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("hello");
-    let _ = std::fs::remove_file(&file);
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("hello");
 
     let script = format!(
         "shopt -s expand_aliases\nalias a=touch\ncd {}; alias a=echo; a hello; unalias a",
-        dir.display()
+        dir.path().to_string_lossy()
     );
     let (_, _) = bash_exec_ok(&script);
     assert!(file.exists(), "touch hello should have created the file");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 // Alias funkiness levels (see CONTRIBUTING.md) ========================================================================
@@ -136,17 +133,14 @@ fn alias_funkiness_level3a_redirect_in_value() {
     // Level 3a: alias value contains a redirect — verify the file is created.
     // We check the file on disk instead of captured stdout because pipeline/redirect
     // I/O goes through real file descriptors, not CapturedIo.
-    let dir = std::path::PathBuf::from("/tmp/claude/alias-funkiness-redir");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("out.txt");
-    let _ = std::fs::remove_file(&file);
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("out.txt");
 
-    let script = format!("shopt -s expand_aliases\nalias w='echo hello >'\nw {}", file.display(),);
+    let f = file.to_string_lossy().replace('\\', "/");
+    let script = format!("shopt -s expand_aliases\nalias w='echo hello >'\nw {f}");
     bash_exec_ok(&script);
     let contents = std::fs::read_to_string(&file).expect("redirect should have created file");
     assert_eq!(contents.trim(), "hello");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
@@ -156,6 +150,7 @@ fn alias_funkiness_level3b_command_sub_in_value() {
     assert_eq!(out, "hi\n");
 }
 
+#[cfg(unix)]
 #[testutil::test]
 fn alias_funkiness_level4a_pipe_in_value() {
     // Level 4: alias value contains a pipe (creates a pipeline).
@@ -223,17 +218,14 @@ fn subshell_nested() {
 #[testutil::test]
 fn subshell_with_redirect() {
     // Redirect inside the subshell (not on the compound command).
-    let dir = std::path::PathBuf::from("/tmp/claude/subshell-redir-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("out.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("out.txt");
 
-    let script = format!("(echo hello > {})", file.display());
+    let script = format!("(echo hello > {})", file.to_string_lossy().replace('\\', "/"));
     let (out, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(out, ""); // stdout went to file inside subshell
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 // Bash [[ ]] conditional ----------------------------------------------------------------------------------------------

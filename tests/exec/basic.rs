@@ -251,12 +251,14 @@ fn unset_builtin() {
 
 // External command (basic smoke test) ---------------------------------------------------------------------------------
 
+#[cfg(unix)]
 #[testutil::test]
 fn external_command_true() {
     // /usr/bin/true should exist on any Unix system
     assert_eq!(exec_status("/usr/bin/true"), 0);
 }
 
+#[cfg(unix)]
 #[testutil::test]
 fn external_command_false() {
     assert_eq!(exec_status("/usr/bin/false"), 1);
@@ -340,6 +342,7 @@ fn command_substitution_builtin() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
+#[cfg(unix)]
 #[testutil::test]
 fn command_substitution_external() {
     let program = thaum::parse("X=$(/bin/echo world)").unwrap();
@@ -393,115 +396,101 @@ fn heredoc_basic() {
 
 #[testutil::test]
 fn unsupported_compound_redirect() {
-    expect_unsupported("if true; then echo hi; fi > /tmp/claude/test-out");
+    expect_unsupported("if true; then echo hi; fi > /dev/null");
 }
 
 // Redirect tests ------------------------------------------------------------------------------------------------------
 
+/// Convert a path to a forward-slash string suitable for embedding in shell scripts.
+fn shell_path(p: &std::path::Path) -> String {
+    p.to_string_lossy().replace('\\', "/")
+}
+
 #[testutil::test]
 fn redirect_builtin_stdout_to_file() {
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("stdout.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("stdout.txt");
 
-    let script = format!("echo hello > {}", file.display());
+    let script = format!("echo hello > {}", shell_path(&file));
     let (out, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(out, ""); // stdout went to file, not captured
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn redirect_builtin_append() {
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests-append");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("append.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("append.txt");
+    let f = shell_path(&file);
 
-    let script = format!("echo first > {f}; echo second >> {f}", f = file.display());
+    let script = format!("echo first > {f}; echo second >> {f}");
     let (_, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "first\nsecond\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn redirect_stdin_from_file() {
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests-stdin");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("input.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("input.txt");
     std::fs::write(&file, "from-file\n").unwrap();
 
-    let script = format!("read LINE < {}; echo $LINE", file.display());
+    let script = format!("read LINE < {}; echo $LINE", shell_path(&file));
     let (out, _) = exec_ok(&script);
     assert_eq!(out, "from-file\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn redirect_dup_stdout_to_stderr_file() {
     // > file 2>&1 — redirect stdout to file, then dup stderr to same file
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests-dup");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("combined.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("combined.txt");
 
-    let script = format!("echo hello > {} 2>&1", file.display());
+    let script = format!("echo hello > {} 2>&1", shell_path(&file));
     let (out, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(out, "");
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn redirect_fd3_and_dup_to_stdout() {
     // echo hello 3>/tmp/file >&3 — open FD 3 to file, dup stdout to FD 3
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests-fd3");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("fd3.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
 
-    let script = format!("echo hello 3>{} >&3", file.display());
+    let script = format!("echo hello 3>{} >&3", shell_path(&file));
     let (out, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(out, ""); // stdout went to FD 3 → file
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn redirect_creates_empty_file() {
     // `> file` with no command creates/truncates the file
-    let dir = std::path::PathBuf::from("/tmp/claude/redir-tests-empty");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("empty.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("empty.txt");
 
-    let script = format!("> {}", file.display());
+    let script = format!("> {}", shell_path(&file));
     let (_, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
+#[cfg(unix)]
 #[testutil::test]
 fn external_command_inherits_fd3() {
     // sh -c 'echo hello >&3' writes to FD 3, which is redirected to a file.
     // This tests that FDs 3+ are passed to external child processes.
-    let dir = std::path::PathBuf::from("/tmp/claude/fd-inherit-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("fd3.txt");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
 
-    let script = format!("sh -c 'echo hello >&3' 3>{}", file.display());
+    let script = format!("sh -c 'echo hello >&3' 3>{}", shell_path(&file));
     let (_, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 // Unsupported features produce explicit errors ------------------------------------------------------------------------

@@ -168,9 +168,8 @@ pub fn bash_exec_ok(script: &str) -> (String, i32) {
 pub fn fixture_dir() -> String {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("tests/fixtures/locale")
-        .to_str()
-        .unwrap()
-        .to_string()
+        .to_string_lossy()
+        .replace('\\', "/")
 }
 
 /// Helper: parse and execute with a specific dialect, capturing stdout.

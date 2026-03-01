@@ -75,6 +75,10 @@ impl Executor {
 
     /// Resolve a path relative to the executor's CWD.
     pub(super) fn resolve_path(&self, path: &str) -> std::path::PathBuf {
+        #[cfg(windows)]
+        if path == "/dev/null" {
+            return std::path::PathBuf::from("NUL");
+        }
         let p = std::path::Path::new(path);
         if p.is_relative() {
             self.env.cwd().join(p)

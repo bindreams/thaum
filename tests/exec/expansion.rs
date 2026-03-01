@@ -250,50 +250,47 @@ fn eval_exit_status() {
 
 // source builtin ------------------------------------------------------------------------------------------------------
 
+/// Convert a path to a forward-slash string suitable for embedding in shell scripts.
+fn shell_path(p: &std::path::Path) -> String {
+    p.to_string_lossy().replace('\\', "/")
+}
+
 #[testutil::test]
 fn source_basic() {
-    let dir = std::path::PathBuf::from("/tmp/claude/source-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("test.sh");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("test.sh");
     std::fs::write(&file, "x=sourced_value\n").unwrap();
 
-    let script = format!("source {}; echo $x", file.display());
+    let script = format!("source {}; echo $x", shell_path(&file));
     let (out, _) = exec_ok(&script);
     assert_eq!(out, "sourced_value\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn source_dot_synonym() {
-    let dir = std::path::PathBuf::from("/tmp/claude/source-dot-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("test.sh");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("test.sh");
     std::fs::write(&file, "y=dotted\n").unwrap();
 
-    let script = format!(". {}; echo $y", file.display());
+    let script = format!(". {}; echo $y", shell_path(&file));
     let (out, _) = exec_ok(&script);
     assert_eq!(out, "dotted\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[testutil::test]
 fn source_with_args() {
-    let dir = std::path::PathBuf::from("/tmp/claude/source-args-test");
-    let _ = std::fs::create_dir_all(&dir);
-    let file = dir.join("test.sh");
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("test.sh");
     std::fs::write(&file, "echo $1 $2\n").unwrap();
 
-    let script = format!("source {} hello world", file.display());
+    let script = format!("source {} hello world", shell_path(&file));
     let (out, _) = exec_ok(&script);
     assert_eq!(out, "hello world\n");
-
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 // exec builtin --------------------------------------------------------------------------------------------------------
 
+#[cfg(unix)]
 #[testutil::test]
 fn exec_command() {
     // exec replaces the shell -- wrap in a subshell so the test runner

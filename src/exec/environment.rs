@@ -235,6 +235,12 @@ impl Environment {
             let _ = env.set_var("PPID", &ppid);
             env.set_readonly("PPID");
         }
+        #[cfg(windows)]
+        {
+            let ppid = crate::exec::platform::get_parent_pid().unwrap_or(0);
+            let _ = env.set_var("PPID", &ppid.to_string());
+            env.set_readonly("PPID");
+        }
         env
     }
 
@@ -313,7 +319,8 @@ impl Environment {
         let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");
     }
 
-    /// Non-unix stub.
+    /// Non-unix stub: sets bash variables using platform-neutral APIs where
+    /// possible, with fallbacks for Unix-specific values.
     #[cfg(not(unix))]
     pub fn initialize_bash_vars(&mut self) {
         let _ = self.set_var("BASH_VERSION", "5.2.0(1)-release");
@@ -332,9 +339,25 @@ impl Environment {
             ],
         );
         self.set_readonly("BASH_VERSINFO");
+
+        // UID / EUID: no direct equivalent on Windows; use 0 (conventional).
+        let _ = self.set_var("UID", "0");
+        self.set_readonly("UID");
+        let _ = self.set_var("EUID", "0");
+        self.set_readonly("EUID");
+
+        // HOSTNAME: use COMPUTERNAME env var on Windows.
+        let hostname = std::env::var("COMPUTERNAME").unwrap_or_default();
+        let _ = self.set_var("HOSTNAME", &hostname);
+
         let _ = self.set_var("HOSTTYPE", hosttype);
         let _ = self.set_var("OSTYPE", ostype);
         let _ = self.set_var("MACHTYPE", &machtype);
+
+        // GROUPS: use a single group [0] on non-Unix.
+        let _ = self.set_array("GROUPS", vec!["0".to_string()]);
+        self.special_active.insert("GROUPS".to_string());
+
         let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");
     }
 

@@ -94,6 +94,41 @@ pub fn is_fd_terminal(fd: i32) -> bool {
     }
 }
 
+/// Get the parent process ID on Windows via the toolhelp snapshot API.
+#[cfg(windows)]
+pub fn get_parent_pid() -> Option<u32> {
+    use windows::Win32::Foundation::CloseHandle;
+    use windows::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Process32First, Process32Next, PROCESSENTRY32, TH32CS_SNAPPROCESS,
+    };
+
+    let pid = std::process::id();
+
+    let snapshot = unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) }.ok()?;
+    let mut entry = PROCESSENTRY32 {
+        dwSize: std::mem::size_of::<PROCESSENTRY32>() as u32,
+        ..Default::default()
+    };
+
+    let found = unsafe {
+        if Process32First(snapshot, &mut entry).is_ok() {
+            loop {
+                if entry.th32ProcessID == pid {
+                    break Some(entry.th32ParentProcessID);
+                }
+                if Process32Next(snapshot, &mut entry).is_err() {
+                    break None;
+                }
+            }
+        } else {
+            None
+        }
+    };
+
+    unsafe { CloseHandle(snapshot) }.ok();
+    found
+}
+
 #[cfg(test)]
 #[path = "platform_tests.rs"]
 mod tests;

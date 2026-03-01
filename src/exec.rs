@@ -617,6 +617,10 @@ impl Executor {
             return Ok(0);
         }
 
+        // Update $_ to the last argument of this simple command.
+        let last_arg = expanded_args.last().unwrap().clone();
+        self.env.set_last_arg(&last_arg);
+
         let cmd_name = &expanded_args[0];
         let cmd_args = &expanded_args[1..];
 

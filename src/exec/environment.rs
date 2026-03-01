@@ -180,6 +180,9 @@ impl Environment {
         };
 
         let _ = env.set_var("IFS", " \t\n");
+        // $_ is a regular variable, exported by default, auto-updated by the executor.
+        let _ = env.set_var("_", "");
+        env.export_var("_");
         env
     }
 
@@ -751,13 +754,13 @@ impl Environment {
 
     // Special parameters ----------------------------------------------------------------------------------------------
 
-    /// Get a special parameter value: `$?`, `$#`, `$0`, `$$`, `$!`, `$@`, `$*`.
-    /// Returns None if the name is not a special parameter.
     /// Return the current IFS value, defaulting to space+tab+newline.
     pub fn get_ifs(&self) -> &str {
         self.get_var("IFS").unwrap_or(" \t\n")
     }
 
+    /// Get a special parameter value (`$?`, `$#`, `$0`, `$$`, `$!`, `$@`, `$*`, `$-`).
+    /// Returns `None` if the name is not a special parameter.
     pub fn get_special(&self, name: &str) -> Option<String> {
         match name {
             "?" => Some(self.last_exit_status.to_string()),
@@ -766,6 +769,7 @@ impl Environment {
             "$" => Some(self.pid.to_string()),
             "!" => self.last_bg_pid.map(|p| p.to_string()),
             "@" | "*" => Some(self.positional_params.join(" ")),
+            "-" => Some(self.option_flags_string()),
             _ => {
                 if let Ok(n) = name.parse::<usize>() {
                     if n >= 1 {
@@ -777,6 +781,31 @@ impl Environment {
         }
     }
 
+    /// Build the `$-` flags string from the currently enabled shell options.
+    ///
+    /// Each enabled option contributes a single letter, following bash conventions:
+    /// `e` = errexit, `u` = nounset, `x` = xtrace, `B` = braceexpand (always on),
+    /// `h` = hashall (always on for now).
+    fn option_flags_string(&self) -> String {
+        let mut flags = String::new();
+        // Bash outputs flags in a specific order: himBHs (roughly alphabetical
+        // with capitals after lowercase). We follow a similar convention.
+        if self.errexit {
+            flags.push('e');
+        }
+        // h (hashall) — we hash by default
+        flags.push('h');
+        if self.nounset {
+            flags.push('u');
+        }
+        if self.xtrace {
+            flags.push('x');
+        }
+        // B (braceexpand) — always on for now
+        flags.push('B');
+        flags
+    }
+
     /// Returns `$1`, `$2`, ... as a slice (0-indexed: `[0]` is `$1`).
     pub fn positional_params(&self) -> &[String] {
         &self.positional_params
@@ -785,6 +814,20 @@ impl Environment {
     /// Replace all positional parameters. Used by the `set` and `shift` builtins.
     pub fn set_positional_params(&mut self, params: Vec<String>) {
         self.positional_params = params;
+    }
+
+    /// Update `$_` (last argument of previous simple command).
+    ///
+    /// The executor calls this after each simple command with the last
+    /// expanded argument (or the command name if there were no arguments).
+    pub fn set_last_arg(&mut self, arg: &str) {
+        // $_  is stored as a regular variable so it appears in `declare -p`.
+        // We bypass readonly checks — the shell always updates $_.
+        if let Some(var) = self.variables.get_mut("_") {
+            var.value = VarValue::Scalar(arg.to_string());
+        } else {
+            let _ = self.set_var("_", arg);
+        }
     }
 
     /// Returns `$0` (the shell or script name).

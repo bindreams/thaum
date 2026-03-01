@@ -697,9 +697,9 @@ fn resolve_var(name: &str, env: &Environment) -> Option<String> {
 }
 
 /// Returns true if a parameter name refers to a special parameter that is
-/// always defined (`?`, `#`, `0`, `$`, `!`, `@`, `*`, or a numeric positional).
+/// always defined (`?`, `#`, `0`, `$`, `!`, `@`, `*`, `-`, or a numeric positional).
 fn is_special_param(name: &str) -> bool {
-    matches!(name, "?" | "#" | "0" | "$" | "!" | "@" | "*") || name.parse::<usize>().is_ok()
+    matches!(name, "?" | "#" | "0" | "$" | "!" | "@" | "*" | "-") || name.parse::<usize>().is_ok()
 }
 
 /// Expand a parameter expansion.

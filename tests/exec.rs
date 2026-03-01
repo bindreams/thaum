@@ -13,6 +13,8 @@ mod basic;
 mod expansion;
 #[path = "exec/printf.rs"]
 mod printf;
+#[path = "exec/variables.rs"]
+mod variables;
 
 use thaum::exec::{CapturedIo, Environment, ExecError, Executor};
 use thaum::Dialect;

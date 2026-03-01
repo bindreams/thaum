@@ -135,3 +135,50 @@ fn pid_is_set() {
     let env = Environment::new();
     assert_eq!(env.get_special("$"), Some(std::process::id().to_string()));
 }
+
+#[testutil::test]
+fn special_param_dash_default() {
+    let env = Environment::new();
+    let flags = env.get_special("-").expect("$- should return Some");
+    // Default env has no options enabled, so flags should be empty or contain only
+    // default-on flags.
+    for c in flags.chars() {
+        assert!(c.is_ascii_alphabetic(), "unexpected char in $-: {:?}", c);
+    }
+}
+
+#[testutil::test]
+fn special_param_dash_with_errexit() {
+    let mut env = Environment::new();
+    env.set_errexit(true);
+    let flags = env.get_special("-").unwrap();
+    assert!(flags.contains('e'), "flags should contain 'e' when errexit is on");
+}
+
+#[testutil::test]
+fn special_param_dash_with_nounset() {
+    let mut env = Environment::new();
+    env.set_nounset(true);
+    let flags = env.get_special("-").unwrap();
+    assert!(flags.contains('u'), "flags should contain 'u' when nounset is on");
+}
+
+#[testutil::test]
+fn special_param_dash_with_xtrace() {
+    let mut env = Environment::new();
+    env.set_xtrace(true);
+    let flags = env.get_special("-").unwrap();
+    assert!(flags.contains('x'), "flags should contain 'x' when xtrace is on");
+}
+
+#[testutil::test]
+fn special_param_dash_with_multiple_options() {
+    let mut env = Environment::new();
+    env.set_errexit(true);
+    env.set_nounset(true);
+    env.set_xtrace(true);
+    let flags = env.get_special("-").unwrap();
+    assert!(flags.contains('e'));
+    assert!(flags.contains('u'));
+    assert!(flags.contains('x'));
+}

@@ -69,6 +69,13 @@ pub struct Executor {
     /// Shell options (dialect features) controlling which builtins and syntax
     /// extensions are available at execution time.
     options: crate::dialect::ShellOptions,
+    /// Stack of source filenames. Pushed by `source`/`.` builtin, popped on
+    /// return. Used to populate `BASH_SOURCE` in `CallInfo`.
+    source_stack: Vec<String>,
+    /// Line number offset for function bodies. When executing a function
+    /// defined on line N, `lineno_base` is set to N-1 so `execute_lines`
+    /// produces correct source line numbers (i + 1 + base).
+    lineno_base: usize,
 }
 
 impl Executor {
@@ -82,6 +89,8 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            source_stack: Vec::new(),
+            lineno_base: 0,
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
         }
@@ -101,6 +110,8 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            source_stack: Vec::new(),
+            lineno_base: 0,
             errexit_suppressed: false,
             options,
         }
@@ -113,6 +124,8 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            source_stack: Vec::new(),
+            lineno_base: 0,
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
         }
@@ -130,6 +143,8 @@ impl Executor {
             fd_table: HashMap::new(),
             alias_snapshot: HashMap::new(),
             exe_path: None,
+            source_stack: Vec::new(),
+            lineno_base: 0,
             errexit_suppressed: false,
             options,
         }
@@ -164,6 +179,11 @@ impl Executor {
     /// processes to reconstruct inherited FDs.
     pub fn fd_table_mut(&mut self) -> &mut HashMap<i32, std::fs::File> {
         &mut self.fd_table
+    }
+
+    /// Current source filename (top of the source stack, or empty for stdin/-c).
+    fn current_source(&self) -> String {
+        self.source_stack.last().cloned().unwrap_or_default()
     }
 
     /// Adopt redirects from `exec` redirect-only mode into persistent state.
@@ -202,7 +222,7 @@ impl Executor {
     pub fn execute_lines(&mut self, lines: &[crate::ast::Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let mut status = 0;
         for (i, line) in lines.iter().enumerate() {
-            self.env.set_lineno(i + 1);
+            self.env.set_lineno(i + 1 + self.lineno_base);
             self.alias_snapshot = self.env.alias_snapshot();
             status = self.execute_statements(line, io)?;
         }
@@ -345,7 +365,7 @@ impl Executor {
             Expression::Compound { body, redirects } => self.execute_compound(body, redirects, io),
 
             Expression::FunctionDef(fndef) => {
-                let stored = environment::StoredFunction::from(fndef);
+                let stored = environment::StoredFunction::with_context(fndef, self.env.lineno(), self.current_source());
                 self.env.set_function(fndef.name.clone(), stored);
                 Ok(0)
             }
@@ -754,12 +774,20 @@ impl Executor {
             let saved = self.apply_prefix_assignments(&cmd.assignments)?;
             let call_info = environment::CallInfo {
                 function_name: cmd_name.to_string(),
-                ..Default::default()
+                source_file: func.def_source.clone(),
+                call_lineno: self.env.lineno(),
             };
             self.env.push_scope_with_info(cmd_args.to_vec(), call_info);
 
+            // Set lineno_base so execute_lines offsets line numbers to the
+            // function's definition position in the source file.
+            let saved_base = self.lineno_base;
+            self.lineno_base = func.def_lineno.saturating_sub(1);
+
             let mut cmd_io = active.apply_to_io(io);
             let result = self.execute_compound(&func.body, &func.redirects, &mut cmd_io);
+
+            self.lineno_base = saved_base;
 
             self.env.pop_scope();
             self.restore_prefix_assignments(saved);

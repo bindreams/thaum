@@ -187,6 +187,23 @@ pub struct Environment {
 pub struct StoredFunction {
     pub body: CompoundCommand,
     pub redirects: Vec<crate::ast::Redirect>,
+    /// Source line number where the function was defined (1-based).
+    /// Used to offset LINENO when executing the function body.
+    pub def_lineno: usize,
+    /// Source file where the function was defined (for BASH_SOURCE).
+    pub def_source: String,
+}
+
+impl StoredFunction {
+    /// Create with definition context (line number and source file).
+    pub fn with_context(def: &FunctionDef, def_lineno: usize, def_source: String) -> Self {
+        StoredFunction {
+            body: (*def.body).clone(),
+            redirects: def.redirects.clone(),
+            def_lineno,
+            def_source,
+        }
+    }
 }
 
 impl From<&FunctionDef> for StoredFunction {
@@ -194,6 +211,8 @@ impl From<&FunctionDef> for StoredFunction {
         StoredFunction {
             body: (*def.body).clone(),
             redirects: def.redirects.clone(),
+            def_lineno: 0,
+            def_source: String::new(),
         }
     }
 }

@@ -624,6 +624,119 @@ fn bash_lineno_cannot_be_unset() {
     assert_ne!(status, 0, "unset BASH_LINENO should fail");
 }
 
+#[testutil::test]
+fn bash_lineno_tracks_call_site() {
+    // f is defined on line 1, called on line 2.
+    // BASH_LINENO[0] should be 2 (the line where f was called).
+    let (out, _) = bash_exec_ok("f() { echo ${BASH_LINENO[0]}; }\nf");
+    assert_eq!(out.trim(), "2", "BASH_LINENO[0] should be the call site line");
+}
+
+#[testutil::test]
+fn bash_lineno_nested_calls() {
+    // g defined line 1, f defined line 2, f called at line 3.
+    // Inside g: BASH_LINENO = [2, 3] (g called at line 2 inside f, f called at line 3).
+    let script = "g() { echo ${BASH_LINENO[@]}; }\nf() { g; }\nf";
+    let (out, _) = bash_exec_ok(script);
+    assert_eq!(out.trim(), "2 3", "BASH_LINENO should show nested call sites");
+}
+
+#[testutil::test]
+fn bash_source_empty_at_top_level() {
+    // Outside functions, BASH_SOURCE should be empty.
+    let (out, _) = bash_exec_ok("echo \"x${BASH_SOURCE[0]}x\"");
+    assert_eq!(out.trim(), "xx");
+}
+
+#[testutil::test]
+fn bash_source_in_sourced_file() {
+    // source a file, and inside it BASH_SOURCE[0] should be the filename.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("lib.sh");
+    std::fs::write(&file, "echo ${BASH_SOURCE[0]}\n").unwrap();
+
+    let f = file.to_string_lossy().replace('\\', "/");
+    let (out, _) = bash_exec_ok(&format!("source {f}"));
+    // On Windows, the shell normalizes backslashes to forward slashes.
+    let expected = file.to_string_lossy().replace('\\', "/");
+    assert_eq!(out.trim(), expected);
+}
+
+#[testutil::test]
+fn bash_lineno_in_sourced_file_calling_function() {
+    // Source a file that defines and calls a function.
+    // BASH_LINENO inside the function should reflect the sourced file's lines.
+    let dir = tempfile::tempdir().unwrap();
+    let lib = dir.path().join("lib.sh");
+    // Line 1: function definition, line 2: function call.
+    std::fs::write(&lib, "f() { echo ${BASH_LINENO[0]}; }\nf\n").unwrap();
+
+    let f = lib.to_string_lossy().replace('\\', "/");
+    let (out, _) = bash_exec_ok(&format!("source {f}"));
+    assert_eq!(out.trim(), "2", "BASH_LINENO should track line in sourced file");
+}
+
+#[testutil::test]
+fn bash_lineno_source_from_function() {
+    // A function on line 1 sources a file. Inside the sourced file, BASH_LINENO
+    // should reflect the sourced file's own line numbers, not the function's
+    // definition offset.
+    let dir = tempfile::tempdir().unwrap();
+    let lib = dir.path().join("lib.sh");
+    // lib.sh: line 1 defines g, line 2 calls g.
+    std::fs::write(&lib, "g() { echo ${BASH_LINENO[0]}; }\ng\n").unwrap();
+
+    let f = lib.to_string_lossy().replace('\\', "/");
+    // h on line 1, f on line 2 → f's def_lineno=2, lineno_base=1.
+    // If lineno_base leaks into the sourced file, g's call site would be
+    // 3 (= 2 + 1) instead of 2.
+    let script = format!("h() {{ :; }}\nf() {{ source {f}; }}\nf");
+    let (out, _) = bash_exec_ok(&script);
+    assert_eq!(
+        out.trim(),
+        "2",
+        "sourced file lineno should not inherit function's lineno_base"
+    );
+}
+
+#[testutil::test]
+fn bash_source_tracks_definition_file() {
+    // A function defined in lib.sh should show lib.sh in BASH_SOURCE,
+    // even when called from the main script (not from lib.sh).
+    let dir = tempfile::tempdir().unwrap();
+    let lib = dir.path().join("lib.sh");
+    std::fs::write(&lib, "f() { echo ${BASH_SOURCE[0]}; }\n").unwrap();
+
+    let f = lib.to_string_lossy().replace('\\', "/");
+    let expected = f.clone();
+    // source lib.sh to define f, then call f from the main script.
+    let (out, _) = bash_exec_ok(&format!("source {f}; f"));
+    assert_eq!(
+        out.trim(),
+        expected,
+        "BASH_SOURCE[0] should be the file where f was DEFINED"
+    );
+}
+
+#[testutil::test]
+fn bash_source_nested_source() {
+    // source a.sh which sources b.sh. Inside b.sh, BASH_SOURCE should stack.
+    let dir = tempfile::tempdir().unwrap();
+    let b = dir.path().join("b.sh");
+    let a = dir.path().join("a.sh");
+    let b_path = b.to_string_lossy().replace('\\', "/");
+    std::fs::write(&b, "echo ${BASH_SOURCE[0]}\n").unwrap();
+    std::fs::write(&a, format!("source {b_path}\n")).unwrap();
+
+    let a_path = a.to_string_lossy().replace('\\', "/");
+    let (out, _) = bash_exec_ok(&format!("source {a_path}"));
+    assert_eq!(
+        out.trim(),
+        b_path,
+        "BASH_SOURCE[0] should be the innermost sourced file"
+    );
+}
+
 // pushd/popd/dirs + DIRSTACK ==========================================================================================
 
 #[testutil::test]

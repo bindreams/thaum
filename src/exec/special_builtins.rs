@@ -61,19 +61,37 @@ impl Executor {
             Err(_) => return Ok(2),
         };
 
-        // Save and set positional params.
-        let old_params = self.env.positional_params().to_vec();
+        // Push a call stack frame so BASH_SOURCE/FUNCNAME/BASH_LINENO track
+        // the sourced file. Positional params are replaced if extra args
+        // were provided; push_scope_with_info saves the old ones for restore.
+        let source_path = path.display().to_string();
+        self.source_stack.push(source_path.clone());
+        let call_info = crate::exec::environment::CallInfo {
+            function_name: "source".to_string(),
+            source_file: source_path,
+            call_lineno: self.env.lineno(),
+        };
+        let new_params = if args.len() > 1 {
+            args[1..].to_vec()
+        } else {
+            self.env.positional_params().to_vec()
+        };
+        self.env.push_scope_with_info(new_params, call_info);
+
         let old_name = self.env.program_name().to_string();
-        if args.len() > 1 {
-            self.env.set_positional_params(args[1..].to_vec());
-        }
         self.env.set_program_name(path.display().to_string());
+
+        // Reset lineno_base: sourced file lines start from 1, not from the
+        // caller's function definition offset.
+        let saved_base = self.lineno_base;
+        self.lineno_base = 0;
 
         let result = self.execute_lines(&program.lines, io);
 
-        // Restore.
-        self.env.set_positional_params(old_params);
+        self.lineno_base = saved_base;
         self.env.set_program_name(old_name);
+        self.env.pop_scope();
+        self.source_stack.pop();
 
         result
     }

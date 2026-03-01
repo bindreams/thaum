@@ -162,6 +162,11 @@ impl Environment {
         }
     }
 
+    /// Current line number (1-based, as set by `execute_lines`).
+    pub fn lineno(&self) -> usize {
+        self.lineno
+    }
+
     /// Update the current line number (called by the executor).
     pub fn set_lineno(&mut self, lineno: usize) {
         self.lineno = lineno;

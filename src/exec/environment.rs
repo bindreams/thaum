@@ -150,6 +150,9 @@ pub struct Environment {
     lineno: usize,
     /// User-assigned offset for LINENO (from `LINENO=N`).
     lineno_offset: isize,
+    /// Internal sub-index for getopts grouped option processing (e.g. `-abc`).
+    /// Reset when OPTIND is set to 1.
+    getopts_subindex: usize,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -199,12 +202,22 @@ impl Environment {
             seconds_offset: 0,
             lineno: 0,
             lineno_offset: 0,
+            getopts_subindex: 0,
         };
 
         let _ = env.set_var("IFS", " \t\n");
         // $_ is a regular variable, exported by default, auto-updated by the executor.
         let _ = env.set_var("_", "");
         env.export_var("_");
+        // OPTIND: getopts index, initialized to 1 per POSIX.
+        let _ = env.set_var("OPTIND", "1");
+        // PPID: parent process ID (readonly). POSIX required.
+        #[cfg(unix)]
+        {
+            let ppid = nix::unistd::getppid().as_raw().to_string();
+            let _ = env.set_var("PPID", &ppid);
+            env.set_readonly("PPID");
+        }
         env
     }
 
@@ -907,6 +920,13 @@ impl Environment {
                 self.lineno_offset = assigned - self.lineno as isize;
                 Some(Ok(()))
             }
+            // When OPTIND is set to 1, reset the getopts sub-index.
+            "OPTIND" => {
+                if value == "1" {
+                    self.getopts_subindex = 0;
+                }
+                None // fall through to normal set_var
+            }
             _ => None,
         }
     }
@@ -936,6 +956,16 @@ impl Environment {
     /// Update the current line number (called by the executor).
     pub fn set_lineno(&mut self, lineno: usize) {
         self.lineno = lineno;
+    }
+
+    /// Get the getopts sub-index (position within a grouped option string like `-abc`).
+    pub fn getopts_subindex(&self) -> usize {
+        self.getopts_subindex
+    }
+
+    /// Set the getopts sub-index.
+    pub fn set_getopts_subindex(&mut self, idx: usize) {
+        self.getopts_subindex = idx;
     }
 
     /// Returns `$1`, `$2`, ... as a slice (0-indexed: `[0]` is `$1`).
@@ -1484,6 +1514,7 @@ impl Environment {
             seconds_offset: 0,
             lineno: 0,
             lineno_offset: 0,
+            getopts_subindex: 0,
         }
     }
 }

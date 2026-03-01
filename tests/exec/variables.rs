@@ -246,3 +246,159 @@ fn lineno_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset LINENO; LINENO=42; echo $LINENO");
     assert_eq!(out.trim(), "42");
 }
+
+// PPID ================================================================================================================
+
+#[testutil::test]
+fn ppid_is_set() {
+    let (out, _) = bash_exec_ok("echo $PPID");
+    let val: u32 = out.trim().parse().expect("PPID should be a number");
+    assert!(val > 0, "PPID should be positive");
+}
+
+#[testutil::test]
+fn ppid_is_readonly() {
+    // PPID should reject assignment.
+    let status = bash_exec_result("PPID=42 2>/dev/null");
+    assert_ne!(status, 0, "PPID assignment should fail");
+}
+
+#[testutil::test]
+fn ppid_cannot_be_unset() {
+    let status = bash_exec_result("unset PPID 2>/dev/null");
+    assert_ne!(status, 0, "unset PPID should fail");
+}
+
+// getopts =============================================================================================================
+
+#[testutil::test]
+fn getopts_basic_single_options() {
+    let script = r#"
+while getopts "abc" opt -- -a -b -c; do
+    echo $opt
+done
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out, "a\nb\nc\n");
+}
+
+#[testutil::test]
+fn getopts_grouped_options() {
+    let script = r#"
+while getopts "abc" opt -- -abc; do
+    echo $opt
+done
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out, "a\nb\nc\n");
+}
+
+#[testutil::test]
+fn getopts_option_with_argument_separate() {
+    let script = r#"
+getopts "a:" opt -- -a VALUE
+echo "$opt $OPTARG"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "a VALUE");
+}
+
+#[testutil::test]
+fn getopts_option_with_argument_concatenated() {
+    let script = r#"
+getopts "a:" opt -- -aVALUE
+echo "$opt $OPTARG"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "a VALUE");
+}
+
+#[testutil::test]
+fn getopts_unknown_option_verbose() {
+    // Unknown option in verbose mode: name=?, stderr diagnostic
+    let script = r#"
+getopts "ab" opt -- -z 2>/dev/null
+echo $opt
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "?");
+}
+
+#[testutil::test]
+fn getopts_silent_mode_unknown() {
+    // Silent mode (leading :): name=?, OPTARG=offending char
+    let script = r#"
+getopts ":ab" opt -- -z
+echo "$opt $OPTARG"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "? z");
+}
+
+#[testutil::test]
+fn getopts_silent_mode_missing_arg() {
+    // Silent mode: missing argument → name=:, OPTARG=option char
+    let script = r#"
+getopts ":a:" opt -- -a
+echo "$opt $OPTARG"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), ": a");
+}
+
+#[testutil::test]
+fn getopts_double_dash_terminates() {
+    let script = r#"
+getopts "a" opt -- -- -a
+echo "status=$?"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "status=1");
+}
+
+#[testutil::test]
+fn getopts_non_option_terminates() {
+    let script = r#"
+getopts "a" opt -- foo -a
+echo "status=$?"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "status=1");
+}
+
+#[testutil::test]
+fn getopts_optind_reset() {
+    // After processing, OPTIND can be reset to 1 to re-parse.
+    let script = r#"
+getopts "a" opt -- -a
+echo $opt
+OPTIND=1
+getopts "a" opt -- -a
+echo $opt
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out, "a\na\n");
+}
+
+#[testutil::test]
+fn getopts_uses_positional_params_by_default() {
+    let script = r#"
+set -- -a -b
+while getopts "ab" opt; do
+    echo $opt
+done
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out, "a\nb\n");
+}
+
+#[testutil::test]
+fn getopts_grouped_with_required_arg() {
+    // -abc where a requires arg → OPTARG=bc
+    let script = r#"
+getopts "a:bc" opt -- -abc
+echo "$opt $OPTARG"
+"#;
+    let (out, _) = exec_ok(script);
+    assert_eq!(out.trim(), "a bc");
+}

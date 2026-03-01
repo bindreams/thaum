@@ -41,6 +41,7 @@ pub fn is_builtin(name: &str) -> bool {
             | "local"
             | "declare"
             | "typeset"
+            | "getopts"
     )
 }
 
@@ -77,6 +78,7 @@ pub fn run_builtin(
         "readonly" => builtin_readonly(args, env, stdout),
         "local" => builtin_local(args, env),
         "declare" | "typeset" => builtin_declare(args, env, stdout),
+        "getopts" => builtin_getopts(args, env, stderr),
         // eval, exec, source, and . are handled as special builtins in
         // execute_command (they need Executor access, not just Environment).
         // They should never reach run_builtin.
@@ -748,6 +750,159 @@ fn builtin_declare(args: &[String], env: &mut Environment, stdout: &mut dyn Writ
     }
 
     Ok(0)
+}
+
+// getopts builtin =====================================================================================================
+
+/// `getopts optstring name [arg ...]`
+///
+/// Parses positional parameters (or explicit `arg` list) for options described
+/// by `optstring`. Sets `name` to the found option character, updates `OPTIND`
+/// and `OPTARG`. Returns 0 while options remain, >0 when done.
+fn builtin_getopts(args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
+    if args.len() < 2 {
+        let _ = writeln!(stderr, "getopts: usage: getopts optstring name [arg ...]");
+        return Ok(2);
+    }
+
+    let optstring = &args[0];
+    let var_name = &args[1];
+
+    // Determine the argument list to parse. Clone to avoid borrow conflicts.
+    let explicit_args: Vec<String> = if args.len() > 2 {
+        // Skip the `--` separator if present after name.
+        let rest = &args[2..];
+        if rest.first().map(|s| s.as_str()) == Some("--") {
+            rest[1..].to_vec()
+        } else {
+            rest.to_vec()
+        }
+    } else {
+        // Use positional parameters.
+        env.positional_params().to_vec()
+    };
+
+    // Silent mode: leading ':' in optstring suppresses error messages.
+    let silent = optstring.starts_with(':');
+    let opts = if silent { &optstring[1..] } else { optstring.as_str() };
+
+    // Read current OPTIND (1-based index into the argument list).
+    let optind: usize = env.get_var("OPTIND").and_then(|s| s.parse().ok()).unwrap_or(1);
+
+    let arg_idx = optind.saturating_sub(1); // 0-based index
+
+    // Check if we've exhausted all arguments.
+    if arg_idx >= explicit_args.len() {
+        let _ = env.set_var(var_name, "?");
+        return Ok(1);
+    }
+
+    let current_arg = &explicit_args[arg_idx];
+    let subindex = env.getopts_subindex();
+
+    // Not an option: doesn't start with '-', or is exactly '-'.
+    if !current_arg.starts_with('-') || current_arg == "-" {
+        let _ = env.set_var(var_name, "?");
+        return Ok(1);
+    }
+
+    // '--' terminates option processing.
+    if current_arg == "--" {
+        let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+        let _ = env.set_var(var_name, "?");
+        env.set_getopts_subindex(0);
+        return Ok(1);
+    }
+
+    // Strip the leading '-' to get the option characters.
+    let opt_chars: Vec<char> = current_arg[1..].chars().collect();
+    let char_idx = subindex; // position within this grouped option string
+
+    if char_idx >= opt_chars.len() {
+        // All chars in this arg were consumed on previous calls — advance to next arg.
+        // This shouldn't happen in normal flow (the last char sets OPTIND += 1),
+        // but handle it defensively.
+        let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+        env.set_getopts_subindex(0);
+        let _ = env.set_var(var_name, "?");
+        return Ok(1);
+    }
+
+    let opt_char = opt_chars[char_idx];
+
+    // Look up this character in optstring.
+    let opt_pos = opts.find(opt_char);
+    let requires_arg = opt_pos
+        .map(|pos| opts.get(pos + 1..pos + 2) == Some(":"))
+        .unwrap_or(false);
+
+    match opt_pos {
+        None => {
+            // Unknown option.
+            if silent {
+                let _ = env.set_var(var_name, "?");
+                let _ = env.set_var("OPTARG", &opt_char.to_string());
+            } else {
+                let _ = writeln!(stderr, "getopts: illegal option -- {opt_char}");
+                let _ = env.set_var(var_name, "?");
+                env.unset_var("OPTARG").ok();
+            }
+            // Advance past this character.
+            if char_idx + 1 < opt_chars.len() {
+                env.set_getopts_subindex(char_idx + 1);
+            } else {
+                let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+                env.set_getopts_subindex(0);
+            }
+            Ok(0)
+        }
+        Some(_) if requires_arg => {
+            // Option requires an argument.
+            let _ = env.set_var(var_name, &opt_char.to_string());
+
+            if char_idx + 1 < opt_chars.len() {
+                // Remaining chars in this group become the argument.
+                let optarg: String = opt_chars[char_idx + 1..].iter().collect();
+                let _ = env.set_var("OPTARG", &optarg);
+                let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+                env.set_getopts_subindex(0);
+            } else if arg_idx + 1 < explicit_args.len() {
+                // Next argument is the option-argument.
+                let optarg = &explicit_args[arg_idx + 1];
+                let _ = env.set_var("OPTARG", optarg);
+                let _ = env.set_var("OPTIND", &(optind + 2).to_string());
+                env.set_getopts_subindex(0);
+            } else {
+                // Missing argument.
+                if silent {
+                    let _ = env.set_var(var_name, ":");
+                    let _ = env.set_var("OPTARG", &opt_char.to_string());
+                } else {
+                    let _ = writeln!(stderr, "getopts: option requires an argument -- {opt_char}");
+                    let _ = env.set_var(var_name, "?");
+                    env.unset_var("OPTARG").ok();
+                }
+                let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+                env.set_getopts_subindex(0);
+            }
+            Ok(0)
+        }
+        Some(_) => {
+            // Regular option (no argument required).
+            let _ = env.set_var(var_name, &opt_char.to_string());
+            env.unset_var("OPTARG").ok();
+
+            if char_idx + 1 < opt_chars.len() {
+                // More characters in this grouped option.
+                env.set_getopts_subindex(char_idx + 1);
+            } else {
+                // Move to next argument.
+                let _ = env.set_var("OPTIND", &(optind + 1).to_string());
+                env.set_getopts_subindex(0);
+            }
+            Ok(0)
+        }
+    }
 }
 
 #[cfg(test)]

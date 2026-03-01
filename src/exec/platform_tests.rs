@@ -28,3 +28,13 @@ fn is_fd_terminal_false_for_pipe_stdout() {
 fn is_fd_terminal_false_for_invalid_fd() {
     assert!(!super::is_fd_terminal(999));
 }
+
+#[testutil::test]
+fn is_fd_terminal_false_for_negative_fd() {
+    assert!(!super::is_fd_terminal(-1));
+}
+
+#[testutil::test]
+fn is_fd_terminal_false_for_max_fd() {
+    assert!(!super::is_fd_terminal(i32::MAX));
+}

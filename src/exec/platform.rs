@@ -41,6 +41,9 @@ pub fn file_owned_by_current_group(path: &str) -> bool {
 /// `_get_osfhandle()` and checks with `GetConsoleMode` + MSYS/Cygwin
 /// PTY heuristics (via `std::io::IsTerminal`).
 pub fn is_fd_terminal(fd: i32) -> bool {
+    if fd < 0 {
+        return false;
+    }
     #[cfg(unix)]
     {
         use std::os::fd::BorrowedFd;
@@ -56,17 +59,30 @@ pub fn is_fd_terminal(fd: i32) -> bool {
         extern "C" {
             fn _isatty(fd: i32) -> i32;
             fn _get_osfhandle(fd: i32) -> isize;
+            fn _set_thread_local_invalid_parameter_handler(
+                handler: Option<unsafe extern "C" fn(*const u16, *const u16, *const u16, u32, usize)>,
+            ) -> Option<unsafe extern "C" fn(*const u16, *const u16, *const u16, u32, usize)>;
         }
-        // _isatty handles invalid fds gracefully (returns 0, sets errno to
-        // EBADF) without triggering the CRT invalid parameter handler.
-        // _get_osfhandle on an out-of-range fd would invoke __fastfail.
-        if unsafe { _isatty(fd) } == 0 {
+        unsafe extern "C" fn noop_handler(_: *const u16, _: *const u16, _: *const u16, _: u32, _: usize) {}
+
+        // Suppress the CRT invalid-parameter handler so out-of-range FDs
+        // don't trigger __fastfail (STATUS_STACK_BUFFER_OVERRUN).
+        let prev = unsafe { _set_thread_local_invalid_parameter_handler(Some(noop_handler)) };
+        let is_tty = unsafe { _isatty(fd) };
+        unsafe { _set_thread_local_invalid_parameter_handler(prev) };
+
+        if is_tty == 0 {
             return false;
         }
         // fd is valid and points to a character device. Get the OS handle for
         // the full is_terminal() check (covers MSYS/Cygwin PTYs too).
+        let prev = unsafe { _set_thread_local_invalid_parameter_handler(Some(noop_handler)) };
         let handle = unsafe { _get_osfhandle(fd) };
-        debug_assert!(handle != -1 && handle != -2);
+        unsafe { _set_thread_local_invalid_parameter_handler(prev) };
+
+        if handle == -1 || handle == -2 {
+            return false;
+        }
         // SAFETY: _isatty confirmed the fd is valid, so the handle is valid.
         // The borrow does not outlive this call.
         unsafe { BorrowedHandle::borrow_raw(handle as _) }.is_terminal()

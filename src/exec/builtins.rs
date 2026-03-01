@@ -946,24 +946,7 @@ fn do_cd(env: &mut Environment, dir: &std::path::Path, stderr: &mut dyn Write) -
 /// Print the directory stack (used by dirs and after pushd/popd).
 fn print_dir_stack(env: &Environment, stdout: &mut dyn Write) {
     let home = env.get_var("HOME").map(|s| s.to_string());
-    let parts: Vec<String> = env
-        .dir_stack()
-        .iter()
-        .map(|p| {
-            let s = p.to_string_lossy().to_string();
-            if let Some(ref h) = home {
-                if s == *h {
-                    return "~".to_string();
-                }
-                if let Some(rest) = s.strip_prefix(h.as_str()) {
-                    if rest.starts_with('/') {
-                        return format!("~{rest}");
-                    }
-                }
-            }
-            s
-        })
-        .collect();
+    let parts: Vec<String> = env.dir_stack().iter().map(|p| format_dir(p, &home)).collect();
     let _ = writeln!(stdout, "{}", parts.join(" "));
 }
 

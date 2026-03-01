@@ -2,6 +2,8 @@ name: Redirect in the middle of a simple command
 dialect: bash
 source: oils:spec/redirect-command#redirect-in-the-middle-of-a-simple-command
 stdout: "1 2 3 4 5 6 7 8 9 1 2 3 4 5 6\n"
+environment:
+  TMP: /tmp
 ---
 f=$TMP/out
 echo -n 1 2 '3 ' > $f

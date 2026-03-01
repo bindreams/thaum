@@ -4,6 +4,15 @@ source:
   oils:spec/var-ref#a-default-is-legal-but-fails-with-more-than-one-element
 status: 0
 stdout: "status=1\nstatus=1\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 # bash allows this construct, but the indirection fails when the array has more

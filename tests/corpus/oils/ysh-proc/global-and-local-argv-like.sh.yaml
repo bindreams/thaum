@@ -3,6 +3,15 @@ name: Global and local ARGV, like "$@"
 dialect: bash
 source: oils:spec/ysh-proc#global-and-local-argv-like
 stdout: "[]\n[]\n['a b', 'c']\n[]\n['1', '2 3']\n[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 $SH -o ysh:upgrade -c '

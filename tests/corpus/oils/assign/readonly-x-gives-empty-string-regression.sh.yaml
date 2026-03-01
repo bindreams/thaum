@@ -2,6 +2,15 @@ name: readonly x= gives empty string (regression)
 dialect: bash
 source: oils:spec/assign#readonly-x-gives-empty-string-regression
 stdout: "['']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 readonly x=
 argv.py "$x"

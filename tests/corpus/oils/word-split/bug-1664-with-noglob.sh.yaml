@@ -2,6 +2,15 @@ name: 'Bug #1664, \\ with noglob'
 dialect: bash
 source: oils:spec/word-split#bug-1664-with-noglob
 stdout: "['[\\\\]_']\n['[\\\\]_']\nnoglob\n['[\\\\]_']\n['[\\\\]_']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 # Note that we're not changing IFS

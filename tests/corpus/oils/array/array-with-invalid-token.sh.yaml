@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/array#array-with-invalid-token
 status: 2
 parse-error: "unexpected token ')', expected a command"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(
 1

@@ -2,6 +2,15 @@ name: Extended glob patterns with spaces
 dialect: bash
 source: oils:spec/extglob-files#extended-glob-patterns-with-spaces
 stdout: "['eg4/a b', 'eg4/foo']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s extglob
 mkdir -p eg4

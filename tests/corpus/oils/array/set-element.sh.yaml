@@ -2,6 +2,15 @@ name: Set element
 dialect: bash
 source: oils:spec/array#set-element
 stdout: "['9', '2 3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(1 '2 3')
 a[0]=9

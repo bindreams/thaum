@@ -2,6 +2,15 @@ name: Single array with :-
 dialect: bash
 source: oils:spec/array#single-array-with
 stdout: "['none', 'x', 'none']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 # 2024-06 - bash 5.2 and mksh now match, bash 4.4 differed.

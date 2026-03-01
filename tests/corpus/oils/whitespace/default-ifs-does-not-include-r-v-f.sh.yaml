@@ -2,6 +2,15 @@ name: Default IFS does not include \r \v \f
 dialect: bash
 source: oils:spec/whitespace#default-ifs-does-not-include-r-v-f
 stdout: "['-', '-']\n['-\\r-']\n['-\\x0b-']\n['-\\x0c-']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 # dash and zsh don't have echo -e

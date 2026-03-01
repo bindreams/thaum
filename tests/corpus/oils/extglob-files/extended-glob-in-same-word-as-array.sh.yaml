@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/extglob-files#extended-glob-in-same-word-as-array
 stdout: "['a b', 'c']\n['star', 'glob', 'a b c.py']\n['star', 'extglob', 'a b c.cc',
   'a b c.py']\n['at', 'extglob', 'a b', 'cee.cc', 'cee.py']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s extglob
 mkdir -p eg10

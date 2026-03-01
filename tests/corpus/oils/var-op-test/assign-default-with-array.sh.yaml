@@ -2,6 +2,15 @@ name: Assign default with array
 dialect: bash
 source: oils:spec/var-op-test#assign-default-with-array
 stdout: "['Xx1', '2', '3', '4xX']\n['x1 2 3 4x']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 set -- '1 2' '3 4'
 argv.py X${unset=x"$@"x}X

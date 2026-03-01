@@ -2,6 +2,8 @@ name: command -p (override existing program)
 dialect: bash
 source: oils:spec/builtin-meta#command--p-override-existing-program
 stdout: "wrong\nbbb\n"
+environment:
+  TMP: /tmp
 ---
 # Tests whether command -p overrides the path
 # tr chosen because we need a simple non-builtin

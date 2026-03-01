@@ -2,6 +2,8 @@ name: Permission denied
 dialect: bash
 source: oils:spec/command#permission-denied
 status: 126
+environment:
+  TMP: /tmp
 ---
 touch $TMP/text-file
 $TMP/text-file

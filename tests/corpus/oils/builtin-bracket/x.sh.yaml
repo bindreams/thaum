@@ -2,6 +2,8 @@ name: -x
 dialect: bash
 source: oils:spec/builtin-bracket#x
 stdout: "no\nyes\nbad\n"
+environment:
+  TMP: /tmp
 ---
 rm -f $TMP/x
 echo 'echo hi' > $TMP/x

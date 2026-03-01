@@ -4,6 +4,15 @@ source:
   oils:spec/nix-idioms#ref-to-undefined-string-var-is-fatal-inconsistent-with-array
 status: 1
 stdout: "[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 hookSlice='preHooks'
 

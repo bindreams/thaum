@@ -2,6 +2,15 @@ name: var ref to array 'preHooks[@]'
 dialect: bash
 source: oils:spec/nix-idioms#var-ref-to-array-prehooks
 stdout: "show\n[]\n[]\nshow\n['foo', 'bar', 'baz']\n['foo bar', 'baz']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 #
 # This idiom discussed on

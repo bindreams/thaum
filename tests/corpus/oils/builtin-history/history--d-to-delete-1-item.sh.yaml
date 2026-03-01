@@ -2,6 +2,8 @@ name: history -d to delete 1 item
 dialect: bash
 source: oils:spec/builtin-history#history--d-to-delete-1-item
 stdout: "status=1\n"
+environment:
+  TMP: /tmp
 ---
 
 cd $TMP

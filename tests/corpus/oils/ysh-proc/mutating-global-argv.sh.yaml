@@ -3,6 +3,15 @@ name: Mutating global ARGV
 dialect: bash
 source: oils:spec/ysh-proc#mutating-global-argv
 stdout: "['global']\n['global', 'GG']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 $SH -o ysh:upgrade -c '

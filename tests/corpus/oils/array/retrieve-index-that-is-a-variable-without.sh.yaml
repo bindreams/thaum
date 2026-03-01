@@ -2,6 +2,15 @@ name: Retrieve index that is a variable without $
 dialect: bash
 source: oils:spec/array#retrieve-index-that-is-a-variable-without
 stdout: "['2 3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(1 '2 3')
 i=5

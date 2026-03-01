@@ -4,6 +4,15 @@ source:
   oils:spec/glob-bash#shopt--s-failglob-exits-properly-in-command-context-with-set--e
 status: 1
 stdout: "['*.ZZ']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 set -e
 argv.py *.ZZ

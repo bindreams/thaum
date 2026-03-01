@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/var-op-bash#array-expansion-with-nullary-var-op-q
 stdout: "['1', '2', '3', '4', '5', '6', '7', '8', '9']\n['1 2 3 4 5 6 7 8 9']\n['hello',
   'world', 'osh', 'ysh']\n['hello world osh ysh']\n[]\n['']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 declare -a a=({1..9})
 declare -A A=(['a']=hello ['b']=world ['c']=osh ['d']=ysh)

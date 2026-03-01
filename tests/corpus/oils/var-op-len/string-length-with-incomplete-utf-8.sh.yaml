@@ -8,6 +8,8 @@ stdout: "0\n1\n2\n-1\n3\n4\n-1\n-1\n5\n6\n-1\n-1\n-1\n7\n[ stdin ]:3: warning: U
   UTF-8 decode: Truncated bytes at offset 9 in string of 10 bytes\n[ stdin ]:3: warning:
   UTF-8 decode: Truncated bytes at offset 9 in string of 11 bytes\n[ stdin ]:3: warning:
   UTF-8 decode: Truncated bytes at offset 9 in string of 12 bytes\n"
+environment:
+  TMP: /tmp
 ---
 for num_bytes in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do
   s=$(head -c $num_bytes $REPO_ROOT/spec/testdata/utf8-chars.txt)

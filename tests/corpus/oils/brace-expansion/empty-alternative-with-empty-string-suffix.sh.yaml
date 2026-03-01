@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/brace-expansion#empty-alternative-with-empty-string-suffix
 status: 0
 stdout: "['X', '', 'Y', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # zsh and mksh don't do word elision, probably because they do brace expansion
 # AFTER variable substitution.

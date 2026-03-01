@@ -2,6 +2,16 @@ name: 'error: append used like env prefix'
 dialect: bash
 source: oils:spec/append#error-append-used-like-env-prefix
 status: 2
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 # This should be an error in other shells but it's not.
 A=a

@@ -2,6 +2,15 @@ name: strip all
 dialect: bash
 source: oils:spec/var-op-strip#strip-all
 stdout: "['']\n['']\n['']\n['']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 x=abc
 argv.py "${x#abc}"

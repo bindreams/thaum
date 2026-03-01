@@ -2,6 +2,15 @@ name: Filenames with spaces
 dialect: bash
 source: oils:spec/extglob-files#filenames-with-spaces
 stdout: "['eg5/a bcd', 'eg5/a bde']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s extglob
 mkdir -p eg5

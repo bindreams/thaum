@@ -2,6 +2,8 @@ name: -u for setuid, -g too
 dialect: bash
 source: oils:spec/builtin-bracket#u-for-setuid--g-too
 stdout: "status=0\nstatus=1\nstatus=1\nstatus=0\n"
+environment:
+  TMP: /tmp
 ---
 
 touch $TMP/setuid $TMP/setgid

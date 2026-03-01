@@ -2,6 +2,15 @@ name: max_split and backslash escaping
 dialect: bash
 source: oils:spec/builtin-read#maxsplit-and-backslash-escaping
 stdout: "['Aa', 'b  a b']\n['Aa', 'b', ' a b']\n['Aa', 'b', ' a b', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 echo 'Aa b \ a\ b' | (read a b; argv.py "$a" "$b")
 echo 'Aa b \ a\ b' | (read a b c; argv.py "$a" "$b" "$c")

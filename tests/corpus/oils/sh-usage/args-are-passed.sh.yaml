@@ -2,5 +2,14 @@ name: args are passed
 dialect: bash
 source: oils:spec/sh-usage#args-are-passed
 stdout: "['a', 'b']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 $SH -c 'argv.py "$@"' dummy a b

@@ -2,6 +2,16 @@ name: export a=1 no_value c=2
 dialect: bash
 source: oils:spec/assign#export-a1-novalue-c2
 stdout: "foo\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 no_value=foo
 export a=1 no_value c=2

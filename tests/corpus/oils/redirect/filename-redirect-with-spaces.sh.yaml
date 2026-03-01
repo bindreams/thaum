@@ -2,6 +2,8 @@ name: Filename redirect with spaces
 dialect: bash
 source: oils:spec/redirect#filename-redirect-with-spaces
 stdout: "two\n"
+environment:
+  TMP: /tmp
 ---
 # This time 1 *is* a descriptor, not a word.  If you add a space between 1 and
 # >, it doesn't work.

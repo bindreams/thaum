@@ -2,6 +2,15 @@ name: read bash bug
 dialect: bash
 source: oils:spec/builtin-read#read-bash-bug
 stdout: "['', '   ']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 IFS='x '
 echo 'x\  \ ' | (read a b; argv.py "$a" "$b")

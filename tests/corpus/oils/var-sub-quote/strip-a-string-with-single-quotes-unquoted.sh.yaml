@@ -2,6 +2,15 @@ name: Strip a string with single quotes, unquoted
 dialect: bash
 source: oils:spec/var-sub-quote#strip-a-string-with-single-quotes-unquoted
 stdout: "[\"'a\", 'b', 'c']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 foo="'a b c d'"
 argv.py ${foo%d\'}

@@ -2,6 +2,8 @@ name: nonexistent --rcdir is ignored
 dialect: bash
 source: oils:spec/interactive#nonexistent---rcdir-is-ignored
 stdout: "hi\nstatus=0\n"
+environment:
+  TMP: /tmp
 ---
 case $SH in bash) exit ;; esac
 

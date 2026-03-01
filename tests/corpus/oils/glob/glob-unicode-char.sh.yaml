@@ -2,6 +2,8 @@ name: Glob unicode char
 dialect: bash
 source: oils:spec/glob#glob-unicode-char
 stdout: "__a__ __μ__\n"
+environment:
+  TMP: /tmp
 ---
 
 touch $TMP/__a__

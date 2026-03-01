@@ -2,6 +2,8 @@ name: alias with redirects works
 dialect: bash
 source: oils:spec/alias#alias-with-redirects-works
 stdout: "1\n2\n3\n"
+environment:
+  TMP: /tmp
 ---
 shopt -s expand_aliases
 alias e_=echo

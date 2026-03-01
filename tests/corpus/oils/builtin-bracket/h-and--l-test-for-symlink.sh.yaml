@@ -2,6 +2,8 @@ name: -h and -L test for symlink
 dialect: bash
 source: oils:spec/builtin-bracket#h-and--l-test-for-symlink
 stdout: "no\nno\nis-file\nsymlink\nsymlink\ndangling\ndangling\ndangling is not file\n"
+environment:
+  TMP: /tmp
 ---
 tmp=$TMP/builtin-test-1
 mkdir -p $tmp

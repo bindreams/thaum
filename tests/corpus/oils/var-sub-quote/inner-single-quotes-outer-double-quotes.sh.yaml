@@ -2,6 +2,15 @@ name: Inner single quotes, outer double quotes
 dialect: bash
 source: oils:spec/var-sub-quote#inner-single-quotes-outer-double-quotes
 stdout: "[\"'b'\"]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # This is the WEIRD ONE.  Single quotes appear outside.  But all shells agree!
 argv.py "${Unset:-'b'}"

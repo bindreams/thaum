@@ -2,6 +2,8 @@ name: -r
 dialect: bash
 source: oils:spec/builtin-bracket#r
 stdout: "yes\nno\n"
+environment:
+  TMP: /tmp
 ---
 echo '1' > $TMP/testr_yes
 echo '2' > $TMP/testr_no

@@ -2,6 +2,15 @@ name: Evaluation order (2)
 dialect: bash
 source: oils:spec/array-literal#evaluation-order-2
 stdout: "keys: ['0', '6', '10']\nvals: ['1+2+3', '10', 'hello']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # When evaluating the index, the modification to the array by the previous item
 # of the initializer list is visible to the current item.

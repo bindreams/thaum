@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-history#histsize-shrinks-the-in-memory-history-when-changed
 stdout: "10\n5\n"
+environment:
+  TMP: /tmp
 ---
 
 cd $TMP

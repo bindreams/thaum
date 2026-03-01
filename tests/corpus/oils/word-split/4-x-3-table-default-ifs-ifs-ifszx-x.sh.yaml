@@ -5,6 +5,15 @@ stdout: "['  $*  ', 'a', 'b', 'c']\n[' \"$*\" ', 'a b c ']\n['  $@  ', 'a', 'b',
   [' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n[' \"$*\" ', 'a bc']\n['\
   \  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n\
   [' \"$*\" ', 'a bzcz']\n['  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 setopt SH_WORD_SPLIT  # for zsh

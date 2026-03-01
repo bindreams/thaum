@@ -2,6 +2,16 @@ name: can't export array (strict_array)
 dialect: bash
 source: oils:spec/builtin-vars#cant-export-array-strictarray
 stdout: "None\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 shopt -s strict_array
 

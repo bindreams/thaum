@@ -2,6 +2,15 @@ name: 'Prepend using replacement of #'
 dialect: bash
 source: oils:spec/var-op-strip#prepend-using-replacement-of
 stdout: "['prefix-aa', 'prefix-bb', 'prefix-']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # This case was found in Kubernetes and others
 array=(aa bb '')

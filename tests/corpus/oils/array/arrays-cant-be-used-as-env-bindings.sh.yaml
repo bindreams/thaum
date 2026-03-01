@@ -3,6 +3,16 @@ dialect: bash
 source: oils:spec/array#arrays-cant-be-used-as-env-bindings
 status: 2
 stdout: ''
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 # Hm bash it treats it as a string!
 A=a B=(b b) printenv.py A B

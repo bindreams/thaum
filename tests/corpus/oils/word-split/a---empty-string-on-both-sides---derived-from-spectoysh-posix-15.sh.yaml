@@ -5,6 +5,15 @@ source:
 stdout: "['abc', 'def']\n['', 'abc', 'def', '']\n['abc', 'def']\n['', 'abc', 'def',
   '']\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n==\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n\
   ==\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 A="   abc   def   "

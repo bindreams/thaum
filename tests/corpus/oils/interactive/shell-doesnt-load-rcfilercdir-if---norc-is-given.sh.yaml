@@ -2,6 +2,8 @@ name: shell doesn't load rcfile/rcdir if --norc is given
 dialect: bash
 source: oils:spec/interactive#shell-doesnt-load-rcfilercdir-if---norc-is-given
 stdout: "A\nC\nD\n"
+environment:
+  TMP: /tmp
 ---
 
 $SH -c 'echo A'

@@ -3,6 +3,16 @@ name: Temp Bindings
 dialect: bash
 source: oils:spec/ysh-scope#temp-bindings
 stdout: "myfunc FOO=bar\nmyproc FOO=\ninline FOO=\nbar\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 shopt --set parse_proc
 

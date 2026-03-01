@@ -2,6 +2,8 @@ name: <> for read/write named pipes
 dialect: bash
 source: oils:spec/redirect#for-readwrite-named-pipes
 stdout: "line1=first line2=second\n"
+environment:
+  TMP: /tmp
 ---
 rm -f "$TMP/f.pipe"
 mkfifo "$TMP/f.pipe"

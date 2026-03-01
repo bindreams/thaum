@@ -2,6 +2,8 @@ name: <&
 dialect: bash
 source: oils:spec/redirect#unnamed
 stdout: "[foo51]\n"
+environment:
+  TMP: /tmp
 ---
 # Is there a simpler test case for this?
 echo foo51 > $TMP/lessamp.txt

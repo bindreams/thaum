@@ -2,6 +2,8 @@ name: $OLDPWD
 dialect: bash
 source: oils:spec/builtin-cd#oldpwd
 stdout: "old: /\nOLDPWD=/\n/\n"
+environment:
+  TMP: /tmp
 ---
 cd /
 cd $TMP

@@ -2,6 +2,8 @@ name: 'read multiple lines with IFS=:'
 dialect: bash
 source: oils:spec/builtin-read#read-multiple-lines-with-ifs
 stdout: "[  \\a |b: c|d  e|]\n"
+environment:
+  TMP: /tmp
 ---
 # The leading spaces are stripped if they appear in IFS.
 # IFS chars are escaped with :.

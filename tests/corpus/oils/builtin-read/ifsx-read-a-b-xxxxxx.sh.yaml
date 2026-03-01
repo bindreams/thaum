@@ -4,6 +4,15 @@ source: oils:spec/builtin-read#ifsx-read-a-b-xxxxxx
 stdout: "['', '']\n['', '']\n['', 'xx']\n['', 'xxx']\n['', 'xxxx']\n-- spaces --\n\
   ['', '']\n['', '']\n['', 'xx']\n['', 'xxx']\n['', 'xxxx']\n-- with char --\n['',
   'a']\n['', 'a']\n['', 'axx']\n['', 'axxx']\n['', 'axxxx']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 IFS='x '
 echo x     | (read a b; argv.py "$a" "$b")

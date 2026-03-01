@@ -4,6 +4,15 @@ dialect: bash
 source: oils:spec/ysh-with-sh#slice-bash-array-isnt-allowed
 status: 3
 stdout: "['c d', 'e']\n['copy', 'bash']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 shopt --set parse_at

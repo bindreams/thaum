@@ -3,6 +3,16 @@ dialect: bash
 source: 
   oils:spec/builtin-special#prefix-assignments-persist-after-readonly-but-not-exported-set--o-posix
 stdout: "foo=bar\nspam=eggs\nNone\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 
 # Bash only implements it behind the posix option

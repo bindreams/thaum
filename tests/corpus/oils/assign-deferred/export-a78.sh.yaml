@@ -2,6 +2,22 @@ name: export a[7]=8
 dialect: bash
 source: oils:spec/assign-deferred#export-a78
 stdout: "status=1\n[]\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 export a[7]=8
 echo status=$?

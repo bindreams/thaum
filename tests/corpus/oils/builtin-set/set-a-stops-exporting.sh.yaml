@@ -2,6 +2,16 @@ name: set +a stops exporting
 dialect: bash
 source: oils:spec/builtin-set#set-a-stops-exporting
 stdout: "exported\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 set -a
 FOO=exported

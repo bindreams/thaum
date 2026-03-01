@@ -3,6 +3,17 @@ dialect: bash
 source: 
   oils:spec/builtin-read#read-with-line-continuation-reads-multiple-physical-lines
 stdout: "['onetwo', 'one\\\\']\n"
+environment:
+  TMP: /tmp
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # NOTE: osh failing because of file descriptor issue.  stdin has to be closed!
 tmp=$TMP/$(basename $SH)-readr.txt

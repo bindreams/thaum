@@ -2,6 +2,20 @@ name: '&> redirects stdout and stderr'
 dialect: bash
 source: oils:spec/redirect#redirects-stdout-and-stderr
 stdout: "STDOUT\nSTDERR\n"
+setup: |
+  #!/bin/sh
+  cat > stdout_stderr.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  stdout = sys.argv[1] if len(sys.argv) > 1 else "STDOUT"
+  stderr = sys.argv[2] if len(sys.argv) > 2 else "STDERR"
+  status = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+  print(stdout)
+  print(stderr, file=sys.stderr)
+  sys.exit(status)
+  HELPER
+  chmod +x stdout_stderr.py
+
 ---
 tmp="$(basename $SH)-$$.txt"  # unique name for shell and test case
 #echo $tmp

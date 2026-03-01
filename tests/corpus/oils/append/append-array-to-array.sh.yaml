@@ -2,6 +2,15 @@ name: Append array to array
 dialect: bash
 source: oils:spec/append#append-array-to-array
 stdout: "['x', 'y', 't', 'u v']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(x y )
 a+=(t 'u v')

@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/interactive#error-message-with-bad-oshrc-file-currently-ignored
 stdout: "hi\nstatus=0\nbad_oshrc:\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 echo 'foo >' > bad_oshrc

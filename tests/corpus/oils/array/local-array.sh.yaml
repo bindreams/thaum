@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/array#local-array
 status: 0
 stdout: "['1']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # mksh support local variables, but not local arrays, oddly.
 f() {

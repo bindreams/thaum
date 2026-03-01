@@ -2,6 +2,15 @@ name: var ref TO array var, with subscripts
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-array-var-with-subscripts
 stdout: "['']\n['x']\n['z']\n['x', 'y', 'z']\n['x y z']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 f() {
   argv.py "${!1}"

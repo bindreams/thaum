@@ -4,6 +4,15 @@ source: oils:spec/array-literal#index-increments-without-k-basharray
 stdout: "keys: ['100', '101', '102', '103']\nvals: ['1', '2', '3', '4']\nkeys: ['5',
   '6', '7', '8', '100', '101', '102', '103']\nvals: ['a', 'b', 'c', 'd', '1', '2',
   '3', '4']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=([100]=1 2 3 4)
 printf 'keys: '; argv.py "${!a[@]}"

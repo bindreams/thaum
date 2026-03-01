@@ -2,6 +2,8 @@ name: if pipeline doesn't fail fatally
 dialect: bash
 source: oils:spec/errexit-osh#if-pipeline-doesnt-fail-fatally
 stdout: "done\n"
+environment:
+  TMP: /tmp
 ---
 set -o errexit
 set -o pipefail

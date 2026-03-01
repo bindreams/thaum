@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/smoke#redirect-external-command
 stdout: "3\n"
 stderr: ''
+environment:
+  TMP: /tmp
 ---
 expr 3 > $TMP/expr3.txt
 cat $TMP/expr3.txt

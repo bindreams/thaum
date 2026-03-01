@@ -1,14 +1,21 @@
 mod common;
 
 use std::path::{Path, PathBuf};
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, AtomicU8};
 
 use libtest_mimic::Failed;
 use serde::Deserialize;
 use yaml_rust2::Yaml;
 
-/// Checked once at startup; cached to avoid repeated docker calls.
-static DOCKER_AVAILABLE: AtomicBool = AtomicBool::new(false);
+/// Execution backend for corpus exec tests.
+/// 0 = not initialized, 1 = docker, 2 = native (--no-sandbox), 3 = disabled
+static EXEC_BACKEND: AtomicU8 = AtomicU8::new(0);
+const BACKEND_DOCKER: u8 = 1;
+const BACKEND_NATIVE: u8 = 2;
+const BACKEND_DISABLED: u8 = 3;
+
+/// Whether --no-sandbox was passed on the command line.
+static NO_SANDBOX: AtomicBool = AtomicBool::new(false);
 
 // Test spec schema ----------------------------------------------------------------------------------------------------
 
@@ -78,6 +85,16 @@ struct TestSpec {
 
     #[serde(rename = "parse-error")]
     parse_error: Option<ParseErrorSpec>,
+
+    /// Environment variables set before setup/execution.  Values undergo
+    /// shell-style expansion so `PATH: "/my/bin:$PATH"` works.
+    #[serde(default)]
+    environment: std::collections::HashMap<String, String>,
+
+    /// Setup script executed before the test. Runs as a file in a fresh temp
+    /// directory (shebang selects interpreter). The same directory becomes cwd
+    /// for the main test script.
+    setup: Option<String>,
 
     // ast is parsed separately from the raw YAML header using yaml_rust2
     // to avoid version mismatches with serde_yaml2's wrapper type.
@@ -380,14 +397,19 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
                 .map_err(|msg| format!("AST mismatch: {}\n\nActual verbose YAML:\n{}", msg, actual_yaml_str))?;
         }
 
-        // 3. Execution assertions (optional, requires Docker)
+        // 3. Execution assertions (optional, requires sandbox or --no-sandbox)
         if spec.status.is_some() || spec.stdout.is_some() || spec.stderr.is_some() {
-            if !DOCKER_AVAILABLE.load(std::sync::atomic::Ordering::Relaxed) {
+            let backend = EXEC_BACKEND.load(std::sync::atomic::Ordering::Relaxed);
+            if backend == BACKEND_DISABLED {
                 return Ok(());
             }
 
             let bash_flag = matches!(spec.dialect.as_str(), "bash" | "bash44" | "bash50" | "bash51");
-            let result = common::docker::run_thaum_in_docker(input, bash_flag);
+            let result = if backend == BACKEND_NATIVE {
+                common::docker::exec_native(input, bash_flag, spec.setup.as_deref(), &spec.environment)
+            } else {
+                common::docker::exec_in_container(input, bash_flag, spec.setup.as_deref(), &spec.environment)
+            };
 
             if let Some(expected_status) = spec.status {
                 if result.exit_code != expected_status {
@@ -486,12 +508,26 @@ fn collect_files_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 fn main() {
-    // Check Docker availability once at startup.
-    let docker_ok = common::docker::docker_image_available("thaum-corpus-exec");
-    DOCKER_AVAILABLE.store(docker_ok, std::sync::atomic::Ordering::Relaxed);
-    if !docker_ok {
-        eprintln!("note: thaum-corpus-exec Docker image not found; execution assertions will be skipped");
-        eprintln!("      run scripts/build-corpus-docker.sh to enable them");
+    // Parse --no-sandbox / --sandbox before testutil takes over arg parsing.
+    let no_sandbox = std::env::args().any(|a| a == "--no-sandbox");
+    NO_SANDBOX.store(no_sandbox, std::sync::atomic::Ordering::Relaxed);
+
+    // Initialize exec backend.
+    if no_sandbox {
+        EXEC_BACKEND.store(BACKEND_NATIVE, std::sync::atomic::Ordering::Relaxed);
+        eprintln!("note: running execution tests natively (--no-sandbox)");
+    } else if common::docker::docker_available() && common::docker::docker_image_available("thaum-corpus-exec") {
+        if common::docker::ensure_container() {
+            EXEC_BACKEND.store(BACKEND_DOCKER, std::sync::atomic::Ordering::Relaxed);
+        } else {
+            eprintln!("warning: failed to start Docker container; execution tests will be skipped");
+            EXEC_BACKEND.store(BACKEND_DISABLED, std::sync::atomic::Ordering::Relaxed);
+        }
+    } else {
+        eprintln!("note: thaum-corpus-exec Docker image not found; execution tests will be skipped");
+        eprintln!("      use --no-sandbox to run natively, or build the image:");
+        eprintln!("      docker build -t thaum-corpus-exec -f tests/docker/Dockerfile .");
+        EXEC_BACKEND.store(BACKEND_DISABLED, std::sync::atomic::Ordering::Relaxed);
     }
 
     let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");
@@ -538,5 +574,11 @@ fn main() {
         });
     }
 
-    runner.run();
+    let conclusion = runner.run_tests();
+
+    // Note: the Docker container (thaum-corpus-sandbox) is intentionally left
+    // running to be reused across nextest invocations. It can be cleaned up
+    // with: docker rm -f thaum-corpus-sandbox
+
+    conclusion.exit();
 }

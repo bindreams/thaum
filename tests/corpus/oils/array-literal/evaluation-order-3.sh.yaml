@@ -4,6 +4,15 @@ source: oils:spec/array-literal#evaluation-order-3
 stdout: "keys: ['0', '1', '2', '3', '4']\nvals: ['old3', 'old1', 'old2', 'old3', 'old1']\n\
   keys: ['0', '1', '2', '5', '201', '202']\nvals: ['new1', 'new2', 'new3', 'old3',
   'old1', 'old2']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # RHS should be expanded before any modification to the array.
 a=(old1 old2 old3)

@@ -2,6 +2,15 @@ name: ${FUNCNAME} with prefix/suffix operators
 dialect: bash
 source: oils:spec/introspect#funcname-with-prefixsuffix-operators
 stdout: "['5']\n['c']\n['heck']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 check() {

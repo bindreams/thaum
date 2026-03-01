@@ -2,6 +2,15 @@ name: ${!ref} to undefined array
 dialect: bash
 source: oils:spec/nix-idioms#ref-to-undefined-array
 stdout: "[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 set -u

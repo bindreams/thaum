@@ -2,6 +2,8 @@ name: 'compgen with actions: function / variable / file'
 dialect: bash
 source: oils:spec/builtin-completion#compgen-with-actions-function-variable-file
 stdout: "PA_FUNC\nPATH\nPA_FILE\n"
+environment:
+  TMP: /tmp
 ---
 mkdir -p $TMP/compgen2
 touch $TMP/compgen2/{PA,Q}_FILE

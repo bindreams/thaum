@@ -2,6 +2,15 @@ name: IFS='\ ' and backslash escaping
 dialect: bash
 source: oils:spec/builtin-read#ifs-and-backslash-escaping
 stdout: "['hello world', 'test']\n['hello world  test', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 IFS='\ '
 echo "hello\ world  test" | (read a b; argv.py "$a" "$b")

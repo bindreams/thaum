@@ -2,6 +2,15 @@ name: 'Nested % and # operators (bug reported by Crestwave)'
 dialect: bash
 source: oils:spec/var-op-strip#nested-and-operators-bug-reported-by-crestwave
 stdout: "['']\n['\\n']\n['\\n']\n['']\n['a']\n['a']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 var=$'\n'
 argv.py "${var#?}"

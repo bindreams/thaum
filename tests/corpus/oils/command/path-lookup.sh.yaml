@@ -2,6 +2,8 @@ name: $PATH lookup
 dialect: bash
 source: oils:spec/command#path-lookup
 stdout: "one\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 mkdir -p one two

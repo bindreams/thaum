@@ -2,6 +2,17 @@ name: read -n (with $REPLY)
 dialect: bash
 source: oils:spec/builtin-read#read--n-with-reply
 stdout: "['1234', '12']\n"
+environment:
+  TMP: /tmp
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 echo 12345 > $TMP/readn.txt
 read -n 4 x < $TMP/readn.txt

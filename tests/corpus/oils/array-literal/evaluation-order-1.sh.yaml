@@ -2,6 +2,15 @@ name: Evaluation order (1)
 dialect: bash
 source: oils:spec/array-literal#evaluation-order-1
 stdout: "keys: ['104', '205', '306']\nvals: ['1', '2', '3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # RHS of [k]=v are expanded when the initializer list is instanciated.  For the
 # indexed array, the array indices are evaluated when the array is modified.

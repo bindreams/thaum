@@ -2,6 +2,15 @@ name: "IFS='' with $@ and $* (bug #627)"
 dialect: bash
 source: oils:spec/word-split#ifs-with-and-bug-627
 stdout: "['at', 'a', 'b c']\n['star', 'a', 'b c']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 set -- a 'b c'
 IFS=''

@@ -4,6 +4,8 @@ source:
   oils:spec/builtin-type-bash#type--t-doesnt-find-non-executable-like-command--v
 status: 1
 stdout: "\n"
+environment:
+  TMP: /tmp
 ---
 PATH="$TMP:$PATH"
 touch $TMP/non-executable

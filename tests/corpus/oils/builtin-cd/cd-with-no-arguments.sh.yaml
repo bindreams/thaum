@@ -2,6 +2,8 @@ name: cd with no arguments
 dialect: bash
 source: oils:spec/builtin-cd#cd-with-no-arguments
 stdout: "OK\n"
+environment:
+  TMP: /tmp
 ---
 HOME=$TMP/home
 mkdir -p $HOME

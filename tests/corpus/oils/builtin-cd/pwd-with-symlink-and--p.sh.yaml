@@ -2,6 +2,8 @@ name: pwd with symlink and -P
 dialect: bash
 source: oils:spec/builtin-cd#pwd-with-symlink-and--p
 stdout: "pwd:\nsymlink\npwd -P:\ntarget\n"
+environment:
+  TMP: /tmp
 ---
 tmp=$TMP/builtins-pwd-1
 mkdir -p $tmp/target

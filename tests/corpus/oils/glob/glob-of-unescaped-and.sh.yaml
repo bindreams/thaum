@@ -2,6 +2,8 @@ name: Glob of unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#glob-of-unescaped-and
 stdout: "[ ]\n[ ]\n"
+environment:
+  TMP: /tmp
 ---
 touch $TMP/[ $TMP/]
 cd $TMP

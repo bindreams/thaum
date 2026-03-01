@@ -6,6 +6,22 @@ source:
 stdout: ":\n 20 09 0a 0a\nIFS= z\n\nshellfunc IFS= z\n['x', 'x', 'x']\n\nshellfunc
   IFS= x\n['', 'z', 'z', 'z']\n\nmyproc IFS= z\n['x', 'x', 'x']\n\nmyproc IFS= x\n\
   ['', 'z', 'z', 'z']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 
 # Note: osh/split.py uses dynamic scope to look up IFS

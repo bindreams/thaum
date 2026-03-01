@@ -2,5 +2,14 @@ name: Inner double quotes
 dialect: bash
 source: oils:spec/var-sub-quote#inner-double-quotes
 stdout: "['b']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 argv.py ${Unset:-"b"}

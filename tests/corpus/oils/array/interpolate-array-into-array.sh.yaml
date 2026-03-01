@@ -2,6 +2,15 @@ name: Interpolate array into array
 dialect: bash
 source: oils:spec/array#interpolate-array-into-array
 stdout: "['0', '1', '2 3', '4 5']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(1 '2 3')
 a=(0 "${a[@]}" '4 5')

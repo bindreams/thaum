@@ -3,6 +3,8 @@ name: argv0 trace
 dialect: bash
 source: oils:spec/ysh-dev#argv0-trace
 stdout: "internal\nx1\nx2\n(\n$(\n)\nx3\n"
+environment:
+  TMP: /tmp
 ---
 
 OILS_TRACE_DIR=$TMP $SH -c '

@@ -2,6 +2,8 @@ name: read -N ignores delimiters
 dialect: bash
 source: oils:spec/builtin-read#read--n-ignores-delimiters
 stdout: "a\nb\n"
+environment:
+  TMP: /tmp
 ---
 case $SH in dash|ash|zsh) exit ;; esac
 

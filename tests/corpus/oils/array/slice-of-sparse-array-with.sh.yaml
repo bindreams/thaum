@@ -2,6 +2,15 @@ name: Slice of sparse array with [@]
 dialect: bash
 source: oils:spec/array#slice-of-sparse-array-with
 stdout: "['1', '2']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # mksh doesn't support this syntax!  It's a bash extension.
 (( a[33]=1 ))

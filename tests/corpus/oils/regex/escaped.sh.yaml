@@ -2,6 +2,15 @@ name: Escaped {
 dialect: bash
 source: oils:spec/regex#escaped
 stdout: "['$PA', '$', 'PA']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # from bash-completion
 [[ '$PA' =~ ^(\$\{?)([A-Za-z0-9_]*)$ ]] && argv.py "${BASH_REMATCH[@]}"

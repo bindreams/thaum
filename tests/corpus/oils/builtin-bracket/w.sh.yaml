@@ -2,6 +2,8 @@ name: -w
 dialect: bash
 source: oils:spec/builtin-bracket#w
 stdout: "yes\nno\n"
+environment:
+  TMP: /tmp
 ---
 rm -f $TMP/testw_*
 echo '1' > $TMP/testw_yes

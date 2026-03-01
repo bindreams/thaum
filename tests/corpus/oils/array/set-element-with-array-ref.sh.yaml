@@ -2,6 +2,15 @@ name: Set element with array ref
 dialect: bash
 source: oils:spec/array#set-element-with-array-ref
 stdout: "['1', '9']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # This makes parsing a little more complex.  Anything can be inside [],
 # including other [].

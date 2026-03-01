@@ -2,6 +2,8 @@ name: shopt with no flags prints options
 dialect: bash
 source: oils:spec/sh-options#shopt-with-no-flags-prints-options
 stdout: "2 one.txt\nnullglob\nfailglob\n1\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 

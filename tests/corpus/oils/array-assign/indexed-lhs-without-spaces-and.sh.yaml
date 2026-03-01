@@ -2,6 +2,15 @@ name: Indexed LHS without spaces, and +=
 dialect: bash
 source: oils:spec/array-assign#indexed-lhs-without-spaces-and
 stdout: "status=0\n['x']\n['x', 'y']\n['x', 'yz']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a[1]=x
 echo status=$?

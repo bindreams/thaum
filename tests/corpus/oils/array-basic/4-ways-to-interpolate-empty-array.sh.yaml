@@ -2,5 +2,14 @@ name: 4 ways to interpolate empty array
 dialect: bash
 source: oils:spec/array-basic#4-ways-to-interpolate-empty-array
 stdout: "['1', '2', '3', '', '4', '5']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 argv.py 1 "${a[@]}" 2 ${a[@]} 3 "${a[*]}" 4 ${a[*]} 5

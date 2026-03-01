@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-history#history--w-writes-out-the-in-memory-history-to-the-history-file
 stdout: "found=1\n"
+environment:
+  TMP: /tmp
 ---
 
 cd $TMP

@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/builtin-eval-source#exit-within-source-regression
 status: 42
 stdout: ''
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 echo 'exit 42' > lib.sh

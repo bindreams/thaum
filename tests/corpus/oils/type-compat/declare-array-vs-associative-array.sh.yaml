@@ -2,6 +2,15 @@ name: declare array vs. associative array
 dialect: bash
 source: oils:spec/type-compat#declare-array-vs-associative-array
 stdout: "['1', '0', 'd']\n['2', 'a', 'c', 'b', 'd']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # Hm I don't understand why the array only has one element.  I guess because
 # index 0 is used twice?

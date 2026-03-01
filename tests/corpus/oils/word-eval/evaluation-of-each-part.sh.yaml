@@ -2,6 +2,15 @@ name: Evaluation of each part
 dialect: bash
 source: oils:spec/word-eval#evaluation-of-each-part
 stdout: "['bare', 'sq', '/home/bob', 's', '-s-', 'a1', 'a2', '3', 'c', 'c']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 #set -o noglob
 HOME=/home/bob

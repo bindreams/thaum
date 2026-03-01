@@ -1,6 +1,8 @@
 name: '>| to clobber'
 dialect: bash
 source: oils:spec/redirect#to-clobber
+environment:
+  TMP: /tmp
 ---
 echo XX >| $TMP/c.txt
 

@@ -2,5 +2,14 @@ name: args that look like flags are passed after -c
 dialect: bash
 source: oils:spec/sh-usage#args-that-look-like-flags-are-passed-after--c
 stdout: "['--help', '-h']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 $SH -c 'argv.py "$@"' --help --help -h

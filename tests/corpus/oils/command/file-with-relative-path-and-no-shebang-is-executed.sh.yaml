@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/command#file-with-relative-path-and-no-shebang-is-executed
 status: 0
 stdout: "hi\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 echo 'echo hi' > no-shebang

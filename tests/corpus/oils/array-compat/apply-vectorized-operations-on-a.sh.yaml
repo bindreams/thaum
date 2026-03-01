@@ -2,6 +2,15 @@ name: Apply vectorized operations on ${a[*]}
 dialect: bash
 source: oils:spec/array-compat#apply-vectorized-operations-on-a
 stdout: "['x- y-y z-']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=('-x-' 'y-y' '-z-')
 

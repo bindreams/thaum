@@ -2,6 +2,15 @@ name: Append sparse arrays
 dialect: bash
 source: oils:spec/array#append-sparse-arrays
 stdout: "['1', '2', '3']\n['1', '2', '3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=()
 (( a[99]=1 ))

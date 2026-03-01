@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/var-op-slice#permutations-of-implicit-begin-and-length
 stdout: "['1', '2', '3']\n['1', '2', '3']\n[]\n\n['1', '2', '3']\n['1', '2', '3']\n\
   []\n\n['123']\n['123']\n['']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 array=(1 2 3)
 

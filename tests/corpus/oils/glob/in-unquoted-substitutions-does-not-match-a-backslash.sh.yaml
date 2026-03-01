@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/glob#in-unquoted-substitutions-does-not-match-a-backslash
 stdout: "['x/*\\\\*.txt']\n[\"x/test.ifs.'.txt\"]\n['x/test.ifs.a.txt']\n['x/test.ifs.\\\
   \\b.txt']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 mkdir x
 touch \

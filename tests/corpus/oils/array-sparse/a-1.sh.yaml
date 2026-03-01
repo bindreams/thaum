@@ -4,6 +4,15 @@ source: oils:spec/array-sparse#a
 stdout: "['0', '1', '5', '6', '8', '9']\n['abc0', '1', '5', '6', '8', '9xyz']\n['v',
   'v', 'v', 'v6', 'v8', 'v9']\n['abcv', 'v', 'v', 'v6', 'v8', 'v9xyz']\n['', '', '',
   '', '', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in mksh) exit ;; esac
 

@@ -3,6 +3,16 @@ dialect: bash
 source: oils:spec/assign#env-binding-not-allowed-before-compound-command
 status: 2
 parse-error: "unexpected token 'do', expected a command"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 # bash gives exit code 2 for syntax error, because of 'do'.
 # dash gives 0 because there is stuff after for?  Should really give an error.

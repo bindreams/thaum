@@ -2,6 +2,8 @@ name: Glob of negated unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#glob-of-negated-unescaped-and
 stdout: "_G _G\n_G _G\n"
+environment:
+  TMP: /tmp
 ---
 # osh does this "correctly" because it defers to libc!
 touch $TMP/_G

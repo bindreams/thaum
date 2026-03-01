@@ -2,6 +2,15 @@ name: $(< $file) yields the contents of the file
 dialect: bash
 source: oils:spec/redirect-command#file-yields-the-contents-of-the-file
 stdout: "['2\\n3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 seq 2 3 > myfile

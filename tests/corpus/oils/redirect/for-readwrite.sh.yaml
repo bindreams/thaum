@@ -2,6 +2,8 @@ name: <> for read/write
 dialect: bash
 source: oils:spec/redirect#for-readwrite
 stdout: "line=first\nCONTENTS\nfirst\nsecond\n"
+environment:
+  TMP: /tmp
 ---
 echo first >$TMP/rw.txt
 exec 8<>$TMP/rw.txt

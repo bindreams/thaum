@@ -2,6 +2,8 @@ name: Nonexistent file
 dialect: bash
 source: oils:spec/redirect#nonexistent-file
 stdout: "status=1\n"
+environment:
+  TMP: /tmp
 ---
 cat <$TMP/nonexistent.txt
 echo status=$?

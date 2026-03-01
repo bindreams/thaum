@@ -2,6 +2,8 @@ name: Nested backticks
 dialect: bash
 source: oils:spec/command-sub#nested-backticks
 stdout: "000000-first\n"
+environment:
+  TMP: /tmp
 ---
 # Inner `` are escaped!  Not sure how to do triple..  Seems like an unlikely
 # use case.  Not sure if I even want to support this!

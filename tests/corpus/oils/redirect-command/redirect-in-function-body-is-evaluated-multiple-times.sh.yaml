@@ -2,6 +2,8 @@ name: Redirect in function body is evaluated multiple times
 dialect: bash
 source: 
   oils:spec/redirect-command#redirect-in-function-body-is-evaluated-multiple-times
+environment:
+  TMP: /tmp
 ---
 i=0
 fun() { echo "file $i"; } 1> "$TMP/file$((i++))"

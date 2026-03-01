@@ -7,6 +7,15 @@ stdout: "declare -a z=()\ndeclare -a z=([0]=\"b\" [1]=\"c\")\ndeclare -a z=([0]=
   b-mystr\" [1]=\"ZZZ\" [5]=\"d\" [6]=\"f\" [7]=\"g\")\ndeclare -a z=([0]=\"b-mystr\"\
   \ [1]=\"ZZZ-append\" [5]=\"d\" [6]=\"f\" [7]=\"g\")\n['keys', '0', '1', '5', '6',
   '7']\n['values', 'b-mystr', 'ZZZ-append', 'd', 'f', 'g']\nstatus=1\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 case $SH in mksh) exit ;; esac

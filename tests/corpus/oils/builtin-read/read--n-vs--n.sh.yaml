@@ -2,6 +2,8 @@ name: read -n vs. -N
 dialect: bash
 source: oils:spec/builtin-read#read--n-vs--n
 stdout: "read -n\n'a' 'b' 'c'\n'a' 'b' ''\n\nread -N\n'a b c' '' ''\n'a b ' '' ''\n"
+environment:
+  TMP: /tmp
 ---
 # dash, ash and zsh do not implement read -N
 # mksh treats -N exactly the same as -n

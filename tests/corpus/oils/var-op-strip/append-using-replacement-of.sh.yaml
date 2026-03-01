@@ -2,6 +2,15 @@ name: Append using replacement of %
 dialect: bash
 source: oils:spec/var-op-strip#append-using-replacement-of
 stdout: "['aa-suffix', 'bb-suffix', '-suffix']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 array=(aa bb '')
 argv.py ${array[@]/%/-suffix}

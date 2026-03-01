@@ -3,6 +3,8 @@ name: crash dump
 dialect: bash
 source: oils:spec/ysh-dev#crash-dump
 stdout: "status=1\nstatus=0\n"
+environment:
+  TMP: /tmp
 ---
 
 rm -f $TMP/*.json

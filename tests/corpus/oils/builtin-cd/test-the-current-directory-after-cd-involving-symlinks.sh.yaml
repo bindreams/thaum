@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-cd#test-the-current-directory-after-cd-involving-symlinks
 stdout: "a\nc\n"
+environment:
+  TMP: /tmp
 ---
 dir=$TMP/symlinktest
 mkdir -p $dir

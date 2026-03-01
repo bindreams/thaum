@@ -1,6 +1,8 @@
 name: $LINENO in redirect arg (bug regression)
 dialect: bash
 source: oils:spec/vars-special#lineno-in-redirect-arg-bug-regression
+environment:
+  TMP: /tmp
 ---
 filename=$TMP/lineno_regression3
 rm -f $filename

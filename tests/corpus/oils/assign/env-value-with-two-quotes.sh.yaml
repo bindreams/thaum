@@ -2,5 +2,15 @@ name: Env value with two quotes
 dialect: bash
 source: oils:spec/assign#env-value-with-two-quotes
 stdout: "fooadjacent\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 FOO='foo'"adjacent" printenv.py FOO

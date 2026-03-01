@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/glob-bash#dotglob-bash-option-that-nodashglob-is-roughly-consistent-with
 stdout: "other\n.foorc other\n"
+environment:
+  TMP: /tmp
 ---
 mkdir -p $TMP/dotglob
 cd $TMP/dotglob

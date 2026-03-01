@@ -2,6 +2,15 @@ name: "IFS='' with ${!a[@]} and ${!a[*]} (bug #627)"
 dialect: bash
 source: oils:spec/word-split#ifs-with-a-and-a-bug-627
 stdout: "['at', '0', '1', '2']\n['star', '0', '1', '2']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in dash | mksh | ash | yash) exit 0 ;; esac
 

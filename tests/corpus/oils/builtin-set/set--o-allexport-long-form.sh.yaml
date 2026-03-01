@@ -2,6 +2,16 @@ name: set -o allexport (long form)
 dialect: bash
 source: oils:spec/builtin-set#set--o-allexport-long-form
 stdout: "value1\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 set -o allexport
 VAR1=value1

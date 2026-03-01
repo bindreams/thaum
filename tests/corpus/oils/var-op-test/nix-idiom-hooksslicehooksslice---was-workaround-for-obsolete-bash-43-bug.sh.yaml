@@ -4,6 +4,15 @@ dialect: bash
 source: 
   oils:spec/var-op-test#nix-idiom-hooksslicehooksslice---was-workaround-for-obsolete-bash-43-bug
 stdout: "[]\n[]\n['42']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 case $SH in dash|mksh|zsh) exit ;; esac

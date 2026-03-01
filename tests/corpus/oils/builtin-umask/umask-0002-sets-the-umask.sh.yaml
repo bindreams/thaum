@@ -4,6 +4,8 @@ source: oils:spec/builtin-umask#umask-0002-sets-the-umask
 status: 0
 stdout: "664\n644\n"
 stderr: ''
+environment:
+  TMP: /tmp
 ---
 umask 0002
 echo one > $TMP/umask-one

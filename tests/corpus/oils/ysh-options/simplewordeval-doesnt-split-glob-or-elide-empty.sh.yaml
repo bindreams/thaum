@@ -4,6 +4,15 @@ dialect: bash
 source: oils:spec/ysh-options#simplewordeval-doesnt-split-glob-or-elide-empty
 stdout: "['a', 'b', 'bar.z', 'foo.z', 'spam.z', 'spam.z']\n['-x y', 'z-']\n['a b',
   '*.z', '', 'spam.z']\n['-x y', 'z-']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 mkdir mydir
 touch foo.z bar.z spam.z

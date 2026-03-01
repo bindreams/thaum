@@ -4,6 +4,8 @@ dialect: bash
 source: 
   oils:spec/builtin-history#history--n-reads-new-commands-from-the-history-file-and-appends-them-to-the-current-history
 stdout: "10\n10\n"
+environment:
+  TMP: /tmp
 ---
 # NB: Based on line ranges, not contents
 

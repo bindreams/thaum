@@ -3,6 +3,16 @@ dialect: bash
 source: oils:spec/assign#multiple-temporary-envs-on-the-stack
 stdout: "f [] [A]\n--- g() ---\nf\n[]\n[A]\nNone\np\n--- f() ---\nf\nNone\nNone\n\
   None\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 g() {
   echo "$F" "$G1" "$G2"

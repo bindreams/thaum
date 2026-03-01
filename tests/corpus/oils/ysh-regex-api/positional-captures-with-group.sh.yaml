@@ -4,6 +4,15 @@ dialect: bash
 source: oils:spec/ysh-regex-api#positional-captures-with-group
 stdout: "['2020-08', '2020', '08']\n['2020-08', '2020', '08']\n['2020-08', '2020',
   '08']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s ysh:upgrade
 

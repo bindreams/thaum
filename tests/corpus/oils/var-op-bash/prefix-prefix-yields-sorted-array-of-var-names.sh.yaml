@@ -5,6 +5,15 @@ stdout: "['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO Z
   ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n\
   ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO ZOOM']\n['Z
   ZIP ZOO ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 ZOO=zoo
 ZIP=zip

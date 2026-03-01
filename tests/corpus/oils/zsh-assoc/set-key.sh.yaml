@@ -2,6 +2,15 @@ name: set key
 dialect: bash
 source: oils:spec/zsh-assoc#set-key
 stdout: "['bar', 'b', 'c', 'XX']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 typeset -A a
 a=(aa b foo bar a+1 c)

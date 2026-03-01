@@ -2,6 +2,23 @@ name: Multiple here docs in pipeline on multiple lines
 dialect: bash
 source: oils:spec/here-doc#multiple-here-docs-in-pipeline-on-multiple-lines
 stdout: "0: 3: fd3\n5: fd5\nok\n"
+setup: |
+  #!/bin/sh
+  cat > read_from_fd.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for arg in sys.argv[1:]:
+      fd = int(arg)
+      try:
+          data = os.read(fd, 1024)
+      except OSError as e:
+          print(f"FATAL: Error reading from fd {fd}: {e}", file=sys.stderr)
+          sys.exit(1)
+      sys.stdout.write(f"{fd}: ")
+      sys.stdout.buffer.write(data)
+  HELPER
+  chmod +x read_from_fd.py
+
 ---
 case $SH in *osh) exit ;; esac
 

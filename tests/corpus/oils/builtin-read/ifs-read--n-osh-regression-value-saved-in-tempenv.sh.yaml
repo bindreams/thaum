@@ -2,6 +2,17 @@ name: 'IFS= read -n (OSH regression: value saved in tempenv)'
 dialect: bash
 source: oils:spec/builtin-read#ifs-read--n-osh-regression-value-saved-in-tempenv
 stdout: "['X']\n"
+environment:
+  TMP: /tmp
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 echo XYZ > "$TMP/readn.txt"
 IFS= TMOUT= read -n 1 char < "$TMP/readn.txt"

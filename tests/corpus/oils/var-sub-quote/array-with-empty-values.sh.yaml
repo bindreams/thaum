@@ -2,6 +2,15 @@ name: array with empty values
 dialect: bash
 source: oils:spec/var-sub-quote#array-with-empty-values
 stdout: "['', 'x', '', '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 declare -a A=('' x "" '')
 argv.py "${A[@]}"

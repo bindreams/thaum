@@ -2,6 +2,8 @@ name: pwd after cd ..
 dialect: bash
 source: oils:spec/builtin-cd#pwd-after-cd
 stdout: "dir-two\ndir-one\n"
+environment:
+  TMP: /tmp
 ---
 dir=$TMP/dir-one/dir-two
 mkdir -p $dir

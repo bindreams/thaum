@@ -2,6 +2,8 @@ name: Nested function stdout redirect
 dialect: bash
 source: oils:spec/redirect-command#nested-function-stdout-redirect
 stdout: "i1\ni2\n--\no1\no2\n"
+environment:
+  TMP: /tmp
 ---
 # Shows that a stack is necessary.
 inner() {

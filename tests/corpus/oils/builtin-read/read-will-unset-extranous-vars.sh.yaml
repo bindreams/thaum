@@ -2,6 +2,8 @@ name: read will unset extranous vars
 dialect: bash
 source: oils:spec/builtin-read#read-will-unset-extranous-vars
 stdout: "'a' 'b' ''\n'a' 'b' ''\n"
+environment:
+  TMP: /tmp
 ---
 
 echo 'a b' > $TMP/read-few.txt

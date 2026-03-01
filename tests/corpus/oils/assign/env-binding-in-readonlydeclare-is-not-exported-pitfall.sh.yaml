@@ -2,6 +2,16 @@ name: Env binding in readonly/declare is NOT exported!  (pitfall)
 dialect: bash
 source: oils:spec/assign#env-binding-in-readonlydeclare-is-not-exported-pitfall
 stdout: "v=None\nv2=foo\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 
 # All shells agree on this, but it's very confusing behavior.

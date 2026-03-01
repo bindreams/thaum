@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/interactive#exit-in-oshrc-regression
 status: 42
 stdout: "one\n"
+environment:
+  TMP: /tmp
 ---
 cat >$TMP/oshrc <<EOF
 echo one

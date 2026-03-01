@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/regex#multiple-adjacent-groups
 stdout: "['a-b-c-d', 'b', 'd']\n['ff', '', '']\n['zz', 'zz', '']\n['zz', 'z', 'z',
   '']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 if [[ 'a-b-c-d' =~ a-(b|  >>)-c-( ;|[de])|ff|gg ]]; then

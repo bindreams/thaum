@@ -4,6 +4,8 @@ dialect: bash
 source: oils:spec/ysh-blocks#consistency-unwanted-blocks-are-errors
 stdout: "true 2\nfalse 2\necho block 2\necho args 2\ncommand echo 2\nbuiltin echo
   2\npushd 2\n"
+environment:
+  TMP: /tmp
 ---
 shopt --set parse_brace
 

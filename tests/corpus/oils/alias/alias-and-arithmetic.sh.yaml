@@ -2,6 +2,15 @@ name: Alias and arithmetic
 dialect: bash
 source: oils:spec/alias#alias-and-arithmetic
 stdout: "['3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s expand_aliases
 alias a=argv.py

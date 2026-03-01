@@ -2,6 +2,15 @@ name: Empty array with :-
 dialect: bash
 source: oils:spec/array-basic#empty-array-with
 stdout: "['not', 'one', 'not one']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 empty=()
 argv.py ${empty[@]:-not one} "${empty[@]:-not one}"

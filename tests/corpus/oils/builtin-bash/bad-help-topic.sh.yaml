@@ -1,6 +1,8 @@
 name: bad help topic
 dialect: bash
 source: oils:spec/builtin-bash#bad-help-topic
+environment:
+  TMP: /tmp
 ---
 help ZZZ 2>$TMP/err.txt
 echo "help=$?"

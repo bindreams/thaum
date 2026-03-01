@@ -3,6 +3,8 @@ name: crash dump with source
 dialect: bash
 source: oils:spec/ysh-dev#crash-dump-with-source
 stdout: "crash status=1\nfound crash dump\n"
+environment:
+  TMP: /tmp
 ---
 # TODO: The failure is not propagated through 'source'.  Failure only happens
 # on 'errexit'.

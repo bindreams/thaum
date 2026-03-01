@@ -4,6 +4,15 @@ source:
   oils:spec/array-assoc#slice-of-associative-array-doesnt-make-sense-in-bash
 status: 1
 stdout: ''
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 declare -A a
 a[xx]=1

@@ -1,6 +1,15 @@
 name: ${BASH_SOURCE[@]} with source and function name
 dialect: bash
 source: oils:spec/introspect#bashsource-with-source-and-function-name
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 cd $REPO_ROOT
 

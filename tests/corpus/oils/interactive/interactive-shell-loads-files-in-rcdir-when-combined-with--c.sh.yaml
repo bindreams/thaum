@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/interactive#interactive-shell-loads-files-in-rcdir-when-combined-with--c
 stdout: "A\nrcdir 1\nrcdir 2\nB\nrcfile first\nrcdir 1\nrcdir 2\nC\n"
+environment:
+  TMP: /tmp
 ---
 
 $SH -c 'echo A'

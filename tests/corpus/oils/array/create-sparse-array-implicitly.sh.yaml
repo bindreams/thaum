@@ -2,6 +2,15 @@ name: Create sparse array implicitly
 dialect: bash
 source: oils:spec/array#create-sparse-array-implicitly
 stdout: "len=1\n['1']\nunset=\nlen-of-unset=0\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 (( a[99]=1 ))
 echo len=${#a[@]}

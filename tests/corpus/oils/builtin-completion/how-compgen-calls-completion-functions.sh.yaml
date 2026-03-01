@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/builtin-completion#how-compgen-calls-completion-functions
 stdout: "['argv', 'compgen', 'foo', '']\n['COMP_WORDS']\n['COMP_CWORD', '-1']\n['COMP_LINE',
   '']\n['COMP_POINT', '0']\none\ntwo\nthree\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 foo_complete() {
   # first, cur, prev

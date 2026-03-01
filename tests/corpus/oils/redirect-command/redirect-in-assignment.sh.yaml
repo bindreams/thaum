@@ -2,6 +2,8 @@ name: Redirect in assignment
 dialect: bash
 source: oils:spec/redirect-command#redirect-in-assignment
 stdout: "FILE=\nfoo\nFOO=\n"
+environment:
+  TMP: /tmp
 ---
 # dash captures stderr to a file here, which seems correct.  Bash doesn't and
 # just lets it go to actual stderr.

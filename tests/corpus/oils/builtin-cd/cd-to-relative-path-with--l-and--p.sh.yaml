@@ -2,6 +2,8 @@ name: cd to relative path with -L and -P
 dialect: bash
 source: oils:spec/builtin-cd#cd-to-relative-path-with--l-and--p
 stdout: "OK\nOK\nOK\n"
+environment:
+  TMP: /tmp
 ---
 die() { echo "$@"; exit 1; }
 

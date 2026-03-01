@@ -5,6 +5,15 @@ stdout: "['-SHELL', 'a', '1-']\n['-a', '1', 'b', '2-']\n['-c', '3-']\n['--']\n['
   ['-SHELL', 'a', '1-']\n['-a', '1', 'b', '2-']\n['-c', '3-']\n['--']\n['--']\n['-SHELL
   a 1-']\n['-a 1 b 2-']\n['-c 3-']\n['--']\n['--']\n['-SHELL', 'a 1-']\n['-a 1', 'b
   2-']\n['-c 3-']\n['--']\n['--']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in zsh) return ;; esac  # zsh is very different
 

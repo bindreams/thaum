@@ -2,6 +2,8 @@ name: Open file on descriptor 4 and write to it many times
 dialect: bash
 source: oils:spec/redirect#open-file-on-descriptor-4-and-write-to-it-many-times
 stdout: "hello\nworld\n"
+environment:
+  TMP: /tmp
 ---
 
 # different than the case above because because 4 isn't the likely first FD

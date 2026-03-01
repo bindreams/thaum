@@ -2,6 +2,15 @@ name: Array Decay with IFS
 dialect: bash
 source: oils:spec/array-compat#array-decay-with-ifs
 stdout: "['[x y z]']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 IFS=x
 set -- x y z

@@ -4,6 +4,8 @@ dialect: bash
 source: 
   oils:spec/builtin-history#history--r-reads-from-the-history-file-and-appends-it-to-the-current-history
 stdout: "20\n"
+environment:
+  TMP: /tmp
 ---
 
 cd $TMP

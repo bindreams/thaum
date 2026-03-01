@@ -4,6 +4,8 @@ dialect: bash
 source: oils:spec/array-sparse#crash-dump
 stdout: "{\n  \"val\": {\n    \"type\": \"BashArray\",\n    \"data\": {\n      \"\
   0\": \"0\",\n      \"1\": \"1\",\n      \"3\": \"3\"\n    }\n  }\n}\n"
+environment:
+  TMP: /tmp
 ---
 case $SH in bash|mksh) exit ;; esac
 

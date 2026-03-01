@@ -2,6 +2,8 @@ name: -ef
 dialect: bash
 source: oils:spec/builtin-bracket#ef
 stdout: "same\nsame\ndifferent\ndifferent\n"
+environment:
+  TMP: /tmp
 ---
 left=$TMP/left
 right=$TMP/right

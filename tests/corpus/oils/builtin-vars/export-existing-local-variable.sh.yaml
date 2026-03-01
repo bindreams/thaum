@@ -1,6 +1,16 @@
 name: Export existing local variable
 dialect: bash
 source: oils:spec/builtin-vars#export-existing-local-variable
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 f() {
   local L1=local1

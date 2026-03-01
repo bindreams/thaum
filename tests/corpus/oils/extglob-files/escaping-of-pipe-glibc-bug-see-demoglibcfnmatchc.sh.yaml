@@ -2,6 +2,15 @@ name: Escaping of pipe (glibc bug, see demo/glibc_fnmatch.c)
 dialect: bash
 source: oils:spec/extglob-files#escaping-of-pipe-glibc-bug-see-demoglibcfnmatchc
 stdout: "['__|', 'foo']\n['__|', 'foo']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s extglob
 

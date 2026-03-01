@@ -2,6 +2,16 @@ name: dynamic flag in array in assign builtin
 dialect: bash
 source: oils:spec/assign-extended#dynamic-flag-in-array-in-assign-builtin
 stdout: "foo=F\nbar=B\nF\nB\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 typeset b
 b=(unused1 unused2)  # this works in mksh

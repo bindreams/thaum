@@ -2,6 +2,8 @@ name: -ot and -nt
 dialect: bash
 source: oils:spec/builtin-bracket#ot-and--nt
 stdout: "older\nnot newer\nnot older than itself\nnot newer than itself\n"
+environment:
+  TMP: /tmp
 ---
 touch -d 2017/12/31 $TMP/x
 touch -d 2018/01/01 > $TMP/y

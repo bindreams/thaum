@@ -2,6 +2,8 @@ name: cd to symlink with -L and -P
 dialect: bash
 source: oils:spec/builtin-cd#cd-to-symlink-with--l-and--p
 stdout: "OK\nOK\nOK\n"
+environment:
+  TMP: /tmp
 ---
 targ=$TMP/cd-symtarget
 lnk=$TMP/cd-symlink

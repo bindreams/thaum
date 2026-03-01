@@ -2,6 +2,8 @@ name: compgen doesn't need shell quoting
 dialect: bash
 source: oils:spec/builtin-completion#compgen-doesnt-need-shell-quoting
 stdout: "foo bar\nfoo'bar\n"
+environment:
+  TMP: /tmp
 ---
 # There is an obsolete comment in bash_completion that claims the opposite.
 cd $TMP

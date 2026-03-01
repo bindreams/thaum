@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-eval-source#source-works-for-files-in-current-directory-bash-only
 stdout: "current dir\nstatus=0\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 echo "echo current dir" > cmd

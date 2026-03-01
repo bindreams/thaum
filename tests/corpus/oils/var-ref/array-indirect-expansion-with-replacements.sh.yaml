@@ -5,6 +5,15 @@ stdout: "==== v1 ====\n['alue']\n['valu']\n['vlu']\n['vxlux']\n==== v2 ====\n[''
   ['']\n['']\n['']\n==== a1 ====\n['']\n['']\n['']\n['']\n==== a2[0] ====\n['lement']\n\
   ['elemen']\n['lmnt']\n['xlxmxnt']\n==== a3[@] ====\n['', '', '']\n['', '', '']\n\
   ['1', '2', '3']\n['1', '2', '3']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 declare -A ref=(['dummy']=v1)

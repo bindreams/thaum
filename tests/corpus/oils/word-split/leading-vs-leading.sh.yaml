@@ -2,6 +2,15 @@ name: Leading ' ' vs leading ' _ '
 dialect: bash
 source: oils:spec/word-split#leading-vs-leading
 stdout: "['', 'a', 'b']\n['a', 'b']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # This behavior is weird, but all shells agree.
 IFS='_ '

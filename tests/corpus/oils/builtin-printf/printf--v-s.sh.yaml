@@ -2,6 +2,15 @@ name: printf -v %s
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-s
 stdout: "['hello there']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 var=foo
 printf -v $var %s 'hello there'

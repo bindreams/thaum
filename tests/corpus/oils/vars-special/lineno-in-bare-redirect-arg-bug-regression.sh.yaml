@@ -1,6 +1,8 @@
 name: $LINENO in "bare" redirect arg (bug regression)
 dialect: bash
 source: oils:spec/vars-special#lineno-in-bare-redirect-arg-bug-regression
+environment:
+  TMP: /tmp
 ---
 filename=$TMP/bare3
 rm -f $filename

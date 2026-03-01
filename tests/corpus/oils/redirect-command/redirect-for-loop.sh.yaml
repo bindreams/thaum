@@ -2,6 +2,8 @@ name: redirect for loop
 dialect: bash
 source: oils:spec/redirect-command#redirect-for-loop
 stdout: "1\n2\n3\n"
+environment:
+  TMP: /tmp
 ---
 for i in $(seq 3)
 do

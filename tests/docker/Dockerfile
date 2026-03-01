@@ -7,5 +7,6 @@ RUN git clean -fdx
 RUN cargo build --features cli --release
 
 FROM alpine:latest
+RUN apk add --no-cache python3
 COPY --from=builder /src/target/release/thaum /usr/local/bin/thaum
 ENTRYPOINT ["thaum", "exec"]

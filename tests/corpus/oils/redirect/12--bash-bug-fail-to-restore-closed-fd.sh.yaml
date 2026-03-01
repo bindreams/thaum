@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/redirect#12--bash-bug-fail-to-restore-closed-fd
 status: 1
 stdout: ''
+environment:
+  TMP: /tmp
 ---
 
 # 7/2021: descriptor 8 is open on Github Actions, so use descriptor 6 instead

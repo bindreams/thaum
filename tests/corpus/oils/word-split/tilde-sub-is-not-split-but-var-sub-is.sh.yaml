@@ -2,6 +2,15 @@ name: Tilde sub is not split, but var sub is
 dialect: bash
 source: oils:spec/word-split#tilde-sub-is-not-split-but-var-sub-is
 stdout: "['foo bar']\n['foo', 'bar']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 HOME="foo bar"
 argv.py ~

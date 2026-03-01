@@ -2,6 +2,8 @@ name: noclobber on <>
 dialect: bash
 source: oils:spec/sh-options#noclobber-on
 stdout: "f.o\n"
+environment:
+  TMP: /tmp
 ---
 set -C
 echo foo >| $TMP/no-clobber

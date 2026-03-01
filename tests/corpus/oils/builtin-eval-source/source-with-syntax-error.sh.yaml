@@ -2,6 +2,8 @@ name: Source with syntax error
 dialect: bash
 source: oils:spec/builtin-eval-source#source-with-syntax-error
 stdout: "status=2\n"
+environment:
+  TMP: /tmp
 ---
 # TODO: We should probably use dash behavior of a fatal error.
 # Although set-o errexit handles this.  We don't want to break the invariant

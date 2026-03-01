@@ -2,6 +2,15 @@ name: '[compat_array] ${arr} is ${arr[0]}'
 dialect: bash
 source: oils:spec/ble-features#compatarray-arr-is-arr0
 stdout: "['foo', 'foo']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case ${SH##*/} in dash|ash) exit 1 ;; esac # dash/ash does not have arrays
 case ${SH##*/} in osh) shopt -s compat_array ;; esac

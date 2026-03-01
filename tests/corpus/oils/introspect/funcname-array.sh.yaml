@@ -1,6 +1,15 @@
 name: ${FUNCNAME[@]} array
 dialect: bash
 source: oils:spec/introspect#funcname-array
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 g() {
   argv.py "${FUNCNAME[@]}"

@@ -2,6 +2,15 @@ name: assignment using dynamic var names doesn't split
 dialect: bash
 source: oils:spec/assign#assignment-using-dynamic-var-names-doesnt-split
 stdout: "['a b c', 'a b c']\n['a b c', 'a b c']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 words='a b c'
 arg_ex=ex=$words

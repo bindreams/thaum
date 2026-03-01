@@ -2,6 +2,15 @@ name: op-test for unquoted ${a[*]:-empty} with IFS=
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-unquoted-a-empty-with-ifs
 stdout: "[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in dash) exit ;; esac
 

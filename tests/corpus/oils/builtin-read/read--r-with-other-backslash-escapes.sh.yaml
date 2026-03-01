@@ -2,6 +2,17 @@ name: read -r with other backslash escapes
 dialect: bash
 source: oils:spec/builtin-read#read--r-with-other-backslash-escapes
 stdout: "['one twox65three', 'one\\\\ two\\\\x65three']\n"
+environment:
+  TMP: /tmp
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 echo 'one\ two\x65three' > $TMP/readr.txt
 read escaped < $TMP/readr.txt

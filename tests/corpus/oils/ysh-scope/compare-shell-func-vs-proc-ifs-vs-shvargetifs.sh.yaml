@@ -4,6 +4,15 @@ dialect: bash
 source: oils:spec/ysh-scope#compare-shell-func-vs-proc-ifs-vs-shvargetifs
 stdout: "shellfunc\nIFS=z\nshvarGet IFS=z\n['x', 'x ', 'x']\n\nmyproc -> p2\nIFS=x\n\
   shvarGet IFS=x\n['', 'z', ' z', 'z']\n\nnull\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 shopt --set parse_proc parse_ysh_expr_sub

@@ -2,6 +2,15 @@ name: IFS with whitespace and non-whitepace.
 dialect: bash
 source: oils:spec/word-split#ifs-with-whitespace-and-non-whitepace
 stdout: "['a', 'b', '', '', 'c', 'd', 'e']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # NOTE: Three delimiters means two empty words in the middle.  No elision.
 IFS='_ '

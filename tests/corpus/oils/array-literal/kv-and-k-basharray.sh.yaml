@@ -5,6 +5,15 @@ stdout: "keys: ['0', '1', '2', '5']\nvals: ['1', '2', '3', '1 2 3']\nkeys: ['0',
   '2', '5']\nvals: ['1', '2', '3', '3 5 7']\nkeys: ['0', '1', '2', '5']\nvals: ['1',
   '2', '3', '3 5 7']\nkeys: ['0', '1', '2', '5']\nvals: ['1', '2', '3', '3 5 7']\n\
   keys: ['0', '1', '2', '5']\nvals: ['1', '2', '3', '3 5 7']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 i=5
 v='1 2 3'

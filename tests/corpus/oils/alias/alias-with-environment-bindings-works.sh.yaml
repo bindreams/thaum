@@ -2,6 +2,16 @@ name: alias with environment bindings works
 dialect: bash
 source: oils:spec/alias#alias-with-environment-bindings-works
 stdout: "1\n2\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 shopt -s expand_aliases
 alias p_=printenv.py

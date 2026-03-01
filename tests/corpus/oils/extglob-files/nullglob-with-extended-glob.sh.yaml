@@ -2,6 +2,15 @@ name: nullglob with extended glob
 dialect: bash
 source: oils:spec/extglob-files#nullglob-with-extended-glob
 stdout: "['eg6/@(no|matches)']\n[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 shopt -s extglob
 mkdir eg6

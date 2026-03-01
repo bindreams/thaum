@@ -3,6 +3,20 @@ dialect: bash
 source: 
   oils:spec/redirect#word-redirects-stdout-and-stderr-when-word-is-not-a-number-or
 stdout: "STDOUT\nSTDERR\n"
+setup: |
+  #!/bin/sh
+  cat > stdout_stderr.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  stdout = sys.argv[1] if len(sys.argv) > 1 else "STDOUT"
+  stderr = sys.argv[2] if len(sys.argv) > 2 else "STDERR"
+  status = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+  print(stdout)
+  print(stderr, file=sys.stderr)
+  sys.exit(status)
+  HELPER
+  chmod +x stdout_stderr.py
+
 ---
 
 # dash, mksh don't implement this bash behaviour.

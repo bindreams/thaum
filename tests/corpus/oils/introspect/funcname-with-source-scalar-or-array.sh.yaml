@@ -4,6 +4,15 @@ source: oils:spec/introspect#funcname-with-source-scalar-or-array
 stdout: "['  @', 'source', 'f', 'g']\n['  0', 'source']\n['${}', 'source']\n['  $',
   'source']\n-----\n['  @', 'source']\n['  0', 'source']\n['${}', 'source']\n['  $',
   'source']\n-----\n[]\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 cd $REPO_ROOT
 

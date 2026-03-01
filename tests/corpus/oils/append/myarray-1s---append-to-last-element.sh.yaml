@@ -2,6 +2,15 @@ name: myarray[-1]+=s - Append to last element
 dialect: bash
 source: oils:spec/append#myarray-1s---append-to-last-element
 stdout: "['1', '2 3 4']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # Works in bash, but not mksh.  It seems like bash is doing the right thing.
 # a[-1] is allowed on the LHS.  mksh doesn't have negative indexing?

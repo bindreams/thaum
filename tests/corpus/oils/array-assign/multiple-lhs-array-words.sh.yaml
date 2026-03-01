@@ -5,6 +5,15 @@ stdout: "declare -a a=([0]=\"0\" [1]=\"\" [2]=\"2\")\ndeclare -a b=([0]=\"3\" [1
   4\" [2]=\"/home/spec-test/src\")\n---\n['b[2', '+', '0]=bar']\nstatus=0\ndeclare
   -a a=([0]=\"0\" [1]=\"\" [2]=\"2\")\ndeclare -a b=([0]=\"3\" [1]=\"4\" [2]=\"/home/spec-test/src\"\
   )\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in zsh|ash) exit ;; esac
 

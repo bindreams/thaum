@@ -2,6 +2,8 @@ name: Source
 dialect: bash
 source: oils:spec/builtin-eval-source#source
 stdout: "libvar\n"
+environment:
+  TMP: /tmp
 ---
 lib=$TMP/spec-test-lib.sh
 echo 'LIBVAR=libvar' > $lib

@@ -3,6 +3,15 @@ name: split command sub @() in command mode
 dialect: bash
 source: oils:spec/ysh-command-sub#split-command-sub-in-command-mode
 stdout: "1\n2\n3\n--\n['a', 'b', '', 'c']\n--\n1\n2\n3\n--\n['axbxxc']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 shopt -s parse_at

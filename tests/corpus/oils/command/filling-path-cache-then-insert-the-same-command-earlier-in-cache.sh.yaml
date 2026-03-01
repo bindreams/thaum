@@ -3,6 +3,8 @@ dialect: bash
 source: 
   oils:spec/command#filling-path-cache-then-insert-the-same-command-earlier-in-cache
 stdout: "two\ntwo\none\n"
+environment:
+  TMP: /tmp
 ---
 cd $TMP
 PATH="one:two:$PATH"

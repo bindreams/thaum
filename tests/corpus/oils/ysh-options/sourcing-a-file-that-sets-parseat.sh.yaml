@@ -3,6 +3,15 @@ name: sourcing a file that sets parse_at
 dialect: bash
 source: oils:spec/ysh-options#sourcing-a-file-that-sets-parseat
 stdout: "['@words']\nlib.sh\nmain.sh\n['a', 'b c']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 cat >lib.sh <<EOF
 shopt -s parse_at

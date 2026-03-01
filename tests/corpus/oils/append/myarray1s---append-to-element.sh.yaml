@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/append#myarray1s---append-to-element
 status: 0
 stdout: "['x', 'yz']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # They treat this as implicit index 0.  We disallow this on the LHS, so we will
 # also disallow it on the RHS.

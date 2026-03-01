@@ -3,6 +3,8 @@ dialect: bash
 source: oils:spec/builtin-cd#pwd-in-symlinked-dir-on-shell-initialization
 stdout: "symlink\ntarget\n"
 stderr: ''
+environment:
+  TMP: /tmp
 ---
 tmp=$TMP/builtins-pwd-2
 mkdir -p $tmp

@@ -2,6 +2,15 @@ name: read -n 0
 dialect: bash
 source: oils:spec/builtin-read#read--n-0
 stdout: "['']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in zsh) exit 99;; esac  # read -n not implemented
 

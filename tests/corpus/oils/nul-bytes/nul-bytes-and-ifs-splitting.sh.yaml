@@ -2,6 +2,15 @@ name: NUL bytes and IFS splitting
 dialect: bash
 source: oils:spec/nul-bytes#nul-bytes-and-ifs-splitting
 stdout: "[]\n['']\n['ab']\n['ab']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 case $SH in dash) exit ;; esac
 

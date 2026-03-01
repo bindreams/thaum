@@ -4,6 +4,8 @@ dialect: bash
 source: 
   oils:spec/builtin-history#shopt-histappend---osh-ignores-shopt-and-appends-bash-sometimes-overwrites
 stdout: "^D\nstatus=0\n^D\nstatus=1\n## OK osh STDOUT:\n^D\nstatus=0\n^D\nstatus=0\n"
+environment:
+  TMP: /tmp
 ---
 # When set, bash always appends when exiting, no matter what. 
 # When unset, bash will append anyway as long the # of new commands < the hist length

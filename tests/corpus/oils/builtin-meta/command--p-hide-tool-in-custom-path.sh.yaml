@@ -2,6 +2,8 @@ name: command -p (hide tool in custom path)
 dialect: bash
 source: oils:spec/builtin-meta#command--p-hide-tool-in-custom-path
 status: 127
+environment:
+  TMP: /tmp
 ---
 mkdir -p $TMP/bin
 echo "echo hello" > $TMP/bin/hello

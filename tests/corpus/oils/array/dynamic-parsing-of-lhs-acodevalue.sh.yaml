@@ -2,6 +2,15 @@ name: Dynamic parsing of LHS a[$code]=value
 dialect: bash
 source: oils:spec/array#dynamic-parsing-of-lhs-acodevalue
 stdout: "['one', 'two']\nx=1\ny=2\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 
 declare -a array

@@ -2,6 +2,8 @@ name: "'set' and 'eval' round trip"
 dialect: bash
 source: oils:spec/builtin-set#set-and-eval-round-trip
 stdout: "[ ]\nOK\nOK\nOK\nOK\nOK\n"
+environment:
+  TMP: /tmp
 ---
 
 # NOTE: not testing arrays and associative arrays!

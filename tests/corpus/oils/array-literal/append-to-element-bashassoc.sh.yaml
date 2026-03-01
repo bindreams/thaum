@@ -2,6 +2,15 @@ name: append to element (BashAssoc)
 dialect: bash
 source: oils:spec/array-literal#append-to-element-bashassoc
 stdout: "keys: ['hello']\nvals: ['12']\nkeys: ['hello']\nvals: ['12:34:56']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 declare -A a
 hello=100

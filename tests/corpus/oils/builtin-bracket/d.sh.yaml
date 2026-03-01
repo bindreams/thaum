@@ -2,6 +2,8 @@ name: -d
 dialect: bash
 source: oils:spec/builtin-bracket#d
 stdout: "status=0\nstatus=1\n"
+environment:
+  TMP: /tmp
 ---
 test -d $TMP
 echo status=$?

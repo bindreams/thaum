@@ -4,6 +4,16 @@ source:
   oils:spec/array#exporting-array-doesnt-do-anything-not-even-first-element
 status: 0
 stdout: "mystr\nNone\nNone\n"
+setup: |
+  #!/bin/sh
+  cat > printenv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import os, sys
+  for name in sys.argv[1:]:
+      print(os.environ.get(name))
+  HELPER
+  chmod +x printenv.py
+
 ---
 # bash parses, but doesn't execute.
 # mksh gives syntax error -- parses differently with 'export'

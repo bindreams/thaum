@@ -5,6 +5,15 @@ source:
 stdout: "['']\n['']\n['']\n['']\n['']\n['']\n__\n['spec/testdata/bash-source-string.sh']\n\
   ['spec/testdata/bash-source-string.sh']\n['11']\n['11']\n____\n['spec/testdata/bash-source-string2.sh']\n\
   ['spec/testdata/bash-source-string2.sh']\n['11']\n['11']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 cd $REPO_ROOT
 

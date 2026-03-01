@@ -4,6 +4,8 @@ source: oils:spec/builtin-umask#set-umask-with-symbolic-mode-g-wo-w
 status: 0
 stdout: "664\n644\n"
 stderr: ''
+environment:
+  TMP: /tmp
 ---
 
 umask 0002  # begin in a known state for the test

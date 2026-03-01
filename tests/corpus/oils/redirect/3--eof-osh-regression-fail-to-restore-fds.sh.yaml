@@ -2,6 +2,8 @@ name: '3>&- << EOF (OSH regression: fail to restore fds)'
 dialect: bash
 source: oils:spec/redirect#3--eof-osh-regression-fail-to-restore-fds
 stdout: "hello\nworld\n"
+environment:
+  TMP: /tmp
 ---
 exec 3> "$TMP/fd.txt"
 echo hello 3>&- << EOF

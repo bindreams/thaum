@@ -2,6 +2,8 @@ name: exec redirect then various builtins
 dialect: bash
 source: oils:spec/redirect#exec-redirect-then-various-builtins
 stdout: "done\n"
+environment:
+  TMP: /tmp
 ---
 exec 5>$TMP/log.txt
 echo hi >&5

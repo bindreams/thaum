@@ -2,6 +2,15 @@ name: Escaped { stored in variable first
 dialect: bash
 source: oils:spec/regex#escaped-stored-in-variable-first
 stdout: "['$PA', '$', 'PA']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # from bash-completion
 pat='^(\$\{?)([A-Za-z0-9_]*)$'

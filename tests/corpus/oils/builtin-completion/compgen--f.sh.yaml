@@ -2,6 +2,8 @@ name: compgen -f
 dialect: bash
 source: oils:spec/builtin-completion#compgen--f
 stdout: "one\nthree\ntwo\n--\nthree\ntwo\n"
+environment:
+  TMP: /tmp
 ---
 mkdir -p $TMP/compgen
 touch $TMP/compgen/{one,two,three}

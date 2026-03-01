@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/array#negative-slice-length
 status: 1
 stdout: ''
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 a=(1 2 3 4 5)
 argv.py "${a[@]: 1: -3}"

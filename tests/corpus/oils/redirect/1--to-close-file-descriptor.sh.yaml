@@ -2,6 +2,8 @@ name: 1>&- to close file descriptor
 dialect: bash
 source: oils:spec/redirect#1--to-close-file-descriptor
 stdout: "hello\n"
+environment:
+  TMP: /tmp
 ---
 exec 5> "$TMP/f.txt"
 echo hello >&5

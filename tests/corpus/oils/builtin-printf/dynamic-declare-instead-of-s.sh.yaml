@@ -2,6 +2,15 @@ name: dynamic declare instead of %s
 dialect: bash
 source: oils:spec/builtin-printf#dynamic-declare-instead-of-s
 stdout: "['hello there']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 var=foo
 declare $var='hello there'

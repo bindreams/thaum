@@ -3,6 +3,15 @@ dialect: bash
 source: oils:spec/array#stripping-a-whole-array-unquoted
 status: 0
 stdout: "['foo', 'sp', 'ace.h', 'bar']\n"
+setup: |
+  #!/bin/sh
+  cat > argv.py <<'HELPER'
+  #!/usr/bin/env python3
+  import sys
+  print(sys.argv[1:])
+  HELPER
+  chmod +x argv.py
+
 ---
 # Problem: it joins it first.
 files=('foo.c' 'sp ace.h' 'bar.c')

@@ -441,19 +441,27 @@ impl Executor {
                             Err(e) => return Err(e),
                         }
                     } else {
-                        let mut child_cmd = std::process::Command::new(cmd_name);
-                        child_cmd.args(cmd_args);
-                        child_cmd.current_dir(self.env.cwd());
-                        child_cmd.stdout(Stdio::piped());
-                        child_cmd.env_clear();
-                        for (key, val) in self.env.exported_vars() {
-                            child_cmd.env(&key, &val);
-                        }
+                        let mut argv: Vec<std::ffi::OsString> = Vec::with_capacity(1 + cmd_args.len());
+                        argv.push(cmd_name.into());
+                        argv.extend(cmd_args.iter().map(std::ffi::OsString::from));
 
-                        match child_cmd.output() {
-                            Ok(output) => {
-                                captured.extend_from_slice(&output.stdout);
-                                let code = output.status.code().unwrap_or(128);
+                        let mut child_cmd = command_ex::CommandEx::new(argv);
+                        child_cmd.cwd = Some(self.env.cwd().to_path_buf());
+                        child_cmd.env = self
+                            .env
+                            .exported_vars()
+                            .into_iter()
+                            .map(|(k, v): (String, String)| (std::ffi::OsString::from(k), std::ffi::OsString::from(v)))
+                            .collect();
+                        child_cmd.fds.insert(1, command_ex::Fd::Pipe);
+
+                        match child_cmd.spawn() {
+                            Ok(mut child) => {
+                                if let Some(mut pipe) = child.take_pipe(1) {
+                                    use std::io::Read;
+                                    let _ = pipe.read_to_end(&mut captured);
+                                }
+                                let code = child.wait().unwrap_or(128);
                                 self.env.set_last_exit_status(code);
                             }
                             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {

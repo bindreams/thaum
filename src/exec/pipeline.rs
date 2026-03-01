@@ -2,10 +2,10 @@
 //! stage with piped stdin/stdout, and returns the exit status of the last stage.
 
 use std::io::Write;
-use std::process::{Child, Command, Stdio};
+use std::process::{Command, Stdio};
 
 use crate::ast::Expression;
-use crate::exec::command_ex::CommandEx;
+use crate::exec::command_ex::{ChildEx, CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
@@ -47,27 +47,18 @@ pub fn execute_pipeline(
     }
 
     // Build the pipeline: spawn each stage, connecting stdout→stdin.
-    let mut children: Vec<Child> = Vec::new();
-    let mut prev_stdout: Option<std::process::ChildStdout> = None;
+    let mut children: Vec<ChildEx> = Vec::new();
+    let mut prev_stdout: Option<std::fs::File> = None;
 
     for (i, stage) in stages.iter().enumerate() {
         let is_last = i == stages.len() - 1;
 
-        // For each pipeline stage, we need to spawn the command with
-        // appropriate stdin/stdout.
-        let child = spawn_pipeline_stage(
-            executor,
-            stage,
-            prev_stdout.take(),
-            !is_last, // pipe_stdout: all but last
-            io,
-        )?;
+        let child = spawn_pipeline_stage(executor, stage, prev_stdout.take(), !is_last, io)?;
 
         if let Some(mut child) = child {
-            prev_stdout = child.stdout.take();
+            prev_stdout = child.take_pipe(1);
             children.push(child);
         } else {
-            // Stage was a builtin or assignment — prev_stdout stays None
             prev_stdout = None;
         }
     }
@@ -76,7 +67,7 @@ pub fn execute_pipeline(
     let mut statuses: Vec<i32> = Vec::new();
     for mut child in children {
         let status = child.wait().map_err(ExecError::Io)?;
-        statuses.push(status.code().unwrap_or(128));
+        statuses.push(status);
     }
     let last_status = statuses.last().copied().unwrap_or(0);
 
@@ -94,10 +85,10 @@ pub fn execute_pipeline(
 fn spawn_pipeline_stage(
     executor: &mut Executor,
     expr: &Expression,
-    stdin: Option<std::process::ChildStdout>,
+    stdin: Option<std::fs::File>,
     pipe_stdout: bool,
     io: &mut IoContext<'_>,
-) -> Result<Option<Child>, ExecError> {
+) -> Result<Option<ChildEx>, ExecError> {
     match expr {
         Expression::Command(cmd) => {
             // Expand arguments
@@ -108,7 +99,6 @@ fn spawn_pipeline_stage(
             }
 
             if expanded_args.is_empty() {
-                // Assignment-only command — handle in-process
                 for assignment in &cmd.assignments {
                     executor.execute_assignment(assignment)?;
                 }
@@ -118,10 +108,8 @@ fn spawn_pipeline_stage(
             let cmd_name = &expanded_args[0];
             let cmd_args = &expanded_args[1..];
 
-            // Check for builtins in pipeline — run in a subprocess-like manner
+            // Builtins in pipeline — run in-process, pipe output through `cat`.
             if crate::exec::builtins::is_builtin(cmd_name) {
-                // For builtins in a pipeline, we need to handle I/O differently.
-                // Run the builtin capturing its output, then we can pipe it.
                 let mut stdout_buf: Vec<u8> = Vec::new();
                 let mut stderr_buf: Vec<u8> = Vec::new();
 
@@ -134,9 +122,9 @@ fn spawn_pipeline_stage(
                     &mut stderr_buf,
                 );
 
-                // For builtins in a pipeline, we use `echo`-like approach:
-                // pipe the output through `cat` to create a proper child process.
                 if pipe_stdout && !stdout_buf.is_empty() {
+                    // TODO: replace `cat` hack with proper pipe when CommandEx is used
+                    // for builtins-in-pipeline too.
                     let mut child = Command::new("cat")
                         .stdin(Stdio::piped())
                         .stdout(Stdio::piped())
@@ -146,11 +134,29 @@ fn spawn_pipeline_stage(
                     if let Some(ref mut child_stdin) = child.stdin {
                         let _ = child_stdin.write_all(&stdout_buf);
                     }
-                    // Drop stdin to signal EOF
                     child.stdin.take();
-                    return Ok(Some(child));
+
+                    // Wrap the std::process::Child into a ChildEx.
+                    let stdout_file: Option<std::fs::File> = child.stdout.take().map(|s| {
+                        #[cfg(unix)]
+                        {
+                            use std::os::fd::FromRawFd;
+                            use std::os::unix::io::IntoRawFd;
+                            unsafe { std::fs::File::from_raw_fd(s.into_raw_fd()) }
+                        }
+                        #[cfg(windows)]
+                        {
+                            use std::os::windows::io::FromRawHandle;
+                            use std::os::windows::io::IntoRawHandle;
+                            unsafe { std::fs::File::from_raw_handle(s.into_raw_handle()) }
+                        }
+                    });
+                    let mut pipes = std::collections::HashMap::new();
+                    if let Some(f) = stdout_file {
+                        pipes.insert(1, f);
+                    }
+                    return Ok(Some(ChildEx::from_std_child(child, pipes)));
                 } else {
-                    // Last stage or no output — write directly
                     if !stdout_buf.is_empty() {
                         io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
                     }
@@ -162,35 +168,38 @@ fn spawn_pipeline_stage(
             }
 
             // External command
-            let mut child_cmd = CommandEx::new(cmd_name);
-            child_cmd.args(cmd_args);
-            child_cmd.current_dir(executor.env().cwd());
+            let mut argv: Vec<std::ffi::OsString> = Vec::with_capacity(1 + cmd_args.len());
+            argv.push(cmd_name.into());
+            argv.extend(cmd_args.iter().map(std::ffi::OsString::from));
 
-            // Set environment
-            child_cmd.env_clear();
-            for (key, val) in executor.env().exported_vars() {
-                child_cmd.env(&key, &val);
-            }
+            let mut child_cmd = CommandEx::new(argv);
+            child_cmd.cwd = Some(executor.env().cwd().to_path_buf());
 
-            // Apply prefix assignments as env vars
+            let env: std::collections::HashMap<std::ffi::OsString, std::ffi::OsString> = executor
+                .env()
+                .exported_vars()
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect();
+            child_cmd.env = env;
+
             for assignment in &cmd.assignments {
                 let value = executor.expand_scalar_assignment(assignment)?;
-                child_cmd.env(&assignment.name, &value);
+                child_cmd.env.insert(assignment.name.clone().into(), value.into());
             }
 
-            // Inherit persistent FDs 3+ from the executor's fd_table
             for (&fd, file) in executor.fd_table().iter() {
-                child_cmd.fd_mapping(fd, file.try_clone().map_err(ExecError::Io)?);
+                child_cmd
+                    .fds
+                    .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
             }
 
-            // Set up stdin from previous stage
             if let Some(prev_out) = stdin {
-                child_cmd.stdin(prev_out);
+                child_cmd.fds.insert(0, Fd::File(prev_out));
             }
 
-            // Set up stdout for piping
             if pipe_stdout {
-                child_cmd.stdout(Stdio::piped());
+                child_cmd.fds.insert(1, Fd::Pipe);
             }
 
             match child_cmd.spawn() {
@@ -202,8 +211,6 @@ fn spawn_pipeline_stage(
                 Err(e) => Err(ExecError::Io(e)),
             }
         }
-        // For compound commands in pipeline stages, we'd need to fork.
-        // For now, fall back to sequential execution.
         _ => {
             let status = executor.execute_expression(expr, io)?;
             executor.env_mut().set_last_exit_status(status);

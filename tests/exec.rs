@@ -57,6 +57,16 @@ pub fn test_executor() -> Executor {
     executor
 }
 
+/// Create a Bash-dialect executor for tests (includes Bash-specific variables).
+pub fn test_bash_executor() -> Executor {
+    let mut env = Environment::new();
+    let _ = env.set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+    let options = Dialect::Bash.options();
+    let mut executor = Executor::with_env_and_options(env, options);
+    executor.set_exe_path(thaum_exe());
+    executor
+}
+
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 pub fn exec_ok(script: &str) -> (String, i32) {
     let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
@@ -130,7 +140,7 @@ pub fn bash_exec_result(script: &str) -> i32 {
     let program =
         thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    let mut executor = test_executor();
+    let mut executor = test_bash_executor();
 
     let mut captured = CapturedIo::new();
     match executor.execute(&program, &mut captured.context()) {
@@ -145,7 +155,7 @@ pub fn bash_exec_ok(script: &str) -> (String, i32) {
     let program =
         thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
 
-    let mut executor = test_executor();
+    let mut executor = test_bash_executor();
 
     let mut captured = CapturedIo::new();
     match executor.execute(&program, &mut captured.context()) {

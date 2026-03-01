@@ -221,6 +221,85 @@ impl Environment {
         env
     }
 
+    /// Initialize Bash-specific static variables. Called when the executor is
+    /// configured for Bash dialect.
+    #[cfg(unix)]
+    pub fn initialize_bash_vars(&mut self) {
+        let hosttype = std::env::consts::ARCH;
+        let ostype = match std::env::consts::OS {
+            "linux" => "linux-gnu",
+            "macos" => "darwin",
+            "freebsd" => "freebsd",
+            other => other,
+        };
+        let machtype = format!("{hosttype}-pc-{ostype}");
+
+        // BASH_VERSION: compatibility version string.
+        let _ = self.set_var("BASH_VERSION", "5.2.0(1)-release");
+
+        // BASH_VERSINFO: readonly array with version components.
+        let _ = self.set_array(
+            "BASH_VERSINFO",
+            vec![
+                "5".to_string(),
+                "2".to_string(),
+                "0".to_string(),
+                "1".to_string(),
+                "release".to_string(),
+                machtype.clone(),
+            ],
+        );
+        self.set_readonly("BASH_VERSINFO");
+
+        // UID / EUID: readonly integers.
+        let _ = self.set_var("UID", &nix::unistd::getuid().as_raw().to_string());
+        self.set_readonly("UID");
+        let _ = self.set_var("EUID", &nix::unistd::geteuid().as_raw().to_string());
+        self.set_readonly("EUID");
+
+        // HOSTNAME
+        let hostname = nix::unistd::gethostname()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        let _ = self.set_var("HOSTNAME", &hostname);
+
+        // HOSTTYPE, OSTYPE, MACHTYPE
+        let _ = self.set_var("HOSTTYPE", hosttype);
+        let _ = self.set_var("OSTYPE", ostype);
+        let _ = self.set_var("MACHTYPE", &machtype);
+
+        // GROUPS: array of group IDs. Assign-silently-ignored (Category D).
+        if let Ok(groups) = nix::unistd::getgroups() {
+            let group_strs: Vec<String> = groups.iter().map(|g| g.as_raw().to_string()).collect();
+            let _ = self.set_array("GROUPS", group_strs);
+            self.special_active.insert("GROUPS".to_string());
+        }
+    }
+
+    /// Non-unix stub.
+    #[cfg(not(unix))]
+    pub fn initialize_bash_vars(&mut self) {
+        let _ = self.set_var("BASH_VERSION", "5.2.0(1)-release");
+        let hosttype = std::env::consts::ARCH;
+        let ostype = std::env::consts::OS;
+        let machtype = format!("{hosttype}-pc-{ostype}");
+        let _ = self.set_array(
+            "BASH_VERSINFO",
+            vec![
+                "5".to_string(),
+                "2".to_string(),
+                "0".to_string(),
+                "1".to_string(),
+                "release".to_string(),
+                machtype.clone(),
+            ],
+        );
+        self.set_readonly("BASH_VERSINFO");
+        let _ = self.set_var("HOSTTYPE", hosttype);
+        let _ = self.set_var("OSTYPE", ostype);
+        let _ = self.set_var("MACHTYPE", &machtype);
+    }
+
     // Variable chain resolution -------------------------------------------------------------------------------------------
 
     /// Follow a chain of variable lookups with cycle detection.
@@ -445,6 +524,10 @@ impl Environment {
     pub fn set_array(&mut self, name: &str, elements: Vec<String>) -> Result<(), ExecError> {
         let name = self.resolve_nameref(name).to_string();
         let name = name.as_str();
+        // Dynamic variable intercept for array writes.
+        if let Some(result) = self.set_dynamic(name, "") {
+            return result;
+        }
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -914,6 +997,10 @@ impl Environment {
                 // Assignment silently ignored.
                 Some(Ok(()))
             }
+            "GROUPS" if self.special_active.contains("GROUPS") => {
+                // Assignment silently ignored (Category D).
+                Some(Ok(()))
+            }
             "LINENO" if self.special_active.contains("LINENO") => {
                 // Assignment offsets subsequent line numbers.
                 let assigned: isize = value.parse().unwrap_or(0);
@@ -947,6 +1034,11 @@ impl Environment {
             // Category D: unset works, removes variable.
             "BASHPID" => {
                 self.special_active.remove("BASHPID");
+                Some(Ok(()))
+            }
+            "GROUPS" if self.special_active.contains("GROUPS") => {
+                self.special_active.remove("GROUPS");
+                self.variables.remove("GROUPS");
                 Some(Ok(()))
             }
             _ => None,

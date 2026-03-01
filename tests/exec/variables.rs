@@ -402,3 +402,110 @@ echo "$opt $OPTARG"
     let (out, _) = exec_ok(script);
     assert_eq!(out.trim(), "a bc");
 }
+
+// Bash static variables ===============================================================================================
+
+#[testutil::test]
+fn bash_version_is_set() {
+    let (out, _) = bash_exec_ok("echo $BASH_VERSION");
+    let ver = out.trim();
+    assert!(!ver.is_empty(), "BASH_VERSION should be set");
+    // Should contain a dot (e.g. "5.2.0(1)-release")
+    assert!(ver.contains('.'), "BASH_VERSION should contain a dot: {ver}");
+}
+
+#[testutil::test]
+fn bash_versinfo_is_array() {
+    let (out, _) = bash_exec_ok("echo ${BASH_VERSINFO[0]}");
+    let major: u32 = out.trim().parse().expect("BASH_VERSINFO[0] should be a number");
+    assert!(major >= 1, "major version should be >= 1");
+}
+
+#[testutil::test]
+fn bash_versinfo_is_readonly() {
+    let status = bash_exec_result("BASH_VERSINFO=(1 2 3) 2>/dev/null");
+    assert_ne!(status, 0, "BASH_VERSINFO should be readonly");
+}
+
+#[testutil::test]
+fn uid_is_set() {
+    let (out, _) = bash_exec_ok("echo $UID");
+    let val: u32 = out.trim().parse().expect("UID should be a number");
+    // Just check it's a valid uid (could be 0 for root)
+    assert!(val <= 65534, "UID out of range: {val}");
+}
+
+#[testutil::test]
+fn uid_is_readonly() {
+    let status = bash_exec_result("UID=42 2>/dev/null");
+    assert_ne!(status, 0, "UID should be readonly");
+}
+
+#[testutil::test]
+fn euid_is_set() {
+    let (out, _) = bash_exec_ok("echo $EUID");
+    let val: u32 = out.trim().parse().expect("EUID should be a number");
+    assert!(val <= 65534, "EUID out of range: {val}");
+}
+
+#[testutil::test]
+fn euid_is_readonly() {
+    let status = bash_exec_result("EUID=42 2>/dev/null");
+    assert_ne!(status, 0, "EUID should be readonly");
+}
+
+#[testutil::test]
+fn hostname_is_set() {
+    let (out, _) = bash_exec_ok("echo $HOSTNAME");
+    assert!(!out.trim().is_empty(), "HOSTNAME should be non-empty");
+}
+
+#[testutil::test]
+fn hosttype_is_set() {
+    let (out, _) = bash_exec_ok("echo $HOSTTYPE");
+    let ht = out.trim();
+    assert!(!ht.is_empty(), "HOSTTYPE should be set");
+    // Should be something like "x86_64" or "aarch64"
+    assert!(
+        ht.chars().all(|c| c.is_ascii_alphanumeric() || c == '_'),
+        "unexpected HOSTTYPE: {ht}"
+    );
+}
+
+#[testutil::test]
+fn ostype_is_set() {
+    let (out, _) = bash_exec_ok("echo $OSTYPE");
+    let ost = out.trim();
+    assert!(!ost.is_empty(), "OSTYPE should be set");
+}
+
+#[testutil::test]
+fn machtype_is_set() {
+    let (out, _) = bash_exec_ok("echo $MACHTYPE");
+    let mt = out.trim();
+    assert!(!mt.is_empty(), "MACHTYPE should be set");
+    // Should contain a dash (e.g. "x86_64-pc-linux-gnu")
+    assert!(mt.contains('-'), "MACHTYPE should contain a dash: {mt}");
+}
+
+#[testutil::test]
+fn hostname_can_be_overwritten() {
+    // HOSTNAME is Category E — can be freely assigned
+    let (out, _) = bash_exec_ok("HOSTNAME=myhost; echo $HOSTNAME");
+    assert_eq!(out.trim(), "myhost");
+}
+
+#[testutil::test]
+fn groups_is_array() {
+    let (out, _) = bash_exec_ok("echo ${GROUPS[0]}");
+    let gid: u32 = out.trim().parse().expect("GROUPS[0] should be a number");
+    assert!(gid <= 65534, "GID out of range: {gid}");
+}
+
+#[testutil::test]
+fn groups_assign_silently_ignored() {
+    // GROUPS is Category D — assign silently ignored
+    let (out1, _) = bash_exec_ok("echo ${GROUPS[0]}");
+    let (out2, _) = bash_exec_ok("GROUPS=(999); echo ${GROUPS[0]}");
+    assert_eq!(out1, out2, "GROUPS assignment should be silently ignored");
+}

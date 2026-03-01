@@ -279,6 +279,14 @@ fn debug_assert_commandline_roundtrips(cmdline: &OsStr, expected_argv: &[OsStrin
 
 // Platform spawn ==================================================================
 
+/// Close a list of raw file descriptors, ignoring errors.
+#[cfg(unix)]
+fn close_raw_fds(fds: &[std::os::fd::RawFd]) {
+    for &fd in fds {
+        unsafe { nix::libc::close(fd) };
+    }
+}
+
 #[cfg(unix)]
 fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     use nix::spawn::{posix_spawnp, PosixSpawnFileActions};
@@ -289,21 +297,29 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let mut file_actions = PosixSpawnFileActions::init().map_err(io::Error::other)?;
 
     let mut pipes: HashMap<i32, File> = HashMap::new();
-    // Write-ends of pipes that must be closed in the parent after spawn.
-    let mut write_ends_to_close: Vec<std::os::fd::RawFd> = Vec::new();
+    // Raw FDs that must be closed in the parent after spawn (or on error).
+    let mut raw_fds_to_close: Vec<std::os::fd::RawFd> = Vec::new();
 
     for (&fd_num, fd_spec) in &cmd.fds {
         match fd_spec {
             Fd::Pipe => {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
                 let write_raw = write_end.into_raw_fd();
-                file_actions.add_dup2(write_raw, fd_num).map_err(io::Error::other)?;
-                write_ends_to_close.push(write_raw);
+                // Track for cleanup before the fallible add_dup2 call.
+                raw_fds_to_close.push(write_raw);
+                file_actions.add_dup2(write_raw, fd_num).map_err(|e| {
+                    close_raw_fds(&raw_fds_to_close);
+                    io::Error::other(e)
+                })?;
                 pipes.insert(fd_num, File::from(read_end));
             }
             Fd::File(file) => {
                 let raw_fd = file.try_clone()?.into_raw_fd();
-                file_actions.add_dup2(raw_fd, fd_num).map_err(io::Error::other)?;
+                raw_fds_to_close.push(raw_fd);
+                file_actions.add_dup2(raw_fd, fd_num).map_err(|e| {
+                    close_raw_fds(&raw_fds_to_close);
+                    io::Error::other(e)
+                })?;
             }
         }
     }
@@ -349,10 +365,8 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
         io::Error::new(kind, e)
     });
 
-    // Close write-ends of pipes in the parent so readers get EOF.
-    for raw_fd in write_ends_to_close {
-        unsafe { nix::libc::close(raw_fd) };
-    }
+    // Close raw FDs in the parent so readers get EOF.
+    close_raw_fds(&raw_fds_to_close);
 
     // Restore cwd.
     if let Some(prev) = saved_cwd {

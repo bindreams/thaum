@@ -166,7 +166,8 @@ impl Executor {
     /// definitions within a line only take effect for subsequent lines.
     pub fn execute_lines(&mut self, lines: &[crate::ast::Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         let mut status = 0;
-        for line in lines {
+        for (i, line) in lines.iter().enumerate() {
+            self.env.set_lineno(i + 1);
             self.alias_snapshot = self.env.alias_snapshot();
             status = self.execute_statements(line, io)?;
         }

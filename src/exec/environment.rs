@@ -6,6 +6,7 @@
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use contracts::debug_ensures;
 use serde::{Deserialize, Serialize};
@@ -134,6 +135,21 @@ pub struct Environment {
     array_empty_element_alternative_bug: bool,
     /// When true, `typeset +r` / `declare +r` removes the readonly attribute.
     typeset_can_unset_readonly: bool,
+
+    // Dynamic variable state -----
+    /// Tracks which Category-A dynamic variables still have special behavior.
+    /// When a variable is unset, it is removed from this set permanently.
+    special_active: HashSet<String>,
+    /// RANDOM LCG state.
+    random_state: u32,
+    /// Shell start time (Unix epoch seconds) for SECONDS.
+    start_epoch_secs: u64,
+    /// User-assigned offset for SECONDS (from `SECONDS=N`).
+    seconds_offset: i64,
+    /// Current source line number (updated by the executor).
+    lineno: usize,
+    /// User-assigned offset for LINENO (from `LINENO=N`).
+    lineno_offset: isize,
 }
 
 /// A stored function definition (just the parts we need for execution).
@@ -177,6 +193,12 @@ impl Environment {
             xtrace: false,
             array_empty_element_alternative_bug: false,
             typeset_can_unset_readonly: false,
+            special_active: default_special_active(),
+            random_state: pid ^ epoch_secs_now() as u32,
+            start_epoch_secs: epoch_secs_now(),
+            seconds_offset: 0,
+            lineno: 0,
+            lineno_offset: 0,
         };
 
         let _ = env.set_var("IFS", " \t\n");
@@ -279,6 +301,10 @@ impl Environment {
     pub fn set_var(&mut self, name: &str, value: &str) -> Result<(), ExecError> {
         let name = self.resolve_nameref(name).to_string();
         let name = name.as_str();
+        // Dynamic variable intercept (RANDOM seeds, SECONDS reset, etc.).
+        if let Some(result) = self.set_dynamic(name, value) {
+            return result;
+        }
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -705,6 +731,10 @@ impl Environment {
     pub fn unset_var(&mut self, name: &str) -> Result<(), ExecError> {
         let name = self.resolve_nameref(name).to_string();
         let name = name.as_str();
+        // Dynamic variable intercept (Category A: kills special behavior).
+        if let Some(result) = self.unset_dynamic(name) {
+            return result;
+        }
         if let Some(existing) = self.variables.get(name) {
             if existing.readonly {
                 return Err(ExecError::ReadonlyVariable(name.to_string()));
@@ -804,6 +834,108 @@ impl Environment {
         // B (braceexpand) — always on for now
         flags.push('B');
         flags
+    }
+
+    // Dynamic variables --------------------------------------------------------------------------------------------------
+
+    /// Get a dynamic variable's computed value.
+    ///
+    /// Returns `Some(value)` for variables with active special behavior,
+    /// `None` to fall through to regular variable lookup.
+    pub fn get_dynamic(&mut self, name: &str) -> Option<String> {
+        match name {
+            "RANDOM" if self.special_active.contains("RANDOM") => {
+                self.random_state = self.random_state.wrapping_mul(1103515245).wrapping_add(12345);
+                Some(((self.random_state >> 16) & 0x7fff).to_string())
+            }
+            "SECONDS" if self.special_active.contains("SECONDS") => {
+                let elapsed = epoch_secs_now().saturating_sub(self.start_epoch_secs) as i64;
+                Some((elapsed + self.seconds_offset).to_string())
+            }
+            "EPOCHSECONDS" if self.special_active.contains("EPOCHSECONDS") => Some(epoch_secs_now().to_string()),
+            "EPOCHREALTIME" if self.special_active.contains("EPOCHREALTIME") => {
+                let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+                Some(format!("{}.{:06}", dur.as_secs(), dur.subsec_micros()))
+            }
+            "SRANDOM" if self.special_active.contains("SRANDOM") => {
+                let mut buf = [0u8; 4];
+                getrandom::fill(&mut buf).unwrap_or_default();
+                Some(u32::from_ne_bytes(buf).to_string())
+            }
+            "BASHPID" if self.special_active.contains("BASHPID") => Some(std::process::id().to_string()),
+            "LINENO" if self.special_active.contains("LINENO") => {
+                Some(((self.lineno as isize + self.lineno_offset) as usize).to_string())
+            }
+            _ => None,
+        }
+    }
+
+    /// Intercept writes to dynamic variables.
+    ///
+    /// Returns `Some(Ok(()))` if the write was handled (caller should not store),
+    /// `Some(Err(_))` if the write is forbidden, or `None` to fall through.
+    pub fn set_dynamic(&mut self, name: &str, value: &str) -> Option<Result<(), ExecError>> {
+        match name {
+            "RANDOM" if self.special_active.contains("RANDOM") => {
+                // Assignment seeds the RNG.
+                self.random_state = value.parse::<u32>().unwrap_or(0);
+                Some(Ok(()))
+            }
+            "SECONDS" if self.special_active.contains("SECONDS") => {
+                // Assignment resets the timer.
+                let assigned: i64 = value.parse().unwrap_or(0);
+                let elapsed = epoch_secs_now().saturating_sub(self.start_epoch_secs) as i64;
+                self.seconds_offset = assigned - elapsed;
+                Some(Ok(()))
+            }
+            "EPOCHSECONDS" if self.special_active.contains("EPOCHSECONDS") => {
+                // Assignment accepted but overridden on next read.
+                Some(Ok(()))
+            }
+            "EPOCHREALTIME" if self.special_active.contains("EPOCHREALTIME") => Some(Ok(())),
+            "SRANDOM" if self.special_active.contains("SRANDOM") => {
+                // Assignment silently ignored.
+                Some(Ok(()))
+            }
+            "BASHPID" if self.special_active.contains("BASHPID") => {
+                // Assignment silently ignored.
+                Some(Ok(()))
+            }
+            "LINENO" if self.special_active.contains("LINENO") => {
+                // Assignment offsets subsequent line numbers.
+                let assigned: isize = value.parse().unwrap_or(0);
+                self.lineno_offset = assigned - self.lineno as isize;
+                Some(Ok(()))
+            }
+            _ => None,
+        }
+    }
+
+    /// Intercept unset of dynamic variables.
+    ///
+    /// Returns `Some(Ok(()))` if handled (Category A: kills special behavior),
+    /// `Some(Err(_))` if unset is forbidden, or `None` to fall through.
+    pub fn unset_dynamic(&mut self, name: &str) -> Option<Result<(), ExecError>> {
+        match name {
+            // Category A: unset kills special behavior forever.
+            "RANDOM" | "SECONDS" | "EPOCHSECONDS" | "EPOCHREALTIME" | "SRANDOM" | "LINENO" => {
+                self.special_active.remove(name);
+                // Also remove from the regular variable store if present.
+                self.variables.remove(name);
+                Some(Ok(()))
+            }
+            // Category D: unset works, removes variable.
+            "BASHPID" => {
+                self.special_active.remove("BASHPID");
+                Some(Ok(()))
+            }
+            _ => None,
+        }
+    }
+
+    /// Update the current line number (called by the executor).
+    pub fn set_lineno(&mut self, lineno: usize) {
+        self.lineno = lineno;
     }
 
     /// Returns `$1`, `$2`, ... as a slice (0-indexed: `[0]` is `$1`).
@@ -1320,6 +1452,7 @@ impl Environment {
             cwd: self.cwd.clone(),
             array_empty_element_alternative_bug: self.array_empty_element_alternative_bug,
             typeset_can_unset_readonly: self.typeset_can_unset_readonly,
+            special_active: self.special_active.clone(),
         }
     }
 
@@ -1345,6 +1478,12 @@ impl Environment {
             xtrace: s.xtrace,
             array_empty_element_alternative_bug: s.array_empty_element_alternative_bug,
             typeset_can_unset_readonly: s.typeset_can_unset_readonly,
+            special_active: s.special_active,
+            random_state: std::process::id() ^ epoch_secs_now() as u32,
+            start_epoch_secs: epoch_secs_now(),
+            seconds_offset: 0,
+            lineno: 0,
+            lineno_offset: 0,
         }
     }
 }
@@ -1367,6 +1506,31 @@ pub struct SerializedEnvironment {
     pub array_empty_element_alternative_bug: bool,
     #[serde(default)]
     pub typeset_can_unset_readonly: bool,
+    #[serde(default = "default_special_active")]
+    pub special_active: HashSet<String>,
+}
+
+fn default_special_active() -> HashSet<String> {
+    [
+        "RANDOM",
+        "SECONDS",
+        "EPOCHSECONDS",
+        "EPOCHREALTIME",
+        "SRANDOM",
+        "LINENO",
+        "BASHPID",
+    ]
+    .into_iter()
+    .map(String::from)
+    .collect()
+}
+
+/// Current Unix epoch time in seconds.
+fn epoch_secs_now() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
 }
 
 impl Default for Environment {

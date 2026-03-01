@@ -688,9 +688,13 @@ pub(crate) fn parse_array_subscript(name: &str) -> Option<(&str, &str)> {
 }
 
 /// Resolve a parameter name to its string value, handling array subscripts.
-fn resolve_var(name: &str, env: &Environment) -> Option<String> {
+fn resolve_var(name: &str, env: &mut Environment) -> Option<String> {
     // Special parameters ($?, $#, $0, $$, etc.) take priority.
     if let Some(val) = env.get_special(name) {
+        return Some(val);
+    }
+    // Dynamic variables (RANDOM, SECONDS, etc.) — computed on read.
+    if let Some(val) = env.get_dynamic(name) {
         return Some(val);
     }
     env.resolve_element(name)

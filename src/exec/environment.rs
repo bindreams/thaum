@@ -291,6 +291,9 @@ impl Environment {
             let _ = self.set_array("GROUPS", group_strs);
             self.special_active.insert("GROUPS".to_string());
         }
+
+        // COMP_WORDBREAKS: characters Readline treats as word separators during completion.
+        let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");
     }
 
     /// Non-unix stub.
@@ -315,6 +318,7 @@ impl Environment {
         let _ = self.set_var("HOSTTYPE", hosttype);
         let _ = self.set_var("OSTYPE", ostype);
         let _ = self.set_var("MACHTYPE", &machtype);
+        let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");
     }
 
     // Variable chain resolution -------------------------------------------------------------------------------------------

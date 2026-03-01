@@ -683,3 +683,26 @@ fn pushd_n_no_cd() {
     // With -n, pushd should NOT change directory.
     assert_ne!(out.trim(), "/tmp", "pushd -n should not change directory");
 }
+
+// COMP_WORDBREAKS =====================================================================================================
+
+#[testutil::test]
+fn comp_wordbreaks_initialized() {
+    let (out, _) = bash_exec_ok("echo \"x${COMP_WORDBREAKS}x\"");
+    let inner = out.trim();
+    // Should not be empty (has a default value).
+    assert_ne!(inner, "xx", "COMP_WORDBREAKS should be initialized");
+}
+
+#[testutil::test]
+fn comp_wordbreaks_can_be_unset() {
+    let (out, _) = bash_exec_ok("unset COMP_WORDBREAKS; echo \"x${COMP_WORDBREAKS}x\"");
+    assert_eq!(out.trim(), "xx");
+}
+
+#[testutil::test]
+fn comp_vars_not_set_by_default() {
+    // COMP_WORDS, COMP_CWORD, etc. should not be set outside completion context.
+    let (out, _) = bash_exec_ok("echo \"x${COMP_WORDS}x\"");
+    assert_eq!(out.trim(), "xx");
+}

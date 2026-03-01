@@ -331,6 +331,53 @@ fn exec_rejects_unknown_flags() {
     assert_eq!(exec_status("(exec -z true 2>/dev/null)"), 2);
 }
 
+// exec redirect-only mode -----------------------------------------------------------------------------------------
+
+#[testutil::test]
+fn exec_redirect_fd3_persists() {
+    // exec 3>file opens FD 3 for the rest of the shell session.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 3>{f}; echo hello >&3; echo world >&3; exec 3>&-");
+    let (_, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(
+        std::fs::read_to_string(&file).unwrap(),
+        "hello\nworld\n",
+        "FD 3 should persist across multiple writes"
+    );
+}
+
+#[testutil::test]
+fn exec_redirect_stdout_to_file() {
+    // exec 1>file redirects stdout to a file for all subsequent commands.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("stdout.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 1>{f}; echo redirected");
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "", "captured stdout should be empty after exec 1>file");
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "redirected\n");
+}
+
+#[testutil::test]
+fn exec_close_fd() {
+    // exec 3>file; echo hello >&3; exec 3>&- closes FD 3.
+    // Verify the file only contains writes from before the close.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 3>{f}; echo hello >&3; exec 3>&-");
+    let (_, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
+}
+
 #[cfg(unix)]
 #[testutil::test]
 fn exec_dash_a_sets_argv0() {

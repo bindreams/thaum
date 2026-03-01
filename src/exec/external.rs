@@ -40,7 +40,15 @@ impl Executor {
         }
         child_cmd.env = env;
 
-        // FDs 0-2 from pre-resolved redirects.
+        // Persistent fd_table first (includes FDs 0-2 from `exec` redirects).
+        for (&fd, file) in &self.fd_table {
+            child_cmd
+                .fds
+                .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+
+        // Per-command redirects override persistent ones: FDs 0-2 from
+        // redirect list, then FDs 3+ from extra_fds.
         if let Some(ref file) = active.stdin {
             child_cmd
                 .fds
@@ -56,9 +64,7 @@ impl Executor {
                 .fds
                 .insert(2, Fd::File(file.try_clone().map_err(ExecError::Io)?));
         }
-
-        // FDs 3+ from command-level redirects and persistent fd_table.
-        for (&fd, file) in self.fd_table.iter().chain(active.extra_fds.iter()) {
+        for (&fd, file) in &active.extra_fds {
             child_cmd
                 .fds
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));

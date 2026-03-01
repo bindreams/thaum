@@ -161,6 +161,30 @@ impl Executor {
         &self.fd_table
     }
 
+    /// Adopt redirects from `exec` redirect-only mode into persistent state.
+    ///
+    /// FDs 0-2 and 3+ are all stored in `fd_table`. Persistent FDs 0-2 are
+    /// injected into `ActiveRedirects` at the start of `execute_command`;
+    /// FDs 3+ are inherited by child processes via `execute_external` and
+    /// pipeline stages. Explicitly closed FDs are removed.
+    fn adopt_redirects(&mut self, active: redirect::ActiveRedirects) {
+        for fd in &active.closed_fds {
+            self.fd_table.remove(fd);
+        }
+        if let Some(f) = active.stdin {
+            self.fd_table.insert(0, f);
+        }
+        if let Some(f) = active.stdout {
+            self.fd_table.insert(1, f);
+        }
+        if let Some(f) = active.stderr {
+            self.fd_table.insert(2, f);
+        }
+        for (fd, file) in active.extra_fds {
+            self.fd_table.insert(fd, file);
+        }
+    }
+
     /// Execute a parsed program. Returns the exit status of the last command.
     pub fn execute(&mut self, program: &Program, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         self.execute_lines(&program.lines, io)
@@ -620,6 +644,28 @@ impl Executor {
         // out of scope.
         let mut active = self.resolve_redirects(&cmd.redirects)?;
 
+        // Apply persistent FDs 0-2 from fd_table (set by `exec` redirects)
+        // as defaults — per-command redirects in `active` take precedence.
+        for &fd in &[0i32, 1, 2] {
+            if let Some(file) = self.fd_table.get(&fd) {
+                let has_override = match fd {
+                    0 => active.stdin.is_some(),
+                    1 => active.stdout.is_some(),
+                    2 => active.stderr.is_some(),
+                    _ => false,
+                };
+                if !has_override {
+                    let cloned = file.try_clone().map_err(ExecError::Io)?;
+                    match fd {
+                        0 => active.stdin = Some(cloned),
+                        1 => active.stdout = Some(cloned),
+                        2 => active.stderr = Some(cloned),
+                        _ => {}
+                    }
+                }
+            }
+        }
+
         // Xtrace: print expanded command to stderr before dispatch.
         if self.env.xtrace_enabled() && !expanded_args.is_empty() {
             let ps4 = self.env.get_var("PS4").unwrap_or("+ ").to_string();
@@ -659,6 +705,12 @@ impl Executor {
             }
             "exec" => {
                 let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+                if cmd_args.is_empty() {
+                    // Redirect-only mode: adopt redirects permanently.
+                    self.adopt_redirects(active);
+                    self.restore_prefix_assignments(saved);
+                    return Ok(0);
+                }
                 let mut cmd_io = active.apply_to_io(io);
                 let result = self.builtin_exec(cmd_args, &mut cmd_io);
                 self.restore_prefix_assignments(saved);

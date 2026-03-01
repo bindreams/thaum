@@ -1,7 +1,7 @@
 //! Redirect resolution: opens files, sets up FD overrides, and applies them
 //! to an `IoContext` for the duration of a single command.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
 
@@ -21,6 +21,9 @@ pub(super) struct ActiveRedirects {
     pub stdout: Option<File>,
     pub stderr: Option<File>,
     pub extra_fds: HashMap<i32, File>,
+    /// FDs explicitly closed via `N>&-` / `N<&-`. Used by `exec` redirect-only
+    /// mode to remove persistent FDs from the fd_table.
+    pub closed_fds: HashSet<i32>,
 }
 
 impl ActiveRedirects {
@@ -30,11 +33,12 @@ impl ActiveRedirects {
             stdout: None,
             stderr: None,
             extra_fds: HashMap::new(),
+            closed_fds: HashSet::new(),
         }
     }
 
     /// Returns true if any redirections are active.
-    #[allow(dead_code)] // Part of the ActiveRedirects API, needed for upcoming exec changes.
+    #[allow(dead_code)] // Kept for diagnostics and future use.
     pub fn is_active(&self) -> bool {
         self.stdin.is_some() || self.stdout.is_some() || self.stderr.is_some() || !self.extra_fds.is_empty()
     }
@@ -202,6 +206,7 @@ fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<
 
 /// Close a write FD by assigning a sink.
 fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
+    active.closed_fds.insert(fd);
     match fd {
         // For FDs 0-2, we can't truly close them — use /dev/null equivalent.
         // The null device file is opened lazily when needed via apply_to_io.
@@ -217,6 +222,7 @@ fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
 
 /// Close a read FD.
 fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
+    active.closed_fds.insert(fd);
     match fd {
         0 => active.stdin = None,
         n => {
@@ -245,6 +251,10 @@ fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, s
     if let Some(file) = fd_table.get(&src_fd) {
         return file.try_clone().map_err(ExecError::Io);
     }
+    // For FDs 0-2, fall back to duplicating the process's own file descriptors.
+    if let Some(file) = dup_process_fd(src_fd) {
+        return Ok(file);
+    }
     Err(ExecError::BadRedirect(format!("{}: bad file descriptor", src_fd)))
 }
 
@@ -252,6 +262,68 @@ fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, s
 fn clone_fd_for_read(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, src_fd: i32) -> Result<File, ExecError> {
     // Same resolution order as clone_fd_for_write.
     clone_fd_for_write(active, fd_table, src_fd)
+}
+
+/// Duplicate a process-level file descriptor (0=stdin, 1=stdout, 2=stderr).
+///
+/// Returns `None` for FDs that don't correspond to standard process streams.
+fn dup_process_fd(fd: i32) -> Option<File> {
+    #[cfg(unix)]
+    {
+        use std::os::fd::FromRawFd;
+        match fd {
+            0..=2 => {
+                // dup() the process FD to get an independent handle.
+                let new_fd = unsafe { nix::libc::dup(fd) };
+                if new_fd < 0 {
+                    return None;
+                }
+                Some(unsafe { File::from_raw_fd(new_fd) })
+            }
+            _ => None,
+        }
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::io::FromRawHandle;
+        use windows::Win32::Foundation::HANDLE;
+        use windows::Win32::System::Threading::GetCurrentProcess;
+        match fd {
+            0 => dup_std_handle(windows::Win32::System::Console::STD_INPUT_HANDLE),
+            1 => dup_std_handle(windows::Win32::System::Console::STD_OUTPUT_HANDLE),
+            2 => dup_std_handle(windows::Win32::System::Console::STD_ERROR_HANDLE),
+            _ => None,
+        }
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        None
+    }
+}
+
+#[cfg(windows)]
+fn dup_std_handle(which: windows::Win32::System::Console::STD_HANDLE) -> Option<File> {
+    use std::os::windows::io::FromRawHandle;
+    use windows::Win32::Foundation::{DuplicateHandle, DUPLICATE_SAME_ACCESS, HANDLE};
+    use windows::Win32::System::Console::GetStdHandle;
+    use windows::Win32::System::Threading::GetCurrentProcess;
+
+    let handle = unsafe { GetStdHandle(which).ok()? };
+    let process = unsafe { GetCurrentProcess() };
+    let mut dup_handle = HANDLE::default();
+    unsafe {
+        DuplicateHandle(
+            process,
+            handle,
+            process,
+            &mut dup_handle,
+            0,
+            false,
+            DUPLICATE_SAME_ACCESS,
+        )
+        .ok()?;
+    }
+    Some(unsafe { File::from_raw_handle(dup_handle.0 as _) })
 }
 
 /// Create a temporary file for heredoc/herestring content.

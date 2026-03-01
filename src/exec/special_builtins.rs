@@ -78,16 +78,14 @@ impl Executor {
 
     /// `exec` builtin: replace the current shell with the given command.
     ///
-    /// With no arguments, redirections take effect on the current shell
-    /// (redirect-only mode, not yet fully implemented).
+    /// With no arguments, redirect-only mode is handled by the caller
+    /// (`execute_command`) which adopts the redirects into the persistent
+    /// `fd_table` before reaching this function.
     ///
-    /// On Unix, uses `CommandExt::exec()` which replaces the process image.
-    /// In tests and on non-Unix, spawns the child and exits via
-    /// `ExitRequested`.
+    /// With a command, spawns the child and exits via `ExitRequested`.
     pub(super) fn builtin_exec(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         if args.is_empty() {
-            // Redirect-only mode -- redirects were already applied by the
-            // caller before we got here. Nothing else to do.
+            // Redirect-only mode is handled before this function is called.
             return Ok(0);
         }
 

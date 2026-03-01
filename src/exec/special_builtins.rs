@@ -105,9 +105,8 @@ impl Executor {
                 cmd_start = i;
                 continue;
             } else if args[i].starts_with('-') {
-                i += 1;
-                cmd_start = i;
-                continue;
+                let _ = writeln!(io.stderr, "exec: {}: invalid option", args[i]);
+                return Ok(2);
             } else {
                 cmd_start = i;
                 break;

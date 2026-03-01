@@ -322,6 +322,15 @@ fn exec_not_found() {
     assert!(out.trim() != "0");
 }
 
+#[testutil::test]
+fn exec_rejects_unknown_flags() {
+    // Bash: `exec -z` → "exec: -z: invalid option", exit 2.
+    let (out, _) = exec_ok("(exec -z 2>/dev/null); echo $?");
+    assert_eq!(out.trim(), "2", "exec with unknown flag should exit 2");
+    // Also verify that unknown flag is rejected even with a command following.
+    assert_eq!(exec_status("(exec -z true 2>/dev/null)"), 2);
+}
+
 #[cfg(unix)]
 #[testutil::test]
 fn exec_dash_a_sets_argv0() {

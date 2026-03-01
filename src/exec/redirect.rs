@@ -15,7 +15,7 @@ use crate::exec::Executor;
 ///
 /// Holds file handles opened by the command's redirect list. FDs 0-2 override
 /// the IoContext; FDs 3+ are stored in `extra_fds` for dup resolution and
-/// (future) child process inheritance.
+/// child process inheritance.
 pub(super) struct ActiveRedirects {
     pub stdin: Option<File>,
     pub stdout: Option<File>,
@@ -264,35 +264,35 @@ fn clone_fd_for_read(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, sr
     clone_fd_for_write(active, fd_table, src_fd)
 }
 
-/// Duplicate a process-level file descriptor (0=stdin, 1=stdout, 2=stderr).
+/// Duplicate a process-level file descriptor.
 ///
-/// Returns `None` for FDs that don't correspond to standard process streams.
-fn dup_process_fd(fd: i32) -> Option<File> {
+/// On Unix, attempts `dup(fd)` for any non-negative FD. Returns `None` if
+/// the FD doesn't exist (EBADF). This handles both standard streams (0-2)
+/// and FDs inherited from parent processes (e.g., subshells inheriting
+/// FDs opened by `exec 3>file`).
+///
+/// On Windows, FDs 0-2 use `GetStdHandle` + `DuplicateHandle`; FDs 3+ use
+/// `_get_osfhandle` to convert CRT FD numbers to OS handles.
+pub fn dup_process_fd(fd: i32) -> Option<File> {
     #[cfg(unix)]
     {
         use std::os::fd::FromRawFd;
-        match fd {
-            0..=2 => {
-                // dup() the process FD to get an independent handle.
-                let new_fd = unsafe { nix::libc::dup(fd) };
-                if new_fd < 0 {
-                    return None;
-                }
-                Some(unsafe { File::from_raw_fd(new_fd) })
-            }
-            _ => None,
+        if fd < 0 {
+            return None;
         }
+        let new_fd = unsafe { nix::libc::dup(fd) };
+        if new_fd < 0 {
+            return None;
+        }
+        Some(unsafe { File::from_raw_fd(new_fd) })
     }
     #[cfg(windows)]
     {
-        use std::os::windows::io::FromRawHandle;
-        use windows::Win32::Foundation::HANDLE;
-        use windows::Win32::System::Threading::GetCurrentProcess;
         match fd {
             0 => dup_std_handle(windows::Win32::System::Console::STD_INPUT_HANDLE),
             1 => dup_std_handle(windows::Win32::System::Console::STD_OUTPUT_HANDLE),
             2 => dup_std_handle(windows::Win32::System::Console::STD_ERROR_HANDLE),
-            _ => None,
+            _ => dup_crt_fd(fd),
         }
     }
     #[cfg(not(any(unix, windows)))]
@@ -309,6 +309,44 @@ fn dup_std_handle(which: windows::Win32::System::Console::STD_HANDLE) -> Option<
     use windows::Win32::System::Threading::GetCurrentProcess;
 
     let handle = unsafe { GetStdHandle(which).ok()? };
+    let process = unsafe { GetCurrentProcess() };
+    let mut dup_handle = HANDLE::default();
+    unsafe {
+        DuplicateHandle(
+            process,
+            handle,
+            process,
+            &mut dup_handle,
+            0,
+            false,
+            DUPLICATE_SAME_ACCESS,
+        )
+        .ok()?;
+    }
+    Some(unsafe { File::from_raw_handle(dup_handle.0 as _) })
+}
+
+/// Duplicate a CRT file descriptor (3+) on Windows.
+///
+/// Uses `_get_osfhandle` to get the OS handle, then `DuplicateHandle`.
+/// Returns `None` if the CRT FD is invalid.
+#[cfg(windows)]
+fn dup_crt_fd(fd: i32) -> Option<File> {
+    use std::os::windows::io::FromRawHandle;
+    use windows::Win32::Foundation::{DuplicateHandle, DUPLICATE_SAME_ACCESS, HANDLE};
+    use windows::Win32::System::Threading::GetCurrentProcess;
+
+    extern "C" {
+        fn _get_osfhandle(fd: i32) -> isize;
+    }
+
+    let os_handle = unsafe { _get_osfhandle(fd) };
+    // _get_osfhandle returns -1 (INVALID_HANDLE_VALUE) on error.
+    if os_handle == -1 {
+        return None;
+    }
+
+    let handle = HANDLE(os_handle as _);
     let process = unsafe { GetCurrentProcess() };
     let mut dup_handle = HANDLE::default();
     unsafe {

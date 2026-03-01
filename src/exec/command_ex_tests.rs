@@ -64,6 +64,88 @@ mod posix_quoting {
     }
 
     #[testutil::test]
+    fn input_pipe_cat() {
+        use std::io::{Read, Write};
+        // Test InputPipe: write to stdin, capture stdout.
+        let mut cmd = super::super::CommandEx::new(vec![OsString::from("cat")]);
+        cmd.fds.insert(0, super::super::Fd::InputPipe);
+        cmd.fds.insert(1, super::super::Fd::Pipe);
+        let mut child = cmd.spawn().expect("spawn failed");
+
+        // Write to stdin via InputPipe.
+        let mut stdin_pipe = child.take_pipe(0).expect("no stdin pipe");
+        stdin_pipe.write_all(b"hello from input pipe\n").unwrap();
+        drop(stdin_pipe); // EOF
+
+        // Read stdout.
+        let mut stdout_pipe = child.take_pipe(1).expect("no stdout pipe");
+        let mut output = String::new();
+        stdout_pipe.read_to_string(&mut output).unwrap();
+        assert_eq!(output, "hello from input pipe\n");
+
+        let status = child.wait().expect("wait failed");
+        assert_eq!(status, 0);
+    }
+
+    /// Regression test: multiple pipes (stdout + stderr) on the same child.
+    /// Without CLOEXEC on parent-side pipe ends, the child inherits both
+    /// parent ends and never sees EOF — causing a deadlock.
+    #[testutil::test]
+    fn multi_pipe_stdout_stderr() {
+        use std::io::Read;
+        let mut cmd = super::super::CommandEx::new(vec![
+            OsString::from("sh"),
+            OsString::from("-c"),
+            OsString::from("echo out; echo err >&2"),
+        ]);
+        cmd.fds.insert(1, super::super::Fd::Pipe);
+        cmd.fds.insert(2, super::super::Fd::Pipe);
+        let mut child = cmd.spawn().expect("spawn failed");
+
+        let mut stdout_pipe = child.take_pipe(1).expect("no stdout pipe");
+        let mut stderr_pipe = child.take_pipe(2).expect("no stderr pipe");
+
+        let mut stdout = String::new();
+        let mut stderr = String::new();
+        stdout_pipe.read_to_string(&mut stdout).unwrap();
+        stderr_pipe.read_to_string(&mut stderr).unwrap();
+
+        assert_eq!(stdout, "out\n");
+        assert_eq!(stderr, "err\n");
+
+        let status = child.wait().expect("wait failed");
+        assert_eq!(status, 0);
+    }
+
+    /// Regression test: stdin pipe + stdout pipe simultaneously.
+    /// The child reads stdin and echoes it to stdout. Without CLOEXEC,
+    /// the child inherits the parent's write-end of stdin, preventing EOF.
+    #[testutil::test]
+    fn stdin_pipe_with_stdout_pipe() {
+        use std::io::{Read, Write};
+        let mut cmd = super::super::CommandEx::new(vec![
+            OsString::from("sh"),
+            OsString::from("-c"),
+            OsString::from("read line; echo got:$line"),
+        ]);
+        cmd.fds.insert(0, super::super::Fd::InputPipe);
+        cmd.fds.insert(1, super::super::Fd::Pipe);
+        let mut child = cmd.spawn().expect("spawn failed");
+
+        let mut stdin_pipe = child.take_pipe(0).expect("no stdin pipe");
+        stdin_pipe.write_all(b"hello\n").unwrap();
+        drop(stdin_pipe);
+
+        let mut stdout_pipe = child.take_pipe(1).expect("no stdout pipe");
+        let mut output = String::new();
+        stdout_pipe.read_to_string(&mut output).unwrap();
+        assert_eq!(output, "got:hello\n");
+
+        let status = child.wait().expect("wait failed");
+        assert_eq!(status, 0);
+    }
+
+    #[testutil::test]
     fn spawn_echo() {
         let argv = vec![OsString::from("echo"), OsString::from("hello")];
         let mut cmd = super::super::CommandEx::new(argv);

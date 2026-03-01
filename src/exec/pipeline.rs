@@ -196,7 +196,7 @@ fn spawn_pipeline_stage(
 }
 
 /// Create an OS pipe, returning `(read_end, write_end)` as `std::fs::File`.
-fn os_pipe() -> Result<(std::fs::File, std::fs::File), ExecError> {
+pub(super) fn os_pipe() -> Result<(std::fs::File, std::fs::File), ExecError> {
     #[cfg(unix)]
     {
         let (read, write) = nix::unistd::pipe().map_err(|e| ExecError::Io(std::io::Error::other(e)))?;

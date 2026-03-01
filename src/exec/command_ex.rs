@@ -15,9 +15,12 @@ use std::path::PathBuf;
 
 /// What to do with a file descriptor in the child process.
 pub(crate) enum Fd {
-    /// Create a pipe. After spawn, the parent gets the read-end via
-    /// `ChildEx::take_pipe(fd)`.
+    /// Output pipe: child gets the write-end, parent gets the read-end
+    /// via `ChildEx::take_pipe(fd)`. Used for capturing stdout/stderr.
     Pipe,
+    /// Input pipe: child gets the read-end, parent gets the write-end
+    /// via `ChildEx::take_pipe(fd)`. Used for feeding stdin to a child.
+    InputPipe,
     /// Redirect to/from this file.
     File(File),
 }
@@ -203,7 +206,7 @@ impl CommandEx {
                         unsafe { nix::libc::close(raw) };
                     }
                 }
-                Fd::Pipe => {} // Not meaningful for exec replacement.
+                Fd::Pipe | Fd::InputPipe => {} // Not meaningful for exec replacement.
             }
         }
 
@@ -324,6 +327,10 @@ fn commandline_windows(argv: &[OsString]) -> OsString {
                 out.push(b'\\' as u16);
                 out.push(b'"' as u16);
             } else {
+                // Emit accumulated backslashes as-is (not before a quote).
+                for _ in 0..backslashes {
+                    out.push(b'\\' as u16);
+                }
                 backslashes = 0;
                 out.push(ch);
             }
@@ -393,6 +400,22 @@ impl Drop for CwdGuard {
     }
 }
 
+/// Set FD_CLOEXEC on a File so it isn't inherited by child processes.
+///
+/// On macOS, `pipe()` doesn't set O_CLOEXEC, so parent-side pipe ends
+/// must be explicitly marked to prevent leaking into the child.
+#[cfg(unix)]
+fn set_cloexec(file: &File) {
+    use std::os::fd::AsRawFd;
+    let fd = file.as_raw_fd();
+    unsafe {
+        let flags = nix::libc::fcntl(fd, nix::libc::F_GETFD);
+        if flags >= 0 {
+            nix::libc::fcntl(fd, nix::libc::F_SETFD, flags | nix::libc::FD_CLOEXEC);
+        }
+    }
+}
+
 /// Close a list of raw file descriptors, ignoring errors.
 #[cfg(unix)]
 fn close_raw_fds(fds: &[std::os::fd::RawFd]) {
@@ -419,13 +442,30 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
             Fd::Pipe => {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
                 let write_raw = write_end.into_raw_fd();
-                // Track for cleanup before the fallible add_dup2 call.
                 raw_fds_to_close.push(write_raw);
                 file_actions.add_dup2(write_raw, fd_num).map_err(|e| {
                     close_raw_fds(&raw_fds_to_close);
                     io::Error::other(e)
                 })?;
-                pipes.insert(fd_num, File::from(read_end));
+                // Parent reads from this pipe. Set CLOEXEC on the parent's
+                // read-end so it isn't leaked to the child.
+                let parent_file = File::from(read_end);
+                set_cloexec(&parent_file);
+                pipes.insert(fd_num, parent_file);
+            }
+            Fd::InputPipe => {
+                let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
+                let read_raw = read_end.into_raw_fd();
+                raw_fds_to_close.push(read_raw);
+                file_actions.add_dup2(read_raw, fd_num).map_err(|e| {
+                    close_raw_fds(&raw_fds_to_close);
+                    io::Error::other(e)
+                })?;
+                // Parent writes to this pipe. Set CLOEXEC on the parent's
+                // write-end so it isn't leaked to the child.
+                let parent_file = File::from(write_end);
+                set_cloexec(&parent_file);
+                pipes.insert(fd_num, parent_file);
             }
             Fd::File(file) => {
                 let raw_fd = file.try_clone()?.into_raw_fd();

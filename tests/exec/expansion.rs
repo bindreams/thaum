@@ -365,6 +365,35 @@ fn exec_redirect_stdout_to_file() {
 }
 
 #[testutil::test]
+fn exec_redirect_affects_subshell() {
+    // exec 1>file must redirect stdout for ALL subsequent commands,
+    // including compound commands and subshells — not just simple commands.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("stdout.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 1>{f}; (echo from_subshell)");
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "", "subshell stdout should go to file, not captured");
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "from_subshell\n");
+}
+
+#[testutil::test]
+fn exec_redirect_affects_compound() {
+    // exec 1>file should also apply to brace groups and if/while bodies.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("stdout.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 1>{f}; if true; then echo from_if; fi");
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "", "if-body stdout should go to file");
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "from_if\n");
+}
+
+#[testutil::test]
 fn exec_close_fd() {
     // exec 3>file; echo hello >&3; exec 3>&- closes FD 3.
     // Verify the file only contains writes from before the close.
@@ -399,6 +428,40 @@ fn exec_inherits_per_command_fds() {
     let (_, status) = exec_ok(&script);
     assert_eq!(status, 0);
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "from_exec\n");
+}
+
+#[testutil::test]
+fn exec_fd3_inherited_by_subshell() {
+    // exec 3>file persists FD 3, and a subshell should inherit it.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
+    let f = shell_path(&file);
+
+    let script = format!("exec 3>{f}; (echo hello >&3); exec 3>&-");
+    let (_, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
+}
+
+#[testutil::test]
+fn exec_closed_fd_not_inherited_by_subshell() {
+    // After exec 3>&-, a subsequent subshell must NOT see FD 3.
+    // This validates that fd_table is explicitly constructed per-spawn
+    // (no CLOEXEC race conditions).
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
+    let f = shell_path(&file);
+
+    // Open FD 3 and immediately close it. The subshell should fail to use FD 3.
+    let script = format!("exec 3>{f}; echo before >&3; exec 3>&-; (echo after >&3 2>/dev/null; echo $?)");
+    let (out, _) = exec_ok(&script);
+    // The subshell's echo should fail; $? should be non-zero.
+    assert!(
+        out.trim() != "0",
+        "closed FD 3 should not be inherited by subshell; got: {out}"
+    );
+    // The file should only have "before" from before the close.
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "before\n");
 }
 
 #[cfg(unix)]

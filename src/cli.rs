@@ -478,6 +478,13 @@ fn do_exec_ast(cli: &CliArgs) {
     let env = Environment::from_serialized(payload.env);
     let mut executor = Executor::with_env_and_options(env, payload.options);
 
+    // Reconstruct fd_table from FDs inherited via CommandEx (posix_spawn).
+    for fd in payload.inherited_fds {
+        if let Some(file) = thaum::exec::redirect::dup_process_fd(fd) {
+            executor.fd_table_mut().insert(fd, file);
+        }
+    }
+
     let mut process_io = ProcessIo::new();
     match executor.execute_lines(&payload.body, &mut process_io.context()) {
         Ok(status) => process::exit(status),

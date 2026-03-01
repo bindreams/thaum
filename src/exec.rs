@@ -31,7 +31,7 @@ mod pattern;
 pub mod pipeline;
 mod platform;
 pub(crate) mod printf;
-mod redirect;
+pub mod redirect;
 mod special_builtins;
 /// Subshell serialization payload for cross-process `thaum exec-ast`.
 pub mod subshell;
@@ -44,7 +44,6 @@ use pattern::shell_pattern_match;
 
 use std::collections::{HashMap, HashSet};
 use std::io::Write;
-use std::process::Stdio;
 
 use crate::ast::{Command, ExecutionMode, Expression, Line, Program, Statement};
 
@@ -161,6 +160,12 @@ impl Executor {
         &self.fd_table
     }
 
+    /// Mutable access to the persistent FD table. Used by `exec-ast` child
+    /// processes to reconstruct inherited FDs.
+    pub fn fd_table_mut(&mut self) -> &mut HashMap<i32, std::fs::File> {
+        &mut self.fd_table
+    }
+
     /// Adopt redirects from `exec` redirect-only mode into persistent state.
     ///
     /// FDs 0-2 and 3+ are all stored in `fd_table`. Persistent FDs 0-2 are
@@ -211,10 +216,16 @@ impl Executor {
     /// is a real separate process, so `$BASHPID` and signal isolation work
     /// correctly on all platforms.
     pub(crate) fn execute_subshell(&mut self, body: &[Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+        use command_ex::{CommandEx, Fd};
+        use std::io::Read;
+
+        let inherited_fds: Vec<i32> = self.fd_table.keys().filter(|&&fd| fd >= 3).copied().collect();
+
         let payload = subshell::SubshellPayload {
             env: self.env.serialize(),
             body: body.to_vec(),
             options: self.options.clone(),
+            inherited_fds: inherited_fds.clone(),
         };
         let json = serde_json::to_string(&payload).map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
 
@@ -223,24 +234,42 @@ impl Executor {
             None => std::env::current_exe().map_err(ExecError::Io)?,
         };
 
-        let mut child = std::process::Command::new(&exe)
-            .arg("exec-ast")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .current_dir(self.env.cwd())
-            .spawn()
-            .map_err(ExecError::Io)?;
+        let mut cmd = CommandEx::new(vec![exe.into(), "exec-ast".into()]);
+        cmd.fds.insert(0, Fd::InputPipe); // parent writes JSON payload
+        cmd.fds.insert(1, Fd::Pipe); // parent reads stdout
+        cmd.fds.insert(2, Fd::Pipe); // parent reads stderr
+        cmd.cwd = Some(self.env.cwd().to_path_buf());
+        // Inherit the full process environment so the child has system vars.
+        cmd.env = std::env::vars_os().collect();
 
-        if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(json.as_bytes()).map_err(ExecError::Io)?;
+        // Pass fd_table FDs (3+) to the child atomically.
+        for &fd in &inherited_fds {
+            if let Some(file) = self.fd_table.get(&fd) {
+                cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+            }
         }
 
-        let output = child.wait_with_output().map_err(ExecError::Io)?;
-        let status = output.status.code().unwrap_or(128);
+        let mut child = cmd.spawn().map_err(ExecError::Io)?;
 
-        io.stdout.write_all(&output.stdout).map_err(ExecError::Io)?;
-        io.stderr.write_all(&output.stderr).map_err(ExecError::Io)?;
+        // Write JSON payload and close the write end so child sees EOF.
+        if let Some(mut stdin_pipe) = child.take_pipe(0) {
+            stdin_pipe.write_all(json.as_bytes()).map_err(ExecError::Io)?;
+        }
+
+        // Read stdout and stderr from the child.
+        let mut stdout_buf = Vec::new();
+        let mut stderr_buf = Vec::new();
+        if let Some(mut stdout_pipe) = child.take_pipe(1) {
+            stdout_pipe.read_to_end(&mut stdout_buf).map_err(ExecError::Io)?;
+        }
+        if let Some(mut stderr_pipe) = child.take_pipe(2) {
+            stderr_pipe.read_to_end(&mut stderr_buf).map_err(ExecError::Io)?;
+        }
+
+        let status = child.wait().map_err(ExecError::Io)?;
+
+        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
 
         Ok(status)
     }
@@ -279,6 +308,30 @@ impl Executor {
 
     /// Execute an expression, returning its exit status.
     pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+        // Apply persistent FDs 0-2 from fd_table (set by `exec` redirects).
+        // Clone into locals so the overridden IoContext borrows them.
+        let mut fd0 = self.fd_table.get(&0).and_then(|f| f.try_clone().ok());
+        let mut fd1 = self.fd_table.get(&1).and_then(|f| f.try_clone().ok());
+        let mut fd2 = self.fd_table.get(&2).and_then(|f| f.try_clone().ok());
+        let mut persistent_io = IoContext::new(
+            match fd0.as_mut() {
+                Some(f) => f as &mut dyn std::io::Read,
+                None => io.stdin,
+            },
+            match fd1.as_mut() {
+                Some(f) => f as &mut dyn std::io::Write,
+                None => io.stdout,
+            },
+            match fd2.as_mut() {
+                Some(f) => f as &mut dyn std::io::Write,
+                None => io.stderr,
+            },
+        );
+
+        self.execute_expression_inner(expr, &mut persistent_io)
+    }
+
+    fn execute_expression_inner(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match expr {
             Expression::Command(cmd) => {
                 // Try alias expansion before normal execution
@@ -300,11 +353,11 @@ impl Executor {
             Expression::And { left, right } => {
                 let saved = self.errexit_suppressed;
                 self.errexit_suppressed = true;
-                let left_status = self.execute_expression(left, io)?;
+                let left_status = self.execute_expression_inner(left, io)?;
                 self.errexit_suppressed = saved;
                 self.env.set_last_exit_status(left_status);
                 if left_status == 0 {
-                    self.execute_expression(right, io)
+                    self.execute_expression_inner(right, io)
                 } else {
                     // Short-circuit: left failed, skip right.  The non-zero
                     // status is an expected control-flow outcome of the &&
@@ -317,11 +370,11 @@ impl Executor {
             Expression::Or { left, right } => {
                 let saved = self.errexit_suppressed;
                 self.errexit_suppressed = true;
-                let left_status = self.execute_expression(left, io)?;
+                let left_status = self.execute_expression_inner(left, io)?;
                 self.errexit_suppressed = saved;
                 self.env.set_last_exit_status(left_status);
                 if left_status != 0 {
-                    self.execute_expression(right, io)
+                    self.execute_expression_inner(right, io)
                 } else {
                     Ok(0)
                 }
@@ -335,7 +388,7 @@ impl Executor {
             Expression::Not(inner) => {
                 let saved = self.errexit_suppressed;
                 self.errexit_suppressed = true;
-                let status = self.execute_expression(inner, io)?;
+                let status = self.execute_expression_inner(inner, io)?;
                 self.errexit_suppressed = saved;
                 let negated = if status == 0 { 1 } else { 0 };
                 Ok(negated)
@@ -625,7 +678,7 @@ impl Executor {
                 self.execute_command(cmd, io)
             }
             // For non-Command expressions, delegate normally
-            _ => self.execute_expression(expr, io),
+            _ => self.execute_expression_inner(expr, io),
         }
     }
 
@@ -643,28 +696,6 @@ impl Executor {
         // without a command). Redirect handles are dropped when `active` goes
         // out of scope.
         let mut active = self.resolve_redirects(&cmd.redirects)?;
-
-        // Apply persistent FDs 0-2 from fd_table (set by `exec` redirects)
-        // as defaults — per-command redirects in `active` take precedence.
-        for &fd in &[0i32, 1, 2] {
-            if let Some(file) = self.fd_table.get(&fd) {
-                let has_override = match fd {
-                    0 => active.stdin.is_some(),
-                    1 => active.stdout.is_some(),
-                    2 => active.stderr.is_some(),
-                    _ => false,
-                };
-                if !has_override {
-                    let cloned = file.try_clone().map_err(ExecError::Io)?;
-                    match fd {
-                        0 => active.stdin = Some(cloned),
-                        1 => active.stdout = Some(cloned),
-                        2 => active.stderr = Some(cloned),
-                        _ => {}
-                    }
-                }
-            }
-        }
 
         // Xtrace: print expanded command to stderr before dispatch.
         if self.env.xtrace_enabled() && !expanded_args.is_empty() {

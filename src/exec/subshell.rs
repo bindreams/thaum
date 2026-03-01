@@ -13,4 +13,9 @@ pub struct SubshellPayload {
     pub body: Vec<Line>,
     /// Shell options inherited from the parent executor.
     pub options: crate::dialect::ShellOptions,
+    /// FD numbers from the parent's fd_table that were passed to the child
+    /// via `CommandEx.fds`. The child reconstructs `fd_table` entries by
+    /// duping these inherited OS file descriptors.
+    #[serde(default)]
+    pub inherited_fds: Vec<i32>,
 }

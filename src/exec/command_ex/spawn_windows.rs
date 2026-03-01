@@ -33,12 +33,19 @@ pub(super) fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
         match fd_spec {
             Fd::Pipe => {
                 let (read_handle, write_handle) = create_pipe()?;
-                // Wrap read_handle in File immediately so it's closed on error.
                 let read_file = unsafe { File::from_raw_handle(read_handle.0 as _) };
                 // Child gets write end; parent gets read end.
                 make_inheritable(write_handle)?;
                 handle_table.insert(fd_num, (write_handle, FOPEN | FPIPE));
                 pipes.insert(fd_num, read_file);
+            }
+            Fd::InputPipe => {
+                let (read_handle, write_handle) = create_pipe()?;
+                let write_file = unsafe { File::from_raw_handle(write_handle.0 as _) };
+                // Child gets read end; parent gets write end.
+                make_inheritable(read_handle)?;
+                handle_table.insert(fd_num, (read_handle, FOPEN | FPIPE));
+                pipes.insert(fd_num, write_file);
             }
             Fd::File(file) => {
                 let raw = file.try_clone()?.into_raw_handle();

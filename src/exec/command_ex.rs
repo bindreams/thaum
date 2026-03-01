@@ -179,6 +179,96 @@ impl ChildEx {
     }
 }
 
+// Process replacement =============================================================
+
+impl CommandEx {
+    /// Replace the current process image with this command (Unix `execvp`).
+    ///
+    /// Applies FD redirections via `dup2`, changes CWD, sets environment,
+    /// then calls `execvp`. On success, this function never returns.
+    /// On failure, returns the OS error.
+    #[cfg(unix)]
+    pub fn exec_replace(self) -> io::Error {
+        use std::ffi::{CStr, CString};
+        use std::os::fd::IntoRawFd;
+        use std::os::unix::ffi::OsStrExt;
+
+        // Apply FD redirections via dup2.
+        for (&fd_num, fd_spec) in &self.fds {
+            match fd_spec {
+                Fd::File(file) => {
+                    if let Ok(cloned) = file.try_clone() {
+                        let raw = cloned.into_raw_fd();
+                        unsafe { nix::libc::dup2(raw, fd_num) };
+                        unsafe { nix::libc::close(raw) };
+                    }
+                }
+                Fd::Pipe => {} // Not meaningful for exec replacement.
+            }
+        }
+
+        // Change CWD (no RAII guard — we're replacing the process).
+        if let Some(ref cwd) = self.cwd {
+            let _ = std::env::set_current_dir(cwd);
+        }
+
+        // Build CString argv and envp.
+        let argv_c: Vec<CString> = self
+            .argv
+            .iter()
+            .map(|a| CString::new(a.as_bytes()).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e)))
+            .collect::<Result<_, _>>()
+            .unwrap_or_default();
+
+        let envp_c: Vec<CString> = self
+            .env
+            .iter()
+            .map(|(k, v)| {
+                let mut s = k.as_bytes().to_vec();
+                s.push(b'=');
+                s.extend_from_slice(v.as_bytes());
+                CString::new(s).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))
+            })
+            .collect::<Result<_, _>>()
+            .unwrap_or_default();
+
+        let path_c = match CString::new(self.path.as_bytes()) {
+            Ok(c) => c,
+            Err(e) => return io::Error::new(io::ErrorKind::InvalidInput, e),
+        };
+
+        // Resolve the executable path via PATH if it's a bare name.
+        let resolved = if self.path.to_string_lossy().contains('/') {
+            path_c
+        } else {
+            // Search PATH manually for execve (which doesn't do PATH lookup).
+            let path_var = std::env::var("PATH").unwrap_or_default();
+            let mut found = None;
+            for dir in path_var.split(':') {
+                let candidate = format!("{}/{}", dir, self.path.to_string_lossy());
+                if let Ok(c) = CString::new(candidate.as_bytes()) {
+                    if std::path::Path::new(&candidate).is_file() {
+                        found = Some(c);
+                        break;
+                    }
+                }
+            }
+            found.unwrap_or(path_c)
+        };
+
+        // execve replaces the process image. Only returns on error.
+        let argv_refs: Vec<&CStr> = argv_c.iter().map(|c| c.as_c_str()).collect();
+        let envp_refs: Vec<&CStr> = envp_c.iter().map(|c| c.as_c_str()).collect();
+        let err = nix::unistd::execve(&resolved, &argv_refs, &envp_refs).unwrap_err();
+        let kind = match err {
+            nix::Error::ENOENT => io::ErrorKind::NotFound,
+            nix::Error::EACCES => io::ErrorKind::PermissionDenied,
+            _ => io::ErrorKind::Other,
+        };
+        io::Error::new(kind, err)
+    }
+}
+
 // Command-line quoting ============================================================
 
 /// POSIX shell quoting: single-quote each argument, escaping embedded `'`.

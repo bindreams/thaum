@@ -711,8 +711,7 @@ impl Executor {
                     self.restore_prefix_assignments(saved);
                     return Ok(0);
                 }
-                let mut cmd_io = active.apply_to_io(io);
-                let result = self.builtin_exec(cmd_args, &mut cmd_io);
+                let result = self.builtin_exec(cmd_args, &mut active, io);
                 self.restore_prefix_assignments(saved);
                 return result;
             }

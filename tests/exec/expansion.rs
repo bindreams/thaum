@@ -380,6 +380,29 @@ fn exec_close_fd() {
 
 #[cfg(unix)]
 #[testutil::test]
+fn exec_with_redirect_to_file() {
+    // exec 2>/dev/null /bin/echo hello — redirects applied before exec.
+    // The subshell's stderr is discarded; stdout should still work.
+    let (out, _) = exec_ok("(exec 2>/dev/null /bin/echo hello)");
+    assert_eq!(out, "hello\n");
+}
+
+#[cfg(unix)]
+#[testutil::test]
+fn exec_inherits_per_command_fds() {
+    // exec 3>file cmd — the per-command redirect should be applied before exec.
+    let dir = tempfile::tempdir().unwrap();
+    let file = dir.path().join("fd3.txt");
+    let f = shell_path(&file);
+
+    let script = format!("(exec 3>{f} sh -c 'echo from_exec >&3')");
+    let (_, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "from_exec\n");
+}
+
+#[cfg(unix)]
+#[testutil::test]
 fn exec_dash_a_sets_argv0() {
     // exec -a custom_name uses a custom argv[0].
     // We verify by having the child print $0 (which reflects argv[0]).

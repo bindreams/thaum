@@ -4,8 +4,10 @@
 //! so they are intercepted in `execute_command` before the normal builtin
 //! dispatch path.
 
+use crate::exec::command_ex::{CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
+use crate::exec::redirect::ActiveRedirects;
 use crate::exec::Executor;
 
 impl Executor {
@@ -82,8 +84,14 @@ impl Executor {
     /// (`execute_command`) which adopts the redirects into the persistent
     /// `fd_table` before reaching this function.
     ///
-    /// With a command, spawns the child and exits via `ExitRequested`.
-    pub(super) fn builtin_exec(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    /// On Unix, replaces the process image via `execvp`. On other platforms,
+    /// spawns the child and exits via `ExitRequested`.
+    pub(super) fn builtin_exec(
+        &mut self,
+        args: &[String],
+        active: &mut ActiveRedirects,
+        io: &mut IoContext<'_>,
+    ) -> Result<i32, ExecError> {
         if args.is_empty() {
             // Redirect-only mode is handled before this function is called.
             return Ok(0);
@@ -123,8 +131,7 @@ impl Executor {
         argv.push(argv0_override.unwrap_or(cmd_name).into());
         argv.extend(cmd_args.iter().map(std::ffi::OsString::from));
 
-        let mut cmd = super::command_ex::CommandEx::new(argv);
-        // If -a was used, argv[0] differs from the actual executable path.
+        let mut cmd = CommandEx::new(argv);
         cmd.path = cmd_name.into();
         cmd.cwd = Some(self.env.cwd().to_path_buf());
         cmd.env = self
@@ -134,14 +141,42 @@ impl Executor {
             .map(|(k, v)| (k.into(), v.into()))
             .collect();
 
-        match cmd.spawn() {
-            Ok(mut child) => {
-                let code = child.wait().map_err(ExecError::Io)?;
-                Err(ExecError::ExitRequested(code))
-            }
-            Err(e) => {
-                let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
-                Err(ExecError::ExitRequested(127))
+        // Build FD table: persistent fd_table first, per-command redirects override.
+        for (&fd, file) in &self.fd_table {
+            cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        if let Some(ref file) = active.stdin {
+            cmd.fds.insert(0, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        if let Some(ref file) = active.stdout {
+            cmd.fds.insert(1, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        if let Some(ref file) = active.stderr {
+            cmd.fds.insert(2, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        for (&fd, file) in &active.extra_fds {
+            cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+
+        #[cfg(unix)]
+        {
+            // Replace the process image. Only returns on error.
+            let e = cmd.exec_replace();
+            let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+            Err(ExecError::ExitRequested(127))
+        }
+
+        #[cfg(not(unix))]
+        {
+            match cmd.spawn() {
+                Ok(mut child) => {
+                    let code = child.wait().map_err(ExecError::Io)?;
+                    Err(ExecError::ExitRequested(code))
+                }
+                Err(e) => {
+                    let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+                    Err(ExecError::ExitRequested(127))
+                }
             }
         }
     }

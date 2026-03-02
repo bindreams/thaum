@@ -60,7 +60,7 @@ fn test_expr_binary_string_equals() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::StringEquals);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -70,7 +70,7 @@ fn test_expr_binary_string_not_equals() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::StringNotEquals);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -80,7 +80,7 @@ fn test_expr_binary_int_eq() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::IntEq);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -90,7 +90,7 @@ fn test_expr_binary_int_lt() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::IntLt);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -101,7 +101,7 @@ fn test_expr_binary_less_than() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::StringLessThan);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -111,7 +111,7 @@ fn test_expr_binary_greater_than() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::StringGreaterThan);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -121,7 +121,7 @@ fn test_expr_binary_regex_match() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::RegexMatch);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -155,7 +155,7 @@ fn test_expr_binary_file_newer() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::FileNewerThan);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -178,7 +178,7 @@ fn test_expr_logical_or() {
             }
         ));
     } else {
-        panic!("expected Or, got {:?}", expr);
+        panic!("expected Or, got {expr:?}");
     }
 }
 
@@ -194,7 +194,7 @@ fn test_expr_logical_not() {
             }
         ));
     } else {
-        panic!("expected Not, got {:?}", expr);
+        panic!("expected Not, got {expr:?}");
     }
 }
 
@@ -205,7 +205,7 @@ fn test_expr_double_not() {
     if let BashTestExpr::Not(inner) = &expr {
         assert!(matches!(inner.as_ref(), BashTestExpr::Not(_)));
     } else {
-        panic!("expected Not, got {:?}", expr);
+        panic!("expected Not, got {expr:?}");
     }
 }
 
@@ -221,7 +221,7 @@ fn test_expr_grouped() {
             }
         ));
     } else {
-        panic!("expected Group, got {:?}", expr);
+        panic!("expected Group, got {expr:?}");
     }
 }
 
@@ -297,7 +297,7 @@ fn test_expr_precedence_and_binds_tighter_than_or() {
         ));
         assert!(matches!(right.as_ref(), BashTestExpr::And { .. }));
     } else {
-        panic!("expected Or, got {:?}", expr);
+        panic!("expected Or, got {expr:?}");
     }
 }
 
@@ -315,7 +315,7 @@ fn test_expr_not_binds_tighter_than_and() {
             }
         ));
     } else {
-        panic!("expected And, got {:?}", expr);
+        panic!("expected And, got {expr:?}");
     }
 }
 
@@ -333,7 +333,7 @@ fn test_expr_grouped_or_overrides_precedence() {
             }
         ));
     } else {
-        panic!("expected And, got {:?}", expr);
+        panic!("expected And, got {expr:?}");
     }
 }
 
@@ -344,7 +344,7 @@ fn test_expr_binary_eq_single_equals() {
     if let BashTestExpr::Binary { op, .. } = &expr {
         assert_eq!(*op, BinaryTestOp::StringEquals);
     } else {
-        panic!("expected Binary, got {:?}", expr);
+        panic!("expected Binary, got {expr:?}");
     }
 }
 
@@ -372,7 +372,7 @@ fn test_expr_chained_and() {
             }
         ));
     } else {
-        panic!("expected And, got {:?}", expr);
+        panic!("expected And, got {expr:?}");
     }
 }
 
@@ -390,7 +390,7 @@ fn test_expr_chained_or() {
             }
         ));
     } else {
-        panic!("expected Or, got {:?}", expr);
+        panic!("expected Or, got {expr:?}");
     }
 }
 
@@ -424,12 +424,12 @@ fn test_expr_all_unary_ops() {
         ("-R", UnaryTestOp::VariableIsNameRef),
     ];
     for (op_str, expected_op) in cases {
-        let input = format!("[[ {} arg ]]", op_str);
+        let input = format!("[[ {op_str} arg ]]");
         let expr = parse_test_expr(&input);
         if let BashTestExpr::Unary { op, .. } = &expr {
-            assert_eq!(*op, expected_op, "failed for {}", op_str);
+            assert_eq!(*op, expected_op, "failed for {op_str}");
         } else {
-            panic!("expected Unary for {}, got {:?}", op_str, expr);
+            panic!("expected Unary for {op_str}, got {expr:?}");
         }
     }
 }
@@ -453,12 +453,12 @@ fn test_expr_all_binary_word_ops() {
         ("-ef", BinaryTestOp::FileSameDevice),
     ];
     for (op_str, expected_op) in cases {
-        let input = format!("[[ a {} b ]]", op_str);
+        let input = format!("[[ a {op_str} b ]]");
         let expr = parse_test_expr(&input);
         if let BashTestExpr::Binary { op, .. } = &expr {
-            assert_eq!(*op, expected_op, "failed for {}", op_str);
+            assert_eq!(*op, expected_op, "failed for {op_str}");
         } else {
-            panic!("expected Binary for {}, got {:?}", op_str, expr);
+            panic!("expected Binary for {op_str}, got {expr:?}");
         }
     }
 }

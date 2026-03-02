@@ -9,7 +9,7 @@ fn print_error_header(msg: &str) {
     if colored::control::SHOULD_COLORIZE.should_colorize() {
         eprintln!("{}{} {}", "error".red().bold(), ":".bold(), msg.bold());
     } else {
-        eprintln!("error: {}", msg);
+        eprintln!("error: {msg}");
     }
 }
 
@@ -26,7 +26,7 @@ pub(super) fn print_error(error: &thaum::ParseError, source: &str, filename: &st
         if colorize {
             eprintln!(" {} {}:{}:{}", "-->".blue().bold(), filename, line_num, col);
         } else {
-            eprintln!(" --> {}:{}:{}", filename, line_num, col);
+            eprintln!(" --> {filename}:{line_num}:{col}");
         }
 
         // Extract the source line
@@ -44,12 +44,12 @@ pub(super) fn print_error(error: &thaum::ParseError, source: &str, filename: &st
         if colorize {
             eprintln!(
                 "{} {} {}",
-                format!("{}", line_num).blue().bold(),
+                format!("{line_num}").blue().bold(),
                 "|".blue().bold(),
                 source_line
             );
         } else {
-            eprintln!("{} | {}", line_num, source_line);
+            eprintln!("{line_num} | {source_line}");
         }
 
         // Underline

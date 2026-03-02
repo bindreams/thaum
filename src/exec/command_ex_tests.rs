@@ -4,7 +4,10 @@ testutil::default_labels!(exec);
 
 #[cfg(unix)]
 mod posix_quoting {
+    use std::path::Path;
+
     use super::*;
+    use testutil::TempDir;
 
     fn roundtrip(args: &[&str]) {
         let argv: Vec<OsString> = args.iter().map(OsString::from).collect();
@@ -178,9 +181,8 @@ mod posix_quoting {
     }
 
     #[testutil::test]
-    fn spawn_fd3_inheritance() {
-        let dir = tempfile::tempdir().unwrap();
-        let file_path = dir.path().join("fd3.txt");
+    fn spawn_fd3_inheritance(#[fixture(TempDir)] dir: &Path) {
+        let file_path = dir.join("fd3.txt");
         let file = std::fs::File::create(&file_path).unwrap();
 
         let mut cmd = super::super::CommandEx::new(vec![

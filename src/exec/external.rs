@@ -76,11 +76,11 @@ impl Executor {
                 Ok(status)
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                let _ = writeln!(io.stderr, "{}: command not found", name);
+                let _ = writeln!(io.stderr, "{name}: command not found");
                 Ok(127)
             }
             Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                let _ = writeln!(io.stderr, "{}: permission denied", name);
+                let _ = writeln!(io.stderr, "{name}: permission denied");
                 Ok(126)
             }
             Err(e) => Err(ExecError::Io(e)),

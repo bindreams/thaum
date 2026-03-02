@@ -1,3 +1,6 @@
+use std::path::Path;
+
+use testutil::TempDir;
 use thaum::exec::{CapturedIo, Executor};
 
 use crate::*;
@@ -407,9 +410,8 @@ fn shell_path(p: &std::path::Path) -> String {
 }
 
 #[testutil::test]
-fn redirect_builtin_stdout_to_file() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("stdout.txt");
+fn redirect_builtin_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("stdout.txt");
 
     let script = format!("echo hello > {}", shell_path(&file));
     let (out, status) = exec_ok(&script);
@@ -419,9 +421,8 @@ fn redirect_builtin_stdout_to_file() {
 }
 
 #[testutil::test]
-fn redirect_builtin_append() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("append.txt");
+fn redirect_builtin_append(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("append.txt");
     let f = shell_path(&file);
 
     let script = format!("echo first > {f}; echo second >> {f}");
@@ -431,9 +432,8 @@ fn redirect_builtin_append() {
 }
 
 #[testutil::test]
-fn redirect_stdin_from_file() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("input.txt");
+fn redirect_stdin_from_file(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("input.txt");
     std::fs::write(&file, "from-file\n").unwrap();
 
     let script = format!("read LINE < {}; echo $LINE", shell_path(&file));
@@ -442,10 +442,9 @@ fn redirect_stdin_from_file() {
 }
 
 #[testutil::test]
-fn redirect_dup_stdout_to_stderr_file() {
+fn redirect_dup_stdout_to_stderr_file(#[fixture(TempDir)] dir: &Path) {
     // > file 2>&1 — redirect stdout to file, then dup stderr to same file
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("combined.txt");
+    let file = dir.join("combined.txt");
 
     let script = format!("echo hello > {} 2>&1", shell_path(&file));
     let (out, status) = exec_ok(&script);
@@ -455,10 +454,9 @@ fn redirect_dup_stdout_to_stderr_file() {
 }
 
 #[testutil::test]
-fn redirect_fd3_and_dup_to_stdout() {
+fn redirect_fd3_and_dup_to_stdout(#[fixture(TempDir)] dir: &Path) {
     // echo hello 3>/tmp/file >&3 — open FD 3 to file, dup stdout to FD 3
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
 
     let script = format!("echo hello 3>{} >&3", shell_path(&file));
     let (out, status) = exec_ok(&script);
@@ -468,10 +466,9 @@ fn redirect_fd3_and_dup_to_stdout() {
 }
 
 #[testutil::test]
-fn redirect_creates_empty_file() {
+fn redirect_creates_empty_file(#[fixture(TempDir)] dir: &Path) {
     // `> file` with no command creates/truncates the file
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("empty.txt");
+    let file = dir.join("empty.txt");
 
     let script = format!("> {}", shell_path(&file));
     let (_, status) = exec_ok(&script);
@@ -481,11 +478,10 @@ fn redirect_creates_empty_file() {
 
 #[cfg(unix)]
 #[testutil::test]
-fn external_command_inherits_fd3() {
+fn external_command_inherits_fd3(#[fixture(TempDir)] dir: &Path) {
     // sh -c 'echo hello >&3' writes to FD 3, which is redirected to a file.
     // This tests that FDs 3+ are passed to external child processes.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
 
     let script = format!("sh -c 'echo hello >&3' 3>{}", shell_path(&file));
     let (_, status) = exec_ok(&script);
@@ -518,7 +514,7 @@ fn posix_rejects_declare() {
     match result {
         Ok(status) => assert_ne!(status, 0),
         Err(thaum::exec::ExecError::CommandNotFound(_)) => {} // expected
-        Err(e) => panic!("unexpected error: {:?}", e),
+        Err(e) => panic!("unexpected error: {e:?}"),
     }
 }
 
@@ -534,7 +530,7 @@ fn posix_rejects_shopt() {
     match result {
         Ok(status) => assert_ne!(status, 0),
         Err(thaum::exec::ExecError::CommandNotFound(_)) => {}
-        Err(e) => panic!("unexpected error: {:?}", e),
+        Err(e) => panic!("unexpected error: {e:?}"),
     }
 }
 

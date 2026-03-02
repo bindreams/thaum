@@ -6,7 +6,7 @@ use super::*;
 testutil::default_labels!(parse);
 
 fn parse_ok(input: &str) -> ArithExpr {
-    parse_arith_expr(input).unwrap_or_else(|e| panic!("parse_arith_expr failed for {:?}: {}", input, e))
+    parse_arith_expr(input).unwrap_or_else(|e| panic!("parse_arith_expr failed for {input:?}: {e}"))
 }
 
 // Tokenizer tests -----------------------------------------------------------------------------------------------------
@@ -452,9 +452,9 @@ fn compound_all_assign_ops() {
     for (input, expected_op) in cases {
         let expr = parse_ok(input);
         if let ArithExpr::Assignment { op, .. } = &expr {
-            assert_eq!(*op, expected_op, "failed for {}", input);
+            assert_eq!(*op, expected_op, "failed for {input}");
         } else {
-            panic!("expected Assignment for {}, got {:?}", input, expr);
+            panic!("expected Assignment for {input}, got {expr:?}");
         }
     }
 }
@@ -467,7 +467,7 @@ fn assignment_right_associative() {
         assert_eq!(target, "x");
         assert!(matches!(value.as_ref(), ArithExpr::Assignment { .. }));
     } else {
-        panic!("expected Assignment, got {:?}", expr);
+        panic!("expected Assignment, got {expr:?}");
     }
 }
 
@@ -560,7 +560,7 @@ fn complex_precedence() {
             }
         ));
     } else {
-        panic!("expected Sub at top, got {:?}", expr);
+        panic!("expected Sub at top, got {expr:?}");
     }
 }
 

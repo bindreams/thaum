@@ -1,3 +1,5 @@
+use std::path::Path;
+use testutil::TempDir;
 use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum::Dialect;
 
@@ -256,9 +258,8 @@ fn shell_path(p: &std::path::Path) -> String {
 }
 
 #[testutil::test]
-fn source_basic() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("test.sh");
+fn source_basic(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("test.sh");
     std::fs::write(&file, "x=sourced_value\n").unwrap();
 
     let script = format!("source {}; echo $x", shell_path(&file));
@@ -267,9 +268,8 @@ fn source_basic() {
 }
 
 #[testutil::test]
-fn source_dot_synonym() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("test.sh");
+fn source_dot_synonym(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("test.sh");
     std::fs::write(&file, "y=dotted\n").unwrap();
 
     let script = format!(". {}; echo $y", shell_path(&file));
@@ -278,9 +278,8 @@ fn source_dot_synonym() {
 }
 
 #[testutil::test]
-fn source_with_args() {
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("test.sh");
+fn source_with_args(#[fixture(TempDir)] dir: &Path) {
+    let file = dir.join("test.sh");
     std::fs::write(&file, "echo $1 $2\n").unwrap();
 
     let script = format!("source {} hello world", shell_path(&file));
@@ -289,14 +288,13 @@ fn source_with_args() {
 }
 
 #[testutil::test]
-fn source_finds_script_via_path_lookup() {
+fn source_finds_script_via_path_lookup(#[fixture(TempDir)] dir: &Path) {
     // Put a script in a temp directory, add that directory to PATH,
     // and source by bare name (no slashes) to exercise find_in_path().
-    let dir = tempfile::tempdir().unwrap();
-    let script_path = dir.path().join("my_sourceable.sh");
+    let script_path = dir.join("my_sourceable.sh");
     std::fs::write(&script_path, "sourced_via_path=yes\n").unwrap();
 
-    let dir_str = shell_path(dir.path());
+    let dir_str = shell_path(dir);
     // Use the platform's PATH separator so the test validates the fix on all platforms.
     let sep = if cfg!(windows) { ";" } else { ":" };
     let script = format!("PATH=\"{dir_str}{sep}/usr/bin{sep}/bin\"; source my_sourceable.sh; echo $sourced_via_path");
@@ -334,10 +332,9 @@ fn exec_rejects_unknown_flags() {
 // exec redirect-only mode -----------------------------------------------------------------------------------------
 
 #[testutil::test]
-fn exec_redirect_fd3_persists() {
+fn exec_redirect_fd3_persists(#[fixture(TempDir)] dir: &Path) {
     // exec 3>file opens FD 3 for the rest of the shell session.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 3>{f}; echo hello >&3; echo world >&3; exec 3>&-");
@@ -351,10 +348,9 @@ fn exec_redirect_fd3_persists() {
 }
 
 #[testutil::test]
-fn exec_redirect_stdout_to_file() {
+fn exec_redirect_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
     // exec 1>file redirects stdout to a file for all subsequent commands.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("stdout.txt");
+    let file = dir.join("stdout.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 1>{f}; echo redirected");
@@ -365,11 +361,10 @@ fn exec_redirect_stdout_to_file() {
 }
 
 #[testutil::test]
-fn exec_redirect_affects_subshell() {
+fn exec_redirect_affects_subshell(#[fixture(TempDir)] dir: &Path) {
     // exec 1>file must redirect stdout for ALL subsequent commands,
     // including compound commands and subshells — not just simple commands.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("stdout.txt");
+    let file = dir.join("stdout.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 1>{f}; (echo from_subshell)");
@@ -380,10 +375,9 @@ fn exec_redirect_affects_subshell() {
 }
 
 #[testutil::test]
-fn exec_redirect_affects_compound() {
+fn exec_redirect_affects_compound(#[fixture(TempDir)] dir: &Path) {
     // exec 1>file should also apply to brace groups and if/while bodies.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("stdout.txt");
+    let file = dir.join("stdout.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 1>{f}; if true; then echo from_if; fi");
@@ -394,11 +388,10 @@ fn exec_redirect_affects_compound() {
 }
 
 #[testutil::test]
-fn exec_close_fd() {
+fn exec_close_fd(#[fixture(TempDir)] dir: &Path) {
     // exec 3>file; echo hello >&3; exec 3>&- closes FD 3.
     // Verify the file only contains writes from before the close.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 3>{f}; echo hello >&3; exec 3>&-");
@@ -418,10 +411,9 @@ fn exec_with_redirect_to_file() {
 
 #[cfg(unix)]
 #[testutil::test]
-fn exec_inherits_per_command_fds() {
+fn exec_inherits_per_command_fds(#[fixture(TempDir)] dir: &Path) {
     // exec 3>file cmd — the per-command redirect should be applied before exec.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     let script = format!("(exec 3>{f} sh -c 'echo from_exec >&3')");
@@ -431,10 +423,9 @@ fn exec_inherits_per_command_fds() {
 }
 
 #[testutil::test]
-fn exec_fd3_inherited_by_subshell() {
+fn exec_fd3_inherited_by_subshell(#[fixture(TempDir)] dir: &Path) {
     // exec 3>file persists FD 3, and a subshell should inherit it.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     let script = format!("exec 3>{f}; (echo hello >&3); exec 3>&-");
@@ -444,12 +435,11 @@ fn exec_fd3_inherited_by_subshell() {
 }
 
 #[testutil::test]
-fn exec_closed_fd_not_inherited_by_subshell() {
+fn exec_closed_fd_not_inherited_by_subshell(#[fixture(TempDir)] dir: &Path) {
     // After exec 3>&-, a subsequent subshell must NOT see FD 3.
     // This validates that fd_table is explicitly constructed per-spawn
     // (no CLOEXEC race conditions).
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("fd3.txt");
+    let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     // Open FD 3 and immediately close it. The subshell should fail to use FD 3.

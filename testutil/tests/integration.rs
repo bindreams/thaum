@@ -8,7 +8,7 @@ fn main() {
 
     // Post-run assertions: verify test bodies and teardowns actually ran.
     support::harness_tests::assert_satisfied_test_ran();
-    support::fixture_tests::assert_fixture_teardown_called();
+    support::fixture_tests::assert_fixture_drop_called();
     support::label_tests::assert_all_ran();
 
     conclusion.exit();

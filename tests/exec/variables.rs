@@ -1,3 +1,7 @@
+use std::path::Path;
+
+use testutil::TempDir;
+
 use crate::*;
 
 // $- (option flags) ===================================================================================================
@@ -11,7 +15,7 @@ fn dollar_dash_default() {
     let flags = out.trim();
     assert!(!flags.is_empty(), "$- should not be empty");
     for c in flags.chars() {
-        assert!(c.is_ascii_alphabetic(), "unexpected char in $-: {:?}", c);
+        assert!(c.is_ascii_alphabetic(), "unexpected char in $-: {c:?}");
     }
 }
 
@@ -649,10 +653,9 @@ fn bash_source_empty_at_top_level() {
 }
 
 #[testutil::test]
-fn bash_source_in_sourced_file() {
+fn bash_source_in_sourced_file(#[fixture(TempDir)] dir: &Path) {
     // source a file, and inside it BASH_SOURCE[0] should be the filename.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("lib.sh");
+    let file = dir.join("lib.sh");
     std::fs::write(&file, "echo ${BASH_SOURCE[0]}\n").unwrap();
 
     let f = file.to_string_lossy().replace('\\', "/");
@@ -663,11 +666,10 @@ fn bash_source_in_sourced_file() {
 }
 
 #[testutil::test]
-fn bash_lineno_in_sourced_file_calling_function() {
+fn bash_lineno_in_sourced_file_calling_function(#[fixture(TempDir)] dir: &Path) {
     // Source a file that defines and calls a function.
     // BASH_LINENO inside the function should reflect the sourced file's lines.
-    let dir = tempfile::tempdir().unwrap();
-    let lib = dir.path().join("lib.sh");
+    let lib = dir.join("lib.sh");
     // Line 1: function definition, line 2: function call.
     std::fs::write(&lib, "f() { echo ${BASH_LINENO[0]}; }\nf\n").unwrap();
 
@@ -677,12 +679,11 @@ fn bash_lineno_in_sourced_file_calling_function() {
 }
 
 #[testutil::test]
-fn bash_lineno_source_from_function() {
+fn bash_lineno_source_from_function(#[fixture(TempDir)] dir: &Path) {
     // A function on line 1 sources a file. Inside the sourced file, BASH_LINENO
     // should reflect the sourced file's own line numbers, not the function's
     // definition offset.
-    let dir = tempfile::tempdir().unwrap();
-    let lib = dir.path().join("lib.sh");
+    let lib = dir.join("lib.sh");
     // lib.sh: line 1 defines g, line 2 calls g.
     std::fs::write(&lib, "g() { echo ${BASH_LINENO[0]}; }\ng\n").unwrap();
 
@@ -700,11 +701,10 @@ fn bash_lineno_source_from_function() {
 }
 
 #[testutil::test]
-fn bash_source_tracks_definition_file() {
+fn bash_source_tracks_definition_file(#[fixture(TempDir)] dir: &Path) {
     // A function defined in lib.sh should show lib.sh in BASH_SOURCE,
     // even when called from the main script (not from lib.sh).
-    let dir = tempfile::tempdir().unwrap();
-    let lib = dir.path().join("lib.sh");
+    let lib = dir.join("lib.sh");
     std::fs::write(&lib, "f() { echo ${BASH_SOURCE[0]}; }\n").unwrap();
 
     let f = lib.to_string_lossy().replace('\\', "/");
@@ -719,11 +719,10 @@ fn bash_source_tracks_definition_file() {
 }
 
 #[testutil::test]
-fn bash_source_nested_source() {
+fn bash_source_nested_source(#[fixture(TempDir)] dir: &Path) {
     // source a.sh which sources b.sh. Inside b.sh, BASH_SOURCE should stack.
-    let dir = tempfile::tempdir().unwrap();
-    let b = dir.path().join("b.sh");
-    let a = dir.path().join("a.sh");
+    let b = dir.join("b.sh");
+    let a = dir.join("a.sh");
     let b_path = b.to_string_lossy().replace('\\', "/");
     std::fs::write(&b, "echo ${BASH_SOURCE[0]}\n").unwrap();
     std::fs::write(&a, format!("source {b_path}\n")).unwrap();

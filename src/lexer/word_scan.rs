@@ -804,7 +804,7 @@ impl Lexer {
         let kind = match (open, close) {
             ('(', ')') => "command substitution — missing ')'".to_string(),
             ('{', '}') => "parameter expansion — missing '}'".to_string(),
-            _ => format!("expression — missing '{}'", close),
+            _ => format!("expression — missing '{close}'"),
         };
         Err(LexError::UnterminatedExpansion {
             kind,

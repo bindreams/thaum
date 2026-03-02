@@ -8,6 +8,7 @@ testutil-macros = { path = "macros" }
 inventory = "0.3"
 libtest-mimic = "0.8"
 clap = { version = "4", features = ["derive"] }
+tempfile = "3"
 
 [[test]]
 name = "integration"

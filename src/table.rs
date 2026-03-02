@@ -101,8 +101,8 @@ impl fmt::Display for Table {
                     buf.push_str("  ");
                 }
                 match align {
-                    Align::Left => buf.push_str(&format!("{:<w$}", text)),
-                    Align::Right => buf.push_str(&format!("{:>w$}", text)),
+                    Align::Left => buf.push_str(&format!("{text:<w$}")),
+                    Align::Right => buf.push_str(&format!("{text:>w$}")),
                 }
             }
             writeln!(f, "{}", buf.trim_end())

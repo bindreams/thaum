@@ -536,7 +536,7 @@ fn expand_locale_quoted(
         loop {
             let tok = lexer
                 .next_token()
-                .map_err(|e| ExecError::BadSubstitution(format!("gettext re-parse: {}", e)))?;
+                .map_err(|e| ExecError::BadSubstitution(format!("gettext re-parse: {e}")))?;
             if tok.token == crate::token::Token::Eof {
                 break;
             }
@@ -801,7 +801,7 @@ fn expand_complex_parameter(
                 let msg = if let Some(arg) = argument {
                     expand_word(arg, env)?
                 } else {
-                    format!("{}: parameter null or not set", name)
+                    format!("{name}: parameter null or not set")
                 };
                 return Err(ExecError::BadSubstitution(msg));
             }
@@ -908,9 +908,9 @@ fn expand_complex_parameter(
                 name
             };
             if flags.is_empty() {
-                out.push_str(&format!("{}='{}'", base_name, val));
+                out.push_str(&format!("{base_name}='{val}'"));
             } else {
-                out.push_str(&format!("declare -{} {}='{}'", flags, base_name, val));
+                out.push_str(&format!("declare -{flags} {base_name}='{val}'"));
             }
         }
         Some(ParamOp::TransformEscape) => {

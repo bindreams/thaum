@@ -138,8 +138,7 @@ fn cli_command_substitution_formatting() {
         .expect("should contain CommandSubstitution");
     assert!(
         !in_subst.contains("source:"),
-        "command substitution inner statements should not have source annotations, got: {}",
-        in_subst
+        "command substitution inner statements should not have source annotations, got: {in_subst}"
     );
 }
 
@@ -232,28 +231,28 @@ fn run_err(input: &str) -> String {
 #[testutil::test]
 fn cli_error_shows_error_label() {
     let err = run_err("if true; then fi");
-    assert!(err.contains("error:"), "should start with 'error:': {}", err);
+    assert!(err.contains("error:"), "should start with 'error:': {err}");
 }
 
 #[testutil::test]
 fn cli_error_shows_source_location() {
     let err = run_err("if true; then fi");
-    assert!(err.contains("-->"), "should contain ' --> ' location arrow: {}", err);
-    assert!(err.contains("<stdin>:"), "should reference the filename: {}", err);
+    assert!(err.contains("-->"), "should contain ' --> ' location arrow: {err}");
+    assert!(err.contains("<stdin>:"), "should reference the filename: {err}");
 }
 
 #[testutil::test]
 fn cli_error_shows_source_line() {
     let err = run_err("if true; then fi");
     // Should display the actual source code line
-    assert!(err.contains("if true; then fi"), "should show the source line: {}", err);
+    assert!(err.contains("if true; then fi"), "should show the source line: {err}");
 }
 
 #[testutil::test]
 fn cli_error_shows_underline() {
     let err = run_err("if true; then fi");
     // Should have carets/underline pointing at the error
-    assert!(err.contains('^'), "should contain '^' underline: {}", err);
+    assert!(err.contains('^'), "should contain '^' underline: {err}");
 }
 
 #[testutil::test]
@@ -265,8 +264,7 @@ fn cli_error_unterminated_subst() {
     // Should say "unterminated", not "unexpected character ')'"
     assert!(
         !err.contains("unexpected character"),
-        "unterminated $( should not say 'unexpected character': {}",
-        err
+        "unterminated $( should not say 'unexpected character': {err}"
     );
 }
 
@@ -275,11 +273,7 @@ fn cli_error_no_internal_names() {
     // Error messages should use shell syntax, not Rust debug names
     let err = run_err("if true; then fi");
     // Should say something like 'fi' or `fi`, not "Fi"
-    assert!(
-        !err.contains(" Fi"),
-        "should not leak internal token name 'Fi': {}",
-        err
-    );
+    assert!(!err.contains(" Fi"), "should not leak internal token name 'Fi': {err}");
 }
 
 #[testutil::test]
@@ -287,8 +281,7 @@ fn cli_error_no_debug_token_names() {
     let err = run_err("if true; then done");
     assert!(
         !err.contains(" Done"),
-        "should not leak internal token name 'Done': {}",
-        err
+        "should not leak internal token name 'Done': {err}"
     );
 }
 
@@ -352,8 +345,7 @@ fn cli_exec_unsupported_feature_error() {
     assert_ne!(code, 0);
     assert!(
         stderr.contains("unsupported feature"),
-        "stderr should mention unsupported feature: {}",
-        stderr,
+        "stderr should mention unsupported feature: {stderr}",
     );
 }
 
@@ -361,7 +353,7 @@ fn cli_exec_unsupported_feature_error() {
 fn cli_exec_parse_error() {
     let (_, stderr, code) = run_exec("if true; then fi");
     assert_eq!(code, 1);
-    assert!(stderr.contains("error:"), "stderr should contain error: {}", stderr,);
+    assert!(stderr.contains("error:"), "stderr should contain error: {stderr}",);
 }
 
 #[testutil::test]

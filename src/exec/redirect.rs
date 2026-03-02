@@ -79,14 +79,13 @@ impl Executor {
                 RedirectKind::Input(word) => {
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file = File::open(&resolved).map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                    let file = File::open(&resolved).map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), file)?;
                 }
                 RedirectKind::Output(word) | RedirectKind::Clobber(word) => {
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file =
-                        File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                    let file = File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     assign_write_fd(&mut active, fd.unwrap_or(1), file)?;
                 }
                 RedirectKind::Append(word) => {
@@ -96,7 +95,7 @@ impl Executor {
                         .create(true)
                         .append(true)
                         .open(&resolved)
-                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                        .map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     assign_write_fd(&mut active, fd.unwrap_or(1), file)?;
                 }
                 RedirectKind::ReadWrite(word) => {
@@ -108,7 +107,7 @@ impl Executor {
                         .create(true)
                         .truncate(false)
                         .open(&resolved)
-                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                        .map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     assign_read_fd(&mut active, fd.unwrap_or(0), file)?;
                 }
                 RedirectKind::DupOutput(word) => {
@@ -121,7 +120,7 @@ impl Executor {
                         let cloned = clone_fd_for_write(&active, &self.fd_table, src_fd)?;
                         assign_write_fd(&mut active, dest_fd, cloned)?;
                     } else {
-                        return Err(ExecError::BadRedirect(format!("{}: ambiguous redirect", target)));
+                        return Err(ExecError::BadRedirect(format!("{target}: ambiguous redirect")));
                     }
                 }
                 RedirectKind::DupInput(word) => {
@@ -133,7 +132,7 @@ impl Executor {
                         let cloned = clone_fd_for_read(&active, &self.fd_table, src_fd)?;
                         assign_read_fd(&mut active, dest_fd, cloned)?;
                     } else {
-                        return Err(ExecError::BadRedirect(format!("{}: ambiguous redirect", target)));
+                        return Err(ExecError::BadRedirect(format!("{target}: ambiguous redirect")));
                     }
                 }
                 RedirectKind::HereDoc { body, .. } => {
@@ -155,8 +154,7 @@ impl Executor {
                     // &> file — redirect both stdout and stderr to file
                     let path = expand::expand_word(word, &mut self.env)?;
                     let resolved = self.resolve_path(&path);
-                    let file =
-                        File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                    let file = File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
                     active.stdout = Some(file);
                     active.stderr = Some(clone);
@@ -169,7 +167,7 @@ impl Executor {
                         .create(true)
                         .append(true)
                         .open(&resolved)
-                        .map_err(|e| ExecError::BadRedirect(format!("{}: {}", path, e)))?;
+                        .map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
                     active.stdout = Some(file);
                     active.stderr = Some(clone);
@@ -255,7 +253,7 @@ fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, s
     if let Some(file) = dup_process_fd(src_fd) {
         return Ok(file);
     }
-    Err(ExecError::BadRedirect(format!("{}: bad file descriptor", src_fd)))
+    Err(ExecError::BadRedirect(format!("{src_fd}: bad file descriptor")))
 }
 
 /// Clone a file descriptor for use as a read source.

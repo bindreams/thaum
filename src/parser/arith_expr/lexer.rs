@@ -329,7 +329,7 @@ impl ArithLexer {
                         }
                     }
                     let inner: String = self.chars[start..self.pos - 1].iter().collect();
-                    Ok(ArithToken::Ident(format!("${{{}}}", inner)))
+                    Ok(ArithToken::Ident(format!("${{{inner}}}")))
                 } else if self.peek_char() == Some('(') {
                     // $(...) command substitution — consume balanced parens as opaque Ident
                     let dollar_pos = self.pos - 1; // position of $
@@ -372,7 +372,7 @@ impl ArithLexer {
                 let content: String = self.chars[start..self.pos].iter().collect();
                 Ok(ArithToken::Ident(content))
             }
-            _ => Err(format!("unexpected character '{}' in arithmetic expression", ch)),
+            _ => Err(format!("unexpected character '{ch}' in arithmetic expression")),
         }
     }
 
@@ -398,7 +398,7 @@ impl ArithLexer {
                         return Err("invalid hex literal: no digits after 0x".to_string());
                     }
                     let hex_str: String = self.chars[hex_start..self.pos].iter().collect();
-                    let value = i64::from_str_radix(&hex_str, 16).map_err(|e| format!("invalid hex literal: {}", e))?;
+                    let value = i64::from_str_radix(&hex_str, 16).map_err(|e| format!("invalid hex literal: {e}"))?;
                     return Ok(ArithToken::Number(value));
                 }
                 Some(c) if c.is_ascii_digit() => {
@@ -411,8 +411,7 @@ impl ArithLexer {
                         }
                     }
                     let oct_str: String = self.chars[start + 1..self.pos].iter().collect();
-                    let value =
-                        i64::from_str_radix(&oct_str, 8).map_err(|e| format!("invalid octal literal: {}", e))?;
+                    let value = i64::from_str_radix(&oct_str, 8).map_err(|e| format!("invalid octal literal: {e}"))?;
                     return Ok(ArithToken::Number(value));
                 }
                 _ => {
@@ -433,7 +432,7 @@ impl ArithLexer {
         let num_str: String = self.chars[start..self.pos].iter().collect();
         let value = num_str
             .parse::<i64>()
-            .map_err(|e| format!("invalid number literal: {}", e))?;
+            .map_err(|e| format!("invalid number literal: {e}"))?;
         Ok(ArithToken::Number(value))
     }
 

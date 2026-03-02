@@ -12,22 +12,17 @@ fn roundtrip_string(key: &str, value: &str) {
     let yaml_value = YamlValue::mapping().scalar(key, value).build();
     let emitted = emit(&yaml_value);
     let docs = yaml_rust2::YamlLoader::load_from_str(&emitted)
-        .unwrap_or_else(|e| panic!("emitted YAML is invalid: {}\n---\n{}", e, emitted));
+        .unwrap_or_else(|e| panic!("emitted YAML is invalid: {e}\n---\n{emitted}"));
     let doc = &docs[0];
     let actual = &doc[key];
     assert!(
         matches!(actual, yaml_rust2::Yaml::String(_)),
-        "expected String for key {:?} with value {:?}, got {:?}\nemitted: {}",
-        key,
-        value,
-        actual,
-        emitted
+        "expected String for key {key:?} with value {value:?}, got {actual:?}\nemitted: {emitted}"
     );
     assert_eq!(
         actual.as_str().unwrap(),
         value,
-        "round-trip value mismatch for key {:?}",
-        key
+        "round-trip value mismatch for key {key:?}"
     );
 }
 
@@ -95,8 +90,7 @@ fn yaml_reader_is_1_2() {
     let val = &docs[0]["value"];
     assert!(
         matches!(val, yaml_rust2::Yaml::String(_)),
-        "expected String(\"no\") under YAML 1.2, got {:?} — reader may be YAML 1.1",
-        val
+        "expected String(\"no\") under YAML 1.2, got {val:?} — reader may be YAML 1.1"
     );
     assert_eq!(val.as_str().unwrap(), "no");
 }

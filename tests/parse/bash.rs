@@ -111,7 +111,7 @@ fn bash_double_brackets_with_and() {
                 }
             ));
         } else {
-            panic!("expected And, got {:?}", expression);
+            panic!("expected And, got {expression:?}");
         }
     } else {
         panic!("expected DoubleBracket");

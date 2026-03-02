@@ -141,7 +141,10 @@ fn locale_variants_language_only() {
 #[testutil::test]
 fn default_textdomaindir_not_empty_on_unix() {
     if !cfg!(windows) {
-        assert!(!DEFAULT_TEXTDOMAINDIR.is_empty());
+        #[allow(clippy::const_is_empty)] // DEFAULT_TEXTDOMAINDIR resolved at build time
+        {
+            assert!(!DEFAULT_TEXTDOMAINDIR.is_empty());
+        }
     }
 }
 

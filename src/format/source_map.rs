@@ -35,6 +35,6 @@ impl SourceMapper {
     /// Format a span as `filename:line:col` for use in YAML source annotations.
     pub fn format_span(&self, span: Span, filename: &str) -> String {
         let (line, col) = self.offset_to_line_col(span.start.0);
-        format!("{}:{}:{}", filename, line, col)
+        format!("{filename}:{line}:{col}")
     }
 }

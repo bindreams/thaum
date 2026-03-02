@@ -7,7 +7,7 @@ use pretty_assertions::assert_eq;
 testutil::default_labels!(lex, parse);
 
 fn parse_ok(input: &str) -> Program {
-    parse(input).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", input, e))
+    parse(input).unwrap_or_else(|e| panic!("parse failed for {input:?}: {e}"))
 }
 
 fn first_stmt(input: &str) -> Statement {
@@ -21,14 +21,14 @@ fn first_expr(input: &str) -> Expression {
 fn first_cmd(input: &str) -> Command {
     match first_expr(input) {
         Expression::Command(c) => c,
-        other => panic!("expected Command, got {:?}", other),
+        other => panic!("expected Command, got {other:?}"),
     }
 }
 
 fn first_compound(input: &str) -> CompoundCommand {
     match first_expr(input) {
         Expression::Compound { body, .. } => body,
-        other => panic!("expected Compound, got {:?}", other),
+        other => panic!("expected Compound, got {other:?}"),
     }
 }
 

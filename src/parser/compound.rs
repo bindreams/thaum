@@ -444,7 +444,7 @@ impl Parser {
         if list.is_empty() {
             return Err(ParseError::UnexpectedToken {
                 found: self.lexer.peek()?.token.display_name().to_string(),
-                expected: format!("a command in {}", context),
+                expected: format!("a command in {context}"),
                 span: self.lexer.peek()?.span,
             });
         }

@@ -1300,6 +1300,7 @@ dependencies = [
  "clap",
  "inventory",
  "libtest-mimic",
+ "tempfile",
  "testutil-macros",
 ]
 

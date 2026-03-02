@@ -1279,7 +1279,7 @@ impl Environment {
         };
 
         let value_str = match &var.value {
-            VarValue::Scalar(s) => format!("\"{}\"", s),
+            VarValue::Scalar(s) => format!("\"{s}\""),
             VarValue::IndexedArray(map) => {
                 let parts: Vec<String> = map.iter().map(|(i, v)| format!("[{i}]=\"{v}\"")).collect();
                 format!("({})", parts.join(" "))

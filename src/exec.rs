@@ -996,7 +996,7 @@ impl Default for Executor {
 
 /// Convenience: parse and execute a script string.
 pub fn run(input: &str) -> Result<i32, ExecError> {
-    let program = crate::parse(input).map_err(|e| ExecError::BadSubstitution(format!("parse error: {}", e)))?;
+    let program = crate::parse(input).map_err(|e| ExecError::BadSubstitution(format!("parse error: {e}")))?;
     let mut executor = Executor::new();
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {

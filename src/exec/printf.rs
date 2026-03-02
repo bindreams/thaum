@@ -478,10 +478,10 @@ fn format_int_core(prefix: &str, digits: &str, spec: &FormatSpec, out: &mut dyn 
     if spec.zero_pad && !spec.left_align && spec.precision.is_none() && total < width {
         // Zero-pad between prefix and digits
         let zeros = "0".repeat(width - total);
-        let content = format!("{}{}{}", prefix, zeros, padded_digits);
+        let content = format!("{prefix}{zeros}{padded_digits}");
         let _ = out.write_all(content.as_bytes());
     } else {
-        let content = format!("{}{}", prefix, padded_digits);
+        let content = format!("{prefix}{padded_digits}");
         pad_and_write(&content, spec.width, spec.left_align, ' ', out);
     }
 }
@@ -535,9 +535,9 @@ fn format_hex(spec: &FormatSpec, arg: &str, uppercase: bool, out: &mut dyn Write
 
     let uval = val as u64;
     let digits = if uppercase {
-        format!("{:X}", uval)
+        format!("{uval:X}")
     } else {
-        format!("{:x}", uval)
+        format!("{uval:x}")
     };
 
     let prefix = if spec.hash && uval != 0 {
@@ -561,7 +561,7 @@ fn format_octal(spec: &FormatSpec, arg: &str, out: &mut dyn Write) -> i32 {
     let status = if had_error { 1 } else { 0 };
 
     let uval = val as u64;
-    let digits = format!("{:o}", uval);
+    let digits = format!("{uval:o}");
 
     // # prefix for octal is "0" (not "0o" like Rust!).
     // Precision zero-padding guarantees a leading '0', so the prefix is only
@@ -582,7 +582,7 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write, d
     let prec = spec.precision.unwrap_or(6);
 
     let formatted = match conv {
-        'f' => format!("{:.prec$}", val, prec = prec),
+        'f' => format!("{val:.prec$}"),
         'e' => format_scientific(val, prec, false),
         'E' => format_scientific(val, prec, true),
         'g' => format_general(val, prec, false),
@@ -610,7 +610,7 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write, d
         ""
     };
 
-    let content = format!("{}{}", sign, formatted);
+    let content = format!("{sign}{formatted}");
     let total = content.len();
     let width = spec.width.unwrap_or(0);
 
@@ -619,11 +619,11 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write, d
         if content.starts_with('-') || content.starts_with('+') || content.starts_with(' ') {
             let (s, rest) = content.split_at(1);
             let zeros = "0".repeat(width - total);
-            let padded = format!("{}{}{}", s, zeros, rest);
+            let padded = format!("{s}{zeros}{rest}");
             let _ = out.write_all(padded.as_bytes());
         } else {
             let zeros = "0".repeat(width - total);
-            let padded = format!("{}{}", zeros, content);
+            let padded = format!("{zeros}{content}");
             let _ = out.write_all(padded.as_bytes());
         }
     } else {
@@ -637,9 +637,9 @@ fn format_float(spec: &FormatSpec, arg: &str, conv: char, out: &mut dyn Write, d
 fn format_scientific(val: f64, prec: usize, upper: bool) -> String {
     if val == 0.0 {
         let zeros = "0".repeat(prec);
-        let frac = if prec > 0 { format!(".{}", zeros) } else { String::new() };
+        let frac = if prec > 0 { format!(".{zeros}") } else { String::new() };
         let e = if upper { 'E' } else { 'e' };
-        return format!("0{}{}+00", frac, e);
+        return format!("0{frac}{e}+00");
     }
 
     let negative = val.is_sign_negative();
@@ -648,19 +648,19 @@ fn format_scientific(val: f64, prec: usize, upper: bool) -> String {
     let mantissa = abs_val / 10f64.powi(exp);
 
     // Format mantissa with given precision
-    let mantissa_str = format!("{:.prec$}", mantissa, prec = prec);
+    let mantissa_str = format!("{mantissa:.prec$}");
 
     let e = if upper { 'E' } else { 'e' };
     let sign_char = if exp >= 0 { '+' } else { '-' };
     let exp_abs = exp.unsigned_abs();
     let exp_str = if exp_abs < 10 {
-        format!("0{}", exp_abs)
+        format!("0{exp_abs}")
     } else {
-        format!("{}", exp_abs)
+        format!("{exp_abs}")
     };
 
     let prefix = if negative { "-" } else { "" };
-    format!("{}{}{}{}{}", prefix, mantissa_str, e, sign_char, exp_str)
+    format!("{prefix}{mantissa_str}{e}{sign_char}{exp_str}")
 }
 
 /// Format using %g / %G rules: use %f if exponent in [-4, prec), else %e.
@@ -678,7 +678,7 @@ fn format_general(val: f64, prec: usize, upper: bool) -> String {
     if exp >= -4 && exp < prec as i32 {
         // Use %f style with (prec - 1 - exp) decimal places
         let decimal_places = (prec as i32 - 1 - exp).max(0) as usize;
-        let formatted = format!("{:.prec$}", val, prec = decimal_places);
+        let formatted = format!("{val:.decimal_places$}");
         strip_trailing_zeros(&formatted)
     } else {
         // Use %e style with (prec - 1) decimal places
@@ -687,7 +687,7 @@ fn format_general(val: f64, prec: usize, upper: bool) -> String {
         if let Some(e_pos) = sci.find(if upper { 'E' } else { 'e' }) {
             let (mantissa_part, exp_part) = sci.split_at(e_pos);
             let stripped = strip_trailing_zeros(mantissa_part);
-            format!("{}{}", stripped, exp_part)
+            format!("{stripped}{exp_part}")
         } else {
             sci
         }

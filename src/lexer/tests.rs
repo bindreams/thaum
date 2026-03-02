@@ -241,8 +241,7 @@ fn lex_process_sub_after_suppressed_whitespace() {
     let tok = lexer.next_token().unwrap().token;
     assert!(
         matches!(tok, Token::BashProcessSub { direction: '<', .. }),
-        "expected BashProcessSub, got {:?}",
-        tok
+        "expected BashProcessSub, got {tok:?}"
     );
 }
 

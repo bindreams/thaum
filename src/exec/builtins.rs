@@ -89,7 +89,7 @@ pub fn run_builtin(
         // execute_command (they need Executor access, not just Environment).
         // They should never reach run_builtin.
         "eval" | "exec" | "." | "source" => {
-            debug_assert!(false, "{} should be intercepted in execute_command", name);
+            debug_assert!(false, "{name} should be intercepted in execute_command");
             Err(ExecError::CommandNotFound(name.to_string()))
         }
         _ => Err(ExecError::CommandNotFound(name.to_string())),
@@ -210,7 +210,7 @@ fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) ->
             Ok(0)
         }
         Err(e) => {
-            let _ = writeln!(stderr, "cd: {}", e);
+            let _ = writeln!(stderr, "cd: {e}");
             Ok(1)
         }
     }
@@ -259,7 +259,7 @@ fn builtin_alias(args: &[String], env: &mut Environment, stdout: &mut dyn Write)
         names.sort();
         for name in names {
             let value = &aliases[name];
-            let _ = writeln!(stdout, "alias {}='{}'", name, value);
+            let _ = writeln!(stdout, "alias {name}='{value}'");
         }
         return Ok(0);
     }
@@ -272,7 +272,7 @@ fn builtin_alias(args: &[String], env: &mut Environment, stdout: &mut dyn Write)
             // Print a single alias
             match env.get_alias(arg) {
                 Some(value) => {
-                    let _ = writeln!(stdout, "alias {}='{}'", arg, value);
+                    let _ = writeln!(stdout, "alias {arg}='{value}'");
                 }
                 None => {
                     status = 1;
@@ -294,7 +294,7 @@ fn builtin_unalias(args: &[String], env: &mut Environment, stderr: &mut dyn Writ
         if arg == "-a" {
             env.unalias_all();
         } else if !env.unalias(arg) {
-            let _ = writeln!(stderr, "unalias: {}: not found", arg);
+            let _ = writeln!(stderr, "unalias: {arg}: not found");
             status = 1;
         }
     }
@@ -356,7 +356,7 @@ fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write)
         match arg.parse::<usize>() {
             Ok(n) => n,
             Err(_) => {
-                let _ = writeln!(stderr, "shift: {}: numeric argument required", arg);
+                let _ = writeln!(stderr, "shift: {arg}: numeric argument required");
                 return Ok(2);
             }
         }
@@ -581,7 +581,7 @@ fn builtin_readonly(args: &[String], env: &mut Environment, stdout: &mut dyn Wri
         let mut vars = env.readonly_vars();
         vars.sort_by(|a, b| a.0.cmp(&b.0));
         for (name, value) in &vars {
-            let _ = writeln!(stdout, "declare -r {}=\"{}\"", name, value);
+            let _ = writeln!(stdout, "declare -r {name}=\"{value}\"");
         }
         return Ok(0);
     }
@@ -707,7 +707,7 @@ fn builtin_declare(
         let mut names = env.function_names();
         names.sort();
         for name in names {
-            let _ = writeln!(stdout, "declare -f {}", name);
+            let _ = writeln!(stdout, "declare -f {name}");
         }
         return Ok(0);
     }
@@ -718,7 +718,7 @@ fn builtin_declare(
         for name in names {
             if let Some(func) = env.get_function(name) {
                 let source = crate::format::SourceWriter::format_function(name, func);
-                let _ = write!(stdout, "{}", source);
+                let _ = write!(stdout, "{source}");
             }
         }
         return Ok(0);

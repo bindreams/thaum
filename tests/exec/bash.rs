@@ -1,3 +1,6 @@
+use std::path::Path;
+
+use testutil::TempDir;
 use thaum::Dialect;
 
 use crate::*;
@@ -100,18 +103,17 @@ fn alias_snapshot_uses_previous_line() {
 
 #[cfg(unix)]
 #[testutil::test]
-fn alias_snapshot_touch_file() {
+fn alias_snapshot_touch_file(#[fixture(TempDir)] dir: &Path) {
     // Line 2: alias a="touch"
     // Line 3: alias a="echo"; a hello; unalias a
     //   → snapshot for line 3 has a=touch (from line 2)
     //   → "a hello" expands to "touch hello" (creates file)
     // Line 4: a hello  → not found
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("hello");
+    let file = dir.join("hello");
 
     let script = format!(
         "shopt -s expand_aliases\nalias a=touch\ncd {}; alias a=echo; a hello; unalias a",
-        dir.path().to_string_lossy()
+        dir.to_string_lossy()
     );
     let (_, _) = bash_exec_ok(&script);
     assert!(file.exists(), "touch hello should have created the file");
@@ -129,12 +131,11 @@ fn alias_funkiness_level2_multiple_words() {
 }
 
 #[testutil::test]
-fn alias_funkiness_level3a_redirect_in_value() {
+fn alias_funkiness_level3a_redirect_in_value(#[fixture(TempDir)] dir: &Path) {
     // Level 3a: alias value contains a redirect — verify the file is created.
     // We check the file on disk instead of captured stdout because pipeline/redirect
     // I/O goes through real file descriptors, not CapturedIo.
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("out.txt");
+    let file = dir.join("out.txt");
 
     let f = file.to_string_lossy().replace('\\', "/");
     let script = format!("shopt -s expand_aliases\nalias w='echo hello >'\nw {f}");
@@ -216,10 +217,9 @@ fn subshell_nested() {
 }
 
 #[testutil::test]
-fn subshell_with_redirect() {
+fn subshell_with_redirect(#[fixture(TempDir)] dir: &Path) {
     // Redirect inside the subshell (not on the compound command).
-    let dir = tempfile::tempdir().unwrap();
-    let file = dir.path().join("out.txt");
+    let file = dir.join("out.txt");
 
     let script = format!("(echo hello > {})", file.to_string_lossy().replace('\\', "/"));
     let (out, status) = exec_ok(&script);

@@ -150,7 +150,7 @@ fn posix_function_definition() {
         assert_eq!(f.name, "myfunc");
         assert!(matches!(f.body.as_ref(), CompoundCommand::BraceGroup { .. }));
     } else {
-        panic!("expected FunctionDef, got {:?}", e);
+        panic!("expected FunctionDef, got {e:?}");
     }
 }
 

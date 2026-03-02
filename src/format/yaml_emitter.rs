@@ -45,34 +45,34 @@ fn emit_kv(buf: &mut String, key: &str, value: &YamlValue, indent: usize) {
 fn emit_kv_after_prefix(buf: &mut String, key: &str, value: &YamlValue, indent: usize) {
     match value {
         YamlValue::Null => {
-            let _ = writeln!(buf, "{}: null", key);
+            let _ = writeln!(buf, "{key}: null");
         }
         YamlValue::Scalar(s) => {
             let _ = writeln!(buf, "{}: {}", key, yaml_escape(s));
         }
         YamlValue::RawScalar(s) => {
-            let _ = writeln!(buf, "{}: {}", key, s);
+            let _ = writeln!(buf, "{key}: {s}");
         }
         YamlValue::BlockScalar(s) => {
-            let _ = writeln!(buf, "{}:", key);
+            let _ = writeln!(buf, "{key}:");
             write_indent(buf, indent + 2);
             buf.push_str("|\n");
             for line in s.lines() {
                 write_indent(buf, indent + 2);
-                let _ = writeln!(buf, "{}", line);
+                let _ = writeln!(buf, "{line}");
             }
         }
         YamlValue::Sequence(items) if items.is_empty() => {
-            let _ = writeln!(buf, "{}: []", key);
+            let _ = writeln!(buf, "{key}: []");
         }
         YamlValue::Sequence(items) => {
-            let _ = writeln!(buf, "{}:", key);
+            let _ = writeln!(buf, "{key}:");
             for item in items {
                 emit_seq_item(buf, item, indent + 2);
             }
         }
         YamlValue::Mapping(entries) => {
-            let _ = writeln!(buf, "{}:", key);
+            let _ = writeln!(buf, "{key}:");
             for (k, v) in entries {
                 emit_kv(buf, k, v, indent + 2);
             }
@@ -104,7 +104,7 @@ fn emit_seq_item(buf: &mut String, item: &YamlValue, indent: usize) {
         }
         YamlValue::RawScalar(s) => {
             write_indent(buf, indent);
-            let _ = writeln!(buf, "- {}", s);
+            let _ = writeln!(buf, "- {s}");
         }
         YamlValue::Null => {
             write_indent(buf, indent);
@@ -129,13 +129,13 @@ fn emit_value(buf: &mut String, value: &YamlValue, indent: usize) {
             let _ = writeln!(buf, "{}", yaml_escape(s));
         }
         YamlValue::RawScalar(s) => {
-            let _ = writeln!(buf, "{}", s);
+            let _ = writeln!(buf, "{s}");
         }
         YamlValue::BlockScalar(s) => {
             buf.push_str("|\n");
             for line in s.lines() {
                 write_indent(buf, indent);
-                let _ = writeln!(buf, "{}", line);
+                let _ = writeln!(buf, "{line}");
             }
         }
         YamlValue::Sequence(items) => {

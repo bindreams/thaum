@@ -79,7 +79,7 @@ fn write_arith_var(name: &str, value: &str, env: &mut Environment) -> Result<(),
 /// Parse a string as i64, supporting decimal, hex (0x), and octal (0) prefixes.
 fn parse_i64(context: &str, s: &str) -> Result<i64, ExecError> {
     super::numeric::parse_shell_int(s)
-        .map_err(|()| ExecError::InvalidNumber(format!("{}: expression", context), s.trim().to_string()))
+        .map_err(|()| ExecError::InvalidNumber(format!("{context}: expression"), s.trim().to_string()))
 }
 
 /// Evaluate a binary operation.
@@ -273,7 +273,7 @@ fn expect_variable(expr: &ArithExpr) -> Result<&str, ExecError> {
     match expr {
         ArithExpr::Variable(name) => Ok(name),
         _ => {
-            debug_assert!(false, "increment/decrement operand must be a Variable, got {:?}", expr);
+            debug_assert!(false, "increment/decrement operand must be a Variable, got {expr:?}");
             Err(ExecError::BadSubstitution("operand requires a variable".to_string()))
         }
     }

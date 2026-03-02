@@ -52,7 +52,7 @@ impl Executor {
         let source = std::fs::read_to_string(&path).map_err(|e| {
             ExecError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
-                format!("{}: {}", filename, e),
+                format!("{filename}: {e}"),
             ))
         })?;
 
@@ -180,7 +180,7 @@ impl Executor {
         {
             // Replace the process image. Only returns on error.
             let e = cmd.exec_replace();
-            let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+            let _ = writeln!(io.stderr, "exec: {cmd_name}: {e}");
             Err(ExecError::ExitRequested(127))
         }
 
@@ -214,7 +214,7 @@ impl Executor {
         }
         Err(ExecError::Io(std::io::Error::new(
             std::io::ErrorKind::NotFound,
-            format!("{}: No such file or directory", name),
+            format!("{name}: No such file or directory"),
         )))
     }
 }

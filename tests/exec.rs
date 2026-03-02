@@ -69,7 +69,7 @@ pub fn test_bash_executor() -> Executor {
 
 /// Parse and execute a script, capturing stdout. Returns (stdout, exit_status).
 pub fn exec_ok(script: &str) -> (String, i32) {
-    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
 
     let mut executor = test_executor();
 
@@ -77,7 +77,7 @@ pub fn exec_ok(script: &str) -> (String, i32) {
     match executor.execute(&program, &mut captured.context()) {
         Ok(status) => (captured.stdout_string(), status),
         Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), code),
-        Err(e) => panic!("exec failed for {:?}: {}", script, e),
+        Err(e) => panic!("exec failed for {script:?}: {e}"),
     }
 }
 
@@ -89,7 +89,7 @@ pub fn exec_status(script: &str) -> i32 {
 /// Parse and execute a script, returning the exit status or 1 on error.
 /// Unlike `exec_ok`, this does not panic on execution errors.
 pub fn exec_result(script: &str) -> i32 {
-    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
 
     let mut executor = test_executor();
 
@@ -102,35 +102,31 @@ pub fn exec_result(script: &str) -> i32 {
 }
 
 pub fn expect_unsupported(script: &str) {
-    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
     let mut executor = Executor::new();
     let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
     let mut captured = CapturedIo::new();
     let err = executor
         .execute(&program, &mut captured.context())
-        .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
+        .expect_err(&format!("expected UnsupportedFeature for {script:?}"));
     assert!(
         matches!(err, ExecError::UnsupportedFeature(_)),
-        "expected UnsupportedFeature, got {:?} for {:?}",
-        err,
-        script,
+        "expected UnsupportedFeature, got {err:?} for {script:?}",
     );
 }
 
 #[allow(dead_code)]
 pub fn expect_unsupported_bash(script: &str) {
     let program =
-        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
     let mut executor = Executor::new();
     let mut captured = CapturedIo::new();
     let err = executor
         .execute(&program, &mut captured.context())
-        .expect_err(&format!("expected UnsupportedFeature for {:?}", script));
+        .expect_err(&format!("expected UnsupportedFeature for {script:?}"));
     assert!(
         matches!(err, ExecError::UnsupportedFeature(_)),
-        "expected UnsupportedFeature, got {:?} for {:?}",
-        err,
-        script,
+        "expected UnsupportedFeature, got {err:?} for {script:?}",
     );
 }
 
@@ -138,7 +134,7 @@ pub fn expect_unsupported_bash(script: &str) {
 /// Unlike `bash_exec_ok`, this does not panic on execution errors.
 pub fn bash_exec_result(script: &str) -> i32 {
     let program =
-        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
 
     let mut executor = test_bash_executor();
 
@@ -153,7 +149,7 @@ pub fn bash_exec_result(script: &str) -> i32 {
 /// Parse and execute a Bash-dialect script, capturing stdout. Returns (stdout, exit_status).
 pub fn bash_exec_ok(script: &str) -> (String, i32) {
     let program =
-        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {:?}: {}", script, e));
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
 
     let mut executor = test_bash_executor();
 
@@ -161,7 +157,7 @@ pub fn bash_exec_ok(script: &str) -> (String, i32) {
     match executor.execute(&program, &mut captured.context()) {
         Ok(status) => (captured.stdout_string(), status),
         Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), code),
-        Err(e) => panic!("exec failed for {:?}: {}", script, e),
+        Err(e) => panic!("exec failed for {script:?}: {e}"),
     }
 }
 
@@ -175,7 +171,7 @@ pub fn fixture_dir() -> String {
 /// Helper: parse and execute with a specific dialect, capturing stdout.
 pub fn dialect_exec_ok(script: &str, dialect: Dialect) -> (String, i32) {
     let program = thaum::parse_with(script, dialect)
-        .unwrap_or_else(|e| panic!("parse failed for {:?} with {:?}: {}", script, dialect, e));
+        .unwrap_or_else(|e| panic!("parse failed for {script:?} with {dialect:?}: {e}"));
     let options = dialect.options();
     let mut exec = Executor::with_options(options);
     exec.set_exe_path(thaum_exe());
@@ -184,6 +180,6 @@ pub fn dialect_exec_ok(script: &str, dialect: Dialect) -> (String, i32) {
     match exec.execute(&program, &mut io.context()) {
         Ok(status) => (io.stdout_string(), status),
         Err(ExecError::ExitRequested(code)) => (io.stdout_string(), code),
-        Err(e) => panic!("exec failed for {:?} with {:?}: {}", script, dialect, e),
+        Err(e) => panic!("exec failed for {script:?} with {dialect:?}: {e}"),
     }
 }

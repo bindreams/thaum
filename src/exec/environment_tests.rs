@@ -143,7 +143,7 @@ fn special_param_dash_default() {
     // Default env has no options enabled, so flags should be empty or contain only
     // default-on flags.
     for c in flags.chars() {
-        assert!(c.is_ascii_alphabetic(), "unexpected char in $-: {:?}", c);
+        assert!(c.is_ascii_alphabetic(), "unexpected char in $-: {c:?}");
     }
 }
 

@@ -7,7 +7,7 @@ use crate::token::{GlobKind, Token};
 
 /// Display name for a keyword string (for error messages).
 pub(super) fn keyword_display_name(keyword: &str) -> String {
-    format!("'{}'", keyword)
+    format!("'{keyword}'")
 }
 
 /// Get the span of a compound command.
@@ -101,17 +101,17 @@ pub(super) fn fragment_token_to_text(token: &Token) -> &str {
 pub(super) fn fragment_token_to_source(token: &Token) -> String {
     match token {
         Token::Literal(s) => s.clone(),
-        Token::SimpleParam(s) => format!("${}", s),
-        Token::BraceParam(s) => format!("${{{}}}", s),
-        Token::CommandSub(s) => format!("$({})", s),
-        Token::BacktickSub(s) => format!("`{}`", s),
-        Token::ArithSub(s) => format!("$(({}))", s),
-        Token::SingleQuoted(s) => format!("'{}'", s),
-        Token::DoubleQuoted(s) => format!("\"{}\"", s),
+        Token::SimpleParam(s) => format!("${s}"),
+        Token::BraceParam(s) => format!("${{{s}}}"),
+        Token::CommandSub(s) => format!("$({s})"),
+        Token::BacktickSub(s) => format!("`{s}`"),
+        Token::ArithSub(s) => format!("$(({s}))"),
+        Token::SingleQuoted(s) => format!("'{s}'"),
+        Token::DoubleQuoted(s) => format!("\"{s}\""),
         Token::Glob(GlobKind::Star) => "*".to_string(),
         Token::Glob(GlobKind::Question) => "?".to_string(),
         Token::Glob(GlobKind::BracketOpen) => "[".to_string(),
-        Token::TildePrefix(s) => format!("~{}", s),
+        Token::TildePrefix(s) => format!("~{s}"),
         _ => token.display_name().trim_matches('\'').to_string(),
     }
 }

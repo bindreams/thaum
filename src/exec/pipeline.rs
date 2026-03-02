@@ -181,7 +181,7 @@ fn spawn_pipeline_stage(
             match child_cmd.spawn() {
                 Ok(child) => Ok(Some(child)),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    let _ = writeln!(io.stderr, "{}: command not found", cmd_name);
+                    let _ = writeln!(io.stderr, "{cmd_name}: command not found");
                     Ok(None)
                 }
                 Err(e) => Err(ExecError::Io(e)),

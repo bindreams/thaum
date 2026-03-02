@@ -246,7 +246,7 @@ fn decimal_separator_french() {
     let locale = parse_posix_locale("fr_FR.UTF-8");
     // ICU4X should return ',' for French
     let sep = decimal_separator(&locale);
-    assert!(sep == ',' || sep == '.', "got: {}", sep);
+    assert!(sep == ',' || sep == '.', "got: {sep}");
 }
 
 #[testutil::test]
@@ -565,7 +565,7 @@ fn strftime_weekday_german() {
     // 2001-09-09 (Sunday) in UTC — timestamp 1_000_000_000
     let result = strftime_locale("%A", 1_000_000_000, &env);
     // In German, Sunday is "Sonntag"
-    assert_eq!(result, "Sonntag", "got: {}", result);
+    assert_eq!(result, "Sonntag", "got: {result}");
 }
 
 #[testutil::test]
@@ -575,7 +575,7 @@ fn strftime_weekday_abbreviated_german() {
     let _ = env.set_var("TZ", "UTC");
     env.export_var("TZ");
     let result = strftime_locale("%a", 1_000_000_000, &env);
-    assert!(result == "So" || result == "So.", "got: {}", result);
+    assert!(result == "So" || result == "So.", "got: {result}");
 }
 
 #[testutil::test]
@@ -586,7 +586,7 @@ fn strftime_month_french() {
     env.export_var("TZ");
     // 2001-09-09 — September in French is "septembre"
     let result = strftime_locale("%B", 1_000_000_000, &env);
-    assert_eq!(result, "septembre", "got: {}", result);
+    assert_eq!(result, "septembre", "got: {result}");
 }
 
 #[testutil::test]
@@ -596,7 +596,7 @@ fn strftime_month_abbreviated_french() {
     let _ = env.set_var("TZ", "UTC");
     env.export_var("TZ");
     let result = strftime_locale("%b", 1_000_000_000, &env);
-    assert_eq!(result, "sept.", "got: {}", result);
+    assert_eq!(result, "sept.", "got: {result}");
 }
 
 #[testutil::test]
@@ -618,8 +618,7 @@ fn strftime_c_locale_english_weekday() {
     ];
     assert!(
         english_days.contains(&result.as_str()),
-        "Expected English day name, got: {}",
-        result
+        "Expected English day name, got: {result}"
     );
 }
 
@@ -631,12 +630,8 @@ fn strftime_mixed_codes() {
     env.export_var("TZ");
     // Test mixing locale-aware and non-locale codes
     let result = strftime_locale("%A %Y", 1_000_000_000, &env);
-    assert!(
-        result.starts_with("Sonntag"),
-        "Expected German weekday, got: {}",
-        result
-    );
-    assert!(result.ends_with("2001"), "Expected year 2001, got: {}", result);
+    assert!(result.starts_with("Sonntag"), "Expected German weekday, got: {result}");
+    assert!(result.ends_with("2001"), "Expected year 2001, got: {result}");
 }
 
 #[testutil::test]
@@ -654,7 +649,7 @@ fn strftime_percent_h_is_month_abbreviated() {
     env.export_var("TZ");
     // %h is an alias for %b
     let result = strftime_locale("%h", 1_000_000_000, &env);
-    assert_eq!(result, "sept.", "got: {}", result);
+    assert_eq!(result, "sept.", "got: {result}");
 }
 
 // Timezone resolution tests -------------------------------------------------------------------------------------------
@@ -667,7 +662,7 @@ fn resolve_timezone_exported_iana_name() {
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
     // 1_000_000_000 = 2001-09-09 01:46:40 UTC = Sunday
     let result = strftime_locale("%A", 1_000_000_000, &env);
-    assert_eq!(result, "Sonntag", "TZ=UTC should give Sunday; got: {}", result);
+    assert_eq!(result, "Sonntag", "TZ=UTC should give Sunday; got: {result}");
 }
 
 #[testutil::test]
@@ -678,7 +673,7 @@ fn resolve_timezone_empty_is_utc() {
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
     // Empty TZ means UTC per POSIX tzset()
     let result = strftime_locale("%A", 1_000_000_000, &env);
-    assert_eq!(result, "Sonntag", "TZ='' should be UTC (Sunday); got: {}", result);
+    assert_eq!(result, "Sonntag", "TZ='' should be UTC (Sunday); got: {result}");
 }
 
 #[testutil::test]
@@ -708,5 +703,5 @@ fn resolve_timezone_colon_prefix_stripped() {
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
     // Leading colon is a POSIX file-path marker and should be stripped
     let result = strftime_locale("%A", 1_000_000_000, &env);
-    assert_eq!(result, "Sonntag", "TZ=:UTC should give Sunday; got: {}", result);
+    assert_eq!(result, "Sonntag", "TZ=:UTC should give Sunday; got: {result}");
 }

@@ -295,28 +295,28 @@ fn do_lex(cli: &CliArgs) {
         match lexer.next_token() {
             Ok(spanned) => {
                 let (line, col) = mapper.offset_to_line_col(spanned.span.start.0);
-                let location = format!("{}:{}:{}", filename, line, col);
+                let location = format!("{filename}:{line}:{col}");
                 let name = spanned.token.token_name();
                 if matches!(spanned.token, Token::Eof) {
                     break;
                 }
                 let text = match &spanned.token {
                     Token::Literal(s) => s.clone(),
-                    Token::SingleQuoted(s) => format!("'{}'", s),
-                    Token::DoubleQuoted(s) => format!("\"{}\"", s),
-                    Token::SimpleParam(s) => format!("${}", s),
-                    Token::BraceParam(s) => format!("${{{}}}", s),
-                    Token::CommandSub(s) => format!("$({})", s),
-                    Token::BacktickSub(s) => format!("`{}`", s),
-                    Token::ArithSub(s) => format!("$(({})))", s),
+                    Token::SingleQuoted(s) => format!("'{s}'"),
+                    Token::DoubleQuoted(s) => format!("\"{s}\""),
+                    Token::SimpleParam(s) => format!("${s}"),
+                    Token::BraceParam(s) => format!("${{{s}}}"),
+                    Token::CommandSub(s) => format!("$({s})"),
+                    Token::BacktickSub(s) => format!("`{s}`"),
+                    Token::ArithSub(s) => format!("$(({s})))"),
                     Token::Glob(k) => match k {
                         token::GlobKind::Star => "*".to_string(),
                         token::GlobKind::Question => "?".to_string(),
                         token::GlobKind::BracketOpen => "[".to_string(),
                     },
-                    Token::TildePrefix(s) => format!("~{}", s),
-                    Token::BashAnsiCQuoted(s) => format!("$'{}'", s),
-                    Token::BashLocaleQuoted(s) => format!("$\"{}\"", s),
+                    Token::TildePrefix(s) => format!("~{s}"),
+                    Token::BashAnsiCQuoted(s) => format!("$'{s}'"),
+                    Token::BashLocaleQuoted(s) => format!("$\"{s}\""),
                     Token::BashExtGlob { kind, pattern } => {
                         let prefix = match kind {
                             token::ExtGlobTokenKind::ZeroOrOne => "?",
@@ -325,10 +325,10 @@ fn do_lex(cli: &CliArgs) {
                             token::ExtGlobTokenKind::ExactlyOne => "@",
                             token::ExtGlobTokenKind::Not => "!",
                         };
-                        format!("{}({})", prefix, pattern)
+                        format!("{prefix}({pattern})")
                     }
                     Token::BashProcessSub { direction, content } => {
-                        format!("{}({})", direction, content)
+                        format!("{direction}({content})")
                     }
                     Token::Whitespace => " ".to_string(),
                     Token::IoNumber(n) => n.to_string(),
@@ -375,14 +375,7 @@ fn do_lex(cli: &CliArgs) {
     );
 
     for (location, name, text) in &rows {
-        println!(
-            "{:<loc_w$}  {:<name_w$}  {}",
-            location,
-            name,
-            text,
-            loc_w = loc_width,
-            name_w = name_width,
-        );
+        println!("{location:<loc_width$}  {name:<name_width$}  {text}",);
     }
 }
 
@@ -413,7 +406,7 @@ fn do_parse(cli: &CliArgs) {
     if colored::control::SHOULD_COLORIZE.should_colorize() {
         color::print_colored_yaml(&output);
     } else {
-        print!("{}", output);
+        print!("{output}");
     }
 }
 
@@ -440,7 +433,7 @@ fn do_exec(cli: &CliArgs) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(ExecError::CommandNotFound(name)) => {
-            eprintln!("{}: command not found", name);
+            eprintln!("{name}: command not found");
             process::exit(127);
         }
         Err(e) => {
@@ -490,7 +483,7 @@ fn do_exec_ast(cli: &CliArgs) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(ExecError::CommandNotFound(name)) => {
-            eprintln!("{}: command not found", name);
+            eprintln!("{name}: command not found");
             process::exit(127);
         }
         Err(e) => {
@@ -504,13 +497,13 @@ fn read_source(file_arg: &str) -> String {
     if file_arg == "-" {
         let mut buf = String::new();
         io::stdin().read_to_string(&mut buf).unwrap_or_else(|e| {
-            eprintln!("error reading stdin: {}", e);
+            eprintln!("error reading stdin: {e}");
             process::exit(1);
         });
         buf
     } else {
         fs::read_to_string(file_arg).unwrap_or_else(|e| {
-            eprintln!("error reading '{}': {}", file_arg, e);
+            eprintln!("error reading '{file_arg}': {e}");
             process::exit(1);
         })
     }

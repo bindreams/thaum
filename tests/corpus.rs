@@ -116,7 +116,7 @@ impl TestSpec {
             "bash50" => Ok(thaum::Dialect::Bash50),
             "bash51" => Ok(thaum::Dialect::Bash51),
             "bash" => Ok(thaum::Dialect::Bash),
-            other => Err(format!("unknown dialect: {:?}", other)),
+            other => Err(format!("unknown dialect: {other:?}")),
         }
     }
 }
@@ -139,30 +139,24 @@ impl OutputMatcher {
         match self {
             OutputMatcher::Exact(expected) => {
                 if actual != expected {
-                    return Err(format!(
-                        "{field_name} mismatch:\n  expected: {:?}\n  actual:   {:?}",
-                        expected, actual
-                    )
-                    .into());
+                    return Err(
+                        format!("{field_name} mismatch:\n  expected: {expected:?}\n  actual:   {actual:?}").into(),
+                    );
                 }
             }
             OutputMatcher::Pattern(pat) => {
                 if let Some(substr) = &pat.contains {
                     if !actual.contains(substr.as_str()) {
-                        return Err(
-                            format!("{field_name} does not contain {:?}:\n  actual: {:?}", substr, actual).into(),
-                        );
+                        return Err(format!("{field_name} does not contain {substr:?}:\n  actual: {actual:?}").into());
                     }
                 }
                 if let Some(re_str) = &pat.regex {
-                    let re = regex::Regex::new(re_str)
-                        .map_err(|e| format!("{field_name} invalid regex {:?}: {}", re_str, e))?;
+                    let re =
+                        regex::Regex::new(re_str).map_err(|e| format!("{field_name} invalid regex {re_str:?}: {e}"))?;
                     if !re.is_match(actual) {
-                        return Err(format!(
-                            "{field_name} does not match regex {:?}:\n  actual: {:?}",
-                            re_str, actual
-                        )
-                        .into());
+                        return Err(
+                            format!("{field_name} does not match regex {re_str:?}:\n  actual: {actual:?}").into(),
+                        );
                     }
                 }
             }
@@ -199,23 +193,23 @@ fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), Stri
             for (key, exp_val) in exp_map {
                 let key_str = match key {
                     Yaml::String(s) => s.clone(),
-                    _ => format!("{:?}", key),
+                    _ => format!("{key:?}"),
                 };
                 let child_path = if path.is_empty() {
                     key_str.clone()
                 } else {
-                    format!("{}.{}", path, key_str)
+                    format!("{path}.{key_str}")
                 };
                 let act_val = act_map
                     .get(key)
-                    .ok_or_else(|| format!("{}: key not found in actual AST", child_path))?;
+                    .ok_or_else(|| format!("{child_path}: key not found in actual AST"))?;
                 yaml_is_subset(exp_val, act_val, &child_path)?;
             }
             Ok(())
         }
         (Yaml::Array(exp_seq), Yaml::Array(act_seq)) => {
             for (i, exp_item) in exp_seq.iter().enumerate() {
-                let child_path = format!("{}[{}]", path, i);
+                let child_path = format!("{path}[{i}]");
                 let act_item = act_seq.get(i).ok_or_else(|| {
                     format!(
                         "{}: expected element at index {} but actual has only {} elements",
@@ -232,7 +226,7 @@ fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), Stri
             if expected == actual || scalars_equivalent(expected, actual) {
                 Ok(())
             } else {
-                Err(format!("{}: expected {:?}, got {:?}", path, expected, actual))
+                Err(format!("{path}: expected {expected:?}, got {actual:?}"))
             }
         }
     }
@@ -240,7 +234,7 @@ fn yaml_is_subset(expected: &Yaml, actual: &Yaml, path: &str) -> Result<(), Stri
 
 /// Parse a YAML string into a yaml_rust2::Yaml value (first document).
 fn parse_yaml(s: &str) -> Result<Yaml, String> {
-    let docs = yaml_rust2::YamlLoader::load_from_str(s).map_err(|e| format!("YAML parse error: {}", e))?;
+    let docs = yaml_rust2::YamlLoader::load_from_str(s).map_err(|e| format!("YAML parse error: {e}"))?;
     docs.into_iter().next().ok_or_else(|| "empty YAML document".to_string())
 }
 
@@ -324,39 +318,30 @@ fn check_parse_error(spec: &ParseErrorSpec, err: &thaum::ParseError, source: &st
         }
         ParseErrorSpec::Exact(expected) => {
             if msg != *expected {
-                return Err(format!(
-                    "parse-error mismatch:\n  expected: {:?}\n  actual:   {:?}",
-                    expected, msg
-                )
-                .into());
+                return Err(format!("parse-error mismatch:\n  expected: {expected:?}\n  actual:   {msg:?}").into());
             }
         }
         ParseErrorSpec::Pattern(pat) => {
             if let Some(substr) = &pat.contains {
                 if !msg.contains(substr.as_str()) {
-                    return Err(format!("parse-error does not contain {:?}:\n  actual: {:?}", substr, msg).into());
+                    return Err(format!("parse-error does not contain {substr:?}:\n  actual: {msg:?}").into());
                 }
             }
             if let Some(re_str) = &pat.regex {
-                let re =
-                    regex::Regex::new(re_str).map_err(|e| format!("parse-error invalid regex {:?}: {}", re_str, e))?;
+                let re = regex::Regex::new(re_str).map_err(|e| format!("parse-error invalid regex {re_str:?}: {e}"))?;
                 if !re.is_match(&msg) {
-                    return Err(format!("parse-error does not match regex {:?}:\n  actual: {:?}", re_str, msg).into());
+                    return Err(format!("parse-error does not match regex {re_str:?}:\n  actual: {msg:?}").into());
                 }
             }
             if let Some(expected_at) = &pat.at {
                 let span = err.span().ok_or_else(|| {
-                    format!(
-                        "parse-error `at: {:?}` specified but error has no span:\n  error: {:?}",
-                        expected_at, msg
-                    )
+                    format!("parse-error `at: {expected_at:?}` specified but error has no span:\n  error: {msg:?}")
                 })?;
                 let (line, col) = byte_offset_to_line_col(source, span.start.0);
-                let actual_at = format!("{}:{}", line, col);
+                let actual_at = format!("{line}:{col}");
                 if actual_at != *expected_at {
                     return Err(format!(
-                        "parse-error location mismatch:\n  expected: {:?}\n  actual:   {:?}",
-                        expected_at, actual_at
+                        "parse-error location mismatch:\n  expected: {expected_at:?}\n  actual:   {actual_at:?}"
                     )
                     .into());
                 }
@@ -384,7 +369,7 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     }
 
     if spec.is_valid {
-        let program = parse_result.map_err(|e| format!("expected parse: ok, but got error: {}", e))?;
+        let program = parse_result.map_err(|e| format!("expected parse: ok, but got error: {e}"))?;
 
         // 2. AST assertion (optional)
         if let Some(expected_yaml) = &parsed.ast {
@@ -392,9 +377,9 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
             let writer = thaum::format::YamlWriter::new_verbose(&mapper, "<test>");
             let actual_yaml_str = writer.write_program(&program);
             let actual_yaml = parse_yaml(&actual_yaml_str)
-                .map_err(|e| format!("failed to re-parse verbose YAML: {}\n---\n{}", e, actual_yaml_str))?;
+                .map_err(|e| format!("failed to re-parse verbose YAML: {e}\n---\n{actual_yaml_str}"))?;
             yaml_is_subset(expected_yaml, &actual_yaml, "")
-                .map_err(|msg| format!("AST mismatch: {}\n\nActual verbose YAML:\n{}", msg, actual_yaml_str))?;
+                .map_err(|msg| format!("AST mismatch: {msg}\n\nActual verbose YAML:\n{actual_yaml_str}"))?;
         }
 
         // 3. Execution assertions (optional, requires sandbox or --no-sandbox)
@@ -435,7 +420,7 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
         if let Some(ref substr) = spec.error_contains {
             let msg = err.to_string();
             if !msg.contains(substr.as_str()) {
-                return Err(format!("error message does not contain {:?}:\n  actual: {:?}", substr, msg).into());
+                return Err(format!("error message does not contain {substr:?}:\n  actual: {msg:?}").into());
             }
         }
     }
@@ -546,7 +531,7 @@ fn main() {
         let parsed = match parse_test_file(&path) {
             Ok(p) => p,
             Err(e) => {
-                eprintln!("warning: skipping {}: {}", rel, e);
+                eprintln!("warning: skipping {rel}: {e}");
                 continue;
             }
         };
@@ -555,9 +540,9 @@ fn main() {
         let disabled = parsed.spec.disabled.is_disabled();
         let display_name = match &parsed.spec.disabled {
             Disabled::WithReason { reason } => {
-                format!("{} ({}) [disabled: {}]", rel, test_name, reason)
+                format!("{rel} ({test_name}) [disabled: {reason}]")
             }
-            _ => format!("{} ({})", rel, test_name),
+            _ => format!("{rel} ({test_name})"),
         };
 
         let has_exec = parsed.spec.status.is_some() || parsed.spec.stdout.is_some() || parsed.spec.stderr.is_some();

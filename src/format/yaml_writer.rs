@@ -544,7 +544,7 @@ impl<'a> YamlWriter<'a> {
                 if s.is_empty() {
                     m.scalar("value", "~");
                 } else {
-                    m.scalar("value", &format!("~{}", s));
+                    m.scalar("value", &format!("~{s}"));
                 }
             }
             Fragment::BashAnsiCQuoted(s) => {
@@ -701,6 +701,7 @@ impl<'a> YamlWriter<'a> {
         }
     }
 
+    #[allow(clippy::only_used_in_recursion)]
     fn build_arith_expr(&self, expr: &ArithExpr) -> YamlValue {
         let mut m = MappingBuilder::new();
         match expr {
@@ -805,7 +806,7 @@ impl<'a> YamlWriter<'a> {
     fn extend_param_expansion(&self, m: &mut MappingBuilder, exp: &ParameterExpansion) {
         match exp {
             ParameterExpansion::Simple(name) => {
-                m.scalar("name", &format!("${}", name));
+                m.scalar("name", &format!("${name}"));
             }
             ParameterExpansion::Complex {
                 name,

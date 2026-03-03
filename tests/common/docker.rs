@@ -2,12 +2,13 @@
 //!
 //! Provides two process-scoped fixtures:
 //!
-//! - **`corpus_image`**: builds the thaum Docker image (untagged), removes on drop.
+//! - **`corpus_image`**: builds the Docker image (untagged), removes on drop.
 //! - **`corpus_sandbox`**: starts a container from the image, kills on drop.
 //!
-//! Tests use [`exec_in_container`] to run scripts inside the sandbox.
+//! The corpus test binary is compiled into the Docker image alongside thaum.
+//! Exec tests delegate to the binary inside Docker via `docker exec` with
+//! `--no-sandbox --format json --exact`.
 
-use std::collections::HashMap;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -98,101 +99,12 @@ fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox
     Ok(CorpusSandbox { container_id })
 }
 
-// Execution ===================================================================
+// ExecResult ==================================================================
 
-/// Result from running a test script.
+/// Result from running a test script (used by `run_exec_native` in corpus.rs).
 #[derive(Debug)]
 pub struct ExecResult {
     pub stdout: String,
     pub stderr: String,
     pub exit_code: i32,
-}
-
-/// Run a test inside a Docker container via `docker exec`.
-///
-/// Creates a per-test temp directory, applies `environment`, runs `setup` (if
-/// provided), then executes the test script via `thaum exec`.
-pub fn exec_in_container(
-    container_id: &str,
-    script: &str,
-    bash: bool,
-    setup: Option<&str>,
-    environment: &HashMap<String, String>,
-) -> ExecResult {
-    let wrapper = build_wrapper(script, bash, setup, environment);
-
-    let output = Command::new("docker")
-        .args(["exec", "-i", container_id, "/bin/sh", "-c", &wrapper])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .expect("failed to run docker exec");
-
-    let exit_code = output.status.code().unwrap_or(128);
-
-    ExecResult {
-        stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
-        stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
-        exit_code,
-    }
-}
-
-/// Run a test natively on the host (--no-sandbox mode).
-pub fn exec_native(script: &str, bash: bool, setup: Option<&str>, environment: &HashMap<String, String>) -> ExecResult {
-    let wrapper = build_wrapper(script, bash, setup, environment);
-
-    let output = Command::new("/bin/sh")
-        .args(["-c", &wrapper])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .expect("failed to run /bin/sh");
-
-    let exit_code = output.status.code().unwrap_or(128);
-
-    ExecResult {
-        stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
-        stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
-        exit_code,
-    }
-}
-
-/// Build the shell wrapper that handles environment, setup, and test execution.
-fn build_wrapper(script: &str, bash: bool, setup: Option<&str>, environment: &HashMap<String, String>) -> String {
-    let bash_flag = if bash { " --bash" } else { "" };
-
-    let mut w = String::new();
-    w.push_str("set -e\n");
-
-    // Create a per-test working directory and cd into it.
-    w.push_str("workdir=$(mktemp -d)\n");
-    w.push_str("cd \"$workdir\"\n");
-
-    // Export environment variables.
-    for (key, value) in environment {
-        let escaped = value.replace('\\', "\\\\").replace('"', "\\\"");
-        w.push_str(&format!("export {key}=\"{escaped}\"\n"));
-    }
-
-    // Write and execute setup script if provided.
-    if let Some(setup_script) = setup {
-        w.push_str("cat > .setup <<'__SETUP__'\n");
-        w.push_str(setup_script);
-        if !setup_script.ends_with('\n') {
-            w.push('\n');
-        }
-        w.push_str("__SETUP__\n");
-        w.push_str("chmod +x .setup && ./.setup\n");
-    }
-
-    // Add workdir to PATH so helpers created by setup are found as commands.
-    w.push_str("export PATH=\"$workdir:$PATH\"\n");
-
-    // Run the test script. `set +e` so thaum's exit code propagates instead
-    // of triggering the wrapper's `set -e`.
-    w.push_str("set +e\n");
-    let escaped_test = script.replace('\'', "'\\''");
-    w.push_str(&format!("thaum exec{bash_flag} -c '{escaped_test}'\n"));
-
-    w
 }

@@ -2,6 +2,7 @@
 slow-timeout = { period = "30s", terminate-after = 2 }
 
 # Docker image builds can take minutes on first run (cached afterwards).
+# Corpus exec tests also trigger Docker builds via the corpus_sandbox fixture.
 [[profile.default.overrides]]
-filter = "test(~docker)"
+filter = "test(~docker) | binary_id(~corpus)"
 slow-timeout = { period = "120s", terminate-after = 2 }

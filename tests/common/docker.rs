@@ -5,6 +5,7 @@
 //! tests use `docker exec` against it.
 
 use std::collections::HashMap;
+use std::path::Path;
 use std::process::{Command, Stdio};
 
 const CONTAINER_NAME: &str = "thaum-corpus-sandbox";
@@ -30,6 +31,52 @@ pub fn docker_image_available(image: &str) -> bool {
         .stderr(Stdio::null())
         .status()
         .is_ok_and(|s| s.success())
+}
+
+/// Build the corpus Docker image from `tests/docker/Dockerfile`.
+///
+/// Returns `Ok(())` on success, or an error message on failure.  The caller
+/// should treat a failed build as a hard error when Docker is available — it
+/// means the Dockerfile or the project source is broken.
+pub fn build_image() -> Result<(), String> {
+    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
+    if !dockerfile.exists() {
+        return Err(format!("Dockerfile not found at {}", dockerfile.display()));
+    }
+
+    let output = Command::new("docker")
+        .args([
+            "build",
+            "-t",
+            IMAGE_NAME,
+            "-f",
+            &dockerfile.to_string_lossy(),
+            &manifest_dir.to_string_lossy(),
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(|e| format!("failed to run docker build: {e}"))?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        Err(format!(
+            "docker build failed (exit {}):\n{}",
+            output.status.code().unwrap_or(-1),
+            stderr
+                .lines()
+                .rev()
+                .take(20)
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+                .collect::<Vec<_>>()
+                .join("\n")
+        ))
+    }
 }
 
 /// Check if the sandbox container is already running.

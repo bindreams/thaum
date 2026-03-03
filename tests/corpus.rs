@@ -498,21 +498,35 @@ fn main() {
     NO_SANDBOX.store(no_sandbox, std::sync::atomic::Ordering::Relaxed);
 
     // Initialize exec backend.
-    if no_sandbox {
+    // Skip Docker setup during `--list` (nextest test discovery) — Docker is only
+    // needed for actual test execution.  Nextest runs `--list` and `--list --ignored`
+    // in parallel, so concurrent Docker init causes race conditions.
+    let listing = std::env::args().any(|a| a == "--list");
+
+    if listing {
+        // During listing, assume Docker is available so exec tests are discovered.
+        // The actual backend is initialized when tests run (separate process).
+        EXEC_BACKEND.store(BACKEND_DOCKER, std::sync::atomic::Ordering::Relaxed);
+    } else if no_sandbox {
         EXEC_BACKEND.store(BACKEND_NATIVE, std::sync::atomic::Ordering::Relaxed);
         eprintln!("note: running execution tests natively (--no-sandbox)");
-    } else if common::docker::docker_available() && common::docker::docker_image_available("thaum-corpus-exec") {
-        if common::docker::ensure_container() {
-            EXEC_BACKEND.store(BACKEND_DOCKER, std::sync::atomic::Ordering::Relaxed);
-        } else {
-            eprintln!("warning: failed to start Docker container; execution tests will be skipped");
-            EXEC_BACKEND.store(BACKEND_DISABLED, std::sync::atomic::Ordering::Relaxed);
-        }
-    } else {
-        eprintln!("note: thaum-corpus-exec Docker image not found; execution tests will be skipped");
-        eprintln!("      use --no-sandbox to run natively, or build the image:");
-        eprintln!("      docker build -t thaum-corpus-exec -f tests/docker/Dockerfile .");
+    } else if !common::docker::docker_available() {
+        // Docker daemon not installed/running — silently skip exec tests.
+        eprintln!("note: Docker not available; execution tests will be skipped");
+        eprintln!("      use --no-sandbox to run natively, or install Docker");
         EXEC_BACKEND.store(BACKEND_DISABLED, std::sync::atomic::Ordering::Relaxed);
+    } else if !common::docker::docker_image_available("thaum-corpus-exec") {
+        // Docker is available but the image is missing — fail hard. The image must
+        // be built before running tests; a missing image means the build is broken
+        // or was never run.
+        panic!(
+            "Docker is available but thaum-corpus-exec image is missing.\n\
+             Build it with: docker build -t thaum-corpus-exec -f tests/docker/Dockerfile ."
+        );
+    } else if common::docker::ensure_container() {
+        EXEC_BACKEND.store(BACKEND_DOCKER, std::sync::atomic::Ordering::Relaxed);
+    } else {
+        panic!("Docker is available but failed to start the corpus sandbox container");
     }
 
     let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");

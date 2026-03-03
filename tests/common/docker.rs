@@ -1,141 +1,101 @@
 //! Docker sandbox for corpus execution tests.
 //!
-//! Provides a named container fixture (`thaum-corpus-sandbox`).  The container
-//! is started on first use and reused across nextest invocations.  Individual
-//! tests use `docker exec` against it.
+//! Provides two process-scoped fixtures:
+//!
+//! - **`corpus_image`**: builds the thaum Docker image (untagged), removes on drop.
+//! - **`corpus_sandbox`**: starts a container from the image, kills on drop.
+//!
+//! Tests use [`exec_in_container`] to run scripts inside the sandbox.
 
 use std::collections::HashMap;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-const CONTAINER_NAME: &str = "thaum-corpus-sandbox";
-const IMAGE_NAME: &str = "thaum-corpus-exec";
+// Precondition ================================================================
 
-// Container lifecycle =========================================================
-
-/// Check if Docker is available on this host.
-pub fn docker_available() -> bool {
-    Command::new("docker")
-        .arg("info")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .is_ok_and(|s| s.success())
-}
-
-/// Check if a Docker image is available locally.
-pub fn docker_image_available(image: &str) -> bool {
-    Command::new("docker")
-        .args(["image", "inspect", image])
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .is_ok_and(|s| s.success())
-}
-
-/// Build the corpus Docker image from `tests/docker/Dockerfile`.
-///
-/// Returns `Ok(())` on success, or an error message on failure.  The caller
-/// should treat a failed build as a hard error when Docker is available — it
-/// means the Dockerfile or the project source is broken.
-pub fn build_image() -> Result<(), String> {
-    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
-    if !dockerfile.exists() {
-        return Err(format!("Dockerfile not found at {}", dockerfile.display()));
-    }
-
-    let output = Command::new("docker")
-        .args([
-            "build",
-            "-t",
-            IMAGE_NAME,
-            "-f",
-            &dockerfile.to_string_lossy(),
-            &manifest_dir.to_string_lossy(),
-        ])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .map_err(|e| format!("failed to run docker build: {e}"))?;
-
-    if output.status.success() {
+fn docker_available() -> Result<(), String> {
+    if testutil::docker::available() {
         Ok(())
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!(
-            "docker build failed (exit {}):\n{}",
-            output.status.code().unwrap_or(-1),
-            stderr
-                .lines()
-                .rev()
-                .take(20)
-                .collect::<Vec<_>>()
-                .into_iter()
-                .rev()
-                .collect::<Vec<_>>()
-                .join("\n")
-        ))
+        Err("Docker not available".into())
     }
 }
 
-/// Check if the sandbox container is already running.
-fn container_running() -> bool {
+// Corpus image fixture (process-scoped) =======================================
+
+/// A Docker image built from `tests/docker/Dockerfile`. Untagged — identified
+/// by raw image ID. Removed on drop (build cache stays).
+pub struct CorpusImage {
+    pub id: String,
+}
+
+impl Drop for CorpusImage {
+    fn drop(&mut self) {
+        testutil::docker::remove_image(&self.id);
+        eprintln!("corpus: removed Docker image {}", &self.id[..12.min(self.id.len())]);
+    }
+}
+
+#[testutil::fixture(scope = process, requires = [docker_available])]
+fn corpus_image() -> Result<CorpusImage, String> {
+    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
+    eprintln!("corpus: building Docker image...");
+    let id = testutil::docker::build_image(&dockerfile, manifest_dir, None)?;
+    eprintln!("corpus: built Docker image {}", &id[..12.min(id.len())]);
+    Ok(CorpusImage { id })
+}
+
+// Corpus sandbox fixture (process-scoped) =====================================
+
+/// A running Docker container for corpus test execution. Killed on drop.
+pub struct CorpusSandbox {
+    pub container_id: String,
+}
+
+impl Drop for CorpusSandbox {
+    fn drop(&mut self) {
+        let _ = Command::new("docker")
+            .args(["rm", "-f", &self.container_id])
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+        eprintln!(
+            "corpus: removed sandbox container {}",
+            &self.container_id[..12.min(self.container_id.len())]
+        );
+    }
+}
+
+#[testutil::fixture(scope = process, requires = [docker_available])]
+fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox, String> {
     let output = Command::new("docker")
-        .args(["inspect", "-f", "{{.State.Running}}", CONTAINER_NAME])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .output()
-        .ok();
-    output
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim() == "true")
-        .unwrap_or(false)
-}
-
-/// Ensure the sandbox container is running. Starts it if needed.
-///
-/// The container runs with `--network=none --tmpfs=/tmp:size=8m,exec` and sleeps
-/// forever. Tests use `exec_in_container` to run commands inside it.
-pub fn ensure_container() -> bool {
-    if container_running() {
-        return true;
-    }
-
-    // Remove any stopped container with the same name.
-    let _ = Command::new("docker")
-        .args(["rm", "-f", CONTAINER_NAME])
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status();
-
-    let status = Command::new("docker")
         .args([
             "run",
             "-d",
-            "--name",
-            CONTAINER_NAME,
             "--network=none",
-            "--tmpfs=/tmp:size=8m,exec",
+            "--tmpfs=/tmp:size=64m,exec",
             "--entrypoint",
             "sleep",
-            IMAGE_NAME,
+            &corpus_image.id,
             "infinity",
         ])
-        .stdout(Stdio::null())
+        .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .status()
-        .ok();
+        .output()
+        .map_err(|e| format!("failed to start container: {e}"))?;
 
-    status.is_some_and(|s| s.success())
-}
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("docker run failed: {stderr}"));
+    }
 
-/// Stop and remove the sandbox container.
-pub fn stop_container() {
-    let _ = Command::new("docker")
-        .args(["rm", "-f", CONTAINER_NAME])
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status();
+    let container_id = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    eprintln!(
+        "corpus: started sandbox container {}",
+        &container_id[..12.min(container_id.len())]
+    );
+    Ok(CorpusSandbox { container_id })
 }
 
 // Execution ===================================================================
@@ -148,11 +108,12 @@ pub struct ExecResult {
     pub exit_code: i32,
 }
 
-/// Run a test inside the sandbox Docker container via `docker exec`.
+/// Run a test inside a Docker container via `docker exec`.
 ///
 /// Creates a per-test temp directory, applies `environment`, runs `setup` (if
 /// provided), then executes the test script via `thaum exec`.
 pub fn exec_in_container(
+    container_id: &str,
     script: &str,
     bash: bool,
     setup: Option<&str>,
@@ -161,7 +122,7 @@ pub fn exec_in_container(
     let wrapper = build_wrapper(script, bash, setup, environment);
 
     let output = Command::new("docker")
-        .args(["exec", "-i", CONTAINER_NAME, "/bin/sh", "-c", &wrapper])
+        .args(["exec", "-i", container_id, "/bin/sh", "-c", &wrapper])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .output()
@@ -207,9 +168,7 @@ fn build_wrapper(script: &str, bash: bool, setup: Option<&str>, environment: &Ha
     w.push_str("workdir=$(mktemp -d)\n");
     w.push_str("cd \"$workdir\"\n");
 
-    // Export environment variables. Double-quoted so $VAR and backticks in
-    // values undergo shell expansion — intentional for corpus test flexibility,
-    // but assumes trusted test data.
+    // Export environment variables.
     for (key, value) in environment {
         let escaped = value.replace('\\', "\\\\").replace('"', "\\\"");
         w.push_str(&format!("export {key}=\"{escaped}\"\n"));

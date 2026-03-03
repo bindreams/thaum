@@ -19,7 +19,7 @@ pub mod test_name;
 
 pub use fixture::{
     cleanup_process_fixtures, collect_fixture_requires, enter_test_scope, fixture, fixture_get, fixture_registry,
-    FixtureDef, FixtureHandle, FixtureRef, FixtureScope, TestScope,
+    warm_up, FixtureDef, FixtureHandle, FixtureRef, FixtureScope, TestScope,
 };
 pub use temp_dir::TempDir;
 pub use test_name::TestName;

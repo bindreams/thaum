@@ -271,6 +271,26 @@ pub fn enter_test_scope(name: &'static str, module_path: &'static str) -> TestSc
 
 // Public API ==================================================================================
 
+/// Eagerly initialize a process-scoped fixture by name.
+///
+/// Call this from `main()` before running tests to pre-build expensive resources
+/// (e.g. Docker images). Does nothing if the fixture is already initialized or
+/// if the fixture is not process-scoped.
+///
+/// # Panics
+///
+/// - No fixture registered with `name`.
+/// - Fixture setup returns `Err`.
+pub fn warm_up(name: &str) {
+    let registry = fixture_registry();
+    let def = registry
+        .get(name)
+        .unwrap_or_else(|| panic!("no fixture registered with name {name:?}"));
+    if def.scope == FixtureScope::Process {
+        ensure_process_fixture(def);
+    }
+}
+
 /// Look up a fixture by name and return a handle.
 ///
 /// The handle's lifetime depends on the fixture's scope:
@@ -280,20 +300,23 @@ pub fn enter_test_scope(name: &'static str, module_path: &'static str) -> TestSc
 ///
 /// # Panics
 ///
-/// - No test scope is active on this thread.
+/// - No test scope is active on this thread (Variable/Test scope only).
 /// - No fixture registered with `name`.
 /// - The fixture's `cast` function does not support `target`.
 /// - Fixture setup returns `Err`.
 pub fn fixture_get(name: &str, target: TypeId) -> FixtureHandle {
-    assert!(
-        crate::CURRENT_TEST.get().is_some(),
-        "testutil::fixture_get({name:?}) called outside a test scope"
-    );
-
+    // Process fixtures don't require a test scope (they're global singletons).
+    // Variable and Test fixtures do.
     let registry = fixture_registry();
     let def = registry
         .get(name)
         .unwrap_or_else(|| panic!("no fixture registered with name {name:?}"));
+    if def.scope != FixtureScope::Process {
+        assert!(
+            crate::CURRENT_TEST.get().is_some(),
+            "testutil::fixture_get({name:?}) called outside a test scope"
+        );
+    }
 
     match def.scope {
         FixtureScope::Variable => get_variable(def, target),

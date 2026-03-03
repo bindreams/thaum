@@ -863,22 +863,52 @@ impl Executor {
         self.execute_external(cmd_name, cmd_args, &cmd.assignments, &mut active, io)
     }
 
-    /// Execute a full assignment (scalar, indexed, or array).
+    /// Execute a full assignment (scalar, indexed, or array), with append support.
     pub(crate) fn execute_assignment(&mut self, assignment: &crate::ast::Assignment) -> Result<(), ExecError> {
         if let Some(ref subscript) = assignment.index {
-            // Indexed or associative assignment: name[subscript]=value
+            // Indexed or associative assignment: name[subscript]=value or name[subscript]+=value
             let value = self.expand_word(assignment.value.as_scalar())?;
             if self.env.is_assoc_array(&assignment.name) {
-                self.env.set_assoc_element(&assignment.name, subscript, &value)?;
+                if assignment.append {
+                    let old = self
+                        .env
+                        .get_assoc_element(&assignment.name, subscript)
+                        .unwrap_or("")
+                        .to_string();
+                    self.env
+                        .set_assoc_element(&assignment.name, subscript, &format!("{old}{value}"))?;
+                } else {
+                    self.env.set_assoc_element(&assignment.name, subscript, &value)?;
+                }
             } else {
                 let index = self.eval_subscript_as_index(subscript)?;
-                self.env.set_array_element(&assignment.name, index, &value)?;
+                if assignment.append {
+                    let old = self
+                        .env
+                        .get_array_element(&assignment.name, index)
+                        .unwrap_or("")
+                        .to_string();
+                    self.env
+                        .set_array_element(&assignment.name, index, &format!("{old}{value}"))?;
+                } else {
+                    self.env.set_array_element(&assignment.name, index, &value)?;
+                }
             }
         } else {
             match &assignment.value {
                 crate::ast::AssignmentValue::Scalar(word) => {
                     let value = self.expand_word(word)?;
-                    if self.env.has_integer_attr(&assignment.name) {
+                    if assignment.append {
+                        if self.env.has_integer_attr(&assignment.name) {
+                            let old_str = self.env.get_var(&assignment.name).unwrap_or("0").to_string();
+                            let old_val = Self::parse_arith_or_zero(&old_str, &mut self.env);
+                            let new_val = Self::parse_arith_or_zero(&value, &mut self.env);
+                            self.env.set_var(&assignment.name, &(old_val + new_val).to_string())?;
+                        } else {
+                            let old = self.env.get_var(&assignment.name).unwrap_or("").to_string();
+                            self.env.set_var(&assignment.name, &format!("{old}{value}"))?;
+                        }
+                    } else if self.env.has_integer_attr(&assignment.name) {
                         let arith_value = match crate::parser::arith_expr::parse_arith_expr(&value) {
                             Ok(expr) => arithmetic::evaluate_arith_expr(&expr, &mut self.env)?,
                             Err(_) => 0,
@@ -889,30 +919,71 @@ impl Executor {
                     }
                 }
                 crate::ast::AssignmentValue::BashArray(elems) => {
-                    let mut plain_elements = Vec::new();
-                    for elem in elems {
-                        match elem {
-                            crate::ast::ArrayElement::Plain(word) => {
-                                plain_elements.push(self.expand_word(word)?);
-                            }
-                            crate::ast::ArrayElement::Subscripted { index, value } => {
-                                // Flush any accumulated plain elements first
-                                if !plain_elements.is_empty() {
-                                    self.env
-                                        .set_array(&assignment.name, std::mem::take(&mut plain_elements))?;
-                                }
-                                let val = self.expand_word(value)?;
-                                if self.env.is_assoc_array(&assignment.name) {
-                                    self.env.set_assoc_element(&assignment.name, index, &val)?;
-                                } else {
-                                    let idx = self.eval_subscript_as_index(index)?;
-                                    self.env.set_array_element(&assignment.name, idx, &val)?;
-                                }
-                            }
-                        }
+                    if assignment.append {
+                        self.execute_array_append(&assignment.name, elems)?;
+                    } else {
+                        self.execute_array_assign(&assignment.name, elems)?;
                     }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Parse a string as an arithmetic value, returning 0 on failure.
+    fn parse_arith_or_zero(s: &str, env: &mut environment::Environment) -> i64 {
+        match crate::parser::arith_expr::parse_arith_expr(s) {
+            Ok(expr) => arithmetic::evaluate_arith_expr(&expr, env).unwrap_or(0),
+            Err(_) => s.parse().unwrap_or(0),
+        }
+    }
+
+    /// Replace an array variable with new elements (non-append).
+    fn execute_array_assign(&mut self, name: &str, elems: &[crate::ast::ArrayElement]) -> Result<(), ExecError> {
+        let mut plain_elements = Vec::new();
+        for elem in elems {
+            match elem {
+                crate::ast::ArrayElement::Plain(word) => {
+                    plain_elements.push(self.expand_word(word)?);
+                }
+                crate::ast::ArrayElement::Subscripted { index, value } => {
+                    // Flush any accumulated plain elements first
                     if !plain_elements.is_empty() {
-                        self.env.set_array(&assignment.name, plain_elements)?;
+                        self.env.set_array(name, std::mem::take(&mut plain_elements))?;
+                    }
+                    let val = self.expand_word(value)?;
+                    if self.env.is_assoc_array(name) {
+                        self.env.set_assoc_element(name, index, &val)?;
+                    } else {
+                        let idx = self.eval_subscript_as_index(index)?;
+                        self.env.set_array_element(name, idx, &val)?;
+                    }
+                }
+            }
+        }
+        if !plain_elements.is_empty() {
+            self.env.set_array(name, plain_elements)?;
+        }
+        Ok(())
+    }
+
+    /// Append elements to an existing array (or create one).
+    fn execute_array_append(&mut self, name: &str, elems: &[crate::ast::ArrayElement]) -> Result<(), ExecError> {
+        let mut next_idx = self.env.get_array_next_index(name);
+        for elem in elems {
+            match elem {
+                crate::ast::ArrayElement::Plain(word) => {
+                    let val = self.expand_word(word)?;
+                    self.env.set_array_element(name, next_idx, &val)?;
+                    next_idx += 1;
+                }
+                crate::ast::ArrayElement::Subscripted { index, value } => {
+                    let val = self.expand_word(value)?;
+                    if self.env.is_assoc_array(name) {
+                        self.env.set_assoc_element(name, index, &val)?;
+                    } else {
+                        let idx = self.eval_subscript_as_index(index)?;
+                        self.env.set_array_element(name, idx, &val)?;
                     }
                 }
             }
@@ -960,7 +1031,13 @@ impl Executor {
             }
             let old_val = self.env.get_var(&assignment.name).map(|s| s.to_string());
             let old_exported = self.env.is_exported(&assignment.name);
-            let value = self.expand_scalar_assignment(assignment)?;
+            let expanded = self.expand_scalar_assignment(assignment)?;
+            let value = if assignment.append {
+                let old = old_val.as_deref().unwrap_or("");
+                format!("{old}{expanded}")
+            } else {
+                expanded
+            };
             self.env.set_var(&assignment.name, &value)?;
             self.env.export_var(&assignment.name);
             saved.push((assignment.name.clone(), old_val, old_exported));

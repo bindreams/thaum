@@ -145,12 +145,14 @@ pub enum Atom {
     },
 }
 
-/// A variable assignment: `name=value`, `name[idx]=value`, or `name=(array)`.
+/// A variable assignment: `name=value`, `name+=value`, `name[idx]=value`, or `name=(array)`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Assignment {
     pub name: String,
     /// Array subscript, if present: `name[index]=value`.
     pub index: Option<String>,
+    /// When true, the assignment uses `+=` (append) instead of `=`.
+    pub append: bool,
     pub value: AssignmentValue,
     pub span: Span,
 }

@@ -559,6 +559,19 @@ impl Environment {
         }
     }
 
+    /// Next available index for array append (`max_index + 1`, or `0` if undefined).
+    pub fn get_array_next_index(&self, name: &str) -> usize {
+        let name = self.resolve_nameref(name);
+        match self.variables.get(name) {
+            Some(var) => match &var.value {
+                VarValue::IndexedArray(map) => map.keys().next_back().map(|k| k + 1).unwrap_or(0),
+                VarValue::Scalar(_) => 1,
+                VarValue::AssocArray(_) => 0,
+            },
+            None => 0,
+        }
+    }
+
     /// Set a single element in an indexed array variable.
     ///
     /// If the variable does not exist, creates a new indexed array.

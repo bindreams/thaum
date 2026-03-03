@@ -323,6 +323,7 @@ pub fn fold_assignment<F: Fold + ?Sized>(f: &mut F, assignment: Assignment) -> A
     Assignment {
         name: assignment.name,
         index: assignment.index,
+        append: assignment.append,
         value,
         span: assignment.span,
     }

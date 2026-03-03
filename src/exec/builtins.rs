@@ -218,11 +218,17 @@ fn builtin_cd(args: &[String], env: &mut Environment, stderr: &mut dyn Write) ->
 
 fn builtin_export(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {
     for arg in args {
-        if let Some((name, value)) = arg.split_once('=') {
-            env.set_var(name, value)?;
+        let (name, value, is_append) = parse_assignment_operand(arg);
+        if let Some(val) = value {
+            if is_append {
+                let old = env.get_var(name).unwrap_or("").to_string();
+                env.set_var(name, &format!("{old}{val}"))?;
+            } else {
+                env.set_var(name, val)?;
+            }
             env.export_var(name);
         } else {
-            env.export_var(arg);
+            env.export_var(name);
         }
     }
     Ok(0)
@@ -590,11 +596,17 @@ fn builtin_readonly(args: &[String], env: &mut Environment, stdout: &mut dyn Wri
         if arg.starts_with('-') {
             continue; // Skip flags like -p
         }
-        if let Some((name, value)) = arg.split_once('=') {
-            env.set_var(name, value)?;
+        let (name, value, is_append) = parse_assignment_operand(arg);
+        if let Some(val) = value {
+            if is_append {
+                let old = env.get_var(name).unwrap_or("").to_string();
+                env.set_var(name, &format!("{old}{val}"))?;
+            } else {
+                env.set_var(name, val)?;
+            }
             env.set_readonly(name);
         } else {
-            env.set_readonly(arg);
+            env.set_readonly(name);
         }
     }
     Ok(0)
@@ -608,14 +620,20 @@ fn builtin_local(args: &[String], env: &mut Environment) -> Result<i32, ExecErro
     }
 
     for arg in args {
-        if let Some((name, value)) = arg.split_once('=') {
+        let (name, value, is_append) = parse_assignment_operand(arg);
+        if let Some(val) = value {
             env.declare_local(name)?;
-            env.set_var(name, value)?;
+            if is_append {
+                let old = env.get_var(name).unwrap_or("").to_string();
+                env.set_var(name, &format!("{old}{val}"))?;
+            } else {
+                env.set_var(name, val)?;
+            }
         } else {
-            env.declare_local(arg)?;
+            env.declare_local(name)?;
             // If the variable doesn't exist yet, create it with empty value.
-            if env.get_var(arg).is_none() {
-                env.set_var(arg, "")?;
+            if env.get_var(name).is_none() {
+                env.set_var(name, "")?;
             }
         }
     }
@@ -731,11 +749,9 @@ fn builtin_declare(
 
     // Process each operand
     for operand in &operands {
-        let (name, value) = if let Some((n, v)) = operand.split_once('=') {
-            (n.to_string(), Some(v.to_string()))
-        } else {
-            (operand.clone(), None)
-        };
+        let (name_str, value_opt, is_append) = parse_assignment_operand(operand);
+        let name = name_str.to_string();
+        let value = value_opt.map(|v| v.to_string());
 
         // Handle nameref (declare -n)
         if attrs.nameref_set {
@@ -767,6 +783,16 @@ fn builtin_declare(
             env.declare_with_attrs(&name, None, &attrs)?;
             continue;
         }
+
+        // Apply append: prepend old value to the new one.
+        let value = if is_append {
+            value.map(|v| {
+                let old = env.get_var(&name).unwrap_or("").to_string();
+                format!("{old}{v}")
+            })
+        } else {
+            value
+        };
 
         // Evaluate value as arithmetic if the variable will have the integer
         // attribute AFTER this declare. Skip if +i is removing it.
@@ -1104,6 +1130,19 @@ fn format_dir(path: &std::path::Path, home: &Option<String>) -> String {
         }
     }
     s
+}
+
+/// Parse an assignment operand: `name=value`, `name+=value`, or bare `name`.
+///
+/// Returns `(name, optional_value, is_append)`.
+fn parse_assignment_operand(arg: &str) -> (&str, Option<&str>, bool) {
+    if let Some(eq_pos) = arg.find('=') {
+        if eq_pos > 0 && arg.as_bytes()[eq_pos - 1] == b'+' {
+            return (&arg[..eq_pos - 1], Some(&arg[eq_pos + 1..]), true);
+        }
+        return (&arg[..eq_pos], Some(&arg[eq_pos + 1..]), false);
+    }
+    (arg, None, false)
 }
 
 #[cfg(test)]

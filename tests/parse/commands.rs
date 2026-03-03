@@ -181,3 +181,48 @@ fn case_inside_command_substitution() {
     let prog = parse_ok("echo $(case x in a) echo yes;; esac)");
     assert_eq!(prog.lines[0].len(), 1);
 }
+
+// Append assignment (+=) =============================================================
+
+#[testutil::test]
+fn append_scalar_assignment() {
+    let cmd = first_cmd("s+=foo");
+    assert_eq!(cmd.assignments.len(), 1);
+    assert_eq!(cmd.assignments[0].name, "s");
+    assert!(cmd.assignments[0].append);
+    assert_eq!(cmd.arguments.len(), 0);
+}
+
+#[testutil::test]
+fn append_array_assignment() {
+    let prog = thaum::parse_with("a+=(x y)", thaum::Dialect::Bash).unwrap();
+    let cmd = match prog.lines[0][0].expression {
+        Expression::Command(ref c) => c,
+        _ => panic!("expected Command"),
+    };
+    assert_eq!(cmd.assignments.len(), 1);
+    assert_eq!(cmd.assignments[0].name, "a");
+    assert!(cmd.assignments[0].append);
+    assert!(matches!(cmd.assignments[0].value, AssignmentValue::BashArray(_)));
+}
+
+#[testutil::test]
+fn append_indexed_assignment() {
+    let prog = thaum::parse_with("a[1]+=z", thaum::Dialect::Bash).unwrap();
+    let cmd = match prog.lines[0][0].expression {
+        Expression::Command(ref c) => c,
+        _ => panic!("expected Command"),
+    };
+    assert_eq!(cmd.assignments.len(), 1);
+    assert_eq!(cmd.assignments[0].name, "a");
+    assert_eq!(cmd.assignments[0].index, Some("1".to_string()));
+    assert!(cmd.assignments[0].append);
+}
+
+#[testutil::test]
+fn plus_equals_not_assignment_for_invalid_name() {
+    // '123+=bar' has an invalid name, so it should be treated as an argument.
+    let cmd = first_cmd("123+=bar");
+    assert_eq!(cmd.assignments.len(), 0);
+    assert_eq!(cmd.arguments.len(), 1);
+}

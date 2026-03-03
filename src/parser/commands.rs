@@ -29,17 +29,21 @@ impl Parser {
                 continue;
             }
 
-            // Assignment detection: first Literal in a word contains '='
+            // Assignment detection: first Literal in a word contains '=' or '+='
             if let Token::Literal(ref w) = self.lexer.peek()?.token {
                 if let Some(eq_pos) = w.find('=') {
-                    let name = &w[..eq_pos];
-                    if is_valid_name(name) && !name.is_empty() {
+                    let (name_str, is_append) = if eq_pos > 0 && w.as_bytes()[eq_pos - 1] == b'+' {
+                        (&w[..eq_pos - 1], true)
+                    } else {
+                        (&w[..eq_pos], false)
+                    };
+                    if is_valid_name(name_str) && !name_str.is_empty() {
                         let value_prefix = w[eq_pos + 1..].to_string();
-                        let name = name.to_string();
+                        let name = name_str.to_string();
                         let word_span = self.lexer.peek()?.span;
                         self.lexer.advance()?; // consume the Literal("name=value...")
 
-                        // Array assignment: name=( ... ) (Bash)
+                        // Array assignment: name=( ... ) or name+=( ... ) (Bash)
                         if value_prefix.is_empty() && self.options.arrays && self.lexer.peek()?.token == Token::LParen {
                             self.lexer.advance()?; // consume (
                             let mut elements = Vec::new();
@@ -64,6 +68,7 @@ impl Parser {
                             assignments.push(Assignment {
                                 name,
                                 index: None,
+                                append: is_append,
                                 value: AssignmentValue::BashArray(elements),
                                 span: arr_span,
                             });
@@ -73,6 +78,7 @@ impl Parser {
                             assignments.push(Assignment {
                                 name,
                                 index: None,
+                                append: is_append,
                                 value: AssignmentValue::Scalar(value_word),
                                 span: word_span,
                             });
@@ -122,19 +128,23 @@ impl Parser {
                     continue;
                 }
 
-                // In declare-family commands, try parsing `name=(...)` as an assignment.
+                // In declare-family commands, try parsing `name=(...)` or `name+=(...)` as an assignment.
                 if is_declare_like && self.options.arrays {
                     if let Token::Literal(ref w) = self.lexer.peek()?.token {
                         if let Some(eq_pos) = w.find('=') {
-                            let name = &w[..eq_pos];
+                            let (name_str, is_append) = if eq_pos > 0 && w.as_bytes()[eq_pos - 1] == b'+' {
+                                (&w[..eq_pos - 1], true)
+                            } else {
+                                (&w[..eq_pos], false)
+                            };
                             let value_prefix = &w[eq_pos + 1..];
-                            if is_valid_name(name) && !name.is_empty() && value_prefix.is_empty() {
+                            if is_valid_name(name_str) && !name_str.is_empty() && value_prefix.is_empty() {
                                 // Peek ahead: is the next-next token LParen?
-                                let name = name.to_string();
+                                let name = name_str.to_string();
                                 let word_span = self.lexer.peek()?.span;
 
                                 let arr = self.lexer.speculate(|lex| {
-                                    lex.advance()?; // consume Literal("name=")
+                                    lex.advance()?; // consume Literal("name=") or Literal("name+=")
                                     if lex.peek()?.token == Token::LParen {
                                         lex.advance()?; // consume LParen
                                         Ok(Some(()))
@@ -144,7 +154,7 @@ impl Parser {
                                 })?;
 
                                 if arr.is_some() {
-                                    // Speculation already consumed Literal("name=") and LParen
+                                    // Speculation already consumed the literal and LParen
                                     let mut elements = Vec::new();
                                     loop {
                                         self.skip_linebreak()?;
@@ -165,6 +175,7 @@ impl Parser {
                                     assignments.push(Assignment {
                                         name,
                                         index: None,
+                                        append: is_append,
                                         value: AssignmentValue::BashArray(elements),
                                         span: arr_span,
                                     });
@@ -294,9 +305,10 @@ impl Parser {
             };
             lex.advance()?;
 
-            // 4. Literal starting with '='
-            let value_text = match &lex.peek()?.token {
-                Token::Literal(w) if w.starts_with('=') => w[1..].to_string(),
+            // 4. Literal starting with '+=' or '='
+            let (value_text, is_append) = match &lex.peek()?.token {
+                Token::Literal(w) if w.starts_with("+=") => (w[2..].to_string(), true),
+                Token::Literal(w) if w.starts_with('=') => (w[1..].to_string(), false),
                 _ => return Ok(None),
             };
             let eq_span = lex.peek()?.span;
@@ -331,6 +343,7 @@ impl Parser {
             Ok(Some(Assignment {
                 name,
                 index: Some(subscript),
+                append: is_append,
                 value: AssignmentValue::Scalar(value_word),
                 span: start_span.merge(eq_span),
             }))

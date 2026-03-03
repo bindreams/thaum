@@ -580,7 +580,11 @@ impl<'ast> Visit<'ast> for SourceWriter {
             self.push(idx);
             self.push("]");
         }
-        self.push("=");
+        if assignment.append {
+            self.push("+=");
+        } else {
+            self.push("=");
+        }
         match &assignment.value {
             AssignmentValue::Scalar(w) => self.visit_word(w),
             AssignmentValue::BashArray(elems) => {

@@ -3,6 +3,8 @@
 #[path = "common/mod.rs"]
 mod common;
 
+#[path = "exec/append.rs"]
+mod append;
 #[path = "exec/arrays.rs"]
 mod arrays;
 #[path = "exec/bash.rs"]

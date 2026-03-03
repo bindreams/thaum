@@ -168,6 +168,9 @@ impl<'a> YamlWriter<'a> {
         let mut m = MappingBuilder::new();
         m.raw("source", &self.source(a.span));
         m.scalar("name", &a.name);
+        if a.append {
+            m.raw("op", "+=");
+        }
         match &a.value {
             AssignmentValue::Scalar(word) => {
                 m.value("value", self.build_word_value(word));

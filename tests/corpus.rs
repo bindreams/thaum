@@ -1,9 +1,11 @@
 mod common;
 
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 use libtest_mimic::Failed;
 use serde::Deserialize;
+use thaum::exec::{CapturedIo, ExecError, Executor};
 use yaml_rust2::Yaml;
 
 /// Whether --no-sandbox was passed on the command line.
@@ -341,6 +343,159 @@ fn check_parse_error(spec: &ParseErrorSpec, err: &thaum::ParseError, source: &st
     Ok(())
 }
 
+// Native execution ====================================================================================================
+
+/// Execute a test script natively using the thaum Rust API.
+///
+/// Creates a temp directory (auto-cleaned on drop), sets up environment
+/// variables, runs setup scripts, then executes via `Executor` with `CapturedIo`.
+fn run_exec_native(
+    spec: &TestSpec,
+    input: &str,
+    dialect: thaum::Dialect,
+) -> Result<common::docker::ExecResult, Failed> {
+    let dir = tempfile::tempdir().map_err(|e| format!("failed to create temp dir: {e}"))?;
+    let saved_cwd = std::env::current_dir().ok();
+    std::env::set_current_dir(dir.path()).map_err(|e| format!("chdir: {e}"))?;
+
+    // Set environment variables.
+    let mut saved_env = Vec::new();
+    for (key, value) in &spec.environment {
+        saved_env.push((key.clone(), std::env::var(key).ok()));
+        std::env::set_var(key, value);
+    }
+
+    // Prepend workdir to PATH so setup-created helpers are found.
+    let old_path = std::env::var("PATH").unwrap_or_default();
+    std::env::set_var("PATH", format!("{}:{old_path}", dir.path().display()));
+
+    // Write and execute setup script if provided.
+    if let Some(setup_script) = &spec.setup {
+        let setup_path = dir.path().join(".setup");
+        std::fs::write(&setup_path, setup_script).map_err(|e| format!("write setup: {e}"))?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&setup_path, std::fs::Permissions::from_mode(0o755))
+                .map_err(|e| format!("chmod setup: {e}"))?;
+        }
+        let status = Command::new(&setup_path)
+            .current_dir(dir.path())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .map_err(|e| format!("run setup: {e}"))?;
+        if !status.success() {
+            return Err(format!("setup script failed with {status}").into());
+        }
+    }
+
+    // Parse and execute.
+    let program = thaum::parse_with(input, dialect).map_err(|e| format!("parse: {e}"))?;
+    let options = dialect.options();
+    let mut exec = Executor::with_options(options);
+    let _ = exec
+        .env_mut()
+        .set_var("PATH", &std::env::var("PATH").unwrap_or_default());
+
+    let mut io = CapturedIo::new();
+    let exit_code = match exec.execute(&program, &mut io.context()) {
+        Ok(status) => status,
+        Err(ExecError::ExitRequested(code)) => code,
+        Err(_) => 127,
+    };
+
+    let result = common::docker::ExecResult {
+        stdout: io.stdout_string(),
+        stderr: io.stderr_string(),
+        exit_code,
+    };
+
+    // Restore environment.
+    for (key, old_val) in saved_env {
+        match old_val {
+            Some(v) => std::env::set_var(&key, v),
+            None => std::env::remove_var(&key),
+        }
+    }
+    std::env::set_var("PATH", old_path);
+    if let Some(cwd) = saved_cwd {
+        let _ = std::env::set_current_dir(cwd);
+    }
+
+    Ok(result)
+}
+
+// Docker proxy execution ==============================================================================================
+
+/// Execute a corpus test inside Docker by running the corpus binary with --no-sandbox.
+///
+/// Invokes the compiled corpus binary inside the container with `--format json`
+/// and `--exact` to run a single test. Parses the libtest JSON output to
+/// determine pass/fail.
+fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker::ExecResult, Failed> {
+    let output = Command::new("docker")
+        .args([
+            "exec",
+            container_id,
+            "/usr/local/bin/corpus-test",
+            "--no-sandbox",
+            "--format",
+            "json",
+            "--exact",
+            test_name,
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(|e| format!("docker exec failed: {e}"))?;
+
+    // Parse libtest JSON events from stdout to find the test result.
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    let stderr_str = String::from_utf8_lossy(&output.stderr);
+
+    for line in stdout_str.lines() {
+        // Look for test result event: {"type":"test","name":"...","event":"ok"|"failed",...}
+        if let Ok(event) = serde_json::from_str::<serde_json::Value>(line) {
+            if event.get("type").and_then(|v| v.as_str()) == Some("test")
+                && event.get("name").is_some()
+                && event.get("event").is_some()
+            {
+                let event_type = event["event"].as_str().unwrap_or("");
+                match event_type {
+                    "ok" => {
+                        return Ok(common::docker::ExecResult {
+                            stdout: String::new(),
+                            stderr: String::new(),
+                            exit_code: 0,
+                        });
+                    }
+                    "failed" => {
+                        let message = event
+                            .get("stdout")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("test failed (no details)");
+                        return Err(message.to_string().into());
+                    }
+                    "ignored" => {
+                        return Ok(common::docker::ExecResult {
+                            stdout: String::new(),
+                            stderr: String::new(),
+                            exit_code: 0,
+                        });
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    // No test result event found — the binary likely failed to start.
+    Err(format!("corpus binary produced no test result\nstdout: {stdout_str}\nstderr: {stderr_str}").into())
+}
+
+// Test execution ======================================================================================================
+
 fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
     let spec = &parsed.spec;
     let input = &parsed.shell_input;
@@ -372,24 +527,9 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
                 .map_err(|msg| format!("AST mismatch: {msg}\n\nActual verbose YAML:\n{actual_yaml_str}"))?;
         }
 
-        // 3. Execution assertions (optional)
+        // 3. Execution assertions (optional, --no-sandbox native mode only)
         if spec.status.is_some() || spec.stdout.is_some() || spec.stderr.is_some() {
-            let no_sandbox = NO_SANDBOX.load(std::sync::atomic::Ordering::Relaxed);
-            let bash_flag = matches!(spec.dialect.as_str(), "bash" | "bash44" | "bash50" | "bash51");
-
-            let result = if no_sandbox {
-                common::docker::exec_native(input, bash_flag, spec.setup.as_deref(), &spec.environment)
-            } else {
-                let sandbox: &common::docker::CorpusSandbox = testutil::fixture("corpus_sandbox");
-                common::docker::exec_in_container(
-                    &sandbox.container_id,
-                    input,
-                    bash_flag,
-                    spec.setup.as_deref(),
-                    &spec.environment,
-                )
-            };
-
+            let result = run_exec_native(spec, input, dialect)?;
             if let Some(expected_status) = spec.status {
                 if result.exit_code != expected_status {
                     return Err(format!(
@@ -399,7 +539,6 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
                     .into());
                 }
             }
-
             if let Some(ref stdout_matcher) = spec.stdout {
                 stdout_matcher.check(&result.stdout, "stdout")?;
             }
@@ -504,6 +643,7 @@ fn main() {
     let files = discover_corpus_files(&corpus_dir);
 
     let mut runner = testutil::TestRunner::new();
+    runner.strip_args(&["--no-sandbox"]);
 
     for path in files {
         let rel = path
@@ -540,12 +680,23 @@ fn main() {
         // Disable exec tests when Docker is unavailable (unless --no-sandbox).
         let ignored = disabled || (has_exec && !exec_available);
 
-        runner.add(display_name, &labels, ignored, move || {
-            // Test scope auto-managed by TestRunner::add().
-            if let Err(e) = run_test(&parsed) {
-                panic!("{}", e.message().unwrap_or("test failed"));
-            }
-        });
+        if has_exec && !no_sandbox && !disabled {
+            // Docker mode: delegate the entire test to the corpus binary inside Docker.
+            let display_name_for_docker = display_name.clone();
+            runner.add(display_name, &labels, ignored, move || {
+                let sandbox: &common::docker::CorpusSandbox = testutil::fixture("corpus_sandbox");
+                if let Err(e) = run_exec_docker(&sandbox.container_id, &display_name_for_docker) {
+                    panic!("{}", e.message().unwrap_or("test failed"));
+                }
+            });
+        } else {
+            // Native mode (--no-sandbox) or parse-only tests: run locally.
+            runner.add(display_name, &labels, ignored, move || {
+                if let Err(e) = run_test(&parsed) {
+                    panic!("{}", e.message().unwrap_or("test failed"));
+                }
+            });
+        }
     }
 
     // Process fixtures (corpus_image, corpus_sandbox) are cleaned up

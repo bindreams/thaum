@@ -237,11 +237,22 @@ struct DynTest {
 #[derive(Default)]
 pub struct TestRunner {
     dynamic: Vec<DynTest>,
+    /// Custom args to strip before passing to libtest-mimic/clap.
+    strip: Vec<String>,
 }
 
 impl TestRunner {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Register custom CLI args to strip before passing to libtest-mimic.
+    ///
+    /// Use for test-binary-specific flags (e.g. `--no-sandbox`) that would
+    /// otherwise be rejected by the standard argument parser.
+    pub fn strip_args(&mut self, args: &[&str]) -> &mut Self {
+        self.strip.extend(args.iter().map(|s| s.to_string()));
+        self
     }
 
     /// Add a test that was generated at runtime (e.g. from a data file).
@@ -269,7 +280,8 @@ impl TestRunner {
 
     /// Run all tests and return the conclusion for post-run assertions.
     pub fn run_tests(self) -> libtest_mimic::Conclusion {
-        let (label_selectors, remaining_args) = extract_label_filters();
+        let (label_selectors, mut remaining_args) = extract_label_filters();
+        remaining_args.retain(|a| !self.strip.contains(a));
         let args = Arguments::parse_from(remaining_args);
         let mut trials = Vec::new();
         let mut unavailable: Vec<(String, String)> = Vec::new();

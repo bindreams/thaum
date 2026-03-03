@@ -92,3 +92,33 @@ name = "thaum-bench"
 path = "benches/bench.rs"
 required-features = ["bench"]
 test = false
+
+[[bin]]
+name = "test-echo"
+path = "tests/tools/echo.rs"
+test = false
+
+[[bin]]
+name = "test-true"
+path = "tests/tools/true.rs"
+test = false
+
+[[bin]]
+name = "test-false"
+path = "tests/tools/false.rs"
+test = false
+
+[[bin]]
+name = "test-cat"
+path = "tests/tools/cat.rs"
+test = false
+
+[[bin]]
+name = "test-env"
+path = "tests/tools/env.rs"
+test = false
+
+[[bin]]
+name = "test-touch"
+path = "tests/tools/touch.rs"
+test = false

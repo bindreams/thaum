@@ -253,6 +253,12 @@ fn load_source(cli: &CliArgs) -> (String, String) {
 
 /// CLI entry point: parses clap args and dispatches to the selected subcommand.
 pub fn run() {
+    // If invoked as "sh" (e.g. via symlink), impersonate POSIX sh.
+    if invoked_as_sh() {
+        run_as_sh();
+        return;
+    }
+
     let cli = Cli::parse();
     let args = cli.resolve();
 
@@ -262,6 +268,68 @@ pub fn run() {
         Subcommand::Exec => do_exec(&args),
         Subcommand::ExecAst => do_exec_ast(&args),
     }
+}
+
+/// Check whether the binary was invoked via an argv[0] whose filename is "sh".
+fn invoked_as_sh() -> bool {
+    let Some(argv0) = std::env::args_os().next() else {
+        return false;
+    };
+    let filename = std::path::Path::new(&argv0)
+        .file_stem()
+        .unwrap_or_default()
+        .to_string_lossy();
+    filename == "sh"
+}
+
+/// Minimal POSIX sh impersonation. Supports:
+/// - `sh -c 'command'`  — execute string
+/// - `sh script [args]` — execute file with positional params
+/// - `sh` (stdin pipe)  — read and execute stdin
+fn run_as_sh() {
+    let raw_args: Vec<String> = std::env::args().skip(1).collect();
+
+    let args = if raw_args.first().map(|s| s.as_str()) == Some("-c") {
+        if raw_args.len() < 2 {
+            eprintln!("sh: -c: option requires an argument");
+            process::exit(2);
+        }
+        CliArgs {
+            subcommand: Subcommand::Exec,
+            dialect: thaum::Dialect::Posix,
+            verbose: false,
+            quiet: false,
+            command_str: Some(raw_args[1].clone()),
+            file_arg: None,
+            script_args: raw_args[2..].to_vec(),
+            payload_format: PayloadFormat::Json,
+        }
+    } else if let Some(file) = raw_args.first() {
+        CliArgs {
+            subcommand: Subcommand::Exec,
+            dialect: thaum::Dialect::Posix,
+            verbose: false,
+            quiet: false,
+            command_str: None,
+            file_arg: Some(file.clone()),
+            script_args: raw_args[1..].to_vec(),
+            payload_format: PayloadFormat::Json,
+        }
+    } else {
+        // No args — read from stdin.
+        CliArgs {
+            subcommand: Subcommand::Exec,
+            dialect: thaum::Dialect::Posix,
+            verbose: false,
+            quiet: false,
+            command_str: None,
+            file_arg: Some("-".to_string()),
+            script_args: Vec::new(),
+            payload_format: PayloadFormat::Json,
+        }
+    };
+
+    do_exec(&args);
 }
 
 fn do_lex(cli: &CliArgs) {

@@ -10,6 +10,7 @@ pub mod arithmetic;
 pub(crate) mod bash_test;
 /// Shell builtins that only need `Environment` (not the full `Executor`).
 pub mod builtins;
+mod child_io;
 pub(crate) mod command_ex;
 mod compound;
 /// Shell state: variables, functions, aliases, positional parameters, CWD, `$?`.
@@ -237,7 +238,6 @@ impl Executor {
     /// correctly on all platforms.
     pub(crate) fn execute_subshell(&mut self, body: &[Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         use command_ex::{CommandEx, Fd};
-        use std::io::Read;
 
         let inherited_fds: Vec<i32> = self.fd_table.keys().filter(|&&fd| fd >= 3).copied().collect();
 
@@ -276,16 +276,9 @@ impl Executor {
             stdin_pipe.write_all(json.as_bytes()).map_err(ExecError::Io)?;
         }
 
-        // Read stdout and stderr from the child.
-        let mut stdout_buf = Vec::new();
-        let mut stderr_buf = Vec::new();
-        if let Some(mut stdout_pipe) = child.take_pipe(1) {
-            stdout_pipe.read_to_end(&mut stdout_buf).map_err(ExecError::Io)?;
-        }
-        if let Some(mut stderr_pipe) = child.take_pipe(2) {
-            stderr_pipe.read_to_end(&mut stderr_buf).map_err(ExecError::Io)?;
-        }
-
+        // Read stdout and stderr concurrently to avoid deadlock when both
+        // pipes are full (see child_io::drain_child_pipes).
+        let (stdout_buf, stderr_buf) = child_io::drain_child_pipes(&mut child)?;
         let status = child.wait().map_err(ExecError::Io)?;
 
         io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
@@ -861,7 +854,7 @@ impl Executor {
         }
 
         // External command — pass ActiveRedirects for Stdio setup;
-        // `io` is used only for error messages (not redirected).
+        // `io` receives piped stdout/stderr from the child process.
         self.execute_external(cmd_name, cmd_args, &cmd.assignments, &mut active, io)
     }
 

@@ -35,8 +35,9 @@ fn exit_nonzero() {
 
 #[testutil::test]
 fn variable_assignment_and_echo() {
-    // Just test that assignment doesn't error — we can't capture echo output yet.
-    assert_eq!(exec_status("X=hello"), 0);
+    let (out, status) = exec_ok("X=hello; echo $X");
+    assert_eq!(status, 0);
+    assert_eq!(out, "hello\n");
 }
 
 #[testutil::test]
@@ -251,20 +252,7 @@ fn unset_builtin() {
     assert_eq!(executor.env().get_var("X"), None);
 }
 
-// External command (basic smoke test) ---------------------------------------------------------------------------------
-
-#[cfg(unix)]
-#[testutil::test]
-fn external_command_true() {
-    // /usr/bin/true should exist on any Unix system
-    assert_eq!(exec_status("/usr/bin/true"), 0);
-}
-
-#[cfg(unix)]
-#[testutil::test]
-fn external_command_false() {
-    assert_eq!(exec_status("/usr/bin/false"), 1);
-}
+// External command (basic smoke test) — moved to exec/external.rs -------------------------------------------------------
 
 #[testutil::test]
 fn external_command_not_found() {
@@ -344,12 +332,10 @@ fn command_substitution_builtin() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn command_substitution_external() {
-    let program = thaum::parse("X=$(/bin/echo world)").unwrap();
-    let mut executor = Executor::new();
-    let _ = executor.env_mut().set_var("PATH", "/usr/bin:/bin");
+fn command_substitution_external(#[fixture(test_tools)] tools: &Path) {
+    let program = thaum::parse("X=$(echo world)").unwrap();
+    let mut executor = crate::test_executor_with_tools(tools);
     let mut captured = CapturedIo::new();
     executor.execute(&program, &mut captured.context()).unwrap();
     assert_eq!(executor.env().get_var("X"), Some("world"));
@@ -389,8 +375,6 @@ fn command_substitution_exit_status() {
 
 #[testutil::test]
 fn heredoc_basic() {
-    // Use `read` (builtin) to verify heredoc stdin redirection.
-    // External commands write to the real process stdout, not CapturedIo.
     let (out, status) = exec_ok("read VAR <<EOF\nhello\nEOF\necho $VAR");
     assert_eq!(status, 0);
     assert_eq!(out, "hello\n");
@@ -475,18 +459,7 @@ fn redirect_creates_empty_file(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "");
 }
 
-#[cfg(unix)]
-#[testutil::test]
-fn external_command_inherits_fd3(#[fixture(temp_dir)] dir: &Path) {
-    // sh -c 'echo hello >&3' writes to FD 3, which is redirected to a file.
-    // This tests that FDs 3+ are passed to external child processes.
-    let file = dir.join("fd3.txt");
-
-    let script = format!("sh -c 'echo hello >&3' 3>{}", shell_path(&file));
-    let (_, status) = exec_ok(&script);
-    assert_eq!(status, 0);
-    assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
-}
+// external_command_inherits_fd3 — moved to exec/external.rs
 
 // Unsupported features produce explicit errors ------------------------------------------------------------------------
 

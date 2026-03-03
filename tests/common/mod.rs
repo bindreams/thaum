@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 pub mod docker;
+pub mod test_tools;
 
 use thaum::ast::*;
 use thaum::{parse, parse_with, Dialect};

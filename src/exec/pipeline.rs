@@ -176,10 +176,27 @@ fn spawn_pipeline_stage(
 
             if pipe_stdout {
                 child_cmd.fds.insert(1, Fd::Pipe);
+            } else {
+                // Last pipeline stage: pipe stdout to relay through IoContext.
+                child_cmd.fds.entry(1).or_insert(Fd::Pipe);
             }
+            // Always pipe stderr (unless redirected) to relay through IoContext.
+            child_cmd.fds.entry(2).or_insert(Fd::Pipe);
 
             match child_cmd.spawn() {
-                Ok(child) => Ok(Some(child)),
+                Ok(mut child) => {
+                    if !pipe_stdout {
+                        // Last stage: drain pipes and relay output through io.
+                        let (stdout_buf, stderr_buf) = crate::exec::child_io::drain_child_pipes(&mut child)?;
+                        if !stdout_buf.is_empty() {
+                            io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                        }
+                        if !stderr_buf.is_empty() {
+                            io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                        }
+                    }
+                    Ok(Some(child))
+                }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                     let _ = writeln!(io.stderr, "{cmd_name}: command not found");
                     Ok(None)

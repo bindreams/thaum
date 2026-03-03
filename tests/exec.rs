@@ -11,6 +11,8 @@ mod bash;
 mod basic;
 #[path = "exec/expansion.rs"]
 mod expansion;
+#[path = "exec/external.rs"]
+mod external;
 #[path = "exec/printf.rs"]
 mod printf;
 #[path = "exec/variables.rs"]
@@ -157,6 +159,51 @@ pub fn bash_exec_ok(script: &str) -> (String, i32) {
     match executor.execute(&program, &mut captured.context()) {
         Ok(status) => (captured.stdout_string(), status),
         Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), code),
+        Err(e) => panic!("exec failed for {script:?}: {e}"),
+    }
+}
+
+/// Create an executor whose PATH points only to the test_tools directory.
+pub fn test_executor_with_tools(tools: &std::path::Path) -> Executor {
+    let mut env = Environment::new();
+    let _ = env.set_var("PATH", &tools.to_string_lossy());
+    let mut executor = Executor::with_env(env);
+    executor.set_exe_path(thaum_exe());
+    executor
+}
+
+/// Create a Bash-dialect executor whose PATH points only to the test_tools directory.
+pub fn test_bash_executor_with_tools(tools: &std::path::Path) -> Executor {
+    let mut env = Environment::new();
+    let _ = env.set_var("PATH", &tools.to_string_lossy());
+    let options = Dialect::Bash.options();
+    let mut executor = Executor::with_env_and_options(env, options);
+    executor.set_exe_path(thaum_exe());
+    executor
+}
+
+/// Parse and execute, capturing stdout+stderr, with PATH set to the tools directory.
+/// Returns (stdout, stderr, exit_status).
+pub fn exec_with_tools(script: &str, tools: &std::path::Path) -> (String, String, i32) {
+    let program = thaum::parse(script).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
+    let mut executor = test_executor_with_tools(tools);
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => (captured.stdout_string(), captured.stderr_string(), status),
+        Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), captured.stderr_string(), code),
+        Err(e) => panic!("exec failed for {script:?}: {e}"),
+    }
+}
+
+/// Parse and execute Bash-dialect, capturing stdout, with PATH set to the tools directory.
+pub fn bash_exec_with_tools(script: &str, tools: &std::path::Path) -> (String, String, i32) {
+    let program =
+        thaum::parse_with(script, Dialect::Bash).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
+    let mut executor = test_bash_executor_with_tools(tools);
+    let mut captured = CapturedIo::new();
+    match executor.execute(&program, &mut captured.context()) {
+        Ok(status) => (captured.stdout_string(), captured.stderr_string(), status),
+        Err(ExecError::ExitRequested(code)) => (captured.stdout_string(), captured.stderr_string(), code),
         Err(e) => panic!("exec failed for {script:?}: {e}"),
     }
 }

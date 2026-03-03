@@ -303,12 +303,10 @@ fn source_finds_script_via_path_lookup(#[fixture(temp_dir)] dir: &Path) {
 
 // exec builtin --------------------------------------------------------------------------------------------------------
 
-#[cfg(unix)]
 #[testutil::test]
-fn exec_command() {
-    // exec replaces the shell -- wrap in a subshell so the test runner
-    // is not replaced.
-    let (out, _) = exec_ok("(exec echo hello)");
+fn exec_command(#[fixture(test_tools)] tools: &Path) {
+    // exec replaces the shell — needs a real binary on PATH (not a builtin).
+    let (out, _, _) = exec_with_tools("(exec echo hello)", tools);
     assert_eq!(out, "hello\n");
 }
 
@@ -399,24 +397,22 @@ fn exec_close_fd(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn exec_with_redirect_to_file() {
-    // exec 2>/dev/null /bin/echo hello — redirects applied before exec.
+fn exec_with_redirect_to_file(#[fixture(test_tools)] tools: &Path) {
+    // exec 2>/dev/null echo hello — redirects applied before exec.
     // The subshell's stderr is discarded; stdout should still work.
-    let (out, _) = exec_ok("(exec 2>/dev/null /bin/echo hello)");
+    let (out, _, _) = exec_with_tools("(exec 2>/dev/null echo hello)", tools);
     assert_eq!(out, "hello\n");
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn exec_inherits_per_command_fds(#[fixture(temp_dir)] dir: &Path) {
+fn exec_inherits_per_command_fds(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
     // exec 3>file cmd — the per-command redirect should be applied before exec.
     let file = dir.join("fd3.txt");
     let f = shell_path(&file);
 
     let script = format!("(exec 3>{f} sh -c 'echo from_exec >&3')");
-    let (_, status) = exec_ok(&script);
+    let (_, _, status) = exec_with_tools(&script, tools);
     assert_eq!(status, 0);
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "from_exec\n");
 }
@@ -453,12 +449,11 @@ fn exec_closed_fd_not_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "before\n");
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn exec_dash_a_sets_argv0() {
+fn exec_dash_a_sets_argv0(#[fixture(test_tools)] tools: &Path) {
     // exec -a custom_name uses a custom argv[0].
     // We verify by having the child print $0 (which reflects argv[0]).
-    let (out, _) = exec_ok("(exec -a custom_name sh -c 'echo $0'); echo done");
+    let (out, _, _) = exec_with_tools("(exec -a custom_name sh -c 'echo $0'); echo done", tools);
     let lines: Vec<&str> = out.trim().lines().collect();
     assert_eq!(lines[0], "custom_name", "argv[0] should be 'custom_name'; got: {out}");
     assert_eq!(lines[1], "done", "parent should continue after subshell");

@@ -100,21 +100,17 @@ fn alias_snapshot_uses_previous_line() {
     assert_eq!(out, "hello\n");
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn alias_snapshot_touch_file(#[fixture(temp_dir)] dir: &Path) {
+fn alias_snapshot_creates_file(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
     // Line 2: alias a="touch"
     // Line 3: alias a="echo"; a hello; unalias a
     //   → snapshot for line 3 has a=touch (from line 2)
     //   → "a hello" expands to "touch hello" (creates file)
-    // Line 4: a hello  → not found
     let file = dir.join("hello");
+    let d = dir.to_string_lossy().replace('\\', "/");
 
-    let script = format!(
-        "shopt -s expand_aliases\nalias a=touch\ncd {}; alias a=echo; a hello; unalias a",
-        dir.to_string_lossy()
-    );
-    let (_, _) = bash_exec_ok(&script);
+    let script = format!("shopt -s expand_aliases\nalias a=touch\ncd {d}; alias a=echo; a hello; unalias a");
+    let (_, _, _) = bash_exec_with_tools(&script, tools);
     assert!(file.exists(), "touch hello should have created the file");
 }
 
@@ -132,8 +128,6 @@ fn alias_funkiness_level2_multiple_words() {
 #[testutil::test]
 fn alias_funkiness_level3a_redirect_in_value(#[fixture(temp_dir)] dir: &Path) {
     // Level 3a: alias value contains a redirect — verify the file is created.
-    // We check the file on disk instead of captured stdout because pipeline/redirect
-    // I/O goes through real file descriptors, not CapturedIo.
     let file = dir.join("out.txt");
 
     let f = file.to_string_lossy().replace('\\', "/");
@@ -150,16 +144,15 @@ fn alias_funkiness_level3b_command_sub_in_value() {
     assert_eq!(out, "hi\n");
 }
 
-#[cfg(unix)]
 #[testutil::test]
-fn alias_funkiness_level4a_pipe_in_value() {
+fn alias_funkiness_level4a_pipe_in_value(#[fixture(test_tools)] tools: &Path) {
     // Level 4: alias value contains a pipe (creates a pipeline).
-    // The pipeline result feeds into a subsequent command via ; to verify it ran.
-    let (out, _) = bash_exec_ok("shopt -s expand_aliases\nalias both='echo hello | cat; echo'\nboth done");
     // After expansion: `echo hello | cat; echo done`
-    // Pipeline output goes through real FDs (not CapturedIo) but the second
-    // command `echo done` is a simple builtin that IS captured.
-    assert!(out.contains("done"), "commands after pipe should run; got: {out}");
+    let (out, _, _) = bash_exec_with_tools(
+        "shopt -s expand_aliases\nalias both='echo hello | cat; echo'\nboth done",
+        tools,
+    );
+    assert_eq!(out, "hello\ndone\n");
 }
 
 #[testutil::test]

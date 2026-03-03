@@ -1,6 +1,9 @@
 //! External (non-builtin) command execution via fork/exec. Sets up redirections,
 //! exported environment variables, and extra FD mappings before spawning.
+//! Stdout and stderr are piped and relayed through `IoContext` so that output
+//! is captured correctly in both live and test (CapturedIo) contexts.
 
+use crate::exec::child_io;
 use crate::exec::command_ex::{CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
@@ -10,8 +13,10 @@ use crate::exec::Executor;
 impl Executor {
     /// Execute an external command via fork/exec.
     ///
-    /// Redirections are pre-resolved in `active`. All fds (including 0-2) are
-    /// set via the `CommandEx.fds` table.
+    /// Redirections are pre-resolved in `active`. Stdout and stderr are piped
+    /// when not explicitly redirected, and the captured output is relayed
+    /// through `io` so that `CapturedIo` (tests) and `ProcessIo` (live) both
+    /// receive the child's output.
     pub(super) fn execute_external(
         &mut self,
         name: &str,
@@ -70,9 +75,22 @@ impl Executor {
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
         }
 
+        // If stdout/stderr are not explicitly redirected, pipe them so we can
+        // relay output through IoContext (capturing it for tests, writing it
+        // to the real streams for live execution).
+        child_cmd.fds.entry(1).or_insert(Fd::Pipe);
+        child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+
         match child_cmd.spawn() {
             Ok(mut child) => {
+                let (stdout_buf, stderr_buf) = child_io::drain_child_pipes(&mut child)?;
                 let status = child.wait().map_err(ExecError::Io)?;
+                if !stdout_buf.is_empty() {
+                    io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                }
+                if !stderr_buf.is_empty() {
+                    io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                }
                 Ok(status)
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {

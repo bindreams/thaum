@@ -3,13 +3,11 @@
 use std::ops::Deref;
 use std::path::Path;
 
-use crate::TestName;
-
-/// A per-test temporary directory. Created fresh for each test, removed on drop.
+/// A temporary directory. Created fresh per request (variable scope), removed
+/// on drop. The directory name includes the test function name for debugging.
 ///
-/// The directory name includes the test function name for easier debugging.
 /// Implements `Deref<Target = Path>` so it can be used as `&Path` directly
-/// via `#[fixture(TempDir)] dir: &Path`.
+/// via `#[fixture(temp_dir)] dir: &Path`.
 pub struct TempDir {
     inner: tempfile::TempDir,
 }
@@ -21,8 +19,8 @@ impl Deref for TempDir {
     }
 }
 
-#[testutil::fixture()]
-fn temp_dir(#[fixture(TestName)] name: &str) -> Result<TempDir, String> {
+#[testutil::fixture(deref)]
+fn temp_dir(#[fixture(test_name)] name: &str) -> Result<TempDir, String> {
     tempfile::Builder::new()
         .prefix(&format!("{name}-"))
         .tempdir()

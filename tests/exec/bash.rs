@@ -1,6 +1,5 @@
 use std::path::Path;
 
-use testutil::TempDir;
 use thaum::Dialect;
 
 use crate::*;
@@ -103,7 +102,7 @@ fn alias_snapshot_uses_previous_line() {
 
 #[cfg(unix)]
 #[testutil::test]
-fn alias_snapshot_touch_file(#[fixture(TempDir)] dir: &Path) {
+fn alias_snapshot_touch_file(#[fixture(temp_dir)] dir: &Path) {
     // Line 2: alias a="touch"
     // Line 3: alias a="echo"; a hello; unalias a
     //   → snapshot for line 3 has a=touch (from line 2)
@@ -131,7 +130,7 @@ fn alias_funkiness_level2_multiple_words() {
 }
 
 #[testutil::test]
-fn alias_funkiness_level3a_redirect_in_value(#[fixture(TempDir)] dir: &Path) {
+fn alias_funkiness_level3a_redirect_in_value(#[fixture(temp_dir)] dir: &Path) {
     // Level 3a: alias value contains a redirect — verify the file is created.
     // We check the file on disk instead of captured stdout because pipeline/redirect
     // I/O goes through real file descriptors, not CapturedIo.
@@ -217,7 +216,7 @@ fn subshell_nested() {
 }
 
 #[testutil::test]
-fn subshell_with_redirect(#[fixture(TempDir)] dir: &Path) {
+fn subshell_with_redirect(#[fixture(temp_dir)] dir: &Path) {
     // Redirect inside the subshell (not on the compound command).
     let file = dir.join("out.txt");
 

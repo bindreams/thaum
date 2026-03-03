@@ -1,12 +1,11 @@
 //! Tests for the fixture system.
 
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use std::path::Path;
+// Fixtures ====================================================================
 
-use testutil::TempDir;
-
-// A simple fixture that tracks setup/drop calls.
+// Variable-scoped counter (default scope). Tracks setup/drop calls.
 
 static COUNTER_SETUP_COUNT: AtomicU32 = AtomicU32::new(0);
 static COUNTER_DROP_CALLED: AtomicBool = AtomicBool::new(false);
@@ -21,8 +20,14 @@ impl Drop for Counter {
     }
 }
 
-#[testutil::fixture()]
-fn counter() -> Result<Counter, String> {
+#[testutil::fixture]
+fn c1() -> Result<Counter, String> {
+    let n = COUNTER_SETUP_COUNT.fetch_add(1, Ordering::Relaxed);
+    Ok(Counter { value: n + 1 })
+}
+
+#[testutil::fixture]
+fn c2() -> Result<Counter, String> {
     let n = COUNTER_SETUP_COUNT.fetch_add(1, Ordering::Relaxed);
     Ok(Counter { value: n + 1 })
 }
@@ -35,18 +40,24 @@ fn unavailable_dep() -> Result<(), String> {
 
 pub struct UnavailableFixture;
 
-#[testutil::fixture(unavailable_dep)]
+#[testutil::fixture(requires = [unavailable_dep])]
 fn unavailable_fixture() -> Result<UnavailableFixture, String> {
     panic!("setup should never be called for unavailable fixture");
 }
 
-// Tests -----------------------------------------------------------------------
+// Variable scope tests --------------------------------------------------------
 
 #[testutil::test]
-fn fixture_per_test_is_fresh(#[fixture] c1: &Counter, #[fixture] c2: &Counter) {
-    // Per-test fixtures: each #[fixture] param gets a fresh instance.
-    assert_ne!(c1.value, c2.value, "per-test fixture should create fresh instances");
+fn variable_fixture_fresh_each_request(#[fixture] c1: &Counter, #[fixture] c2: &Counter) {
+    // c1 and c2 are different fixtures (different names), each variable-scoped,
+    // so they get different instances.
+    assert_ne!(
+        c1.value, c2.value,
+        "different fixtures should produce different instances"
+    );
 }
+
+// Requirement propagation tests -----------------------------------------------
 
 /// Fixture requirements propagate: a test using `UnavailableFixture` should be
 /// skipped (not panicked) even without listing `unavailable_dep` in `#[requires]`.
@@ -58,7 +69,7 @@ fn fixture_requirement_propagation(#[fixture] _f: &UnavailableFixture) {
 // TestName fixture ------------------------------------------------------------
 
 #[testutil::test]
-fn test_name_returns_function_name(#[fixture] name: &testutil::TestName) {
+fn test_name_returns_function_name(#[fixture(test_name)] name: &testutil::TestName) {
     assert_eq!(
         &**name, "test_name_returns_function_name",
         "TestName should return the test function name"
@@ -66,7 +77,7 @@ fn test_name_returns_function_name(#[fixture] name: &testutil::TestName) {
 }
 
 #[testutil::test]
-fn test_name_deref_to_str(#[fixture(testutil::TestName)] name: &str) {
+fn test_name_deref_to_str(#[fixture(test_name)] name: &str) {
     assert_eq!(
         name, "test_name_deref_to_str",
         "TestName with deref coercion should work as &str"
@@ -76,13 +87,13 @@ fn test_name_deref_to_str(#[fixture(testutil::TestName)] name: &str) {
 // TempDir fixture -------------------------------------------------------------
 
 #[testutil::test]
-fn temp_dir_exists(#[fixture(TempDir)] dir: &Path) {
+fn temp_dir_exists(#[fixture(temp_dir)] dir: &Path) {
     assert!(dir.exists(), "temp dir should exist");
     assert!(dir.is_dir(), "temp dir should be a directory");
 }
 
 #[testutil::test]
-fn temp_dir_contains_test_name(#[fixture(TempDir)] dir: &Path) {
+fn temp_dir_contains_test_name(#[fixture(temp_dir)] dir: &Path) {
     let dir_name = dir.file_name().unwrap().to_string_lossy();
     assert!(
         dir_name.starts_with("temp_dir_contains_test_name-"),
@@ -91,8 +102,13 @@ fn temp_dir_contains_test_name(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn temp_dir_is_unique(#[fixture(TempDir)] d1: &Path, #[fixture(TempDir)] d2: &Path) {
-    assert_ne!(d1, d2, "each per-test fixture injection should be a fresh instance");
+fn temp_dir_is_unique(#[fixture(temp_dir)] d1: &Path, #[fixture(temp_dir)] d2: &Path) {
+    // TempDir is variable-scoped, so two requests with the same name still
+    // produce fresh instances (each #[fixture] param is a separate request).
+    assert_ne!(
+        d1, d2,
+        "variable-scoped fixture should create fresh instances per request"
+    );
 }
 
 // Post-run assertion ----------------------------------------------------------

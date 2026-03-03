@@ -1,5 +1,4 @@
 use std::path::Path;
-use testutil::TempDir;
 use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum::Dialect;
 
@@ -258,7 +257,7 @@ fn shell_path(p: &std::path::Path) -> String {
 }
 
 #[testutil::test]
-fn source_basic(#[fixture(TempDir)] dir: &Path) {
+fn source_basic(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("test.sh");
     std::fs::write(&file, "x=sourced_value\n").unwrap();
 
@@ -268,7 +267,7 @@ fn source_basic(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn source_dot_synonym(#[fixture(TempDir)] dir: &Path) {
+fn source_dot_synonym(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("test.sh");
     std::fs::write(&file, "y=dotted\n").unwrap();
 
@@ -278,7 +277,7 @@ fn source_dot_synonym(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn source_with_args(#[fixture(TempDir)] dir: &Path) {
+fn source_with_args(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("test.sh");
     std::fs::write(&file, "echo $1 $2\n").unwrap();
 
@@ -288,7 +287,7 @@ fn source_with_args(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn source_finds_script_via_path_lookup(#[fixture(TempDir)] dir: &Path) {
+fn source_finds_script_via_path_lookup(#[fixture(temp_dir)] dir: &Path) {
     // Put a script in a temp directory, add that directory to PATH,
     // and source by bare name (no slashes) to exercise find_in_path().
     let script_path = dir.join("my_sourceable.sh");
@@ -332,7 +331,7 @@ fn exec_rejects_unknown_flags() {
 // exec redirect-only mode -----------------------------------------------------------------------------------------
 
 #[testutil::test]
-fn exec_redirect_fd3_persists(#[fixture(TempDir)] dir: &Path) {
+fn exec_redirect_fd3_persists(#[fixture(temp_dir)] dir: &Path) {
     // exec 3>file opens FD 3 for the rest of the shell session.
     let file = dir.join("fd3.txt");
     let f = shell_path(&file);
@@ -348,7 +347,7 @@ fn exec_redirect_fd3_persists(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_redirect_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
+fn exec_redirect_stdout_to_file(#[fixture(temp_dir)] dir: &Path) {
     // exec 1>file redirects stdout to a file for all subsequent commands.
     let file = dir.join("stdout.txt");
     let f = shell_path(&file);
@@ -361,7 +360,7 @@ fn exec_redirect_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_redirect_affects_subshell(#[fixture(TempDir)] dir: &Path) {
+fn exec_redirect_affects_subshell(#[fixture(temp_dir)] dir: &Path) {
     // exec 1>file must redirect stdout for ALL subsequent commands,
     // including compound commands and subshells — not just simple commands.
     let file = dir.join("stdout.txt");
@@ -375,7 +374,7 @@ fn exec_redirect_affects_subshell(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_redirect_affects_compound(#[fixture(TempDir)] dir: &Path) {
+fn exec_redirect_affects_compound(#[fixture(temp_dir)] dir: &Path) {
     // exec 1>file should also apply to brace groups and if/while bodies.
     let file = dir.join("stdout.txt");
     let f = shell_path(&file);
@@ -388,7 +387,7 @@ fn exec_redirect_affects_compound(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_close_fd(#[fixture(TempDir)] dir: &Path) {
+fn exec_close_fd(#[fixture(temp_dir)] dir: &Path) {
     // exec 3>file; echo hello >&3; exec 3>&- closes FD 3.
     // Verify the file only contains writes from before the close.
     let file = dir.join("fd3.txt");
@@ -411,7 +410,7 @@ fn exec_with_redirect_to_file() {
 
 #[cfg(unix)]
 #[testutil::test]
-fn exec_inherits_per_command_fds(#[fixture(TempDir)] dir: &Path) {
+fn exec_inherits_per_command_fds(#[fixture(temp_dir)] dir: &Path) {
     // exec 3>file cmd — the per-command redirect should be applied before exec.
     let file = dir.join("fd3.txt");
     let f = shell_path(&file);
@@ -423,7 +422,7 @@ fn exec_inherits_per_command_fds(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_fd3_inherited_by_subshell(#[fixture(TempDir)] dir: &Path) {
+fn exec_fd3_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path) {
     // exec 3>file persists FD 3, and a subshell should inherit it.
     let file = dir.join("fd3.txt");
     let f = shell_path(&file);
@@ -435,7 +434,7 @@ fn exec_fd3_inherited_by_subshell(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn exec_closed_fd_not_inherited_by_subshell(#[fixture(TempDir)] dir: &Path) {
+fn exec_closed_fd_not_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path) {
     // After exec 3>&-, a subsequent subshell must NOT see FD 3.
     // This validates that fd_table is explicitly constructed per-spawn
     // (no CLOEXEC race conditions).

@@ -1,7 +1,5 @@
 use std::path::Path;
 
-use testutil::TempDir;
-
 use crate::*;
 
 // $- (option flags) ===================================================================================================
@@ -653,7 +651,7 @@ fn bash_source_empty_at_top_level() {
 }
 
 #[testutil::test]
-fn bash_source_in_sourced_file(#[fixture(TempDir)] dir: &Path) {
+fn bash_source_in_sourced_file(#[fixture(temp_dir)] dir: &Path) {
     // source a file, and inside it BASH_SOURCE[0] should be the filename.
     let file = dir.join("lib.sh");
     std::fs::write(&file, "echo ${BASH_SOURCE[0]}\n").unwrap();
@@ -666,7 +664,7 @@ fn bash_source_in_sourced_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn bash_lineno_in_sourced_file_calling_function(#[fixture(TempDir)] dir: &Path) {
+fn bash_lineno_in_sourced_file_calling_function(#[fixture(temp_dir)] dir: &Path) {
     // Source a file that defines and calls a function.
     // BASH_LINENO inside the function should reflect the sourced file's lines.
     let lib = dir.join("lib.sh");
@@ -679,7 +677,7 @@ fn bash_lineno_in_sourced_file_calling_function(#[fixture(TempDir)] dir: &Path) 
 }
 
 #[testutil::test]
-fn bash_lineno_source_from_function(#[fixture(TempDir)] dir: &Path) {
+fn bash_lineno_source_from_function(#[fixture(temp_dir)] dir: &Path) {
     // A function on line 1 sources a file. Inside the sourced file, BASH_LINENO
     // should reflect the sourced file's own line numbers, not the function's
     // definition offset.
@@ -701,7 +699,7 @@ fn bash_lineno_source_from_function(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn bash_source_tracks_definition_file(#[fixture(TempDir)] dir: &Path) {
+fn bash_source_tracks_definition_file(#[fixture(temp_dir)] dir: &Path) {
     // A function defined in lib.sh should show lib.sh in BASH_SOURCE,
     // even when called from the main script (not from lib.sh).
     let lib = dir.join("lib.sh");
@@ -719,7 +717,7 @@ fn bash_source_tracks_definition_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn bash_source_nested_source(#[fixture(TempDir)] dir: &Path) {
+fn bash_source_nested_source(#[fixture(temp_dir)] dir: &Path) {
     // source a.sh which sources b.sh. Inside b.sh, BASH_SOURCE should stack.
     let b = dir.join("b.sh");
     let a = dir.join("a.sh");

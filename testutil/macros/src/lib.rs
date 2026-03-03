@@ -88,24 +88,141 @@ impl Parse for TestArgs {
     }
 }
 
+// #[testutil::fixture] argument parsing =======================================
+
+/// Parsed arguments for `#[testutil::fixture(...)]`.
+#[derive(Default)]
+struct FixtureArgs {
+    requires: Vec<Path>,
+    scope: Option<Ident>,
+    name: Option<String>,
+    deref: bool,
+}
+
+impl Parse for FixtureArgs {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut args = FixtureArgs::default();
+
+        if input.is_empty() {
+            return Ok(args);
+        }
+
+        loop {
+            let key: Ident = input.parse()?;
+            match key.to_string().as_str() {
+                "requires" => {
+                    let _eq: Token![=] = input.parse()?;
+                    let content;
+                    bracketed!(content in input);
+                    args.requires = Punctuated::<Path, Token![,]>::parse_terminated(&content)?
+                        .into_iter()
+                        .collect();
+                }
+                "scope" => {
+                    let _eq: Token![=] = input.parse()?;
+                    let scope: Ident = input.parse()?;
+                    let s = scope.to_string();
+                    if s != "variable" && s != "test" && s != "process" {
+                        return Err(syn::Error::new(
+                            scope.span(),
+                            format!("unknown scope `{s}`; expected variable, test, or process"),
+                        ));
+                    }
+                    args.scope = Some(scope);
+                }
+                "name" => {
+                    let _eq: Token![=] = input.parse()?;
+                    let lit: LitStr = input.parse()?;
+                    args.name = Some(lit.value());
+                }
+                "deref" => {
+                    args.deref = true;
+                }
+                other => {
+                    return Err(syn::Error::new(
+                        key.span(),
+                        format!("unknown argument `{other}`; expected requires, scope, name, or deref"),
+                    ));
+                }
+            }
+
+            if input.is_empty() {
+                break;
+            }
+            let _comma: Token![,] = input.parse()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+
+        Ok(args)
+    }
+}
+
+// #[fixture] parameter parsing ================================================
+
+/// Parsed info for a `#[fixture]` / `#[fixture(name)]` parameter.
+struct FixtureParam {
+    /// The parameter's binding pattern (e.g. `dir`).
+    binding: syn::Pat,
+    /// The fixture name to look up (param name or explicit).
+    fixture_name: String,
+    /// The target type for the cast (param type stripped of `&`).
+    target_ty: Type,
+    /// The full parameter type (e.g. `&Path`).
+    param_ty: Box<Type>,
+}
+
+/// Parse a `#[fixture]` or `#[fixture(name)]` attribute on a function parameter.
+fn parse_fixture_param(attr: &syn::Attribute, pat_type: &syn::PatType) -> FixtureParam {
+    let binding = (*pat_type.pat).clone();
+    let param_ty = pat_type.ty.clone();
+    let target_ty = strip_reference(&param_ty);
+
+    // Fixture name: from #[fixture(name)] or from the parameter name.
+    let fixture_name = parse_fixture_name_arg(attr).unwrap_or_else(|| {
+        // Use the parameter's binding pattern as the name.
+        binding_to_name(&binding)
+    });
+
+    FixtureParam {
+        binding,
+        fixture_name,
+        target_ty,
+        param_ty,
+    }
+}
+
+/// Extract the name argument from `#[fixture(name)]`. Returns `None` for bare `#[fixture]`.
+fn parse_fixture_name_arg(attr: &syn::Attribute) -> Option<String> {
+    match &attr.meta {
+        syn::Meta::List(list) => {
+            let ident: Ident = syn::parse2(list.tokens.clone()).ok()?;
+            Some(ident.to_string())
+        }
+        _ => None,
+    }
+}
+
+/// Extract a simple identifier name from a binding pattern.
+fn binding_to_name(pat: &syn::Pat) -> String {
+    match pat {
+        syn::Pat::Ident(ident) => ident.ident.to_string(),
+        _ => panic!("#[fixture] parameter must be a simple identifier binding"),
+    }
+}
+
 // #[testutil::test] ===========================================================
 
 /// Register a test function with the testutil harness.
 ///
-/// Replaces both `#[test]` and `#[requires(...)]`. Supports optional arguments:
-///
-/// - `requires = [path1, path2]` — runtime preconditions (`fn() -> Result<(), String>`)
-/// - `name = "display name"` — custom name shown in test output
-/// - `labels = [ident1, ident2]` — prepended as `[ident1][ident2]` for nextest filtering
-/// - `ignore` or `ignore = "reason"` — statically ignore the test
-///
-/// Parameters annotated with `#[fixture]` are automatically injected. An optional
-/// type argument specifies the fixture type when it differs from the parameter type
-/// (e.g. `#[fixture(TestName)] name: &str` uses deref coercion).
+/// Parameters annotated with `#[fixture]` or `#[fixture(name)]` are injected
+/// from the name-based fixture registry. The fixture name is the parameter name
+/// or the explicit name in `#[fixture(name)]`.
 ///
 /// ```ignore
 /// #[testutil::test(requires = [preconditions::valgrind], labels = [slow])]
-/// fn my_test(#[fixture] dir: &TempDir) { /* ... */ }
+/// fn my_test(#[fixture(temp_dir)] dir: &Path) { /* ... */ }
 /// ```
 #[proc_macro_attribute]
 pub fn test(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -126,8 +243,6 @@ pub fn requires(attr: TokenStream, item: TokenStream) -> TokenStream {
     expand_test_def(args, func)
 }
 
-// Shared expansion logic ======================================================
-
 fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
     // Guard: reject #[test] on the same function.
     for attr in &func.attrs {
@@ -144,10 +259,7 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
     let name = &func.sig.ident;
     let name_str = name.to_string();
 
-    // Build display_name from custom name (labels go in `kind`, not in the name).
     let display_name_expr = build_display_name(&args.name);
-
-    // Build labels. None = inherit module defaults; Some([]) = explicit opt-out.
     let labels_explicit = args.labels.is_some();
     let label_strs: Vec<String> = args
         .labels
@@ -155,33 +267,22 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
         .iter()
         .map(|id| id.to_string())
         .collect();
-
-    // Build ignore expression.
     let ignore_expr = match &args.ignore {
         IgnoreArg::No => quote! { ::testutil::Ignore::No },
         IgnoreArg::Yes => quote! { ::testutil::Ignore::Yes },
         IgnoreArg::WithReason(reason) => quote! { ::testutil::Ignore::WithReason(#reason) },
     };
-
     let req_exprs: Vec<_> = args.requires.iter().collect();
 
-    // Collect #[fixture] / #[fixture(Type)] parameters.
-    let mut fixture_bindings = Vec::new(); // (binding_pat, fixture_type, param_type)
-    let mut fixture_req_exprs = Vec::new();
+    // Collect #[fixture] / #[fixture(name)] parameters.
+    let mut fixture_params: Vec<FixtureParam> = Vec::new();
     let mut clean_params = Vec::new();
 
     for param in &func.sig.inputs {
         if let FnArg::Typed(pat_type) = param {
             let fixture_attr = pat_type.attrs.iter().find(|a| a.path().is_ident("fixture"));
             if let Some(attr) = fixture_attr {
-                let binding = &pat_type.pat;
-                let param_ty = &pat_type.ty;
-
-                // Determine fixture type: from attribute arg or from parameter type.
-                let fixture_ty = parse_fixture_type_arg(attr).unwrap_or_else(|| strip_reference(param_ty));
-
-                fixture_bindings.push((binding.clone(), fixture_ty.clone(), param_ty.clone()));
-                fixture_req_exprs.push(fixture_ty);
+                fixture_params.push(parse_fixture_param(attr, pat_type));
 
                 let mut clean = pat_type.clone();
                 clean.attrs.retain(|a| !a.path().is_ident("fixture"));
@@ -194,49 +295,49 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
         }
     }
 
-    // Build fixture injection code: call setup() directly, hold value in a local.
-    let fixture_setup: Vec<_> = fixture_bindings
+    // Fixture names for TestDef.fixture_names.
+    let fixture_name_strs: Vec<&str> = fixture_params.iter().map(|p| p.fixture_name.as_str()).collect();
+
+    // Build fixture injection code using fixture_get().
+    let fixture_setup: Vec<_> = fixture_params
         .iter()
         .enumerate()
-        .map(|(i, (binding, fixture_ty, param_ty))| {
-            let inst_name = format_ident!("__fixture_inst_{}", i);
+        .map(|(i, fp)| {
+            let handle_name = format_ident!("__fixture_handle_{}", i);
+            let binding = &fp.binding;
+            let target_ty = &fp.target_ty;
+            let param_ty = &fp.param_ty;
+            let fixture_name = &fp.fixture_name;
             quote! {
-                let #inst_name = <#fixture_ty as ::testutil::Fixture>::setup()
-                    .expect("fixture setup failed");
-                let #binding: #param_ty = &#inst_name;
+                let #handle_name = ::testutil::fixture_get(
+                    #fixture_name,
+                    ::std::any::TypeId::of::<#target_ty>(),
+                );
+                let #binding: #param_ty = unsafe { #handle_name.as_ref::<#target_ty>() };
             }
         })
         .collect();
 
-    // Emit the original function with cleaned parameters.
     let vis = &func.vis;
     let block = &func.block;
     let ret = &func.sig.output;
     let fn_token = &func.sig.fn_token;
     let attrs: Vec<_> = func.attrs.iter().collect();
-    let call_args: Vec<_> = fixture_bindings.iter().map(|(binding, _, _)| binding).collect();
-    let has_fixtures = !fixture_bindings.is_empty();
+    let call_args: Vec<_> = fixture_params.iter().map(|fp| &fp.binding).collect();
 
-    let fixture_requires_expr = if has_fixtures {
-        quote! { &[#(<#fixture_req_exprs as ::testutil::FixtureMeta>::REQUIRES),*] }
-    } else {
-        quote! { &[] }
-    };
-
-    // Body always sets the test context, then optionally injects fixtures.
-    let body_expr = if has_fixtures {
+    let body_expr = if fixture_params.is_empty() {
         quote! {
             || {
-                ::testutil::set_current_test(#name_str, ::core::module_path!());
-                #(#fixture_setup)*
-                #name(#(#call_args),*);
+                let __scope = ::testutil::enter_test_scope(#name_str, ::core::module_path!());
+                #name();
             }
         }
     } else {
         quote! {
             || {
-                ::testutil::set_current_test(#name_str, ::core::module_path!());
-                #name();
+                let __scope = ::testutil::enter_test_scope(#name_str, ::core::module_path!());
+                #(#fixture_setup)*
+                #name(#(#call_args),*);
             }
         }
     };
@@ -250,7 +351,7 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
             module: ::core::module_path!(),
             display_name: #display_name_expr,
             requires: &[#(#req_exprs),*],
-            fixture_requires: #fixture_requires_expr,
+            fixture_names: &[#(#fixture_name_strs),*],
             ignore: #ignore_expr,
             labels: &[#(#label_strs),*],
             labels_explicit: #labels_explicit,
@@ -260,37 +361,40 @@ fn expand_test_def(args: TestArgs, func: ItemFn) -> TokenStream {
     expanded.into()
 }
 
-/// Build the `display_name: Option<&'static str>` expression.
-///
-/// - No custom name → `None` (runner uses function name)
-/// - Custom name → `Some("display name")`
-fn build_display_name(custom_name: &Option<String>) -> proc_macro2::TokenStream {
-    match custom_name {
-        Some(n) => quote! { Some(#n) },
-        None => quote! { None },
-    }
-}
-
 // #[testutil::fixture] ========================================================
 
-/// Define a fixture from a function. The return type (inside `Result`) is the
-/// fixture type; `#[fixture]` parameters are dependencies injected before the
-/// body runs.
+/// Define a fixture from a function.
+///
+/// The function must return `Result<T, String>`. The fixture name defaults to
+/// the function name, overridable with `name = "..."`.
 ///
 /// ```ignore
-/// #[testutil::fixture(docker_available)]
-/// fn temp_dir(#[fixture(TestName)] name: &str) -> Result<TempDir, String> {
-///     // ...
-/// }
-/// ```
+/// #[testutil::fixture(scope = process, requires = [docker_available])]
+/// fn corpus_image() -> Result<CorpusImage, String> { ... }
 ///
-/// Generates `impl Fixture for TempDir` and `impl FixtureMeta for TempDir`.
+/// #[testutil::fixture(deref)]
+/// fn temp_dir(#[fixture(test_name)] name: &str) -> Result<TempDir, String> { ... }
+/// ```
 #[proc_macro_attribute]
 pub fn fixture(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let reqs = parse_macro_input!(attr with Punctuated::<Path, Token![,]>::parse_terminated);
+    let args = parse_macro_input!(attr as FixtureArgs);
     let mut func = parse_macro_input!(item as ItemFn);
+    expand_fixture_def(args, &mut func)
+}
 
-    let req_exprs: Vec<_> = reqs.iter().collect();
+fn expand_fixture_def(args: FixtureArgs, func: &mut ItemFn) -> TokenStream {
+    let req_exprs: Vec<_> = args.requires.iter().collect();
+
+    // Determine fixture name.
+    let fixture_name = args.name.unwrap_or_else(|| func.sig.ident.to_string());
+
+    // Determine scope.
+    let scope_expr = match args.scope.as_ref().map(|s| s.to_string()).as_deref() {
+        Some("variable") | None => quote! { ::testutil::FixtureScope::Variable },
+        Some("test") => quote! { ::testutil::FixtureScope::Test },
+        Some("process") => quote! { ::testutil::FixtureScope::Process },
+        _ => unreachable!(), // validated in parser
+    };
 
     // Extract the fixture type from the return type: Result<T, String> → T.
     let fixture_ty = match extract_result_ok_type(&func.sig.output) {
@@ -302,18 +406,15 @@ pub fn fixture(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     };
 
-    // Collect #[fixture] / #[fixture(Type)] parameters on the setup function.
-    let mut dep_bindings = Vec::new(); // (binding_pat, fixture_type, param_type)
+    // Collect #[fixture] / #[fixture(name)] dependency parameters.
+    let mut dep_params: Vec<FixtureParam> = Vec::new();
     let mut clean_inputs = syn::punctuated::Punctuated::new();
 
     for param in &func.sig.inputs {
         if let FnArg::Typed(pat_type) = param {
             let fixture_attr = pat_type.attrs.iter().find(|a| a.path().is_ident("fixture"));
             if let Some(attr) = fixture_attr {
-                let binding = &pat_type.pat;
-                let param_ty = &pat_type.ty;
-                let dep_fixture_ty = parse_fixture_type_arg(attr).unwrap_or_else(|| strip_reference(param_ty));
-                dep_bindings.push((binding.clone(), dep_fixture_ty, param_ty.clone()));
+                dep_params.push(parse_fixture_param(attr, pat_type));
             } else {
                 clean_inputs.push(param.clone());
             }
@@ -322,20 +423,29 @@ pub fn fixture(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    // Strip #[fixture] params from the function signature.
+    // Dependency names for FixtureDef.deps.
+    let dep_name_strs: Vec<&str> = dep_params.iter().map(|p| p.fixture_name.as_str()).collect();
+
+    // Strip fixture params from the function signature.
     func.sig.inputs = clean_inputs;
 
     // Prepend dependency injection code to the function body.
-    if !dep_bindings.is_empty() {
-        let dep_setup: Vec<_> = dep_bindings
+    if !dep_params.is_empty() {
+        let dep_setup: Vec<_> = dep_params
             .iter()
             .enumerate()
-            .map(|(i, (binding, fixture_ty, param_ty))| {
-                let inst_name = format_ident!("__fixture_dep_{}", i);
+            .map(|(i, fp)| {
+                let handle_name = format_ident!("__fixture_dep_handle_{}", i);
+                let binding = &fp.binding;
+                let target_ty = &fp.target_ty;
+                let param_ty = &fp.param_ty;
+                let dep_name = &fp.fixture_name;
                 quote! {
-                    let #inst_name = <#fixture_ty as ::testutil::Fixture>::setup()
-                        .expect("fixture dependency setup failed");
-                    let #binding: #param_ty = &#inst_name;
+                    let #handle_name = ::testutil::fixture_get(
+                        #dep_name,
+                        ::std::any::TypeId::of::<#target_ty>(),
+                    );
+                    let #binding: #param_ty = unsafe { #handle_name.as_ref::<#target_ty>() };
                 }
             })
             .collect();
@@ -349,24 +459,81 @@ pub fn fixture(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let func_name = &func.sig.ident;
 
-    let expanded = quote! {
-        #func
-
-        impl ::testutil::Fixture for #fixture_ty {
-            fn setup() -> Result<Self, String> {
-                #func_name()
+    // Generate cast function.
+    let cast_fn = if args.deref {
+        quote! {
+            {
+                fn __cast(
+                    any: &(dyn ::std::any::Any + Send + Sync),
+                    target: ::std::any::TypeId,
+                ) -> Option<::testutil::FixtureRef> {
+                    let val = any.downcast_ref::<#fixture_ty>()?;
+                    if target == ::std::any::TypeId::of::<#fixture_ty>() {
+                        Some(::testutil::FixtureRef::from_ref(val))
+                    } else if target == ::std::any::TypeId::of::<<#fixture_ty as ::std::ops::Deref>::Target>() {
+                        use ::std::ops::Deref;
+                        Some(::testutil::FixtureRef::from_ref(val.deref()))
+                    } else {
+                        None
+                    }
+                }
+                __cast
             }
         }
-
-        impl ::testutil::FixtureMeta for #fixture_ty {
-            const REQUIRES: &'static [fn() -> Result<(), String>] = &[#(#req_exprs),*];
+    } else {
+        quote! {
+            {
+                fn __cast(
+                    any: &(dyn ::std::any::Any + Send + Sync),
+                    target: ::std::any::TypeId,
+                ) -> Option<::testutil::FixtureRef> {
+                    let val = any.downcast_ref::<#fixture_ty>()?;
+                    if target == ::std::any::TypeId::of::<#fixture_ty>() {
+                        Some(::testutil::FixtureRef::from_ref(val))
+                    } else {
+                        None
+                    }
+                }
+                __cast
+            }
         }
     };
 
+    let fixture_ty_str = quote!(#fixture_ty).to_string();
+
+    let expanded = quote! {
+        #func
+
+        ::testutil::inventory::submit!(::testutil::FixtureDef {
+            name: #fixture_name,
+            scope: #scope_expr,
+            requires: &[#(#req_exprs),*],
+            deps: &[#(#dep_name_strs),*],
+            setup: || -> ::core::result::Result<
+                ::std::boxed::Box<dyn ::std::any::Any + ::core::marker::Send + ::core::marker::Sync>,
+                ::std::string::String,
+            > {
+                #func_name().map(|v| {
+                    ::std::boxed::Box::new(v)
+                        as ::std::boxed::Box<dyn ::std::any::Any + ::core::marker::Send + ::core::marker::Sync>
+                })
+            },
+            cast: #cast_fn,
+            type_name: #fixture_ty_str,
+        });
+    };
     expanded.into()
 }
 
 // Helpers =====================================================================
+
+/// Build the `display_name: Option<&'static str>` expression.
+fn build_display_name(custom_name: &Option<String>) -> proc_macro2::TokenStream {
+    match custom_name {
+        Some(n) => quote! { Some(#n) },
+        None => quote! { None },
+    }
+}
 
 /// Strip a leading `&` from a type (e.g. `&TempDir` → `TempDir`).
 fn strip_reference(ty: &Type) -> Type {
@@ -374,15 +541,6 @@ fn strip_reference(ty: &Type) -> Type {
         (*r.elem).clone()
     } else {
         ty.clone()
-    }
-}
-
-/// Parse the optional type argument from `#[fixture(Type)]`.
-/// Returns `None` for bare `#[fixture]`.
-fn parse_fixture_type_arg(attr: &syn::Attribute) -> Option<Type> {
-    match &attr.meta {
-        syn::Meta::List(list) => syn::parse2::<Type>(list.tokens.clone()).ok(),
-        _ => None,
     }
 }
 

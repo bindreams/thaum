@@ -4,7 +4,7 @@ use std::fmt;
 use std::ops::Deref;
 
 /// The current test's function name. Implements `Deref<Target = str>` so it
-/// can be used transparently as `&str` via `#[fixture(TestName)] name: &str`.
+/// can be used transparently as `&str` via `#[fixture(test_name)] name: &str`.
 pub struct TestName(String);
 
 impl Deref for TestName {
@@ -20,7 +20,7 @@ impl fmt::Display for TestName {
     }
 }
 
-#[testutil::fixture()]
+#[testutil::fixture(scope = test, deref)]
 fn test_name() -> Result<TestName, String> {
     Ok(TestName(crate::current_test().name.to_owned()))
 }

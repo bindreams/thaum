@@ -1,6 +1,5 @@
 use std::path::Path;
 
-use testutil::TempDir;
 use thaum::exec::{CapturedIo, Executor};
 
 use crate::*;
@@ -410,7 +409,7 @@ fn shell_path(p: &std::path::Path) -> String {
 }
 
 #[testutil::test]
-fn redirect_builtin_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
+fn redirect_builtin_stdout_to_file(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("stdout.txt");
 
     let script = format!("echo hello > {}", shell_path(&file));
@@ -421,7 +420,7 @@ fn redirect_builtin_stdout_to_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn redirect_builtin_append(#[fixture(TempDir)] dir: &Path) {
+fn redirect_builtin_append(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("append.txt");
     let f = shell_path(&file);
 
@@ -432,7 +431,7 @@ fn redirect_builtin_append(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn redirect_stdin_from_file(#[fixture(TempDir)] dir: &Path) {
+fn redirect_stdin_from_file(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("input.txt");
     std::fs::write(&file, "from-file\n").unwrap();
 
@@ -442,7 +441,7 @@ fn redirect_stdin_from_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn redirect_dup_stdout_to_stderr_file(#[fixture(TempDir)] dir: &Path) {
+fn redirect_dup_stdout_to_stderr_file(#[fixture(temp_dir)] dir: &Path) {
     // > file 2>&1 — redirect stdout to file, then dup stderr to same file
     let file = dir.join("combined.txt");
 
@@ -454,7 +453,7 @@ fn redirect_dup_stdout_to_stderr_file(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn redirect_fd3_and_dup_to_stdout(#[fixture(TempDir)] dir: &Path) {
+fn redirect_fd3_and_dup_to_stdout(#[fixture(temp_dir)] dir: &Path) {
     // echo hello 3>/tmp/file >&3 — open FD 3 to file, dup stdout to FD 3
     let file = dir.join("fd3.txt");
 
@@ -466,7 +465,7 @@ fn redirect_fd3_and_dup_to_stdout(#[fixture(TempDir)] dir: &Path) {
 }
 
 #[testutil::test]
-fn redirect_creates_empty_file(#[fixture(TempDir)] dir: &Path) {
+fn redirect_creates_empty_file(#[fixture(temp_dir)] dir: &Path) {
     // `> file` with no command creates/truncates the file
     let file = dir.join("empty.txt");
 
@@ -478,7 +477,7 @@ fn redirect_creates_empty_file(#[fixture(TempDir)] dir: &Path) {
 
 #[cfg(unix)]
 #[testutil::test]
-fn external_command_inherits_fd3(#[fixture(TempDir)] dir: &Path) {
+fn external_command_inherits_fd3(#[fixture(temp_dir)] dir: &Path) {
     // sh -c 'echo hello >&3' writes to FD 3, which is redirected to a file.
     // This tests that FDs 3+ are passed to external child processes.
     let file = dir.join("fd3.txt");

@@ -7,7 +7,6 @@ mod posix_quoting {
     use std::path::Path;
 
     use super::*;
-    use testutil::TempDir;
 
     fn roundtrip(args: &[&str]) {
         let argv: Vec<OsString> = args.iter().map(OsString::from).collect();
@@ -181,7 +180,7 @@ mod posix_quoting {
     }
 
     #[testutil::test]
-    fn spawn_fd3_inheritance(#[fixture(TempDir)] dir: &Path) {
+    fn spawn_fd3_inheritance(#[fixture(temp_dir)] dir: &Path) {
         let file_path = dir.join("fd3.txt");
         let file = std::fs::File::create(&file_path).unwrap();
 

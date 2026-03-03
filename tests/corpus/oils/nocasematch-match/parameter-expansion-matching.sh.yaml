@@ -1,7 +1,9 @@
 name: parameter expansion matching
 dialect: bash
 source: oils:spec/nocasematch-match#parameter-expansion-matching
-stdout: "a a\nA A\n"
+stdout: |-
+  a a
+  A A
 ---
 shopt -s nocasematch
 foo=a

@@ -2,7 +2,13 @@ disabled: true
 name: nested ctx
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#nested-ctx
-stdout: "{\n  \"from\": \"a\"\n}\n{\n  \"from\": \"b\"\n}\n"
+stdout: |-
+  {
+    "from": "a"
+  }
+  {
+    "from": "b"
+  }
 ---
 var a = {}
 var b = {}

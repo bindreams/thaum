@@ -1,7 +1,9 @@
 name: -d
 dialect: bash
 source: oils:spec/builtin-bracket#d
-stdout: "status=0\nstatus=1\n"
+stdout: |
+  status=0
+  status=1
 environment:
   TMP: /tmp
 ---

@@ -1,7 +1,13 @@
 name: defining multiple aliases, then unalias
 dialect: bash
 source: oils:spec/alias#defining-multiple-aliases-then-unalias
-stdout: "status=0\nx X\ny Y\nstatus=0\nundefined\nundefined\n"
+stdout: |-
+  status=0
+  x X
+  y Y
+  status=0
+  undefined
+  undefined
 ---
 shopt -s expand_aliases  # bash requires this
 x=x

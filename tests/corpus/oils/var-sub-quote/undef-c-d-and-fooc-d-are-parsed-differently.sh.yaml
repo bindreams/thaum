@@ -1,9 +1,14 @@
 name: "\"${undef-'c d'}\" and \"${foo%'c d'}\" are parsed differently"
 dialect: bash
 source: oils:spec/var-sub-quote#undef-c-d-and-fooc-d-are-parsed-differently
-stdout: "[\"'c d'\", \"'c  d'\"]\n['c d', 'c  d']\n---\n['a b ', 'a b c d']\n['a b
-  zzz', 'a b c d']\n['a b zzz', 'a b c d']\n"
-setup: |
+stdout: |
+  ["'c d'", "'c  d'"]
+  ['c d', 'c  d']
+  ---
+  ['a b ', 'a b c d']
+  ['a b zzz', 'a b c d']
+  ['a b zzz', 'a b c d']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +16,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 # quotes are LITERAL here

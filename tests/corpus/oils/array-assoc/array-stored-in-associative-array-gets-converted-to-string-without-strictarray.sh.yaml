@@ -3,8 +3,9 @@ name: Array stored in associative array gets converted to string (without
 dialect: bash
 source: 
   oils:spec/array-assoc#array-stored-in-associative-array-gets-converted-to-string-without-strictarray
-stdout: "['1 2 3']\n"
-setup: |
+stdout: |
+  ['1 2 3']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 array=('1 2' 3)

@@ -1,7 +1,8 @@
 name: 'exec {fd}>&- (OSH regression: fails to close fd)'
 dialect: bash
 source: oils:spec/redirect#exec-fd--osh-regression-fails-to-close-fd
-stdout: "foo55\n"
+stdout: |-
+  foo55
 ---
 # mksh, dash do not implement {fd} redirections.
 case $SH in mksh|dash) exit 1 ;; esac

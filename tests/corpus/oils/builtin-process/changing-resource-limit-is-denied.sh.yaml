@@ -1,7 +1,12 @@
 name: Changing resource limit is denied
 dialect: bash
 source: oils:spec/builtin-process#changing-resource-limit-is-denied
-stdout: "both=0\nsoft=0\nsoft=0\nsoft OK\nhard OK\n"
+stdout: |-
+  both=0
+  soft=0
+  soft=0
+  soft OK
+  hard OK
 ---
 
 # Not sure why these don't work

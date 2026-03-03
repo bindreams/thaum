@@ -2,7 +2,10 @@ disabled: true
 name: dict with 'bare word' keys
 dialect: bash
 source: oils:spec/ysh-dict#dict-with-bare-word-keys
-stdout: "len=0\nlen=1\nlen=2\n"
+stdout: |-
+  len=0
+  len=1
+  len=2
 ---
 shopt --set parse_ysh_expr_sub
 

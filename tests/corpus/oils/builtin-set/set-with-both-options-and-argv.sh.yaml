@@ -2,7 +2,8 @@ name: set with both options and argv
 dialect: bash
 source: oils:spec/builtin-set#set-with-both-options-and-argv
 status: 1
-stdout: "a b c\n"
+stdout: |-
+  a b c
 ---
 set -o errexit a b c
 echo "$@"

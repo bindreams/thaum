@@ -3,7 +3,8 @@ name: Augmented assignment respects command_sub_errexit
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-respects-commandsuberrexit
 status: 1
-stdout: "x=45\n"
+stdout: |-
+  x=45
 ---
 
 

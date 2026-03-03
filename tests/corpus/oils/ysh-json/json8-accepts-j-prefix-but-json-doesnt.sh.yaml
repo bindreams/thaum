@@ -2,7 +2,14 @@ disabled: true
 name: json8 accepts j"" prefix, but json doesn't
 dialect: bash
 source: oils:spec/ysh-json#json8-accepts-j-prefix-but-json-doesnt
-stdout: "json=1\n\njson8=0\n(Str)   \"foo\\nbar\"\n\njson8=0\n(Str)   \"A\"\n"
+stdout: |-
+  json=1
+
+  json8=0
+  (Str)   "foo\nbar"
+
+  json8=0
+  (Str)   "A"
 ---
 
 var msg = r'j"foo\nbar"'

@@ -2,7 +2,11 @@ disabled: true
 name: redefine_source is on in interactive shell
 dialect: bash
 source: oils:spec/ysh-options#redefinesource-is-on-in-interactive-shell
-stdout: "common\ncommon\nstatus=0\n2 stderr.txt\n"
+stdout: |-
+  common
+  common
+  status=0
+  2 stderr.txt
 ---
 
 $SH -O oil:all -i --rcfile /dev/null -c "

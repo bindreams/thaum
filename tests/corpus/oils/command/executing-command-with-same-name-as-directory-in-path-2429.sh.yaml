@@ -2,7 +2,13 @@ name: Executing command with same name as directory in PATH (#2429)
 dialect: bash
 source: 
   oils:spec/command#executing-command-with-same-name-as-directory-in-path-2429
-stdout: "hi\nstatus=0\nhi\nstatus=0\nhi\nstatus=0\n"
+stdout: |-
+  hi
+  status=0
+  hi
+  status=0
+  hi
+  status=0
 ---
 
 # Make the following directory structure. File type and permission bits are

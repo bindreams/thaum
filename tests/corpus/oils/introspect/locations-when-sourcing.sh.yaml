@@ -1,8 +1,12 @@
 name: Locations when sourcing
 dialect: bash
 source: oils:spec/introspect#locations-when-sourcing
-stdout: "F\nG\nSTACK:spec/testdata/bash-source-pushtemp.sh:g:3\nSTACK:spec/testdata/bash-source-pushtemp.sh:f:19\n\
-  STACK:spec/testdata/bash-source-pushtemp.sh:source:2\n"
+stdout: |-
+  F
+  G
+  STACK:spec/testdata/bash-source-pushtemp.sh:g:3
+  STACK:spec/testdata/bash-source-pushtemp.sh:f:19
+  STACK:spec/testdata/bash-source-pushtemp.sh:source:2
 ---
 
 cd $REPO_ROOT

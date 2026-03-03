@@ -1,7 +1,9 @@
 name: trap -p
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap--p
-stdout: "shown\nexit\n"
+stdout: |-
+  shown
+  exit
 ---
 
 trap 'echo exit' EXIT

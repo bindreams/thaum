@@ -2,7 +2,8 @@ name: 'Invalid LValue: two sets of brackets'
 dialect: bash
 source: oils:spec/arith#invalid-lvalue-two-sets-of-brackets
 status: 0
-stdout: "status=1\n"
+stdout: |
+  status=1
 stderr: {contains: "invalid arithmetic operator"}
 ---
 (( a[1][2] = 3 ))

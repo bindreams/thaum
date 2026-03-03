@@ -1,8 +1,11 @@
 name: 'var ref: 1, @, *'
 dialect: bash
 source: oils:spec/var-ref#var-ref-1
-stdout: "['x']\n['x', 'y']\n['x y']\n"
-setup: |
+stdout: |
+  ['x']
+  ['x', 'y']
+  ['x y']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 set -- x y
 ref=1; argv.py "${!ref}"

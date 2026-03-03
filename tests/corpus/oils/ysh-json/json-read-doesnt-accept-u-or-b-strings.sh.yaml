@@ -2,7 +2,9 @@ disabled: true
 name: json read doesn't accept u'' or b'' strings
 dialect: bash
 source: oils:spec/ysh-json#json-read-doesnt-accept-u-or-b-strings
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 
 json read <<EOF

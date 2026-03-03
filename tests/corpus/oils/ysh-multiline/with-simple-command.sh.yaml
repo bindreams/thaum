@@ -2,7 +2,9 @@ disabled: true
 name: '... with simple command'
 dialect: bash
 source: oils:spec/ysh-multiline#with-simple-command
-stdout: "hi there\n---\n"
+stdout: |-
+  hi there
+  ---
 ---
 ... echo  # comment
     hi  # comment

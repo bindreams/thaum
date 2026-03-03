@@ -1,7 +1,10 @@
 name: trap can use original $LINENO
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-can-use-original-lineno
-stdout: "line=3\nline=4\nok\n"
+stdout: |-
+  line=3
+  line=4
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

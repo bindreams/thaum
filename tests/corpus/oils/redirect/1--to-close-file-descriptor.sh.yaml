@@ -1,7 +1,8 @@
 name: 1>&- to close file descriptor
 dialect: bash
 source: oils:spec/redirect#1--to-close-file-descriptor
-stdout: "hello\n"
+stdout: |
+  hello
 environment:
   TMP: /tmp
 ---

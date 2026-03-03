@@ -2,7 +2,11 @@ disabled: true
 name: GetValue scope and shopt --unset dynamic_scope
 dialect: bash
 source: oils:spec/ysh-scope#getvalue-scope-and-shopt---unset-dynamicscope
-stdout: "sh x=dynamic\nysh x=global\nsh x=global\nx=global\n"
+stdout: |-
+  sh x=dynamic
+  ysh x=global
+  sh x=global
+  x=global
 ---
 shopt --set parse_proc
 

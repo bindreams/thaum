@@ -1,7 +1,9 @@
 name: $- with interactive shell
 dialect: bash
 source: oils:spec/sh-options#with-interactive-shell
-stdout: "FALSE\nTRUE\n"
+stdout: |-
+  FALSE
+  TRUE
 ---
 $SH -c 'echo $-' | grep i || echo FALSE
 $SH -i -c 'echo $-' | grep -q i && echo TRUE

@@ -1,8 +1,14 @@
 name: continue in subshell
 dialect: bash
 source: oils:spec/loop#continue-in-subshell
-stdout: "# osh lets you fail\n> 1\nsubshell status=1\n. 1\n> 2\nsubshell status=1\n\
-  . 2\n"
+stdout: |-
+  # osh lets you fail
+  > 1
+  subshell status=1
+  . 1
+  > 2
+  subshell status=1
+  . 2
 ---
 for i in $(seq 2); do
   echo "> $i"

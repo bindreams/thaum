@@ -1,7 +1,9 @@
 name: shopt -p validates option names
 dialect: bash
 source: oils:spec/sh-options#shopt--p-validates-option-names
-stdout: "status=2\nstatus=2\n"
+stdout: |
+  status=2
+  status=2
 environment:
   TMP: /tmp
 ---

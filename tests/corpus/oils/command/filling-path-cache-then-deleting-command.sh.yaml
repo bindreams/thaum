@@ -1,7 +1,10 @@
 name: filling $PATH cache, then deleting command
 dialect: bash
 source: oils:spec/command#filling-path-cache-then-deleting-command
-stdout: "two\nstatus=0\nstatus=127\n"
+stdout: |
+  two
+  status=0
+  status=127
 environment:
   TMP: /tmp
 ---

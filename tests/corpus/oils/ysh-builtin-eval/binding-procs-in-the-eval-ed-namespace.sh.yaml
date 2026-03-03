@@ -2,7 +2,9 @@ disabled: true
 name: binding procs in the eval-ed namespace
 dialect: bash
 source: oils:spec/ysh-builtin-eval#binding-procs-in-the-eval-ed-namespace
-stdout: "flag -h --help\narg file\n"
+stdout: |-
+  flag -h --help
+  arg file
 ---
 proc __flag (short, long) {
   echo "flag $short $long"

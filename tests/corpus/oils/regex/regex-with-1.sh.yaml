@@ -1,7 +1,9 @@
 name: regex with ?
 dialect: bash
 source: oils:spec/regex#regex-with
-stdout: "true\ntrue\n"
+stdout: |-
+  true
+  true
 ---
 [[ 'c' =~ c? ]] && echo true
 [[ '' =~ c? ]] && echo true

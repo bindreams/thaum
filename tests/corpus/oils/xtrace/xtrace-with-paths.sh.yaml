@@ -1,8 +1,10 @@
 name: xtrace with paths
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-paths
-stdout: "my-dir/my_file.cc\n"
-stderr: "+ echo my-dir/my_file.cc\n"
+stdout: |
+  my-dir/my_file.cc
+stderr: |-
+  + echo my-dir/my_file.cc
 ---
 set -o xtrace
 echo my-dir/my_file.cc

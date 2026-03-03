@@ -2,7 +2,11 @@ disabled: true
 name: "''' in Here Doc"
 dialect: bash
 source: oils:spec/ysh-string#in-here-doc
-stdout: "\\u{61}\n'' '\n'\ntwo = $two\n"
+stdout: |-
+  \u{61}
+  '' '
+  '
+  two = $two
 ---
 
 tac <<< '''

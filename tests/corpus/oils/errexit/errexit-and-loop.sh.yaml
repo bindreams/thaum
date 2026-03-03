@@ -2,7 +2,8 @@ name: errexit and loop
 dialect: bash
 source: oils:spec/errexit#errexit-and-loop
 status: 1
-stdout: "hi 2\n"
+stdout: |-
+  hi 2
 ---
 set -o errexit
 for x in 1 2 3; do

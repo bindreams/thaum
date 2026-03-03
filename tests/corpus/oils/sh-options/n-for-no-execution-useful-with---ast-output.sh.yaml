@@ -2,7 +2,8 @@ name: -n for no execution (useful with --ast-output)
 dialect: bash
 source: oils:spec/sh-options#n-for-no-execution-useful-with---ast-output
 status: 0
-stdout: "1\n"
+stdout: |-
+  1
 ---
 # NOTE: set +n doesn't work because nothing is executed!
 echo 1

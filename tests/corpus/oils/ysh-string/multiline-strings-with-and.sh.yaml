@@ -2,7 +2,14 @@ disabled: true
 name: Multiline strings with '' and ""
 dialect: bash
 source: oils:spec/ysh-string#multiline-strings-with-and
-stdout: "\n  single\n\n\n  double 42\n\n"
+stdout: |2+
+
+    single
+
+
+    double 42
+
+...
 ---
 
 var single = '

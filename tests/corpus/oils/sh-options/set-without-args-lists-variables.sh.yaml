@@ -2,7 +2,11 @@ name: set without args lists variables
 dialect: bash
 source: oils:spec/sh-options#set-without-args-lists-variables
 status: 0
-stdout: "__GLOBAL=mutated\n__OTHERLOCAL=L\n__mylocal=L\n__var_in_parent_scope=D\n"
+stdout: |-
+  __GLOBAL=mutated
+  __OTHERLOCAL=L
+  __mylocal=L
+  __var_in_parent_scope=D
 ---
 __GLOBAL=g
 f() {

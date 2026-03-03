@@ -1,6 +1,11 @@
 name: kill -l 0 returns EXIT
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-0-returns-exit
-stdout: "EXIT\n## N-I dash status: 2\n## N-I dash STDOUT:\n## N-I mksh STDOUT:\n0\n"
+stdout: |-
+  EXIT
+  ## N-I dash status: 2
+  ## N-I dash STDOUT:
+  ## N-I mksh STDOUT:
+  0
 ---
 kill -l 0

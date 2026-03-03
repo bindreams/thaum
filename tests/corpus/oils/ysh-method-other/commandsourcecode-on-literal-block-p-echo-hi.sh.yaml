@@ -2,8 +2,16 @@ disabled: true
 name: 'Command.sourceCode() on literal block: p { echo hi }'
 dialect: bash
 source: oils:spec/ysh-method-other#commandsourcecode-on-literal-block-p-echo-hi
-stdout: "{\n  \"location_str\": \"[ stdin ]\",\n  \"location_start_line\": 22\n}\n\
-  1\n2\n---\n1\n2\n"
+stdout: |-
+  {
+    "location_str": "[ stdin ]",
+    "location_start_line": 22
+  }
+  1
+  2
+  ---
+  1
+  2
 ---
 
 proc p ( ; ; ; block) {

@@ -3,7 +3,10 @@ name: hay at top level allows arbitrary commands
 dialect: bash
 source: oils:spec/hay-isolation#hay-at-top-level-allows-arbitrary-commands
 status: 127
-stdout: "3\n4\ninside\n"
+stdout: |-
+  3
+  4
+  inside
 ---
 shopt --set parse_brace
 

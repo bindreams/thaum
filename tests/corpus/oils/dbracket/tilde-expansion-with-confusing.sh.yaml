@@ -1,7 +1,11 @@
 name: tilde expansion with =~ (confusing)
 dialect: bash
 source: oils:spec/dbracket#tilde-expansion-with-confusing
-stdout: "regex=0\nregex=0\nregex=1\nregex=0\n"
+stdout: |-
+  regex=0
+  regex=0
+  regex=1
+  regex=0
 ---
 case $SH in mksh) exit ;; esac
 

@@ -2,7 +2,8 @@ disabled: true
 name: ysh:upgrade allows assoc arrays, with parse_ysh_string
 dialect: bash
 source: oils:spec/ysh-options#yshupgrade-allows-assoc-arrays-with-parseyshstring
-stdout: "2\n"
+stdout: |-
+  2
 ---
 
 shopt --set ysh:upgrade

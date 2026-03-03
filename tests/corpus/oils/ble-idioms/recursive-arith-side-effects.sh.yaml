@@ -1,7 +1,8 @@
 name: 'recursive arith: side effects'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-side-effects
-stdout: "123:123\n"
+stdout: |-
+  123:123
 ---
 # In Zsh and Busybox sh, the side effect of inner arithmetic
 # evaluations seems to take effect only after the whole evaluation.

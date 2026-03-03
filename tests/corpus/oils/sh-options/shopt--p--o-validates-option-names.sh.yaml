@@ -1,7 +1,9 @@
 name: shopt -p -o validates option names
 dialect: bash
 source: oils:spec/sh-options#shopt--p--o-validates-option-names
-stdout: "set +o errexit\nstatus=2\n"
+stdout: |-
+  set +o errexit
+  status=2
 ---
 shopt -p -o errexit invalid nounset
 echo status=$?

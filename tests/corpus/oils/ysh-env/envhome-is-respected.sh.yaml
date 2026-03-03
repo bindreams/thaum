@@ -2,7 +2,9 @@ disabled: true
 name: ENV.HOME is respected
 dialect: bash
 source: oils:spec/ysh-env#envhome-is-respected
-stdout: "zz-osh/src\nysh-zz/src\n"
+stdout: |-
+  zz-osh/src
+  ysh-zz/src
 ---
 
 HOME=zz-osh

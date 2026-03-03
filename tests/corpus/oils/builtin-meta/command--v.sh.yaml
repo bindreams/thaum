@@ -1,8 +1,24 @@
 name: command -v
 dialect: bash
 source: oils:spec/builtin-meta#command--v
-stdout: "echo\n0\nmyfunc\n0\nnonexistent=1\nempty=1\nfor\n0\n## OK dash/ash STDOUT:\n\
-  echo\n0\nmyfunc\n0\nnonexistent=127\nempty=127\nfor\n0\n"
+stdout: |-
+  echo
+  0
+  myfunc
+  0
+  nonexistent=1
+  empty=1
+  for
+  0
+  ## OK dash/ash STDOUT:
+  echo
+  0
+  myfunc
+  0
+  nonexistent=127
+  empty=127
+  for
+  0
 ---
 myfunc() { echo x; }
 command -v echo

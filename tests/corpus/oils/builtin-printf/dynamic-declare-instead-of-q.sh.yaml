@@ -1,7 +1,8 @@
 name: dynamic declare instead of %q
 dialect: bash
 source: oils:spec/builtin-printf#dynamic-declare-instead-of-q
-stdout: "'\"quoted\" with spaces and \\'\n"
+stdout: |-
+  '"quoted" with spaces and \'
 ---
 var=foo
 val='"quoted" with spaces and \'

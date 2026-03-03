@@ -1,7 +1,8 @@
 name: Brace group redirect
 dialect: bash
 source: oils:spec/redirect-command#brace-group-redirect
-stdout: "15\n"
+stdout: |
+  15
 environment:
   TMP: /tmp
 ---

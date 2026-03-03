@@ -1,7 +1,9 @@
 name: command -p (override existing program)
 dialect: bash
 source: oils:spec/builtin-meta#command--p-override-existing-program
-stdout: "wrong\nbbb\n"
+stdout: |
+  wrong
+  bbb
 environment:
   TMP: /tmp
 ---

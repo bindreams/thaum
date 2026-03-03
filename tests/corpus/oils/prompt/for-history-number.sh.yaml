@@ -1,7 +1,9 @@
 name: \! for history number
 dialect: bash
 source: oils:spec/prompt#for-history-number
-stdout: "matched=0\nmatched=0\n"
+stdout: |-
+  matched=0
+  matched=0
 ---
 set -o history # enable history
 PS1='foo \! bar'

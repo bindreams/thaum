@@ -1,7 +1,12 @@
 name: bind -m with bind -x/-X
 dialect: bash
 source: oils:spec/builtin-bind#bind--m-with-bind--x-x
-stdout: "status=1\nemacs\nstatus=0\nvi\nstatus=0\n"
+stdout: |-
+  status=1
+  emacs
+  status=0
+  vi
+  status=0
 ---
 bind -X | grep -oF 'emacs|vi'
 echo status=$?

@@ -1,10 +1,16 @@
 name: "IFS=x and '' and $@ - same bug as spec/toysh-posix case #12"
 dialect: bash
 source: oils:spec/word-split#ifsx-and-and---same-bug-as-spectoysh-posix-case-12
-stdout: "  $*   -one- -two-\n \"$*\"  -one  two-\n  $@   -one- -two-\n \"$@\"  -one-
-  -- -two-\n['  $*  ', 'one', 'two']\n[' \"$*\" ', 'onezztwo']\n['  $@  ', 'one',
-  'two']\n[' \"$@\" ', 'one', '', 'two']\n"
-setup: |
+stdout: |2
+    $*   -one- -two-
+   "$*"  -one  two-
+    $@   -one- -two-
+   "$@"  -one- -- -two-
+  ['  $*  ', 'one', 'two']
+  [' "$*" ', 'onezztwo']
+  ['  $@  ', 'one', 'two']
+  [' "$@" ', 'one', '', 'two']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +18,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in yash) exit ;; esac  # no echo -n
 

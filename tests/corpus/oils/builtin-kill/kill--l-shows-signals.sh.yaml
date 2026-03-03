@@ -1,7 +1,9 @@
 name: kill -l shows signals
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-shows-signals
-stdout: "0\n## N-I dash STDOUT:\n"
+stdout: |-
+  0
+  ## N-I dash STDOUT:
 ---
 case $SH in dash) exit ;; esac
 

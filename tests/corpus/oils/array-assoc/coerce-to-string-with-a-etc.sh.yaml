@@ -1,8 +1,12 @@
 name: coerce to string with ${A[*]}, etc.
 dialect: bash
 source: oils:spec/array-assoc#coerce-to-string-with-a-etc
-stdout: "['xx yy']\n['X X Y Y']\n['xx', 'yy']\n['X', 'X', 'Y', 'Y']\n"
-setup: |
+stdout: |
+  ['xx yy']
+  ['X X Y Y']
+  ['xx', 'yy']
+  ['X', 'X', 'Y', 'Y']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 declare -A A
 A['X X']=xx

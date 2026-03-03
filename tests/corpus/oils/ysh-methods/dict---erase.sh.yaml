@@ -3,8 +3,9 @@ name: Dict -> erase()
 dialect: bash
 source: oils:spec/ysh-methods#dict---erase
 status: 0
-stdout: "(Dict)   {\"title\":\"The Histories\"}\n(Dict)   {\"title\":\"The Histories\"\
-  }\n"
+stdout: |-
+  (Dict)   {"title":"The Histories"}
+  (Dict)   {"title":"The Histories"}
 ---
 var book = {title: "The Histories", author: "Herodotus"}
 call book->erase("author")

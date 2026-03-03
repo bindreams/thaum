@@ -1,7 +1,9 @@
 name: '[ matching'
 dialect: bash
 source: oils:spec/nocasematch-match#matching
-stdout: "1\n1\n"
+stdout: |-
+  1
+  1
 ---
 shopt -s nocasematch
 [ a = A ]; echo $?

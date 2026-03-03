@@ -2,7 +2,8 @@ name: errexit double guard
 dialect: bash
 source: oils:spec/errexit#errexit-double-guard
 status: 1
-stdout: "true\n"
+stdout: |-
+  true
 ---
 # OSH bug fix.  ErrExit needs a counter, not a boolean.
 set -o errexit

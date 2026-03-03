@@ -3,9 +3,9 @@ name: Shell arrays support tilde detection, static globbing, brace detection
 dialect: bash
 source: 
   oils:spec/ysh-list#shell-arrays-support-tilde-detection-static-globbing-brace-detection
-stdout: "['/home/bob/src', 'bar.py', 'foo.py', 'andy@example.com', 'bob@example.com',
-  '*.py']\n"
-setup: |
+stdout: |
+  ['/home/bob/src', 'bar.py', 'foo.py', 'andy@example.com', 'bob@example.com', '*.py']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s parse_at simple_word_eval
 touch {foo,bar}.py

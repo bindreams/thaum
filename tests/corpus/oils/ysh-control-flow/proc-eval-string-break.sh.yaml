@@ -3,7 +3,9 @@ name: 'proc eval string: break'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-string-break
 status: 1
-stdout: "one\n1\n"
+stdout: |-
+  one
+  1
 ---
 shopt -s ysh:all
 

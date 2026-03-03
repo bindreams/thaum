@@ -2,7 +2,13 @@ disabled: true
 name: Integer literals with underscores
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-literals-with-underscores
-stdout: "SHELL\n65536\n21\n1005\n65551\nsum 40\n"
+stdout: |-
+  SHELL
+  65536
+  21
+  1005
+  65551
+  sum 40
 ---
 const dec = 65_536
 const bin = 0b0001_0101

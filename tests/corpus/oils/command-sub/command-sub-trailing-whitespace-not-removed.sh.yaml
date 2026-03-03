@@ -1,8 +1,9 @@
 name: Command Sub trailing whitespace not removed
 dialect: bash
 source: oils:spec/command-sub#command-sub-trailing-whitespace-not-removed
-stdout: "['ab\\ncd\\n ']\n"
-setup: |
+stdout: |
+  ['ab\ncd\n ']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 s=$(python2 -c 'print("ab\ncd\n ")')
 argv.py "$s"

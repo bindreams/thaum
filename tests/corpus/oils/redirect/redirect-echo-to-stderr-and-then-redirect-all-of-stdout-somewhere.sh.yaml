@@ -2,8 +2,10 @@ name: Redirect echo to stderr, and then redirect all of stdout somewhere.
 dialect: bash
 source: 
   oils:spec/redirect#redirect-echo-to-stderr-and-then-redirect-all-of-stdout-somewhere
-stdout: "10\n"
-stderr: "foo52\n"
+stdout: |
+  10
+stderr: |
+  foo52
 environment:
   TMP: /tmp
 ---

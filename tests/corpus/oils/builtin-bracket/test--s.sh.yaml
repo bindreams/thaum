@@ -1,7 +1,10 @@
 name: test -s
 dialect: bash
 source: oils:spec/builtin-bracket#test--s
-stdout: "status=1\nstatus=1\nstatus=0\n"
+stdout: |
+  status=1
+  status=1
+  status=0
 environment:
   TMP: /tmp
 ---

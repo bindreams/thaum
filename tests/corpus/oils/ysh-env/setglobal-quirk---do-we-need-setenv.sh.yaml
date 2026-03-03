@@ -2,7 +2,9 @@ disabled: true
 name: setglobal quirk - do we need setenv?
 dialect: bash
 source: oils:spec/ysh-env#setglobal-quirk---do-we-need-setenv
-stdout: "(Null)   null\n(Str)   \"perm\"\n"
+stdout: |-
+  (Null)   null
+  (Str)   "perm"
 ---
 shopt --set ysh:all
 

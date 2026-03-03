@@ -2,7 +2,8 @@ name: Assign local separately
 dialect: bash
 source: oils:spec/sh-func#assign-local-separately
 status: 0
-stdout: "[new-value]\n"
+stdout: |-
+  [new-value]
 ---
 f() {
   local f

@@ -1,8 +1,18 @@
 name: unsigned / octal / hex big
 dialect: bash
 source: oils:spec/builtin-printf#unsigned-octal-hex-big
-stdout: "[4294967296]\n[40000000000]\n[100000000]\n[100000000]\n\n[9223372036854775807]\n\
-  [777777777777777777777]\n[7fffffffffffffff]\n[7FFFFFFFFFFFFFFF]\n\n"
+stdout: |+
+  [4294967296]
+  [40000000000]
+  [100000000]
+  [100000000]
+
+  [9223372036854775807]
+  [777777777777777777777]
+  [7fffffffffffffff]
+  [7FFFFFFFFFFFFFFF]
+
+...
 ---
 
 for big in $(( 1 << 32 )) $(( (1 << 63) - 1 )); do

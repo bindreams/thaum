@@ -1,8 +1,18 @@
 name: Compare trap DEBUG vs. trap ERR
 dialect: bash
 source: oils:spec/builtin-trap-bash#compare-trap-debug-vs-trap-err
-stdout: "dbg 3\ndbg 3\ndbg 3\ndbg 5\ndbg 5\ndbg 5\ndbg 7\ndbg 9\nerr 14\nerr 16\n\
-  ok\n"
+stdout: |-
+  dbg 3
+  dbg 3
+  dbg 3
+  dbg 5
+  dbg 5
+  dbg 5
+  dbg 7
+  dbg 9
+  err 14
+  err 16
+  ok
 ---
 
 # Pipelines and AndOr are problematic

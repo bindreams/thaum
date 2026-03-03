@@ -2,8 +2,10 @@ name: substitution of IFS character, quoted and unquoted
 dialect: bash
 source: 
   oils:spec/var-sub-quote#substitution-of-ifs-character-quoted-and-unquoted
-stdout: "['']\n[':']\n"
-setup: |
+stdout: |
+  ['']
+  [':']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 IFS=:
 s=:

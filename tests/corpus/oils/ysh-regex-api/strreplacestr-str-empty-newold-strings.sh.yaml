@@ -2,7 +2,11 @@ disabled: true
 name: Str.replace(Str, Str), empty new/old strings
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplacestr-str-empty-newold-strings
-stdout: "a\nnewanewbnewcnewanew\nnewabca\nnewanewbnewcnewanew\n"
+stdout: |-
+  a
+  newanewbnewcnewanew
+  newabca
+  newanewbnewcnewanew
 ---
 shopt --set parse_ysh_expr_sub
 

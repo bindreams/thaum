@@ -1,7 +1,8 @@
 name: Sparse array with big index
 dialect: bash
 source: oils:spec/ble-idioms#sparse-array-with-big-index
-stdout: "len=1\n"
+stdout: |-
+  len=1
 ---
 
 # TODO: more InternalStringArray idioms / stress tests ?

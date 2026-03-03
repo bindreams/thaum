@@ -2,9 +2,14 @@ disabled: true
 name: s ~ regex and s !~ regex
 dialect: bash
 source: oils:spec/ysh-regex-api#s-regex-and-s-regex
-stdout: "matches\n['foo', 'oo']\ndoes not match\n['foo', 'oo']\ngot expected status
-  3\ngot expected status 3\n"
-setup: |
+stdout: |
+  matches
+  ['foo', 'oo']
+  does not match
+  ['foo', 'oo']
+  got expected status 3
+  got expected status 3
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +17,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s ysh:upgrade
 

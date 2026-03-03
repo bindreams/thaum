@@ -1,10 +1,19 @@
 name: declare -p var
 dialect: bash
 source: oils:spec/assign-extended#declare--p-var
-stdout: "[declare]\ndeclare -- test_var1=111\ndeclare -r test_var2=222\ndeclare -x
-  test_var3=333\ndeclare -n test_var4=test_var1\ndeclare -- test_var5=555\n[readonly]\n\
-  declare -r test_var2=222\n[export]\ndeclare -x test_var3=333\n[local]\ndeclare --
-  test_var5=555\n"
+stdout: |-
+  [declare]
+  declare -- test_var1=111
+  declare -r test_var2=222
+  declare -x test_var3=333
+  declare -n test_var4=test_var1
+  declare -- test_var5=555
+  [readonly]
+  declare -r test_var2=222
+  [export]
+  declare -x test_var3=333
+  [local]
+  declare -- test_var5=555
 ---
 # BUG? bash doesn't output anything for 'local/readonly -p var', which seems to
 #   contradict with manual.  Besides, 'export -p var' is not described in

@@ -2,7 +2,10 @@ disabled: true
 name: 'parse_paren: if statement'
 dialect: bash
 source: oils:spec/ysh-options#parseparen-if-statement
-stdout: "less\nless\nother\n"
+stdout: |-
+  less
+  less
+  other
 ---
 shopt -s oil:upgrade
 var x = 1

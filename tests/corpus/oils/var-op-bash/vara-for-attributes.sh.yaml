@@ -1,7 +1,10 @@
 name: ${var@a} for attributes
 dialect: bash
 source: oils:spec/var-op-bash#vara-for-attributes
-stdout: "a\nar\nrx\n"
+stdout: |-
+  a
+  ar
+  rx
 ---
 array=(one two)
 echo ${array@a}

@@ -2,9 +2,23 @@ disabled: true
 name: json read then json write
 dialect: bash
 source: oils:spec/ysh-json#json-read-then-json-write
-stdout: "{\n  \"name\": \"bob\",\n  \"age\": 42,\n  \"ok\": true\n}\n{\n  \"name\"\
-  : \"bob\",\n  \"age\": 42,\n  \"ok\": true\n}\n{\n  \"name\": {},\n  \"age\": {},\n\
-  \  \"x\": -1,\n  \"y\": 0\n}\n"
+stdout: |-
+  {
+    "name": "bob",
+    "age": 42,
+    "ok": true
+  }
+  {
+    "name": "bob",
+    "age": 42,
+    "ok": true
+  }
+  {
+    "name": {},
+    "age": {},
+    "x": -1,
+    "y": 0
+  }
 ---
 
 # BUG with space before true

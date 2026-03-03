@@ -2,7 +2,9 @@ disabled: true
 name: ${x %05d}
 dialect: bash
 source: oils:spec/ysh-var-sub#x-05d
-stdout: "00003\n00003\n"
+stdout: |-
+  00003
+  00003
 ---
 x=3
 printf '%05d\n' "$x"

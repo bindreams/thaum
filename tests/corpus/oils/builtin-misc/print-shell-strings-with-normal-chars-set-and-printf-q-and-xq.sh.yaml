@@ -2,7 +2,11 @@ name: 'Print shell strings with normal chars: set and printf %q and ${x@Q}'
 dialect: bash
 source: 
   oils:spec/builtin-misc#print-shell-strings-with-normal-chars-set-and-printf-q-and-xq
-stdout: "foo=spam\ndeclare -- foo=spam\npf  spam\n@Q  spam\n"
+stdout: |-
+  foo=spam
+  declare -- foo=spam
+  pf  spam
+  @Q  spam
 ---
 
 # There are variations on whether quotes are printed

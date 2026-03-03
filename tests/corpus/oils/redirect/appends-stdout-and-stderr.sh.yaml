@@ -1,10 +1,13 @@
 name: '&>> appends stdout and stderr'
 dialect: bash
 source: oils:spec/redirect#appends-stdout-and-stderr
-stdout: "ok\nok\nok\n"
+stdout: |
+  ok
+  ok
+  ok
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -17,7 +20,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 
 # Fix for flaky tests: dash behaves non-deterministically under load!  It

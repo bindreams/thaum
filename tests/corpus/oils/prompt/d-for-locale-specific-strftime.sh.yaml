@@ -1,7 +1,8 @@
 name: \D{} for locale specific strftime
 dialect: bash
 source: oils:spec/prompt#d-for-locale-specific-strftime
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 
 # In bash y.tab.c uses %X when string is empty

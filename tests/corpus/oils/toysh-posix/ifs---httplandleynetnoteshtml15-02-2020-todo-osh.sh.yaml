@@ -1,7 +1,15 @@
 name: 'IFS - http://landley.net/notes.html#15-02-2020 (TODO: osh)'
 dialect: bash
 source: oils:spec/toysh-posix#ifs---httplandleynetnoteshtml15-02-2020-todo-osh
-stdout: "==\n=abc=\n==\n\n==\n=abc=\n=def=\n==\n"
+stdout: |-
+  ==
+  =abc=
+  ==
+
+  ==
+  =abc=
+  =def=
+  ==
 ---
 
 IFS=x

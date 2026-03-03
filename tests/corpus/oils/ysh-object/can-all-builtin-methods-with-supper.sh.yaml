@@ -2,7 +2,9 @@ disabled: true
 name: Can all builtin methods with s.upper()
 dialect: bash
 source: oils:spec/ysh-object#can-all-builtin-methods-with-supper
-stdout: "(Str)   \"FOO\"\n(Str)   \"--foo\"\n"
+stdout: |-
+  (Str)   "FOO"
+  (Str)   "--foo"
 ---
 
 var s = 'foo'

@@ -1,7 +1,10 @@
 name: K and V are variables in (( array[K] = V ))
 dialect: bash
 source: oils:spec/assign-dialects#k-and-v-are-variables-in-arrayk-v
-stdout: "array[5]=42\nkeys = 5\nvalues = 42\n"
+stdout: |-
+  array[5]=42
+  keys = 5
+  values = 42
 ---
 K=5
 V=42

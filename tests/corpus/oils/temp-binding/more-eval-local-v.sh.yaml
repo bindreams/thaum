@@ -1,7 +1,10 @@
 name: More eval 'local v='
 dialect: bash
 source: oils:spec/temp-binding#more-eval-local-v
-stdout: "x=x\ny=y\nz=z\n"
+stdout: |-
+  x=x
+  y=y
+  z=z
 ---
 case $SH in mksh) exit ;; esac
 

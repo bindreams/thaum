@@ -1,7 +1,8 @@
 name: Nested ${}
 dialect: bash
 source: oils:spec/var-sub#nested
-stdout: "ZZ\n"
+stdout: |-
+  ZZ
 ---
 bar=ZZ
 echo ${foo:-${bar}}

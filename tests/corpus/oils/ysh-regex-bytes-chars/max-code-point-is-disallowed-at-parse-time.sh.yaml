@@ -3,7 +3,12 @@ name: Max code point is disallowed at parse time
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#max-code-point-is-disallowed-at-parse-time
-stdout: "(Bool)   false\n(Bool)   true\n\n(Bool)   false\n(Bool)   true\n"
+stdout: |-
+  (Bool)   false
+  (Bool)   true
+
+  (Bool)   false
+  (Bool)   true
 ---
 
 pp test_ (/ [\u{10ffff}] /)

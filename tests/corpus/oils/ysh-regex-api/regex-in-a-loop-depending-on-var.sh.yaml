@@ -2,7 +2,11 @@ disabled: true
 name: Regex in a loop depending on var
 dialect: bash
 source: oils:spec/ysh-regex-api#regex-in-a-loop-depending-on-var
-stdout: "line foo\nmatched foo\nline bar\nmatched bar\n"
+stdout: |-
+  line foo
+  matched foo
+  line bar
+  matched bar
 ---
 
 shopt --set ysh:all

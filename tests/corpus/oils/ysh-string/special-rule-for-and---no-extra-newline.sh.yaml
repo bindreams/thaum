@@ -2,9 +2,15 @@ disabled: true
 name: Special rule for <<< ''' and <<< """ - no extra newline
 dialect: bash
 source: oils:spec/ysh-string#special-rule-for-and---no-extra-newline
-stdout: "(Str)   \"unquoted\\n\"\n(Str)   \"single with newline\\n\"\n(Str)   \"double
-  with newline\\n\"\n(Str)   \"j8 with newline\\n\"\n\n(Str)   \"multi\\nsingle\\\
-  n\"\n(Str)   \"multi\\ndouble\\n\"\n(Str)   \"multi\\nj8\\n\"\n"
+stdout: |-
+  (Str)   "unquoted\n"
+  (Str)   "single with newline\n"
+  (Str)   "double with newline\n"
+  (Str)   "j8 with newline\n"
+
+  (Str)   "multi\nsingle\n"
+  (Str)   "multi\ndouble\n"
+  (Str)   "multi\nj8\n"
 ---
 
 read --all <<< unquoted

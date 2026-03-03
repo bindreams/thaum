@@ -2,8 +2,14 @@ name: When LC_ALL=C, pattern ? doesn't match multibyte character
 dialect: bash
 source: 
   oils:spec/var-op-patsub#when-lcallc-pattern-doesnt-match-multibyte-character
-stdout: "_μ_ and _μ_\n_μ_ and _μ_\n_μ_ and _μ_\n\nfoo and foo\nfoo and _y_\n_x_ and
-  foo\n"
+stdout: |-
+  _μ_ and _μ_
+  _μ_ and _μ_
+  _μ_ and _μ_
+
+  foo and foo
+  foo and _y_
+  _x_ and foo
 ---
 export LC_ALL='C'
 

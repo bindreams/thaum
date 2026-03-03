@@ -1,7 +1,9 @@
 name: Dynamic parsing on empty string
 dialect: bash
 source: oils:spec/arith#dynamic-parsing-on-empty-string
-stdout: "0\n0\n"
+stdout: |-
+  0
+  0
 ---
 a=''
 echo $(( a ))

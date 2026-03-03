@@ -1,7 +1,9 @@
 name: Crash after changing $[] to be alias of $(( ))
 dialect: bash
 source: oils:spec/bugs#crash-after-changing-to-be-alias-of
-stdout: "1\nhello\n"
+stdout: |-
+  1
+  hello
 ---
 echo $[i + 1]
 case foo in

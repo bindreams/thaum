@@ -2,7 +2,8 @@ disabled: true
 name: multiline dict
 dialect: bash
 source: oils:spec/ysh-expr#multiline-dict
-stdout: "mydict=2\n"
+stdout: |-
+  mydict=2
 ---
 
 # Note: a pair has to be all on one line.  We could relax that but there isn't

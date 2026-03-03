@@ -1,7 +1,9 @@
 name: $PATH is set if unset at startup
 dialect: bash
 source: oils:spec/vars-special#path-is-set-if-unset-at-startup
-stdout: "yes\nyes\n"
+stdout: |-
+  yes
+  yes
 ---
 
 # WORKAROUND for Python version of bin/osh -- we can't run bin/oils_for_unix.py

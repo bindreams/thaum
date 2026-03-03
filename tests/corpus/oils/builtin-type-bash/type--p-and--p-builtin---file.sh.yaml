@@ -1,7 +1,14 @@
 name: type -p and -P builtin -> file
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-and--p-builtin---file
-stdout: "/tmp/mv\n/tmp/tar\n/tmp/grep\n--\n/tmp/mv\n/tmp/tar\n/tmp/grep\n"
+stdout: |-
+  /tmp/mv
+  /tmp/tar
+  /tmp/grep
+  --
+  /tmp/mv
+  /tmp/tar
+  /tmp/grep
 ---
 touch /tmp/{mv,tar,grep}
 chmod +x /tmp/{mv,tar,grep}

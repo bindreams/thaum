@@ -1,7 +1,13 @@
 name: Unset wrong type
 dialect: bash
 source: oils:spec/builtin-vars#unset-wrong-type
-stdout: "undef 1\nundef 1\narray 0\narray 1\nassoc 0\nassoc 0\n"
+stdout: |-
+  undef 1
+  undef 1
+  array 0
+  array 1
+  assoc 0
+  assoc 0
 ---
 case $SH in mksh) exit ;; esac
 

@@ -1,7 +1,11 @@
 name: \command readonly - similar issue
 dialect: bash
 source: oils:spec/builtin-meta-assign#command-readonly---similar-issue
-stdout: "a b\na b\na b\na b\n"
+stdout: |-
+  a b
+  a b
+  a b
+  a b
 ---
 case $SH in zsh) exit ;; esac
 

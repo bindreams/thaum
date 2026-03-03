@@ -1,7 +1,10 @@
 name: Mixing << and <<-
 dialect: bash
 source: oils:spec/here-doc#mixing-and
-stdout: "one\n--\ntwo\n"
+stdout: |-
+  one
+  --
+  two
 ---
 cat <<-EOF; echo --; cat <<EOF2
 	one

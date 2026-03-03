@@ -2,7 +2,12 @@ disabled: true
 name: Char Class Ranges
 dialect: bash
 source: oils:spec/ysh-regex#char-class-ranges
-stdout: "[0-9a-f]+\n[0-9a-f]+\nyes\nno\nno\n"
+stdout: |-
+  [0-9a-f]+
+  [0-9a-f]+
+  yes
+  no
+  no
 ---
 shopt -s ysh:all
 

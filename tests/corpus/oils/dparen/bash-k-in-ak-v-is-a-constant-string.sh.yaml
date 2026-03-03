@@ -1,7 +1,10 @@
 name: 'bash: K in (( A[K] = V )) is a constant string'
 dialect: bash
 source: oils:spec/dparen#bash-k-in-ak-v-is-a-constant-string
-stdout: "A[5]=\nkeys = K\nvalues = 42\n"
+stdout: |-
+  A[5]=
+  keys = K
+  values = 42
 ---
 K=5
 V=42

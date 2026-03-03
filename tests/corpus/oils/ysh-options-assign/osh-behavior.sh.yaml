@@ -2,7 +2,11 @@ disabled: true
 name: OSH behavior
 dialect: bash
 source: oils:spec/ysh-options-assign#osh-behavior
-stdout: "status=0\nx=1\nstatus=127\ny=\n"
+stdout: |-
+  status=0
+  x=1
+  status=127
+  y=
 ---
 x=1
 echo status=$?

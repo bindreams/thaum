@@ -2,7 +2,8 @@ name: but trap DEBUG respects errexit
 dialect: bash
 source: oils:spec/builtin-trap-bash#but-trap-debug-respects-errexit
 status: 42
-stdout: "  [10]\n"
+stdout: |2-
+    [10]
 ---
 set -o errexit
 

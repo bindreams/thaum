@@ -4,7 +4,9 @@ dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#eval-builtin-does-not-take-a-literal-block---can-restore-this-later
 status: 2
-stdout: "obj\ncommand literal\n"
+stdout: |-
+  obj
+  command literal
 ---
 
 var b = ^(echo obj)

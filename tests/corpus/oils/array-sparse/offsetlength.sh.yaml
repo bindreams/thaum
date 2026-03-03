@@ -1,11 +1,22 @@
 name: ${@:offset:length}
 dialect: bash
 source: oils:spec/array-sparse#offsetlength
-stdout: "==== ${@:offset:length} ====\n[$SH v1 v2][$SH v1 v2]\n[v1 v2 v3][v1 v2 v3]\n\
-  [v3 v4 v5][v3 v4 v5]\n[v5 v6 v7 v8 v9][v5 v6 v7 v8 v9]\n==== ${@:negative} ====\n\
-  [v9][v9]\n[v7 v8 v9][v7 v8 v9]\n[v1 v2 v3 v4 v5 v6 v7 v8 v9][v1 v2 v3 v4 v5 v6 v7
-  v8 v9]\n[$SH v1 v2 v3 v4 v5 v6 v7 v8 v9][$SH v1 v2 v3 v4 v5 v6 v7 v8 v9]\n[][]\n\
-  [v7 v8][v7 v8]\n[v1 v2 v3 v4][v1 v2 v3 v4]\n[$SH v1 v2 v3][$SH v1 v2 v3]\n[][]\n"
+stdout: |-
+  ==== ${@:offset:length} ====
+  [$SH v1 v2][$SH v1 v2]
+  [v1 v2 v3][v1 v2 v3]
+  [v3 v4 v5][v3 v4 v5]
+  [v5 v6 v7 v8 v9][v5 v6 v7 v8 v9]
+  ==== ${@:negative} ====
+  [v9][v9]
+  [v7 v8 v9][v7 v8 v9]
+  [v1 v2 v3 v4 v5 v6 v7 v8 v9][v1 v2 v3 v4 v5 v6 v7 v8 v9]
+  [$SH v1 v2 v3 v4 v5 v6 v7 v8 v9][$SH v1 v2 v3 v4 v5 v6 v7 v8 v9]
+  [][]
+  [v7 v8][v7 v8]
+  [v1 v2 v3 v4][v1 v2 v3 v4]
+  [$SH v1 v2 v3][$SH v1 v2 v3]
+  [][]
 ---
 case $SH in mksh) exit ;; esac
 

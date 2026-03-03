@@ -1,7 +1,8 @@
 name: precedence of && and || in a command context
 dialect: bash
 source: oils:spec/dbracket#precedence-of-and-in-a-command-context
-stdout: "NO precedence\n"
+stdout: |-
+  NO precedence
 ---
 if test True || test '' && test ''; then
   echo YES

@@ -2,7 +2,10 @@ disabled: true
 name: splice with capital letters
 dialect: bash
 source: oils:spec/ysh-regex#splice-with-capital-letters
-stdout: "[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+\nyes\nno\n"
+stdout: |-
+  [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+  yes
+  no
 ---
 shopt -s ysh:all
 var D = /d+/;

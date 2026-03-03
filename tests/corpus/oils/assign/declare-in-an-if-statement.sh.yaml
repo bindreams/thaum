@@ -1,7 +1,9 @@
 name: declare in an if statement
 dialect: bash
 source: oils:spec/assign#declare-in-an-if-statement
-stdout: "bar\neggs\n"
+stdout: |-
+  bar
+  eggs
 ---
 # bug caught by my feature detection snippet in bash-completion
 if ! foo=bar; then

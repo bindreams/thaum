@@ -1,7 +1,8 @@
 name: Triple parens should be disambiguated
 dialect: bash
 source: oils:spec/arith-context#triple-parens-should-be-disambiguated
-stdout: "7 7\n"
+stdout: |-
+  7 7
 ---
 # The first paren is part of the math, parens 2 and 3 are a single token ending
 # arith sub.

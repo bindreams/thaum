@@ -1,7 +1,9 @@
 name: pwd in symlinked dir on shell initialization
 dialect: bash
 source: oils:spec/builtin-cd#pwd-in-symlinked-dir-on-shell-initialization
-stdout: "symlink\ntarget\n"
+stdout: |
+  symlink
+  target
 stderr: ''
 environment:
   TMP: /tmp

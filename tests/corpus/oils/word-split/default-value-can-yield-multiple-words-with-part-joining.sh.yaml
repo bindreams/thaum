@@ -2,8 +2,9 @@ name: default value can yield multiple words with part joining
 dialect: bash
 source: 
   oils:spec/word-split#default-value-can-yield-multiple-words-with-part-joining
-stdout: "['12 3', '4 56']\n"
-setup: |
+stdout: |
+  ['12 3', '4 56']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,6 +12,5 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py 1${undefined:-"2 3" "4 5"}6

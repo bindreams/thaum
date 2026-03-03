@@ -2,7 +2,10 @@ disabled: true
 name: float() conversion
 dialect: bash
 source: oils:spec/ysh-convert#float-conversion
-stdout: "1234.0\n1.234\n2.345\n"
+stdout: |-
+  1234.0
+  1.234
+  2.345
 ---
 shopt --set parse_ysh_expr_sub
 

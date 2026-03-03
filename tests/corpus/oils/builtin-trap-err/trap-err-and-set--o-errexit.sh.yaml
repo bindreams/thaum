@@ -2,7 +2,11 @@ name: trap ERR and set -o errexit
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-set--o-errexit
 status: 1
-stdout: "line=3\na\nb\nline=9\n"
+stdout: |-
+  line=3
+  a
+  b
+  line=9
 ---
 
 trap 'echo line=$LINENO' ERR

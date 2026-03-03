@@ -1,7 +1,8 @@
 name: Indirect expansion, THEN suffix operators
 dialect: bash
 source: oils:spec/var-ref#indirect-expansion-then-suffix-operators
-stdout: "ok\n"
+stdout: |-
+  ok
 ---
 
 check_eq() {

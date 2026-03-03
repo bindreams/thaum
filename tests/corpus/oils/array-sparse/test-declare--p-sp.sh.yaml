@@ -1,8 +1,11 @@
 name: test "declare -p sp"
 dialect: bash
 source: oils:spec/array-sparse#test-declare--p-sp
-stdout: "declare -a a0=()\ndeclare -a a1=(1)\ndeclare -a a2=(1 2)\ndeclare -a a=([0]=x
-  [1]=y [2]=z [3]=w [500]=100 [1000]=100)\n"
+stdout: |-
+  declare -a a0=()
+  declare -a a1=(1)
+  declare -a a2=(1 2)
+  declare -a a=([0]=x [1]=y [2]=z [3]=w [500]=100 [1000]=100)
 ---
 a0=()
 a1=(1)

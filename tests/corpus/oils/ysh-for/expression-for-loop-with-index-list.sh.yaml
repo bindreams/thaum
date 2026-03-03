@@ -2,7 +2,9 @@ disabled: true
 name: 'Expression for loop with index: List'
 dialect: bash
 source: oils:spec/ysh-for#expression-for-loop-with-index-list
-stdout: "0 spam\n1 eggs\n"
+stdout: |-
+  0 spam
+  1 eggs
 ---
 for i, item in (['spam', 'eggs']) {
   echo "$i $item"

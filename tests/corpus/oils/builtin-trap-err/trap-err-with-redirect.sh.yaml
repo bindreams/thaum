@@ -1,7 +1,10 @@
 name: trap ERR with redirect
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-redirect
-stdout: "line=3\nline=7\nok\n"
+stdout: |-
+  line=3
+  line=7
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

@@ -2,7 +2,12 @@ disabled: true
 name: OshLanguageSetValue constructs
 dialect: bash
 source: oils:spec/ysh-scope#oshlanguagesetvalue-constructs
-stdout: "x=42\n---\nx=\n--- global\nx=\n"
+stdout: |-
+  x=42
+  ---
+  x=
+  --- global
+  x=
 ---
 
 f() {

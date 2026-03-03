@@ -1,8 +1,13 @@
 name: IFS=x and '' and $@ (#3)
 dialect: bash
 source: oils:spec/word-split#ifsx-and-and-3
-stdout: "[]\n[]\n[]\n[]\n[]\n"
-setup: |
+stdout: |
+  []
+  []
+  []
+  []
+  []
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 setopt SH_WORD_SPLIT  # for zsh
 

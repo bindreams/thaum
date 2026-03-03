@@ -1,7 +1,9 @@
 name: -eq on strings
 dialect: bash
 source: oils:spec/dbracket#eq-on-strings
-stdout: "true\ntrue\n"
+stdout: |-
+  true
+  true
 ---
 # This is lame behavior: it does a conversion to 0 first for any string
 shopt -u strict_arith || true

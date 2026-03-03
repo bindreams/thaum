@@ -1,7 +1,9 @@
 name: shopt -s failglob in array literal context
 dialect: bash
 source: oils:spec/glob-bash#shopt--s-failglob-in-array-literal-context
-stdout: "*.ZZ\nstatus=1\n"
+stdout: |-
+  *.ZZ
+  status=1
 ---
 myarr=(*.ZZ)
 echo "${myarr[@]}"

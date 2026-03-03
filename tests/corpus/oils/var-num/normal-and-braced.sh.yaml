@@ -1,6 +1,7 @@
 name: Normal and braced
 dialect: bash
 source: oils:spec/var-num#normal-and-braced
-stdout: "a b c\n"
+stdout: |-
+  a b c
 ---
 $SH -c 'echo $0 $1 ${2}' a b c d

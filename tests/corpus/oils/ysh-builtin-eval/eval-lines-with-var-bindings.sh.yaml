@@ -2,7 +2,12 @@ disabled: true
 name: eval lines with var bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-lines-with-var-bindings
-stdout: "a b | a mylocal\nc d | c mylocal\n\na b | a local2\nc d | c local2\n"
+stdout: |-
+  a b | a mylocal
+  c d | c mylocal
+
+  a b | a local2
+  c d | c local2
 ---
 
 proc my-split (;;; block) {

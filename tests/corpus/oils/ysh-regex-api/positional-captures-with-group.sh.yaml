@@ -2,9 +2,11 @@ disabled: true
 name: Positional captures with _group
 dialect: bash
 source: oils:spec/ysh-regex-api#positional-captures-with-group
-stdout: "['2020-08', '2020', '08']\n['2020-08', '2020', '08']\n['2020-08', '2020',
-  '08']\n"
-setup: |
+stdout: |
+  ['2020-08', '2020', '08']
+  ['2020-08', '2020', '08']
+  ['2020-08', '2020', '08']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s ysh:upgrade
 

@@ -1,7 +1,9 @@
 name: Mixing quoted and unquoted parts
 dialect: bash
 source: oils:spec/regex#mixing-quoted-and-unquoted-parts
-stdout: "true\ntrue\n"
+stdout: |-
+  true
+  true
 ---
 [[ 'a b' =~ 'a 'b ]] && echo true
 [[ "a b" =~ "a "'b' ]] && echo true

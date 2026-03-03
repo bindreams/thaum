@@ -2,7 +2,10 @@ disabled: true
 name: --tool cat-em
 dialect: bash
 source: oils:spec/ysh-dev#tool-cat-em
-stdout: "status=1\nstatus=0\nstatus=1\n"
+stdout: |-
+  status=1
+  status=0
+  status=1
 ---
 
 $SH --tool cat-em zzZZ

@@ -2,7 +2,9 @@ disabled: true
 name: default prompt doesn't confuse OSH and YSH
 dialect: bash
 source: oils:spec/ysh-prompt#default-prompt-doesnt-confuse-osh-and-ysh
-stdout: "/ysh \\$ /  /null/\n/null/  /\\s-\\v\\$ /\n"
+stdout: |-
+  /ysh \$ /  /null/
+  /null/  /\s-\v\$ /
 ---
 
 # Special ysh prefix if PS1 is set

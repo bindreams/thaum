@@ -2,7 +2,10 @@ disabled: true
 name: 'Executor: can run Hay (while Hay is hard-coded)'
 dialect: bash
 source: oils:spec/ysh-purity#executor-can-run-hay-while-hay-is-hard-coded
-stdout: "{\n  \"version\": \"1.1\"\n}\n"
+stdout: |-
+  {
+    "version": "1.1"
+  }
 ---
 
 shopt --set ysh:upgrade

@@ -3,8 +3,9 @@ name: captureAll() doesn't fail
 dialect: bash
 source: oils:spec/ysh-method-io#captureall-doesnt-fail
 status: 0
-stdout: "(Dict)   {\"code\":0}\n(Dict)   {\"stdout\":\"out\\n\",\"stderr\":\"err\\\
-  n\",\"status\":1}\n"
+stdout: |-
+  (Dict)   {"code":0}
+  (Dict)   {"stdout":"out\n","stderr":"err\n","status":1}
 ---
 
 var c = ^(shopt --unset verbose_errexit; echo out; echo err >&2; false; echo two)

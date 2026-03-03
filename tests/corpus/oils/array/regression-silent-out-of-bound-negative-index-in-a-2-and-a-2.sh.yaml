@@ -2,10 +2,18 @@ name: 'Regression: silent out-of-bound negative index in ${a[-2]} and $((a[-2]))
 dialect: bash
 source: 
   oils:spec/array#regression-silent-out-of-bound-negative-index-in-a-2-and-a-2
-stdout: "[]\n0\n[0]\n0\n"
-stderr: "  echo \"[${a[-2]}]\"\n           ^\n[ stdin ]:4: Index -2 out of bounds
-  for array of length 1\n  echo \"[$((a[-2]))]\"\n             ^\n[ stdin ]:6: Index
-  -2 out of bounds for array of length 1\n"
+stdout: |
+  []
+  0
+  [0]
+  0
+stderr: |2-
+    echo "[${a[-2]}]"
+             ^
+  [ stdin ]:4: Index -2 out of bounds for array of length 1
+    echo "[$((a[-2]))]"
+               ^
+  [ stdin ]:6: Index -2 out of bounds for array of length 1
 ---
 case $SH in mksh) exit ;; esac
 

@@ -2,8 +2,10 @@ disabled: true
 name: empty array and simple_word_eval (regression test)
 dialect: bash
 source: oils:spec/ysh-list#empty-array-and-simplewordeval-regression-test
-stdout: "len=0\n['/', '/']\n"
-setup: |
+stdout: |
+  len=0
+  ['/', '/']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s parse_at simple_word_eval
 var empty = :| |

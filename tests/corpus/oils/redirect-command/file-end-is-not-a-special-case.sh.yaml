@@ -1,7 +1,13 @@
 name: $(< file; end) is not a special case
 dialect: bash
 source: oils:spec/redirect-command#file-end-is-not-a-special-case
-stdout: "begin\n---\nend\n---\n\n---\n"
+stdout: |-
+  begin
+  ---
+  end
+  ---
+
+  ---
 ---
 
 seq 5 6 > myfile

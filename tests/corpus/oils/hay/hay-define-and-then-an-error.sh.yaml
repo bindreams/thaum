@@ -3,7 +3,13 @@ name: hay define and then an error
 dialect: bash
 source: oils:spec/hay#hay-define-and-then-an-error
 status: 127
-stdout: "user 0\npackage 0\nTASK 0\ninside\nlicense 0\nlicense 0\n"
+stdout: |-
+  user 0
+  package 0
+  TASK 0
+  inside
+  license 0
+  license 0
 ---
 shopt --set parse_brace parse_equals parse_proc
 

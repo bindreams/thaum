@@ -3,7 +3,10 @@ name: Basic List, a[42] a['42'] allowed
 dialect: bash
 source: oils:spec/ysh-list#basic-list-a42-a42-allowed
 status: 3
-stdout: "len=3\n(Str)   \"2\"\n(Str)   \"3\"\n"
+stdout: |-
+  len=3
+  (Str)   "2"
+  (Str)   "3"
 ---
 
 var x = :| 1 2 3 |

@@ -2,6 +2,7 @@ name: redirect subshell
 dialect: bash
 source: oils:spec/redirect-command#redirect-subshell
 stdout: ''
-stderr: "foo\n"
+stderr: |-
+  foo
 ---
 ( echo foo ) 1>&2

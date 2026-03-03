@@ -1,7 +1,13 @@
 name: trap ERR does not run in errexit situations
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-does-not-run-in-errexit-situations
-stdout: "until\nline=16\nline=20\nline=20\nline=20\nok\n"
+stdout: |-
+  until
+  line=16
+  line=20
+  line=20
+  line=20
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

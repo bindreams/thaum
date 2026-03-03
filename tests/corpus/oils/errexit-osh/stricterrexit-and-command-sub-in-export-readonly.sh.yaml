@@ -1,7 +1,14 @@
 name: strict_errexit and command sub in export / readonly
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-and-command-sub-in-export-readonly
-stdout: "a\nstatus=1\na\nstatus=1\na\nb\nstatus=0\n"
+stdout: |-
+  a
+  status=1
+  a
+  status=1
+  a
+  b
+  status=0
 ---
 case $SH in dash|bash|mksh|ash) exit ;; esac
 

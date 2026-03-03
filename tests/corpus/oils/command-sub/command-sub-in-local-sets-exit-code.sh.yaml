@@ -1,7 +1,10 @@
 name: Command Sub in local sets exit code
 dialect: bash
 source: oils:spec/command-sub#command-sub-in-local-sets-exit-code
-stdout: "x\n0\n0\n"
+stdout: |-
+  x
+  0
+  0
 ---
 # A command resets the exit code, but an assignment doesn't.
 f() {

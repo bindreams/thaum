@@ -3,7 +3,11 @@ name: JSON and J8 reject encoded string above max code point
 dialect: bash
 source: 
   oils:spec/ysh-unicode#json-and-j8-reject-encoded-string-above-max-code-point
-stdout: "status=0\nstatus=1\nstatus=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
+  status=0
+  status=1
 ---
 
 max=$(bash <<'EOF'

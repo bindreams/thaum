@@ -1,7 +1,12 @@
 name: unset a[-1] in sparse array (bf.bash regression)
 dialect: bash
 source: oils:spec/builtin-vars#unset-a-1-in-sparse-array-bfbash-regression
-stdout: "len=3 a=0 2 3\nlast=3 second=2 third=\n---\nlen=2 a=0 2\nlast=2 second= third=0\n"
+stdout: |-
+  len=3 a=0 2 3
+  last=3 second=2 third=
+  ---
+  len=2 a=0 2
+  last=2 second= third=0
 ---
 case $SH in dash|zsh) exit ;; esac
 

@@ -1,7 +1,8 @@
 name: read -t -0.5 is invalid
 dialect: bash
 source: oils:spec/builtin-read#read--t--05-is-invalid
-stdout: "2\n"
+stdout: |-
+  2
 ---
 # bash appears to just take the absolute value?
 

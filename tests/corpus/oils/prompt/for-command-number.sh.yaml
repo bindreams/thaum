@@ -1,7 +1,8 @@
 name: \# for command number
 dialect: bash
 source: oils:spec/prompt#for-command-number
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 PS1='foo \# bar'
 prev_cmd_num="$(echo "${PS1@P}" | egrep -o 'foo [0-9]+ bar' | sed -E 's/foo ([0-9]+) bar/\1/')"

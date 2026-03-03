@@ -2,7 +2,9 @@ disabled: true
 name: Str.replace(Eggex, Expr)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-expr
-stdout: "Hello Bob\nHello Bob (extracted from 'name: Bob')\n"
+stdout: |-
+  Hello Bob
+  Hello Bob (extracted from 'name: Bob')
 ---
 shopt --set ysh:all
 

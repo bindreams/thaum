@@ -1,7 +1,10 @@
 name: ${x//~/~root}
 dialect: bash
 source: oils:spec/tilde#xroot
-stdout: "/root\n/root\n[/root]\n"
+stdout: |-
+  /root
+  /root
+  [/root]
 ---
 HOME=/home/bar
 x=~

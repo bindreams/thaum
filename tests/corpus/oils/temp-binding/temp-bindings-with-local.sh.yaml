@@ -1,7 +1,11 @@
 name: Temp bindings with local
 dialect: bash
 source: oils:spec/temp-binding#temp-bindings-with-local
-stdout: "x=\ntx=\ny=\nty=\n"
+stdout: |-
+  x=
+  tx=
+  y=
+  ty=
 ---
 
 f() {

@@ -2,7 +2,17 @@ name: trap DEBUG with 'return'
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-with-return
 status: 0
-stdout: "  [7]\nstatus=0\n  [8]\nA\n  [9]\nstatus=0\n  [10]\nB\n  [11]\nstatus=0\n"
+stdout: |2-
+    [7]
+  status=0
+    [8]
+  A
+    [9]
+  status=0
+    [10]
+  B
+    [11]
+  status=0
 ---
 
 debuglog() {

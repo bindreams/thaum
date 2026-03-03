@@ -1,7 +1,9 @@
 name: File redirects with glob args (bash and zsh only)
 dialect: bash
 source: oils:spec/redirect-multi#file-redirects-with-glob-args-bash-and-zsh-only
-stdout: "hi\nescaped\n"
+stdout: |-
+  hi
+  escaped
 ---
 
 touch one-bar

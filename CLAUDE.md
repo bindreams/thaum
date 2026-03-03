@@ -1,6 +1,7 @@
 # Shell Parser Development Guidelines
 
 ## Important rules
+
 - **Important!** Follow TDD - test-driven development! In particular:
   - Write tests before implementing functionality of fixing bugs;
   - Write tests instead of or in addition to manually verifying.
@@ -17,11 +18,20 @@
   - For function-level docstrings, in addition to the above, the reader has read the function name and argument names. Avoid duplicating obvious information, but include otherwise hidden knowledge.
   - The reader does not know what task you were accomplishing while writing this comment/docstring. Avoid including unnecessary task-related details.
 
+## Cross-platform and Thread Safety
+
+- All features must work on Unix and Windows. Use `#[cfg]` blocks only for platform-specific implementations, never to skip functionality.
+- Test external commands via the `test_tools` fixture (cross-platform binaries), not system paths.
+- Process spawning is concurrent in tests. Avoid process-global side effects (e.g. `set_current_dir`). Use `posix_spawn_file_actions_addchdir_np` where available, with a mutex fallback.
+- When adding `unsafe` platform calls, add both Unix and Windows implementations (or a compile-error stub for unsupported platforms).
+
 ## Correctness
+
 - **Tests must match shell specification.** When writing tests, verify that the expected AST matches what bash/POSIX sh would actually execute. When in doubt, test in a real shell first.
 - **When you notice an issue that won't be fixed immediately, write a TODO comment.** Comments are free. Include a description of the bug and what the correct behavior should be.
 
 ## Contracts and Assertions
+
 Use the `contracts` crate and `debug_assert!` to verify pre-conditions, post-conditions, and internal invariants. These checks run in debug/test builds only — zero overhead in release.
 
 - **`#[debug_requires(condition)]`** — precondition on a function. Use when the condition can be expressed over the function's parameters and `self`.
@@ -33,14 +43,16 @@ Place contracts on every function where there is a meaningful invariant to check
 ## Interface Design
 
 1. **Method names reflect intent.** Observing actions use prefixes like `is_*`, `can_*`, `peek_*`, `as_*`. Mutating actions use verbs like `advance`, `skip`, `scan`, `push`, `pop`.
-2. **Observing actions must not call mutating actions.** The only exception is mutating an internal cache, which must be wrapped in a `Cell`/`RefCell`.
-3. **Query logic belongs on the data, not the consumer.** Token-level queries (is this a keyword? can a command start here?) are methods on `Token`. The parser peeks tokens itself and calls Token methods — it does not wrap peek+query in its own methods.
-4. **Token ownership.** A parsing function consumes only the tokens that constitute the AST node it creates. Leading whitespace is the caller's responsibility to skip; trailing whitespace is the next consumer's responsibility. For example, `collect_word()` does not skip whitespace before or after — the caller handles word boundaries. Helper methods (`eat`, `expect`, `expect_keyword`, `expect_closing_keyword`) skip whitespace internally because they are boundary utilities, not AST-building functions.
+1. **Observing actions must not call mutating actions.** The only exception is mutating an internal cache, which must be wrapped in a `Cell`/`RefCell`.
+1. **Query logic belongs on the data, not the consumer.** Token-level queries (is this a keyword? can a command start here?) are methods on `Token`. The parser peeks tokens itself and calls Token methods — it does not wrap peek+query in its own methods.
+1. **Token ownership.** A parsing function consumes only the tokens that constitute the AST node it creates. Leading whitespace is the caller's responsibility to skip; trailing whitespace is the next consumer's responsibility. For example, `collect_word()` does not skip whitespace before or after — the caller handles word boundaries. Helper methods (`eat`, `expect`, `expect_keyword`, `expect_closing_keyword`) skip whitespace internally because they are boundary utilities, not AST-building functions.
 
 ## Test macro
+
 Use `#[testutil::test]` instead of `#[test]` everywhere. All test binaries use `harness = false` with the testutil custom harness. Do NOT use bare `#[test]` — it compiles but silently never runs.
 
 Optional arguments:
+
 - `requires = [f1, f2]` — runtime preconditions (`fn() -> Result<(), String>`)
 - `name = "display name"` — custom name in test output
 - `labels = [docker, slow]` — prepended as `[docker][slow]` for nextest filtering
@@ -49,22 +61,27 @@ Optional arguments:
 For dynamic test generation (e.g. corpus tests from data files), use `testutil::TestRunner::add()`.
 
 ## Pre-commit checklist
+
 Before every commit, run `pre-commit run --all-files` and fix any issues. This checks:
+
 1. No stray `#[test]` — use `#[testutil::test]` instead
-2. `cargo fmt` — formatting is correct
-3. `cargo clippy` — no linter warnings
+1. `cargo fmt` — formatting is correct
+1. `cargo clippy` — no linter warnings
 
 Additionally:
-4. Run `cargo nextest run --features cli`: all tests pass
-5. Update stale information in documentation:
-   - `README.md`: General information for new users
-   - `CONTRIBUTING.md`: Guidance for contributors (people and LLMs)
-   - `CLAUDE.md`: Instructions specifically for LLM agents
+4\. Run `cargo nextest run --features cli`: all tests pass
+5\. Update stale information in documentation:
+
+- `README.md`: General information for new users
+- `CONTRIBUTING.md`: Guidance for contributors (people and LLMs)
+- `CLAUDE.md`: Instructions specifically for LLM agents
 
 ## Architecture
+
 See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, dialect system, adding new features).
 
 ### Lexer/Parser pipeline
+
 - The **lexer is context-free** — it produces fragment tokens (`Literal`, `SimpleParam`, `DoubleQuoted`, etc.), `Whitespace`, `IoNumber`, operators, `Newline`, `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
 - The **parser promotes keywords** — it checks `Token::Literal("if")` etc. when the grammatical context expects a keyword.
 - The **lexer has no lifetime parameter** — it owns a `CharSource` backed by `Read`. Constructed via `Lexer::from_str()` or `Lexer::from_reader()`.
@@ -74,11 +91,13 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
 - The lexer handles heredocs autonomously — no parser→lexer feedback.
 
 ### Token naming
+
 - Bash-specific tokens use `Bash` prefix: `BashHereStringOp`, `BashDblLBracket`, etc.
 - Semantic names, not character mnemonics: `RedirectFromFile` not `Less`
 - POSIX spec names in doc comments: `/// '<' — redirect input (POSIX: LESS)`
 
 ### Project structure
+
 - `src/lexer/` — context-free tokenizer (char_source, heredoc, operators, word_scan)
 - `src/parser/` — recursive descent (expressions, commands, compound, bash, helpers)
 - `src/word/` — word expansion parsing (fragments, params, substitution)

@@ -3,7 +3,8 @@ name: block in yb-capture Dict (&d) can read from outer scope
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#block-in-yb-capture-dict-d-can-read-from-outer-scope
-stdout: "(Dict)   {\"status\":0,\"stdout\":\"43\\n\"}\n"
+stdout: |-
+  (Dict)   {"status":0,"stdout":"43\n"}
 ---
 
 proc yb-capture(; out; ; block) {

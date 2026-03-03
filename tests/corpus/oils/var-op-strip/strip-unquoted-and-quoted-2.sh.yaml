@@ -1,7 +1,11 @@
 name: strip unquoted and quoted ?
 dialect: bash
 source: oils:spec/var-op-strip#strip-unquoted-and-quoted
-stdout: "foo]\n[foo]\nfoo]\n[foo]\n"
+stdout: |-
+  foo]
+  [foo]
+  foo]
+  [foo]
 ---
 var='[foo]'
 echo ${var#?}

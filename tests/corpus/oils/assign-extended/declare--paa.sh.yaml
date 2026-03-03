@@ -1,7 +1,11 @@
 name: declare -paA
 dialect: bash
 source: oils:spec/assign-extended#declare--paa
-stdout: "[declare -pa]\ndeclare -a test_var6=()\n[declare -pA]\ndeclare -A test_var7=()\n"
+stdout: |-
+  [declare -pa]
+  declare -a test_var6=()
+  [declare -pA]
+  declare -A test_var7=()
 ---
 declare -a test_var6=()
 declare -A test_var7=()

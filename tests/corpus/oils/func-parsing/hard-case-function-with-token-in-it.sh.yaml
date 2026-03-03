@@ -1,6 +1,7 @@
 name: Hard case, function with } token in it
 dialect: bash
 source: oils:spec/func-parsing#hard-case-function-with-token-in-it
-stdout: "}\n"
+stdout: |-
+  }
 ---
 rbrace() { echo }; }; rbrace

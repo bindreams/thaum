@@ -2,7 +2,13 @@ name: 'symbolic syntax error: start with -'
 dialect: bash
 source: oils:spec/builtin-umask#symbolic-syntax-error-start-with
 status: 0
-stdout: "error\n124\nerror\n124\nerror\n124\n"
+stdout: |-
+  error
+  124
+  error
+  124
+  error
+  124
 ---
 umask 0124
 umask -rwx

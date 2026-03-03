@@ -1,7 +1,8 @@
 name: Bug regression
 dialect: bash
 source: oils:spec/builtin-bracket#bug-regression
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 test "$ipv6" = "yes" -a "$ipv6lib" != "none"
 echo status=$?

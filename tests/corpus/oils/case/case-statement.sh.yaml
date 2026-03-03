@@ -1,7 +1,10 @@
 name: Case statement
 dialect: bash
 source: oils:spec/case#case-statement
-stdout: "A\nloop\nloop\n"
+stdout: |-
+  A
+  loop
+  loop
 ---
 case a in
   a) echo A ;;

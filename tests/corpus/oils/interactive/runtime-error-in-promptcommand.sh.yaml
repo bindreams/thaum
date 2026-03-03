@@ -1,7 +1,10 @@
 name: runtime error in PROMPT_COMMAND
 dialect: bash
 source: oils:spec/interactive#runtime-error-in-promptcommand
-stdout: "one\ntwo\n^D\n"
+stdout: |-
+  one
+  two
+  ^D
 ---
 export PS1=''  # OSH prints prompt to stdout
 

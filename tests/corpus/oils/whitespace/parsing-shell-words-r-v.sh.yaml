@@ -1,8 +1,12 @@
 name: Parsing shell words \r \v
 dialect: bash
 source: oils:spec/whitespace#parsing-shell-words-r-v
-stdout: "['-', '-']\n['-\\r-']\n['-\\x0b-']\n['-\\x0c-']\n"
-setup: |
+stdout: |
+  ['-', '-']
+  ['-\r-']
+  ['-\x0b-']
+  ['-\x0c-']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 # frontend/lexer_def.py has rules for this

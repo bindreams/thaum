@@ -1,7 +1,8 @@
 name: Negative second arg is position, not length!
 dialect: bash
 source: oils:spec/var-op-slice#negative-second-arg-is-position-not-length
-stdout: "def de d\n"
+stdout: |-
+  def de d
 ---
 foo=abcdefg
 echo ${foo:3:-1} ${foo: 3: -2} ${foo:3 :-3 }

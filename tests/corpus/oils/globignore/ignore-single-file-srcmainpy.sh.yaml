@@ -1,7 +1,8 @@
 name: Ignore single file src/__main__.py
 dialect: bash
 source: oils:spec/globignore#ignore-single-file-srcmainpy
-stdout: "src/__main__.py\n"
+stdout: |-
+  src/__main__.py
 ---
 mkdir src
 touch src/{__init__.py,__main__.py}

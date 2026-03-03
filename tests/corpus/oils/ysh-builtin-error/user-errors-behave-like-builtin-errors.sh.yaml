@@ -3,7 +3,8 @@ name: User errors behave like builtin errors
 dialect: bash
 source: oils:spec/ysh-builtin-error#user-errors-behave-like-builtin-errors
 status: 3
-stdout: "status=3\n"
+stdout: |-
+  status=3
 ---
 func divide(a, b) {
   if (b === 0) {

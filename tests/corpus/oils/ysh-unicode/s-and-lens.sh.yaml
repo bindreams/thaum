@@ -2,8 +2,11 @@ disabled: true
 name: ${#s} and len(s)
 dialect: bash
 source: oils:spec/ysh-unicode#s-and-lens
-stdout: "farmer scalars = 4\nfacepalm scalars = 5\nfarmer len = 15\nfacepalm len =
-  17\n"
+stdout: |-
+  farmer scalars = 4
+  facepalm scalars = 5
+  farmer len = 15
+  facepalm len = 17
 ---
 shopt --set parse_ysh_expr_sub
 

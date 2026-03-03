@@ -2,10 +2,14 @@ disabled: true
 name: 'pp: Obj cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-obj-cycle
-stdout: "(Obj)   (\"z\":99) --> (\"__foo__\":null)\n(Obj)   (z: 99) --> (__foo__:
-  null)\n\n(Obj)   (\"z\":99,\"cycle\":(...)) --> (\"__foo__\":null)\n(Obj)   (z:
-  99, cycle: (...)) --> (__foo__: null)\n\n(List)   [(\"z\":99,\"cycle\":(...)) -->
-  (\"__foo__\":null),(\"z\":99,\"cycle\":(...)) --> (\"__foo__\":null)]\n"
+stdout: |-
+  (Obj)   ("z":99) --> ("__foo__":null)
+  (Obj)   (z: 99) --> (__foo__: null)
+
+  (Obj)   ("z":99,"cycle":(...)) --> ("__foo__":null)
+  (Obj)   (z: 99, cycle: (...)) --> (__foo__: null)
+
+  (List)   [("z":99,"cycle":(...)) --> ("__foo__":null),("z":99,"cycle":(...)) --> ("__foo__":null)]
 ---
 
 var methods = Object(null, {__foo__: null})

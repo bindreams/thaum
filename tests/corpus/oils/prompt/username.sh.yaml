@@ -1,7 +1,8 @@
 name: username
 dialect: bash
 source: oils:spec/prompt#username
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 PS1='\u '
 USER=$(whoami)

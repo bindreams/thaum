@@ -1,7 +1,21 @@
 name: sh -c -- 'echo hi' does not run anything (#2637)
 dialect: bash
 source: oils:spec/sh-usage#sh--c----echo-hi-does-not-run-anything-2637
-stdout: "z failed\n\nthree failed\n\ntwo\ntwo=0\n\none\none=0\n\nzero=0\n\naa\naa=0\n"
+stdout: |-
+  z failed
+
+  three failed
+
+  two
+  two=0
+
+  one
+  one=0
+
+  zero=0
+
+  aa
+  aa=0
 ---
 
 $SH -c -z 'echo z'

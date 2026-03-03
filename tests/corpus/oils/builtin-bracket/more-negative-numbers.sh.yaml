@@ -1,7 +1,9 @@
 name: More negative numbers
 dialect: bash
 source: oils:spec/builtin-bracket#more-negative-numbers
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 case $SH in dash) exit ;; esac
 

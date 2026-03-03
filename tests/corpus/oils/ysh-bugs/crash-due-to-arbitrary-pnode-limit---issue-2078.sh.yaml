@@ -2,7 +2,8 @@ disabled: true
 name: 'crash due to arbitrary PNode limit - issue #2078'
 dialect: bash
 source: oils:spec/ysh-bugs#crash-due-to-arbitrary-pnode-limit---issue-2078
-stdout: "21\n"
+stdout: |-
+  21
 ---
 
 #!/usr/bin/env ysh

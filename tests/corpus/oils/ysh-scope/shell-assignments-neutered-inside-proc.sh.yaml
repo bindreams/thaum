@@ -2,7 +2,10 @@ disabled: true
 name: shell assignments 'neutered' inside 'proc'
 dialect: bash
 source: oils:spec/ysh-scope#shell-assignments-neutered-inside-proc
-stdout: "e=E g=G\ne=E g=G\ne=SH g=SH\n"
+stdout: |-
+  e=E g=G
+  e=E g=G
+  e=SH g=SH
 ---
 shopt --set parse_proc
 

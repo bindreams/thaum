@@ -2,7 +2,8 @@ name: bad arg to break
 dialect: bash
 source: oils:spec/loop#bad-arg-to-break
 status: 1
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 x=oops
 while true; do 

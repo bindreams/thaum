@@ -1,7 +1,12 @@
 name: command export,readonly
 dialect: bash
 source: oils:spec/builtin-meta-assign#command-exportreadonly
-stdout: "c=export\nc=readonly\n--\ncc=export\ncc=readonly\n"
+stdout: |-
+  c=export
+  c=readonly
+  --
+  cc=export
+  cc=readonly
 ---
 case $SH in zsh) exit ;; esac
 

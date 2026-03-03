@@ -1,12 +1,28 @@
 name: ${@:offset} and ${*:offset}
 dialect: bash
 source: oils:spec/var-op-slice#offset-and-offset
-stdout: "['-SHELL', 'a', '1', 'b', '2', 'c', '3-']\n['-a', '1', 'b', '2', 'c', '3-']\n\
-  ['-c', '3-']\n['--']\n['--']\n['-SHELL', 'a', '1', 'b', '2', 'c', '3-']\n['-a',
-  '1', 'b', '2', 'c', '3-']\n['-c', '3-']\n['--']\n['--']\n['-SHELL a 1 b 2 c 3-']\n\
-  ['-a 1 b 2 c 3-']\n['-c 3-']\n['--']\n['--']\n['-SHELL', 'a 1', 'b 2', 'c 3-']\n\
-  ['-a 1', 'b 2', 'c 3-']\n['-c 3-']\n['--']\n['--']\n"
-setup: |
+stdout: |
+  ['-SHELL', 'a', '1', 'b', '2', 'c', '3-']
+  ['-a', '1', 'b', '2', 'c', '3-']
+  ['-c', '3-']
+  ['--']
+  ['--']
+  ['-SHELL', 'a', '1', 'b', '2', 'c', '3-']
+  ['-a', '1', 'b', '2', 'c', '3-']
+  ['-c', '3-']
+  ['--']
+  ['--']
+  ['-SHELL a 1 b 2 c 3-']
+  ['-a 1 b 2 c 3-']
+  ['-c 3-']
+  ['--']
+  ['--']
+  ['-SHELL', 'a 1', 'b 2', 'c 3-']
+  ['-a 1', 'b 2', 'c 3-']
+  ['-c 3-']
+  ['--']
+  ['--']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -14,7 +30,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in zsh) return ;; esac  # zsh is very different
 

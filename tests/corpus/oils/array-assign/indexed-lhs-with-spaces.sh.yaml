@@ -1,8 +1,10 @@
 name: Indexed LHS with spaces
 dialect: bash
 source: oils:spec/array-assign#indexed-lhs-with-spaces
-stdout: "status=0\n['x', 'z']\n"
-setup: |
+stdout: |
+  status=0
+  ['x', 'z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in zsh|ash) exit ;; esac
 

@@ -4,7 +4,8 @@ dialect: bash
 source: 
   oils:spec/ysh-user-feedback#readonly-in-loop-explains-why-const-doesnt-work
 status: 1
-stdout: "x\n"
+stdout: |-
+  x
 ---
 shopt --unset no_osh_builtins
 

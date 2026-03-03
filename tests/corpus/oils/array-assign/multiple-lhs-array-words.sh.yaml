@@ -1,11 +1,15 @@
 name: Multiple LHS array words
 dialect: bash
 source: oils:spec/array-assign#multiple-lhs-array-words
-stdout: "declare -a a=([0]=\"0\" [1]=\"\" [2]=\"2\")\ndeclare -a b=([0]=\"3\" [1]=\"\
-  4\" [2]=\"/home/spec-test/src\")\n---\n['b[2', '+', '0]=bar']\nstatus=0\ndeclare
-  -a a=([0]=\"0\" [1]=\"\" [2]=\"2\")\ndeclare -a b=([0]=\"3\" [1]=\"4\" [2]=\"/home/spec-test/src\"\
-  )\n"
-setup: |
+stdout: |
+  declare -a a=([0]="0" [1]="" [2]="2")
+  declare -a b=([0]="3" [1]="4" [2]="/home/spec-test/src")
+  ---
+  ['b[2', '+', '0]=bar']
+  status=0
+  declare -a a=([0]="0" [1]="" [2]="2")
+  declare -a b=([0]="3" [1]="4" [2]="/home/spec-test/src")
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +17,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in zsh|ash) exit ;; esac
 

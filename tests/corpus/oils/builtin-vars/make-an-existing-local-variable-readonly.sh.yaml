@@ -1,7 +1,10 @@
 name: Make an existing local variable readonly
 dialect: bash
 source: oils:spec/builtin-vars#make-an-existing-local-variable-readonly
-stdout: "local\nstatus=1\nglobal\n"
+stdout: |-
+  local
+  status=1
+  global
 ---
 f() {
 	local x=local

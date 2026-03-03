@@ -1,7 +1,9 @@
 name: Ambiguous colon in slice
 dialect: bash
 source: oils:spec/arith-context#ambiguous-colon-in-slice
-stdout: "2\nc\n"
+stdout: |-
+  2
+  c
 ---
 s='abcd'
 echo $(( 0 < 1 ? 2 : 0 ))  # evaluates to 2

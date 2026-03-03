@@ -2,7 +2,9 @@ disabled: true
 name: 'parse_brace: cd { } in pipeline'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-cd-in-pipeline
-stdout: "/TMP\n/TMP\n"
+stdout: |-
+  /TMP
+  /TMP
 ---
 shopt -s oil:upgrade
 cd /tmp {

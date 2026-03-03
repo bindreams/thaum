@@ -1,8 +1,11 @@
-disabled: { reason: "funkiness level 5: partial-syntax aliases are unsupported by design" }
+disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by design"}
 name: Loop split across both iterative and recursive aliases
 dialect: bash
 source: oils:spec/alias#loop-split-across-both-iterative-and-recursive-aliases
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 shopt -s expand_aliases  # bash requires this
 alias FOR1='for '

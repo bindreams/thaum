@@ -2,7 +2,10 @@ disabled: true
 name: help List/append, runes, etc.
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-listappend-runes-etc
-stdout: "status=0\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
 ---
 
 shopt --set ysh:upgrade

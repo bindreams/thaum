@@ -2,7 +2,10 @@ disabled: true
 name: Equivalent of zip()
 dialect: bash
 source: oils:spec/ysh-for#equivalent-of-zip
-stdout: "0 a d\n1 b e\n2 c f\n"
+stdout: |-
+  0 a d
+  1 b e
+  2 c f
 ---
 
 var array = :| d e f |

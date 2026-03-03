@@ -1,7 +1,9 @@
 name: ulimit -n limits file descriptors
 dialect: bash
 source: oils:spec/builtin-process#ulimit--n-limits-file-descriptors
-stdout: "status=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
 ---
 
 # OSH bug

@@ -1,10 +1,13 @@
 name: '[bash_unset] local-unset for nested tempenvs'
 dialect: bash
 source: oils:spec/ble-unset#bashunset-local-unset-for-nested-tempenvs
-stdout: "# value-unset, mksh-unset, tempenv-value-unset?\n[global,tempenv1,tempenv2,tempenv3]
-  v: tempenv3\n[global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 1)\n[global,tempenv1,tempenv2,tempenv3]
-  v: (unset) (unset 2)\n[global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 3)\n\
-  [global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 4)\n"
+stdout: |-
+  # value-unset, mksh-unset, tempenv-value-unset?
+  [global,tempenv1,tempenv2,tempenv3] v: tempenv3
+  [global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 1)
+  [global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 2)
+  [global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 3)
+  [global,tempenv1,tempenv2,tempenv3] v: (unset) (unset 4)
 ---
 f4_unset() {
   v=tempenv2 eval '

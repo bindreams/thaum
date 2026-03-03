@@ -1,7 +1,8 @@
 name: Builtin in background
 dialect: bash
 source: oils:spec/background#builtin-in-background
-stdout: "async\n"
+stdout: |-
+  async
 ---
 echo async &
 wait

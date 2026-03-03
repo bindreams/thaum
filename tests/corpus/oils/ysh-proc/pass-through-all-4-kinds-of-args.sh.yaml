@@ -3,9 +3,18 @@ name: Pass through all 4 kinds of args
 dialect: bash
 source: oils:spec/ysh-proc#pass-through-all-4-kinds-of-args
 status: 1
-stdout: "(List)   [\"a\",\"b\"]\n(List)   [\"c\",\"d\"]\n(Dict)   {\"n\":99}\nCommand\n\
-  \n(List)   [\"a\",\"b\"]\n(List)   [\"c\",\"d\"]\n(Dict)   {\"n\":99}\nCommand\n\
-  \n"
+stdout: |+
+  (List)   ["a","b"]
+  (List)   ["c","d"]
+  (Dict)   {"n":99}
+  Command
+
+  (List)   ["a","b"]
+  (List)   ["c","d"]
+  (Dict)   {"n":99}
+  Command
+
+...
 ---
 
 shopt --set ysh:upgrade

@@ -2,10 +2,29 @@ disabled: true
 name: 'Char class special: ^ - ] \'
 dialect: bash
 source: oils:spec/ysh-regex#char-class-special
-stdout: "caret=[x^]\ncaret2=[x^]\ncaret3=[x^]\nmatch x\nmatch ^\n---\nhyphen=[ab-]\n\
-  hyphen2=[ab-]\nmatch -\nmatch a\n---\nrbracket=[][]\nrbracket2=[][]\nmatch [\nmatch
-  ]\n---\nbackslash=[xn\\\\]\nbackslash2=[xn\\\\]\nbackslash3=[xn\\\\]\nmatch x\n\
-  match n\nmatch backslash\n"
+stdout: |-
+  caret=[x^]
+  caret2=[x^]
+  caret3=[x^]
+  match x
+  match ^
+  ---
+  hyphen=[ab-]
+  hyphen2=[ab-]
+  match -
+  match a
+  ---
+  rbracket=[][]
+  rbracket2=[][]
+  match [
+  match ]
+  ---
+  backslash=[xn\\]
+  backslash2=[xn\\]
+  backslash3=[xn\\]
+  match x
+  match n
+  match backslash
 ---
 
 # See demo/ere-char-class-literals.sh

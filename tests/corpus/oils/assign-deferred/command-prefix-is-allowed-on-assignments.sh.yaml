@@ -1,7 +1,9 @@
 name: "'command' prefix is allowed on assignments"
 dialect: bash
 source: oils:spec/assign-deferred#command-prefix-is-allowed-on-assignments
-stdout: "r1=R1\nr2=R2\n"
+stdout: |-
+  r1=R1
+  r2=R2
 ---
 readonly r1='R1'  # zsh has this
 command readonly r2='R2'  # but not this

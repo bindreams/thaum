@@ -2,7 +2,9 @@ name: source works for files in current directory (bash only)
 dialect: bash
 source: 
   oils:spec/builtin-eval-source#source-works-for-files-in-current-directory-bash-only
-stdout: "current dir\nstatus=0\n"
+stdout: |
+  current dir
+  status=0
 environment:
   TMP: /tmp
 ---

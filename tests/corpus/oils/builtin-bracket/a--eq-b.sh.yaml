@@ -1,7 +1,8 @@
 name: '[ a -eq b ]'
 dialect: bash
 source: oils:spec/builtin-bracket#a--eq-b
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 [ a -eq a ]
 echo status=$?

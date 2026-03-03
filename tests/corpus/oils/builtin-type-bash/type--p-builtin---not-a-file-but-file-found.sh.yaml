@@ -2,7 +2,10 @@ name: type -P builtin -> not a file but file found
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-builtin---not-a-file-but-file-found
 status: 1
-stdout: "_tmp/mv\n_tmp/tar\n_tmp/grep\n"
+stdout: |-
+  _tmp/mv
+  _tmp/tar
+  _tmp/grep
 ---
 touch _tmp/{mv,tar,grep}
 chmod +x _tmp/{mv,tar,grep}

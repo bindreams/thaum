@@ -2,7 +2,10 @@ name: '[[ ]]'
 dialect: bash
 source: oils:spec/xtrace#unnamed
 stdout: ''
-stderr: "+ dir=/\n+ [[ -d $dir ]]\n+ (( a = 42 ))\n"
+stderr: |-
+  + dir=/
+  + [[ -d $dir ]]
+  + (( a = 42 ))
 ---
 case $SH in dash|mksh) exit ;; esac
 

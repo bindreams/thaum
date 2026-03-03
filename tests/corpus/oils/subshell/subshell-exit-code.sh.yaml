@@ -2,7 +2,8 @@ name: Subshell exit code
 dialect: bash
 source: oils:spec/subshell#subshell-exit-code
 status: 0
-stdout: "1\n"
+stdout: |-
+  1
 ---
 ( false; )
 echo $?

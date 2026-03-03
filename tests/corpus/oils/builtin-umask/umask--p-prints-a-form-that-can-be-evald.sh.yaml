@@ -1,7 +1,9 @@
 name: "'umask -p' prints a form that can be eval'd"
 dialect: bash
 source: oils:spec/builtin-umask#umask--p-prints-a-form-that-can-be-evald
-stdout: "umask 0022\nstatus=0\n"
+stdout: |-
+  umask 0022
+  status=0
 ---
 umask -p
 echo status=$?

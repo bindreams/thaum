@@ -1,7 +1,12 @@
 name: Compare \x00 byte versus \x01 byte - command sub
 dialect: bash
 source: oils:spec/nul-bytes#compare-x00-byte-versus-x01-byte---command-sub
-stdout: "len=3\n 2e 01 2e\nlen=2\n 2e 2e\nlen=0\n"
+stdout: |-
+  len=3
+   2e 01 2e
+  len=2
+   2e 2e
+  len=0
 ---
 
 # https://stackoverflow.com/questions/32722007/is-skipping-ignoring-nul-bytes-on-process-substitution-standardized

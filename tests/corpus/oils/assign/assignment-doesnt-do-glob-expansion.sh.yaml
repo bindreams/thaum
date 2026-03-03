@@ -1,8 +1,9 @@
 name: Assignment doesn't do glob expansion
 dialect: bash
 source: oils:spec/assign#assignment-doesnt-do-glob-expansion
-stdout: "['_tmp/*.Z']\n"
-setup: |
+stdout: |
+  ['_tmp/*.Z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 touch _tmp/z.Z _tmp/zz.Z
 a=_tmp/*.Z

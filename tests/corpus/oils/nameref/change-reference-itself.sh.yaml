@@ -1,7 +1,18 @@
 name: change reference itself
 dialect: bash
 source: oils:spec/nameref#change-reference-itself
-stdout: "ref=XX\nx=XX\ny=YY\n----\nref=YY\nx=XX\ny=YY\n----\nref=z\nx=XX\ny=z\n"
+stdout: |-
+  ref=XX
+  x=XX
+  y=YY
+  ----
+  ref=YY
+  x=XX
+  y=YY
+  ----
+  ref=z
+  x=XX
+  y=z
 ---
 x=XX
 y=YY

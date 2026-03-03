@@ -1,7 +1,8 @@
 name: Ignore dirs dist/*:node_modules/*
 dialect: bash
 source: oils:spec/globignore#ignore-dirs-distnodemodules
-stdout: "compose/base.compose.yaml compose/dev.compose.yaml src/a.js src/b.js\n"
+stdout: |-
+  compose/base.compose.yaml compose/dev.compose.yaml src/a.js src/b.js
 ---
 mkdir {src,compose,dist,node_modules}
 touch src/{a.js,b.js}

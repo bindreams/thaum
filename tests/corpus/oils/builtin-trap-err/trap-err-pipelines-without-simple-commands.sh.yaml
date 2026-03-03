@@ -1,7 +1,14 @@
 name: trap ERR pipelines without simple commands
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-pipelines-without-simple-commands
-stdout: "assign\ndparen\ndbracket\nsubshell\nsubshell2\ngroup\nok\n"
+stdout: |-
+  assign
+  dparen
+  dbracket
+  subshell
+  subshell2
+  group
+  ok
 ---
 
 trap 'echo assign' ERR

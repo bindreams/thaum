@@ -2,7 +2,12 @@ disabled: true
 name: ysh --eval respects _this_dir and $0
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-respects-thisdir-and-0
-stdout: "one\ntwo\nthree AA\ndollar0 = three.ysh\nflag -c\n"
+stdout: |-
+  one
+  two
+  three AA
+  dollar0 = three.ysh
+  flag -c
 ---
 
 #echo tmp=$[ENV.TMP]

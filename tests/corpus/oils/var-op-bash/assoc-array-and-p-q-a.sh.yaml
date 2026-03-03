@@ -1,7 +1,13 @@
 name: assoc array and @P @Q @a
 dialect: bash
 source: oils:spec/var-op-bash#assoc-array-and-p-q-a
-stdout: "- y\nstatus=0\n- 'y'\nstatus=0\nA - A\nstatus=0\n"
+stdout: |-
+  - y
+  status=0
+  - 'y'
+  status=0
+  A - A
+  status=0
 ---
 
 # note: "y z" causes a bug!

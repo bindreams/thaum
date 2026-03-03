@@ -1,7 +1,11 @@
 name: Upper Case with ^ and ^^
 dialect: bash
 source: oils:spec/var-op-bash#upper-case-with-and
-stdout: "Abc def\nABC DEF\nempty=\nempty=\n"
+stdout: |-
+  Abc def
+  ABC DEF
+  empty=
+  empty=
 ---
 x='abc def'
 echo ${x^}

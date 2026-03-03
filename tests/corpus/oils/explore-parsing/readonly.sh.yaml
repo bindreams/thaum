@@ -1,7 +1,8 @@
 name: readonly +
 dialect: bash
 source: oils:spec/explore-parsing#readonly
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 
 # dash and bash validate this!  But not set +

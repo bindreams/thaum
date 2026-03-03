@@ -2,7 +2,12 @@ disabled: true
 name: 'Consistency: Exit Status and Blocks'
 dialect: bash
 source: oils:spec/ysh-blocks#consistency-exit-status-and-blocks
-stdout: "cd=0\nshopt=0\n  FOO=foo\nshvar=0\ntry=0\n"
+stdout: |-
+  cd=0
+  shopt=0
+    FOO=foo
+  shvar=0
+  try=0
 ---
 shopt --set parse_brace
 

@@ -1,7 +1,9 @@
 name: '[k1]=v1 (BashArray)'
 dialect: bash
 source: oils:spec/array-literal#k1v1-basharray
-stdout: "v2\nv2\n"
+stdout: |-
+  v2
+  v2
 ---
 # Note: This and next tests have originally been in "spec/assign.test.sh" and
 # compared the behavior of OSH's BashAssoc and Bash's indexed array.  After

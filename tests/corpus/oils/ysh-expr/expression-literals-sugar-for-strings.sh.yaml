@@ -2,7 +2,8 @@ disabled: true
 name: expression literals, sugar for strings
 dialect: bash
 source: oils:spec/ysh-expr#expression-literals-sugar-for-strings
-stdout: "result=x is 1\n"
+stdout: |-
+  result=x is 1
 ---
 shopt --set parse_ysh_expr_sub
 

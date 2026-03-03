@@ -2,7 +2,8 @@ name: "'exit' in oshrc (regression)"
 dialect: bash
 source: oils:spec/interactive#exit-in-oshrc-regression
 status: 42
-stdout: "one\n"
+stdout: |
+  one
 environment:
   TMP: /tmp
 ---

@@ -2,10 +2,20 @@ disabled: true
 name: Str.lines()
 dialect: bash
 source: oils:spec/ysh-methods#strlines
-stdout: "(List)   []\n(List)   [\"\"]\n(List)   [\"\",\"\"]\n(List)   [\"one\",\"\
-  two\",\"three\"]\n(List)   [\"foo\"]\n\n(List)   [\"foo\",\"bar\"]\n(List)   [\"\
-  foo\",\"bar\"]\n(List)   [\"foo\",\"bar\"]\n\n(List)   []\n(List)   [\"foo\\u0000bar\\\
-  u0000\"]\n(List)   [\"foo\\r\",\"bar\\r\"]\n"
+stdout: |-
+  (List)   []
+  (List)   [""]
+  (List)   ["",""]
+  (List)   ["one","two","three"]
+  (List)   ["foo"]
+
+  (List)   ["foo","bar"]
+  (List)   ["foo","bar"]
+  (List)   ["foo","bar"]
+
+  (List)   []
+  (List)   ["foo\u0000bar\u0000"]
+  (List)   ["foo\r","bar\r"]
 ---
 
 var empty = u''

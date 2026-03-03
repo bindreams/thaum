@@ -1,7 +1,8 @@
 name: Julia example from spec/oil-user-feedback
 dialect: bash
 source: oils:spec/blog1#julia-example-from-specoil-user-feedback
-stdout: "git branch -D foo baz\n"
+stdout: |-
+  git branch -D foo baz
 ---
 
 case $SH in dash|mksh|zsh) exit ;; esac

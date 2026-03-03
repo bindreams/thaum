@@ -1,8 +1,19 @@
 name: Changing PATH will invalidate PATH cache
 dialect: bash
 source: oils:spec/divergence#changing-path-will-invalidate-path-cache
-stdout: "hi\nstatus=0\nhey\nstatus=0\nhi\nstatus=0\nhey\nstatus=0\nhi\nstatus=0\n\
-  hey\nstatus=0\n"
+stdout: |-
+  hi
+  status=0
+  hey
+  status=0
+  hi
+  status=0
+  hey
+  status=0
+  hi
+  status=0
+  hey
+  status=0
 ---
 
 mkdir -p _tmp/bin

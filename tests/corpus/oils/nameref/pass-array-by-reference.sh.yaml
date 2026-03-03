@@ -1,7 +1,8 @@
 name: pass array by reference
 dialect: bash
 source: oils:spec/nameref#pass-array-by-reference
-stdout: "zo\n"
+stdout: |-
+  zo
 ---
 show_value() {
   local -n array_name=$1

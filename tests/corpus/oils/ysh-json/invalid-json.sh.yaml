@@ -3,7 +3,8 @@ name: invalid JSON
 dialect: bash
 source: oils:spec/ysh-json#invalid-json
 status: 1
-stdout: "pipeline status = 1\n"
+stdout: |-
+  pipeline status = 1
 ---
 echo '{' | json read (&y)
 echo pipeline status = $?

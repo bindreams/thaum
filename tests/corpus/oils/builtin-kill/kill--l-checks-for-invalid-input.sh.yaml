@@ -1,7 +1,16 @@
 name: kill -L checks for invalid input
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-checks-for-invalid-input
-stdout: "USR1\nUSR2\nstatus=1\n\n10\n12\nstatus=1\n\n"
+stdout: |+
+  USR1
+  USR2
+  status=1
+
+  10
+  12
+  status=1
+
+...
 ---
 case $SH in mksh|dash) exit ;; esac
 

@@ -1,7 +1,11 @@
 name: 'recursive arith: short circuit &&, ||'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-short-circuit
-stdout: "1:0\n1:123\n0:0\n1:321\n"
+stdout: |-
+  1:0
+  1:123
+  0:0
+  1:321
 ---
 # Note: mksh R52 has a bug. Even though it supports a short circuit like
 #   "echo $((cond&&(a=1)))", it doesn't work with "x=a=1; echo

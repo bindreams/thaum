@@ -1,7 +1,8 @@
 name: (( A[5] += 42 ))
 dialect: bash
 source: oils:spec/array-assoc#a5-42
-stdout: "16\n"
+stdout: |-
+  16
 ---
 declare -A A
 (( A[5] = 10 ))

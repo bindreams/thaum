@@ -1,7 +1,10 @@
 name: trap ERR and || conditional
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-conditional
-stdout: "line=3\nok\nok\n"
+stdout: |-
+  line=3
+  ok
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

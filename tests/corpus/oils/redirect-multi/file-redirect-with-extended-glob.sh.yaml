@@ -2,7 +2,9 @@ name: File redirect with extended glob
 dialect: bash
 source: oils:spec/redirect-multi#file-redirect-with-extended-glob
 status: 0
-stdout: "status=0\nhi\n"
+stdout: |-
+  status=0
+  hi
 ---
 
 shopt -s extglob

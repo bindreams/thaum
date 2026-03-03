@@ -2,8 +2,14 @@ disabled: true
 name: Str->search() method returns value.Match object
 dialect: bash
 source: oils:spec/ysh-regex-api#str-search-method-returns-valuematch-object
-stdout: "g0 2 6 Hi5-\ng1 2 4 Hi\ng2 4 5 5\n---\ng0 7 12 Bye6-\ng1 7 10 Bye\ng2 10
-  11 6\n"
+stdout: |-
+  g0 2 6 Hi5-
+  g1 2 4 Hi
+  g2 4 5 5
+  ---
+  g0 7 12 Bye6-
+  g1 7 10 Bye
+  g2 10 11 6
 ---
 
 shopt --set parse_ysh_expr_sub

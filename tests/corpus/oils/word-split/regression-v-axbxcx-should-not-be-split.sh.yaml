@@ -1,7 +1,15 @@
 name: 'Regression: "${v:-AxBxC}"x should not be split'
 dialect: bash
 source: oils:spec/word-split#regression-v-axbxcx-should-not-be-split
-stdout: "AxBxC\nAxBxCx\nA B C\nA B Cx\nAxBxC\nAxBxCx\nAxBxC\nAxBxCx\n"
+stdout: |-
+  AxBxC
+  AxBxCx
+  A B C
+  A B Cx
+  AxBxC
+  AxBxCx
+  AxBxC
+  AxBxCx
 ---
 IFS=x
 v=

@@ -2,8 +2,13 @@ disabled: true
 name: Param binding semantics
 dialect: bash
 source: oils:spec/ysh-func#param-binding-semantics
-stdout: "(Str)   \"foo\"\n(Null)   null\n(Str)   \"foo\"\n(List)   [\"a\",\"b\",\"\
-  c\"]\n(Null)   null\n(List)   [\"z\",\"b\",\"c\"]\n"
+stdout: |-
+  (Str)   "foo"
+  (Null)   null
+  (Str)   "foo"
+  (List)   ["a","b","c"]
+  (Null)   null
+  (List)   ["z","b","c"]
 ---
 # value
 var x = 'foo'

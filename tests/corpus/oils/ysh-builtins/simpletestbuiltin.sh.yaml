@@ -2,8 +2,17 @@ disabled: true
 name: simple_test_builtin
 dialect: bash
 source: oils:spec/ysh-builtins#simpletestbuiltin
-stdout: "status=0\nstatus=0\nstatus=0\n---\nstatus=2\nstatus=2\nstatus=1\n---\nstatus=2\n\
-  status=2\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
+  ---
+  status=2
+  status=2
+  status=1
+  ---
+  status=2
+  status=2
 ---
 
 test -n "foo"

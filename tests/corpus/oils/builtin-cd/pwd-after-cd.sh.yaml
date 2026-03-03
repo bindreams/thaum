@@ -1,7 +1,9 @@
 name: pwd after cd ..
 dialect: bash
 source: oils:spec/builtin-cd#pwd-after-cd
-stdout: "dir-two\ndir-one\n"
+stdout: |
+  dir-two
+  dir-one
 environment:
   TMP: /tmp
 ---

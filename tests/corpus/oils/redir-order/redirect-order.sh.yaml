@@ -1,7 +1,9 @@
 name: '[[ + redirect order'
 dialect: bash
 source: oils:spec/redir-order#redirect-order
-stdout: "status=1\nstatus=0\n"
+stdout: |-
+  status=1
+  status=0
 ---
 case $SH in dash|ash) exit ;; esac
 

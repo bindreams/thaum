@@ -2,7 +2,11 @@ disabled: true
 name: push-registers usage
 dialect: bash
 source: oils:spec/ysh-builtins#push-registers-usage
-stdout: "status=2\nstatus=2\nhi\nstatus=0\n"
+stdout: |-
+  status=2
+  status=2
+  hi
+  status=0
 ---
 shopt --set parse_brace
 

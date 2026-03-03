@@ -3,7 +3,8 @@ name: trap block arg is a not a closure - like cd and other builtins
 dialect: bash
 source: 
   oils:spec/ysh-builtin-trap#trap-block-arg-is-a-not-a-closure---like-cd-and-other-builtins
-stdout: "x = global\n"
+stdout: |-
+  x = global
 ---
 
 # e.g. We're not using ctx_EnclosedFrame in RunTrapsOnExit() and in the signal

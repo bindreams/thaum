@@ -2,8 +2,9 @@ disabled: true
 name: or BashArray, or BashAssoc
 dialect: bash
 source: oils:spec/ysh-expr-bool#or-basharray-or-bashassoc
-stdout: "{\"type\":\"BashArray\",\"data\":{\"0\":\"1\",\"1\":\"2\",\"2\":\"3\"}}\n\
-  {\"type\":\"BashAssoc\",\"data\":{\"k\":\"v\"}}\n"
+stdout: |-
+  {"type":"BashArray","data":{"0":"1","1":"2","2":"3"}}
+  {"type":"BashAssoc","data":{"k":"v"}}
 ---
 declare -a array=(1 2 3)
 pp test_ (array or 'yy')

@@ -1,8 +1,9 @@
 name: Create a "user" array out of the argv array
 dialect: bash
 source: oils:spec/array#create-a-user-array-out-of-the-argv-array
-stdout: "['x y', 'z', 'a b', 'c']\n"
-setup: |
+stdout: |
+  ['x y', 'z', 'a b', 'c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 set -- 'a b' 'c'
 array1=('x y' 'z')

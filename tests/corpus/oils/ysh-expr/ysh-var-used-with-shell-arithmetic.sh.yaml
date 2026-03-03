@@ -2,7 +2,11 @@ disabled: true
 name: YSH var used with shell arithmetic
 dialect: bash
 source: oils:spec/ysh-expr#ysh-var-used-with-shell-arithmetic
-stdout: "lt=1\ngt=0\nlt=1\ngt=0\n"
+stdout: |-
+  lt=1
+  gt=0
+  lt=1
+  gt=0
 ---
 var w = "3"
 echo lt=$(( w < 4 ))

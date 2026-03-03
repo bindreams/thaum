@@ -2,7 +2,9 @@ disabled: true
 name: floatsEqual()
 dialect: bash
 source: oils:spec/ysh-expr-compare#floatsequal
-stdout: "(Bool)   true\n(Bool)   false\n"
+stdout: |-
+  (Bool)   true
+  (Bool)   false
 ---
 
 var x = 42.0

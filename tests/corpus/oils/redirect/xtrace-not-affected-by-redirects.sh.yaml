@@ -2,7 +2,9 @@ name: xtrace not affected by redirects
 dialect: bash
 source: oils:spec/redirect#xtrace-not-affected-by-redirects
 stdout: "\n"
-stderr: "+ printf aaaa\n+ set +x\n"
+stderr: |-
+  + printf aaaa
+  + set +x
 ---
 set -x
 printf 'aaaa' > /dev/null 2> test_osh

@@ -1,7 +1,10 @@
 name: Here doc as command prefix
 dialect: bash
 source: oils:spec/here-doc#here-doc-as-command-prefix
-stdout: "3\n2\n1\n"
+stdout: |-
+  3
+  2
+  1
 ---
 <<EOF tac
 1

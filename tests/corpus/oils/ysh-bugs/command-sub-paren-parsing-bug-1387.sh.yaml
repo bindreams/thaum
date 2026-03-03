@@ -2,7 +2,11 @@ disabled: true
 name: Command sub paren parsing bug (#1387)
 dialect: bash
 source: oils:spec/ysh-bugs#command-sub-paren-parsing-bug-1387
-stdout: "true\n3\n125\n13\n"
+stdout: |-
+  true
+  3
+  125
+  13
 ---
 
 write $(if (true) { write true })

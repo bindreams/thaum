@@ -1,7 +1,8 @@
 name: \0 \1 \8
 dialect: bash
 source: oils:spec/builtin-echo#0-1-8
-stdout: " \\0 \\ 1 \\ 8\n"
+stdout: |2-
+   \0 \ 1 \ 8
 ---
 # \0 is special, but \1 isn't in bash
 # \1 is special in dash!  geez

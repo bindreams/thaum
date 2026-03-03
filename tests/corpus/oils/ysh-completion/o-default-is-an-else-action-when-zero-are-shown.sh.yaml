@@ -2,8 +2,10 @@ disabled: true
 name: -o default is an "else action", when zero are shown
 dialect: bash
 source: oils:spec/ysh-completion#o-default-is-an-else-action-when-zero-are-shown
-stdout: "TODO\ngit\n"
-setup: |
+stdout: |
+  TODO
+  git
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 touch file1 file2

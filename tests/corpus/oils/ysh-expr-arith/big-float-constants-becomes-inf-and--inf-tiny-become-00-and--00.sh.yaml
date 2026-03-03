@@ -3,8 +3,15 @@ name: Big float constants becomes inf and -inf, tiny become 0.0 and -0.0
 dialect: bash
 source: 
   oils:spec/ysh-expr-arith#big-float-constants-becomes-inf-and--inf-tiny-become-00-and--00
-stdout: "(Float)   0.12345\nfloat=0\n(Float)   INFINITY\n(Float)   -INFINITY\nfloat=0\n\
-  (Float)   0.0\n(Float)   -0.0\nfloat=0\n"
+stdout: |-
+  (Float)   0.12345
+  float=0
+  (Float)   INFINITY
+  (Float)   -INFINITY
+  float=0
+  (Float)   0.0
+  (Float)   -0.0
+  float=0
 ---
 
 $SH -c '

@@ -1,7 +1,8 @@
 name: Exponentiation operator has buggy precedence
 dialect: bash
 source: oils:spec/arith#exponentiation-operator-has-buggy-precedence
-stdout: "9\n"
+stdout: |-
+  9
 ---
 # NOTE: All shells agree on this, but R and Python give -9, which is more
 # mathematically correct.

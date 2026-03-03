@@ -1,7 +1,13 @@
 name: Truncating 'return' status
 dialect: bash
 source: oils:spec/exit-status#truncating-return-status
-stdout: "status=255\nstatus=0\nstatus=1\n===\nstatus=255\nstatus=254\n"
+stdout: |-
+  status=255
+  status=0
+  status=1
+  ===
+  status=255
+  status=254
 ---
 f() { return 255; }; f
 echo status=$?

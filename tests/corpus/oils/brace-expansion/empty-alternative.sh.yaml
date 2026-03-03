@@ -2,8 +2,9 @@ name: Empty alternative
 dialect: bash
 source: oils:spec/brace-expansion#empty-alternative
 status: 0
-stdout: "['X', 'Y']\n"
-setup: |
+stdout: |
+  ['X', 'Y']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # zsh and mksh don't do word elision, probably because they do brace expansion
 # AFTER variable substitution.

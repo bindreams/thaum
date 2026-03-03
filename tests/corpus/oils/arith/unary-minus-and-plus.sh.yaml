@@ -1,7 +1,8 @@
 name: Unary minus and plus
 dialect: bash
 source: oils:spec/arith#unary-minus-and-plus
-stdout: "2\n"
+stdout: |-
+  2
 ---
 a=1
 b=3

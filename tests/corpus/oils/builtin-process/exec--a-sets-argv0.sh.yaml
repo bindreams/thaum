@@ -1,6 +1,7 @@
 name: exec -a sets argv[0]
 dialect: bash
 source: oils:spec/builtin-process#exec--a-sets-argv0
-stdout: "FOOPROC\n"
+stdout: |-
+  FOOPROC
 ---
 exec -a FOOPROC sh -c 'echo $0'

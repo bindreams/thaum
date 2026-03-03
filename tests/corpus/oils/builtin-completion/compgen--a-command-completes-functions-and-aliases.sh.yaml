@@ -2,8 +2,16 @@ name: compgen -A command completes functions and aliases
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--a-command-completes-functions-and-aliases
-stdout: "our_alias\nour_func\nour_func2\nstatus=0\nour_alias\nour_func\nour_func2\n\
-  our_func3\nstatus=0\n"
+stdout: |-
+  our_alias
+  our_func
+  our_func2
+  status=0
+  our_alias
+  our_func
+  our_func2
+  our_func3
+  status=0
 ---
 our_func() { echo ; }
 our_func2() { echo ; }

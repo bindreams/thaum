@@ -1,7 +1,9 @@
 name: '@() with variable arms'
 dialect: bash
 source: oils:spec/extglob-match#with-variable-arms
-stdout: "TRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  FALSE
 ---
 choice1='help'
 choice2='verbose'

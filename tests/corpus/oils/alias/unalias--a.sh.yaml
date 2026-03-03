@@ -1,7 +1,9 @@
 name: unalias -a
 dialect: bash
 source: oils:spec/alias#unalias--a
-stdout: "2\nstatus=0\n"
+stdout: |-
+  2
+  status=0
 ---
 
 alias foo=bar

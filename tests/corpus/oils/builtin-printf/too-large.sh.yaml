@@ -1,7 +1,13 @@
 name: Too large
 dialect: bash
 source: oils:spec/builtin-printf#too-large
-stdout: "too large\n111111\n1118481\n4210421\n\n"
+stdout: |+
+  too large
+  111111
+  1118481
+  4210421
+
+...
 ---
 case $SH in mksh) echo 'weird bug'; exit ;; esac
 

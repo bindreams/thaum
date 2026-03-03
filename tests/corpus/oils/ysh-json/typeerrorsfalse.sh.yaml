@@ -2,8 +2,17 @@ disabled: true
 name: type_errors=false
 dialect: bash
 source: oils:spec/ysh-json#typeerrorsfalse
-stdout: "null\nnull\n{\n  \"key\": null,\n  \"key2\": null\n}\n\nnull\nnull\n{\"key\"\
-  :null,\"key2\":null}\n"
+stdout: |-
+  null
+  null
+  {
+    "key": null,
+    "key2": null
+  }
+
+  null
+  null
+  {"key":null,"key2":null}
 ---
 shopt --set parse_ysh_expr_sub
 

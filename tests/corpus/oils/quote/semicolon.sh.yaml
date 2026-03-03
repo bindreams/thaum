@@ -1,7 +1,9 @@
 name: Semicolon
 dialect: bash
 source: oils:spec/quote#semicolon
-stdout: "separated\nby semi-colon\n"
+stdout: |-
+  separated
+  by semi-colon
 ---
 echo separated; echo by semi-colon
 

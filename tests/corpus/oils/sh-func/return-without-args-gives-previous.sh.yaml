@@ -1,7 +1,8 @@
 name: Return without args gives previous
 dialect: bash
 source: oils:spec/sh-func#return-without-args-gives-previous
-stdout: "status=42\n"
+stdout: |-
+  status=42
 ---
 f() {
   ( exit 42 )

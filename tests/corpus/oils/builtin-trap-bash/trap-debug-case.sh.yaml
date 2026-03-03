@@ -1,7 +1,13 @@
 name: trap DEBUG case
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-case
-stdout: "  [6]\n  [8]\n  [10]\npython\n  [16]\nok\n"
+stdout: |2-
+    [6]
+    [8]
+    [10]
+  python
+    [16]
+  ok
 ---
 debuglog() {
   echo "  [$@]"

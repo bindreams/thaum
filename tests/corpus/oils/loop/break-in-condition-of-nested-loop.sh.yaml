@@ -1,7 +1,11 @@
 name: break in condition of nested loop
 dialect: bash
 source: oils:spec/loop#break-in-condition-of-nested-loop
-stdout: "i=1\ni=2\ni=3\ndone\n"
+stdout: |-
+  i=1
+  i=2
+  i=3
+  done
 ---
 for i in 1 2 3; do
   echo i=$i

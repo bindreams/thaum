@@ -1,7 +1,8 @@
 name: Recursive alias expansion of SECOND word
 dialect: bash
 source: oils:spec/alias#recursive-alias-expansion-of-second-word
-stdout: "one TWO hello world\n"
+stdout: |-
+  one TWO hello world
 ---
 shopt -s expand_aliases  # bash requires this
 alias one='ONE '

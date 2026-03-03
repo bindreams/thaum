@@ -1,6 +1,7 @@
 name: Operator Precedence
 dialect: bash
 source: oils:spec/arith#operator-precedence
-stdout: "3\n"
+stdout: |-
+  3
 ---
 echo $(( 1 + 2*3 - 8/2 ))

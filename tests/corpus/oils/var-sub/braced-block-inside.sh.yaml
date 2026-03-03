@@ -1,7 +1,8 @@
 name: Braced block inside ${}
 dialect: bash
 source: oils:spec/var-sub#braced-block-inside
-stdout: "/bin/ls\n"
+stdout: |-
+  /bin/ls
 ---
 # NOTE: This bug was in bash 4.3 but fixed in bash 4.4.
 echo ${foo:-$({ ls /bin/ls; })}

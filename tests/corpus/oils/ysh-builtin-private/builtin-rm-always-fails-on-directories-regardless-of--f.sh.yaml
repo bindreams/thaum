@@ -3,7 +3,9 @@ name: builtin rm always fails on directories (regardless of -f)
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#builtin-rm-always-fails-on-directories-regardless-of--f
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 case $SH in
   *osh) prefix='builtin' ;;

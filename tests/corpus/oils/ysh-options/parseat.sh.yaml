@@ -2,8 +2,10 @@ disabled: true
 name: parse_at
 dialect: bash
 source: oils:spec/ysh-options#parseat
-stdout: "['@words']\n['a', 'b c']\n"
-setup: |
+stdout: |
+  ['@words']
+  ['a', 'b c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 words=(a 'b c')
 argv.py @words

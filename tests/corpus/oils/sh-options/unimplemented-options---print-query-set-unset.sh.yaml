@@ -1,7 +1,11 @@
 name: Unimplemented options - print, query, set, unset
 dialect: bash
 source: oils:spec/sh-options#unimplemented-options---print-query-set-unset
-stdout: "q=2\np=2\nnoflag=2\nset=1\n"
+stdout: |-
+  q=2
+  p=2
+  noflag=2
+  set=1
 ---
 case $SH in dash|mksh) exit ;; esac
 

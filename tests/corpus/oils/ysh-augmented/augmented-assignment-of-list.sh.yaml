@@ -2,7 +2,10 @@ disabled: true
 name: Augmented assignment of List
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-of-list
-stdout: "31 42\n31 21\n31 10.5\n"
+stdout: |-
+  31 42
+  31 21
+  31 10.5
 ---
 
 shopt -s parse_at

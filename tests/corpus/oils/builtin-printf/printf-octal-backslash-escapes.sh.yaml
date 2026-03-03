@@ -1,8 +1,10 @@
 name: printf octal backslash escapes
 dialect: bash
 source: oils:spec/builtin-printf#printf-octal-backslash-escapes
-stdout: "['\\x1f7']\n['\\xff']\n"
-setup: |
+stdout: |
+  ['\x1f7']
+  ['\xff']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py "$(printf '\0377')"
 argv.py "$(printf '\377')"

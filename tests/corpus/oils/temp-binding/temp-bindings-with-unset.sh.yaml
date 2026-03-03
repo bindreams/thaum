@@ -1,7 +1,17 @@
 name: Temp bindings with unset
 dialect: bash
 source: oils:spec/temp-binding#temp-bindings-with-unset
-stdout: "x=\n---\nx=\nx=\n---\nx=42\nx=42\n---\nx=42\nx=42\n"
+stdout: |-
+  x=
+  ---
+  x=
+  x=
+  ---
+  x=42
+  x=42
+  ---
+  x=42
+  x=42
 ---
 
 # key point:

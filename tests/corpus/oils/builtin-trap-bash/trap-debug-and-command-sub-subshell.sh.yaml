@@ -1,7 +1,14 @@
 name: trap DEBUG and command sub / subshell
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-and-command-sub-subshell
-stdout: "  [8]\nresult = command sub\ntwo\nsubshell\ntwo\n  [12]\ndone\n"
+stdout: |2-
+    [8]
+  result = command sub
+  two
+  subshell
+  two
+    [12]
+  done
 ---
 case $SH in dash|mksh) exit ;; esac
 

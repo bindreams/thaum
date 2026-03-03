@@ -1,7 +1,9 @@
 name: HISTFILE is defined initially
 dialect: bash
 source: oils:spec/builtin-history#histfile-is-defined-initially
-stdout: "exists\n^D\n"
+stdout: |-
+  exists
+  ^D
 ---
 echo '
 if test -n $HISTFILE; then echo exists; fi

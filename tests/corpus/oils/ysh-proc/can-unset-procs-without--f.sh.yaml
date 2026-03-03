@@ -2,7 +2,11 @@ disabled: true
 name: can unset procs without -f
 dialect: bash
 source: oils:spec/ysh-proc#can-unset-procs-without--f
-stdout: "bar\nstatus=0\n<Proc>\nstatus=127\n"
+stdout: |-
+  bar
+  status=0
+  <Proc>
+  status=127
 ---
 shopt -s ysh:upgrade
 

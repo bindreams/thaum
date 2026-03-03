@@ -1,7 +1,11 @@
 name: HOSTNAME OSTYPE can be changed
 dialect: bash
 source: oils:spec/vars-special#hostname-ostype-can-be-changed
-stdout: "hostname=x\nostype=x\n\n"
+stdout: |+
+  hostname=x
+  ostype=x
+
+...
 ---
 case $SH in zsh) exit ;; esac
 

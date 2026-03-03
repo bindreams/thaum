@@ -1,7 +1,13 @@
 name: Double Quotes in Command Sub in Double Quotes
 dialect: bash
 source: oils:spec/command-sub#double-quotes-in-command-sub-in-double-quotes
-stdout: "x hi\nx hi\nx \"hi\"\nx hi\nx hi\nx hi\n"
+stdout: |-
+  x hi
+  x hi
+  x "hi"
+  x hi
+  x hi
+  x hi
 ---
 # virtualenv's bin/activate uses this.
 # This is weird!  Double quotes within `` is different than double quotes

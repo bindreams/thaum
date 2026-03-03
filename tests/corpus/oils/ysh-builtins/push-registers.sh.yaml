@@ -2,7 +2,11 @@ disabled: true
 name: push-registers
 dialect: bash
 source: oils:spec/ysh-builtins#push-registers
-stdout: "status=43\nbar bar\nstatus=42\nfoo foo\n"
+stdout: |-
+  status=43
+  bar bar
+  status=42
+  foo foo
 ---
 shopt --set ysh:upgrade
 shopt --unset errexit

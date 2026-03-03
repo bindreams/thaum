@@ -1,7 +1,14 @@
 name: 'Strip ops # ## % %% with NUL bytes'
 dialect: bash
 source: oils:spec/nul-bytes#strip-ops-with-nul-bytes
-stdout: "len=1\n 2e\n---\nlen=0\nlen=0\nlen=0\nlen=0\n"
+stdout: |-
+  len=1
+   2e
+  ---
+  len=0
+  len=0
+  len=0
+  len=0
 ---
 
 show_bytes() {

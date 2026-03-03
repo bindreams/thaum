@@ -1,7 +1,11 @@
 name: nested @()
 dialect: bash
 source: oils:spec/extglob-match#nested
-stdout: "TRUE\nTRUE\nTRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  TRUE
+  TRUE
+  FALSE
 ---
 shopt -s extglob
 pat='--@(help|verbose|no-@(long|short)-option)'

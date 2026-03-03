@@ -1,7 +1,10 @@
 name: ${array@Q} and ${array[@]@Q}
 dialect: bash
 source: oils:spec/var-op-bash#arrayq-and-arrayq
-stdout: "'x' 'y\\nz'\n'x'\n'x'\n"
+stdout: |-
+  'x' 'y\nz'
+  'x'
+  'x'
 ---
 array=(x 'y\nz')
 echo ${array[@]@Q}

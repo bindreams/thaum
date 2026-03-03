@@ -1,7 +1,15 @@
 name: Quotes '' "" $'' $"" in pattern
 dialect: bash
 source: oils:spec/regex#quotes-in-pattern
-stdout: "sq\nsq=0\ndq\ndq=0\ndollar-sq\ndollar-sq=0\ndollar-dq\ndollar-dq=0\n"
+stdout: |-
+  sq
+  sq=0
+  dq
+  dq=0
+  dollar-sq
+  dollar-sq=0
+  dollar-dq
+  dollar-dq=0
 ---
 
 $SH <<'EOF'

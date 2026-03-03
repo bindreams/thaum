@@ -1,8 +1,9 @@
 name: index by integer does not work
 dialect: bash
 source: oils:spec/zsh-assoc#index-by-integer-does-not-work
-stdout: "['']\n"
-setup: |
+stdout: |
+  ['']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 typeset -A assoc
 assoc=(k1 v1 k2 v2 k3 v3)

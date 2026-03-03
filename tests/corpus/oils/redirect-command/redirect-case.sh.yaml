@@ -1,7 +1,8 @@
 name: redirect case
 dialect: bash
 source: oils:spec/redirect-command#redirect-case
-stdout: "case-body\n"
+stdout: |-
+  case-body
 ---
 case foo in
   foo)

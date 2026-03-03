@@ -1,7 +1,8 @@
 name: Replace is longest match
 dialect: bash
 source: oils:spec/var-op-patsub#replace-is-longest-match
-stdout: "begin [] end\n"
+stdout: |-
+  begin [] end
 ---
 # If it were shortest, then you would just replace the first <html>
 s='begin <html></html> end'

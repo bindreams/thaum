@@ -1,7 +1,9 @@
 name: \(\) in pattern (regression)
 dialect: bash
 source: oils:spec/case#in-pattern-regression
-stdout: "match\nextglob\n"
+stdout: |-
+  match
+  extglob
 ---
 s='foo()'
 

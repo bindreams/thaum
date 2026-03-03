@@ -1,7 +1,8 @@
 name: append in arith context
 dialect: bash
 source: oils:spec/type-compat#append-in-arith-context
-stdout: "3|3|2\n"
+stdout: |-
+  3|3|2
 ---
 declare s
 (( s='1 '))

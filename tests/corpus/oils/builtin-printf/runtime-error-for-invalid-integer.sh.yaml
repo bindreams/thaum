@@ -1,7 +1,11 @@
 name: Runtime error for invalid integer
 dialect: bash
 source: oils:spec/builtin-printf#runtime-error-for-invalid-integer
-stdout: "3\nstatus=1\n0\nstatus=1\n"
+stdout: |-
+  3
+  status=1
+  0
+  status=1
 ---
 x=3abc
 printf '%d\n' $x

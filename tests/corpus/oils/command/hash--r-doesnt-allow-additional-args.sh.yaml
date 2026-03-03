@@ -1,7 +1,8 @@
 name: hash -r doesn't allow additional args
 dialect: bash
 source: oils:spec/command#hash--r-doesnt-allow-additional-args
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 hash -r whoami >/dev/null  # avoid weird output with mksh
 echo status=$?

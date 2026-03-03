@@ -2,7 +2,10 @@ disabled: true
 name: Functions can be shadowed
 dialect: bash
 source: oils:spec/ysh-func#functions-can-be-shadowed
-stdout: "1 + 2 + 3 = 6\nmysum=6\nmysum=1\n"
+stdout: |-
+  1 + 2 + 3 = 6
+  mysum=6
+  mysum=1
 ---
 func mysum(items) {
   var mysum = 0

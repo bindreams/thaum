@@ -1,7 +1,8 @@
 name: shopt -q invalid
 dialect: bash
 source: oils:spec/sh-options#shopt--q-invalid
-stdout: "invalidZZ=2\n"
+stdout: |-
+  invalidZZ=2
 ---
 shopt -q invalidZZ
 echo invalidZZ=$?

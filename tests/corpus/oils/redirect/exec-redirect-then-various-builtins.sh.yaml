@@ -1,7 +1,8 @@
 name: exec redirect then various builtins
 dialect: bash
 source: oils:spec/redirect#exec-redirect-then-various-builtins
-stdout: "done\n"
+stdout: |
+  done
 environment:
   TMP: /tmp
 ---

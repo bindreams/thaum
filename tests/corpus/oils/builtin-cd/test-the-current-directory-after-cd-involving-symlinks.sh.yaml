@@ -2,7 +2,9 @@ name: Test the current directory after 'cd ..' involving symlinks
 dialect: bash
 source: 
   oils:spec/builtin-cd#test-the-current-directory-after-cd-involving-symlinks
-stdout: "a\nc\n"
+stdout: |
+  a
+  c
 environment:
   TMP: /tmp
 ---

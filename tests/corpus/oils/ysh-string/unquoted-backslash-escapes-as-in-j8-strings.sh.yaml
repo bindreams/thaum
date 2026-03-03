@@ -2,8 +2,13 @@ disabled: true
 name: Unquoted backslash escapes, as in J8 strings
 dialect: bash
 source: oils:spec/ysh-string#unquoted-backslash-escapes-as-in-j8-strings
-stdout: "(Str)   \"\\n\"\n(Str)   \"\\t\"\n(Str)   \"\\r\"\n(Str)   \"\\\"'\\\\\"\n\
-  backslash \\\nbackslash \\\n"
+stdout: |-
+  (Str)   "\n"
+  (Str)   "\t"
+  (Str)   "\r"
+  (Str)   "\"'\\"
+  backslash \
+  backslash \
 ---
 
 # everything except \b \f \n

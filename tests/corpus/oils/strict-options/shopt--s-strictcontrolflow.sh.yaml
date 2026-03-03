@@ -2,7 +2,8 @@ name: shopt -s strict_control_flow
 dialect: bash
 source: oils:spec/strict-options#shopt--s-strictcontrolflow
 status: 1
-stdout: "break\n"
+stdout: |-
+  break
 ---
 shopt -s strict_control_flow || true
 echo break

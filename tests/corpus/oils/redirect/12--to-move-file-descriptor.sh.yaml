@@ -1,7 +1,9 @@
 name: 1>&2- to move file descriptor
 dialect: bash
 source: oils:spec/redirect#12--to-move-file-descriptor
-stdout: "hello5\nworld6\n"
+stdout: |
+  hello5
+  world6
 environment:
   TMP: /tmp
 ---

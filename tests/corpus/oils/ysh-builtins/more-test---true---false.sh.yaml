@@ -2,7 +2,11 @@ disabled: true
 name: More test --true --false
 dialect: bash
 source: oils:spec/ysh-builtins#more-test---true---false
-stdout: "dict=1\ndict=0\n\nAndOr\n"
+stdout: |-
+  dict=1
+  dict=0
+
+  AndOr
 ---
 shopt --set ysh:upgrade
 

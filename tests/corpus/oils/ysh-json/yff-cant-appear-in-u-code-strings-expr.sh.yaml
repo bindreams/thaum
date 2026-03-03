@@ -3,7 +3,8 @@ name: \yff can't appear in u'' code strings (expr)
 dialect: bash
 source: oils:spec/ysh-json#yff-cant-appear-in-u-code-strings-expr
 status: 2
-stdout: " fe\n"
+stdout: |2-
+   fe
 ---
 
 var x = b'\yfe' 

@@ -1,7 +1,9 @@
 name: regex with unprintable characters
 dialect: bash
 source: oils:spec/regex#regex-with-unprintable-characters
-stdout: "status=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
 ---
 # can't have nul byte
 

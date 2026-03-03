@@ -1,8 +1,10 @@
 name: variables set before set -a are not exported
 dialect: bash
 source: oils:spec/builtin-set#variables-set-before-set--a-are-not-exported
-stdout: "None\nafter_value\n"
-setup: |
+stdout: |
+  None
+  after_value
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 BEFORE=before_value
 set -a

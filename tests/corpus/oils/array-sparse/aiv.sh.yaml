@@ -1,8 +1,9 @@
 name: a[i]=v
 dialect: bash
 source: oils:spec/array-sparse#aiv
-stdout: "declare -a sp1=([10]=a [20]=b [30]=c)\ndeclare -a sp1=([10]=X [20]=b [25]=Y
-  [30]=c [90]=Z)\n"
+stdout: |-
+  declare -a sp1=([10]=a [20]=b [30]=c)
+  declare -a sp1=([10]=X [20]=b [25]=Y [30]=c [90]=Z)
 ---
 sp1[10]=a
 sp1[20]=b

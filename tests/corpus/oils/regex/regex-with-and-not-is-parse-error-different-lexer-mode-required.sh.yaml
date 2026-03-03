@@ -1,6 +1,6 @@
 name: Regex with == and not =~ is parse error, different lexer mode required
 dialect: bash
-source:
+source: 
   oils:spec/regex#regex-with-and-not-is-parse-error-different-lexer-mode-required
 parse-error: {contains: "expected ']]'"}
 ---

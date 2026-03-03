@@ -1,7 +1,9 @@
 name: '* matches 0 or more'
 dialect: bash
 source: oils:spec/extglob-match#matches-0-or-more
-stdout: "TRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  FALSE
 ---
 [[ -- == --*(help|verbose) ]] && echo TRUE
 [[ --oops == --*(help|verbose) ]] || echo FALSE

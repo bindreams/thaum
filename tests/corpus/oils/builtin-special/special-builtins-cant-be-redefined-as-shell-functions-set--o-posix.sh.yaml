@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/builtin-special#special-builtins-cant-be-redefined-as-shell-functions-set--o-posix
 status: 0
-stdout: "hi\nhi\n"
+stdout: |-
+  hi
+  hi
 ---
 case $SH in
   bash) set -o posix ;;

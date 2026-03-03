@@ -3,7 +3,8 @@ name: Dict with nonexistent key (bug fix)
 dialect: bash
 source: oils:spec/ysh-augmented#dict-with-nonexistent-key-bug-fix
 status: 3
-stdout: "44\n"
+stdout: |-
+  44
 ---
 
 shopt -s parse_ysh_expr_sub

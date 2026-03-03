@@ -2,7 +2,10 @@ disabled: true
 name: evalHay() usage
 dialect: bash
 source: oils:spec/hay#evalhay-usage
-stdout: "status 3\nstatus 3\nstatus 3\n"
+stdout: |-
+  status 3
+  status 3
+  status 3
 ---
 shopt -s parse_brace parse_ysh_expr_sub
 

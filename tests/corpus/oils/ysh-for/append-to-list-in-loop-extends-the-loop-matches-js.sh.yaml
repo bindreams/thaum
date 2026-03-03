@@ -2,7 +2,11 @@ disabled: true
 name: Append to List in loop extends the loop (matches JS)
 dialect: bash
 source: oils:spec/ysh-for#append-to-list-in-loop-extends-the-loop-matches-js
-stdout: "1\n2\n3\n99\n"
+stdout: |-
+  1
+  2
+  3
+  99
 ---
 
 # see demo/survey-loop

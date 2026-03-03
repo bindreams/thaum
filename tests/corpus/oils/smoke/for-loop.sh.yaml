@@ -2,7 +2,10 @@ name: for loop
 dialect: bash
 source: oils:spec/smoke#for-loop
 status: 0
-stdout: "a\nb\nc\n"
+stdout: |-
+  a
+  b
+  c
 ---
 for i in a b c
 do

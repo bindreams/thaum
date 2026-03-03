@@ -3,7 +3,11 @@ name: builtin rm -f - still fails when file can't be removed
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#builtin-rm--f---still-fails-when-file-cant-be-removed
-stdout: "status=1\nread-only/stuck\nstatus=1\nstatus=0\n"
+stdout: |-
+  status=1
+  read-only/stuck
+  status=1
+  status=0
 ---
 
 mkdir read-only

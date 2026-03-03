@@ -2,7 +2,19 @@ disabled: true
 name: Int Augmented //= %= **= and bitwise ops
 dialect: bash
 source: oils:spec/ysh-augmented#int-augmented-and-bitwise-ops
-stdout: "x=3\nx=1\nx=1000\n\nbitwise\nx=5\nx=15\nx=3\n\nshift\nx=16\nx=4\n"
+stdout: |-
+  x=3
+  x=1
+  x=1000
+
+  bitwise
+  x=5
+  x=15
+  x=3
+
+  shift
+  x=16
+  x=4
 ---
 
 var x = 0

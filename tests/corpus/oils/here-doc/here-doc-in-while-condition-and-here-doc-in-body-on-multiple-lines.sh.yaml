@@ -2,7 +2,10 @@ name: Here doc in while condition and here doc in body on multiple lines
 dialect: bash
 source: 
   oils:spec/here-doc#here-doc-in-while-condition-and-here-doc-in-body-on-multiple-lines
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 while cat <<E1 && cat <<E2
 1

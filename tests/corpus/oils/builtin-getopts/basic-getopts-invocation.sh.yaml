@@ -1,7 +1,8 @@
 name: Basic getopts invocation
 dialect: bash
 source: oils:spec/builtin-getopts#basic-getopts-invocation
-stdout: "h=1 c=foo optind=4 argv=x y z\n"
+stdout: |-
+  h=1 c=foo optind=4 argv=x y z
 ---
 set -- -h -c foo x y z
 FLAG_h=0

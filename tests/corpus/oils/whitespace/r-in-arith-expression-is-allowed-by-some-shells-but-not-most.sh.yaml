@@ -2,8 +2,10 @@ name: \r in arith expression is allowed by some shells, but not most!
 dialect: bash
 source: 
   oils:spec/whitespace#r-in-arith-expression-is-allowed-by-some-shells-but-not-most
-stdout: "['3']\nfailed\n"
-setup: |
+stdout: |
+  ['3']
+  failed
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 arith=$(python2 -c 'print "argv.py $(( 1 +\n2))"')

@@ -2,7 +2,8 @@ name: find files in subdirectory but not the ignored pattern
 dialect: bash
 source: 
   oils:spec/globignore#find-files-in-subdirectory-but-not-the-ignored-pattern
-stdout: "dir1/a.txt dir2/a.txt\n"
+stdout: |-
+  dir1/a.txt dir2/a.txt
 ---
 mkdir {dir1,dir2}
 touch dir1/{a.txt,ignore.txt}

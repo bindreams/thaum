@@ -1,7 +1,8 @@
 name: if pipeline doesn't fail fatally
 dialect: bash
 source: oils:spec/errexit-osh#if-pipeline-doesnt-fail-fatally
-stdout: "done\n"
+stdout: |
+  done
 environment:
   TMP: /tmp
 ---

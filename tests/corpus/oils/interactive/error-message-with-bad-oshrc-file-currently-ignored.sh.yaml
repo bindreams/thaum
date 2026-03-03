@@ -2,7 +2,10 @@ name: Error message with bad oshrc file (currently ignored)
 dialect: bash
 source: 
   oils:spec/interactive#error-message-with-bad-oshrc-file-currently-ignored
-stdout: "hi\nstatus=0\nbad_oshrc:\n"
+stdout: |
+  hi
+  status=0
+  bad_oshrc:
 environment:
   TMP: /tmp
 ---

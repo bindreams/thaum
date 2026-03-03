@@ -1,7 +1,9 @@
 name: pattern a=(1)
 dialect: bash
 source: oils:spec/regex#pattern-a1
-stdout: "status=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
 ---
 [[ a=x =~ a=(x) ]]
 echo status=$?

@@ -4,7 +4,10 @@ name: Indexed array as key of associative array coerces to string (without shopt
 dialect: bash
 source: 
   oils:spec/array-assoc#indexed-array-as-key-of-associative-array-coerces-to-string-without-shopt--s-strictarray
-stdout: "foo\n1 2 3\n42\n"
+stdout: |-
+  foo
+  1 2 3
+  42
 ---
 
 declare -a array=(1 2 3)

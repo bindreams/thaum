@@ -2,7 +2,16 @@ disabled: true
 name: 'parse_paren: while statement'
 dialect: bash
 source: oils:spec/ysh-options#parseparen-while-statement
-stdout: "1\n2\ndone ksh\n1\n2\ndone sh\n1\n2\ndone oil\n"
+stdout: |-
+  1
+  2
+  done ksh
+  1
+  2
+  done sh
+  1
+  2
+  done oil
 ---
 shopt -s oil:upgrade
 

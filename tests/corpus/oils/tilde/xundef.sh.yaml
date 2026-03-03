@@ -1,7 +1,8 @@
 name: x=${undef-~:~}
 dialect: bash
 source: oils:spec/tilde#xundef
-stdout: "/home/bar:/home/bar:/home/bar\n"
+stdout: |-
+  /home/bar:/home/bar:/home/bar
 ---
 HOME=/home/bar
 

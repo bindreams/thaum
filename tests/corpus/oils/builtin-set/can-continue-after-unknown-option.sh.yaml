@@ -2,7 +2,8 @@ name: can continue after unknown option
 dialect: bash
 source: oils:spec/builtin-set#can-continue-after-unknown-option
 status: 0
-stdout: "hello\n"
+stdout: |-
+  hello
 ---
 #
 # TODO: this is the posix special builtin logic?

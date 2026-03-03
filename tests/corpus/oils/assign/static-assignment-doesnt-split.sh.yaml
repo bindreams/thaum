@@ -1,8 +1,9 @@
 name: static assignment doesn't split
 dialect: bash
 source: oils:spec/assign#static-assignment-doesnt-split
-stdout: "['a b c', 'a b c', 'a b c']\n"
-setup: |
+stdout: |
+  ['a b c', 'a b c', 'a b c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 words='a b c'
 export ex=$words

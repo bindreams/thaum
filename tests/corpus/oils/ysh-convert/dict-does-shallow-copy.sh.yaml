@@ -2,7 +2,10 @@ disabled: true
 name: dict() does shallow copy
 dialect: bash
 source: oils:spec/ysh-convert#dict-does-shallow-copy
-stdout: "true\nfalse\ntrue\n"
+stdout: |-
+  true
+  false
+  true
 ---
 shopt --set parse_ysh_expr_sub
 

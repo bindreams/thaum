@@ -1,8 +1,15 @@
 name: nameref and assoc array
 dialect: bash
 source: oils:spec/array-assoc#nameref-and-assoc-array
-stdout: "values: val\nbefore val\nafter val2\nvalues: val2\n---\nbefore val2\nafter
-  val3\nvalues: val3\n"
+stdout: |-
+  values: val
+  before val
+  after val2
+  values: val2
+  ---
+  before val2
+  after val3
+  values: val3
 ---
 show-values() {
   echo values: ${A[@]}

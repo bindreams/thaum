@@ -1,7 +1,10 @@
 name: popd usage error
 dialect: bash
 source: oils:spec/builtin-dirs#popd-usage-error
-stdout: "status=2\nstatus=0\nstatus=2\n"
+stdout: |-
+  status=2
+  status=0
+  status=2
 ---
 pushd / >/dev/null
 popd zzz

@@ -2,8 +2,19 @@ name: 'set umask with symbolic mode: u-rw  ...  u=,g+,o-  ...'
 dialect: bash
 source: oils:spec/builtin-umask#set-umask-with-symbolic-mode-u-rw-ugo
 status: 0
-stdout: "status0=0\n600\nstatus1=0\n300\nstatus2=0\n356\nstatus3=0\n356\nstatus4=0\n\
-  421\nstatus5=0\n737\n"
+stdout: |-
+  status0=0
+  600
+  status1=0
+  300
+  status2=0
+  356
+  status3=0
+  356
+  status4=0
+  421
+  status5=0
+  737
 ---
 
 umask 0000

@@ -2,8 +2,13 @@ disabled: true
 name: setglobal a[i] inside proc
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai-inside-proc
-stdout: "BEFORE mutate global\n(List)   [0]\nlocal that is ignored\n(List)   [1]\n\
-  AFTER mutate global\n(List)   [42]\n"
+stdout: |-
+  BEFORE mutate global
+  (List)   [0]
+  local that is ignored
+  (List)   [1]
+  AFTER mutate global
+  (List)   [42]
 ---
 shopt -s ysh:upgrade
 

@@ -1,7 +1,7 @@
 name: Export a global variable and unset it
 dialect: bash
 source: oils:spec/builtin-vars#export-a-global-variable-and-unset-it
-setup: |
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +10,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 f() { export GLOBAL=X; }
 f

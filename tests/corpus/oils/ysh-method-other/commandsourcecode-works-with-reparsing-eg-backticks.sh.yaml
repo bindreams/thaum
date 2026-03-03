@@ -3,9 +3,11 @@ name: Command.sourceCode() works with reparsing, e.g. backticks
 dialect: bash
 source: 
   oils:spec/ysh-method-other#commandsourcecode-works-with-reparsing-eg-backticks
-stdout: "(Str)   \"   \\n  echo \\\"greeting `echo backticks`\\\"\\n\"\n(Str)   \"\
-  \   \\n  array_lhs[i++]=y\\n\"\n(Str)   \"   \\n  e foo\\n\"\n(Str)   \"   \\n \
-  \ e2 zzz\\n\"\n"
+stdout: |-
+  (Str)   "   \n  echo \"greeting `echo backticks`\"\n"
+  (Str)   "   \n  array_lhs[i++]=y\n"
+  (Str)   "   \n  e foo\n"
+  (Str)   "   \n  e2 zzz\n"
 ---
 
 shopt --unset no_osh_builtins  # allow alias builtin

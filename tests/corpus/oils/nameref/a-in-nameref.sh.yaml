@@ -1,9 +1,13 @@
 name: a[@] in nameref
 dialect: bash
 source: oils:spec/nameref#a-in-nameref
-stdout: "['ref', 'A B', 'C']\nstatus=1\n['ref[@]']\n['ref', 'A B', 'C']\n['a[@]',
-  'A B', 'C']\n"
-setup: |
+stdout: |
+  ['ref', 'A B', 'C']
+  status=1
+  ['ref[@]']
+  ['ref', 'A B', 'C']
+  ['a[@]', 'A B', 'C']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 # this confuses code and data

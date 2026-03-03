@@ -1,8 +1,13 @@
 name: xtrace with unprintable chars
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-unprintable-chars
-stdout: "STDOUT\n   a 003   b 004   c  \\0   d  \\n\n  61  03  62  04  63  00  64\
-  \  0a\n\nSTDERR\n+ echo $'a\\u0003b\\u0004c\\u0000d'\n"
+stdout: |-
+  STDOUT
+     a 003   b 004   c  \0   d  \n
+    61  03  62  04  63  00  64  0a
+
+  STDERR
+  + echo $'a\u0003b\u0004c\u0000d'
 ---
 case $SH in dash) exit ;; esac
 

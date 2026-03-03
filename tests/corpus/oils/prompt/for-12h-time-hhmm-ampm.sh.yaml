@@ -1,7 +1,8 @@
 name: \@ for 12h time (HH:MM AM/PM)
 dialect: bash
 source: oils:spec/prompt#for-12h-time-hhmm-ampm
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 PS1='foo \@ bar'
 echo "${PS1@P}" | egrep -q 'foo [0-1][0-9]:[0-5][0-9] (A|P)M bar'

@@ -2,8 +2,14 @@ disabled: true
 name: eval
 dialect: bash
 source: oils:spec/ysh-xtrace#eval
-stdout: "1\n2\n"
-stderr: "> eval\n  . builtin echo 1\n  . builtin echo 2\n< eval\n"
+stdout: |
+  1
+  2
+stderr: |-
+  > eval
+    . builtin echo 1
+    . builtin echo 2
+  < eval
 ---
 shopt --set ysh:upgrade
 set -x

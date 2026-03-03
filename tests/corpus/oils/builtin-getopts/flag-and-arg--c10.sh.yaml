@@ -1,7 +1,9 @@
 name: 'flag and arg: -c10'
 dialect: bash
 source: oils:spec/builtin-getopts#flag-and-arg--c10
-stdout: "OPTIND=2 opt=c OPTARG=10\nOPTIND=2 opt=? OPTARG=\n"
+stdout: |-
+  OPTIND=2 opt=c OPTARG=10
+  OPTIND=2 opt=? OPTARG=
 ---
 getopts "c:" opt -c10
 echo OPTIND=$OPTIND opt=$opt OPTARG=$OPTARG

@@ -1,8 +1,10 @@
 name: Wait for job and PIPESTATUS
 dialect: bash
 source: oils:spec/background#wait-for-job-and-pipestatus
-stdout: "fore status=1 pipestatus=55 1\nback status=0 pipestatus=0\nwait status=1
-  pipestatus=1\n"
+stdout: |-
+  fore status=1 pipestatus=55 1
+  back status=0 pipestatus=0
+  wait status=1 pipestatus=1
 ---
 
 # foreground

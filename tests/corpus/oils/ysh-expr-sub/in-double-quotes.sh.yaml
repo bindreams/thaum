@@ -2,7 +2,11 @@ disabled: true
 name: In Double quotes
 dialect: bash
 source: oils:spec/ysh-expr-sub#in-double-quotes
-stdout: "func 3\nkey 42\nkey 42\ndq 42\n"
+stdout: |-
+  func 3
+  key 42
+  key 42
+  dq 42
 ---
 var a = %(a b c)
 var obj = /d+/

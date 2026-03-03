@@ -3,7 +3,10 @@ name: global frame doesn't contain builtins like len(), dict(), io
 dialect: bash
 source: 
   oils:spec/ysh-namespaces#global-frame-doesnt-contain-builtins-like-len-dict-io
-stdout: "(List)   [0,1]\n(List)   [0,1]\n(List)   [0,1]\n"
+stdout: |-
+  (List)   [0,1]
+  (List)   [0,1]
+  (List)   [0,1]
 ---
 
 try {

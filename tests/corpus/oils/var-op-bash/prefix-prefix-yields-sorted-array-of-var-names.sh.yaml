@@ -1,11 +1,20 @@
 name: ${!prefix@} ${!prefix*} yields sorted array of var names
 dialect: bash
 source: oils:spec/var-op-bash#prefix-prefix-yields-sorted-array-of-var-names
-stdout: "['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO ZOOM']\n\
-  ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n\
-  ['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z ZIP ZOO ZOOM']\n['Z
-  ZIP ZOO ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n['Z', 'ZIP', 'ZOO', 'ZOOM']\n"
-setup: |
+stdout: |
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z ZIP ZOO ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z ZIP ZOO ZOOM']
+  ['Z ZIP ZOO ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+  ['Z', 'ZIP', 'ZOO', 'ZOOM']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +22,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 ZOO=zoo
 ZIP=zip

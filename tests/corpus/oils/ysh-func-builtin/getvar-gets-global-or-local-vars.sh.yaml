@@ -2,7 +2,11 @@ disabled: true
 name: getVar() gets global or local vars
 dialect: bash
 source: oils:spec/ysh-func-builtin#getvar-gets-global-or-local-vars
-stdout: "g=global\nmylocal=43\nmylocal=43\nnot_global_or_local=null\n"
+stdout: |-
+  g=global
+  mylocal=43
+  mylocal=43
+  not_global_or_local=null
 ---
 
 # compare with shvarGet(), which does dynamic scope

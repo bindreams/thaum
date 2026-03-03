@@ -1,7 +1,9 @@
 name: Non-executable on $PATH
 dialect: bash
 source: oils:spec/command#non-executable-on-path
-stdout: "two\nstatus=0\n"
+stdout: |-
+  two
+  status=0
 ---
 
 # shells differ in whether they actually execve('one/cmd') and get EPERM

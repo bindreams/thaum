@@ -1,7 +1,8 @@
 name: = in function name
 dialect: bash
 source: oils:spec/func-parsing#in-function-name
-stdout: "func-name=ext\n"
+stdout: |-
+  func-name=ext
 ---
 # WOW, bash is so lenient. foo=bar is a command, I suppose.  I  think I'm doing
 # to disallow this one.

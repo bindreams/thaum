@@ -1,7 +1,8 @@
 name: while in pipe
 dialect: bash
 source: oils:spec/loop#while-in-pipe
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 x=$(find spec/ | wc -l)
 y=$(find spec/ | while read path; do

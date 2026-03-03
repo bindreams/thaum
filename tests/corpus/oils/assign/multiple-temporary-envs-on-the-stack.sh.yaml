@@ -1,9 +1,21 @@
 name: Multiple temporary envs on the stack
 dialect: bash
 source: oils:spec/assign#multiple-temporary-envs-on-the-stack
-stdout: "f [] [A]\n--- g() ---\nf\n[]\n[A]\nNone\np\n--- f() ---\nf\nNone\nNone\n\
-  None\nNone\n"
-setup: |
+stdout: |
+  f [] [A]
+  --- g() ---
+  f
+  []
+  [A]
+  None
+  p
+  --- f() ---
+  f
+  None
+  None
+  None
+  None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +24,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 g() {
   echo "$F" "$G1" "$G2"

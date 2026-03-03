@@ -1,7 +1,8 @@
 name: \d for date
 dialect: bash
 source: oils:spec/prompt#d-for-date
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 PS1='foo \d bar'
 echo "${PS1@P}" | egrep -q 'foo [A-Z][a-z]+ [A-Z][a-z]+ [0-9]+ bar'

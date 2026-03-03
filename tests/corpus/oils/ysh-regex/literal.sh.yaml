@@ -2,7 +2,10 @@ disabled: true
 name: literal ''
 dialect: bash
 source: oils:spec/ysh-regex#literal
-stdout: "abcdef\nno\nyes\n"
+stdout: |-
+  abcdef
+  no
+  yes
 ---
 shopt -s ysh:all
 var pat = ''

@@ -1,7 +1,9 @@
 name: temp assignment x=~ env
 dialect: bash
 source: oils:spec/tilde#temp-assignment-x-env
-stdout: "xx=/home/bar\nxx=/root:/home/bar:/home/bar\n"
+stdout: |-
+  xx=/home/bar
+  xx=/root:/home/bar:/home/bar
 ---
 
 HOME=/home/bar

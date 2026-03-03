@@ -1,7 +1,8 @@
 name: Dynamic base constants
 dialect: bash
 source: oils:spec/arith#dynamic-base-constants
-stdout: "10\n"
+stdout: |-
+  10
 ---
 base=16
 echo $(( ${base}#a ))

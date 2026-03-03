@@ -1,7 +1,12 @@
 name: Two kinds of tilde expansion
 dialect: bash
 source: oils:spec/brace-expansion#two-kinds-of-tilde-expansion
-stdout: "/home/bob/src /root\n-- /home/bob/src\n-- /root\n== /home/bob/src\n== /root\n"
+stdout: |-
+  /home/bob/src /root
+  -- /home/bob/src
+  -- /root
+  == /home/bob/src
+  == /root
 ---
 
 HOME=/home/bob

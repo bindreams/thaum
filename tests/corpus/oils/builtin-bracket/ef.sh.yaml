@@ -1,7 +1,11 @@
 name: -ef
 dialect: bash
 source: oils:spec/builtin-bracket#ef
-stdout: "same\nsame\ndifferent\ndifferent\n"
+stdout: |
+  same
+  same
+  different
+  different
 environment:
   TMP: /tmp
 ---

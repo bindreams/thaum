@@ -1,7 +1,10 @@
 name: help
 dialect: bash
 source: oils:spec/builtin-bash#help
-stderr: "status=0\nstatus=0\nstatus=0\n"
+stderr: |-
+  status=0
+  status=0
+  status=0
 ---
 help
 echo status=$? >&2

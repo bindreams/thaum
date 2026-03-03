@@ -1,7 +1,8 @@
 name: write big file with ulimit
 dialect: bash
 source: oils:spec/builtin-process#write-big-file-with-ulimit
-stdout: "outer=153\n"
+stdout: |-
+  outer=153
 ---
 
 # I think this will test write() errors, rather than the final flush() error

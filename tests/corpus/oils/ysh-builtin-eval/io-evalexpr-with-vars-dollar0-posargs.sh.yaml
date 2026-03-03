@@ -2,7 +2,14 @@ disabled: true
 name: io->evalExpr() with vars, dollar0, pos_args
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evalexpr-with-vars-dollar0-posargs
-stdout: "z a b hello\n2\n4\n---\n5\n7\n9\n"
+stdout: |-
+  z a b hello
+  2
+  4
+  ---
+  5
+  7
+  9
 ---
 
 var ex = ^["$0 $1 $2 " ++ myvar]

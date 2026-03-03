@@ -2,10 +2,24 @@ disabled: true
 name: Param scope issue (from Zulip, 2025-02)
 dialect: bash
 source: oils:spec/hay-meta#param-scope-issue-from-zulip-2025-02
-stdout: "(Str)   \"remote\"\n(Str)   \"remote\"\n{\n  \"source\": null,\n  \"children\"\
-  : [\n    {\n      \"type\": \"Service\",\n      \"args\": [\n        \"auth.example.com\"\
-  \n      ],\n      \"children\": [],\n      \"attrs\": {\n        \"port\": 80\n\
-  \      }\n    }\n  ]\n}\n"
+stdout: |-
+  (Str)   "remote"
+  (Str)   "remote"
+  {
+    "source": null,
+    "children": [
+      {
+        "type": "Service",
+        "args": [
+          "auth.example.com"
+        ],
+        "children": [],
+        "attrs": {
+          "port": 80
+        }
+      }
+    ]
+  }
 ---
 shopt --set ysh:all
 

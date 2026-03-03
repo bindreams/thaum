@@ -2,7 +2,8 @@ disabled: true
 name: d.key
 dialect: bash
 source: oils:spec/ysh-expr#dkey
-stdout: "andy\n"
+stdout: |-
+  andy
 ---
 var d = {name: 'andy'}
 var x = d.name

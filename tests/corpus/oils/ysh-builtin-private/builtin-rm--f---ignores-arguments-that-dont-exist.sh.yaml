@@ -3,7 +3,9 @@ name: builtin rm -f - ignores arguments that don't exist
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#builtin-rm--f---ignores-arguments-that-dont-exist
-stdout: "status=1\nstatus=0\n"
+stdout: |-
+  status=1
+  status=0
 ---
 case $SH in
   *osh) prefix='builtin' ;;

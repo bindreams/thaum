@@ -2,7 +2,9 @@ disabled: true
 name: crash dump
 dialect: bash
 source: oils:spec/ysh-dev#crash-dump
-stdout: "status=1\nstatus=0\n"
+stdout: |
+  status=1
+  status=0
 environment:
   TMP: /tmp
 ---

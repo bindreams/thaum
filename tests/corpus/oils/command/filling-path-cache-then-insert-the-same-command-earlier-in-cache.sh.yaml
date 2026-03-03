@@ -2,7 +2,10 @@ name: filling $PATH cache, then insert the same command earlier in cache
 dialect: bash
 source: 
   oils:spec/command#filling-path-cache-then-insert-the-same-command-earlier-in-cache
-stdout: "two\ntwo\none\n"
+stdout: |
+  two
+  two
+  one
 environment:
   TMP: /tmp
 ---

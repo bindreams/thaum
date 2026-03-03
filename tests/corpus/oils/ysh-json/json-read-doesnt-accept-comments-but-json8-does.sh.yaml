@@ -2,7 +2,13 @@ disabled: true
 name: json read doesn't accept comments, but json8 does
 dialect: bash
 source: oils:spec/ysh-json#json-read-doesnt-accept-comments-but-json8-does
-stdout: "status=0\n{\n  \"key\": \"val\",\n  \"k2\": \"v2\"\n}\nstatus=1\n"
+stdout: |-
+  status=0
+  {
+    "key": "val",
+    "k2": "v2"
+  }
+  status=1
 ---
 
 json8 read <<EOF

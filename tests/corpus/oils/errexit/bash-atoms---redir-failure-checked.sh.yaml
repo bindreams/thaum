@@ -1,7 +1,9 @@
 name: bash atoms [[ (( - redir failure checked
 dialect: bash
 source: oils:spec/errexit#bash-atoms---redir-failure-checked
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 
 # bash 5.2 fixed bash 4.4 bug: this is now checked

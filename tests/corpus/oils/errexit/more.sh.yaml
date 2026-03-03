@@ -1,7 +1,14 @@
 name: More && ||
 dialect: bash
 source: oils:spec/errexit#more
-stdout: "group\nstatus=1\n\nsubshell\nstatus=42\n\nstatus=1\n"
+stdout: |-
+  group
+  status=1
+
+  subshell
+  status=42
+
+  status=1
 ---
 
 $SH -c 'set -e; false || { echo group; false; }; echo bad'

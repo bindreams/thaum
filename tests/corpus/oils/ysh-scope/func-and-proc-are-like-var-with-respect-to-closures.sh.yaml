@@ -2,7 +2,15 @@ disabled: true
 name: func and proc are like var, with respect to closures
 dialect: bash
 source: oils:spec/ysh-scope#func-and-proc-are-like-var-with-respect-to-closures
-stdout: "inner inner\nouter outer\n\ninner inner\nouter outer\n\ninner\nouter\n"
+stdout: |-
+  inner inner
+  outer outer
+
+  inner inner
+  outer outer
+
+  inner
+  outer
 ---
 shopt --set ysh:all
 

@@ -1,7 +1,16 @@
 name: echo backslashes
 dialect: bash
 source: oils:spec/builtin-echo#echo-backslashes
-stdout: "\\\n\\\n\\\\\n\\\n## BUG dash/mksh/zsh STDOUT:\n\\\n\\\n\\\n\\\n"
+stdout: |-
+  \
+  \
+  \\
+  \
+  ## BUG dash/mksh/zsh STDOUT:
+  \
+  \
+  \
+  \
 ---
 echo \\
 echo '\'

@@ -3,7 +3,8 @@ name: Can't splice nested Dict
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-splice-nested-dict
 status: 3
-stdout: "v v2\n"
+stdout: |-
+  v v2
 ---
 
 declare -A A=([k]=v [k2]=v2)

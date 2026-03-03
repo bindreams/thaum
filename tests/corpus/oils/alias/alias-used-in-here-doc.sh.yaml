@@ -1,7 +1,8 @@
 name: alias used in here doc
 dialect: bash
 source: oils:spec/alias#alias-used-in-here-doc
-stdout: "[ ]\n"
+stdout: |-
+  [ ]
 ---
 shopt -s expand_aliases
 alias echo_='echo [ '

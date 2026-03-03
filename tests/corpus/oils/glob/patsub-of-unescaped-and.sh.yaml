@@ -1,7 +1,11 @@
 name: PatSub of unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#patsub-of-unescaped-and
-stdout: "<foo]\n[foo>\n<foo]\n[foo>\n"
+stdout: |-
+  <foo]
+  [foo>
+  <foo]
+  [foo>
 ---
 x='[foo]'
 echo ${x//[\[z]/<}  # the right way to do it

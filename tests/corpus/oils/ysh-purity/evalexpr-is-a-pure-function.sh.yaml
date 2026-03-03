@@ -2,7 +2,10 @@ disabled: true
 name: evalExpr() is a pure function
 dialect: bash
 source: oils:spec/ysh-purity#evalexpr-is-a-pure-function
-stdout: "pure=43\nimpure code=5\nimpure=45\n"
+stdout: |-
+  pure=43
+  impure code=5
+  impure=45
 ---
 shopt --set ysh:upgrade
 

@@ -2,7 +2,15 @@ disabled: true
 name: Proc that doesn't take a block
 dialect: bash
 source: oils:spec/ysh-blocks#proc-that-doesnt-take-a-block
-stdout: "task name=spam\nno block\nstatus=44\n\ntask name=foo\nrunning\nblock\nstatus=33\n"
+stdout: |-
+  task name=spam
+  no block
+  status=44
+
+  task name=foo
+  running
+  block
+  status=33
 ---
 shopt --set parse_brace parse_proc parse_paren
 

@@ -3,7 +3,10 @@ name: singleton pipeline
 dialect: bash
 source: oils:spec/ysh-xtrace#singleton-pipeline
 stdout: ''
-stderr: ". builtin ':' begin\n. builtin 'false'\n. builtin ':' end\n"
+stderr: |-
+  . builtin ':' begin
+  . builtin 'false'
+  . builtin ':' end
 ---
 
 # Hm extra tracing

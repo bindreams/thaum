@@ -1,7 +1,8 @@
 name: expansion with arith sub
 dialect: bash
 source: oils:spec/brace-expansion#expansion-with-arith-sub
-stdout: "-3- -b-\n"
+stdout: |-
+  -3- -b-
 ---
 a=A
 echo -{$((1 + 2)),b}-

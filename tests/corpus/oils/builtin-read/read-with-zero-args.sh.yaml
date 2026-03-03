@@ -1,7 +1,8 @@
 name: read with zero args
 dialect: bash
 source: oils:spec/builtin-read#read-with-zero-args
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 echo | read
 echo status=$?

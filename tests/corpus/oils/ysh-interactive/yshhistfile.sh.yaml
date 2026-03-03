@@ -2,7 +2,14 @@ disabled: true
 name: YSH_HISTFILE
 dialect: bash
 source: oils:spec/ysh-interactive#yshhistfile
-stdout: "42\n43\n44\n^D\necho 42\necho 43\necho 44\n"
+stdout: |-
+  42
+  43
+  44
+  ^D
+  echo 42
+  echo 43
+  echo 44
 ---
 
 #export YSH_HISTFILE=myhist

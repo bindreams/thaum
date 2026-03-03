@@ -2,7 +2,11 @@ name: set -u with undefined variable exits the interpreter
 dialect: bash
 source: 
   oils:spec/builtin-set#set--u-with-undefined-variable-exits-the-interpreter
-stdout: "before\nOK\nbefore\nOK\n"
+stdout: |-
+  before
+  OK
+  before
+  OK
 ---
 
 # non-interactive

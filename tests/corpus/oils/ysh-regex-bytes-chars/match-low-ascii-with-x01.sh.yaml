@@ -2,7 +2,11 @@ disabled: true
 name: Match low ASCII with [\x01]
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#match-low-ascii-with-x01
-stdout: "(Bool)   true\n\n(Bool)   true\n(Bool)   false\n"
+stdout: |-
+  (Bool)   true
+
+  (Bool)   true
+  (Bool)   false
 ---
 shopt -s ysh:all
 

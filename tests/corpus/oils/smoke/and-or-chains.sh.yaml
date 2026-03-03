@@ -1,7 +1,15 @@
 name: and-or chains
 dialect: bash
 source: oils:spec/smoke#and-or-chains
-stdout: "1\n2\n4\n--\nA\nB\nC\nD\n"
+stdout: |-
+  1
+  2
+  4
+  --
+  A
+  B
+  C
+  D
 ---
 echo 1 && echo 2 || echo 3 && echo 4
 echo --

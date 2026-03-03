@@ -1,7 +1,8 @@
 name: glob after $@ expansion
 dialect: bash
 source: oils:spec/glob#glob-after-expansion
-stdout: "_tmp/b.B\n"
+stdout: |-
+  _tmp/b.B
 ---
 touch _tmp/b.B
 fun() {

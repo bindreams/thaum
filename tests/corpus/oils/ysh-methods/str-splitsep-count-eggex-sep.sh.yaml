@@ -2,8 +2,12 @@ disabled: true
 name: Str => split(sep, count), eggex sep
 dialect: bash
 source: oils:spec/ysh-methods#str-splitsep-count-eggex-sep
-stdout: "(List)   [\"a\",\"b\",\"c\"]\n(List)   [\"\",\"a\"]\n(List)   [\"a\",\"b\"\
-  ,\"c<d\"]\n(List)   [\"a b  c\"]\n(List)   []\n"
+stdout: |-
+  (List)   ["a","b","c"]
+  (List)   ["","a"]
+  (List)   ["a","b","c<d"]
+  (List)   ["a b  c"]
+  (List)   []
 ---
 pp test_ ('a,b;c'.split(/ ',' | ';' /, count=-1))
 pp test_ ('aa'.split(/ dot /, count=1))

@@ -2,7 +2,14 @@ disabled: true
 name: search() and leftMatch() accept ERE string
 dialect: bash
 source: oils:spec/ysh-regex-api#search-and-leftmatch-accept-ere-string
-stdout: "g0 2 6 hi5-\ng1 2 4 hi\ng2 4 5 5\n---\ng0 0 4 hi5-\ng1 0 2 hi\ng2 2 3 5\n"
+stdout: |-
+  g0 2 6 hi5-
+  g1 2 4 hi
+  g2 4 5 5
+  ---
+  g0 0 4 hi5-
+  g1 0 2 hi
+  g2 2 3 5
 ---
 shopt --set parse_ysh_expr_sub
 

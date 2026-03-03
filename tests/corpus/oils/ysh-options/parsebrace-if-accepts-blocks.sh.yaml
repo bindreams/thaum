@@ -2,7 +2,18 @@ disabled: true
 name: 'parse_brace: if accepts blocks'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-if-accepts-blocks
-stdout: "one\ntwo\nthree\nelse\nelif\none line\n1\n2\nsh syntax\n1\n2\n"
+stdout: |-
+  one
+  two
+  three
+  else
+  elif
+  one line
+  1
+  2
+  sh syntax
+  1
+  2
 ---
 shopt -s oil:upgrade
 shopt -u errexit  # don't need strict_errexit check!

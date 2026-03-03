@@ -1,7 +1,8 @@
 name: until loop
 dialect: bash
 source: oils:spec/loop#until-loop
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 # This is just the opposite of while?  while ! cond?
 until false; do

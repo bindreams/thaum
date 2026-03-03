@@ -1,7 +1,9 @@
 name: --rcfile with parse error - shell is executed anyway
 dialect: bash
 source: oils:spec/interactive#rcfile-with-parse-error---shell-is-executed-anyway
-stdout: "flag -c\nstatus=0\n"
+stdout: |
+  flag -c
+  status=0
 environment:
   TMP: /tmp
 ---

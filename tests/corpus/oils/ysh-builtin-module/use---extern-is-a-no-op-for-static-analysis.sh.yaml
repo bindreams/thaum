@@ -2,7 +2,9 @@ disabled: true
 name: use --extern is a no-op, for static analysis
 dialect: bash
 source: oils:spec/ysh-builtin-module#use---extern-is-a-no-op-for-static-analysis
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 
 use --extern grep sed awk

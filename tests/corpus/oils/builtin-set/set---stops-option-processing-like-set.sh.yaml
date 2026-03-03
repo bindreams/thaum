@@ -1,7 +1,8 @@
 name: set - stops option processing like set --
 dialect: bash
 source: oils:spec/builtin-set#set---stops-option-processing-like-set
-stdout: "argv -v\n"
+stdout: |-
+  argv -v
 ---
 case $SH in zsh) exit ;; esac
 

@@ -1,7 +1,11 @@
 name: trap DEBUG and control flow
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-and-control-flow
-stdout: "  [6]\n  [7]\nhello\n  [8]\n"
+stdout: |2-
+    [6]
+    [7]
+  hello
+    [8]
 ---
 
 debuglog() {

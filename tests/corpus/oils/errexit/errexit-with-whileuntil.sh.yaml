@@ -2,7 +2,8 @@ name: errexit with while/until
 dialect: bash
 source: oils:spec/errexit#errexit-with-whileuntil
 status: 0
-stdout: "ok\n"
+stdout: |-
+  ok
 ---
 set -o errexit
 while false; do

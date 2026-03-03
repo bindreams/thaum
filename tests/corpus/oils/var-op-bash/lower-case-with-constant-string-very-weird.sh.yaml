@@ -1,7 +1,9 @@
 name: Lower Case with constant string (VERY WEIRD)
 dialect: bash
 source: oils:spec/var-op-bash#lower-case-with-constant-string-very-weird
-stdout: "aAA ABC DEF\naaa aBC DEF\n"
+stdout: |-
+  aAA ABC DEF
+  aaa aBC DEF
 ---
 x='AAA ABC DEF'
 echo ${x,A}

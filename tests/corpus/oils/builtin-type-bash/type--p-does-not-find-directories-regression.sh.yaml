@@ -1,7 +1,10 @@
 name: type -P does not find directories (regression)
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-does-not-find-directories-regression
-stdout: "status=1\n/usr/bin/cat\nstatus=0\n"
+stdout: |-
+  status=1
+  /usr/bin/cat
+  status=0
 ---
 
 mkdir -p _tmp

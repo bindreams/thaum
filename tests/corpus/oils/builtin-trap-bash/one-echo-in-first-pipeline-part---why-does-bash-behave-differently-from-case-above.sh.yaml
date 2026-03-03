@@ -3,7 +3,12 @@ name: One 'echo' in first pipeline part - why does bash behave differently from
 dialect: bash
 source: 
   oils:spec/builtin-trap-bash#one-echo-in-first-pipeline-part---why-does-bash-behave-differently-from-case-above
-stdout: "  LINENO=6\n  LINENO=7\npipeline\n  LINENO=8\nok\n"
+stdout: |2-
+    LINENO=6
+    LINENO=7
+  pipeline
+    LINENO=8
+  ok
 ---
 
 # TODO: bash runs the trap 3 times, and osh only twice.  I don't see why.  Is

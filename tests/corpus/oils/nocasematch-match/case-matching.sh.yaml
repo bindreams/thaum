@@ -1,7 +1,11 @@
 name: case matching
 dialect: bash
 source: oils:spec/nocasematch-match#case-matching
-stdout: "0\n0\n0\n0\n"
+stdout: |-
+  0
+  0
+  0
+  0
 ---
 shopt -s nocasematch
 case a in A) echo 0 ;; *) echo 1 ;; esac

@@ -1,8 +1,9 @@
 name: "declare array vs. string: mixing -a +a and () ''"
 dialect: bash
 source: oils:spec/type-compat#declare-array-vs-string-mixing--a-a-and
-stdout: "['1', '(2 3)', '4', '5', '6']\n"
-setup: |
+stdout: |
+  ['1', '(2 3)', '4', '5', '6']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # dynamic parsing of first argument.
 declare +a 'xyz1=1'

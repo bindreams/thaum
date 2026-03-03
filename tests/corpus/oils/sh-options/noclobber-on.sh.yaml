@@ -1,7 +1,11 @@
 name: noclobber on
 dialect: bash
 source: oils:spec/sh-options#noclobber-on
-stdout: "create=0\noverwrite=1\nforce=0\nforce\n"
+stdout: |-
+  create=0
+  overwrite=1
+  force=0
+  force
 ---
 
 rm -f no-clobber

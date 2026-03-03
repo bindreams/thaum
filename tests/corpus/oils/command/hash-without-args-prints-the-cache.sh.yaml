@@ -1,7 +1,9 @@
 name: hash without args prints the cache
 dialect: bash
 source: oils:spec/command#hash-without-args-prints-the-cache
-stdout: "/usr/bin/whoami\nstatus=0\n"
+stdout: |-
+  /usr/bin/whoami
+  status=0
 ---
 whoami >/dev/null
 hash

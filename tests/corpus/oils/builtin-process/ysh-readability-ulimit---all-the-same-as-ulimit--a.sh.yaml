@@ -2,7 +2,11 @@ name: 'YSH readability: ulimit --all the same as ulimit -a'
 dialect: bash
 source: 
   oils:spec/builtin-process#ysh-readability-ulimit---all-the-same-as-ulimit--a
-stdout: "  8 short.txt\n  8 long.txt\n 16 total\nstatus=0\n"
+stdout: |2-
+    8 short.txt
+    8 long.txt
+   16 total
+  status=0
 ---
 
 case $SH in bash|dash|mksh|zsh) exit ;; esac

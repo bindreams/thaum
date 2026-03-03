@@ -1,7 +1,10 @@
 name: Dynamic parsing of arithmetic
 dialect: bash
 source: oils:spec/arith#dynamic-parsing-of-arithmetic
-stdout: "6\ntrue\nstatus=2\n"
+stdout: |-
+  6
+  true
+  status=2
 ---
 e=1+2
 echo $(( e + 3 ))

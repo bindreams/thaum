@@ -1,7 +1,9 @@
 name: declare
 dialect: bash
 source: oils:spec/serialize#declare
-stdout: "zz=$'one\\ntwo'\ndeclare -- zz=$'one\\ntwo'\n"
+stdout: |-
+  zz=$'one\ntwo'
+  declare -- zz=$'one\ntwo'
 ---
 case $SH in ash|zsh) return ;; esac  # zsh doesn't make much sense
 

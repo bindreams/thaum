@@ -2,7 +2,10 @@ disabled: true
 name: r''' in Command Mode, Expression mode
 dialect: bash
 source: oils:spec/ysh-string#r-in-command-mode-expression-mode
-stdout: "\\\n\\\nr\\\n"
+stdout: |-
+  \
+  \
+  r\
 ---
 
 echo r'''\'''

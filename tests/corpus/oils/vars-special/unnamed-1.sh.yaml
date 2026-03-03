@@ -2,7 +2,8 @@ name: $#
 dialect: bash
 source: oils:spec/vars-special#unnamed
 status: 0
-stdout: "4\n"
+stdout: |-
+  4
 ---
 set -- 1 2 3 4
 echo $#

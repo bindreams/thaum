@@ -1,7 +1,8 @@
 name: ${##}
 dialect: bash
 source: oils:spec/blog1#unnamed
-stdout: "2\n"
+stdout: |-
+  2
 ---
 set -- $(seq 25)
 echo ${##}

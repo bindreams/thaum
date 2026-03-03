@@ -1,7 +1,9 @@
 name: declare -l -u
 dialect: bash
 source: oils:spec/type-compat#declare--l--u
-stdout: "foo\nFOO\n"
+stdout: |-
+  foo
+  FOO
 ---
 
 declare -l lower=FOO

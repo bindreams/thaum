@@ -1,7 +1,8 @@
 name: 'set -o noglob (bug #698)'
 dialect: bash
 source: oils:spec/glob#set--o-noglob-bug-698
-stdout: "\\z\n"
+stdout: |-
+  \z
 ---
 var='\z'
 set -f

@@ -2,8 +2,12 @@ disabled: true
 name: pp cell_
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-cell
-stdout: "x = (Cell exported:F readonly:F nameref:F val:(value.Str s:42))\nstatus=0\n\
-  x = (Cell exported:F readonly:F nameref:F val:(value.Str s:42))\nstatus=0\nstatus=1\n"
+stdout: |-
+  x = (Cell exported:F readonly:F nameref:F val:(value.Str s:42))
+  status=0
+  x = (Cell exported:F readonly:F nameref:F val:(value.Str s:42))
+  status=0
+  status=1
 ---
 x=42
 

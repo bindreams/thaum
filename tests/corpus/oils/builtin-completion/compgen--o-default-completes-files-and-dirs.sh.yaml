@@ -1,8 +1,13 @@
 name: compgen -o default completes files and dirs
 dialect: bash
 source: oils:spec/builtin-completion#compgen--o-default-completes-files-and-dirs
-stdout: "spec/temp-binding.test.sh\nspec/testdata\nspec/tilde.test.sh\nspec/toysh-posix.test.sh\n\
-  spec/toysh.test.sh\nspec/type-compat.test.sh\n"
+stdout: |-
+  spec/temp-binding.test.sh
+  spec/testdata
+  spec/tilde.test.sh
+  spec/toysh-posix.test.sh
+  spec/toysh.test.sh
+  spec/type-compat.test.sh
 ---
 cd $REPO_ROOT
 compgen -o default spec/t | sort

@@ -4,7 +4,8 @@ dialect: bash
 source: 
   oils:spec/ysh-builtin-module#module-invoked-without-any-arguments-is-an-error
 status: 2
-stdout: "caller_no_leak = null\n"
+stdout: |-
+  caller_no_leak = null
 ---
 shopt --set ysh:upgrade
 

@@ -1,8 +1,9 @@
 name: IFS unset behaves like $' \t\n'
 dialect: bash
 source: oils:spec/word-split#ifs-unset-behaves-like-tn
-stdout: "['a', 'b', 'c']\n"
-setup: |
+stdout: |
+  ['a', 'b', 'c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 unset IFS
 x=$(python2 -c 'print(" a b\tc\n")')

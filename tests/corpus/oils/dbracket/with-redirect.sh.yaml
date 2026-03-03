@@ -1,10 +1,13 @@
 name: '[[ ]] with redirect'
 dialect: bash
 source: oils:spec/dbracket#with-redirect
-stdout: "0\n--\nSTDERR\n"
+stdout: |
+  0
+  --
+  STDERR
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -17,7 +20,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 [[ $(stdout_stderr.py) == STDOUT ]] 2>$TMP/x.txt
 echo $?

@@ -3,7 +3,8 @@ name: Blank line with spaces and tabs isn't OK either
 dialect: bash
 source: oils:spec/ysh-multiline#blank-line-with-spaces-and-tabs-isnt-ok-either
 status: 2
-stdout: "comment is OK\n"
+stdout: |-
+  comment is OK
 ---
 ... echo comment
     # comment

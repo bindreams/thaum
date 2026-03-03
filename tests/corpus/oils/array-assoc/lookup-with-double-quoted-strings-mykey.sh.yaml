@@ -1,7 +1,8 @@
 name: lookup with double quoted strings "mykey"
 dialect: bash
 source: oils:spec/array-assoc#lookup-with-double-quoted-strings-mykey
-stdout: "b bar c\n"
+stdout: |-
+  b bar c
 ---
 declare -A a
 a["aa"]=b

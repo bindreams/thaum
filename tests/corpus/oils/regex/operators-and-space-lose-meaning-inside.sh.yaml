@@ -1,6 +1,7 @@
 name: Operators and space lose meaning inside ()
 dialect: bash
 source: oils:spec/regex#operators-and-space-lose-meaning-inside
-stdout: "true\n"
+stdout: |-
+  true
 ---
 [[ '< >' =~ (< >) ]] && echo true

@@ -1,7 +1,9 @@
 name: Here doc with quote expansion in terminator
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-quote-expansion-in-terminator
-stdout: "one\ntwo\n"
+stdout: |-
+  one
+  two
 ---
 cat <<'EOF'"2"
 one

@@ -2,7 +2,9 @@ disabled: true
 name: Shift operators
 dialect: bash
 source: oils:spec/ysh-expr-arith#shift-operators
-stdout: "16\n1\n"
+stdout: |-
+  16
+  1
 ---
 var a = 1 << 4
 echo $a

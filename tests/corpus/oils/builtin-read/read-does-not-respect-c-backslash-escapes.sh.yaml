@@ -1,7 +1,8 @@
 name: read does not respect C backslash escapes
 dialect: bash
 source: oils:spec/builtin-read#read-does-not-respect-c-backslash-escapes
-stdout: "a b c d e f g h x65 145 i\n"
+stdout: |
+  a b c d e f g h x65 145 i
 environment:
   TMP: /tmp
 ---

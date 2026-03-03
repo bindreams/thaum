@@ -1,7 +1,8 @@
 name: Array index on LHS of assignment
 dialect: bash
 source: oils:spec/arith-context#array-index-on-lhs-of-assignment
-stdout: "1 X 3\n"
+stdout: |-
+  1 X 3
 ---
 a=(1 2 3)
 zero=0

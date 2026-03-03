@@ -1,7 +1,15 @@
 name: IFS - http://landley.net/notes.html#05-03-2020
 dialect: bash
 source: oils:spec/toysh-posix#ifs---httplandleynetnoteshtml05-03-2020
-stdout: "=one=\n=abc=\n=d f=\n=ghi=\n---\n=one=\n==\n=two=\n"
+stdout: |-
+  =one=
+  =abc=
+  =d f=
+  =ghi=
+  ---
+  =one=
+  ==
+  =two=
 ---
 case $SH in zsh) exit ;; esac
 

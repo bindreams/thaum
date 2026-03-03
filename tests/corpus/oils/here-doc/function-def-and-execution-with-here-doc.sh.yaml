@@ -1,7 +1,11 @@
 name: Function def and execution with here doc
 dialect: bash
 source: oils:spec/here-doc#function-def-and-execution-with-here-doc
-stdout: "before\n1\n2\nafter\n"
+stdout: |-
+  before
+  1
+  2
+  after
 ---
 fun() { cat; } <<EOF; echo before; fun; echo after 
 1

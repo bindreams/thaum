@@ -1,7 +1,8 @@
 name: Quadruple parens should be disambiguated
 dialect: bash
 source: oils:spec/arith-context#quadruple-parens-should-be-disambiguated
-stdout: "15 15\n"
+stdout: |-
+  15 15
 ---
 ((a=1 + (2 * (3+4))))
 echo $a $((1 + (2 * (3+4))))

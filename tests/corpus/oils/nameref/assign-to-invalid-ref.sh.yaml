@@ -1,7 +1,10 @@
 name: assign to invalid ref
 dialect: bash
 source: oils:spec/nameref#assign-to-invalid-ref
-stdout: "ref=1\nref=1\nref=foo\n"
+stdout: |-
+  ref=1
+  ref=1
+  ref=foo
 ---
 ref=1   # mksh makes this READ-ONLY!  Because it's not valid.
 

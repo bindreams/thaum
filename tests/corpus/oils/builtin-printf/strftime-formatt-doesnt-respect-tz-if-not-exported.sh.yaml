@@ -2,7 +2,8 @@ name: "%(strftime format)T doesn't respect TZ if not exported"
 dialect: bash
 source: 
   oils:spec/builtin-printf#strftime-formatt-doesnt-respect-tz-if-not-exported
-stdout: "not equal\n"
+stdout: |-
+  not equal
 ---
 
 # note: this test leaks!  It assumes that /etc/localtime is NOT Portugal.

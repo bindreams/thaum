@@ -1,8 +1,11 @@
 name: xtrace
 dialect: bash
 source: oils:spec/serialize#xtrace
-stdout: "one\ntwo\n"
-stderr: "+ echo $'one\\ntwo'\n"
+stdout: |
+  one
+  two
+stderr: |-
+  + echo $'one\ntwo'
 ---
 zz=$'one\ntwo'
 set -x

@@ -1,7 +1,9 @@
 name: For loop starts pipeline
 dialect: bash
 source: oils:spec/pipeline#for-loop-starts-pipeline
-stdout: "two\none\n"
+stdout: |-
+  two
+  one
 ---
 for w in one two; do
   echo $w

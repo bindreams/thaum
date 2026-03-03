@@ -1,7 +1,9 @@
 name: (( status bug
 dialect: bash
 source: oils:spec/bugs#status-bug
-stdout: "status=0\nyes\n"
+stdout: |-
+  status=0
+  yes
 ---
 case $SH in dash|ash) exit ;; esac
 

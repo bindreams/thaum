@@ -1,7 +1,8 @@
 name: command local
 dialect: bash
 source: oils:spec/builtin-meta-assign#command-local
-stdout: "s=local\n"
+stdout: |-
+  s=local
 ---
 
 f() {

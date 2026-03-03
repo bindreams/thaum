@@ -2,8 +2,12 @@ disabled: true
 name: 'pp test_: Dict cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-dict-cycle
-stdout: "(Dict)   {\"z\":99}\n(List)   [{\"z\":99},{\"z\":99}]\n\n(Dict)   {\"k\"\
-  :42,\"cycle\":{...}}\n(List)   [{\"k\":42,\"cycle\":{...}},{\"k\":42,\"cycle\":{...}}]\n"
+stdout: |-
+  (Dict)   {"z":99}
+  (List)   [{"z":99},{"z":99}]
+
+  (Dict)   {"k":42,"cycle":{...}}
+  (List)   [{"k":42,"cycle":{...}},{"k":42,"cycle":{...}}]
 ---
 
 var no_cycle = {z: 99}

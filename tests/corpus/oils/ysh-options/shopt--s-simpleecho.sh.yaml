@@ -2,7 +2,13 @@ disabled: true
 name: shopt -s simple_echo
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-simpleecho
-stdout: "one two\n\none   two\none two\n-e one   two\n-n one   two\n"
+stdout: |-
+  one two
+
+  one   two
+  one two
+  -e one   two
+  -n one   two
 ---
 foo='one   two'
 echo $foo   # bad split then join

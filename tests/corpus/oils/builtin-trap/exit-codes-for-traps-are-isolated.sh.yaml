@@ -1,7 +1,10 @@
 name: exit codes for traps are isolated
 dialect: bash
 source: oils:spec/builtin-trap#exit-codes-for-traps-are-isolated
-stdout: "before=0\nUSR1 trap status=0\nafter=0\n"
+stdout: |-
+  before=0
+  USR1 trap status=0
+  after=0
 ---
 
 trap 'echo USR1 trap status=$?; ( exit 42 )' USR1

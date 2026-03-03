@@ -1,7 +1,11 @@
 name: Replace backslash
 dialect: bash
 source: oils:spec/var-op-patsub#replace-backslash
-stdout: "[_]\n[\\_]\n[\\_]\n[_]\n"
+stdout: |-
+  [_]
+  [\_]
+  [\_]
+  [_]
 ---
 v='[\f]'
 x='\f'

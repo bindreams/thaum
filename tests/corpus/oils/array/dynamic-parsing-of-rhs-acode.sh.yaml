@@ -1,7 +1,9 @@
 name: Dynamic parsing of RHS ${a[$code]}
 dialect: bash
 source: oils:spec/array#dynamic-parsing-of-rhs-acode
-stdout: "three\nthree\n"
+stdout: |-
+  three
+  three
 ---
 declare -a array
 array=(zero one two three)

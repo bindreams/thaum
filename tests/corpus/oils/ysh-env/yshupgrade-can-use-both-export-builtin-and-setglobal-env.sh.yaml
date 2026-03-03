@@ -3,7 +3,9 @@ name: ysh:upgrade can use both export builtin and setglobal ENV
 dialect: bash
 source: 
   oils:spec/ysh-env#yshupgrade-can-use-both-export-builtin-and-setglobal-env
-stdout: "ZZ=export\nZZ=setglobal\n"
+stdout: |-
+  ZZ=export
+  ZZ=setglobal
 ---
 shopt -s ysh:upgrade
 

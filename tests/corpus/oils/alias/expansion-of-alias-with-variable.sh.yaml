@@ -1,7 +1,8 @@
 name: Expansion of alias with variable
 dialect: bash
 source: oils:spec/alias#expansion-of-alias-with-variable
-stdout: "y hi\n"
+stdout: |-
+  y hi
 ---
 shopt -s expand_aliases  # bash requires this
 x=x

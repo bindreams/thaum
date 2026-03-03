@@ -1,7 +1,8 @@
 name: Case with | pattern
 dialect: bash
 source: oils:spec/posix#case-with-pattern
-stdout: "A\n"
+stdout: |-
+  A
 ---
 foo=a
 case $foo in

@@ -1,7 +1,10 @@
 name: -z '>' implies two token lookahead
 dialect: bash
 source: oils:spec/builtin-bracket#z-implies-two-token-lookahead
-stdout: "true\nfalse\ntrue\n"
+stdout: |-
+  true
+  false
+  true
 ---
 [ -z ] && echo true  # -z is operand
 [ -z '>' ] || echo false  # -z is operator

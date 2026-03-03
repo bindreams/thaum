@@ -1,7 +1,10 @@
 name: Background process and then a singleton pipeline
 dialect: bash
 source: oils:spec/background#background-process-and-then-a-singleton-pipeline
-stdout: "begin\nend\nstatus=42\n"
+stdout: |-
+  begin
+  end
+  status=42
 ---
 
 # This was inspired by #416, although that symptom there was timing, so it's

@@ -1,6 +1,7 @@
 name: single expansion
 dialect: bash
 source: oils:spec/brace-expansion#single-expansion
-stdout: "foo bar\n"
+stdout: |-
+  foo bar
 ---
 echo {foo,bar}

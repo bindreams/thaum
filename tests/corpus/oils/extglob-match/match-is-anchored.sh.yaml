@@ -1,7 +1,10 @@
 name: match is anchored
 dialect: bash
 source: oils:spec/extglob-match#match-is-anchored
-stdout: "FALSE\nFALSE\nTRUE\n"
+stdout: |-
+  FALSE
+  FALSE
+  TRUE
 ---
 [[ foo_ == @(foo) ]] || echo FALSE
 [[ _foo == @(foo) ]] || echo FALSE

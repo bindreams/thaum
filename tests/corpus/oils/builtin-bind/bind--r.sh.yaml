@@ -1,7 +1,11 @@
 name: bind -r
 dialect: bash
 source: oils:spec/builtin-bind#bind--r
-stdout: "status=1\n\\C-o\\C-s\\C-h\nstatus=0\nstatus=1\n"
+stdout: |-
+  status=1
+  \C-o\C-s\C-h
+  status=0
+  status=1
 ---
 bind -q yank | grep -oF '\C-o\C-s\C-h'
 echo status=$?

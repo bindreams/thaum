@@ -1,7 +1,10 @@
 name: Basic alias
 dialect: bash
 source: oils:spec/alias#basic-alias
-stdout: "hello world\nhi\nexpected failure\n"
+stdout: |-
+  hello world
+  hi
+  expected failure
 ---
 shopt -s expand_aliases  # bash requires this
 alias hi='echo hello world'

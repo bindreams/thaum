@@ -1,7 +1,10 @@
 name: ulimit of 2**32, 2**31 (int overflow)
 dialect: bash
 source: oils:spec/builtin-process#ulimit-of-232-231-int-overflow
-stdout: "one unlimited\ntwo 4294967296\nthree 2147483648\n"
+stdout: |-
+  one unlimited
+  two 4294967296
+  three 2147483648
 ---
 
 echo -n 'one '; ulimit -f

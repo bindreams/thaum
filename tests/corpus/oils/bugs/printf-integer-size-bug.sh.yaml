@@ -1,7 +1,9 @@
 name: printf integer size bug
 dialect: bash
 source: oils:spec/bugs#printf-integer-size-bug
-stdout: "80000000\n2147483648\n"
+stdout: |-
+  80000000
+  2147483648
 ---
 
 # from Koiche on Zulip

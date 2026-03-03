@@ -1,7 +1,8 @@
 name: Redirect in command sub
 dialect: bash
 source: oils:spec/redirect-command#redirect-in-command-sub
-stderr: "foo\n"
+stderr: |-
+  foo
 ---
 FOO=$(echo foo 1>&2)
 echo $FOO

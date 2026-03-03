@@ -1,7 +1,18 @@
 name: More arith expressions in [[ -v array[expr]] ]]
 dialect: bash
 source: oils:spec/array#more-arith-expressions-in--v-arrayexpr
-stdout: "zero=0\none=0\ntwo=1\n---\nzero=0\none=0\ntwo=1\n---\nzero=0\none=0\ntwo=1\n"
+stdout: |-
+  zero=0
+  one=0
+  two=1
+  ---
+  zero=0
+  one=0
+  two=1
+  ---
+  zero=0
+  one=0
+  two=1
 ---
 
 typeset -a array

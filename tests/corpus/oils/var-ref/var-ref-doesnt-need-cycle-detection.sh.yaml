@@ -2,7 +2,8 @@ name: var ref doesn't need cycle detection
 dialect: bash
 source: oils:spec/var-ref#var-ref-doesnt-need-cycle-detection
 status: 1
-stdout: "cycle=x\n"
+stdout: |-
+  cycle=x
 ---
 x=y
 y=x

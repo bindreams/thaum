@@ -1,7 +1,13 @@
 name: Negative numbers with bit shift
 dialect: bash
 source: oils:spec/arith#negative-numbers-with-bit-shift
-stdout: "10\n5\n---\n8\n16\n---\n"
+stdout: |-
+  10
+  5
+  ---
+  8
+  16
+  ---
 ---
 
 echo $(( 5 << 1 ))

@@ -1,7 +1,9 @@
 name: 'set -e in function #2'
 dialect: bash
 source: oils:spec/errexit#set--e-in-function-2
-stdout: "should be executed\nshould be executed\n"
+stdout: |-
+  should be executed
+  should be executed
 ---
 foo() {
   set -e

@@ -1,7 +1,11 @@
 name: \(\) in pattern (regression)
 dialect: bash
 source: oils:spec/var-op-strip#in-pattern-regression
-stdout: "1 foo\n2\n3\n4\n"
+stdout: |-
+  1 foo
+  2
+  3
+  4
 ---
 x='foo()' 
 echo 1 ${x%*\(\)}

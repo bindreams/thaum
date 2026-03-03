@@ -1,7 +1,11 @@
 name: read -s from pipe, not a terminal
 dialect: bash
 source: oils:spec/builtin-read#read--s-from-pipe-not-a-terminal
-stdout: "foo\nba\n0\nb\n"
+stdout: |-
+  foo
+  ba
+  0
+  b
 ---
 case $SH in dash|zsh) exit ;; esac
 

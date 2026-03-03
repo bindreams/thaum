@@ -1,7 +1,8 @@
 name: Dynamic hex constants
 dialect: bash
 source: oils:spec/arith#dynamic-hex-constants
-stdout: "171\n"
+stdout: |-
+  171
 ---
 zero=0
 echo $(( ${zero}xAB ))

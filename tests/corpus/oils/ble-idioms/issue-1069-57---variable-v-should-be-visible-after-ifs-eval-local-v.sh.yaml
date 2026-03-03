@@ -2,7 +2,8 @@ name: "Issue #1069 [57] - Variable v should be visible after IFS= eval 'local v=
 dialect: bash
 source: 
   oils:spec/ble-idioms#issue-1069-57---variable-v-should-be-visible-after-ifs-eval-local-v
-stdout: "v=hello\n"
+stdout: |-
+  v=hello
 ---
 
 set -u

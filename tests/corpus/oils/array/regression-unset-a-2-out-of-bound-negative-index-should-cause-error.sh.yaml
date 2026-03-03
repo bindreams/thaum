@@ -4,8 +4,10 @@ source:
   oils:spec/array#regression-unset-a-2-out-of-bound-negative-index-should-cause-error
 status: 1
 stdout: "\n"
-stderr: "  unset -v 'a[-2]'\n           ^\n[ stdin ]:4: a[-2]: Index is out of bounds
-  for array of length 1\n"
+stderr: |2-
+    unset -v 'a[-2]'
+             ^
+  [ stdin ]:4: a[-2]: Index is out of bounds for array of length 1
 ---
 case $SH in mksh) exit ;; esac
 

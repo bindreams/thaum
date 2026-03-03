@@ -1,7 +1,10 @@
 name: alias without args lists all aliases
 dialect: bash
 source: oils:spec/alias#alias-without-args-lists-all-aliases
-stdout: "alias ex='exit'\nalias ll='ls -l'\nstatus=0\n"
+stdout: |-
+  alias ex='exit'
+  alias ll='ls -l'
+  status=0
 ---
 alias ex=exit ll='ls -l'
 alias | grep -E 'ex=|ll='  # need to grep because mksh/zsh have builtin aliases

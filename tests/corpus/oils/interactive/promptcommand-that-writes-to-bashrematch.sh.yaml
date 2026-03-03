@@ -1,7 +1,14 @@
 name: PROMPT_COMMAND that writes to BASH_REMATCH
 dialect: bash
 source: oils:spec/interactive#promptcommand-that-writes-to-bashrematch
-stdout: "---\none\n---\n---\nbar b a r\n---\n^D\n"
+stdout: |-
+  ---
+  one
+  ---
+  ---
+  bar b a r
+  ---
+  ^D
 ---
 export PS1=''
 

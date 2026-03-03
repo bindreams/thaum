@@ -1,8 +1,11 @@
 name: create empty assoc array, put, then get
 dialect: bash
 source: oils:spec/array-assoc#create-empty-assoc-array-put-then-get
-stdout: "[]\n[]\nbar\n"
-setup: |
+stdout: |
+  []
+  []
+  bar
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 declare -A A  # still undefined
 argv.py "${A[@]}"

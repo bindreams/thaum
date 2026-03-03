@@ -1,8 +1,12 @@
 name: '[bash_unset] local-unset / dynamic-unset for localvar'
 dialect: bash
 source: oils:spec/ble-features#bashunset-local-unset-dynamic-unset-for-localvar
-stdout: "# bash-unset\n#   local-unset   = value-unset\n#   dynamic-unset = cell-unset\n\
-  [global,local,(unset)] v: (unset)\n[global,local,(unlocal)] v: global\n"
+stdout: |-
+  # bash-unset
+  #   local-unset   = value-unset
+  #   dynamic-unset = cell-unset
+  [global,local,(unset)] v: (unset)
+  [global,local,(unlocal)] v: global
 ---
 unlocal() { unset -v "$1"; }
 

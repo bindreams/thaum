@@ -1,7 +1,10 @@
 name: $LINENO in for (( loop
 dialect: bash
 source: oils:spec/vars-special#lineno-in-for-loop
-stdout: "one\n0\n1\n"
+stdout: |-
+  one
+  0
+  1
 ---
 # This is a real edge case that I'm not sure we care about.  We would have to
 # change the span ID inside the loop to make it really correct.

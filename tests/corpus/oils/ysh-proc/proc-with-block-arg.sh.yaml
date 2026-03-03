@@ -2,7 +2,12 @@ disabled: true
 name: Proc with block arg
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-block-arg
-stdout: "f word a b\nFFF\ng word a b\ng rest c d\nGGG\n"
+stdout: |-
+  f word a b
+  FFF
+  g word a b
+  g rest c d
+  GGG
 ---
 shopt --set ysh:upgrade
 

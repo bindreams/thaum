@@ -1,7 +1,11 @@
 name: Process sub input
 dialect: bash
 source: oils:spec/process-sub#process-sub-input
-stdout: "1\n2\n2\n3\n"
+stdout: |-
+  1
+  2
+  2
+  3
 ---
 f=process-sub.txt
 { echo 1; echo 2; echo 3; } > $f

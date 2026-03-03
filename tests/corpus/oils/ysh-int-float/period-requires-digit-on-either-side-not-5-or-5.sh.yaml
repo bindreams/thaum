@@ -3,7 +3,9 @@ name: Period requires digit on either side, not 5. or .5
 dialect: bash
 source: oils:spec/ysh-int-float#period-requires-digit-on-either-side-not-5-or-5
 status: 2
-stdout: "0.5\n5.0\n"
+stdout: |-
+  0.5
+  5.0
 ---
 shopt --set parse_ysh_expr_sub
 

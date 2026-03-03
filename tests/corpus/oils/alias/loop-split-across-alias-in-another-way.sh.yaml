@@ -1,8 +1,11 @@
-disabled: { reason: "funkiness level 5: partial-syntax aliases are unsupported by design" }
+disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by design"}
 name: Loop split across alias in another way
 dialect: bash
 source: oils:spec/alias#loop-split-across-alias-in-another-way
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 shopt -s expand_aliases
 alias e_='for i in 1 2 3; do echo '

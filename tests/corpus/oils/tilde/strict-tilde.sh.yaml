@@ -2,7 +2,8 @@ name: strict tilde
 dialect: bash
 source: oils:spec/tilde#strict-tilde
 status: 1
-stdout: "~nonexistent\n"
+stdout: |-
+  ~nonexistent
 ---
 echo ~nonexistent
 

@@ -3,8 +3,11 @@ name: LHS array is protected with shopt -s eval_unsafe_arith, e.g. 'a[$(echo
 dialect: bash
 source: 
   oils:spec/array-assign#lhs-array-is-protected-with-shopt--s-evalunsafearith-eg-aecho-2
-stdout: "declare -a b=([0]=\"3\" [1]=\"4\" [2]=\"5\")\nget 5\nset zzz\ndeclare -a
-  b=([0]=\"3\" [1]=\"4\" [2]=\"zzz\")\n"
+stdout: |-
+  declare -a b=([0]="3" [1]="4" [2]="5")
+  get 5
+  set zzz
+  declare -a b=([0]="3" [1]="4" [2]="zzz")
 ---
 case $SH in zsh|ash) exit ;; esac
 

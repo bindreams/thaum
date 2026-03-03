@@ -2,8 +2,12 @@ name: Unset exported variable, then define it again.  It's NOT still exported.
 dialect: bash
 source: 
   oils:spec/builtin-vars#unset-exported-variable-then-define-it-again-its-not-still-exported
-stdout: "u\nNone\nnewvalue\nNone\n"
-setup: |
+stdout: |
+  u
+  None
+  newvalue
+  None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +16,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 export U
 U=u

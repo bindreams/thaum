@@ -2,7 +2,9 @@ disabled: true
 name: Augmented assignment with integers
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-with-integers
-stdout: "x=7\nx=11\n"
+stdout: |-
+  x=7
+  x=11
 ---
 var x = 1 + 2 * 3
 echo x=$x

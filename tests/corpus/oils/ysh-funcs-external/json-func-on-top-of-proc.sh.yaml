@@ -2,7 +2,9 @@ disabled: true
 name: JSON func on top of proc
 dialect: bash
 source: oils:spec/ysh-funcs-external#json-func-on-top-of-proc
-stdout: "TODO\nresult = 3\n"
+stdout: |-
+  TODO
+  result = 3
 ---
 
 proc myadd {

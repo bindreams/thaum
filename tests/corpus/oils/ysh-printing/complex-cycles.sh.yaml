@@ -2,9 +2,16 @@ disabled: true
 name: Complex Cycles
 dialect: bash
 source: oils:spec/ysh-printing#complex-cycles
-stdout: "(Dict)\n{\n    nothing: null,\n    simple_cycle: [[[...]]],\n    tricky_cycle:
-  [{...}],\n    dag: [[1, 2, [...]], [1, 2, [...]]],\n    key_alpha: {omega: {alpha:
-  {...}}},\n    key_omega: {alpha: {omega: {...}}}\n}\n"
+stdout: |-
+  (Dict)
+  {
+      nothing: null,
+      simple_cycle: [[[...]]],
+      tricky_cycle: [{...}],
+      dag: [[1, 2, [...]], [1, 2, [...]]],
+      key_alpha: {omega: {alpha: {...}}},
+      key_omega: {alpha: {omega: {...}}}
+  }
 ---
 var dict = {}
 setvar dict["nothing"] = null

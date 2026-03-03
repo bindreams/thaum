@@ -2,7 +2,10 @@ disabled: true
 name: NaN is encoded as null, like JavaScript
 dialect: bash
 source: oils:spec/ysh-json#nan-is-encoded-as-null-like-javascript
-stdout: "(Float)   NAN\nnull\nnull\n"
+stdout: |-
+  (Float)   NAN
+  null
+  null
 ---
 shopt --set parse_ysh_expr_sub
 

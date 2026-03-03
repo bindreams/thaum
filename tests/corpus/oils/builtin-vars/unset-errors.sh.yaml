@@ -1,7 +1,10 @@
 name: Unset errors
 dialect: bash
 source: oils:spec/builtin-vars#unset-errors
-stdout: "status=0\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
 ---
 unset undef
 echo status=$?

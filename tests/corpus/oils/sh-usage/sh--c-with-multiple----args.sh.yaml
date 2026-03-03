@@ -1,7 +1,10 @@
 name: sh -c with multiple -- args
 dialect: bash
 source: oils:spec/sh-usage#sh--c-with-multiple----args
-stdout: "status=127\nstatus=127\nz failed\n"
+stdout: |-
+  status=127
+  status=127
+  z failed
 ---
 
 # variant of above case

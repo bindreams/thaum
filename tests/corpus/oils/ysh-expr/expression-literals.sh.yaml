@@ -2,7 +2,12 @@ disabled: true
 name: expression literals
 dialect: bash
 source: oils:spec/ysh-expr#expression-literals
-stdout: "type=Expr\n3\nfalse\ntrue\n(List)   [3,4]\n"
+stdout: |-
+  type=Expr
+  3
+  false
+  true
+  (List)   [3,4]
 ---
 var e = ^[1 + 2]
 

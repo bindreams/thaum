@@ -1,7 +1,9 @@
 name: Empty IFS (regression for bug)
 dialect: bash
 source: oils:spec/word-split#empty-ifs-regression-for-bug
-stdout: "[]\n[abc]\n"
+stdout: |-
+  []
+  [abc]
 ---
 IFS=
 echo ["$*"]

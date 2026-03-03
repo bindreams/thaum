@@ -2,7 +2,8 @@ disabled: true
 name: nested expr contexts
 dialect: bash
 source: oils:spec/ysh-expr#nested-expr-contexts
-stdout: "len 3\n"
+stdout: |-
+  len 3
 ---
 var s = "123"
 

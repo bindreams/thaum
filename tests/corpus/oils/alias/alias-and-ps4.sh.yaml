@@ -1,8 +1,9 @@
 name: Alias and PS4
 dialect: bash
 source: oils:spec/alias#alias-and-ps4
-stdout: "['foo', 'bar']\n"
-setup: |
+stdout: |
+  ['foo', 'bar']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # dash enters an infinite loop!
 case $SH in

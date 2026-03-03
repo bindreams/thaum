@@ -2,6 +2,7 @@ name: time pipeline
 dialect: bash
 source: oils:spec/builtin-misc#time-pipeline
 status: 0
-stdout: "3\n"
+stdout: |-
+  3
 ---
 time echo hi | wc -c

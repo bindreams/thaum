@@ -2,7 +2,11 @@ disabled: true
 name: help topics that print URLs
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-topics-that-print-urls
-stdout: "chap-word-lang.html\nstatus=0\nchap-builtin-cmd.html\nstatus=0\n"
+stdout: |-
+  chap-word-lang.html
+  status=0
+  chap-builtin-cmd.html
+  status=0
 ---
 
 help command-sub | grep -o chap-word-lang.html

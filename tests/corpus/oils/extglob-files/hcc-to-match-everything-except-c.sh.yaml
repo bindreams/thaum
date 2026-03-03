@@ -1,7 +1,8 @@
 name: '!(*.h|*.cc) to match everything except C++'
 dialect: bash
 source: oils:spec/extglob-files#hcc-to-match-everything-except-c
-stdout: "extglob2/bar.py extglob2/baz.py extglob2/foo.py\n"
+stdout: |-
+  extglob2/bar.py extglob2/baz.py extglob2/foo.py
 ---
 shopt -s extglob
 mkdir -p extglob2

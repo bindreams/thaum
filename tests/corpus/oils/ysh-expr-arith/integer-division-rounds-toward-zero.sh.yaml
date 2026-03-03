@@ -2,8 +2,16 @@ disabled: true
 name: Integer Division (rounds toward zero)
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-division-rounds-toward-zero
-stdout: "(Int)   2\n(Int)   -2\n(Int)   -2\n(Int)   2\n---\n(Int)   4\n(Int)   -4\n\
-  (Int)   -4\n(Int)   4\n"
+stdout: |-
+  (Int)   2
+  (Int)   -2
+  (Int)   -2
+  (Int)   2
+  ---
+  (Int)   4
+  (Int)   -4
+  (Int)   -4
+  (Int)   4
 ---
 pp test_ (5//2)
 pp test_ (-5//2)

@@ -3,8 +3,9 @@ name: promptVal() with invalid chars
 dialect: bash
 source: oils:spec/ysh-prompt#promptval-with-invalid-chars
 status: 3
-stdout: "x=<Error: \\D{} not in promptVal()> \nx=<Error: \\/ is invalid or unimplemented
-  in $PS1> \n"
+stdout: |-
+  x=<Error: \D{} not in promptVal()> 
+  x=<Error: \/ is invalid or unimplemented in $PS1> 
 ---
 
 # \D{} will be supported with date and time functions

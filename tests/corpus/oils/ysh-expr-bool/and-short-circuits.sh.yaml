@@ -2,7 +2,8 @@ disabled: true
 name: and short circuits
 dialect: bash
 source: oils:spec/ysh-expr-bool#and-short-circuits
-stdout: "OK\n"
+stdout: |-
+  OK
 ---
 shopt -s ysh:upgrade
 

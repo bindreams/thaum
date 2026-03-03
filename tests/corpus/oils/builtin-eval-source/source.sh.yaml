@@ -1,7 +1,8 @@
 name: Source
 dialect: bash
 source: oils:spec/builtin-eval-source#source
-stdout: "libvar\n"
+stdout: |
+  libvar
 environment:
   TMP: /tmp
 ---

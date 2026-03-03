@@ -1,7 +1,8 @@
 name: $PATH lookup
 dialect: bash
 source: oils:spec/command#path-lookup
-stdout: "one\n"
+stdout: |
+  one
 environment:
   TMP: /tmp
 ---

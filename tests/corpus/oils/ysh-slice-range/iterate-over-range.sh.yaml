@@ -2,7 +2,14 @@ disabled: true
 name: Iterate over range
 dialect: bash
 source: oils:spec/ysh-slice-range#iterate-over-range
-stdout: "1\n2\n3\n4\n0, 1\n1, 2\n2, 3\n"
+stdout: |-
+  1
+  2
+  3
+  4
+  0, 1
+  1, 2
+  2, 3
 ---
 for i in (1..<5) {
     echo $[i]

@@ -1,8 +1,9 @@
 name: $@
 dialect: bash
 source: oils:spec/word-split#unnamed
-stdout: "['-a', '1', 'b', '2', 'c', '3-']\n"
-setup: |
+stdout: |
+  ['-a', '1', 'b', '2', 'c', '3-']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # How does this differ from $* ?  I don't think it does.
 fun() { argv.py -$@-; }

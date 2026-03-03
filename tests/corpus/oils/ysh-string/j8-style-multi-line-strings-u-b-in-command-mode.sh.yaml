@@ -2,7 +2,13 @@ disabled: true
 name: J8-style multi-line strings u''' b''' in command mode
 dialect: bash
 source: oils:spec/ysh-string#j8-style-multi-line-strings-u-b-in-command-mode
-stdout: "--\na\n--\n--\nb\n--\n"
+stdout: |-
+  --
+  a
+  --
+  --
+  b
+  --
 ---
 
 write --end '' -- u'''

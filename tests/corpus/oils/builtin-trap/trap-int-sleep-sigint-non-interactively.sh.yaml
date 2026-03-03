@@ -1,7 +1,8 @@
 name: 'trap INT, sleep, SIGINT: non-interactively'
 dialect: bash
 source: oils:spec/builtin-trap#trap-int-sleep-sigint-non-interactively
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 
 # mksh behaves differently in CI -- maybe when it's not connected to a

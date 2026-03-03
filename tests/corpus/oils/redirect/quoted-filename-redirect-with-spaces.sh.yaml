@@ -1,7 +1,8 @@
 name: Quoted filename redirect with spaces
 dialect: bash
 source: oils:spec/redirect#quoted-filename-redirect-with-spaces
-stdout: "two 1\n"
+stdout: |
+  two 1
 environment:
   TMP: /tmp
 ---

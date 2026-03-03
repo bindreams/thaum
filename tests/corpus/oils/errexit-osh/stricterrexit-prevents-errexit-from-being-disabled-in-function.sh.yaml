@@ -3,7 +3,10 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#stricterrexit-prevents-errexit-from-being-disabled-in-function
 status: 1
-stdout: "fun\nbuiltin ok\nexternal ok\n"
+stdout: |-
+  fun
+  builtin ok
+  external ok
 ---
 set -o errexit
 fun() { echo fun; }

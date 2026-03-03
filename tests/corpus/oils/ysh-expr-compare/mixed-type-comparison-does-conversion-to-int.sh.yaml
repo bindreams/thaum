@@ -2,7 +2,11 @@ disabled: true
 name: Mixed Type Comparison does conversion to Int
 dialect: bash
 source: oils:spec/ysh-expr-compare#mixed-type-comparison-does-conversion-to-int
-stdout: "<\n<=\n>\n>=\n"
+stdout: |-
+  <
+  <=
+  >
+  >=
 ---
 shopt -s ysh:upgrade
 

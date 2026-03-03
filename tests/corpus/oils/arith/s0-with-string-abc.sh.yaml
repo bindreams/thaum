@@ -1,7 +1,13 @@
 name: s[0] with string abc
 dialect: bash
 source: oils:spec/arith#s0-with-string-abc
-stdout: "abc 0 0\nstatus=0\n\nstatus=1\n\n"
+stdout: |+
+  abc 0 0
+  status=0
+
+  status=1
+
+...
 ---
 case $SH in dash) exit ;; esac
 

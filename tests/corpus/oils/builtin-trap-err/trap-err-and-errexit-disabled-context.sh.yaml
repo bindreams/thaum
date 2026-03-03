@@ -1,7 +1,11 @@
 name: trap ERR and errexit disabled context
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-errexit-disabled-context
-stdout: "line=3\na\nb\nc\n"
+stdout: |-
+  line=3
+  a
+  b
+  c
 ---
 
 trap 'echo line=$LINENO' ERR

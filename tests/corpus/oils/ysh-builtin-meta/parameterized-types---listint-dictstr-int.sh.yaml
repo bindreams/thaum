@@ -2,9 +2,11 @@ disabled: true
 name: Parameterized types - List[Int], Dict[Str, Int]
 dialect: bash
 source: oils:spec/ysh-builtin-meta#parameterized-types---listint-dictstr-int
-stdout: "(Obj)   (\"unique_id\":\"List[Int]\")\n(Obj)   (\"unique_id\":\"Dict[Str,Int]\"\
-  )\n(Obj)   (\"unique_id\":\"List[List[Int]]\")\n(Obj)   (\"unique_id\":\"Dict[Str,List[Int]]\"\
-  )\n"
+stdout: |-
+  (Obj)   ("unique_id":"List[Int]")
+  (Obj)   ("unique_id":"Dict[Str,Int]")
+  (Obj)   ("unique_id":"List[List[Int]]")
+  (Obj)   ("unique_id":"Dict[Str,List[Int]]")
 ---
 shopt -s ysh:upgrade
 

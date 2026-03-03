@@ -1,7 +1,12 @@
 name: 'ble.sh: eval -- "$(declare -p var arr)"'
 dialect: bash
 source: oils:spec/assign-extended#blesh-eval----declare--p-var-arr
-stdout: "sum=21\narr[0]=a2\narr[1]=a5\narr[2]=a8\narr[3]=a10\n"
+stdout: |-
+  sum=21
+  arr[0]=a2
+  arr[1]=a5
+  arr[2]=a8
+  arr[3]=a10
 ---
 # This illustrates an example usage of "eval & declare" for exporting
 # multiple variables from $().

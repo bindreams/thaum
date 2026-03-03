@@ -2,7 +2,10 @@ disabled: true
 name: Division by zero
 dialect: bash
 source: oils:spec/ysh-expr-arith#division-by-zero
-stdout: "status / is 3\nstatus // is 3\nstatus % is 3\n"
+stdout: |-
+  status / is 3
+  status // is 3
+  status % is 3
 ---
 shopt -s parse_brace parse_ysh_expr_sub
 

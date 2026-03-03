@@ -3,7 +3,10 @@ name: eggex capture
 dialect: bash
 source: oils:spec/ysh-case#eggex-capture
 status: 0
-stdout: "g0=/foo. g1=oo\ng0=ar g1=ar\nno match\n"
+stdout: |-
+  g0=/foo. g1=oo
+  g0=ar g1=ar
+  no match
 ---
 for name in foo/foo.py bar/bar.cc zz {
   case (name) {

@@ -1,7 +1,11 @@
 name: extglob in pattern
 dialect: bash
 source: oils:spec/var-op-strip#extglob-in-pattern
-stdout: "1 foo\n2\n3\n4\n"
+stdout: |-
+  1 foo
+  2
+  3
+  4
 ---
 case $SH in dash|zsh|ash) exit ;; esac
 

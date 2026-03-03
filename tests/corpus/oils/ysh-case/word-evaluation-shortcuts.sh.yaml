@@ -3,7 +3,8 @@ name: word evaluation shortcuts
 dialect: bash
 source: oils:spec/ysh-case#word-evaluation-shortcuts
 status: 0
-stdout: "no error\n"
+stdout: |-
+  no error
 ---
 var x = "abc"
 case (x) {

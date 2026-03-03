@@ -2,7 +2,9 @@ disabled: true
 name: JSON \uXXXX\uYYYY as max code point - can't go above
 dialect: bash
 source: oils:spec/ysh-unicode#json-uxxxxuyyyy-as-max-code-point---cant-go-above
-stdout: " f4 8f bf bf 0a\n f4 8f bf bf 0a\n"
+stdout: |2-
+   f4 8f bf bf 0a
+   f4 8f bf bf 0a
 ---
 
 py-decode() {

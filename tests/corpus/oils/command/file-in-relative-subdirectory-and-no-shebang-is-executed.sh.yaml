@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/command#file-in-relative-subdirectory-and-no-shebang-is-executed
 status: 0
-stdout: "hi\n"
+stdout: |
+  hi
 environment:
   TMP: /tmp
 ---

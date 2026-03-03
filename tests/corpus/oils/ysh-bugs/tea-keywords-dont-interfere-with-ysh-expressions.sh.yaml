@@ -2,7 +2,9 @@ disabled: true
 name: Tea keywords don't interfere with YSH expressions
 dialect: bash
 source: oils:spec/ysh-bugs#tea-keywords-dont-interfere-with-ysh-expressions
-stdout: "foo\n6\n"
+stdout: |-
+  foo
+  6
 ---
 
 var d = {data: 'foo'}

@@ -2,7 +2,16 @@ name: ${ echo hi;}
 dialect: bash
 source: oils:spec/command-sub-ksh#echo-hi
 status: 1
-stdout: "[hi]\n\n[one\ntwo]\n\n[ 3 \n 4 5 ]\n\n"
+stdout: |+
+  [hi]
+
+  [one
+  two]
+
+  [ 3 
+   4 5 ]
+
+...
 ---
 
 x=${ echo hi;}

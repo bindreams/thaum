@@ -3,7 +3,10 @@ name: time with brace group argument
 dialect: bash
 source: oils:spec/builtin-process#time-with-brace-group-argument
 status: 0
-stdout: "user\nresult=0\nnon-zero\n"
+stdout: |-
+  user
+  result=0
+  non-zero
 ---
 
 err=time-$(basename $SH).txt

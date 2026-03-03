@@ -1,7 +1,11 @@
 name: assign to empty nameref and invalid nameref
 dialect: bash
 source: oils:spec/nameref#assign-to-empty-nameref-and-invalid-nameref
-stdout: "ref=\nref=\nref2=\nref2=x\n"
+stdout: |-
+  ref=
+  ref=
+  ref2=
+  ref2=x
 ---
 typeset -n ref
 echo ref=$ref

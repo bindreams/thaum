@@ -2,12 +2,20 @@ name: '[bash_unset] function call with tempenv vs tempenv-eval'
 dialect: bash
 source: 
   oils:spec/ble-features#bashunset-function-call-with-tempenv-vs-tempenv-eval
-stdout: "# bash-unset (bash-5.1)\n[global] v: global\n[global,local] v: (unset)\n\
-  [global,local+unset] v: (unset)\n[global,local+unlocal] v: global\n[global,tempenv]
-  v: tempenv\n[global,tempenv,local] v: tempenv\n[global,tempenv,local+unset] v: (unset)\n\
-  [global,tempenv,local+unlocal] v: global\n[global,tempenv,(eval)] v: tempenv\n[global,tempenv,(eval),local]
-  v: tempenv\n[global,tempenv,(eval),local+unset] v: (unset)\n[global,tempenv,(eval),local+unlocal]
-  v: tempenv\n"
+stdout: |-
+  # bash-unset (bash-5.1)
+  [global] v: global
+  [global,local] v: (unset)
+  [global,local+unset] v: (unset)
+  [global,local+unlocal] v: global
+  [global,tempenv] v: tempenv
+  [global,tempenv,local] v: tempenv
+  [global,tempenv,local+unset] v: (unset)
+  [global,tempenv,local+unlocal] v: global
+  [global,tempenv,(eval)] v: tempenv
+  [global,tempenv,(eval),local] v: tempenv
+  [global,tempenv,(eval),local+unset] v: (unset)
+  [global,tempenv,(eval),local+unlocal] v: tempenv
 ---
 unlocal() { unset -v "$1"; }
 

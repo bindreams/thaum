@@ -2,8 +2,16 @@ name: HISTFILE=my-history loads history from that file, and writes back to it
 dialect: bash
 source: 
   oils:spec/interactive#histfilemy-history-loads-history-from-that-file-and-writes-back-to-it
-stdout: "2\n    1  echo 1\n    2  echo 2\n    3  history\n\n-- after shell exit --\n\
-  echo 1\necho 2\nhistory\n"
+stdout: |-
+  2
+      1  echo 1
+      2  echo 2
+      3  history
+
+  -- after shell exit --
+  echo 1
+  echo 2
+  history
 ---
 
 echo 'echo 1' > my-history

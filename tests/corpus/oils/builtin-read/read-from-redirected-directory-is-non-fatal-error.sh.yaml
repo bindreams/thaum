@@ -1,7 +1,8 @@
 name: read from redirected directory is non-fatal error
 dialect: bash
 source: oils:spec/builtin-read#read-from-redirected-directory-is-non-fatal-error
-stdout: "status=1\n"
+stdout: |
+  status=1
 environment:
   TMP: /tmp
 ---

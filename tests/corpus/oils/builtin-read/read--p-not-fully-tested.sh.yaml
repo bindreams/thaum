@@ -1,7 +1,9 @@
 name: read -p (not fully tested)
 dialect: bash
 source: oils:spec/builtin-read#read--p-not-fully-tested
-stdout: "hi\nh\n"
+stdout: |
+  hi
+  h
 stderr: ''
 ---
 

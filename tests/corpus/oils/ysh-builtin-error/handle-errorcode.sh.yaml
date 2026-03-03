@@ -2,7 +2,9 @@ disabled: true
 name: Handle _error.code
 dialect: bash
 source: oils:spec/ysh-builtin-error#handle-errorcode
-stdout: "PASS\nCASE PASS\n"
+stdout: |-
+  PASS
+  CASE PASS
 ---
 
 proc failing {

@@ -2,7 +2,13 @@ name: interactive shell runs PROMPT_COMMAND after each command
 dialect: bash
 source: 
   oils:spec/interactive#interactive-shell-runs-promptcommand-after-each-command
-stdout: "PROMPT\none\nPROMPT\ntwo\nPROMPT\n^D\n"
+stdout: |-
+  PROMPT
+  one
+  PROMPT
+  two
+  PROMPT
+  ^D
 ---
 export PS1=''  # OSH prints prompt to stdout
 

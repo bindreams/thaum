@@ -1,8 +1,10 @@
 name: Env value doesn't persist
 dialect: bash
 source: oils:spec/assign#env-value-doesnt-persist
-stdout: "foo\n--\n"
-setup: |
+stdout: |
+  foo
+  --
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 FOO=foo printenv.py FOO
 echo -$FOO-

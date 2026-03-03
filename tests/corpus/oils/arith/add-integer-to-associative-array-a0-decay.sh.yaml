@@ -2,7 +2,8 @@ name: Add integer to associative array (a[0] decay)
 dialect: bash
 source: oils:spec/arith#add-integer-to-associative-array-a0-decay
 status: 0
-stdout: "47\n"
+stdout: |-
+  47
 ---
 typeset -A assoc
 assoc[0]=42

@@ -2,7 +2,9 @@ disabled: true
 name: split on \0 delimiters
 dialect: bash
 source: oils:spec/ysh-demo#split-on-0-delimiters
-stdout: "1 one\n2 two\n"
+stdout: |-
+  1 one
+  2 two
 ---
 shopt -s ysh:upgrade
 

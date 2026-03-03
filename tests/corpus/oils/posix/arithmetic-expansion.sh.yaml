@@ -1,7 +1,10 @@
 name: Arithmetic expansion
 dialect: bash
 source: oils:spec/posix#arithmetic-expansion
-stdout: "3\n2\n1\n"
+stdout: |-
+  3
+  2
+  1
 ---
 x=3
 while [ $x -gt 0 ]

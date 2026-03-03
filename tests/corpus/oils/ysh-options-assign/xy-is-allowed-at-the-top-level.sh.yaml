@@ -3,7 +3,9 @@ name: x=y is allowed at the top level
 dialect: bash
 source: oils:spec/ysh-options-assign#xy-is-allowed-at-the-top-level
 status: 2
-stdout: "status=0\nx=42\n"
+stdout: |-
+  status=0
+  x=42
 ---
 shopt --set ysh:all
 

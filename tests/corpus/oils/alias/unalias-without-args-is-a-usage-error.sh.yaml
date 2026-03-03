@@ -1,7 +1,8 @@
 name: unalias without args is a usage error
 dialect: bash
 source: oils:spec/alias#unalias-without-args-is-a-usage-error
-stdout: "usage-error\n"
+stdout: |-
+  usage-error
 ---
 unalias
 if test "$?" != 0; then echo usage-error; fi

@@ -1,7 +1,9 @@
 name: compgen -v with local vars
 dialect: bash
 source: oils:spec/builtin-completion#compgen--v-with-local-vars
-stdout: "v1_global\nv2_local\n"
+stdout: |-
+  v1_global
+  v2_local
 ---
 v1_global=0
 f() {

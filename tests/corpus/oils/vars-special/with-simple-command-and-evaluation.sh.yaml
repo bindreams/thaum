@@ -1,7 +1,9 @@
 name: $_ with simple command and evaluation
 dialect: bash
 source: oils:spec/vars-special#with-simple-command-and-evaluation
-stdout: "hi world\nhi world\n"
+stdout: |-
+  hi world
+  hi world
 ---
 
 name=world

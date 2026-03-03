@@ -2,7 +2,11 @@ disabled: true
 name: help oils-err-12 (case insensitive)
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-oils-err-12-case-insensitive
-stdout: "catalog.html#oils-err-12\nstatus=0\ncatalog.html#oils-err-12\nstatus=0\n"
+stdout: |-
+  catalog.html#oils-err-12
+  status=0
+  catalog.html#oils-err-12
+  status=0
 ---
 
 # note that the topics are lower-casedo

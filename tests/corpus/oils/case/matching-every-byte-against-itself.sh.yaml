@@ -1,7 +1,8 @@
 name: matching every byte against itself
 dialect: bash
 source: oils:spec/case#matching-every-byte-against-itself
-stdout: "sum=255\n"
+stdout: |-
+  sum=255
 ---
 
 # Why does OSH on the CI machine behave differently?  Probably a libc bug fix

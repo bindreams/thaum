@@ -1,7 +1,8 @@
 name: Splitting/Globbing doesn't happen on local assignment
 dialect: bash
 source: oils:spec/glob#splittingglobbing-doesnt-happen-on-local-assignment
-stdout: "void *\n"
+stdout: |-
+  void *
 ---
 cd $REPO_ROOT
 

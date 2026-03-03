@@ -1,7 +1,11 @@
 name: traps are cleared in subshell (started with &)
 dialect: bash
 source: oils:spec/builtin-trap#traps-are-cleared-in-subshell-started-with
-stdout: "SIGURG\nbegin child\nend child\nwait status 0\n"
+stdout: |-
+  SIGURG
+  begin child
+  end child
+  wait status 0
 ---
 
 # Test with SIGURG because the default handler is SIG_IGN

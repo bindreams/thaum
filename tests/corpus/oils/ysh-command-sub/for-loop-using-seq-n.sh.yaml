@@ -2,8 +2,14 @@ disabled: true
 name: for loop using @(seq $n)
 dialect: bash
 source: oils:spec/ysh-command-sub#for-loop-using-seq-n
-stdout: "[1]\n[2]\n[3]\n['z']\n['z']\n['z']\n"
-setup: |
+stdout: |
+  [1]
+  [2]
+  [3]
+  ['z']
+  ['z']
+  ['z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +17,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s oil:upgrade
 

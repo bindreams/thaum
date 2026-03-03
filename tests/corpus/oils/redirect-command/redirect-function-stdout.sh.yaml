@@ -1,7 +1,9 @@
 name: Redirect function stdout
 dialect: bash
 source: oils:spec/redirect-command#redirect-function-stdout
-stdout: "one\ntwo\n"
+stdout: |
+  one
+  two
 environment:
   TMP: /tmp
 ---

@@ -1,7 +1,9 @@
 name: Remove multiple handlers with trap -
 dialect: bash
 source: oils:spec/builtin-trap#remove-multiple-handlers-with-trap
-stdout: "---\nok\n"
+stdout: |-
+  ---
+  ok
 ---
 trap "echo int" INT
 trap "echo e" EXIT

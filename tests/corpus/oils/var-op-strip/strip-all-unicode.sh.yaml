@@ -1,7 +1,16 @@
 name: strip all unicode
 dialect: bash
 source: oils:spec/var-op-strip#strip-all-unicode
-stdout: "\n\n\n\n## BUG dash/mksh/ash STDOUT:\nμabcμ\nμabcμ\nμabcμ\nμabcμ\n"
+stdout: |2-
+
+
+
+
+  ## BUG dash/mksh/ash STDOUT:
+  μabcμ
+  μabcμ
+  μabcμ
+  μabcμ
 ---
 x=μabcμ
 echo "${x#?abc?}"

@@ -2,7 +2,10 @@ disabled: true
 name: _hay() register
 dialect: bash
 source: oils:spec/hay#hay-register
-stdout: "1\n2\n0\n"
+stdout: |-
+  1
+  2
+  0
 ---
 shopt --set parse_paren parse_brace parse_equals parse_proc parse_ysh_expr_sub
 

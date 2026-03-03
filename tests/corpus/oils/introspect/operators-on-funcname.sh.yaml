@@ -2,8 +2,12 @@ name: operators on FUNCNAME
 dialect: bash
 source: oils:spec/introspect#operators-on-funcname
 status: 0
-stdout: "['check']\n['5']\n['c']\n['heck']\n"
-setup: |
+stdout: |
+  ['check']
+  ['5']
+  ['c']
+  ['heck']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 check() {
   argv.py "${FUNCNAME}"

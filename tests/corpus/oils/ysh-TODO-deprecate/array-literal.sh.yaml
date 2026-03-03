@@ -2,7 +2,8 @@ disabled: true
 name: '%() array literal'
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#array-literal
-stdout: "one two\n"
+stdout: |-
+  one two
 ---
 
 shopt --set parse_at

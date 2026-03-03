@@ -1,8 +1,19 @@
 name: trap DEBUG for expr
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-for-expr
-stdout: "  [6]\n  [6]\n  [7]\ni=3\n  [6]\n  [6]\n  [7]\ni=4\n  [6]\n  [6]\n  [10]\n\
-  ok\n"
+stdout: |2-
+    [6]
+    [6]
+    [7]
+  i=3
+    [6]
+    [6]
+    [7]
+  i=4
+    [6]
+    [6]
+    [10]
+  ok
 ---
 debuglog() {
   echo "  [$@]"

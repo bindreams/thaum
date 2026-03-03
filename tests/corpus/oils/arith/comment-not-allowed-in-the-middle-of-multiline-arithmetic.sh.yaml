@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/arith#comment-not-allowed-in-the-middle-of-multiline-arithmetic
 status: 1
-stdout: "6\n"
+stdout: |-
+  6
 ---
 echo $((
 1 +

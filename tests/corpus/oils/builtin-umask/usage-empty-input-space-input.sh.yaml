@@ -1,7 +1,9 @@
 name: 'usage: empty input, space input'
 dialect: bash
 source: oils:spec/builtin-umask#usage-empty-input-space-input
-stdout: "error\nerror too\n"
+stdout: |-
+  error
+  error too
 ---
 umask ''
 case $? in

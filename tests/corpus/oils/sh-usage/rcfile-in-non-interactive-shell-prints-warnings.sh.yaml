@@ -1,7 +1,9 @@
 name: --rcfile in non-interactive shell prints warnings
 dialect: bash
 source: oils:spec/sh-usage#rcfile-in-non-interactive-shell-prints-warnings
-stderr: "warned=1\nwarned=0\n"
+stderr: |-
+  warned=1
+  warned=0
 ---
 echo 'echo rc' > rc
 

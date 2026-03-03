@@ -1,7 +1,9 @@
 name: arg that would overflow 64 bits is detected
 dialect: bash
 source: oils:spec/builtin-process#arg-that-would-overflow-64-bits-is-detected
-stdout: "before unlimited\nafter unlimited\n"
+stdout: |-
+  before unlimited
+  after unlimited
 ---
 
 # no 64-bit integers

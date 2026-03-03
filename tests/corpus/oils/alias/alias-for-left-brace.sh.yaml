@@ -1,8 +1,10 @@
-disabled: { reason: "funkiness level 5: partial-syntax aliases are unsupported by design" }
+disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by design"}
 name: alias for left brace
 dialect: bash
 source: oils:spec/alias#alias-for-left-brace
-stdout: "one\ntwo\n"
+stdout: |-
+  one
+  two
 ---
 shopt -s expand_aliases
 alias LEFT='{'

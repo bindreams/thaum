@@ -1,7 +1,13 @@
 name: unset -v and assoc array
 dialect: bash
 source: oils:spec/array-assoc#unset--v-and-assoc-array
-stdout: "len=1\nlen=0\nlen=1\nlen=0\nlen=1\nlen=0\n"
+stdout: |-
+  len=1
+  len=0
+  len=1
+  len=0
+  len=1
+  len=0
 ---
 shopt -s eval_unsafe_arith || true
 

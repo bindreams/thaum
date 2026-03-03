@@ -1,7 +1,16 @@
 name: process subs and pipelines together
 dialect: bash
 source: oils:spec/process-sub#process-subs-and-pipelines-together
-stdout: "1\n2\n1\n2\n3\nstatus=4\nprocess_sub 2 3\npipeline 0 4\n__\n"
+stdout: |-
+  1
+  2
+  1
+  2
+  3
+  status=4
+  process_sub 2 3
+  pipeline 0 4
+  __
 ---
 
 # zsh is very similar to bash, but don't bother with the assertions

@@ -1,7 +1,11 @@
 name: Alias that is && || ;
 dialect: bash
 source: oils:spec/alias#alias-that-is
-stdout: "one\ntwo\n1\nfour\n"
+stdout: |-
+  one
+  two
+  1
+  four
 ---
 shopt -s expand_aliases
 alias t1='echo one && echo two && echo 3 | wc -l;

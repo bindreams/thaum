@@ -1,7 +1,15 @@
 name: trap DEBUG for each
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-for-each
-stdout: "  [6]\n  [7]\nx=1\n  [6]\n  [7]\nx=2\n  [10]\nok\n"
+stdout: |2-
+    [6]
+    [7]
+  x=1
+    [6]
+    [7]
+  x=2
+    [10]
+  ok
 ---
 
 debuglog() {

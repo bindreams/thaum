@@ -1,7 +1,13 @@
 name: traps are not active inside subshells $() ()  trap | cat
 dialect: bash
 source: oils:spec/builtin-trap#traps-are-not-active-inside-subshells-trap-cat
-stdout: "1 traps.txt\n( )\n$(trap)\n\ntrap | cat\nbye\n"
+stdout: |-
+  1 traps.txt
+  ( )
+  $(trap)
+
+  trap | cat
+  bye
 ---
 
 # TODO: should we change this?  We're not compatible with bash or busybox ash

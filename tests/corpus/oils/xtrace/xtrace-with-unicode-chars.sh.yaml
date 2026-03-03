@@ -1,8 +1,10 @@
 name: xtrace with unicode chars
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-unicode-chars
-stdout: "[μ] [μ]\n"
-stderr: "+ echo '[μ]' '[μ]'\n"
+stdout: |
+  [μ] [μ]
+stderr: |-
+  + echo '[μ]' '[μ]'
 ---
 case $SH in dash) exit ;; esac
 

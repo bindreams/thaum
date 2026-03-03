@@ -1,7 +1,8 @@
 name: 'read multiple lines with IFS=:'
 dialect: bash
 source: oils:spec/builtin-read#read-multiple-lines-with-ifs
-stdout: "[  \\a |b: c|d  e|]\n"
+stdout: |
+  [  \a |b: c|d  e|]
 environment:
   TMP: /tmp
 ---

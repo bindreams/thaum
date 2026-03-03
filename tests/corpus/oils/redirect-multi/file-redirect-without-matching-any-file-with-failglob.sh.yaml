@@ -2,7 +2,9 @@ name: File redirect without matching any file, with failglob
 dialect: bash
 source: 
   oils:spec/redirect-multi#file-redirect-without-matching-any-file-with-failglob
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 
 shopt -s failglob

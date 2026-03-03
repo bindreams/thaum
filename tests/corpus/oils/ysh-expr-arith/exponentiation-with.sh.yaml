@@ -3,7 +3,8 @@ name: Exponentiation with **
 dialect: bash
 source: oils:spec/ysh-expr-arith#exponentiation-with
 status: 3
-stdout: "8\n"
+stdout: |-
+  8
 ---
 var x = 2**3
 echo $x

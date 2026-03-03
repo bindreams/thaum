@@ -2,7 +2,9 @@ disabled: true
 name: can't convert NAN, INFINITY to integer
 dialect: bash
 source: oils:spec/ysh-int-float#cant-convert-nan-infinity-to-integer
-stdout: "code 3\ncode 3\n"
+stdout: |-
+  code 3
+  code 3
 ---
 shopt --set ysh:upgrade
 

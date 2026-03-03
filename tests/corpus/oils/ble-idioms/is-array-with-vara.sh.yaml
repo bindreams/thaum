@@ -1,7 +1,10 @@
 name: is-array with ${var@a}
 dialect: bash
 source: oils:spec/ble-idioms#is-array-with-vara
-stdout: "undef 1\nstring 1\narray 0\n"
+stdout: |-
+  undef 1
+  string 1
+  array 0
 ---
 case $SH in mksh|ash|dash|yash) exit 1 ;; esac
 

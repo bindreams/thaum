@@ -3,7 +3,8 @@ name: shopt supports 'set' options
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt-supports-set-options
 status: 1
-stdout: "shopt -u errexit\n"
+stdout: |-
+  shopt -u errexit
 ---
 shopt -p errexit
 

@@ -1,7 +1,8 @@
 name: autotools as_fn_arith bug in configure
 dialect: bash
 source: oils:spec/bugs#autotools-asfnarith-bug-in-configure
-stdout: "as_val=1\n"
+stdout: |-
+  as_val=1
 ---
 
 # Causes 'grep -e' check to infinite loop.

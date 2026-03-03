@@ -1,10 +1,17 @@
 name: '[bash_unset] localvar-inherit from tempenv'
 dialect: bash
 source: oils:spec/ble-features#bashunset-localvar-inherit-from-tempenv
-stdout: "# init.bash\n#   init.unset   for local\n#   init.inherit for tempenv\n[global,(local)]
-  v: (unset)\n[global,tempenv,(local)] v: tempenv\n[xglobal,(local)] v: (unset)\n\
-  [global,(func),(local)] v: (unset)\n[global,tempenv,(func),(local)] v: tempenv\n\
-  [xglobal,(func),(local)] v: (unset)\n[global,local,(func),(local)] v: (unset)\n"
+stdout: |-
+  # init.bash
+  #   init.unset   for local
+  #   init.inherit for tempenv
+  [global,(local)] v: (unset)
+  [global,tempenv,(local)] v: tempenv
+  [xglobal,(local)] v: (unset)
+  [global,(func),(local)] v: (unset)
+  [global,tempenv,(func),(local)] v: tempenv
+  [xglobal,(func),(local)] v: (unset)
+  [global,local,(func),(local)] v: (unset)
 ---
 f1() {
   local v

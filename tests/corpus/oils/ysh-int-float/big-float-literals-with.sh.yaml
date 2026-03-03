@@ -2,7 +2,10 @@ disabled: true
 name: Big float Literals with _
 dialect: bash
 source: oils:spec/ysh-int-float#big-float-literals-with
-stdout: "42000.0005\n420000.005\n4200.00005\n"
+stdout: |-
+  42000.0005
+  420000.005
+  4200.00005
 ---
 shopt --set parse_ysh_expr_sub
 

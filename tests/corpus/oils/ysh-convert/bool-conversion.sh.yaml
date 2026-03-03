@@ -2,7 +2,18 @@ disabled: true
 name: bool() conversion
 dialect: bash
 source: oils:spec/ysh-convert#bool-conversion
-stdout: "true\nfalse\ntrue\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\ntrue\ntrue\n"
+stdout: |-
+  true
+  false
+  true
+  true
+  true
+  false
+  false
+  false
+  true
+  true
+  true
 ---
 shopt --set parse_ysh_expr_sub
 

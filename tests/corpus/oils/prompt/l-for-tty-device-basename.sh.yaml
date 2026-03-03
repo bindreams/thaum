@@ -1,7 +1,8 @@
 name: \l for TTY device basename
 dialect: bash
 source: oils:spec/prompt#l-for-tty-device-basename
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 PS1='foo \l bar'
 # FIXME this never an actual TTY when using ./test/spec.sh

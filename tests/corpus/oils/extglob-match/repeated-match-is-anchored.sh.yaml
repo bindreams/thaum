@@ -1,7 +1,10 @@
 name: repeated match is anchored
 dialect: bash
 source: oils:spec/extglob-match#repeated-match-is-anchored
-stdout: "FALSE\nFALSE\nTRUE\n"
+stdout: |-
+  FALSE
+  FALSE
+  TRUE
 ---
 [[ foofoo_ == +(foo) ]] || echo FALSE
 [[ _foofoo == +(foo) ]] || echo FALSE

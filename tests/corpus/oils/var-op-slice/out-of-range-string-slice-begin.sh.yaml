@@ -1,7 +1,9 @@
 name: 'Out of range string slice: begin'
 dialect: bash
 source: oils:spec/var-op-slice#out-of-range-string-slice-begin
-stdout: "_\n0\n"
+stdout: |-
+  _
+  0
 ---
 # out of range begin doesn't raise error in bash, but in mksh it skips the
 # whole thing!

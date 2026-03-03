@@ -1,7 +1,10 @@
 name: Alias with internal newlines
 dialect: bash
 source: oils:spec/alias#alias-with-internal-newlines
-stdout: "1\n2\n3 echo foo\n"
+stdout: |-
+  1
+  2
+  3 echo foo
 ---
 shopt -s expand_aliases
 alias e_='echo 1

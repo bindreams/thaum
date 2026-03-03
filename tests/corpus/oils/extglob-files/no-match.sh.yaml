@@ -1,7 +1,9 @@
 name: no match
 dialect: bash
 source: oils:spec/extglob-files#no-match
-stdout: "@(__nope__)\n@(__nope__*|__nope__?|*|?|[:alpha:]||)\n"
+stdout: |-
+  @(__nope__)
+  @(__nope__*|__nope__?|*|?|[:alpha:]||)
 ---
 shopt -s extglob
 echo @(__nope__)

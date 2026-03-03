@@ -2,7 +2,8 @@ disabled: true
 name: eggex as case arm
 dialect: bash
 source: oils:spec/ysh-case#eggex-as-case-arm
-stdout: "C++\n"
+stdout: |-
+  C++
 ---
 const x = "main.cc"
 case (x) {

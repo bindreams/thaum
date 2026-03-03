@@ -1,7 +1,9 @@
 name: $LINENO in [[
 dialect: bash
 source: oils:spec/vars-special#lineno-in
-stdout: "one\nOK\n"
+stdout: |-
+  one
+  OK
 ---
 echo one
 [[ $LINENO -eq 2 ]] && echo OK

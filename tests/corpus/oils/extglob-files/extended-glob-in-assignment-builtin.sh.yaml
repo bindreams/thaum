@@ -1,7 +1,8 @@
 name: Extended glob in assignment builtin
 dialect: bash
 source: oils:spec/extglob-files#extended-glob-in-assignment-builtin
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 
 # Another invocation of _EvalWordToParts() that OSH should handle

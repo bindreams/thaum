@@ -1,7 +1,11 @@
 name: weird flag parsing -oo errexit noglob
 dialect: bash
 source: oils:spec/sh-usage#weird-flag-parsing--oo-errexit-noglob
-stdout: "e\nf\ne\nf\n"
+stdout: |-
+  e
+  f
+  e
+  f
 ---
 
 prog='

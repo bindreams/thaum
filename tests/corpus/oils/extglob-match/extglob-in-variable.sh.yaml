@@ -1,7 +1,12 @@
 name: extglob in variable
 dialect: bash
 source: oils:spec/extglob-match#extglob-in-variable
-stdout: "TRUE\nTRUE\nFALSE\nFALSE\nFALSE\n"
+stdout: |-
+  TRUE
+  TRUE
+  FALSE
+  FALSE
+  FALSE
 ---
 shopt -s extglob
 

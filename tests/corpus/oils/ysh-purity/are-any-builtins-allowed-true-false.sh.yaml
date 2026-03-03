@@ -2,7 +2,10 @@ disabled: true
 name: Are any builtins allowed?  true, false
 dialect: bash
 source: oils:spec/ysh-purity#are-any-builtins-allowed-true-false
-stdout: "true\nbuiltin true\ncommand true\n"
+stdout: |-
+  true
+  builtin true
+  command true
 ---
 shopt --set ysh:upgrade
 

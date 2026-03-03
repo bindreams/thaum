@@ -1,7 +1,12 @@
 name: wait -n with arguments - arguments are respected
 dialect: bash
 source: oils:spec/background#wait--n-with-arguments---arguments-are-respected
-stdout: "x\nstatus=0\nstatus=127\n\ngot error lines\n"
+stdout: |-
+  x
+  status=0
+  status=127
+
+  got error lines
 ---
 case $SH in dash|mksh) exit ;; esac
 

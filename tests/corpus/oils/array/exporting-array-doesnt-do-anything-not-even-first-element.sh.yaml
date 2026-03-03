@@ -3,8 +3,11 @@ dialect: bash
 source: 
   oils:spec/array#exporting-array-doesnt-do-anything-not-even-first-element
 status: 0
-stdout: "mystr\nNone\nNone\n"
-setup: |
+stdout: |
+  mystr
+  None
+  None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +16,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 # bash parses, but doesn't execute.
 # mksh gives syntax error -- parses differently with 'export'

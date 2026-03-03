@@ -2,11 +2,18 @@ disabled: true
 name: BashAssoc, short
 dialect: bash
 source: oils:spec/ysh-printing#bashassoc-short
-stdout: "(BashAssoc)\n(BashAssoc ['k']=$'foo \\u0001μ')\n\n(Dict)  {k: (BashAssoc)}\n\
-  (Dict)  {k: (BashAssoc ['k']=$'foo \\u0001μ')}\n\n{\"type\":\"BashAssoc\",\"data\"\
-  :{}}\n{\"type\":\"BashAssoc\",\"data\":{\"k\":\"foo \\u0001μ\"}}\n\n(Dict)   {\"\
-  k\":{\"type\":\"BashAssoc\",\"data\":{}}}\n(Dict)   {\"k\":{\"type\":\"BashAssoc\"\
-  ,\"data\":{\"k\":\"foo \\u0001μ\"}}}\n"
+stdout: |-
+  (BashAssoc)
+  (BashAssoc ['k']=$'foo \u0001μ')
+
+  (Dict)  {k: (BashAssoc)}
+  (Dict)  {k: (BashAssoc ['k']=$'foo \u0001μ')}
+
+  {"type":"BashAssoc","data":{}}
+  {"type":"BashAssoc","data":{"k":"foo \u0001μ"}}
+
+  (Dict)   {"k":{"type":"BashAssoc","data":{}}}
+  (Dict)   {"k":{"type":"BashAssoc","data":{"k":"foo \u0001μ"}}}
 ---
 declare -A empty
 declare -A assoc=(['k']=$'foo \x01\u03bc')

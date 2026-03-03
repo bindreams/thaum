@@ -1,7 +1,9 @@
 name: == and = does not do glob
 dialect: bash
 source: oils:spec/builtin-bracket#and-does-not-do-glob
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 [ abc = 'a*' ]
 echo status=$?

@@ -2,8 +2,14 @@ name: Unimplemented options - OSH shopt -s ignore_shopt_not_impl
 dialect: bash
 source: 
   oils:spec/sh-options#unimplemented-options---osh-shopt--s-ignoreshoptnotimpl
-stdout: "shopt -u xpg_echo\nq=1\nshopt -s xpg_echo\nshopt -u xpg_echo\np=1\nnoflag=1\n\
-  set=1\n"
+stdout: |-
+  shopt -u xpg_echo
+  q=1
+  shopt -s xpg_echo
+  shopt -u xpg_echo
+  p=1
+  noflag=1
+  set=1
 ---
 case $SH in dash|mksh) exit ;; esac
 

@@ -2,7 +2,8 @@ disabled: true
 name: invoke --proc doesn't run shell functions
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---proc-doesnt-run-shell-functions
-stdout: "status=127\n"
+stdout: |-
+  status=127
 ---
 case $SH in bash) exit ;; esac
 

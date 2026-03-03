@@ -1,7 +1,11 @@
 name: Issue 2269 - Do NUL bytes match ? in ${a#?}
 dialect: bash
 source: oils:spec/nul-bytes#issue-2269---do-nul-bytes-match-in-a
-stdout: "escaped that'\"'\"'s it!\nthat's it!\n---\nescaped ::\n"
+stdout: |-
+  escaped that'"'"'s it!
+  that's it!
+  ---
+  escaped ::
 ---
 
 # https://github.com/oils-for-unix/oils/issues/2269

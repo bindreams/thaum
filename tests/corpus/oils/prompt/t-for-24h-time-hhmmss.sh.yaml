@@ -1,7 +1,8 @@
 name: \t for 24h time (HH:MM:SS)
 dialect: bash
 source: oils:spec/prompt#t-for-24h-time-hhmmss
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 PS1='foo \t bar'
 echo "${PS1@P}" | egrep -q 'foo [0-2][0-9]:[0-5][0-9]:[0-5][0-9] bar'

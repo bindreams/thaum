@@ -1,7 +1,10 @@
 name: shopt allows for backward compatibility like bash
 dialect: bash
 source: oils:spec/sh-options#shopt-allows-for-backward-compatibility-like-bash
-stdout: "shopt -u nullglob\nstatus=0\nshopt -s nullglob\n"
+stdout: |-
+  shopt -u nullglob
+  status=0
+  shopt -s nullglob
 ---
 
 # doesn't have to be on, but just for testing

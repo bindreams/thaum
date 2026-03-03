@@ -2,10 +2,17 @@ disabled: true
 name: --tool syntax-tree respects frontend/syntax_abbrev.py
 dialect: bash
 source: oils:spec/ysh-usage#tool-syntax-tree-respects-frontendsyntaxabbrevpy
-stdout: "(C (w <Lit_Chars echo>) (w (SQ sq)))\n(C\n  (w <Lit_Chars echo>)\n  (w (DQ
-  <Lit_Chars \"hi \"> ($ x) <Lit_Chars \" \"> (${ VSub_Name y)))\n)\n(VarDecl\n  keyword:<KW_Var
-  var>\n  lhs:[(NameType left:<Expr_Name x> name:x)]\n  rhs:(expr.Binary op:<Arith_Plus
-  \"+\"> left:(Const Expr_DecInt _) right:(Var a))\n)\n"
+stdout: |-
+  (C (w <Lit_Chars echo>) (w (SQ sq)))
+  (C
+    (w <Lit_Chars echo>)
+    (w (DQ <Lit_Chars "hi "> ($ x) <Lit_Chars " "> (${ VSub_Name y)))
+  )
+  (VarDecl
+    keyword:<KW_Var var>
+    lhs:[(NameType left:<Expr_Name x> name:x)]
+    rhs:(expr.Binary op:<Arith_Plus "+"> left:(Const Expr_DecInt _) right:(Var a))
+  )
 ---
 
 $[ENV.SH] --tool syntax-tree <<< '''

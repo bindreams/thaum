@@ -1,7 +1,10 @@
 name: Here doc with multiline double quoted string
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-multiline-double-quoted-string
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 cat <<EOF; echo "two
 three"

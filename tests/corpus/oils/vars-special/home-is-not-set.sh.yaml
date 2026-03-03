@@ -1,7 +1,10 @@
 name: $HOME is NOT set
 dialect: bash
 source: oils:spec/vars-special#home-is-not-set
-stdout: "status=0\nstatus=1\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
+  status=1
 ---
 case $SH in *zsh) echo 'zsh sets HOME'; exit ;; esac
 

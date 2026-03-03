@@ -1,7 +1,9 @@
 name: compgen doesn't need shell quoting
 dialect: bash
 source: oils:spec/builtin-completion#compgen-doesnt-need-shell-quoting
-stdout: "foo bar\nfoo'bar\n"
+stdout: |
+  foo bar
+  foo'bar
 environment:
   TMP: /tmp
 ---

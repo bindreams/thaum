@@ -2,7 +2,12 @@ name: declare -F with shopt -s extdebug prints more info
 dialect: bash
 source: 
   oils:spec/assign-extended#declare--f-with-shopt--s-extdebug-prints-more-info
-stdout: "declare -f add\ndeclare -f g\n\nadd 7 main\ng 3 ROOT/spec/testdata/bash-source-2.sh\n"
+stdout: |-
+  declare -f add
+  declare -f g
+
+  add 7 main
+  g 3 ROOT/spec/testdata/bash-source-2.sh
 ---
 case $SH in mksh) exit ;; esac
 

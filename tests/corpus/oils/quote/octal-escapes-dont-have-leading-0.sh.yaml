@@ -1,7 +1,8 @@
 name: $'' octal escapes don't have leading 0
 dialect: bash
 source: oils:spec/quote#octal-escapes-dont-have-leading-0
-stdout: " 001 377\n"
+stdout: |2-
+   001 377
 ---
 # echo -e syntax is echo -e \0377
 echo -n $'\001' $'\377' | od -A n -c | sed 's/ \+/ /g'

@@ -1,7 +1,8 @@
 name: '((test example - liblo package - #2337'
 dialect: bash
 source: oils:spec/paren-ambiguity#test-example---liblo-package---2337
-stdout: "bye\n"
+stdout: |-
+  bye
 ---
 
 if ! ((test x"$i" = x-g) || (test x"$i" = x-O2)); then

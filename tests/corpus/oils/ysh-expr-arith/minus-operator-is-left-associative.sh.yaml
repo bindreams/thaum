@@ -2,7 +2,9 @@ disabled: true
 name: Minus operator is left associative
 dialect: bash
 source: oils:spec/ysh-expr-arith#minus-operator-is-left-associative
-stdout: "a=0 b=0\na=0 b=0\n"
+stdout: |-
+  a=0 b=0
+  a=0 b=0
 ---
 
 var a = 1 - 0 - 1

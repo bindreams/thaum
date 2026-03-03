@@ -1,7 +1,8 @@
 name: ulimit -a doesn't take arg
 dialect: bash
 source: oils:spec/builtin-process#ulimit--a-doesnt-take-arg
-stdout: "failure that was expected\n"
+stdout: |-
+  failure that was expected
 ---
 case $SH in bash) exit ;; esac
 

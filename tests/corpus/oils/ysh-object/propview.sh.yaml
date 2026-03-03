@@ -3,7 +3,9 @@ name: propView()
 dialect: bash
 source: oils:spec/ysh-object#propview
 status: 3
-stdout: "(Dict)   {\"x\":3,\"y\":4}\n(Dict)   {\"x\":99,\"y\":4}\n"
+stdout: |-
+  (Dict)   {"x":3,"y":4}
+  (Dict)   {"x":99,"y":4}
 ---
 
 var obj = Object(null, {x: 3, y: 4})

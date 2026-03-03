@@ -2,8 +2,12 @@ disabled: true
 name: Another "stealing stdin" issue with spec tests
 dialect: bash
 source: oils:spec/ysh-bugs#another-stealing-stdin-issue-with-spec-tests
-stdout: "(Str)   \"1\"\n(Str)   \"2\"\n(Str)   \"3\"\n(Str)   \"4\"\n(Str)   \"5\"\
-  \n"
+stdout: |-
+  (Str)   "1"
+  (Str)   "2"
+  (Str)   "3"
+  (Str)   "4"
+  (Str)   "5"
 ---
 
 proc where2(; pred) {

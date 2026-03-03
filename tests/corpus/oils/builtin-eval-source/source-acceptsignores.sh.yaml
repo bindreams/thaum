@@ -1,7 +1,8 @@
 name: source accepts/ignores --
 dialect: bash
 source: oils:spec/builtin-eval-source#source-acceptsignores
-stdout: "foo\n"
+stdout: |
+  foo
 environment:
   TMP: /tmp
 ---

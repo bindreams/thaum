@@ -1,7 +1,11 @@
 name: '[[ equality matching'
 dialect: bash
 source: oils:spec/nocasematch-match#equality-matching
-stdout: "0\n0\n0\n0\n"
+stdout: |-
+  0
+  0
+  0
+  0
 ---
 shopt -s nocasematch
 [[ a == A ]]; echo $?

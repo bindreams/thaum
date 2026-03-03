@@ -2,7 +2,8 @@ name: Invalid string to int with strict_arith
 dialect: bash
 source: oils:spec/arith#invalid-string-to-int-with-strictarith
 status: 1
-stdout: "foo\n"
+stdout: |-
+  foo
 ---
 shopt -s strict_arith || true
 s=foo

@@ -1,8 +1,11 @@
-disabled: { reason: "zsh syntax not in scope" }
+disabled: {reason: "zsh syntax not in scope"}
 name: iterate over both keys and values
 dialect: bash
 source: oils:spec/zsh-assoc#iterate-over-both-keys-and-values
-stdout: "k1: v1\nk2: v2\nk3: v3\n"
+stdout: |-
+  k1: v1
+  k2: v2
+  k3: v3
 ---
 typeset -A assoc
 assoc=(k1 v1 k2 v2 k3 v3)

@@ -1,7 +1,14 @@
 name: (YSH) $[a1 === a2]
 dialect: bash
 source: oils:spec/array-sparse#ysh-a1-a2
-stdout: "true\ntrue\nfalse\nfalse\ntrue\nfalse\nfalse\n"
+stdout: |-
+  true
+  true
+  false
+  false
+  true
+  false
+  false
 ---
 case $SH in bash|mksh) exit ;; esac
 

@@ -1,7 +1,11 @@
 name: unset a[-1] (bf.bash regression)
 dialect: bash
 source: oils:spec/builtin-vars#unset-a-1-bfbash-regression
-stdout: "len=2\nlast=2\nlast=2\n1 42\n"
+stdout: |-
+  len=2
+  last=2
+  last=2
+  1 42
 ---
 case $SH in dash|zsh) exit ;; esac
 

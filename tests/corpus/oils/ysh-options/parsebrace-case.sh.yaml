@@ -2,7 +2,11 @@ disabled: true
 name: parse_brace case
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-case
-stdout: "python\nshell\npython\nshell\n"
+stdout: |-
+  python
+  shell
+  python
+  shell
 ---
 shopt -s ysh:upgrade
 

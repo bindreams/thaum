@@ -2,8 +2,22 @@ disabled: true
 name: invoke --proc --sh-func --builtin --extern
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---proc---sh-func---builtin---extern
-stdout: "--sh-func\nsh-func true\nstatus=0\n\n--proc\nproc true\nstatus=0\n\n--builtin\n\
-  status=0\n\n--extern\nstatus=0\n\n"
+stdout: |+
+  --sh-func
+  sh-func true
+  status=0
+
+  --proc
+  proc true
+  status=0
+
+  --builtin
+  status=0
+
+  --extern
+  status=0
+
+...
 ---
 case $SH in bash) exit ;; esac
 

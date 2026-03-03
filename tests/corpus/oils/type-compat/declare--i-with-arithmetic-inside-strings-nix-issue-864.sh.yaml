@@ -2,7 +2,9 @@ name: declare -i with arithmetic inside strings (Nix, issue 864)
 dialect: bash
 source: 
   oils:spec/type-compat#declare--i-with-arithmetic-inside-strings-nix-issue-864
-stdout: "s=3\nitem=3\n"
+stdout: |-
+  s=3
+  item=3
 ---
 
 # example

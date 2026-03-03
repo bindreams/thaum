@@ -2,8 +2,10 @@ disabled: true
 name: Background job &
 dialect: bash
 source: oils:spec/ysh-purity#background-job
-stdout: "code=5 message=Background jobs aren't allowed in pure mode (OILS-ERR-204)\n\
-  3\ncode=5 message=Pipelines aren't allowed in pure mode (OILS-ERR-204)\n"
+stdout: |-
+  code=5 message=Background jobs aren't allowed in pure mode (OILS-ERR-204)
+  3
+  code=5 message=Pipelines aren't allowed in pure mode (OILS-ERR-204)
 ---
 shopt --set ysh:upgrade
 

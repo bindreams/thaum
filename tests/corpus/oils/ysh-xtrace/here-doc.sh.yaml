@@ -2,9 +2,14 @@ disabled: true
 name: Here doc
 dialect: bash
 source: oils:spec/ysh-xtrace#here-doc
-stdout: "2\n3\n"
-stderr: ". builtin ':' begin\n| command 12345: tac\n; process 12345: status 0\n. builtin
-  set '+x'\n"
+stdout: |
+  2
+  3
+stderr: |-
+  . builtin ':' begin
+  | command 12345: tac
+  ; process 12345: status 0
+  . builtin set '+x'
 ---
 shopt --set ysh:upgrade
 shopt --unset errexit

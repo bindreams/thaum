@@ -2,10 +2,17 @@ disabled: true
 name: pp proc
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-proc
-stdout: "proc_name\tdoc_comment\nf\t\"doc ' comment with \\\" quotes\"\ng\t\"\"\n\
-  myproc\t\"YSH-style proc\"\nproc-none\t\"\"\nshfunc-none\t\"\"\n\"true\"\t\"Special
-  quoting rule\"\n---\nproc_name\tdoc_comment\nf\t\"doc ' comment with \\\" quotes\"\
-  \n"
+stdout: |-
+  proc_name	doc_comment
+  f	"doc ' comment with \" quotes"
+  g	""
+  myproc	"YSH-style proc"
+  proc-none	""
+  shfunc-none	""
+  "true"	"Special quoting rule"
+  ---
+  proc_name	doc_comment
+  f	"doc ' comment with \" quotes"
 ---
 shopt --set ysh:upgrade
 

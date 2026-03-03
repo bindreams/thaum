@@ -1,8 +1,9 @@
 name: declare builtin doesn't allow spaces
 dialect: bash
 source: oils:spec/array-assign#declare-builtin-doesnt-allow-spaces
-stdout: "declare -a a=([0]=\"1\" [1]=\"X\")\ndeclare -a a=([0]=\"1\" [1]=\"X\" [2]=\"\
-  3\")\n"
+stdout: |-
+  declare -a a=([0]="1" [1]="X")
+  declare -a a=([0]="1" [1]="X" [2]="3")
 ---
 case $SH in zsh|mksh|ash) exit ;; esac
 

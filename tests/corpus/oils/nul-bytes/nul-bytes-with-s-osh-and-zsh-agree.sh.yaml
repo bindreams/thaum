@@ -1,7 +1,9 @@
 name: NUL bytes with ${#s} (OSH and zsh agree)
 dialect: bash
 source: oils:spec/nul-bytes#nul-bytes-with-s-osh-and-zsh-agree
-stdout: "empty=0\nnul=0\n"
+stdout: |-
+  empty=0
+  nul=0
 ---
 
 case $SH in dash) exit ;; esac

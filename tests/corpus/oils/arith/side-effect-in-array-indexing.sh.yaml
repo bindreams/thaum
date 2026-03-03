@@ -1,7 +1,8 @@
 name: Side Effect in Array Indexing
 dialect: bash
 source: oils:spec/arith#side-effect-in-array-indexing
-stdout: "6 b=2\n"
+stdout: |-
+  6 b=2
 ---
 a=(4 5 6)
 echo "${a[b=2]} b=$b"

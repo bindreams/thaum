@@ -2,7 +2,11 @@ name: errexit with if and { }
 dialect: bash
 source: oils:spec/errexit#errexit-with-if-and
 status: 0
-stdout: "one\ntwo\nthree\nfour\n"
+stdout: |-
+  one
+  two
+  three
+  four
 ---
 set -o errexit
 if { echo one; false; echo two; }; then

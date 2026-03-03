@@ -1,7 +1,9 @@
 name: printf %6.0s and %0.0s
 dialect: bash
 source: oils:spec/builtin-printf#printf-60s-and-00s
-stdout: "[      ]\n[]\n"
+stdout: |-
+  [      ]
+  []
 ---
 printf '[%6.0s]\n' foo
 printf '[%0.0s]\n' foo

@@ -2,7 +2,8 @@ disabled: true
 name: Proc with default args
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-default-args
-stdout: "x=foo\n"
+stdout: |-
+  x=foo
 ---
 shopt --set parse_proc
 

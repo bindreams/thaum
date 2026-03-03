@@ -2,7 +2,11 @@ disabled: true
 name: "'... for' is allowed, but NOT recommended"
 dialect: bash
 source: oils:spec/ysh-multiline#for-is-allowed-but-not-recommended
-stdout: "foo\nbar\nfoo\nbar\n"
+stdout: |-
+  foo
+  bar
+  foo
+  bar
 ---
 ... for x in foo bar; do echo $x; done
     ;

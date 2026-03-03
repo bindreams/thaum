@@ -2,7 +2,9 @@ disabled: true
 name: use foo.ysh --pick a b
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh---pick-a-b
-stdout: "(Int)   3\n(Int)   2\n"
+stdout: |-
+  (Int)   3
+  (Int)   2
 ---
 
 use $REPO_ROOT/spec/testdata/module2/builtins.ysh --pick mylen mylen2

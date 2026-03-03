@@ -1,8 +1,9 @@
 name: IFS='\ '
 dialect: bash
 source: oils:spec/word-split#ifs
-stdout: "['a', 'b', '', 'c', 'd']\n"
-setup: |
+stdout: |
+  ['a', 'b', '', 'c', 'd']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # NOTE: OSH fails this because of double backslash escaping issue!
 # When IFS is \, then you're no longer using backslash escaping.

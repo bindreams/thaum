@@ -2,7 +2,8 @@ disabled: true
 name: global frame doesn't contain env vars
 dialect: bash
 source: oils:spec/ysh-namespaces#global-frame-doesnt-contain-env-vars
-stdout: "(List)   [0,1]\n"
+stdout: |-
+  (List)   [0,1]
 ---
 
 #pp frame_vars_

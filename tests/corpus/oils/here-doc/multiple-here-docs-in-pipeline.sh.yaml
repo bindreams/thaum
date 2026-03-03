@@ -1,8 +1,11 @@
 name: Multiple here docs in pipeline
 dialect: bash
 source: oils:spec/here-doc#multiple-here-docs-in-pipeline
-stdout: "0: 3: fd3\n5: fd5\nok\n"
-setup: |
+stdout: |
+  0: 3: fd3
+  5: fd5
+  ok
+setup: |-
   #!/bin/sh
   cat > read_from_fd.py <<'HELPER'
   #!/usr/bin/env python3
@@ -18,7 +21,6 @@ setup: |
       sys.stdout.buffer.write(data)
   HELPER
   chmod +x read_from_fd.py
-
 ---
 case $SH in *osh) exit ;; esac
 

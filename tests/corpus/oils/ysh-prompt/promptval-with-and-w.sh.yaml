@@ -2,7 +2,9 @@ disabled: true
 name: promptVal() with $ and w
 dialect: bash
 source: oils:spec/ysh-prompt#promptval-with-and-w
-stdout: "x=$\npass\n"
+stdout: |-
+  x=$
+  pass
 ---
 
 var x = io.promptVal('$')

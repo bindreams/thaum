@@ -2,7 +2,9 @@ disabled: true
 name: Proc Inside Block
 dialect: bash
 source: oils:spec/hay-meta#proc-inside-block
-stdout: "p\np\n"
+stdout: |-
+  p
+  p
 ---
 shopt --set ysh:all
 

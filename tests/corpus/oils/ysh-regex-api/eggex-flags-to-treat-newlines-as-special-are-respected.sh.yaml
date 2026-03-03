@@ -3,7 +3,11 @@ name: Eggex flags to treat newlines as special are respected
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#eggex-flags-to-treat-newlines-as-special-are-respected
-stdout: "yes\nyes\nyes\nyes\n"
+stdout: |-
+  yes
+  yes
+  yes
+  yes
 ---
 shopt -s ysh:upgrade
 

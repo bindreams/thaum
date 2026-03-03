@@ -1,7 +1,9 @@
 name: repetition with glob
 dialect: bash
 source: oils:spec/extglob-match#repetition-with-glob
-stdout: "TRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  FALSE
 ---
 # NOTE that * means two different things here
 [[ foofoo_foo__foo___ == *(foo*) ]] && echo TRUE

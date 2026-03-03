@@ -2,7 +2,11 @@ name: pushd/popd
 dialect: bash
 source: oils:spec/builtin-dirs#pushdpopd
 status: 0
-stdout: "/tmp /\npwd=/tmp\n/\npwd=/\n"
+stdout: |-
+  /tmp /
+  pwd=/tmp
+  /
+  pwd=/
 ---
 set -o errexit
 cd /

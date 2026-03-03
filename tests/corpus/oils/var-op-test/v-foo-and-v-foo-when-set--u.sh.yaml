@@ -1,7 +1,11 @@
 name: ${v-foo} and ${v:-foo} when set -u
 dialect: bash
 source: oils:spec/var-op-test#v-foo-and-v-foo-when-set--u
-stdout: "v=v\nv=v\nv=foo\nv=foo\n"
+stdout: |-
+  v=v
+  v=v
+  v=foo
+  v=foo
 ---
 set -u
 v=v

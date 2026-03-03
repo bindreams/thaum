@@ -2,7 +2,11 @@ disabled: true
 name: read --all
 dialect: bash
 source: oils:spec/ysh-builtins#read---all
-stdout: "[foo\n]\n[bad\n]\n"
+stdout: |-
+  [foo
+  ]
+  [bad
+  ]
 ---
 echo foo | read --all
 echo "[$_reply]"

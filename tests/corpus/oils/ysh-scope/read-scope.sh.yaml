@@ -2,7 +2,14 @@ disabled: true
 name: read scope
 dialect: bash
 source: oils:spec/ysh-scope#read-scope
-stdout: "x_before=42\nx_after=dynamic-scope\nx=\n---\nx_before=42\nx_after=42\nx=\n"
+stdout: |-
+  x_before=42
+  x_after=dynamic-scope
+  x=
+  ---
+  x_before=42
+  x_after=42
+  x=
 ---
 set -o errexit
 

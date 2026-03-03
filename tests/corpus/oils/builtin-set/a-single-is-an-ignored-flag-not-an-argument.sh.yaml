@@ -1,7 +1,11 @@
 name: A single + is an ignored flag; not an argument
 dialect: bash
 source: oils:spec/builtin-set#a-single-is-an-ignored-flag-not-an-argument
-stdout: "plus\nverbose-on\nxtrace-on\nplus x y\n"
+stdout: |-
+  plus
+  verbose-on
+  xtrace-on
+  plus x y
 ---
 case $SH in zsh) exit ;; esac
 

@@ -2,8 +2,9 @@ name: assignment using dynamic keyword (splits in most shells, not in zsh/osh)
 dialect: bash
 source: 
   oils:spec/assign#assignment-using-dynamic-keyword-splits-in-most-shells-not-in-zshosh
-stdout: "['a b c', 'a b c']\n"
-setup: |
+stdout: |
+  ['a b c', 'a b c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 words='a b c'
 e=export

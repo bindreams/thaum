@@ -1,7 +1,7 @@
 name: Empty env binding
 dialect: bash
 source: oils:spec/assign#empty-env-binding
-setup: |
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,6 +10,5 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 EMPTY= printenv.py EMPTY

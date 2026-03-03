@@ -2,7 +2,11 @@ disabled: true
 name: "''' without parse_triple_quote"
 dialect: bash
 source: oils:spec/ysh-string#without-parsetriplequote
-stdout: "\n  two = $two\n  \\u{61}\n  \n"
+stdout: |2-
+
+    two = $two
+    \u{61}
+    
 ---
 
 # 2025-06: re-allowed after hack for case (x) ''/foo/

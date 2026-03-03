@@ -1,9 +1,12 @@
 name: strip none unicode
 dialect: bash
 source: oils:spec/var-op-strip#strip-none-unicode
-stdout: "['\\xce\\xbcabc\\xce\\xbc']\n['\\xce\\xbcabc\\xce\\xbc']\n['\\xce\\xbcabc\\\
-  xce\\xbc']\n['\\xce\\xbcabc\\xce\\xbc']\n"
-setup: |
+stdout: |
+  ['\xce\xbcabc\xce\xbc']
+  ['\xce\xbcabc\xce\xbc']
+  ['\xce\xbcabc\xce\xbc']
+  ['\xce\xbcabc\xce\xbc']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 x=μabcμ
 argv.py "${x#}"

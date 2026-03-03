@@ -1,7 +1,13 @@
 name: wait for N parallel jobs and check failure
 dialect: bash
 source: oils:spec/background#wait-for-n-parallel-jobs-and-check-failure
-stdout: "1\n2\n3\nstatus=3\nstatus=2\nstatus=1\n"
+stdout: |-
+  1
+  2
+  3
+  status=3
+  status=2
+  status=1
 ---
 
 set -o errexit

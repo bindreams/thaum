@@ -2,13 +2,17 @@ disabled: true
 name: Type objects Bool, Int, Float, etc.
 dialect: bash
 source: oils:spec/ysh-builtin-meta#type-objects-bool-int-float-etc
-stdout: "(Obj)   (\"name\":\"Bool\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"\
-  name\":\"Int\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\":\"Float\")
-  --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\":\"Str\") --> (\"__index__\"\
-  :<BuiltinFunc>)\n(Obj)   (\"name\":\"List\") --> (\"__index__\":<BuiltinFunc>)\n\
-  (Obj)   (\"name\":\"Dict\") --> (\"__index__\":<BuiltinFunc>)\n(Obj)   (\"name\"\
-  :\"Obj\",\"new\":<BuiltinFunc>) --> (\"__index__\":<BuiltinFunc>)\n\n(Bool)   true\n\
-  (Bool)   true\n"
+stdout: |-
+  (Obj)   ("name":"Bool") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"Int") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"Float") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"Str") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"List") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"Dict") --> ("__index__":<BuiltinFunc>)
+  (Obj)   ("name":"Obj","new":<BuiltinFunc>) --> ("__index__":<BuiltinFunc>)
+
+  (Bool)   true
+  (Bool)   true
 ---
 
 pp test_ (Bool)

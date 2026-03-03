@@ -1,7 +1,8 @@
 name: $HOSTNAME
 dialect: bash
 source: oils:spec/vars-special#hostname
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 test "$HOSTNAME" = "$(hostname)"
 echo status=$?

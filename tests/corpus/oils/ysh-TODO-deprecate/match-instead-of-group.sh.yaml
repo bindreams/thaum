@@ -2,7 +2,9 @@ disabled: true
 name: _match() instead of _group()
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#match-instead-of-group
-stdout: "42\n42\n"
+stdout: |-
+  42
+  42
 ---
 
 shopt --set ysh:upgrade

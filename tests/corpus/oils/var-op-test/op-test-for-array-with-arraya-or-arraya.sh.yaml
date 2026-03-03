@@ -1,9 +1,15 @@
 name: op-test for ${!array} with array="a[@]" or array="a[*]"
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-array-with-arraya-or-arraya
-stdout: "ref=a[@]: 'no-colon' 'with-colon'\nref=a[*]: 'no-colon' 'with-colon'\nref=a[@]:
-  '' 'with-colon'\nref=a[*]: '' 'with-colon'\nref=a[@]: ' ' ' '\nref=a[*]: ' ' ' '\n\
-  ref=a[@]: ' ' ' '\nref=a[*]: '' 'with-colon'\n"
+stdout: |-
+  ref=a[@]: 'no-colon' 'with-colon'
+  ref=a[*]: 'no-colon' 'with-colon'
+  ref=a[@]: '' 'with-colon'
+  ref=a[*]: '' 'with-colon'
+  ref=a[@]: ' ' ' '
+  ref=a[*]: ' ' ' '
+  ref=a[@]: ' ' ' '
+  ref=a[*]: '' 'with-colon'
 ---
 case $SH in dash|mksh|zsh) exit ;; esac
 

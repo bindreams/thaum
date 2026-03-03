@@ -2,7 +2,10 @@ disabled: true
 name: mixing assignment builtins and YSH assignment
 dialect: bash
 source: oils:spec/ysh-assign#mixing-assignment-builtins-and-ysh-assignment
-stdout: "x=2\nstatus=0\nstatus=1\n"
+stdout: |-
+  x=2
+  status=0
+  status=1
 ---
 shopt --set ysh:all parse_equals
 shopt --unset no_osh_builtins

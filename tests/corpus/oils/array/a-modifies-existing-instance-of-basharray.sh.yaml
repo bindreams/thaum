@@ -1,7 +1,9 @@
 name: a+=() modifies existing instance of BashArray
 dialect: bash
 source: oils:spec/array#a-modifies-existing-instance-of-basharray
-stdout: "a=(1 2 3 4 5)\nb=(1 2 3 4 5)\n"
+stdout: |-
+  a=(1 2 3 4 5)
+  b=(1 2 3 4 5)
 ---
 case $SH in mksh|bash) exit ;; esac
 

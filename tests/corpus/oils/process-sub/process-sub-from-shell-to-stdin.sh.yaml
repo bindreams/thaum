@@ -1,6 +1,9 @@
 name: Process sub from shell to stdin
 dialect: bash
 source: oils:spec/process-sub#process-sub-from-shell-to-stdin
-stdout: "3\n2\n1\n"
+stdout: |-
+  3
+  2
+  1
 ---
 { echo 1; echo 2; echo 3; } > >(tac)

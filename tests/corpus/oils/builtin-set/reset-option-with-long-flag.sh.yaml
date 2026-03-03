@@ -2,7 +2,8 @@ name: reset option with long flag
 dialect: bash
 source: oils:spec/builtin-set#reset-option-with-long-flag
 status: 0
-stdout: "[]\n"
+stdout: |-
+  []
 ---
 set -o errexit
 set +o errexit

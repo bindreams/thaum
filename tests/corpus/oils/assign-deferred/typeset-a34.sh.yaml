@@ -1,8 +1,10 @@
 name: typeset a[3]=4
 dialect: bash
 source: oils:spec/assign-deferred#typeset-a34
-stdout: "status=0\n['3', '5', '4', '6']\n"
-setup: |
+stdout: |
+  status=0
+  ['3', '5', '4', '6']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 typeset a[3]=4 a[5]=6
 echo status=$?

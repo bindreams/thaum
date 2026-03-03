@@ -2,7 +2,8 @@ name: Multiple assignments / array assignments on a line
 dialect: bash
 source: 
   oils:spec/assign-extended#multiple-assignments-array-assignments-on-a-line
-stdout: "1 2 3\n"
+stdout: |-
+  1 2 3
 ---
 a=1 b[0+0]=2 c=3
 echo $a ${b[@]} $c

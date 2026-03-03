@@ -1,7 +1,9 @@
 name: multi-level break with argument
 dialect: bash
 source: oils:spec/loop#multi-level-break-with-argument
-stdout: "99\n50\n"
+stdout: |-
+  99
+  50
 ---
 
 # reported in issue #1459

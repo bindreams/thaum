@@ -3,7 +3,8 @@ name: cd passed block with return 1
 dialect: bash
 source: oils:spec/ysh-blocks#cd-passed-block-with-return-1
 status: 1
-stdout: "block\n"
+stdout: |-
+  block
 ---
 shopt -s ysh:all
 

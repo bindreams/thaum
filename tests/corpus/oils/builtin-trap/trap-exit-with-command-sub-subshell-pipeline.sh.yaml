@@ -1,7 +1,11 @@
 name: trap EXIT with command sub / subshell / pipeline
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-with-command-sub-subshell-pipeline
-stdout: "command sub\nsubshell\npipeline\nEXIT TRAP\n"
+stdout: |-
+  command sub
+  subshell
+  pipeline
+  EXIT TRAP
 ---
 trap 'echo EXIT TRAP' EXIT 
 

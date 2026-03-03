@@ -2,7 +2,11 @@ disabled: true
 name: dict with expression keys
 dialect: bash
 source: oils:spec/ysh-dict#dict-with-expression-keys
-stdout: "len=1\nhello\nlen=1\nbar\n"
+stdout: |-
+  len=1
+  hello
+  len=1
+  bar
 ---
 shopt --set parse_ysh_expr_sub
 

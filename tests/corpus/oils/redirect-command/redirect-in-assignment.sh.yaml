@@ -1,7 +1,10 @@
 name: Redirect in assignment
 dialect: bash
 source: oils:spec/redirect-command#redirect-in-assignment
-stdout: "FILE=\nfoo\nFOO=\n"
+stdout: |
+  FILE=
+  foo
+  FOO=
 environment:
   TMP: /tmp
 ---

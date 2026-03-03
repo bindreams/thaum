@@ -2,9 +2,15 @@ disabled: true
 name: Str => split(sep, count), non-empty str sep
 dialect: bash
 source: oils:spec/ysh-methods#str-splitsep-count-non-empty-str-sep
-stdout: "(List)   [\"a\",\"b\",\"c\"]\n(List)   [\"a\",\"b\",\"c\"]\n(List)   [\"\"\
-  ,\"a\"]\n(List)   [\"a\",\"b\",\"c<d\"]\n(List)   [\"a\",\"b\",\";c\"]\n(List) \
-  \  []\n(List)   [\"a,b,c\"]\n(List)   []\n"
+stdout: |-
+  (List)   ["a","b","c"]
+  (List)   ["a","b","c"]
+  (List)   ["","a"]
+  (List)   ["a","b","c<d"]
+  (List)   ["a","b",";c"]
+  (List)   []
+  (List)   ["a,b,c"]
+  (List)   []
 ---
 pp test_ ('a,b,c'.split(',', count=-1))
 pp test_ ('a,b,c'.split(',', count=-2))  # Any negative count means "ignore count"

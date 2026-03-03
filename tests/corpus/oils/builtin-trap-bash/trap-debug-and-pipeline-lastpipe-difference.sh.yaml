@@ -1,8 +1,21 @@
 name: trap DEBUG and pipeline (lastpipe difference)
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-and-pipeline-lastpipe-difference
-stdout: "  [6]\na\n  [6]\nb\n  [8]\n2\n  [10]\n  [10]\n  [10]\n1\n  [12]\n  [13]\n\
-  \  [14]\n1\n"
+stdout: |2-
+    [6]
+  a
+    [6]
+  b
+    [8]
+  2
+    [10]
+    [10]
+    [10]
+  1
+    [12]
+    [13]
+    [14]
+  1
 ---
 debuglog() {
   echo "  [$@]"

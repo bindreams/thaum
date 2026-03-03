@@ -2,7 +2,7 @@ name: ${BASH_LINENO[@]} is a stack of line numbers for function calls
 dialect: bash
 source: 
   oils:spec/introspect#bashlineno-is-a-stack-of-line-numbers-for-function-calls
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +10,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # note: it's CALLS, not DEFINITIONS.
 g() {

@@ -1,10 +1,30 @@
 name: Strip unicode prefix
 dialect: bash
 source: oils:spec/var-op-strip#strip-unicode-prefix
-stdout: "   -  \\n\n  2d  0a\n\n   -  \\n\n  2d  0a\n\n   -  \\n\n  2d  0a\n\n   -\
-  \  \\n\n  2d  0a\n## BUG dash/mksh/ash STDOUT:\n 274   -  \\n\n  bc  2d  0a\n\n\
-  \ 274   -  \\n\n  bc  2d  0a\n\n   - 316  \\n\n  2d  ce  0a\n\n   - 316  \\n\n \
-  \ 2d  ce  0a\n"
+stdout: |2-
+     -  \n
+    2d  0a
+
+     -  \n
+    2d  0a
+
+     -  \n
+    2d  0a
+
+     -  \n
+    2d  0a
+  ## BUG dash/mksh/ash STDOUT:
+   274   -  \n
+    bc  2d  0a
+
+   274   -  \n
+    bc  2d  0a
+
+     - 316  \n
+    2d  ce  0a
+
+     - 316  \n
+    2d  ce  0a
 ---
 
 show_hex() { od -A n -t c -t x1; }

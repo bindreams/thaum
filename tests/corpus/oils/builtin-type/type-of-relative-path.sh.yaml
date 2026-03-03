@@ -2,7 +2,8 @@ name: type of relative path
 dialect: bash
 source: oils:spec/builtin-type#type-of-relative-path
 status: 1
-stdout: "_tmp/ex is _tmp/ex\n"
+stdout: |-
+  _tmp/ex is _tmp/ex
 ---
 
 mkdir -p _tmp

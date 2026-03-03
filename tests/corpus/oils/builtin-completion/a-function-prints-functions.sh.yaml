@@ -2,7 +2,15 @@ name: -A function prints functions
 dialect: bash
 source: oils:spec/builtin-completion#a-function-prints-functions
 status: 0
-stdout: "__ec\n_ab\nadd\ndiv\nek\n--\n__ec\n_ab\n"
+stdout: |-
+  __ec
+  _ab
+  add
+  div
+  ek
+  --
+  __ec
+  _ab
 ---
 add () { expr 4 + 4; }
 div () { expr 6 / 2; }

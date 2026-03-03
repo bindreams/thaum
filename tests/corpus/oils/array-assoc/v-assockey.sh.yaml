@@ -1,8 +1,21 @@
 name: '[[ -v assoc[key] ]]'
 dialect: bash
 source: oils:spec/array-assoc#v-assockey
-stdout: "no quotes\nempty=0\nk=0\nnonexistent=1\n\nquotes\nempty=0\nk=0\nnonexistent=1\n\
-  \nvars\nempty=0\nk=0\nnonexistent=1\n"
+stdout: |-
+  no quotes
+  empty=0
+  k=0
+  nonexistent=1
+
+  quotes
+  empty=0
+  k=0
+  nonexistent=1
+
+  vars
+  empty=0
+  k=0
+  nonexistent=1
 ---
 
 typeset -A assoc

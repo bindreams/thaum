@@ -2,7 +2,8 @@ name: getopts with invalid flag
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-with-invalid-flag
 status: 2
-stdout: "ERROR 3\n"
+stdout: |-
+  ERROR 3
 ---
 set -- -h -x
 while getopts "hc:" opt; do

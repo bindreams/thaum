@@ -1,7 +1,9 @@
 name: type -> not found
 dialect: bash
 source: oils:spec/builtin-type#type---not-found
-stdout: "status=1\nzz: not found\n"
+stdout: |
+  status=1
+  zz: not found
 stderr: "\n"
 ---
 

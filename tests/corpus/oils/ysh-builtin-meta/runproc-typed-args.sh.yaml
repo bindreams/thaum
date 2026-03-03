@@ -2,9 +2,26 @@ disabled: true
 name: runproc typed args
 dialect: bash
 source: oils:spec/ysh-builtin-meta#runproc-typed-args
-stdout: "hi from p\n\nty\n(Str)   \"a\"\n(Int)   42\n(Int)   99\nCommand\n\nty\n(Str)\
-  \   \"a\"\n(Int)   42\n(Int)   99\nCommand\n\nty\n(Str)   \"a\"\n(Int)   42\n(Int)\
-  \   99\nCommand\n"
+stdout: |-
+  hi from p
+
+  ty
+  (Str)   "a"
+  (Int)   42
+  (Int)   99
+  Command
+
+  ty
+  (Str)   "a"
+  (Int)   42
+  (Int)   99
+  Command
+
+  ty
+  (Str)   "a"
+  (Int)   42
+  (Int)   99
+  Command
 ---
 shopt --set parse_brace parse_proc parse_ysh_expr_sub
 

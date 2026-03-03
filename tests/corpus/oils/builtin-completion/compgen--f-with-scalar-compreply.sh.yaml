@@ -1,7 +1,8 @@
 name: compgen -F with scalar COMPREPLY
 dialect: bash
 source: oils:spec/builtin-completion#compgen--f-with-scalar-compreply
-stdout: "hello\n"
+stdout: |-
+  hello
 ---
 
 _comp_cmd_test() {

@@ -1,7 +1,9 @@
 name: '>$file touches a file'
 dialect: bash
 source: oils:spec/redirect-command#file-touches-a-file
-stdout: "status=1\nstatus=0\n"
+stdout: |
+  status=1
+  status=0
 stderr: ''
 ---
 rm -f myfile

@@ -3,7 +3,8 @@ name: Dict => keys()
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#dict-keys
 status: 0
-stdout: "(List)   [\"hello\",\"friend\",\"cat\"]\n"
+stdout: |-
+  (List)   ["hello","friend","cat"]
 ---
 var en2fr = {}
 setvar en2fr["hello"] = "bonjour"

@@ -1,7 +1,8 @@
 name: shopt -s lastpipe (always on in OSH)
 dialect: bash
 source: oils:spec/pipeline#shopt--s-lastpipe-always-on-in-osh
-stdout: "line=hi\n"
+stdout: |-
+  line=hi
 ---
 shopt -s lastpipe
 echo hi | read line

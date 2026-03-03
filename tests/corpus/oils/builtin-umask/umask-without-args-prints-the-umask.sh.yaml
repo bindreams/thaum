@@ -1,7 +1,9 @@
 name: "'umask' without args prints the umask"
 dialect: bash
 source: oils:spec/builtin-umask#umask-without-args-prints-the-umask
-stdout: "022\nstatus=0\n"
+stdout: |-
+  022
+  status=0
 ---
 umask | tail --bytes 4  # 0022 versus 022
 echo status=$?

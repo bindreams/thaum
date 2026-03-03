@@ -3,7 +3,9 @@ name: 'For loop over expression: Dict, not BashAssoc'
 dialect: bash
 source: oils:spec/ysh-for#for-loop-over-expression-dict-not-bashassoc
 status: 3
-stdout: "key name\nkey age\n"
+stdout: |-
+  key name
+  key age
 ---
 
 var mydict = {name: 'bob', age: 40}

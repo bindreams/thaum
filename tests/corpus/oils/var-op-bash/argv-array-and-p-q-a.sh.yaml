@@ -1,7 +1,13 @@
 name: argv array and @P @Q @a
 dialect: bash
 source: oils:spec/var-op-bash#argv-array-and-p-q-a
-stdout: "a b c\nstatus=0\n'a' 'b\\nc'\nstatus=0\n\nstatus=0\n"
+stdout: |-
+  a b c
+  status=0
+  'a' 'b\nc'
+  status=0
+
+  status=0
 ---
 $SH -c 'echo ${@@P}' dummy a b c
 echo status=$?

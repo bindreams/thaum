@@ -1,7 +1,10 @@
 name: type -f builtin -> function and file exists
 dialect: bash
 source: oils:spec/builtin-type-bash#type--f-builtin---function-and-file-exists
-stdout: "mv is /tmp/mv\ntar is /tmp/tar\ngrep is /tmp/grep\n"
+stdout: |-
+  mv is /tmp/mv
+  tar is /tmp/tar
+  grep is /tmp/grep
 ---
 touch /tmp/{mv,tar,grep}
 chmod +x /tmp/{mv,tar,grep}

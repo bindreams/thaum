@@ -2,7 +2,11 @@ disabled: true
 name: place->setValue()
 dialect: bash
 source: oils:spec/ysh-place#place-setvalue
-stdout: "f x=f\nfillPlace x=fillPlace\np x=zzz\nglobal x=global\n"
+stdout: |-
+  f x=f
+  fillPlace x=fillPlace
+  p x=zzz
+  global x=global
 ---
 
 func f(place) {

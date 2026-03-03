@@ -3,9 +3,20 @@ name: getFrame()
 dialect: bash
 source: oils:spec/ysh-introspect#getframe
 status: 3
-stdout: "<Frame>\n(List)   []\n\np2 frame -1\n<Frame>\n(Dict)   {\"__E__\":<Frame>,\"\
-  ARGV\":[],\"fr\":<Frame>}\n(List)   [\"__E__\",\"ARGV\",\"fr\"]\n\np2 frame -2\n\
-  <Frame>\n(List)   [\"__E__\",\"ARGV\",\"p1_var\"]\n\n"
+stdout: |+
+  <Frame>
+  (List)   []
+
+  p2 frame -1
+  <Frame>
+  (Dict)   {"__E__":<Frame>,"ARGV":[],"fr":<Frame>}
+  (List)   ["__E__","ARGV","fr"]
+
+  p2 frame -2
+  <Frame>
+  (List)   ["__E__","ARGV","p1_var"]
+
+...
 ---
 
 var fr = vm.getFrame(0)

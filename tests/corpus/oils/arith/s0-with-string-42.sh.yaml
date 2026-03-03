@@ -1,7 +1,9 @@
 name: s[0] with string 42
 dialect: bash
 source: oils:spec/arith#s0-with-string-42
-stdout: "42 42 0\nstatus=0\n"
+stdout: |-
+  42 42 0
+  status=0
 ---
 case $SH in dash) exit ;; esac
 

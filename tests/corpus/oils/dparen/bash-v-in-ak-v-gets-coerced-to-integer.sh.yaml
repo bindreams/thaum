@@ -1,7 +1,10 @@
 name: 'bash: V in (( A["K"] = V )) gets coerced to integer'
 dialect: bash
 source: oils:spec/dparen#bash-v-in-ak-v-gets-coerced-to-integer
-stdout: "A[\"key\"]=\nkeys = K\nvalues = 0\n"
+stdout: |-
+  A["key"]=
+  keys = K
+  values = 0
 ---
 shopt -u strict_arith || true
 K=key

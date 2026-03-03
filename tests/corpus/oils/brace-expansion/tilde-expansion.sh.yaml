@@ -1,7 +1,9 @@
 name: Tilde expansion
 dialect: bash
 source: oils:spec/brace-expansion#tilde-expansion
-stdout: "/home/foo\n/home/bar\n"
+stdout: |-
+  /home/foo
+  /home/bar
 ---
 HOME=/home/foo
 echo ~

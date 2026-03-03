@@ -3,7 +3,10 @@ dialect: bash
 source: 
   oils:spec/strict-options#arrays-are-incorrectly-compared-but-strictarray-prevents-it
 status: 1
-stdout: "2\n4\nEQUAL\n"
+stdout: |-
+  2
+  4
+  EQUAL
 ---
 
 # NOTE: from spec/dbracket has a test case like this

@@ -2,7 +2,9 @@ disabled: true
 name: '... inside command sub $()'
 dialect: bash
 source: oils:spec/ysh-multiline#inside-command-sub
-stdout: "one two three four\nfive\n"
+stdout: |-
+  one two three four
+  five
 ---
 echo one $(... echo
               two

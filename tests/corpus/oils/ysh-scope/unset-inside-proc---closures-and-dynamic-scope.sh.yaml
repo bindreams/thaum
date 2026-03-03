@@ -2,7 +2,10 @@ disabled: true
 name: unset inside proc - closures and dynamic scope
 dialect: bash
 source: oils:spec/ysh-scope#unset-inside-proc---closures-and-dynamic-scope
-stdout: "shellfunc x=\nunset-proc x=\nunset-proc-dynamic-scope x=\n"
+stdout: |-
+  shellfunc x=
+  unset-proc x=
+  unset-proc-dynamic-scope x=
 ---
 shopt --set parse_brace
 shopt --set parse_proc

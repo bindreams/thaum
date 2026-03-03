@@ -41,6 +41,7 @@ Key types: `Program`, `Statement`, `Expression`, `Command`, `CompoundCommand`, `
 Individual Bash features are controlled by `ShellOptions` flags. `Dialect::Bash` enables all of them, `Dialect::Posix` enables none. Versioned dialects (`Bash44`, `Bash50`, `Bash51`) model behavioral differences between Bash releases; `Dialect::Bash` aliases the latest (`Bash51`).
 
 Currently implemented Bash extensions:
+
 - `<<<` here-strings (`here_strings`)
 - `&>` / `&>>` redirects (`ampersand_redirect`)
 - `[[ ]]` extended test (`double_brackets`)
@@ -72,6 +73,7 @@ assert_eq!(status, 0);
 ```
 
 Supported features:
+
 - Variables (scalars, indexed arrays, associative arrays)
 - Functions with local scoping
 - All compound commands (if/while/until/for/case/brace groups)
@@ -83,7 +85,7 @@ Supported features:
 - `$"..."` locale translation via GNU gettext `.mo` catalogs
 - Parameter transformation operators (`${var@Q}`, `${var@a}`, `${var@A}`, etc.)
 - Indirect expansion for array keys (`${!arr[@]}`)
-- Builtins: echo, printf, cd, test/[, eval, exec, source, declare/typeset,
+- Builtins: echo, printf, cd, test/\[, eval, exec, source, declare/typeset,
   export, unset, read, set, shopt, alias/unalias, local, readonly, shift,
   return, break, continue, exit, true, false, :
 
@@ -109,16 +111,16 @@ Kinds use `<stage>.<metric>` format with glob support. Only the needed backends 
 
 **Stages**: `lex`, `parse`, `exec`, `total`
 
-| Metric | Backend | Description |
-|--------|---------|-------------|
-| `instructions` | callgrind | CPU instructions executed (deterministic) |
-| `data-reads` | callgrind | Data cache read accesses |
-| `data-writes` | callgrind | Data cache write accesses |
-| `l1-hits` | callgrind | L1 cache hits (accesses that did not miss L1) |
-| `ll-hits` | callgrind | Last-level cache hits (L1 misses served by LL) |
-| `ram-hits` | callgrind | RAM accesses (LL cache misses) |
-| `est-cycles` | callgrind | Estimated CPU cycles (1/10/100 cost model) |
-| `walltime` | hyperfine | Wall-clock time (thaum only, or vs bash/dash for `total`) |
+| Metric         | Backend   | Description                                               |
+| -------------- | --------- | --------------------------------------------------------- |
+| `instructions` | callgrind | CPU instructions executed (deterministic)                 |
+| `data-reads`   | callgrind | Data cache read accesses                                  |
+| `data-writes`  | callgrind | Data cache write accesses                                 |
+| `l1-hits`      | callgrind | L1 cache hits (accesses that did not miss L1)             |
+| `ll-hits`      | callgrind | Last-level cache hits (L1 misses served by LL)            |
+| `ram-hits`     | callgrind | RAM accesses (LL cache misses)                            |
+| `est-cycles`   | callgrind | Estimated CPU cycles (1/10/100 cost model)                |
+| `walltime`     | hyperfine | Wall-clock time (thaum only, or vs bash/dash for `total`) |
 
 Default: `*` (everything). Callgrind metrics are available for `lex`, `parse`, `exec`. Walltime is available for all stages including `total`.
 

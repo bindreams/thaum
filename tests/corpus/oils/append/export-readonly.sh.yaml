@@ -1,7 +1,10 @@
 name: export readonly +=
 dialect: bash
 source: oils:spec/append#export-readonly
-stdout: "e=foo\nr=bar\ne=foofoo\n"
+stdout: |-
+  e=foo
+  r=bar
+  e=foofoo
 ---
 
 export e+=foo

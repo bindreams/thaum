@@ -1,10 +1,14 @@
 name: ${a[@]@P}, ${a[@]@Q}, and ${a[@]@a}
 dialect: bash
 source: oils:spec/array-sparse#ap-aq-and-aa
-stdout: "['v0', 'v1', 'v5', 'v6', 'v8', 'v9']\n['v0 v1 v5 v6 v8 v9']\n['v0', 'v1',
-  'v5', 'v6', 'v8', 'v9']\n['v0 v1 v5 v6 v8 v9']\n['a', 'a', 'a', 'a', 'a', 'a']\n\
-  ['a a a a a a']\n"
-setup: |
+stdout: |
+  ['v0', 'v1', 'v5', 'v6', 'v8', 'v9']
+  ['v0 v1 v5 v6 v8 v9']
+  ['v0', 'v1', 'v5', 'v6', 'v8', 'v9']
+  ['v0 v1 v5 v6 v8 v9']
+  ['a', 'a', 'a', 'a', 'a', 'a']
+  ['a a a a a a']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +16,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in mksh) exit ;; esac
 

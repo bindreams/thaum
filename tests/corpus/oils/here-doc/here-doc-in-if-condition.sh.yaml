@@ -1,7 +1,9 @@
 name: Here Doc in if condition
 dialect: bash
 source: oils:spec/here-doc#here-doc-in-if-condition
-stdout: "here doc in IF CONDITION\nTHEN executed\n"
+stdout: |-
+  here doc in IF CONDITION
+  THEN executed
 ---
 if cat <<EOF; then
 here doc in IF CONDITION

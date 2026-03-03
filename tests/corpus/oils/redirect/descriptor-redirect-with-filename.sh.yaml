@@ -1,7 +1,8 @@
 name: Descriptor redirect with filename
 dialect: bash
 source: oils:spec/redirect#descriptor-redirect-with-filename
-stdout: "status=1\n"
+stdout: |
+  status=1
 environment:
   TMP: /tmp
 ---

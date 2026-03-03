@@ -2,7 +2,9 @@ disabled: true
 name: help shows 'ysh-chapters' topic
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-shows-ysh-chapters-topic
-stdout: "~~~ ysh-chapters ~~~\nstatus=0\n"
+stdout: |-
+  ~~~ ysh-chapters ~~~
+  status=0
 ---
 
 # shows ~~~ instead of ANSI text

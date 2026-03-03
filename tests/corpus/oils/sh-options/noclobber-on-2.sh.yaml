@@ -1,7 +1,9 @@
 name: noclobber on >>
 dialect: bash
 source: oils:spec/sh-options#noclobber-on
-stdout: "status=0\nfoo\n"
+stdout: |
+  status=0
+  foo
 environment:
   TMP: /tmp
 ---

@@ -1,7 +1,8 @@
 name: Wait on multiple specific IDs returns last status
 dialect: bash
 source: oils:spec/background#wait-on-multiple-specific-ids-returns-last-status
-stdout: "status=7\n"
+stdout: |-
+  status=7
 ---
 { sleep 0.08; exit 8; } &
 jid1=$!

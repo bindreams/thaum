@@ -1,7 +1,10 @@
 name: SHELLOPTS is updated when options are changed
 dialect: bash
 source: oils:spec/sh-options-bash#shellopts-is-updated-when-options-are-changed
-stdout: "1\n0\n1\n"
+stdout: |-
+  1
+  0
+  1
 ---
 echo $SHELLOPTS | grep -q xtrace
 echo $?

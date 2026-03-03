@@ -2,7 +2,10 @@ disabled: true
 name: Shell for loop with index (equivalent of enumerate())
 dialect: bash
 source: oils:spec/ysh-for#shell-for-loop-with-index-equivalent-of-enumerate
-stdout: "0 a\n1 b\n2 c\n"
+stdout: |-
+  0 a
+  1 b
+  2 c
 ---
 for i, item in a b c {
   echo "$i $item"

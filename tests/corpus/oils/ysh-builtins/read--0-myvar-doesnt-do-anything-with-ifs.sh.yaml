@@ -2,7 +2,9 @@ disabled: true
 name: read -0 myvar doesn't do anything with IFS
 dialect: bash
 source: oils:spec/ysh-builtins#read--0-myvar-doesnt-do-anything-with-ifs
-stdout: "[./foo bar  ]\n[./foo bar  ]\n"
+stdout: |-
+  [./foo bar  ]
+  [./foo bar  ]
 ---
 
 touch 'foo bar  '

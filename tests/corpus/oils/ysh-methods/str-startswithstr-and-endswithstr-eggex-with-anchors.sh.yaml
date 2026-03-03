@@ -4,7 +4,13 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex-with-anchors
 status: 0
-stdout: "true false\nfalse false\nfalse false\nfalse false\nfalse true\nfalse false\n"
+stdout: |-
+  true false
+  false false
+  false false
+  false false
+  false true
+  false false
 ---
 func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
 

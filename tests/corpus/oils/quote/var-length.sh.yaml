@@ -1,7 +1,8 @@
 name: Var length
 dialect: bash
 source: oils:spec/quote#var-length
-stdout: "foo3\n"
+stdout: |-
+  foo3
 ---
 FOO=bar
 echo "foo${#FOO}"

@@ -1,7 +1,8 @@
 name: Eval
 dialect: bash
 source: oils:spec/builtin-eval-source#eval
-stdout: "3\n"
+stdout: |-
+  3
 ---
 eval "a=3"
 echo $a

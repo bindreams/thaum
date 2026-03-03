@@ -1,7 +1,9 @@
 name: Double quotes
 dialect: bash
 source: oils:spec/arith-dynamic#double-quotes
-stdout: "7\n7\n"
+stdout: |-
+  7
+  7
 ---
 echo $(( "1 + 2" * 3 ))
 echo $(( "1+2" * 3 ))

@@ -2,7 +2,13 @@ disabled: true
 name: Str => split(), usage errors
 dialect: bash
 source: oils:spec/ysh-methods#str-split-usage-errors
-stdout: "status=3\nstatus=3\nstatus=3\nstatus=3\n(List)   [\"\",\"\"]\nstatus=0\n"
+stdout: |-
+  status=3
+  status=3
+  status=3
+  status=3
+  (List)   ["",""]
+  status=0
 ---
 try { pp test_ ('abc'.split(''))             } # Sep cannot be ""
 echo status=$[_error.code]

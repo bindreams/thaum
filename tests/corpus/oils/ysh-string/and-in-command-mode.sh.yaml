@@ -2,8 +2,21 @@ disabled: true
 name: '""" and $""" in Command Mode'
 dialect: bash
 source: oils:spec/ysh-string#and-in-command-mode
-stdout: "--\none \"\ntwo = 2 \"\"\nthree = 3\n\n--\none \"\ntwo = 2 \"\"\nthree =
-  3\n\n--\nthree = 3\ntwo = 2 \"\"\none \"\n"
+stdout: |-
+  --
+  one "
+  two = 2 ""
+  three = 3
+
+  --
+  one "
+  two = 2 ""
+  three = 3
+
+  --
+  three = 3
+  two = 2 ""
+  one "
 ---
 
 var two=2

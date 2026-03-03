@@ -1,7 +1,10 @@
 name: $'' with newlines
 dialect: bash
 source: oils:spec/quote#with-newlines
-stdout: "col1\ncol2\ncol3\n"
+stdout: |-
+  col1
+  col2
+  col3
 ---
 echo $'col1\ncol2\ncol3'
 # In dash, \n is special within single quotes

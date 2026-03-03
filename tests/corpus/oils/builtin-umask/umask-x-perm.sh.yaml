@@ -2,7 +2,13 @@ name: umask X perm
 dialect: bash
 source: oils:spec/builtin-umask#umask-x-perm
 status: 0
-stdout: "ret0 = 0\n666\nret1 = 0\n777\nret2 = 0\n246\n"
+stdout: |-
+  ret0 = 0
+  666
+  ret1 = 0
+  777
+  ret2 = 0
+  246
 ---
 umask 0124
 umask a=X

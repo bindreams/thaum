@@ -3,7 +3,9 @@ name: Associative array expressions inside (( )) with keys that look like
 dialect: bash
 source: 
   oils:spec/array-assoc#associative-array-expressions-inside-with-keys-that-look-like-numbers
-stdout: "42\n42\n"
+stdout: |-
+  42
+  42
 ---
 declare -A assoc
 assoc[0]=42

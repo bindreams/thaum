@@ -1,6 +1,7 @@
 name: eval accepts/ignores --
 dialect: bash
 source: oils:spec/builtin-eval-source#eval-acceptsignores
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 eval -- echo hi

@@ -1,7 +1,8 @@
 name: Shift is special and fails whole script
 dialect: bash
 source: oils:spec/builtin-special#shift-is-special-and-fails-whole-script
-stdout: "non-zero status\n"
+stdout: |-
+  non-zero status
 ---
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_14

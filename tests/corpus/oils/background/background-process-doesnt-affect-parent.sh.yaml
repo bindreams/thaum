@@ -1,7 +1,12 @@
 name: Background process doesn't affect parent
 dialect: bash
 source: oils:spec/background#background-process-doesnt-affect-parent
-stdout: "1\n1\n2\n\n"
+stdout: |+
+  1
+  1
+  2
+
+...
 ---
 echo ${foo=1}
 echo $foo

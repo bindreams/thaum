@@ -3,8 +3,13 @@ name: 'setglobal d[key] inside proc should mutate global (bug #1841)'
 dialect: bash
 source: 
   oils:spec/ysh-scope#setglobal-dkey-inside-proc-should-mutate-global-bug-1841
-stdout: "BEFORE mutate global\n(Dict)   {}\nlocal that is ignored\n(Dict)   {\"local\"\
-  :1}\nAFTER mutate global\n(Dict)   {\"key\":\"mutated\",\"key2\":\"mutated\"}\n"
+stdout: |-
+  BEFORE mutate global
+  (Dict)   {}
+  local that is ignored
+  (Dict)   {"local":1}
+  AFTER mutate global
+  (Dict)   {"key":"mutated","key2":"mutated"}
 ---
 
 shopt -s ysh:upgrade

@@ -1,7 +1,8 @@
 name: pass assoc array by reference
 dialect: bash
 source: oils:spec/nameref#pass-assoc-array-by-reference
-stdout: "jam\n"
+stdout: |-
+  jam
 ---
 show_value() {
   local -n array_name=$1

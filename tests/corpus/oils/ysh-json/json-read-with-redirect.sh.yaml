@@ -2,8 +2,8 @@ disabled: true
 name: json read with redirect
 dialect: bash
 source: oils:spec/ysh-json#json-read-with-redirect
-stdout: "x = (Cell exported:F readonly:F nameref:F val:(value.Dict d:{age (value.Int
-  i:42)}))\n"
+stdout: |
+  x = (Cell exported:F readonly:F nameref:F val:(value.Dict d:{age (value.Int i:42)}))
 environment:
   TMP: /tmp
 ---

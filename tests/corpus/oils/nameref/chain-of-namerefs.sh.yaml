@@ -1,7 +1,9 @@
 name: Chain of namerefs
 dialect: bash
 source: oils:spec/nameref#chain-of-namerefs
-stdout: "ref_to_ref=foo\nref=foo\n"
+stdout: |-
+  ref_to_ref=foo
+  ref=foo
 ---
 x=foo
 typeset -n ref=x

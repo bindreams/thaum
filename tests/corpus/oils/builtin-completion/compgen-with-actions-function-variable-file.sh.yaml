@@ -1,7 +1,10 @@
 name: 'compgen with actions: function / variable / file'
 dialect: bash
 source: oils:spec/builtin-completion#compgen-with-actions-function-variable-file
-stdout: "PA_FUNC\nPATH\nPA_FILE\n"
+stdout: |
+  PA_FUNC
+  PATH
+  PA_FILE
 environment:
   TMP: /tmp
 ---

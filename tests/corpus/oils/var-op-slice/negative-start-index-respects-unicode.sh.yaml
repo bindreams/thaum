@@ -1,7 +1,8 @@
 name: Negative start index respects unicode
 dialect: bash
 source: oils:spec/var-op-slice#negative-start-index-respects-unicode
-stdout: "d-μ\n"
+stdout: |-
+  d-μ
 ---
 foo=abcd-μ-
 echo ${foo: -4:3}

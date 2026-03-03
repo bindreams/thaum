@@ -1,7 +1,8 @@
 name: echo -e with octal escape
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-with-octal-escape
-stdout: "abcd$e\n"
+stdout: |-
+  abcd$e
 ---
 flags='-e'
 case $SH in dash) flags='' ;; esac

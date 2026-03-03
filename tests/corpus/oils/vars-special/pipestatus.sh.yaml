@@ -2,8 +2,9 @@ name: $PIPESTATUS
 dialect: bash
 source: oils:spec/vars-special#pipestatus
 status: 0
-stdout: "['0', '33', '0']\n"
-setup: |
+stdout: |
+  ['0', '33', '0']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 echo hi | sh -c 'cat; exit 33' | wc -l >/dev/null
 argv.py "${PIPESTATUS[@]}"

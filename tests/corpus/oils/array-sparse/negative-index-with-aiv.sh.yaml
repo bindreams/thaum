@@ -1,7 +1,9 @@
 name: Negative index with a[i]=v
 dialect: bash
 source: oils:spec/array-sparse#negative-index-with-aiv
-stdout: "declare -a sp1=([9]=x)\ndeclare -a sp1=([0]=D [2]=C [6]=B [9]=A)\n"
+stdout: |-
+  declare -a sp1=([9]=x)
+  declare -a sp1=([0]=D [2]=C [6]=B [9]=A)
 ---
 case $SH in mksh) exit ;; esac
 

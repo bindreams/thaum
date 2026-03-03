@@ -3,7 +3,10 @@ name: trap ERR - proc non-zero return status
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---proc-non-zero-return-status
 status: 42
-stdout: "[ stdin ]:16\n    f\n    ^\n"
+stdout: |-
+  [ stdin ]:16
+      f
+      ^
 ---
 
 source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh

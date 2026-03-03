@@ -2,7 +2,8 @@ disabled: true
 name: variables mutated within hay eval don't persist
 dialect: bash
 source: oils:spec/hay-isolation#variables-mutated-within-hay-eval-dont-persist
-stdout: "x = 42\n"
+stdout: |-
+  x = 42
 ---
 shopt --set parse_brace
 

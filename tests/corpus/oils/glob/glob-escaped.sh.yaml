@@ -1,7 +1,8 @@
 name: glob escaped
 dialect: bash
 source: oils:spec/glob#glob-escaped
-stdout: "_tmp/[abc] _tmp/?\n"
+stdout: |-
+  _tmp/[abc] _tmp/?
 ---
 # - mksh doesn't support [[:punct:]] ?
 # - python shell fails because \[ not supported!

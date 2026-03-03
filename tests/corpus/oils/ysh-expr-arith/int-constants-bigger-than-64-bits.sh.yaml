@@ -2,8 +2,19 @@ disabled: true
 name: Int constants bigger than 64 bits
 dialect: bash
 source: oils:spec/ysh-expr-arith#int-constants-bigger-than-64-bits
-stdout: "(Int)   1111\ndec=0\ndec=2\n(Int)   3\nbin=0\nbin=2\n(Int)   63\noct=0\n\
-  oct=2\n(Int)   255\nhex=0\nhex=2\n"
+stdout: |-
+  (Int)   1111
+  dec=0
+  dec=2
+  (Int)   3
+  bin=0
+  bin=2
+  (Int)   63
+  oct=0
+  oct=2
+  (Int)   255
+  hex=0
+  hex=2
 ---
 
 # Decimal

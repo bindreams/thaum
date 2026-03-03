@@ -2,8 +2,9 @@ disabled: true
 name: append onto var a = :| 1 2 |
 dialect: bash
 source: oils:spec/ysh-builtins#append-onto-var-a-1-2
-stdout: "['1', '2', '3 4', '5']\n"
-setup: |
+stdout: |
+  ['1', '2', '3 4', '5']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s parse_at parse_proc
 var a = :| 1 2 |

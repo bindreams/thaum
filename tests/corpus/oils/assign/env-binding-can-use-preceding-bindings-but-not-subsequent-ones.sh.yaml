@@ -2,8 +2,15 @@ name: Env binding can use preceding bindings, but not subsequent ones
 dialect: bash
 source: 
   oils:spec/assign#env-binding-can-use-preceding-bindings-but-not-subsequent-ones
-stdout: "foo\n[foo][]\nbaz\n## BUG mksh STDOUT:\nfoo\n[][]\nbaz\n"
-setup: |
+stdout: |
+  foo
+  [foo][]
+  baz
+  ## BUG mksh STDOUT:
+  foo
+  [][]
+  baz
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +19,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 # This means that for ASSIGNMENT_WORD, on the RHS you invoke the parser again!
 # Could be any kind of quoted string.

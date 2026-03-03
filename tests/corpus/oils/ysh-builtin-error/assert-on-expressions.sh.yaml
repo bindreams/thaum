@@ -2,7 +2,21 @@ disabled: true
 name: assert on expressions
 dialect: bash
 source: oils:spec/ysh-builtin-error#assert-on-expressions
-stdout: "passed\ncode 0\n\ncode 3\n\ncode 3\n\n\ncode 3\n\npassed\ncode 0\n\n"
+stdout: |+
+  passed
+  code 0
+
+  code 3
+
+  code 3
+
+
+  code 3
+
+  passed
+  code 0
+
+...
 ---
 
 try {

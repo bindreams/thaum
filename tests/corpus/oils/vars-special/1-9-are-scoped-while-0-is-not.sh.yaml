@@ -1,7 +1,9 @@
 name: $1 .. $9 are scoped, while $0 is not
 dialect: bash
 source: oils:spec/vars-special#1-9-are-scoped-while-0-is-not
-stdout: "sh\na b\n"
+stdout: |-
+  sh
+  a b
 ---
 fun() {
   case $0 in

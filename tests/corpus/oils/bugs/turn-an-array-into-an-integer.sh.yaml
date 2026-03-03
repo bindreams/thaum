@@ -1,7 +1,8 @@
 name: Turn an array into an integer.
 dialect: bash
 source: oils:spec/bugs#turn-an-array-into-an-integer
-stdout: "42\n"
+stdout: |-
+  42
 ---
 a=(1 2 3)
 (( a = 42 )) 

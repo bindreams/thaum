@@ -1,8 +1,14 @@
 name: osh --eval
 dialect: bash
 source: oils:spec/sh-usage#osh---eval
-stdout: "one x y z\nstatus=0 flag -c x y z\n\none x y z\nfail x y z\nstatus=42 flag
-  -c x y z\nstatus=0\n"
+stdout: |-
+  one x y z
+  status=0 flag -c x y z
+
+  one x y z
+  fail x y z
+  status=42 flag -c x y z
+  status=0
 ---
 case $SH in bash|dash|mksh|zsh) exit ;; esac
 

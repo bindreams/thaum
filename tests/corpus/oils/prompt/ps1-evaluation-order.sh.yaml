@@ -1,7 +1,8 @@
 name: PS1 evaluation order
 dialect: bash
 source: oils:spec/prompt#ps1-evaluation-order
-stdout: "\\h\n"
+stdout: |-
+  \h
 ---
 x='\'
 y='h'

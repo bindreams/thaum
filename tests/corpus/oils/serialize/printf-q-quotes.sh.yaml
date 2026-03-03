@@ -1,7 +1,9 @@
 name: printf %q quotes
 dialect: bash
 source: oils:spec/serialize#printf-q-quotes
-stdout: "\\'\\\"\nroundtrip-ok\n"
+stdout: |-
+  \'\"
+  roundtrip-ok
 ---
 case $SH in ash) return ;; esac  # yash and ash don't implement %q
 

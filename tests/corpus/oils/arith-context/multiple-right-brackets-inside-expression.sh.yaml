@@ -1,7 +1,8 @@
 name: Multiple right brackets inside expression
 dialect: bash
 source: oils:spec/arith-context#multiple-right-brackets-inside-expression
-stdout: "2 3\n"
+stdout: |-
+  2 3
 ---
 
 a=(1 2 3)

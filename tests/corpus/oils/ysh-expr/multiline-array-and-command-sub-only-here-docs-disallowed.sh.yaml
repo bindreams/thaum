@@ -3,7 +3,9 @@ name: multiline array and command sub (only here docs disallowed)
 dialect: bash
 source: 
   oils:spec/ysh-expr#multiline-array-and-command-sub-only-here-docs-disallowed
-stdout: "array=3\ncomsub=6\n"
+stdout: |-
+  array=3
+  comsub=6
 ---
 var array = %(
   one

@@ -1,7 +1,13 @@
 name: Command sub exit code is lost
 dialect: bash
 source: oils:spec/errexit#command-sub-exit-code-is-lost
-stdout: "ft\nstatus=0\nf\nstatus=0\nft\nstatus=0\n"
+stdout: |-
+  ft
+  status=0
+  f
+  status=0
+  ft
+  status=0
 ---
 echo ft $(false) $(true)
 echo status=$?

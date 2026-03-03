@@ -1,7 +1,10 @@
 name: ulimit with no flags is like -f
 dialect: bash
 source: oils:spec/builtin-process#ulimit-with-no-flags-is-like--f
-stdout: "status=0\nstatus=0\ndiff=0\n"
+stdout: |-
+  status=0
+  status=0
+  diff=0
 ---
 
 ulimit > no-flags.txt

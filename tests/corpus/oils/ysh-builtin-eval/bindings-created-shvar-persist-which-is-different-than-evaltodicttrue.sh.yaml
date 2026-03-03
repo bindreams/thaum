@@ -3,7 +3,11 @@ name: bindings created shvar persist, which is different than eval(to_dict=true)
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#bindings-created-shvar-persist-which-is-different-than-evaltodicttrue
-stdout: "a=b\na=a\ninner=z\ninner2=z\n"
+stdout: |-
+  a=b
+  a=a
+  inner=z
+  inner2=z
 ---
 
 var a = 'a'

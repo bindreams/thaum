@@ -2,7 +2,10 @@ disabled: true
 name: json read passed invalid args
 dialect: bash
 source: oils:spec/ysh-json#json-read-passed-invalid-args
-stdout: "status=1\nstatus=2\nstatus=2\n"
+stdout: |-
+  status=1
+  status=2
+  status=2
 ---
 
 # EOF

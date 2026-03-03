@@ -1,7 +1,9 @@
 name: test -v with strings
 dialect: bash
 source: oils:spec/assign-dialects#test--v-with-strings
-stdout: "str=1\nstr=0\n"
+stdout: |-
+  str=1
+  str=0
 ---
 test -v str
 echo str=$?

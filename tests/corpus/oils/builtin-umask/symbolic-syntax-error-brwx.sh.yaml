@@ -1,7 +1,9 @@
 name: 'symbolic syntax error: b=rwx'
 dialect: bash
 source: oils:spec/builtin-umask#symbolic-syntax-error-brwx
-stdout: "error\n0124\n"
+stdout: |-
+  error
+  0124
 ---
 umask 0124
 

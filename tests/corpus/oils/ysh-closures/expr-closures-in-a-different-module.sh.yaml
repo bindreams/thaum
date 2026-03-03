@@ -2,7 +2,9 @@ disabled: true
 name: Expr Closures in a different module
 dialect: bash
 source: oils:spec/ysh-closures#expr-closures-in-a-different-module
-stdout: "global!\nglobal local!\n"
+stdout: |-
+  global!
+  global local!
 ---
 shopt --set ysh:upgrade
 

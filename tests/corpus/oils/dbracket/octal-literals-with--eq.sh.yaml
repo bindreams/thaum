@@ -1,7 +1,9 @@
 name: Octal literals with -eq
 dialect: bash
 source: oils:spec/dbracket#octal-literals-with--eq
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 shopt -u strict_arith || true
 decimal=15

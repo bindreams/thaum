@@ -1,7 +1,9 @@
 name: printf - \0 escape shows NUL byte
 dialect: bash
 source: oils:spec/nul-bytes#printf---0-escape-shows-nul-byte
-stdout: "  \\0  \\n\n  00  0a\n"
+stdout: |2-
+    \0  \n
+    00  0a
 ---
 show_hex() { od -A n -t c -t x1; }
 

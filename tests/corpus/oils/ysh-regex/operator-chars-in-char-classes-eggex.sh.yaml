@@ -2,8 +2,14 @@ disabled: true
 name: Operator chars in char classes (eggex)
 dialect: bash
 source: oils:spec/ysh-regex#operator-chars-in-char-classes-eggex
-stdout: "hyphen\nbackslash\nright bracket\nleft bracket\nperiod\ncaret\nno way to
-  have [^]\n"
+stdout: |-
+  hyphen
+  backslash
+  right bracket
+  left bracket
+  period
+  caret
+  no way to have [^]
 ---
 shopt --set ysh:upgrade
 

@@ -1,7 +1,9 @@
 name: jobs -p prints one line per job
 dialect: bash
 source: oils:spec/background#jobs--p-prints-one-line-per-job
-stdout: "2\n2\n"
+stdout: |-
+  2
+  2
 ---
 sleep 0.1 &
 sleep 0.1 | cat &

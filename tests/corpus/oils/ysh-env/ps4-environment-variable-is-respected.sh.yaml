@@ -2,8 +2,12 @@ disabled: true
 name: PS4 environment variable is respected
 dialect: bash
 source: oils:spec/ysh-env#ps4-environment-variable-is-respected
-stdout: "1\n2\n"
-stderr: "%%% echo 1\n%%% echo 2\n"
+stdout: |
+  1
+  2
+stderr: |-
+  %%% echo 1
+  %%% echo 2
 ---
 shopt -s ysh:upgrade
 

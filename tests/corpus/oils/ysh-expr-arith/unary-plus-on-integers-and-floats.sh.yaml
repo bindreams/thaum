@@ -2,7 +2,11 @@ disabled: true
 name: Unary plus on integers and floats
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-plus-on-integers-and-floats
-stdout: "1\n42\n2.5\n-10\n"
+stdout: |-
+  1
+  42
+  2.5
+  -10
 ---
 
 var a = +1

@@ -1,7 +1,12 @@
 name: \builtin declare - ble.sh relies on it
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declare---blesh-relies-on-it
-stdout: "a b\na b\na b\na b\na b\n"
+stdout: |-
+  a b
+  a b
+  a b
+  a b
+  a b
 ---
 case $SH in dash|mksh|ash) exit ;; esac
 

@@ -2,7 +2,9 @@ disabled: true
 name: _this_dir used with relative path
 dialect: bash
 source: oils:spec/ysh-special-vars#thisdir-used-with-relative-path
-stdout: "hi from this_dir.ysh\n$_this_dir = REPLACED/oils/spec/testdata/module\n"
+stdout: |-
+  hi from this_dir.ysh
+  $_this_dir = REPLACED/oils/spec/testdata/module
 ---
 cd $[ENV.REPO_ROOT]
 source spec/testdata/module/this_dir.ysh

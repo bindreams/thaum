@@ -2,7 +2,9 @@ name: set is special and fails whole script, even if using || true
 dialect: bash
 source: 
   oils:spec/builtin-special#set-is-special-and-fails-whole-script-even-if-using-true
-stdout: "ok\nnon-zero status\n"
+stdout: |-
+  ok
+  non-zero status
 ---
 $SH -c '
 if test -n "$BASH_VERSION"; then

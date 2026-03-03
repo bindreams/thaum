@@ -1,7 +1,12 @@
 name: $_ with loop
 dialect: bash
 source: oils:spec/vars-special#with-loop
-stdout: "init\nbegin=init\nprev=begin=init\nprev=prev=begin=init\nprev=prev=prev=begin=init\n"
+stdout: |-
+  init
+  begin=init
+  prev=begin=init
+  prev=prev=begin=init
+  prev=prev=prev=begin=init
 ---
 
 case $SH in dash|mksh) exit ;; esac

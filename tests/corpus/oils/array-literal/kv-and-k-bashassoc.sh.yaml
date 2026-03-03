@@ -1,9 +1,18 @@
 name: '[k]=$v and [k]="$@" (BashAssoc)'
 dialect: bash
 source: oils:spec/array-literal#kv-and-k-bashassoc
-stdout: "keys: ['i']\nvals: ['1 2 3']\nkeys: ['i']\nvals: ['3 5 7']\nkeys: ['i']\n\
-  vals: ['3 5 7']\nkeys: ['i']\nvals: ['3 5 7']\nkeys: ['i']\nvals: ['3 5 7']\n"
-setup: |
+stdout: |
+  keys: ['i']
+  vals: ['1 2 3']
+  keys: ['i']
+  vals: ['3 5 7']
+  keys: ['i']
+  vals: ['3 5 7']
+  keys: ['i']
+  vals: ['3 5 7']
+  keys: ['i']
+  vals: ['3 5 7']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +20,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 i=5
 v='1 2 3'

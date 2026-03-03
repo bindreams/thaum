@@ -1,8 +1,10 @@
 name: $* with empty IFS
 dialect: bash
 source: oils:spec/word-split#with-empty-ifs
-stdout: "['1 2', '3  4']\n['1 23  4']\n"
-setup: |
+stdout: |
+  ['1 2', '3  4']
+  ['1 23  4']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 set -- "1 2" "3  4"
 

@@ -1,7 +1,10 @@
 name: redirect for loop
 dialect: bash
 source: oils:spec/redirect-command#redirect-for-loop
-stdout: "1\n2\n3\n"
+stdout: |
+  1
+  2
+  3
 environment:
   TMP: /tmp
 ---

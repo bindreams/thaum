@@ -2,8 +2,14 @@ disabled: true
 name: echo $[f(x)] for various types
 dialect: bash
 source: oils:spec/ysh-word-eval#echo-fx-for-various-types
-stdout: "bool true\nint 2\nfloat 3.14\nstr identity\n---\nbool expr true\nbool splice
-  true\n"
+stdout: |-
+  bool true
+  int 2
+  float 3.14
+  str identity
+  ---
+  bool expr true
+  bool splice true
 ---
 shopt --set ysh:upgrade
 

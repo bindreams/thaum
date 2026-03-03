@@ -4,7 +4,8 @@ dialect: bash
 source: 
   oils:spec/ysh-env#export-builtin-is-disabled-in-yshall-in-favor-of-setglobal
 status: 1
-stdout: "ZZ=setglobal\n"
+stdout: |-
+  ZZ=setglobal
 ---
 shopt -s ysh:all
 

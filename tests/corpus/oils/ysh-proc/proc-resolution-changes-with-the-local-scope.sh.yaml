@@ -2,7 +2,10 @@ disabled: true
 name: proc resolution changes with the local scope
 dialect: bash
 source: oils:spec/ysh-proc#proc-resolution-changes-with-the-local-scope
-stdout: "foo\nbar\nfoo\n"
+stdout: |-
+  foo
+  bar
+  foo
 ---
 shopt -s ysh:upgrade
 

@@ -1,7 +1,9 @@
 name: builtin declare,local
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declarelocal
-stdout: "s=declare\ns=local\n"
+stdout: |-
+  s=declare
+  s=local
 ---
 case $SH in dash|ash|mksh) exit ;; esac
 

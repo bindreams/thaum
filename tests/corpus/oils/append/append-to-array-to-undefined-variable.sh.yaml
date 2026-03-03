@@ -1,8 +1,9 @@
 name: Append to array to undefined variable
 dialect: bash
 source: oils:spec/append#append-to-array-to-undefined-variable
-stdout: "['c', 'd']\n"
-setup: |
+stdout: |
+  ['c', 'd']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 y+=(c d)

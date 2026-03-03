@@ -1,7 +1,11 @@
 name: (YSH) $[bool(a)]
 dialect: bash
 source: oils:spec/array-sparse#ysh-boola
-stdout: "false\ntrue\ntrue\ntrue\n"
+stdout: |-
+  false
+  true
+  true
+  true
 ---
 case $SH in bash|mksh) exit ;; esac
 

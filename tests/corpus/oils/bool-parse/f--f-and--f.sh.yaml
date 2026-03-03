@@ -1,7 +1,9 @@
 name: '[[ -f -f ]] and [[ -f == ]]'
 dialect: bash
 source: oils:spec/bool-parse#f--f-and--f
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 [[ -f -f ]]
 echo status=$?

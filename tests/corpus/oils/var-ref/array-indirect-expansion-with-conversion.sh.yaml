@@ -1,10 +1,28 @@
 name: Array indirect expansion with @? conversion
 dialect: bash
 source: oils:spec/var-ref#array-indirect-expansion-with-conversion
-stdout: "==== v1 ====\n['value']\n['value']\n['']\n==== v2 ====\n[\"''\"]\n['']\n\
-  ['']\n==== a1 ====\n['']\n['']\n['a']\n==== a2[0] ====\n['element']\n['element']\n\
-  ['a']\n==== a3[@] ====\n['1', '2', '3']\n['1', '2', '3']\n['a', 'a', 'a']\n"
-setup: |
+stdout: |
+  ==== v1 ====
+  ['value']
+  ['value']
+  ['']
+  ==== v2 ====
+  ["''"]
+  ['']
+  ['']
+  ==== a1 ====
+  ['']
+  ['']
+  ['a']
+  ==== a2[0] ====
+  ['element']
+  ['element']
+  ['a']
+  ==== a3[@] ====
+  ['1', '2', '3']
+  ['1', '2', '3']
+  ['a', 'a', 'a']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +30,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 declare -A ref=(['dummy']=v1)

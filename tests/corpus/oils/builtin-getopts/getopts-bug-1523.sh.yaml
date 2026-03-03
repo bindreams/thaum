@@ -2,7 +2,13 @@ name: 'getopts bug #1523'
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-bug-1523
 status: 1
-stdout: "opt:a\nopt:b\nopt:c arg:def\nopt:a\nopt:b\nopt:c arg:de\n"
+stdout: |-
+  opt:a
+  opt:b
+  opt:c arg:def
+  opt:a
+  opt:b
+  opt:c arg:de
 ---
 
 $SH $REPO_ROOT/spec/testdata/getopts-1523.sh -abcdef -abcde

@@ -2,8 +2,12 @@ name: Prefix assignments persist after readonly, but NOT exported (set -o posix)
 dialect: bash
 source: 
   oils:spec/builtin-special#prefix-assignments-persist-after-readonly-but-not-exported-set--o-posix
-stdout: "foo=bar\nspam=eggs\nNone\nNone\n"
-setup: |
+stdout: |
+  foo=bar
+  spam=eggs
+  None
+  None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +16,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 
 # Bash only implements it behind the posix option

@@ -2,7 +2,9 @@ disabled: true
 name: \x7e was the legacy syntax for \y7e
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#x7e-was-the-legacy-syntax-for-y7e
-stdout: "(Bool)   true\n(Bool)   true\n"
+stdout: |-
+  (Bool)   true
+  (Bool)   true
 ---
 
 pp test_ ('~' ~ / [\x7e] /)  # should be INVALID

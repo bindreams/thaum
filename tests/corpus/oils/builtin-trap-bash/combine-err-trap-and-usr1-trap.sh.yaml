@@ -1,7 +1,10 @@
 name: Combine ERR trap and USR1 trap
 dialect: bash
 source: oils:spec/builtin-trap-bash#combine-err-trap-and-usr1-trap
-stdout: "1 err\n1 usr1\nafter=0\n"
+stdout: |-
+  1 err
+  1 usr1
+  after=0
 ---
 
 case $SH in dash|mksh|ash) exit ;; esac

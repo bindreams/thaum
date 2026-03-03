@@ -2,7 +2,9 @@ disabled: true
 name: exec builtin respects ENV
 dialect: bash
 source: oils:spec/ysh-env#exec-builtin-respects-env
-stdout: "child ZZ=zz\nexec ZZ=zz\n"
+stdout: |-
+  child ZZ=zz
+  exec ZZ=zz
 ---
 
 shopt --set ysh:upgrade

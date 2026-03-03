@@ -2,7 +2,12 @@ disabled: true
 name: 'Operations That Convert to Integer: // % **'
 dialect: bash
 source: oils:spec/ysh-expr-arith#operations-that-convert-to-integer
-stdout: "2\n1\n25\n_status 3\n_status 3\n"
+stdout: |-
+  2
+  1
+  25
+  _status 3
+  _status 3
 ---
 shopt -s parse_brace parse_ysh_expr_sub
 

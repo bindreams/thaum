@@ -2,7 +2,10 @@ disabled: true
 name: simple var sub $name $0 $1 $? etc.
 dialect: bash
 source: oils:spec/ysh-expr#simple-var-sub-name-0-1-etc
-stdout: "status=42\na b\nnamed=a\n"
+stdout: |-
+  status=42
+  a b
+  named=a
 ---
 ( exit 42 )
 var status = $?

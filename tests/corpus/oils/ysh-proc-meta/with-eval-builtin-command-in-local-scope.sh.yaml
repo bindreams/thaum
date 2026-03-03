@@ -2,7 +2,10 @@ disabled: true
 name: with eval builtin command, in local scope
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-eval-builtin-command-in-local-scope
-stdout: "prefix a\nprefix b\nprefix a\n"
+stdout: |-
+  prefix a
+  prefix b
+  prefix a
 ---
 
 proc p {

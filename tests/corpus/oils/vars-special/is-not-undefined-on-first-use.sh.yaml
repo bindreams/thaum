@@ -1,7 +1,8 @@
 name: $_ is not undefined on first use
 dialect: bash
 source: oils:spec/vars-special#is-not-undefined-on-first-use
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 set -e
 

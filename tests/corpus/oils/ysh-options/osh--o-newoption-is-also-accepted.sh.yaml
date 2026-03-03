@@ -2,8 +2,13 @@ disabled: true
 name: osh -o new_option is also accepted
 dialect: bash
 source: oils:spec/ysh-options#osh--o-newoption-is-also-accepted
-stdout: "nullglob\n0 flag nullglob\nupgrade\n0 flag oil:upgrade\n2 set builtin nullglob\n\
-  2 set builtin oil:upgrade\n"
+stdout: |-
+  nullglob
+  0 flag nullglob
+  upgrade
+  0 flag oil:upgrade
+  2 set builtin nullglob
+  2 set builtin oil:upgrade
 ---
 
 $SH -o nullglob -c 'echo nullglob'

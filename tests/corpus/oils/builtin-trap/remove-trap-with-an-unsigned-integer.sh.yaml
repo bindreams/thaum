@@ -1,7 +1,15 @@
 name: Remove trap with an unsigned integer
 dialect: bash
 source: oils:spec/builtin-trap#remove-trap-with-an-unsigned-integer
-stdout: "ok0\n\nok42space\n\nok07\n\ntrap-exit\nfailure\n"
+stdout: |-
+  ok0
+
+  ok42space
+
+  ok07
+
+  trap-exit
+  failure
 ---
 
 $SH -e -c '

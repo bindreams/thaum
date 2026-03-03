@@ -1,8 +1,17 @@
 name: test -b -c -S (block, character, socket)
 dialect: bash
 source: oils:spec/builtin-bracket#test--b--c--s-block-character-socket
-stdout: "-b\nstatus=1\nstatus=1\nstatus=1\n-c\nstatus=1\nstatus=1\n-S\nstatus=1\n\
-  status=1\n"
+stdout: |-
+  -b
+  status=1
+  status=1
+  status=1
+  -c
+  status=1
+  status=1
+  -S
+  status=1
+  status=1
 ---
 # NOTE: we do not have the "true" case
 

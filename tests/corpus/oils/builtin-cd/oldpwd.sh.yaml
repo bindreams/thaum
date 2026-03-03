@@ -1,7 +1,10 @@
 name: $OLDPWD
 dialect: bash
 source: oils:spec/builtin-cd#oldpwd
-stdout: "old: /\nOLDPWD=/\n/\n"
+stdout: |
+  old: /
+  OLDPWD=/
+  /
 environment:
   TMP: /tmp
 ---

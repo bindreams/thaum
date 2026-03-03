@@ -1,8 +1,20 @@
 name: read -n doesn't strip whitespace (bug fix)
 dialect: bash
 source: oils:spec/builtin-read#read--n-doesnt-strip-whitespace-bug-fix
-stdout: "[  a ]\n[  a b]\n[  a b ]\n\none var strips whitespace\n[a]\n[a b]\n[a b]\n\
-  \nthree vars\n[a] [] []\n[a] [b] []\n[a] [b] []\n"
+stdout: |-
+  [  a ]
+  [  a b]
+  [  a b ]
+
+  one var strips whitespace
+  [a]
+  [a b]
+  [a b]
+
+  three vars
+  [a] [] []
+  [a] [b] []
+  [a] [b] []
 ---
 case $SH in dash|zsh) exit ;; esac
 

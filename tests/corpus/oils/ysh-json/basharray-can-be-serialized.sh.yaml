@@ -2,9 +2,19 @@ disabled: true
 name: BashArray can be serialized
 dialect: bash
 source: oils:spec/ysh-json#basharray-can-be-serialized
-stdout: "{\n  \"type\": \"BashArray\",\n  \"data\": {}\n}\n{\n  \"type\": \"BashArray\"\
-  ,\n  \"data\": {\n    \"0\": \"x\",\n    \"1\": \"y\",\n    \"5\": \"z\"\n  }\n\
-  }\n"
+stdout: |-
+  {
+    "type": "BashArray",
+    "data": {}
+  }
+  {
+    "type": "BashArray",
+    "data": {
+      "0": "x",
+      "1": "y",
+      "5": "z"
+    }
+  }
 ---
 
 declare -a empty_array

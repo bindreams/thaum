@@ -1,7 +1,9 @@
 name: nonexistent --rcdir is ignored
 dialect: bash
 source: oils:spec/interactive#nonexistent---rcdir-is-ignored
-stdout: "hi\nstatus=0\n"
+stdout: |
+  hi
+  status=0
 environment:
   TMP: /tmp
 ---

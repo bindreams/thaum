@@ -2,7 +2,8 @@ disabled: true
 name: Complete Filenames with bad characters
 dialect: bash
 source: oils:spec/ysh-completion#complete-filenames-with-bad-characters
-stdout: "TODO\n"
+stdout: |-
+  TODO
 ---
 
 touch hello

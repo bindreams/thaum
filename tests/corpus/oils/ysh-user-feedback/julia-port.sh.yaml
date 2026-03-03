@@ -2,7 +2,15 @@ disabled: true
 name: Julia port
 dialect: bash
 source: oils:spec/ysh-user-feedback#julia-port
-stdout: "git\nbranch\n-D\nfoo\nbaz\n___\nfoo\nbaz\n"
+stdout: |-
+  git
+  branch
+  -D
+  foo
+  baz
+  ___
+  foo
+  baz
 ---
 
 $[ENV.SH] $[ENV.REPO_ROOT]/spec/testdata/ysh-user-feedback.sh

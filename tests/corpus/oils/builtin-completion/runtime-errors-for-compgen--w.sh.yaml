@@ -1,7 +1,8 @@
 name: Runtime errors for compgen -W
 dialect: bash
 source: oils:spec/builtin-completion#runtime-errors-for-compgen--w
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 compgen -W 'foo $(( 1 / 0 )) bar'
 echo status=$?

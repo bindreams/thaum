@@ -1,7 +1,9 @@
 name: kill -15 %- kills previous job
 dialect: bash
 source: oils:spec/builtin-kill#kill--15---kills-previous-job
-stdout: "kill=0\nwait=143\n"
+stdout: |-
+  kill=0
+  wait=143
 ---
 #case $SH in mksh|dash) exit ;; esac
 

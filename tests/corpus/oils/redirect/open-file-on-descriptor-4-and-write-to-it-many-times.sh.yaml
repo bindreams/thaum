@@ -1,7 +1,9 @@
 name: Open file on descriptor 4 and write to it many times
 dialect: bash
 source: oils:spec/redirect#open-file-on-descriptor-4-and-write-to-it-many-times
-stdout: "hello\nworld\n"
+stdout: |
+  hello
+  world
 environment:
   TMP: /tmp
 ---

@@ -1,7 +1,14 @@
 name: builtin typeset, export,readonly
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-typeset-exportreadonly
-stdout: "s=typeset\ns=export\ns=readonly\n--\ns2=typeset\ns2=export\ns2=readonly\n"
+stdout: |-
+  s=typeset
+  s=export
+  s=readonly
+  --
+  s2=typeset
+  s2=export
+  s2=readonly
 ---
 case $SH in dash|ash) exit ;; esac
 

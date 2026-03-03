@@ -2,8 +2,11 @@ disabled: true
 name: Copy to Dict with dict(), and mutate
 dialect: bash
 source: oils:spec/ysh-object#copy-to-dict-with-dict-and-mutate
-stdout: "(Obj)   (\"x\":3,\"y\":4)\n(Dict)   {\"x\":3,\"y\":4}\n(Obj)   (\"x\":99,\"\
-  y\":4)\n(Dict)   {\"x\":100,\"y\":4}\n"
+stdout: |-
+  (Obj)   ("x":3,"y":4)
+  (Dict)   {"x":3,"y":4}
+  (Obj)   ("x":99,"y":4)
+  (Dict)   {"x":100,"y":4}
 ---
 
 var rect = Object(null, {x: 3, y: 4})

@@ -2,7 +2,8 @@ name: $SECONDS
 dialect: bash
 source: oils:spec/vars-special#seconds
 status: 0
-stdout: "ok\n"
+stdout: |-
+  ok
 ---
 
 # most likely 0 seconds, but in CI I've seen 1 second

@@ -1,6 +1,7 @@
 name: Unquoted and single quoted
 dialect: bash
 source: oils:spec/quote#unquoted-and-single-quoted
-stdout: "unquoted and single-quoted\n"
+stdout: |-
+  unquoted and single-quoted
 ---
 echo unquoted' and single-quoted'

@@ -1,7 +1,8 @@
 name: Runtime errors for compgen -F func
 dialect: bash
 source: oils:spec/builtin-completion#runtime-errors-for-compgen--f-func
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 _foo() {
   COMPREPLY=( foo bar )

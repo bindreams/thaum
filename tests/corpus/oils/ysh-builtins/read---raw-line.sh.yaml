@@ -2,7 +2,10 @@ disabled: true
 name: read --raw-line
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line
-stdout: "reply=hi\nlen=2\npass\n"
+stdout: |-
+  reply=hi
+  len=2
+  pass
 ---
 
 shopt --set parse_ysh_expr_sub

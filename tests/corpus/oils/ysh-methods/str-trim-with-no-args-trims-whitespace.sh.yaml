@@ -3,9 +3,14 @@ name: Str => trim*() with no args trims whitespace
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-with-no-args-trims-whitespace
 status: 0
-stdout: "\"\", \"\", \"\"\n\"\", \"\", \"\"\n\"mystr\", \"mystr\", \"mystr\"\n\"mystr\"\
-  , \"  mystr\", \"mystr\"\n\"mystr  \", \"mystr\", \"mystr\"\n\"mystr  \", \"  mystr\"\
-  , \"mystr\"\n\"my str  \", \"  my str\", \"my str\"\n"
+stdout: |-
+  "", "", ""
+  "", "", ""
+  "mystr", "mystr", "mystr"
+  "mystr", "  mystr", "mystr"
+  "mystr  ", "mystr", "mystr"
+  "mystr  ", "  mystr", "mystr"
+  "my str  ", "  my str", "my str"
 ---
 func test(s) { write --sep ', ' --j8 $[s => trimStart()] $[s => trimEnd()] $[s => trim()] }
 

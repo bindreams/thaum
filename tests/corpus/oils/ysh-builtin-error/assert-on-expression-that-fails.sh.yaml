@@ -2,7 +2,12 @@ disabled: true
 name: assert on expression that fails
 dialect: bash
 source: oils:spec/ysh-builtin-error#assert-on-expression-that-fails
-stdout: "code 3\n\ncode 1\n\n"
+stdout: |+
+  code 3
+
+  code 1
+
+...
 ---
 
 try {

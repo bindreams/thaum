@@ -1,7 +1,14 @@
 name: read -n vs. -N
 dialect: bash
 source: oils:spec/builtin-read#read--n-vs--n
-stdout: "read -n\n'a' 'b' 'c'\n'a' 'b' ''\n\nread -N\n'a b c' '' ''\n'a b ' '' ''\n"
+stdout: |
+  read -n
+  'a' 'b' 'c'
+  'a' 'b' ''
+
+  read -N
+  'a b c' '' ''
+  'a b ' '' ''
 environment:
   TMP: /tmp
 ---

@@ -3,7 +3,12 @@ name: "ERE: 'dot' matches code point represented with multiple bytes (mu = 0xce 
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#ere-dot-matches-code-point-represented-with-multiple-bytes-mu-0xce-0xbe
-stdout: "(Bool)   true\n(Bool)   true\n(Bool)   true\n(Bool)   false\n(Bool)   false\n"
+stdout: |-
+  (Bool)   true
+  (Bool)   true
+  (Bool)   true
+  (Bool)   false
+  (Bool)   false
 ---
 
 var pat = / 'a' dot 'b' /

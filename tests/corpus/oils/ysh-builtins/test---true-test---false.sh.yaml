@@ -2,8 +2,24 @@ disabled: true
 name: test --true; test --false
 dialect: bash
 source: oils:spec/ysh-builtins#test---true-test---false
-stdout: "(Bool)   true\ntrue=0\nfalse=1\n\n(Bool)   false\ntrue=1\nfalse=0\n\n(Str)\
-  \   \"\"\ntrue=1\nfalse=1\n\n(Str)   \"other\"\ntrue=1\nfalse=1\n\n"
+stdout: |+
+  (Bool)   true
+  true=0
+  false=1
+
+  (Bool)   false
+  true=1
+  false=0
+
+  (Str)   ""
+  true=1
+  false=1
+
+  (Str)   "other"
+  true=1
+  false=1
+
+...
 ---
 shopt --set ysh:upgrade
 

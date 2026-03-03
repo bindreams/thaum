@@ -2,7 +2,8 @@ name: Invalid LValue
 dialect: bash
 source: oils:spec/arith#invalid-lvalue
 status: 0
-stdout: "9\n"
+stdout: |
+  9
 stderr: {contains: "attempted assignment to non-variable"}
 ---
 a=9

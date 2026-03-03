@@ -1,7 +1,11 @@
 name: '#2640 Hanging when reading from character devices'
 dialect: bash
 source: oils:spec/bugs#2640-hanging-when-reading-from-character-devices
-stdout: "00000\n00000\n00000\n00000\n"
+stdout: |-
+  00000
+  00000
+  00000
+  00000
 ---
 # Relies on timeout from GNU coreutils
 timeout 0.5 $SH -c 'cat /dev/zero | cat | head -c 5 | tr \\0 0; echo'

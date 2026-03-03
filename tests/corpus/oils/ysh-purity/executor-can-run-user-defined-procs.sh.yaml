@@ -2,7 +2,8 @@ disabled: true
 name: 'Executor: can run user-defined Procs'
 dialect: bash
 source: oils:spec/ysh-purity#executor-can-run-user-defined-procs
-stdout: "(List)   [\"p-outside\",\"p-inside\"]\n"
+stdout: |-
+  (List)   ["p-outside","p-inside"]
 ---
 shopt --set ysh:upgrade
 

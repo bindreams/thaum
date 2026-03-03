@@ -2,7 +2,11 @@ disabled: true
 name: 'builtin rm: usage, removing files'
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-rm-usage-removing-files
-stdout: "ok\nok\nstatus=1\nstatus=0\n"
+stdout: |-
+  ok
+  ok
+  status=1
+  status=0
 ---
 case $SH in
   *osh) prefix='builtin' ;;

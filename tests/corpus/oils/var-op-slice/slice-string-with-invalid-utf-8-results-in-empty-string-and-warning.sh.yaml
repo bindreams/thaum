@@ -3,9 +3,10 @@ dialect: bash
 source: 
   oils:spec/var-op-slice#slice-string-with-invalid-utf-8-results-in-empty-string-and-warning
 status: 0
-stdout: "--\n"
-stderr: "[??? no location ???] warning: UTF-8 decode: Bad encoding at offset 0 in
-  string of 6 bytes\n"
+stdout: |
+  --
+stderr: |-
+  [??? no location ???] warning: UTF-8 decode: Bad encoding at offset 0 in string of 6 bytes
 ---
 s=$(echo -e "\xFF")bcdef
 echo -${s:1:3}-

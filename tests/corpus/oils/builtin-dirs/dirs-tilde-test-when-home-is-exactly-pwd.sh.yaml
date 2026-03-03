@@ -2,7 +2,9 @@ name: dirs tilde test when $HOME is exactly $PWD
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-tilde-test-when-home-is-exactly-pwd
 status: 0
-stdout: "~ /\n~ /\n"
+stdout: |-
+  ~ /
+  ~ /
 ---
 cd /
 mkdir -p /tmp/oil_test

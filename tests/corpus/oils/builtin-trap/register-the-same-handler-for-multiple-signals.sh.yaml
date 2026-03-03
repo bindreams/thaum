@@ -1,8 +1,11 @@
 name: Register the same handler for multiple signals
 dialect: bash
 source: oils:spec/builtin-trap#register-the-same-handler-for-multiple-signals
-stdout: "trap -- 'echo test' EXIT\ntrap -- 'echo test' SIGINT\ntrap -- 'echo test'
-  SIGTERM\ntest\n"
+stdout: |-
+  trap -- 'echo test' EXIT
+  trap -- 'echo test' SIGINT
+  trap -- 'echo test' SIGTERM
+  test
 ---
 trap 'echo test' TERM 2 EXIT
 trap

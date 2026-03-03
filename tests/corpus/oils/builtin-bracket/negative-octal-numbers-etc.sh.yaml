@@ -1,7 +1,11 @@
 name: negative octal numbers, etc.
 dialect: bash
 source: oils:spec/builtin-bracket#negative-octal-numbers-etc
-stdout: "zero=0\noctal=1\nhex=2\nbaseN=2\n"
+stdout: |-
+  zero=0
+  octal=1
+  hex=2
+  baseN=2
 ---
 
 # zero

@@ -2,7 +2,12 @@ disabled: true
 name: cd accepts a block, runs it in different dir
 dialect: bash
 source: oils:spec/ysh-blocks#cd-accepts-a-block-runs-it-in-different-dir
-stdout: "/\nOLDPWD=\ndone\nPWD=/tmp\npwd builtin: /tmp\n"
+stdout: |-
+  /
+  OLDPWD=
+  done
+  PWD=/tmp
+  pwd builtin: /tmp
 ---
 shopt -s ysh:all
 

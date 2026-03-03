@@ -2,7 +2,11 @@ disabled: true
 name: Exact equality with === and !==
 dialect: bash
 source: oils:spec/ysh-expr-compare#exact-equality-with-and
-stdout: "ok\nok\nok\nok\n"
+stdout: |-
+  ok
+  ok
+  ok
+  ok
 ---
 shopt -s ysh:all
 

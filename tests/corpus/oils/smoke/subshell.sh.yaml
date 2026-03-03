@@ -2,6 +2,8 @@ name: subshell
 dialect: bash
 source: oils:spec/smoke#subshell
 status: 0
-stdout: "1\n2\n"
+stdout: |-
+  1
+  2
 ---
 (echo 1; echo 2)

@@ -2,7 +2,11 @@ disabled: true
 name: More Command sub paren parsing
 dialect: bash
 source: oils:spec/ysh-bugs#more-command-sub-paren-parsing
-stdout: "for\nwhile\nif\nelif\n"
+stdout: |-
+  for
+  while
+  if
+  elif
 ---
 
 write $( var mylist = ['for']; for x in (mylist) { echo $x } )

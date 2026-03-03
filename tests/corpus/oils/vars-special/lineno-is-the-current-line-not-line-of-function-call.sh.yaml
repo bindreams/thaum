@@ -2,7 +2,7 @@ name: $LINENO is the current line, not line of function call
 dialect: bash
 source: 
   oils:spec/vars-special#lineno-is-the-current-line-not-line-of-function-call
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +10,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 echo $LINENO  # first line
 g() {

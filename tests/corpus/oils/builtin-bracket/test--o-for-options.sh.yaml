@@ -1,7 +1,10 @@
 name: test -o for options
 dialect: bash
 source: oils:spec/builtin-bracket#test--o-for-options
-stdout: "status=1\nstatus=0\nstatus=1\n"
+stdout: |-
+  status=1
+  status=0
+  status=1
 ---
 # note: it's lame that the 'false' case is confused with the 'typo' case.
 # but checking for error code 2 is unlikely anyway.

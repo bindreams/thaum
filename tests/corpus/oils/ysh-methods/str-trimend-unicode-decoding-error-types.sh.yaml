@@ -2,7 +2,12 @@ disabled: true
 name: Str => trimEnd(), unicode decoding error types
 dialect: bash
 source: oils:spec/ysh-methods#str-trimend-unicode-decoding-error-types
-stdout: "status=3\nstatus=3\nstatus=3\nstatus=3\nstatus=3\n"
+stdout: |-
+  status=3
+  status=3
+  status=3
+  status=3
+  status=3
 ---
 # Tests the backwards UTF-8 decoder
 var badStrs = [

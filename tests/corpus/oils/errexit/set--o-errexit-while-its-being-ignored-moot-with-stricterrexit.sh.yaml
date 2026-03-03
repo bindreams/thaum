@@ -3,7 +3,13 @@ dialect: bash
 source: 
   oils:spec/errexit#set--o-errexit-while-its-being-ignored-moot-with-stricterrexit
 status: 1
-stdout: "1\n2\n3\n4\n5\n6\n"
+stdout: |-
+  1
+  2
+  3
+  4
+  5
+  6
 ---
 set -o errexit
 # osh aborts early here

@@ -3,8 +3,10 @@ dialect: bash
 source: oils:spec/array#regression-assigning-with-out-of-range-negative-index
 status: 1
 stdout: "\n"
-stderr: "  a[-1]=1\n  ^~\n[ stdin ]:2: fatal: Index -1 is out of bounds for array
-  of length 0\n"
+stderr: |2-
+    a[-1]=1
+    ^~
+  [ stdin ]:2: fatal: Index -1 is out of bounds for array of length 0
 ---
 a=()
 a[-1]=1

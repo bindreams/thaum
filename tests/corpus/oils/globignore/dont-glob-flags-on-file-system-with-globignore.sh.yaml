@@ -2,7 +2,8 @@ name: Don't glob flags on file system with GLOBIGNORE
 dialect: bash
 source: oils:spec/globignore#dont-glob-flags-on-file-system-with-globignore
 status: 0
-stdout: "-* hello zzzz?\n"
+stdout: |-
+  -* hello zzzz?
 ---
 touch _tmp/-n _tmp/zzzzz
 cd _tmp

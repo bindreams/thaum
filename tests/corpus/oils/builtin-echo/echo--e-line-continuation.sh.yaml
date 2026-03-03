@@ -1,7 +1,9 @@
 name: echo -e line continuation
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-line-continuation
-stdout: "foo\\\nbar\n"
+stdout: |-
+  foo\
+  bar
 ---
 flags='-e'
 case $SH in dash) flags='' ;; esac

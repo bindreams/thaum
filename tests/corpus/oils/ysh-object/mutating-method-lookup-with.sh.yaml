@@ -2,7 +2,9 @@ disabled: true
 name: Mutating method lookup with ->
 dialect: bash
 source: oils:spec/ysh-object#mutating-method-lookup-with
-stdout: "5\n8\n"
+stdout: |-
+  5
+  8
 ---
 
 func inc(self, n) {

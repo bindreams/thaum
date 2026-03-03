@@ -1,7 +1,8 @@
 name: 'usage: invalid octal digits'
 dialect: bash
 source: oils:spec/builtin-umask#usage-invalid-octal-digits
-stdout: "error\n"
+stdout: |-
+  error
 ---
 umask 089
 case $? in

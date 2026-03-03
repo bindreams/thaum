@@ -2,7 +2,9 @@ disabled: true
 name: ysh respects renderPrompt() over PS1
 dialect: bash
 source: oils:spec/ysh-prompt#ysh-respects-renderprompt-over-ps1
-stdout: "hi\n^D\n"
+stdout: |
+  hi
+  ^D
 stderr: 'hi$ hi$ '
 ---
 

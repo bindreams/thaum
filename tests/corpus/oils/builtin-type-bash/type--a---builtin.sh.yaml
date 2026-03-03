@@ -1,6 +1,7 @@
 name: type -a -> builtin
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---builtin
-stdout: "cd is a shell builtin\n"
+stdout: |-
+  cd is a shell builtin
 ---
 type -a cd

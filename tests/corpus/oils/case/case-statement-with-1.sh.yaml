@@ -2,7 +2,19 @@ name: Case statement with ;&
 dialect: bash
 source: oils:spec/case#case-statement-with
 status: 0
-stdout: "aa\nbb\ncc\n--\nbb\ncc\n--\ncc\n--\ndd\n--\n--\n"
+stdout: |-
+  aa
+  bb
+  cc
+  --
+  bb
+  cc
+  --
+  cc
+  --
+  dd
+  --
+  --
 ---
 # ;& ignores the next condition.  Why would that be useful?
 

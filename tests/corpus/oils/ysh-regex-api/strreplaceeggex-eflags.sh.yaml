@@ -2,7 +2,13 @@ disabled: true
 name: Str.replace(Eggex, *), eflags
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-eflags
-stdout: "[1]-[2]-[3]\n[4]-[5]\n[1]-2-3\n4-5\n[1]-2-3\n[4]-5\n"
+stdout: |-
+  [1]-[2]-[3]
+  [4]-[5]
+  [1]-2-3
+  4-5
+  [1]-2-3
+  [4]-5
 ---
 shopt --set ysh:all
 

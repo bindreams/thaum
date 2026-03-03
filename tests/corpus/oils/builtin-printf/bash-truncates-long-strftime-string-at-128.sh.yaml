@@ -1,7 +1,12 @@
 name: bash truncates long strftime string at 128
 dialect: bash
 source: oils:spec/builtin-printf#bash-truncates-long-strftime-string-at-128
-stdout: "4\n40\n120\n124\n0\n"
+stdout: |-
+  4
+  40
+  120
+  124
+  0
 ---
 
 case $SH in ash|dash|mksh|zsh) exit ;; esac

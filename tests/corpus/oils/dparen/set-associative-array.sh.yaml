@@ -1,7 +1,8 @@
 name: set associative array
 dialect: bash
 source: oils:spec/dparen#set-associative-array
-stdout: "42\n"
+stdout: |-
+  42
 ---
 declare -A A=(['foo']=bar ['spam']=42)
 (( x = A['spam'] ))

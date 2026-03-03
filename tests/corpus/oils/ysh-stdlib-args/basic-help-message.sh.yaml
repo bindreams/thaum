@@ -2,9 +2,18 @@ disabled: true
 name: Basic help message
 dialect: bash
 source: oils:spec/ysh-stdlib-args#basic-help-message
-stdout: "usage: program-name [-h] [-v] src dst\n\nReference Implementation\n\npositional
-  arguments:\n src\n dst\n\noptions:\n -h, --help           show this help message
-  and exit\n -v, --verbose        Verbose\n"
+stdout: |-
+  usage: program-name [-h] [-v] src dst
+
+  Reference Implementation
+
+  positional arguments:
+   src
+   dst
+
+  options:
+   -h, --help           show this help message and exit
+   -v, --verbose        Verbose
 ---
 
 source $LIB_YSH/args.ysh

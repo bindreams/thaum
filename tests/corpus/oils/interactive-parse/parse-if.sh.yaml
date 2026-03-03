@@ -1,7 +1,9 @@
 name: parse if
 dialect: bash
 source: oils:spec/interactive-parse#parse-if
-stdout: "hi\n^D\n"
+stdout: |
+  hi
+  ^D
 stderr: '[PS1]> > > [PS1]'
 ---
 

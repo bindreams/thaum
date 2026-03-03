@@ -1,8 +1,9 @@
 name: Extended glob with word splitting
 dialect: bash
 source: oils:spec/extglob-files#extended-glob-with-word-splitting
-stdout: "['a', 'bar.cc', 'bar.h']\n"
-setup: |
+stdout: |
+  ['a', 'bar.cc', 'bar.h']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s extglob
 mkdir -p 3

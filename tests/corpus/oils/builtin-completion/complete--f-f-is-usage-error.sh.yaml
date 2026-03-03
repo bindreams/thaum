@@ -1,7 +1,9 @@
 name: complete -F f is usage error
 dialect: bash
 source: oils:spec/builtin-completion#complete--f-f-is-usage-error
-stdout: "status=0\nstatus=2\n"
+stdout: |-
+  status=0
+  status=2
 ---
 
 #complete -F f cmd

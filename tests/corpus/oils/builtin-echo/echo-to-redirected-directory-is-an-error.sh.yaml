@@ -1,7 +1,9 @@
 name: echo to redirected directory is an error
 dialect: bash
 source: oils:spec/builtin-echo#echo-to-redirected-directory-is-an-error
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 mkdir -p dir
 

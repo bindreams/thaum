@@ -1,7 +1,9 @@
 name: pass shopt options like sh -O nullglob
 dialect: bash
 source: oils:spec/sh-options#pass-shopt-options-like-sh--o-nullglob
-stdout: "foo *.nonexistent bar\nfoo bar\n"
+stdout: |-
+  foo *.nonexistent bar
+  foo bar
 ---
 $SH +O nullglob -c 'echo foo *.nonexistent bar'
 $SH -O nullglob -c 'echo foo *.nonexistent bar'

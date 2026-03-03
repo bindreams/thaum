@@ -2,7 +2,10 @@ name: If shopt --set xtrace is allowed, it should update SHELLOPTS, not BASHOPTS
 dialect: bash
 source: 
   oils:spec/sh-options-bash#if-shopt---set-xtrace-is-allowed-it-should-update-shellopts-not-bashopts
-stdout: "SHELLOPTS=xtrace\nSHELLOPTS=xtrace\nSHELLOPTS=\n"
+stdout: |-
+  SHELLOPTS=xtrace
+  SHELLOPTS=xtrace
+  SHELLOPTS=
 ---
 case $SH in bash) exit ;; esac
 

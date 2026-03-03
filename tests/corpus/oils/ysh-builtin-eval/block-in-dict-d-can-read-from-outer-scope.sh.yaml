@@ -2,7 +2,8 @@ disabled: true
 name: block in Dict (&d) { ... } can read from outer scope
 dialect: bash
 source: oils:spec/ysh-builtin-eval#block-in-dict-d-can-read-from-outer-scope
-stdout: "(Dict)   {\"y\":43}\n"
+stdout: |-
+  (Dict)   {"y":43}
 ---
 
 proc Dict ( ; out; ; block) {

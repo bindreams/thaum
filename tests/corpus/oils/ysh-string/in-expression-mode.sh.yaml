@@ -2,8 +2,19 @@ disabled: true
 name: "''' in Expression Mode"
 dialect: bash
 source: oils:spec/ysh-string#in-expression-mode
-stdout: "[two = $two '\nthree = $three ''\n \\u{61}\n]\n[two = $two '\nthree = $three
-  ''\n a\n]\n[two = $two '\nthree = $three ''\n a a\n]\n"
+stdout: |-
+  [two = $two '
+  three = $three ''
+   \u{61}
+  ]
+  [two = $two '
+  three = $three ''
+   a
+  ]
+  [two = $two '
+  three = $three ''
+   a a
+  ]
 ---
 
 var two = 2

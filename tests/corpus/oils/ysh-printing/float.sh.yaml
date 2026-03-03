@@ -2,6 +2,7 @@ disabled: true
 name: Float
 dialect: bash
 source: oils:spec/ysh-printing#float
-stdout: "(Float) -0.0\n"
+stdout: |-
+  (Float) -0.0
 ---
 = -0.00

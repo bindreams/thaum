@@ -3,8 +3,15 @@ name: 'character class with digit [\\0] should not crash (issue #2380)'
 dialect: bash
 source: 
   oils:spec/ysh-regex#character-class-with-digit-0-should-not-crash-issue-2380
-stdout: "pattern: [0\\\\]\n(Bool)   true\n(Bool)   false\n(Bool)   true\n---\n[0-9]\n\
-  (Bool)   true\n(Bool)   false\n"
+stdout: |-
+  pattern: [0\\]
+  (Bool)   true
+  (Bool)   false
+  (Bool)   true
+  ---
+  [0-9]
+  (Bool)   true
+  (Bool)   false
 ---
 shopt -s ysh:all
 

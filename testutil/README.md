@@ -61,14 +61,15 @@ still be collected by the harness.
 
 ## Built-in probe helpers
 
-| Function | Checks |
-|----------|--------|
+| Function                 | Checks                      |
+| ------------------------ | --------------------------- |
 | `probe_executable(name)` | `<name> --version` succeeds |
-| `probe_path(path)` | File or directory exists |
+| `probe_path(path)`       | File or directory exists    |
 
 ## Output
 
 When all requirements are met:
+
 ```
 running 2 tests
 test smoke_test     ... ok
@@ -78,6 +79,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored
 ```
 
 When a requirement is missing:
+
 ```
 running 2 tests
 test smoke_test     ... ignored
@@ -94,7 +96,7 @@ test result: ok. 0 passed; 0 failed; 2 ignored
 
 1. `#[requires(...)]` is a proc macro that preserves the original function and
    appends an `inventory::submit!` call to register it with the harness.
-2. `run_all()` iterates all registered tests, checks preconditions at runtime,
+1. `run_all()` iterates all registered tests, checks preconditions at runtime,
    and builds `libtest-mimic::Trial`s — marking unmet tests as ignored.
-3. After `libtest-mimic::run()` completes, the unavailability summary is printed
+1. After `libtest-mimic::run()` completes, the unavailability summary is printed
    to stderr.

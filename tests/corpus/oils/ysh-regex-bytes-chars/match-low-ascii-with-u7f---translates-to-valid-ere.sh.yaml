@@ -3,7 +3,13 @@ name: Match low ASCII with \u{7f} - translates to valid ERE
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#match-low-ascii-with-u7f---translates-to-valid-ere
-stdout: " 5b 7f 5d 0a\nyes\nno\nequal\nyes\nno\n"
+stdout: |2-
+   5b 7f 5d 0a
+  yes
+  no
+  equal
+  yes
+  no
 ---
 shopt -s ysh:all
 var pat = /[ \u{7f} ]/;

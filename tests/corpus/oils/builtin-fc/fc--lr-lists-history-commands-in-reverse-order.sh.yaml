@@ -1,7 +1,12 @@
 name: fc -lr lists history commands in reverse order
 dialect: bash
 source: oils:spec/builtin-fc#fc--lr-lists-history-commands-in-reverse-order
-stdout: "4\t echo 3\n3\t echo 2\n2\t echo 1\n1\t history -r\n^D\n"
+stdout: |-
+  4	 echo 3
+  3	 echo 2
+  2	 echo 1
+  1	 history -r
+  ^D
 ---
 printf "echo %s\n" {1..3} > tmp
 

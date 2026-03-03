@@ -1,7 +1,9 @@
 name: IFS
 dialect: bash
 source: oils:spec/toysh-posix#ifs
-stdout: "agd\n{ ,y,z=\"${ ,y,z\"}\n"
+stdout: |-
+  agd
+  { ,y,z="${ ,y,z"}
 ---
 
 IFS=x; X=abxcd; echo ${X/bxc/g}

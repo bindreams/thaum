@@ -2,8 +2,12 @@ disabled: true
 name: printf | head regression (sigpipe_status_ok)
 dialect: bash
 source: oils:spec/ysh-options#printf-head-regression-sigpipestatusok
-stdout: " external on 0 0\n external off 141 0\n builtin on 0 0\n builtin off 141
-  0\nfinished\n"
+stdout: |2-
+   external on 0 0
+   external off 141 0
+   builtin on 0 0
+   builtin off 141 0
+  finished
 ---
 
 shopt --set ysh:upgrade

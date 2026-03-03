@@ -2,9 +2,15 @@ disabled: true
 name: complete -F strings are not quoted again
 dialect: bash
 source: oils:spec/ysh-completion#complete--f-strings-are-not-quoted-again
-stdout: "\"pq-argv $'can\\\\'t' \"\n\"pq-argv 'ch with space' \"\n\"pq-argv checkout
-  \"\n\"pq-argv cherry \"\n\n\"sq-argv 'ch with space' \"\n\"sq-argv 'checkout' \"\
-  \n\"sq-argv 'cherry' \"\n"
+stdout: |-
+  "pq-argv $'can\\'t' "
+  "pq-argv 'ch with space' "
+  "pq-argv checkout "
+  "pq-argv cherry "
+
+  "sq-argv 'ch with space' "
+  "sq-argv 'checkout' "
+  "sq-argv 'cherry' "
 ---
 
 . $REPO_ROOT/testdata/completion/quoting.bash

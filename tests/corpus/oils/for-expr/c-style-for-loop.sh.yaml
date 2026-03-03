@@ -2,7 +2,11 @@ name: C-style for loop
 dialect: bash
 source: oils:spec/for-expr#c-style-for-loop
 status: 0
-stdout: "1\n2\n4\n5\n"
+stdout: |-
+  1
+  2
+  4
+  5
 ---
 n=10
 for ((a=1; a <= n ; a++))  # Double parentheses, and naked 'n'

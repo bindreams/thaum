@@ -3,7 +3,8 @@ name: braced var sub respects strict_array
 dialect: bash
 source: oils:spec/ysh-expr#braced-var-sub-respects-strictarray
 status: 1
-stdout: "a b c\n"
+stdout: |-
+  a b c
 ---
 set -- a b c
 var x = ${undef:-"$@"}

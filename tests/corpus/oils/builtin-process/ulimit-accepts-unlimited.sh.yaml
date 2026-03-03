@@ -1,8 +1,17 @@
 name: ulimit accepts 'unlimited'
 dialect: bash
 source: oils:spec/builtin-process#ulimit-accepts-unlimited
-stdout: "  arg zz\nunlimited\nstatus=0\nFAILED\n\n  arg unlimited\nunlimited\nstatus=0\n\
-  \n"
+stdout: |2+
+    arg zz
+  unlimited
+  status=0
+  FAILED
+
+    arg unlimited
+  unlimited
+  status=0
+
+...
 ---
 
 for arg in zz unlimited; do

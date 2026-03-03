@@ -1,7 +1,8 @@
 name: 'recursive arith: array elements'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-array-elements
-stdout: "123\n"
+stdout: |-
+  123
 ---
 text[1]='d=123'
 text[2]='text[1]'

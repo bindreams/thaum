@@ -1,7 +1,9 @@
 name: ulimit that is 64 bits
 dialect: bash
 source: oils:spec/builtin-process#ulimit-that-is-64-bits
-stdout: "before unlimited\nafter 9007199254740992\n"
+stdout: |-
+  before unlimited
+  after 9007199254740992
 ---
 
 # no 64-bit integers

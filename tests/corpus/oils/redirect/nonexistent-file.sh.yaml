@@ -1,7 +1,8 @@
 name: Nonexistent file
 dialect: bash
 source: oils:spec/redirect#nonexistent-file
-stdout: "status=1\n"
+stdout: |
+  status=1
 environment:
   TMP: /tmp
 ---

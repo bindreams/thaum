@@ -1,7 +1,9 @@
 name: ${var@Q}
 dialect: bash
 source: oils:spec/serialize#varq
-stdout: "$'one\\ntwo μ'\n$'one\\ntwo μ'\n"
+stdout: |-
+  $'one\ntwo μ'
+  $'one\ntwo μ'
 ---
 case $SH in zsh|ash) exit ;; esac
 

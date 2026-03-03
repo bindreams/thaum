@@ -2,7 +2,10 @@ disabled: true
 name: Remove from List in loop shortens it (matches JS)
 dialect: bash
 source: oils:spec/ysh-for#remove-from-list-in-loop-shortens-it-matches-js
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 
 # see demo/survey-loop

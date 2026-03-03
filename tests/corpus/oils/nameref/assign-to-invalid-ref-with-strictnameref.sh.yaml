@@ -2,7 +2,8 @@ name: assign to invalid ref with strict_nameref
 dialect: bash
 source: oils:spec/nameref#assign-to-invalid-ref-with-strictnameref
 status: 1
-stdout: "ref=1\n"
+stdout: |-
+  ref=1
 ---
 case $SH in *bash|*mksh) exit ;; esac
 

@@ -3,9 +3,11 @@ name: redirect after command sub (like case above but without assignment
 dialect: bash
 source: 
   oils:spec/assign#redirect-after-command-sub-like-case-above-but-without-assignment-builtin
-stdout: "stdout=STDOUT\n"
-stderr: "STDERR\n"
-setup: |
+stdout: |
+  stdout=STDOUT
+stderr: |
+  STDERR
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -18,6 +20,5 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 echo stdout=$(stdout_stderr.py) 2>/dev/null

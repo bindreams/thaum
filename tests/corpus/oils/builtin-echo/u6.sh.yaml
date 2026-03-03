@@ -1,7 +1,8 @@
 name: \u6
 dialect: bash
 source: oils:spec/builtin-echo#u6
-stdout: " 006\n"
+stdout: |2-
+   006
 ---
 flags='-en'
 case $SH in dash) flags='-n' ;; esac

@@ -1,7 +1,11 @@
 name: trap 0 2 resets EXIT AND SIGINT
 dialect: bash
 source: oils:spec/builtin-trap#trap-0-2-resets-exit-and-sigint
-stdout: "---\ntrap -- 'echo EXIT' EXIT\n---\n---\n"
+stdout: |-
+  ---
+  trap -- 'echo EXIT' EXIT
+  ---
+  ---
 ---
 
 trap "echo EXIT" EXIT

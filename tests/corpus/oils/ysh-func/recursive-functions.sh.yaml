@@ -2,7 +2,8 @@ disabled: true
 name: Recursive functions
 dialect: bash
 source: oils:spec/ysh-func#recursive-functions
-stdout: "55\n"
+stdout: |-
+  55
 ---
 func fib(n) {
   # TODO: add assert n > 0

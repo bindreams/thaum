@@ -2,7 +2,10 @@ disabled: true
 name: Chained Comparisons
 dialect: bash
 source: oils:spec/ysh-expr-compare#chained-comparisons
-stdout: "123\n123\nno\n"
+stdout: |-
+  123
+  123
+  no
 ---
 shopt -s ysh:upgrade
 

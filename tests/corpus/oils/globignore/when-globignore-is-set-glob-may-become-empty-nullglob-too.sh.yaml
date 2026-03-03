@@ -2,7 +2,10 @@ name: When GLOBIGNORE is set, glob may become empty (nullglob too)
 dialect: bash
 source: 
   oils:spec/globignore#when-globignore-is-set-glob-may-become-empty-nullglob-too
-stdout: "-foo.txt foo.txt\n*t\nnullglob\n"
+stdout: |-
+  -foo.txt foo.txt
+  *t
+  nullglob
 ---
 touch -- foo.txt -foo.txt
 

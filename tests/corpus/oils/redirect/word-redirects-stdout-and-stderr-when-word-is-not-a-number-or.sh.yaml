@@ -2,8 +2,10 @@ name: '>&word redirects stdout and stderr when word is not a number or -'
 dialect: bash
 source: 
   oils:spec/redirect#word-redirects-stdout-and-stderr-when-word-is-not-a-number-or
-stdout: "STDOUT\nSTDERR\n"
-setup: |
+stdout: |
+  STDOUT
+  STDERR
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -16,7 +18,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 
 # dash, mksh don't implement this bash behaviour.

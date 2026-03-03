@@ -3,10 +3,23 @@ name: shvar IFS=x { myproc } rather than IFS=x myproc - no dynamic scope
 dialect: bash
 source: 
   oils:spec/ysh-scope#shvar-ifsx-myproc-rather-than-ifsx-myproc---no-dynamic-scope
-stdout: ":\n 20 09 0a 0a\nIFS= z\n\nshellfunc IFS= z\n['x', 'x', 'x']\n\nshellfunc
-  IFS= x\n['', 'z', 'z', 'z']\n\nmyproc IFS= z\n['x', 'x', 'x']\n\nmyproc IFS= x\n\
-  ['', 'z', 'z', 'z']\n"
-setup: |
+stdout: |
+  :
+   20 09 0a 0a
+  IFS= z
+
+  shellfunc IFS= z
+  ['x', 'x', 'x']
+
+  shellfunc IFS= x
+  ['', 'z', 'z', 'z']
+
+  myproc IFS= z
+  ['x', 'x', 'x']
+
+  myproc IFS= x
+  ['', 'z', 'z', 'z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -21,7 +34,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 
 # Note: osh/split.py uses dynamic scope to look up IFS

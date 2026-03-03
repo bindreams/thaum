@@ -1,8 +1,10 @@
 name: Export sets a global variable
 dialect: bash
 source: oils:spec/builtin-vars#export-sets-a-global-variable
-stdout: "X\nX\n"
-setup: |
+stdout: |
+  X
+  X
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 # Even after you do export -n, it still exists.
 f() { export GLOBAL=X; }

@@ -2,7 +2,11 @@ disabled: true
 name: Comparison of Str does conversion to Int
 dialect: bash
 source: oils:spec/ysh-expr-compare#comparison-of-str-does-conversion-to-int
-stdout: "<\n<=\n>\n>=\n"
+stdout: |-
+  <
+  <=
+  >
+  >=
 ---
 shopt -s ysh:upgrade
 

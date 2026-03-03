@@ -1,8 +1,9 @@
 name: empty argv
 dialect: bash
 source: oils:spec/word-split#empty-argv
-stdout: "['1', '2', '3', '', '4', '5']\n"
-setup: |
+stdout: |
+  ['1', '2', '3', '', '4', '5']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,6 +11,5 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py 1 "$@" 2 $@ 3 "$*" 4 $* 5

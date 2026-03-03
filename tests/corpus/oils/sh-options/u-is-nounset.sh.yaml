@@ -2,7 +2,8 @@ name: -u is nounset
 dialect: bash
 source: oils:spec/sh-options#u-is-nounset
 status: 1
-stdout: "[]\n"
+stdout: |-
+  []
 ---
 echo "[$unset]"
 set -u

@@ -1,7 +1,12 @@
 name: command -v executable, builtin
 dialect: bash
 source: oils:spec/builtin-meta#command--v-executable-builtin
-stdout: "/grep\n/ls\n\ntrue\neval\n"
+stdout: |-
+  /grep
+  /ls
+
+  true
+  eval
 ---
 
 #command -v grep ls

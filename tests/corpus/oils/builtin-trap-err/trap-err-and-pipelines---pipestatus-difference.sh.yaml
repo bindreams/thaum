@@ -2,8 +2,13 @@ name: trap ERR and pipelines - PIPESTATUS difference
 dialect: bash
 source: 
   oils:spec/builtin-trap-err#trap-err-and-pipelines---pipestatus-difference
-stdout: "A\nerr [] status=1 [1]\nB\nerr [] status=1 [0 1]\nerr [] status=1 [0 1 0]\n\
-  ok\n"
+stdout: |-
+  A
+  err [] status=1 [1]
+  B
+  err [] status=1 [0 1]
+  err [] status=1 [0 1 0]
+  ok
 ---
 case $SH in ash) exit ;; esac
 

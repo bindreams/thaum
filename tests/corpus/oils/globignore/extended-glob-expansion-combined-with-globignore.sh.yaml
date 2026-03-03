@@ -1,7 +1,9 @@
 name: Extended glob expansion combined with GLOBIGNORE
 dialect: bash
 source: oils:spec/globignore#extended-glob-expansion-combined-with-globignore
-stdout: "bar.cc bar.h foo.cc foo.h\nbar.cc bar.h\n"
+stdout: |-
+  bar.cc bar.h foo.cc foo.h
+  bar.cc bar.h
 ---
 shopt -s extglob
 

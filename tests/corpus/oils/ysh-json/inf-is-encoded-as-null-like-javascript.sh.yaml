@@ -2,8 +2,17 @@ disabled: true
 name: Inf is encoded as null, like JavaScript
 dialect: bash
 source: oils:spec/ysh-json#inf-is-encoded-as-null-like-javascript
-stdout: "(Float)   INFINITY\n(Float)   -INFINITY\n--\nnull\nerror=0\nnull\nerror=0\n\
-  --\nnull\nnull\n"
+stdout: |-
+  (Float)   INFINITY
+  (Float)   -INFINITY
+  --
+  null
+  error=0
+  null
+  error=0
+  --
+  null
+  null
 ---
 
 # WRONG LOCATION!  Gah

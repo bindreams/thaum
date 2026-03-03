@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#command-sub-with-inheriterrexit-and-commandsuberrexit
 status: 1
-stdout: "zero\n"
+stdout: |-
+  zero
 ---
 set -o errexit
 

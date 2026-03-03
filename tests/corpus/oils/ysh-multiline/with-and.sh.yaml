@@ -2,7 +2,13 @@ disabled: true
 name: '... with && and [['
 dialect: bash
 source: oils:spec/ysh-multiline#with-and
-stdout: "one\ntwo\nthree\nfour\nfive\n---\n"
+stdout: |-
+  one
+  two
+  three
+  four
+  five
+  ---
 ---
 echo one && false || echo two
 

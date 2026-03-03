@@ -3,10 +3,27 @@ name: type / type -a builtin on invokables - shell func, proc, invokable
 dialect: bash
 source: 
   oils:spec/ysh-proc#type-type--a-builtin-on-invokables---shell-func-proc-invokable
-stdout: "function\nproc\nproc\n1\n---\nmy-shell-func is a shell function\nmy-shell-func()
-  {\n   echo hi\n}\nmyproc is a YSH proc\ninvokable is a YSH invokable\n1\n---\nmy-shell-func
-  is a shell function\nmy-shell-func() {\n   echo hi\n}\nmyproc is a YSH proc\ninvokable
-  is a YSH invokable\n---\n"
+stdout: |-
+  function
+  proc
+  proc
+  1
+  ---
+  my-shell-func is a shell function
+  my-shell-func() {
+     echo hi
+  }
+  myproc is a YSH proc
+  invokable is a YSH invokable
+  1
+  ---
+  my-shell-func is a shell function
+  my-shell-func() {
+     echo hi
+  }
+  myproc is a YSH proc
+  invokable is a YSH invokable
+  ---
 ---
 shopt --set ysh:upgrade
 

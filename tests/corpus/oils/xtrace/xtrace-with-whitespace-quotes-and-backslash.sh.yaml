@@ -1,8 +1,10 @@
 name: xtrace with whitespace, quotes, and backslash
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-whitespace-quotes-and-backslash
-stdout: "1 2 ' \" \\\n"
-stderr: "+ echo '1 2' $'\\'' '\"' $'\\\\'\n"
+stdout: |
+  1 2 ' " \
+stderr: |-
+  + echo '1 2' $'\'' '"' $'\\'
 ---
 set -o xtrace
 echo '1 2' \' \" \\

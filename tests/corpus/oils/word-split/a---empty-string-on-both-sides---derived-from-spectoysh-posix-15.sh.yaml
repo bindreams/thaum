@@ -2,10 +2,28 @@ name: '""$A"" - empty string on both sides - derived from spec/toysh-posix #15'
 dialect: bash
 source: 
   oils:spec/word-split#a---empty-string-on-both-sides---derived-from-spectoysh-posix-15
-stdout: "['abc', 'def']\n['', 'abc', 'def', '']\n['abc', 'def']\n['', 'abc', 'def',
-  '']\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n==\n\n=abc=\n=def=\n\n==\n=abc=\n=def=\n\
-  ==\n"
-setup: |
+stdout: |
+  ['abc', 'def']
+  ['', 'abc', 'def', '']
+  ['abc', 'def']
+  ['', 'abc', 'def', '']
+
+  =abc=
+  =def=
+
+  ==
+  =abc=
+  =def=
+  ==
+
+  =abc=
+  =def=
+
+  ==
+  =abc=
+  =def=
+  ==
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +31,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 A="   abc   def   "

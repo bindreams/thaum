@@ -3,8 +3,14 @@ name: leftMatch() combined with REG_NEWLINE - interaction with ^
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#leftmatch-combined-with-regnewline---interaction-with
-stdout: "(List)   [0,\"o\"]\n(List)   [1,\"n\"]\n(List)   [2,\"e\"]\n\n(List)   [0,\"\
-  o\"]\n(List)   [1,\"n\"]\n(List)   [2,\"e\"]\n"
+stdout: |-
+  (List)   [0,"o"]
+  (List)   [1,"n"]
+  (List)   [2,"e"]
+
+  (List)   [0,"o"]
+  (List)   [1,"n"]
+  (List)   [2,"e"]
 ---
 shopt --set ysh:upgrade
 

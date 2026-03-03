@@ -3,7 +3,10 @@ name: FUNCNAME BASH_LINENO BASH_SOURCE not available with YSH functions
 dialect: bash
 source: 
   oils:spec/ysh-introspect#funcname-bashlineno-bashsource-not-available-with-ysh-functions
-stdout: "p\n16\n[ stdin ]\n"
+stdout: |-
+  p
+  16
+  [ stdin ]
 ---
 
 func g(x) {

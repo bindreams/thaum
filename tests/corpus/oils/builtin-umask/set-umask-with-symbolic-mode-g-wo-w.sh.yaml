@@ -2,7 +2,9 @@ name: 'set umask with symbolic mode: g-w,o-w'
 dialect: bash
 source: oils:spec/builtin-umask#set-umask-with-symbolic-mode-g-wo-w
 status: 0
-stdout: "664\n644\n"
+stdout: |
+  664
+  644
 stderr: ''
 environment:
   TMP: /tmp

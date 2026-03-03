@@ -2,7 +2,8 @@ disabled: true
 name: Functions can redefine vars
 dialect: bash
 source: oils:spec/ysh-func#functions-can-redefine-vars
-stdout: "<Func>\n"
+stdout: |-
+  <Func>
 ---
 var f = 0
 func f() { return (1) }

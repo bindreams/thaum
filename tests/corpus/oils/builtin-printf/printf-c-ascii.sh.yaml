@@ -1,7 +1,10 @@
 name: printf %c ASCII
 dialect: bash
 source: oils:spec/builtin-printf#printf-c-ascii
-stdout: "a\nA\nAZ\n"
+stdout: |-
+  a
+  A
+  AZ
 ---
 
 printf '%c\n' a

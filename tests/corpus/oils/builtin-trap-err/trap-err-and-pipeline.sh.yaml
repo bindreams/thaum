@@ -1,7 +1,9 @@
 name: trap ERR and pipeline
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-pipeline
-stdout: "line=3\nline=5\n"
+stdout: |-
+  line=3
+  line=5
 ---
 
 # mksh and bash have different line numbers in this case

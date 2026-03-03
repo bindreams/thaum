@@ -1,7 +1,8 @@
 name: '((pkg-config example - postfix package - #2337'
 dialect: bash
 source: oils:spec/paren-ambiguity#pkg-config-example---postfix-package---2337
-stdout: "bye\n"
+stdout: |-
+  bye
 ---
 
 icu_cppflags=`((pkg-config --cflags icu-uc icu-i18n) ||

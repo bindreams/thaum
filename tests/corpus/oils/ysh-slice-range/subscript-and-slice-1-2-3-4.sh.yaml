@@ -2,9 +2,15 @@ disabled: true
 name: subscript and slice :| 1 2 3 4 |
 dialect: bash
 source: oils:spec/ysh-slice-range#subscript-and-slice-1-2-3-4
-stdout: "(Str)   \"2\"\n(List)   [\"2\",\"3\"]\nimplicit\n(List)   [\"1\",\"2\"]\n\
-  (List)   [\"3\",\"4\"]\nout of bounds\n(List)   [\"1\",\"2\",\"3\",\"4\"]\n(List)\
-  \   [\"1\",\"2\",\"3\",\"4\"]\n"
+stdout: |-
+  (Str)   "2"
+  (List)   ["2","3"]
+  implicit
+  (List)   ["1","2"]
+  (List)   ["3","4"]
+  out of bounds
+  (List)   ["1","2","3","4"]
+  (List)   ["1","2","3","4"]
 ---
 var myarray = :|1 2 3 4|
 pp test_ (myarray[1])

@@ -1,7 +1,10 @@
 name: 'Regression: Negative index in [[ -v a[index] ]]'
 dialect: bash
 source: oils:spec/array#regression-negative-index-in--v-aindex
-stdout: "a has -1\na has -6\na has -11\n"
+stdout: |-
+  a has -1
+  a has -6
+  a has -11
 ---
 a[0]=x
 a[5]=y

@@ -1,8 +1,12 @@
 name: Locations with temp frame
 dialect: bash
 source: oils:spec/introspect#locations-with-temp-frame
-stdout: "F\nG\nSTACK:spec/testdata/bash-source-pushtemp.sh:g:3\nSTACK:spec/testdata/bash-source-pushtemp.sh:f:19\n\
-  STACK:spec/testdata/bash-source-pushtemp.sh:main:0\n"
+stdout: |-
+  F
+  G
+  STACK:spec/testdata/bash-source-pushtemp.sh:g:3
+  STACK:spec/testdata/bash-source-pushtemp.sh:f:19
+  STACK:spec/testdata/bash-source-pushtemp.sh:main:0
 ---
 
 cd $REPO_ROOT

@@ -1,7 +1,11 @@
 name: $_ with pipeline and subshell
 dialect: bash
 source: oils:spec/vars-special#with-pipeline-and-subshell
-stdout: "last=\npipeline=last=\nsubshell=pipeline=last=\ndone=pipeline=last=\n"
+stdout: |-
+  last=
+  pipeline=last=
+  subshell=pipeline=last=
+  done=pipeline=last=
 ---
 case $SH in dash|mksh) exit ;; esac
 

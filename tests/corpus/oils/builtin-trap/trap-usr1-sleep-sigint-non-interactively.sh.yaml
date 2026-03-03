@@ -1,7 +1,9 @@
 name: 'trap USR1, sleep, SIGINT: non-interactively'
 dialect: bash
 source: oils:spec/builtin-trap#trap-usr1-sleep-sigint-non-interactively
-stdout: "usr1\nstatus=0\n"
+stdout: |-
+  usr1
+  status=0
 ---
 
 $REPO_ROOT/spec/testdata/builtin-trap-usr1.sh

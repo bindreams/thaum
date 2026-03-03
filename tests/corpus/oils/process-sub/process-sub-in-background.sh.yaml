@@ -1,7 +1,12 @@
 name: process sub in background &
 dialect: bash
 source: oils:spec/process-sub#process-sub-in-background
-stdout: "1\n2\n3\nsync\nfork\n"
+stdout: |-
+  1
+  2
+  3
+  sync
+  fork
 ---
 
 cat <(seq 3; sleep 0.1) & wait

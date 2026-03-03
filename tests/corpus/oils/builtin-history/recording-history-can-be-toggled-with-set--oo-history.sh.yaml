@@ -2,7 +2,10 @@ name: recording history can be toggled with set -o/+o history
 dialect: bash
 source: 
   oils:spec/builtin-history#recording-history-can-be-toggled-with-set--oo-history
-stdout: "^D\nstatus=1\nstatus=0\n"
+stdout: |
+  ^D
+  status=1
+  status=0
 environment:
   TMP: /tmp
 ---

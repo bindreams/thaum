@@ -2,7 +2,9 @@ disabled: true
 name: 'Regression: 1/3 gives 0.3+'
 dialect: bash
 source: oils:spec/ysh-int-float#regression-13-gives-03
-stdout: "one-third\ntwo-thirds\n"
+stdout: |-
+  one-third
+  two-thirds
 ---
 
 # We were using float precision, not double

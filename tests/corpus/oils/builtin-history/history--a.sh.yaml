@@ -1,8 +1,16 @@
 name: history -a
 dialect: bash
 source: oils:spec/builtin-history#history--a
-stdout: "1\nHISTFILE=tmp\necho 1\nhistory -a\n2\nHISTFILE=tmp\necho 1\nhistory -a\n\
-  ^D\n"
+stdout: |-
+  1
+  HISTFILE=tmp
+  echo 1
+  history -a
+  2
+  HISTFILE=tmp
+  echo 1
+  history -a
+  ^D
 ---
 rm -f tmp
 

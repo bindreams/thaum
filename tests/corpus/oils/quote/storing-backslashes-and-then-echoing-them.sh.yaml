@@ -1,7 +1,9 @@
 name: Storing backslashes and then echoing them
 dialect: bash
 source: oils:spec/quote#storing-backslashes-and-then-echoing-them
-stdout: "\\ \\\\\n\\ \\\\\n"
+stdout: |-
+  \ \\
+  \ \\
 ---
 # This is a bug fix; it used to cause problems with unescaping.
 one='\'

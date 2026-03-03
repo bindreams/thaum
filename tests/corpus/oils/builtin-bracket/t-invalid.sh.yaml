@@ -1,7 +1,8 @@
 name: '[ -t invalid ]'
 dialect: bash
 source: oils:spec/builtin-bracket#t-invalid
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 [ -t invalid ]
 echo status=$?

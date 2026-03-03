@@ -2,7 +2,10 @@ name: compgen -W uses IFS, and delimiters are escaped with \
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--w-uses-ifs-and-delimiters-are-escaped-with
-stdout: "spam\neggs\nham cheese:colon\n"
+stdout: |-
+  spam
+  eggs
+  ham cheese:colon
 ---
 IFS=':%'
 compgen -W 'spam:eggs%ham cheese\:colon'

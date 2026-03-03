@@ -1,8 +1,11 @@
 name: IFS='x ' incomplete backslash
 dialect: bash
 source: oils:spec/builtin-read#ifsx-incomplete-backslash
-stdout: "['a b']\n['a', 'b']\n['a', 'ax  x    hello']\n"
-setup: |
+stdout: |
+  ['a b']
+  ['a', 'b']
+  ['a', 'ax  x    hello']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 echo ' a b \' | (read a; argv.py "$a")
 echo ' a b \' | (read a b; argv.py "$a" "$b")

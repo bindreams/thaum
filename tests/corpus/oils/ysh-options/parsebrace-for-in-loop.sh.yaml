@@ -2,7 +2,12 @@ disabled: true
 name: 'parse_brace: for-in loop'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-for-in-loop
-stdout: "one\ntwo\nthree\nsh syntax\nfour\n"
+stdout: |-
+  one
+  two
+  three
+  sh syntax
+  four
 ---
 shopt -s oil:upgrade
 for x in one two {

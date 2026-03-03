@@ -2,7 +2,10 @@ disabled: true
 name: decode integer larger than 2^64
 dialect: bash
 source: oils:spec/ysh-json#decode-integer-larger-than-264
-stdout: "status=1\nstatus=1\nok\n"
+stdout: |-
+  status=1
+  status=1
+  ok
 ---
 
 $SH <<'EOF'

@@ -1,7 +1,8 @@
 name: Empty do/done
 dialect: bash
 source: oils:spec/empty-bodies#empty-dodone
-stdout: "empty\n"
+stdout: |-
+  empty
 ---
 while false; do
 done

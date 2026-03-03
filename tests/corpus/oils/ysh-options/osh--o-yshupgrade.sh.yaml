@@ -2,6 +2,9 @@ disabled: true
 name: osh -O ysh:upgrade
 dialect: bash
 source: oils:spec/ysh-options#osh--o-yshupgrade
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 $SH -O ysh:upgrade -c 'var x = :|one two three|; write @x'

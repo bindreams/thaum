@@ -1,7 +1,8 @@
 name: Slice UTF-8 String
 dialect: bash
 source: oils:spec/var-op-slice#slice-utf-8-string
-stdout: "-μ-\n"
+stdout: |-
+  -μ-
 ---
 # mksh slices by bytes.
 foo='--μ--'

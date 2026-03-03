@@ -1,7 +1,8 @@
 name: var ref ${!a}
 dialect: bash
 source: oils:spec/var-ref#var-ref-a
-stdout: "ref c b\n"
+stdout: |-
+  ref c b
 ---
 a=b
 b=c

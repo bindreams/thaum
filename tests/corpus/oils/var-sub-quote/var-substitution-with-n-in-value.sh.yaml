@@ -1,7 +1,10 @@
 name: Var substitution with \n in value
 dialect: bash
 source: oils:spec/var-sub-quote#var-substitution-with-n-in-value
-stdout: "a\\nb\nc\\nd\ne\\nf\n"
+stdout: |-
+  a\nb
+  c\nd
+  e\nf
 ---
 echo "${var-a\nb}"
 echo "${var:-c\nd}"

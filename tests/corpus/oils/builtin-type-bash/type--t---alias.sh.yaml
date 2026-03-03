@@ -1,7 +1,8 @@
 name: type -t -> alias
 dialect: bash
 source: oils:spec/builtin-type-bash#type--t---alias
-stdout: "alias\n"
+stdout: |-
+  alias
 ---
 shopt -s expand_aliases
 alias foo=bar

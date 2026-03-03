@@ -1,7 +1,9 @@
 name: '!= on strings'
 dialect: bash
 source: oils:spec/dbracket#on-strings
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 # NOTE: b!=a does NOT work
 [[ b != a ]] && echo true

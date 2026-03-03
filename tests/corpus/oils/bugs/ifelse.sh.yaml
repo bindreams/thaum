@@ -1,7 +1,8 @@
 name: if/else
 dialect: bash
 source: oils:spec/bugs#ifelse
-stdout: "ELSE\n"
+stdout: |-
+  ELSE
 ---
 if false; then
   echo THEN

@@ -1,7 +1,9 @@
 name: $_ and ${_}
 dialect: bash
 source: oils:spec/vars-special#and
-stdout: "42 value 42var\nfoobar\n"
+stdout: |-
+  42 value 42var
+  foobar
 ---
 case $SH in dash|mksh) exit ;; esac
 

@@ -2,6 +2,9 @@ name: '! with { }'
 dialect: bash
 source: oils:spec/pipeline#with
 status: 0
-stdout: "1\n2\nFAILED\n"
+stdout: |-
+  1
+  2
+  FAILED
 ---
 ! { echo 1; echo 2; } || echo FAILED

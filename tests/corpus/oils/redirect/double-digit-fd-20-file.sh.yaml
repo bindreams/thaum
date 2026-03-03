@@ -1,7 +1,8 @@
 name: Double digit fd (20> file)
 dialect: bash
 source: oils:spec/redirect#double-digit-fd-20-file
-stdout: "hello20\n"
+stdout: |
+  hello20
 environment:
   TMP: /tmp
 ---

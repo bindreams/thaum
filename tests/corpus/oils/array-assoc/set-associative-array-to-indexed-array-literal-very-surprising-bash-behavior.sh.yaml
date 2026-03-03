@@ -3,8 +3,9 @@ name: set associative array to indexed array literal (very surprising bash
 dialect: bash
 source: 
   oils:spec/array-assoc#set-associative-array-to-indexed-array-literal-very-surprising-bash-behavior
-stdout: "declare -A assoc=(['k1']=foo ['k2']='spam eggs')\ndeclare -A assoc=(['foo']='spam
-  eggs')\n"
+stdout: |-
+  declare -A assoc=(['k1']=foo ['k2']='spam eggs')
+  declare -A assoc=(['foo']='spam eggs')
 ---
 declare -A assoc=([k1]=foo [k2]='spam eggs')
 declare -p assoc

@@ -2,7 +2,8 @@ disabled: true
 name: read --raw-line --j8
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line---j8
-stdout: "foo\n"
+stdout: |-
+  foo
 ---
 
 # TODO: is this similar to @() ?  It reads j8 lines?

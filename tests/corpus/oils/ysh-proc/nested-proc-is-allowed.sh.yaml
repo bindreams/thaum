@@ -3,7 +3,8 @@ name: Nested proc is allowed
 dialect: bash
 source: oils:spec/ysh-proc#nested-proc-is-allowed
 status: 127
-stdout: "G\n"
+stdout: |-
+  G
 ---
 shopt --set parse_proc
 

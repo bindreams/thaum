@@ -2,7 +2,11 @@ disabled: true
 name: 'parse_brace: while/until'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-whileuntil
-stdout: "one\ntwo\nsh syntax\nthree\n"
+stdout: |-
+  one
+  two
+  sh syntax
+  three
 ---
 shopt -s oil:upgrade
 while true {

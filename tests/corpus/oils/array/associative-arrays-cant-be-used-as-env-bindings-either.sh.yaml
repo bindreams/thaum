@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/array#associative-arrays-cant-be-used-as-env-bindings-either
 status: 2
 stdout: ''
-setup: |
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,6 +12,5 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 A=a B=([k]=v) printenv.py A B

@@ -2,7 +2,8 @@ disabled: true
 name: double quoted
 dialect: bash
 source: oils:spec/ysh-expr#double-quoted
-stdout: "-bar-bar-default-\n"
+stdout: |-
+  -bar-bar-default-
 ---
 var foo = "bar"
 var x = "-$foo-${foo}-${undef:-default}-"

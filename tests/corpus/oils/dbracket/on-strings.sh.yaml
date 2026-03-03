@@ -1,7 +1,9 @@
 name: '> on strings'
 dialect: bash
 source: oils:spec/dbracket#on-strings
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 # NOTE: < doesn't need space, even though == does?  That's silly.
 [[ b>a ]] && echo true

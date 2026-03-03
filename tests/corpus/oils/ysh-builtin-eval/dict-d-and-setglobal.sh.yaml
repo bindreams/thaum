@@ -2,7 +2,11 @@ disabled: true
 name: Dict (&d) and setglobal
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dict-d-and-setglobal
-stdout: "    [frame_vars_] __E__ a\n\n(Dict)   {\"a\":42}\ng=zz\n"
+stdout: |2-
+      [frame_vars_] __E__ a
+
+  (Dict)   {"a":42}
+  g=zz
 ---
 
 proc Dict ( ; out; ; block) {

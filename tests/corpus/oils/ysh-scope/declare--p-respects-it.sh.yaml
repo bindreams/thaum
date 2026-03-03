@@ -2,8 +2,20 @@ disabled: true
 name: declare -p respects it
 dialect: bash
 source: oils:spec/ysh-scope#declare--p-respects-it
-stdout: "declare -- ___g=G\ndeclare -- ___x=X\ndeclare -- ___y=Y\nstatus=0\n-\ndeclare
-  -- ___y=Y\nstatus=0\n---\ndeclare -- ___g=G\ndeclare -- ___x=X\nstatus=0\n-\nstatus=1\n"
+stdout: |-
+  declare -- ___g=G
+  declare -- ___x=X
+  declare -- ___y=Y
+  status=0
+  -
+  declare -- ___y=Y
+  status=0
+  ---
+  declare -- ___g=G
+  declare -- ___x=X
+  status=0
+  -
+  status=1
 ---
 
 ___g=G

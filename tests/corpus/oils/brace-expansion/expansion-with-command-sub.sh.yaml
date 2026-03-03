@@ -1,7 +1,8 @@
 name: expansion with command sub
 dialect: bash
 source: oils:spec/brace-expansion#expansion-with-command-sub
-stdout: "-a- -b-\n"
+stdout: |-
+  -a- -b-
 ---
 a=A
 echo -{$(echo a),b}-

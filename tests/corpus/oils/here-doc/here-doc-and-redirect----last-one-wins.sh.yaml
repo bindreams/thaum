@@ -1,7 +1,8 @@
 name: Here doc and < redirect -- last one wins
 dialect: bash
 source: oils:spec/here-doc#here-doc-and-redirect----last-one-wins
-stdout: "hello\n"
+stdout: |
+  hello
 environment:
   TMP: /tmp
 ---

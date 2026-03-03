@@ -1,7 +1,9 @@
 name: Start background pipeline, wait %job_spec
 dialect: bash
 source: oils:spec/background#start-background-pipeline-wait-jobspec
-stdout: "status=0\nstatus=99\n"
+stdout: |-
+  status=0
+  status=99
 ---
 case $SH in mksh) exit ;; esac  # flakiness?
 

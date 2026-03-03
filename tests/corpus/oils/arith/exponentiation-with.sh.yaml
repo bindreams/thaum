@@ -1,7 +1,10 @@
 name: Exponentiation with **
 dialect: bash
 source: oils:spec/arith#exponentiation-with
-stdout: "1\n3\n9\n"
+stdout: |-
+  1
+  3
+  9
 ---
 echo $(( 3 ** 0 ))
 echo $(( 3 ** 1 ))

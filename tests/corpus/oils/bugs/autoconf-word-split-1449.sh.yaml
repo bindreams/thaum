@@ -1,8 +1,18 @@
 name: autoconf word split (#1449)
 dialect: bash
 source: oils:spec/bugs#autoconf-word-split-1449
-stdout: "--- $()\n[-n]\n[my sed command]\n[f1]\n[f2]\n--- backticks\n[-n]\n[my sed
-  command]\n[f1]\n[f2]\nNOT SPLIT\n"
+stdout: |-
+  --- $()
+  [-n]
+  [my sed command]
+  [f1]
+  [f2]
+  --- backticks
+  [-n]
+  [my sed command]
+  [f1]
+  [f2]
+  NOT SPLIT
 ---
 
 mysed() {

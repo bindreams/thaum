@@ -1,7 +1,17 @@
 name: trap DEBUG function call
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-function-call
-stdout: "  [13]\ni=A\ni=B\n  [15]\nnext\n  [17]\ni=X\ni=Y\n  [19]\nok\n"
+stdout: |2-
+    [13]
+  i=A
+  i=B
+    [15]
+  next
+    [17]
+  i=X
+  i=Y
+    [19]
+  ok
 ---
 debuglog() {
   echo "  [$@]"

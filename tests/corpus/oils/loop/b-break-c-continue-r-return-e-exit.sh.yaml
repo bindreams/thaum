@@ -2,7 +2,17 @@ name: $b break, $c continue, $r return, $e exit
 dialect: bash
 source: oils:spec/loop#b-break-c-continue-r-return-e-exit
 status: 5
-stdout: "- break\n1\n- continue\n1\n3\n- return\n1\n2\nstatus=99\n- exit\n"
+stdout: |-
+  - break
+  1
+  - continue
+  1
+  3
+  - return
+  1
+  2
+  status=99
+  - exit
 ---
 
 # hm would it be saner to make FATAL builtins called break/continue/etc.?

@@ -1,7 +1,11 @@
 name: pwd with symlink and -P
 dialect: bash
 source: oils:spec/builtin-cd#pwd-with-symlink-and--p
-stdout: "pwd:\nsymlink\npwd -P:\ntarget\n"
+stdout: |
+  pwd:
+  symlink
+  pwd -P:
+  target
 environment:
   TMP: /tmp
 ---

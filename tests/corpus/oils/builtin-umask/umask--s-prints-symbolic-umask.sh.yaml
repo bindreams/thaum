@@ -1,7 +1,9 @@
 name: "'umask -S' prints symbolic umask"
 dialect: bash
 source: oils:spec/builtin-umask#umask--s-prints-symbolic-umask
-stdout: "u=rwx,g=rx,o=rx\nstatus=0\n"
+stdout: |-
+  u=rwx,g=rx,o=rx
+  status=0
 ---
 umask -S | grep 'u=[rwx]*,g=[rwx]*,o=[rwx]*' 
 echo status=$?

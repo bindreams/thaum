@@ -2,8 +2,16 @@ name: bash 'type' gets confused - says 'function', but runs builtin
 dialect: bash
 source: 
   oils:spec/builtin-special#bash-type-gets-confused---says-function-but-runs-builtin
-stdout: "TRUE\nbuiltin\nfunction\n---\nEVAL\nbuiltin\nbefore posix\nafter posix\n\
-  builtin\n"
+stdout: |-
+  TRUE
+  builtin
+  function
+  ---
+  EVAL
+  builtin
+  before posix
+  after posix
+  builtin
 ---
 case $SH in dash|mksh|zsh|ash|yash) exit ;; esac
 

@@ -1,8 +1,12 @@
 name: declare -F prints function names
 dialect: bash
 source: oils:spec/assign-extended#declare--f-prints-function-names
-stdout: "declare -f __ec\ndeclare -f _ab\ndeclare -f add\ndeclare -f div\ndeclare
-  -f ek\n"
+stdout: |-
+  declare -f __ec
+  declare -f _ab
+  declare -f add
+  declare -f div
+  declare -f ek
 ---
 add () { expr 4 + 4; }
 div () { expr 6 / 2; }

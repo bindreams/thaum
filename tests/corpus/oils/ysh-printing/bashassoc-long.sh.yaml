@@ -2,9 +2,16 @@ disabled: true
 name: BashAssoc, long
 dialect: bash
 source: oils:spec/ysh-printing#bashassoc-long
-stdout: "(BashAssoc)\n(BashAssoc ['1']='one')\n(BashAssoc ['1']='one' ['two']='2'
-  ['3']='three')\n(BashAssoc\n    ['Lorem']='ipsum'\n    ['dolor']='sit amet,'\n \
-  \   ['consectetur adipiscing']='elit, sed'\n    ['do']='eiusmod.'\n)\n"
+stdout: |-
+  (BashAssoc)
+  (BashAssoc ['1']='one')
+  (BashAssoc ['1']='one' ['two']='2' ['3']='three')
+  (BashAssoc
+      ['Lorem']='ipsum'
+      ['dolor']='sit amet,'
+      ['consectetur adipiscing']='elit, sed'
+      ['do']='eiusmod.'
+  )
 ---
 declare -A assoc_0=()
 declare -A assoc_1=([1]=one)

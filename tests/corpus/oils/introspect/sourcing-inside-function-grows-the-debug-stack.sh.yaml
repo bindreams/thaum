@@ -1,10 +1,16 @@
 name: Sourcing inside function grows the debug stack
 dialect: bash
 source: oils:spec/introspect#sourcing-inside-function-grows-the-debug-stack
-stdout: "F\nG\nSTACK:spec/testdata/bash-source-pushtemp.sh:g:3\nSTACK:spec/testdata/bash-source-pushtemp.sh:f:19\n\
-  STACK:spec/testdata/bash-source-pushtemp.sh:source:2\nSTACK:spec/testdata/bash-source-source.sh:mainfunc:6\n\
-  STACK:spec/testdata/bash-source-source.sh:main2:10\nSTACK:spec/testdata/bash-source-source.sh:main1:13\n\
-  STACK:spec/testdata/bash-source-source.sh:main:0\n"
+stdout: |-
+  F
+  G
+  STACK:spec/testdata/bash-source-pushtemp.sh:g:3
+  STACK:spec/testdata/bash-source-pushtemp.sh:f:19
+  STACK:spec/testdata/bash-source-pushtemp.sh:source:2
+  STACK:spec/testdata/bash-source-source.sh:mainfunc:6
+  STACK:spec/testdata/bash-source-source.sh:main2:10
+  STACK:spec/testdata/bash-source-source.sh:main1:13
+  STACK:spec/testdata/bash-source-source.sh:main:0
 ---
 
 cd $REPO_ROOT

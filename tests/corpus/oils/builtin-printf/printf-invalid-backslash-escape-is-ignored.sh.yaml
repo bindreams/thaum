@@ -1,6 +1,7 @@
 name: printf invalid backslash escape (is ignored)
 dialect: bash
 source: oils:spec/builtin-printf#printf-invalid-backslash-escape-is-ignored
-stdout: "[\\Z]\n"
+stdout: |-
+  [\Z]
 ---
 printf '[\Z]\n'

@@ -1,7 +1,9 @@
 name: read -N ignores delimiters
 dialect: bash
 source: oils:spec/builtin-read#read--n-ignores-delimiters
-stdout: "a\nb\n"
+stdout: |
+  a
+  b
 environment:
   TMP: /tmp
 ---

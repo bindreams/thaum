@@ -2,10 +2,11 @@ disabled: true
 name: pp test_ supports BashArray, BashAssoc
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-test-supports-basharray-bashassoc
-stdout: "{\"type\":\"BashArray\",\"data\":{\"0\":\"a\",\"1\":\"b\",\"2\":\"c\"}}\n\
-  {\"type\":\"BashArray\",\"data\":{\"0\":\"a\",\"1\":\"b\",\"2\":\"c\",\"5\":\"z\"\
-  }}\n{\"type\":\"BashAssoc\",\"data\":{\"k\":\"v\",\"k2\":\"v2\"}}\n{\"type\":\"\
-  BashAssoc\",\"data\":{\"k\":\"v\",\"k2\":\"v2\",\"k3\":\"\"}}\n"
+stdout: |-
+  {"type":"BashArray","data":{"0":"a","1":"b","2":"c"}}
+  {"type":"BashArray","data":{"0":"a","1":"b","2":"c","5":"z"}}
+  {"type":"BashAssoc","data":{"k":"v","k2":"v2"}}
+  {"type":"BashAssoc","data":{"k":"v","k2":"v2","k3":""}}
 ---
 
 declare -a array=(a b c)

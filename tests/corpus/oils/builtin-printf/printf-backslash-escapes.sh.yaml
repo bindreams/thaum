@@ -1,8 +1,12 @@
 name: printf backslash escapes
 dialect: bash
 source: oils:spec/builtin-printf#printf-backslash-escapes
-stdout: "['a\\tb']\n['\\xe2\\x98\\xa0']\n['$e']\n['\\x1f7']\n"
-setup: |
+stdout: |
+  ['a\tb']
+  ['\xe2\x98\xa0']
+  ['$e']
+  ['\x1f7']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py "$(printf 'a\tb')"
 argv.py "$(printf '\xE2\x98\xA0')"

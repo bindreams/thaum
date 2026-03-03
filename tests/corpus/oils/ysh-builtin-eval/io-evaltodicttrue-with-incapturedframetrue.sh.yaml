@@ -2,9 +2,17 @@ disabled: true
 name: io->eval(to_dict=true) with in_captured_frame=true
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-incapturedframetrue
-stdout: "{\n  \"var_in_p_frame\": \"p\",\n  \"foo\": \"global\",\n  \"z\": \"zero\"\
-  ,\n  \"one\": \"a\",\n  \"two\": \"b\",\n  \"three\": \"+c\",\n  \"x\": \"X\",\n\
-  \  \"y\": \"_Y\"\n}\n"
+stdout: |-
+  {
+    "var_in_p_frame": "p",
+    "foo": "global",
+    "z": "zero",
+    "one": "a",
+    "two": "b",
+    "three": "+c",
+    "x": "X",
+    "y": "_Y"
+  }
 ---
 
 proc Dict ( ; out; ; block) {

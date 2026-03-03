@@ -2,8 +2,9 @@ disabled: true
 name: '@[split(x)] respects IFS'
 dialect: bash
 source: oils:spec/ysh-func-builtin#splitx-respects-ifs
-stdout: "['one', 'two', 'three']\n"
-setup: |
+stdout: |
+  ['one', 'two', 'three']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 setvar IFS = ":"
 var x = "one:two:three"

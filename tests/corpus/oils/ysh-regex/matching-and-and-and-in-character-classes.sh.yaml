@@ -2,7 +2,12 @@ disabled: true
 name: Matching ] and \ and ' and " in character classes
 dialect: bash
 source: oils:spec/ysh-regex#matching-and-and-and-in-character-classes
-stdout: "pat=[]'\"\\\\]\nbackslash \\\nrbracket ]\nsq '\ndq \"\"\n"
+stdout: |-
+  pat=[]'"\\]
+  backslash \
+  rbracket ]
+  sq '
+  dq ""
 ---
 shopt -s ysh:all
 

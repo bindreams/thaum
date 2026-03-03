@@ -1,8 +1,22 @@
 name: echo -e backslashes
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-backslashes
-stdout: "\\\n\\\n\\\n\\\n\n\\\nline2\n## N-I dash STDOUT:\n-e \\\n-e \\\n-e \\\n-e
-  \\\n\n-e \\\nline2\n"
+stdout: |-
+  \
+  \
+  \
+  \
+
+  \
+  line2
+  ## N-I dash STDOUT:
+  -e \
+  -e \
+  -e \
+  -e \
+
+  -e \
+  line2
 ---
 echo -e \\
 echo -e '\'

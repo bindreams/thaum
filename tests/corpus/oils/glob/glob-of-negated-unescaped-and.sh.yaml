@@ -1,7 +1,9 @@
 name: Glob of negated unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#glob-of-negated-unescaped-and
-stdout: "_G _G\n_G _G\n"
+stdout: |
+  _G _G
+  _G _G
 environment:
   TMP: /tmp
 ---

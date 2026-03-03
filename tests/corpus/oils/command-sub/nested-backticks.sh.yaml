@@ -1,7 +1,8 @@
 name: Nested backticks
 dialect: bash
 source: oils:spec/command-sub#nested-backticks
-stdout: "000000-first\n"
+stdout: |
+  000000-first
 environment:
   TMP: /tmp
 ---

@@ -1,7 +1,9 @@
 name: break/continue within eval
 dialect: bash
 source: oils:spec/loop#breakcontinue-within-eval
-stdout: "1\n3\n"
+stdout: |-
+  1
+  3
 ---
 # NOTE: This changes things
 # set -e

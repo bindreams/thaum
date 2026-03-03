@@ -2,7 +2,9 @@ name: $BASHPID DOES change with subshell and command sub
 dialect: bash
 source: oils:spec/vars-special#bashpid-does-change-with-subshell-and-command-sub
 status: 3
-stdout: "subshell OK\ncommand sub OK\n"
+stdout: |-
+  subshell OK
+  command sub OK
 ---
 set -o errexit
 die() {

@@ -1,7 +1,10 @@
 name: 'Regression: Array length after unset'
 dialect: bash
 source: oils:spec/array#regression-array-length-after-unset
-stdout: "len 2;\nlen 1;\nlast x;\n"
+stdout: |-
+  len 2;
+  len 1;
+  last x;
 ---
 case $SH in mksh) exit ;; esac
 

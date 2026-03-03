@@ -1,7 +1,9 @@
 name: 'Issue #1069 [52] BUG: \builtin local v=1 fails'
 dialect: bash
 source: oils:spec/ble-idioms#issue-1069-52-bug-builtin-local-v1-fails
-stdout: "l:v=1\ng:v=x\n"
+stdout: |-
+  l:v=1
+  g:v=x
 ---
 case $SH in ash|dash|yash) exit 99 ;; esac
 v=x

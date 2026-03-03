@@ -2,8 +2,9 @@ name: 'error: s+=(my array)'
 dialect: bash
 source: oils:spec/append#error-smy-array
 status: 0
-stdout: "['abc', 'd', 'e', 'f']\n"
-setup: |
+stdout: |
+  ['abc', 'd', 'e', 'f']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 s='abc'
 s+=(d e f)

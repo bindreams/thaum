@@ -2,7 +2,9 @@ disabled: true
 name: Closures as default argument
 dialect: bash
 source: oils:spec/ysh-closures#closures-as-default-argument
-stdout: "global expr!\nglobal block!\n"
+stdout: |-
+  global expr!
+  global block!
 ---
 shopt --set ysh:upgrade
 

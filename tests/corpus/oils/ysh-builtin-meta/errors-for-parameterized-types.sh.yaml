@@ -2,7 +2,8 @@ disabled: true
 name: Errors for parameterized types
 dialect: bash
 source: oils:spec/ysh-builtin-meta#errors-for-parameterized-types
-stdout: "3\n"
+stdout: |-
+  3
 ---
 shopt -s ysh:upgrade
 

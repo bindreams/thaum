@@ -1,7 +1,11 @@
 name: Quoting GLOBIGNORE
 dialect: bash
 source: oils:spec/globignore#quoting-globignore
-stdout: "*\n*\n*\n*\n"
+stdout: |-
+  *
+  *
+  *
+  *
 ---
 # each style of "ignore everything" spotted in a public repo
 touch image.jpeg

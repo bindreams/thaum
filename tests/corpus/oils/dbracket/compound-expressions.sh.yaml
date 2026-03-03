@@ -1,7 +1,8 @@
 name: '[[ compound expressions'
 dialect: bash
 source: oils:spec/dbracket#compound-expressions
-stdout: "true\n"
+stdout: |-
+  true
 ---
 # Notes on whitespace:
 # - 1 and == need space seprating them, but ! and ( don't.

@@ -2,7 +2,10 @@ disabled: true
 name: Unquoted \u{3bc} escape
 dialect: bash
 source: oils:spec/ysh-string#unquoted-u3bc-escape
-stdout: "mu μ\nmu μ\nmu μ\n"
+stdout: |-
+  mu μ
+  mu μ
+  mu μ
 ---
 
 var x = 'mu ' ++ \u{3bc}

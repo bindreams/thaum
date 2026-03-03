@@ -2,7 +2,11 @@ disabled: true
 name: invoke fails to find tools
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke-fails-to-find-tools
-stdout: "status=127\nstatus=127\nstatus=127\nstatus=127\n"
+stdout: |-
+  status=127
+  status=127
+  status=127
+  status=127
 ---
 case $SH in bash) exit ;; esac
 

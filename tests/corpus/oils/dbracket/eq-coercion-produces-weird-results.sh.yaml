@@ -1,7 +1,8 @@
 name: -eq coercion produces weird results
 dialect: bash
 source: oils:spec/dbracket#eq-coercion-produces-weird-results
-stdout: "true\n"
+stdout: |-
+  true
 ---
 shopt -u strict_arith || true
 [[ '' -eq 0 ]] && echo true

@@ -3,7 +3,8 @@ name: Length doesn't apply to BashArray
 dialect: bash
 source: oils:spec/ysh-expr#length-doesnt-apply-to-basharray
 status: 3
-stdout: "shell=5\n"
+stdout: |-
+  shell=5
 ---
 x=(a b c)
 x[10]=A

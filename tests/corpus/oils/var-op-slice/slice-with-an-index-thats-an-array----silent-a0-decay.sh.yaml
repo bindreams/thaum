@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/var-op-slice#slice-with-an-index-thats-an-array----silent-a0-decay
 status: 0
-stdout: "assigned\nde\n"
+stdout: |-
+  assigned
+  de
 ---
 i=(3 4 5)
 mystr=abcdefg

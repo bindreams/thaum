@@ -2,7 +2,9 @@ disabled: true
 name: Can print type of List with pp
 dialect: bash
 source: oils:spec/ysh-list#can-print-type-of-list-with-pp
-stdout: "(List)   [\"true\"]\n(List)   []\n"
+stdout: |-
+  (List)   ["true"]
+  (List)   []
 ---
 
 var b = :|true|  # this is a string

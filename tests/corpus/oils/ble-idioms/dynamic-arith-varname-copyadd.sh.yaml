@@ -1,7 +1,9 @@
 name: 'dynamic arith varname: copy/add'
 dialect: bash
 source: oils:spec/ble-idioms#dynamic-arith-varname-copyadd
-stdout: "c_x=3 c_y=4\nc_x=7 c_y=24\n"
+stdout: |-
+  c_x=3 c_y=4
+  c_x=7 c_y=24
 ---
 shopt -s eval_unsafe_arith  # for RHS
 

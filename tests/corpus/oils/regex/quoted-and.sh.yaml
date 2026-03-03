@@ -1,8 +1,26 @@
 name: Quoted { and +
 dialect: bash
 source: oils:spec/regex#quoted-and
-stdout: "yes {\nyes +\nyes *\nyes ?\nyes ^\nyes $\nyes (\nyes )\nyes |\nyes \\\n---\n\
-  yes .\nno .\n---\na 0\n- 1\nb 0\nz 0\nstatus=0\n"
+stdout: |-
+  yes {
+  yes +
+  yes *
+  yes ?
+  yes ^
+  yes $
+  yes (
+  yes )
+  yes |
+  yes \
+  ---
+  yes .
+  no .
+  ---
+  a 0
+  - 1
+  b 0
+  z 0
+  status=0
 ---
 [[ { =~ "{" ]] && echo 'yes {'
 [[ + =~ "+" ]] && echo 'yes +'

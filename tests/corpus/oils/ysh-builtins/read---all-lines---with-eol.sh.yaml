@@ -2,7 +2,10 @@ disabled: true
 name: read --all-lines --with-eol
 dialect: bash
 source: oils:spec/ysh-builtins#read---all-lines---with-eol
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 seq 3 | read --all-lines --with-eol :nums
 write --sep '' -- @nums

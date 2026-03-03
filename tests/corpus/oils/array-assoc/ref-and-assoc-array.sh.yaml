@@ -1,7 +1,10 @@
 name: ${!ref} and assoc array
 dialect: bash
 source: oils:spec/array-assoc#ref-and-assoc-array
-stdout: "values: val\nref val\nref val\n"
+stdout: |-
+  values: val
+  ref val
+  ref val
 ---
 
 show-values() {

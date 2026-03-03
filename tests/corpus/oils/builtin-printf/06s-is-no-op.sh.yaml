@@ -1,7 +1,12 @@
 name: '%06s is no-op'
 dialect: bash
 source: oils:spec/builtin-printf#06s-is-no-op
-stdout: "(    42)\n(   -42)\n(    42)\n(   -42)\nstatus=0\n"
+stdout: |-
+  (    42)
+  (   -42)
+  (    42)
+  (   -42)
+  status=0
 ---
 printf '(%6s)\n' 42
 printf '(%6s)\n' -42

@@ -1,7 +1,8 @@
 name: while in pipe with subshell
 dialect: bash
 source: oils:spec/loop#while-in-pipe-with-subshell
-stdout: "3\n"
+stdout: |-
+  3
 ---
 i=0
 seq 3 | ( while read foo; do

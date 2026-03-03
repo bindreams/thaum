@@ -2,9 +2,30 @@ disabled: true
 name: Nested Named Capture Uses ( ordering
 dialect: bash
 source: oils:spec/ysh-regex-api#nested-named-capture-uses-ordering
-stdout: "0 when: 2023-10\n1 2023-10\n2 2023-10\n\nnull\n2023 10\nnull null null\n\
-  ---\n0 when: 23:30\n1 23:30\n2 null\n\n23:30\nnull null\n23 30 null\n---\n0 when:
-  23:30:59\n1 23:30:59\n2 null\n\n23:30:59\nnull null\n23 30 59\n"
+stdout: |-
+  0 when: 2023-10
+  1 2023-10
+  2 2023-10
+
+  null
+  2023 10
+  null null null
+  ---
+  0 when: 23:30
+  1 23:30
+  2 null
+
+  23:30
+  null null
+  23 30 null
+  ---
+  0 when: 23:30:59
+  1 23:30:59
+  2 null
+
+  23:30:59
+  null null
+  23 30 59
 ---
 
 shopt -s ysh:upgrade

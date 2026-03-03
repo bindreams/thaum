@@ -1,7 +1,8 @@
 name: case in subshell
 dialect: bash
 source: oils:spec/command-sub#case-in-subshell
-stdout: "letter\n"
+stdout: |-
+  letter
 ---
 # Hm this subhell has to know about the closing ) and stuff like that.
 # case_clause is a compound_command, which is a command.  And a subshell

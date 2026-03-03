@@ -1,7 +1,9 @@
 name: Postincrement
 dialect: bash
 source: oils:spec/arith#postincrement
-stdout: "4\n5\n"
+stdout: |-
+  4
+  5
 ---
 a=4
 echo $((a++))

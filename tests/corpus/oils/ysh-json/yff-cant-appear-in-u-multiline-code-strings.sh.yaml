@@ -3,7 +3,8 @@ name: \yff can't appear in u'' multiline code strings
 dialect: bash
 source: oils:spec/ysh-json#yff-cant-appear-in-u-multiline-code-strings
 status: 2
-stdout: " fc\n"
+stdout: |2-
+   fc
 ---
 
 shopt -s ysh:upgrade

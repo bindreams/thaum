@@ -1,6 +1,7 @@
 name: 'zero args: [ ]'
 dialect: bash
 source: oils:spec/builtin-bracket#zero-args
-stdout: "false\n"
+stdout: |-
+  false
 ---
 [ ] || echo false

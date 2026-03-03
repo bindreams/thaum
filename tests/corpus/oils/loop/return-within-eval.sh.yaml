@@ -1,7 +1,8 @@
 name: return within eval
 dialect: bash
 source: oils:spec/loop#return-within-eval
-stdout: "one\n"
+stdout: |-
+  one
 ---
 f() {
   echo one

@@ -1,7 +1,9 @@
 name: 'bad mutation through nameref: ref[0]= where ref is array[0]'
 dialect: bash
 source: oils:spec/nameref#bad-mutation-through-nameref-ref0-where-ref-is-array0
-stdout: "status=1\nX Y Z\n"
+stdout: |-
+  status=1
+  X Y Z
 ---
 array=(X Y Z)
 typeset -n ref='array[0]'

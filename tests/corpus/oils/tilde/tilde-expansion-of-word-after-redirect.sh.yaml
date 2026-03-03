@@ -2,7 +2,8 @@ name: tilde expansion of word after redirect
 dialect: bash
 source: oils:spec/tilde#tilde-expansion-of-word-after-redirect
 status: 0
-stdout: "3\n"
+stdout: |
+  3
 environment:
   TMP: /tmp
 ---

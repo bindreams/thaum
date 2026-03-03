@@ -4,7 +4,7 @@ source: oils:spec/var-sub-quote#syntax-error-for-single-quote-in-double-quote
 status: 2
 stdout: ''
 parse-error: "unterminated single quote"
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 foo="'a b c d'"
 argv.py "${foo%d'}"

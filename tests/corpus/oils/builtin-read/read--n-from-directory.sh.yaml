@@ -1,7 +1,8 @@
 name: read -n from directory
 dialect: bash
 source: oils:spec/builtin-read#read--n-from-directory
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 
 case $SH in dash|ash) return ;; esac  # not implemented

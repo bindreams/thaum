@@ -1,7 +1,8 @@
 name: Match a literal with a glob character
 dialect: bash
 source: oils:spec/case#match-a-literal-with-a-glob-character
-stdout: "match\n"
+stdout: |-
+  match
 ---
 x='*.py'
 case "$x" in

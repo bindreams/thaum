@@ -2,8 +2,10 @@ disabled: true
 name: invoke --show does proper quoting
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---show-does-proper-quoting
-stdout: " ff 0a 7a 0a\n%.qtt8  name        kind        detail\n        bad-alias \
-  \  alias       b'echo \\yff\\necho z'\n"
+stdout: |2-
+   ff 0a 7a 0a
+  %.qtt8  name        kind        detail
+          bad-alias   alias       b'echo \yff\necho z'
 ---
 case $SH in bash) exit ;; esac
 

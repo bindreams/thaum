@@ -2,7 +2,8 @@ name: shopt -s failglob behavior on single line with semicolon
 dialect: bash
 source: 
   oils:spec/glob-bash#shopt--s-failglob-behavior-on-single-line-with-semicolon
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 # bash behaves differently when commands are separated by a semicolon than when
 # separated by a newline. This behavior doesn't make sense or seem to be

@@ -2,7 +2,11 @@ name: Using ${x-default} after unsetting local shadowing a global
 dialect: bash
 source: 
   oils:spec/assign#using-x-default-after-unsetting-local-shadowing-a-global
-stdout: "x=global\nx=local\n- operator = global\n:- operator = global\n"
+stdout: |-
+  x=global
+  x=local
+  - operator = global
+  :- operator = global
 ---
 f() {
   echo "x=$x"

@@ -1,7 +1,8 @@
 name: String slice
 dialect: bash
 source: oils:spec/var-op-slice#string-slice
-stdout: "bcd\n"
+stdout: |-
+  bcd
 ---
 foo=abcdefg
 echo ${foo:1:3}

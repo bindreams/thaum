@@ -2,7 +2,18 @@ disabled: true
 name: write --sep, --end, -n, varying flag syntax
 dialect: bash
 source: oils:spec/ysh-builtins#write---sep---end--n-varying-flag-syntax
-stdout: "a b\nc d\n.\na b\nc d\n.\na bc d\n.\na b_c d\na b_c d END\nxy\n"
+stdout: |-
+  a b
+  c d
+  .
+  a b
+  c d
+  .
+  a bc d
+  .
+  a b_c d
+  a b_c d END
+  xy
 ---
 shopt -s ysh:all
 var a = %('a b' 'c d')

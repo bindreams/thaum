@@ -3,7 +3,9 @@ name: json write of List in cycle
 dialect: bash
 source: oils:spec/ysh-json#json-write-of-list-in-cycle
 status: 0
-stdout: "(List)   [[...],2,3]\nstatus=1\n"
+stdout: |-
+  (List)   [[...],2,3]
+  status=1
 ---
 
 var L = [1, 2, 3]

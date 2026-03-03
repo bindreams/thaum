@@ -1,7 +1,8 @@
 name: Command block
 dialect: bash
 source: oils:spec/command#command-block
-stdout: "/bin/ls\n"
+stdout: |-
+  /bin/ls
 ---
 PATH=/bin
 

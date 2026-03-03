@@ -1,7 +1,11 @@
 name: shopt -q
 dialect: bash
 source: oils:spec/sh-options#shopt--q
-stdout: "nullglob=1\nnullglob=0\nnullglob,failglob=1\nnullglob,failglob=0\n"
+stdout: |-
+  nullglob=1
+  nullglob=0
+  nullglob,failglob=1
+  nullglob,failglob=0
 ---
 shopt -q nullglob
 echo nullglob=$?

@@ -2,7 +2,14 @@ disabled: true
 name: argv0 trace
 dialect: bash
 source: oils:spec/ysh-dev#argv0-trace
-stdout: "internal\nx1\nx2\n(\n$(\n)\nx3\n"
+stdout: |
+  internal
+  x1
+  x2
+  (
+  $(
+  )
+  x3
 environment:
   TMP: /tmp
 ---

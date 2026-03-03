@@ -1,7 +1,12 @@
 name: shopt histappend toggle check
 dialect: bash
 source: oils:spec/builtin-history#shopt-histappend-toggle-check
-stdout: "status=0\nshopt -s histappend\nstatus=0\nshopt -u histappend\n^D\n"
+stdout: |-
+  status=0
+  shopt -s histappend
+  status=0
+  shopt -u histappend
+  ^D
 ---
 
 shopt -s histappend

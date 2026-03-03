@@ -1,7 +1,13 @@
 name: SHELLOPTS bug with ysh:ugprade
 dialect: bash
 source: oils:spec/osh-bugs#shellopts-bug-with-yshugprade
-stdout: "1\na\nb\n.\n..\n2\n"
+stdout: |-
+  1
+  a
+  b
+  .
+  ..
+  2
 ---
 
 cd $REPO_ROOT/spec/testdata/bug-shellopts

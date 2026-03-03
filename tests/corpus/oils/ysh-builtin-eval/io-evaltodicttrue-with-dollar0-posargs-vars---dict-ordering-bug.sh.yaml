@@ -3,8 +3,16 @@ name: io->eval(to_dict=true) with dollar0, pos_args, vars - dict ordering bug
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-dollar0-posargs-vars---dict-ordering-bug
-stdout: "{\n  \"foo\": \"global\",\n  \"z\": \"zero\",\n  \"one\": \"a\",\n  \"two\"\
-  : \"b\",\n  \"three\": \"+c\",\n  \"x\": \"X\",\n  \"y\": \"_Y\"\n}\n"
+stdout: |-
+  {
+    "foo": "global",
+    "z": "zero",
+    "one": "a",
+    "two": "b",
+    "three": "+c",
+    "x": "X",
+    "y": "_Y"
+  }
 ---
 
 # TODO: mycpp/gc_dict.h should preserve insertion order, in the presence of

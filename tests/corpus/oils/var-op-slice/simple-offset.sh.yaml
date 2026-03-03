@@ -1,8 +1,11 @@
 name: Simple ${@:offset}
 dialect: bash
 source: oils:spec/var-op-slice#simple-offset
-stdout: "['SHELL', '4', '5', '6']\n['4', '5', '6']\n['5', '6']\n"
-setup: |
+stdout: |
+  ['SHELL', '4', '5', '6']
+  ['4', '5', '6']
+  ['5', '6']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 set -- 4 5 6

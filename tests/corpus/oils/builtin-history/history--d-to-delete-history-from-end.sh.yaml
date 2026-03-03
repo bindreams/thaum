@@ -1,7 +1,15 @@
 name: history -d to delete history from end
 dialect: bash
 source: oils:spec/builtin-history#history--d-to-delete-history-from-end
-stdout: "42\n43\n44\nstatus=0\nstatus=0\nstatus=0\nstatus=1\n^D\n"
+stdout: |-
+  42
+  43
+  44
+  status=0
+  status=0
+  status=0
+  status=1
+  ^D
 ---
 # bash 4 doesn't support negative indices or ranges
 

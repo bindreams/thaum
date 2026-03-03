@@ -2,7 +2,9 @@ disabled: true
 name: setglobal a[i] += and d.key +=
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai-and-dkey
-stdout: "(List)   [5]\n(Dict)   {\"k\":5}\n"
+stdout: |-
+  (List)   [5]
+  (Dict)   {"k":5}
 ---
 shopt -s ysh:upgrade
 

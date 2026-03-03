@@ -1,7 +1,10 @@
 name: type -a -> builtin and file
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---builtin-and-file
-stdout: "pwd is a shell builtin\npwd is /bin/pwd\npwd is _tmp/pwd\n"
+stdout: |-
+  pwd is a shell builtin
+  pwd is /bin/pwd
+  pwd is _tmp/pwd
 ---
 touch _tmp/pwd
 chmod +x _tmp/pwd

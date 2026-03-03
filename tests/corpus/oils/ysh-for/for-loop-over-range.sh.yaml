@@ -2,7 +2,10 @@ disabled: true
 name: For loop over range
 dialect: bash
 source: oils:spec/ysh-for#for-loop-over-range
-stdout: "i 0\ni 1\ni 2\n"
+stdout: |-
+  i 0
+  i 1
+  i 2
 ---
 var myrange = 0 ..< 3
 for i in (myrange) {

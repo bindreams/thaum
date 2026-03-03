@@ -2,7 +2,9 @@ name: ${v/} is empty search and replacement
 dialect: bash
 source: oils:spec/var-op-patsub#v-is-empty-search-and-replacement
 status: 0
-stdout: "-abcde-\nstatus=0\n"
+stdout: |-
+  -abcde-
+  status=0
 ---
 v=abcde
 echo -${v/}-

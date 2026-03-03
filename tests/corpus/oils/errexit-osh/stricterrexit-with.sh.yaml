@@ -1,7 +1,10 @@
 name: strict_errexit with && || !
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-with
-stdout: "A\nB\nC\n"
+stdout: |-
+  A
+  B
+  C
 ---
 set -o errexit
 shopt -s strict_errexit || true

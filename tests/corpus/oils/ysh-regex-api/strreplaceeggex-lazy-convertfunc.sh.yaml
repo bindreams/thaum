@@ -2,7 +2,10 @@ disabled: true
 name: Str.replace(Eggex, Lazy), convert_func
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-lazy-convertfunc
-stdout: "124\n123\nstatus=3\n"
+stdout: |-
+  124
+  123
+  status=3
 ---
 shopt --set ysh:all
 

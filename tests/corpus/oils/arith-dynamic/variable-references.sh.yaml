@@ -1,7 +1,11 @@
 name: Variable references
 dialect: bash
 source: oils:spec/arith-dynamic#variable-references
-stdout: "7\nstatus=0\n9\nstatus=0\n"
+stdout: |-
+  7
+  status=0
+  9
+  status=0
 ---
 x='1'
 echo $(( x + 2 * 3 ))

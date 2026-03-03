@@ -1,7 +1,8 @@
 name: test -c
 dialect: bash
 source: oils:spec/builtin-bracket#test--c
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 test -c /dev/zero
 echo status=$?

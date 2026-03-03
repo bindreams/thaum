@@ -2,7 +2,10 @@ disabled: true
 name: Instead of $'foo\\bar' use 'foo' \\ 'bar'
 dialect: bash
 source: oils:spec/ysh-regex#instead-of-foobar-use-foo-bar
-stdout: "foo\\\\bar\nyes\nno\n"
+stdout: |-
+  foo\\bar
+  yes
+  no
 ---
 shopt -s ysh:all
 var pat = /'foo' \\ 'bar'/

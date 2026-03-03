@@ -3,9 +3,11 @@ name: redirect after assignment builtin (eval redirects after evaluating
 dialect: bash
 source: 
   oils:spec/assign#redirect-after-assignment-builtin-eval-redirects-after-evaluating-arguments
-stdout: "done\n"
-stderr: "STDERR\n"
-setup: |
+stdout: |
+  done
+stderr: |
+  STDERR
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -18,7 +20,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 
 # See also: spec/redir-order.test.sh (#2307)

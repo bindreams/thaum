@@ -2,7 +2,9 @@ disabled: true
 name: J8-style u'' and b'' strings in expression mode
 dialect: bash
 source: oils:spec/ysh-string#j8-style-u-and-b-strings-in-expression-mode
-stdout: " ce bc\n ff\n"
+stdout: |2-
+   ce bc
+   ff
 ---
 
 var x = u'\u{3bc}'

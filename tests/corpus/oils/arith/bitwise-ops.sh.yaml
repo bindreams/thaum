@@ -1,7 +1,11 @@
 name: Bitwise ops
 dialect: bash
 source: oils:spec/arith#bitwise-ops
-stdout: "3\n0\n3\n-4\n"
+stdout: |-
+  3
+  0
+  3
+  -4
 ---
 echo $((1|2))
 echo $((1&2))

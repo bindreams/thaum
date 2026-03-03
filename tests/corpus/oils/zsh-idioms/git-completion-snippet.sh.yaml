@@ -1,7 +1,8 @@
 name: git-completion snippet
 dialect: bash
 source: oils:spec/zsh-idioms#git-completion-snippet
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 
 # copied directly from git completion - 2024-04

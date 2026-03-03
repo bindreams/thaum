@@ -2,7 +2,9 @@ disabled: true
 name: 'Parsing crash - bug #2003'
 dialect: bash
 source: oils:spec/ysh-bugs#parsing-crash---bug-2003
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 
 set +o errexit

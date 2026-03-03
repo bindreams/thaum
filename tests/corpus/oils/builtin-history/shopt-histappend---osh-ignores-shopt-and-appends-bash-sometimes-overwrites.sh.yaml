@@ -3,7 +3,16 @@ name: shopt histappend - osh ignores shopt and appends, bash sometimes
 dialect: bash
 source: 
   oils:spec/builtin-history#shopt-histappend---osh-ignores-shopt-and-appends-bash-sometimes-overwrites
-stdout: "^D\nstatus=0\n^D\nstatus=1\n## OK osh STDOUT:\n^D\nstatus=0\n^D\nstatus=0\n"
+stdout: |
+  ^D
+  status=0
+  ^D
+  status=1
+  ## OK osh STDOUT:
+  ^D
+  status=0
+  ^D
+  status=0
 environment:
   TMP: /tmp
 ---

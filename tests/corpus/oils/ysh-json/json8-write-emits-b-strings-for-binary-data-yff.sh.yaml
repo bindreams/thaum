@@ -2,7 +2,12 @@ disabled: true
 name: json8 write emits b'' strings for binary data \yff
 dialect: bash
 source: oils:spec/ysh-json#json8-write-emits-b-strings-for-binary-data-yff
-stdout: "[\n  3,\n  \"foo\",\n  b'-\\yff\\yfe-\\yfd='\n]\n"
+stdout: |-
+  [
+    3,
+    "foo",
+    b'-\yff\yfe-\yfd='
+  ]
 ---
 
 json8 write ([3, "foo", $'-\xff\xfe-\xfd='])

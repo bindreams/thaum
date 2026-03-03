@@ -2,7 +2,9 @@ name: Substitute glob characters in pattern, quoted and unquoted
 dialect: bash
 source: 
   oils:spec/var-op-patsub#substitute-glob-characters-in-pattern-quoted-and-unquoted
-stdout: "a-b\n-\n"
+stdout: |-
+  a-b
+  -
 ---
 
 # INFINITE LOOP in ash!

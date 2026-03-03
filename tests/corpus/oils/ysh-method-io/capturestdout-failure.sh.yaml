@@ -3,8 +3,8 @@ name: captureStdout() failure
 dialect: bash
 source: oils:spec/ysh-method-io#capturestdout-failure
 status: 4
-stdout: "(Dict)   {\"status\":1,\"code\":4,\"message\":\"captureStdout(): command
-  failed with status 1\"}\n"
+stdout: |-
+  (Dict)   {"status":1,"code":4,"message":"captureStdout(): command failed with status 1"}
 ---
 
 var c = ^(echo one; false; echo two)

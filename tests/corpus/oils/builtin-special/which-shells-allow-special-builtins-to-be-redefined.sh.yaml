@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-special#which-shells-allow-special-builtins-to-be-redefined
 status: 0
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 eval() {
   echo 'eval func' "$@"

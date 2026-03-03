@@ -2,8 +2,22 @@ disabled: true
 name: Str.leftMatch() can implement lexer pattern
 dialect: bash
 source: oils:spec/ysh-regex-api#strleftmatch-can-implement-lexer-pattern
-stdout: "pos=0\nnull/ab/null/\n\npos=2\nnull/null/ /\n\npos=3\n12/null/null/\n\npos=5\n\
-  ===\npos=0\nnull/ab/null/\n\npos=2\n"
+stdout: |-
+  pos=0
+  null/ab/null/
+
+  pos=2
+  null/null/ /
+
+  pos=3
+  12/null/null/
+
+  pos=5
+  ===
+  pos=0
+  null/ab/null/
+
+  pos=2
 ---
 
 shopt -s ysh:upgrade

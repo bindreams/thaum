@@ -2,7 +2,11 @@ disabled: true
 name: List => lastIndexOf()
 dialect: bash
 source: oils:spec/ysh-methods#list-lastindexof
-stdout: "4\n3\n2\n-1\n"
+stdout: |-
+  4
+  3
+  2
+  -1
 ---
 var items = ['a', 'b', 'c', 'b', 'a']
 

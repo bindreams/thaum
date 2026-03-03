@@ -2,7 +2,9 @@ disabled: true
 name: pretty print INFINITY, -INFINITY, NAN
 dialect: bash
 source: oils:spec/ysh-int-float#pretty-print-infinity--infinity-nan
-stdout: "(List)  [INFINITY, -INFINITY, NAN]\n(List)   [INFINITY,-INFINITY,NAN]\n"
+stdout: |-
+  (List)  [INFINITY, -INFINITY, NAN]
+  (List)   [INFINITY,-INFINITY,NAN]
 ---
 
 = [INFINITY, -INFINITY, NAN]

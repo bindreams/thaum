@@ -1,7 +1,9 @@
 name: $(command type ls)
 dialect: bash
 source: oils:spec/builtin-meta#command-type-ls
-stdout: "FUNCTION\nstatus=0\n"
+stdout: |-
+  FUNCTION
+  status=0
 ---
 type() { echo FUNCTION; }
 type

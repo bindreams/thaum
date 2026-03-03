@@ -1,8 +1,9 @@
 name: typeset -x makes it exported
 dialect: bash
 source: oils:spec/assign-extended#typeset--x-makes-it-exported
-stdout: "lib/\n"
-setup: |
+stdout: |
+  lib/
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 typeset -rx PYTHONPATH=lib/
 printenv.py PYTHONPATH

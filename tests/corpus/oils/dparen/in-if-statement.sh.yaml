@@ -1,7 +1,8 @@
 name: (( )) in if statement
 dialect: bash
 source: oils:spec/dparen#in-if-statement
-stdout: "True\n"
+stdout: |-
+  True
 ---
 if (( 3 > 2)); then
   echo True

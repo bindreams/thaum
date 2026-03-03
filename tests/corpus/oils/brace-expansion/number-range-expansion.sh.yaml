@@ -1,7 +1,12 @@
 name: Number range expansion
 dialect: bash
 source: oils:spec/brace-expansion#number-range-expansion
-stdout: "-1- -4- -7-\n-1- -4- -7- -10-\n## N-I mksh STDOUT:\n-{1..8..3}-\n-{1..10..3}-\n"
+stdout: |-
+  -1- -4- -7-
+  -1- -4- -7- -10-
+  ## N-I mksh STDOUT:
+  -{1..8..3}-
+  -{1..10..3}-
 ---
 echo -{1..8..3}-
 echo -{1..10..3}-

@@ -2,7 +2,14 @@ disabled: true
 name: printf -v a[i] respects dynamic_scope
 dialect: bash
 source: oils:spec/ysh-scope#printf--v-ai-respects-dynamicscope
-stdout: "a[1]=42\na[1]=dynamic-scope\na[1]=\n---\na[1]=42\na[1]=42\na[1]=\n"
+stdout: |-
+  a[1]=42
+  a[1]=dynamic-scope
+  a[1]=
+  ---
+  a[1]=42
+  a[1]=42
+  a[1]=
 ---
 set -o errexit
 

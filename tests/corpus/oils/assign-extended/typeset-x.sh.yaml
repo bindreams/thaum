@@ -1,8 +1,10 @@
 name: typeset +x
 dialect: bash
 source: oils:spec/assign-extended#typeset-x
-stdout: "E\nNone\n"
-setup: |
+stdout: |
+  E
+  None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 export e=E
 printenv.py e

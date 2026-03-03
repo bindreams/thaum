@@ -2,7 +2,11 @@ disabled: true
 name: Redirect with if, case, while, for
 dialect: bash
 source: oils:spec/ysh-cmd-lang#redirect-with-if-case-while-for
-stdout: "ysh-if\nysh-case\nysh-while\nysh-for\n"
+stdout: |-
+  ysh-if
+  ysh-case
+  ysh-while
+  ysh-for
 ---
 
 if (true) {

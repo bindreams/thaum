@@ -2,7 +2,9 @@ disabled: true
 name: === on float not allowed
 dialect: bash
 source: oils:spec/ysh-expr-compare#on-float-not-allowed
-stdout: "status=3\nstatus=3\n"
+stdout: |-
+  status=3
+  status=3
 ---
 
 $SH -c '

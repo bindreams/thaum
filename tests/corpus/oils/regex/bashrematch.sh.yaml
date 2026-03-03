@@ -1,8 +1,12 @@
 name: BASH_REMATCH
 dialect: bash
 source: oils:spec/regex#bashrematch
-stdout: "status=0\n['foo123', 'foo', '123']\nstatus=1\n[]\n"
-setup: |
+stdout: |
+  status=0
+  ['foo123', 'foo', '123']
+  status=1
+  []
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 [[ foo123 =~ ([a-z]+)([0-9]+) ]]
 echo status=$?

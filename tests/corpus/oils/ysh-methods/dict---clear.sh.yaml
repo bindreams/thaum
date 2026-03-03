@@ -3,7 +3,9 @@ name: Dict -> clear()
 dialect: bash
 source: oils:spec/ysh-methods#dict---clear
 status: 0
-stdout: "(Dict)   {}\n(Dict)   {}\n"
+stdout: |-
+  (Dict)   {}
+  (Dict)   {}
 ---
 var book = {title: "The Histories", author: "Herodotus"}
 call book->clear()

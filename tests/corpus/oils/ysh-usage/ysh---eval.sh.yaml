@@ -2,8 +2,18 @@ disabled: true
 name: ysh --eval
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval
-stdout: "one --eval: x y z\nflag -c: x y z\n\none --eval: a b c\nmyscript: a b c\n\
-  \none --eval: P Q\nyshrc: P Q\nflag -c: P Q\n\n"
+stdout: |+
+  one --eval: x y z
+  flag -c: x y z
+
+  one --eval: a b c
+  myscript: a b c
+
+  one --eval: P Q
+  yshrc: P Q
+  flag -c: P Q
+
+...
 ---
 
 # args are available in both, similar to --rcfile

@@ -2,7 +2,9 @@ disabled: true
 name: 'top level: setvar mutates var'
 dialect: bash
 source: oils:spec/ysh-assign#top-level-setvar-mutates-var
-stdout: "42\n50\n"
+stdout: |-
+  42
+  50
 ---
 var x = 1
 setvar x = 42  # this is allowed

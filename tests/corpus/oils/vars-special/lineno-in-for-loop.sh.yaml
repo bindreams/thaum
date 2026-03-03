@@ -1,7 +1,10 @@
 name: $LINENO in for loop
 dialect: bash
 source: oils:spec/vars-special#lineno-in-for-loop
-stdout: "one\n2\nzzz\n"
+stdout: |-
+  one
+  2
+  zzz
 ---
 # hm bash doesn't take into account the word break.  That's OK; we won't either.
 echo one

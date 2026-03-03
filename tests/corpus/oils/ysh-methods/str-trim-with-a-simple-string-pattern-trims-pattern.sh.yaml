@@ -4,9 +4,14 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-trim-with-a-simple-string-pattern-trims-pattern
 status: 0
-stdout: "\"\", \"\", \"\"\n\"   \", \"   \", \"   \"\n\"xy\", \"xy\", \"xy\"\n\"yz\"\
-  , \"yz\", \"yz\"\n\"\", \"\", \"\"\n\"xyz\", \"xyz\", \"\"\n\"xyzxyz\", \"xyzxyz\"\
-  , \"xyz\"\n"
+stdout: |-
+  "", "", ""
+  "   ", "   ", "   "
+  "xy", "xy", "xy"
+  "yz", "yz", "yz"
+  "", "", ""
+  "xyz", "xyz", ""
+  "xyzxyz", "xyzxyz", "xyz"
 ---
 func test(s, p) { write --sep ', ' --j8 $[s => trimStart(p)] $[s => trimEnd(p)] $[s => trim(p)] }
 

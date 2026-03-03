@@ -1,7 +1,9 @@
 name: kill -KILL kills the process with SIGKILL
 dialect: bash
 source: oils:spec/builtin-kill#kill--kill-kills-the-process-with-sigkill
-stdout: "kill=0\nwait=137\n"
+stdout: |-
+  kill=0
+  wait=137
 ---
 sleep 0.1 & 
 pid=$!

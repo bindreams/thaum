@@ -2,7 +2,11 @@ name: sourcing along PATH should ignore directories
 dialect: bash
 source: 
   oils:spec/builtin-eval-source#sourcing-along-path-should-ignore-directories
-stdout: "hi\nstatus=0\nhi\nstatus=0\n"
+stdout: |-
+  hi
+  status=0
+  hi
+  status=0
 ---
 
 mkdir -p _tmp/shell

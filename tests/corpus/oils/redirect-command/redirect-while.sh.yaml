@@ -1,7 +1,8 @@
 name: redirect while
 dialect: bash
 source: oils:spec/redirect-command#redirect-while
-stdout: "while-body\n"
+stdout: |-
+  while-body
 ---
 while true; do
   echo while-body

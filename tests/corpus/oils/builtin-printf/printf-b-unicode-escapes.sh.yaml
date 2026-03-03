@@ -1,7 +1,9 @@
 name: printf %b unicode escapes
 dialect: bash
 source: oils:spec/builtin-printf#printf-b-unicode-escapes
-stdout: "[\\u03bc]\n[μ]\n"
+stdout: |-
+  [\u03bc]
+  [μ]
 ---
 
 printf '[%s]\n' '\u03bc'  # escapes not evaluated

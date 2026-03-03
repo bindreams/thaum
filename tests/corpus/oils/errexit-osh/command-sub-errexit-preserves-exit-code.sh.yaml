@@ -2,7 +2,8 @@ name: command sub errexit preserves exit code
 dialect: bash
 source: oils:spec/errexit-osh#command-sub-errexit-preserves-exit-code
 status: 42
-stdout: "before\n"
+stdout: |-
+  before
 ---
 set -e
 shopt -s command_sub_errexit || true

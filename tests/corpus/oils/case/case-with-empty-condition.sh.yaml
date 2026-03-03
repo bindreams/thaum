@@ -1,7 +1,8 @@
 name: Case with empty condition
 dialect: bash
 source: oils:spec/case#case-with-empty-condition
-stdout: "match\n"
+stdout: |-
+  match
 ---
 case $empty in
   ''|foo) echo match ;;

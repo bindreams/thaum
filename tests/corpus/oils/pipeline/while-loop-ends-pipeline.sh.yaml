@@ -1,7 +1,10 @@
 name: While Loop ends pipeline
 dialect: bash
 source: oils:spec/pipeline#while-loop-ends-pipeline
-stdout: ".1\n.2\n.3\n"
+stdout: |-
+  .1
+  .2
+  .3
 ---
 seq 3 | while read i
 do

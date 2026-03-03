@@ -2,7 +2,8 @@ name: pass local array by reference, relying on DYNAMIC SCOPING
 dialect: bash
 source: 
   oils:spec/nameref#pass-local-array-by-reference-relying-on-dynamic-scoping
-stdout: "zo\n"
+stdout: |-
+  zo
 ---
 show_value() {
   local -n array_name=$1

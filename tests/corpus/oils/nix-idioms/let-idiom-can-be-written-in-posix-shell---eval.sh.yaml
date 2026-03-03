@@ -1,10 +1,20 @@
 name: 'let idiom can be written in POSIX shell - eval ": \$(( ))"'
 dialect: bash
 source: oils:spec/nix-idioms#let-idiom-can-be-written-in-posix-shell---eval
-stdout: "i=0\nNIX_ENFORCE_NO_NATIVE=0\nNIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=0\n\
-  \ni=1\nNIX_ENFORCE_NO_NATIVE=1\nNIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=1\n\
-  \ni=2\nNIX_ENFORCE_NO_NATIVE=2\nNIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=3\n\
-  \n"
+stdout: |+
+  i=0
+  NIX_ENFORCE_NO_NATIVE=0
+  NIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=0
+
+  i=1
+  NIX_ENFORCE_NO_NATIVE=1
+  NIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=1
+
+  i=2
+  NIX_ENFORCE_NO_NATIVE=2
+  NIX_ENFORCE_NO_NATIVE_x86_64_unknown_linux_gnu=3
+
+...
 ---
 
 for i in 0 1 2; do

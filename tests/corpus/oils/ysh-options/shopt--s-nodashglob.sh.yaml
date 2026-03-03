@@ -2,8 +2,11 @@ disabled: true
 name: shopt -s no_dash_glob
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-nodashglob
-stdout: "['-v', 'file']\n['file']\n['-v', 'file']\n"
-setup: |
+stdout: |
+  ['-v', 'file']
+  ['file']
+  ['-v', 'file']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 mkdir globdir
 cd globdir

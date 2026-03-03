@@ -1,6 +1,7 @@
 name: incomplete unicode escape
 dialect: bash
 source: oils:spec/builtin-echo#incomplete-unicode-escape
-stdout: " a b c d 006\n"
+stdout: |2-
+   a b c d 006
 ---
 echo -en 'abcd\u006' | od -A n -c | sed 's/ \+/ /g'

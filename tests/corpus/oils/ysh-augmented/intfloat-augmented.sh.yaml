@@ -2,7 +2,10 @@ disabled: true
 name: Int/Float augmented += -= *= /=
 dialect: bash
 source: oils:spec/ysh-augmented#intfloat-augmented
-stdout: "x=7\nx=30\nx=5.0\n"
+stdout: |-
+  x=7
+  x=30
+  x=5.0
 ---
 
 var x = 0

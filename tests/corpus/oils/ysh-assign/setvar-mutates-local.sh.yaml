@@ -2,7 +2,11 @@ disabled: true
 name: setvar mutates local
 dialect: bash
 source: oils:spec/ysh-assign#setvar-mutates-local
-stdout: "x=global\nx=local\nx=mutated\nx=global\n"
+stdout: |-
+  x=global
+  x=local
+  x=mutated
+  x=global
 ---
 proc f {
   var x = 'local'

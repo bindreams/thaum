@@ -2,8 +2,12 @@ name: '"backslash + newline" should be swallowed regardless of "-d <delim>"'
 dialect: bash
 source: 
   oils:spec/builtin-read#backslash-newline-should-be-swallowed-regardless-of--d-delim
-stdout: "['a bc d']\n['a b,c d']\n['a bc d\\n']\n['a b,c d\\n']\n"
-setup: |
+stdout: |
+  ['a bc d']
+  ['a b,c d']
+  ['a bc d\n']
+  ['a b,c d\n']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 printf '%s\n' 'a b\' 'c d' | (read; argv.py "$REPLY")

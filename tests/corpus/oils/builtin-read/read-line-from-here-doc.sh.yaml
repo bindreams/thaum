@@ -2,7 +2,8 @@ name: read line from here doc
 dialect: bash
 source: oils:spec/builtin-read#read-line-from-here-doc
 status: 0
-stdout: "[A\t\tB C D E]\n"
+stdout: |-
+  [A		B C D E]
 ---
 
 # NOTE: there are TABS below

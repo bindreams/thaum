@@ -1,7 +1,9 @@
 name: history usage
 dialect: bash
 source: oils:spec/builtin-history#history-usage
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 
 history not-a-number

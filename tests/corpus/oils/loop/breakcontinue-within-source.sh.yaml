@@ -1,7 +1,10 @@
 name: break/continue within source
 dialect: bash
 source: oils:spec/loop#breakcontinue-within-source
-stdout: "1\n3\ndone\n"
+stdout: |-
+  1
+  3
+  done
 ---
 # NOTE: This changes things
 # set -e

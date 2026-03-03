@@ -1,7 +1,13 @@
 name: interactive shell starts with emacs mode on
 dialect: bash
 source: oils:spec/sh-options#interactive-shell-starts-with-emacs-mode-on
-stdout: "non-interactive\n1\n1\ninteractive\n0\n1\n"
+stdout: |-
+  non-interactive
+  1
+  1
+  interactive
+  0
+  1
 ---
 case $SH in dash) exit ;; esac
 case $SH in bash|*osh) flag='--rcfile /dev/null' ;; esac

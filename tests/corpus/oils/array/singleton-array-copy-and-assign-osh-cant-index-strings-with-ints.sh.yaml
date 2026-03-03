@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/array#singleton-array-copy-and-assign-osh-cant-index-strings-with-ints
 status: 1
-stdout: "4 4\n1 1\n"
+stdout: |-
+  4 4
+  1 1
 ---
 a=( '12 3' )
 b=( "${a[@]}" )

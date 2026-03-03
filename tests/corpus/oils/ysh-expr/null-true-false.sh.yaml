@@ -2,7 +2,10 @@ disabled: true
 name: null / true / false
 dialect: bash
 source: oils:spec/ysh-expr#null-true-false
-stdout: "no\nyes\nno\n"
+stdout: |-
+  no
+  yes
+  no
 ---
 shopt -s ysh:upgrade
 var n = null

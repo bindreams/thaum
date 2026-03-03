@@ -1,7 +1,13 @@
 name: case with extglob
 dialect: bash
 source: oils:spec/extglob-match#case-with-extglob
-stdout: "A\nA\nU\nB\nC\nD\n"
+stdout: |-
+  A
+  A
+  U
+  B
+  C
+  D
 ---
 shopt -s extglob
 for word in --help --verbose --unmatched -- -zxzx -; do

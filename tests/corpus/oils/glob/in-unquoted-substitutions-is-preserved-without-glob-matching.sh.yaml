@@ -2,8 +2,9 @@ name: \ in unquoted substitutions is preserved without glob matching
 dialect: bash
 source: 
   oils:spec/glob#in-unquoted-substitutions-is-preserved-without-glob-matching
-stdout: "['x/unmatching.*\\\\*.txt']\n"
-setup: |
+stdout: |
+  ['x/unmatching.*\\*.txt']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 mkdir x
 touch \

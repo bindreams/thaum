@@ -1,7 +1,8 @@
 name: Global Pattern replacement with /
 dialect: bash
 source: oils:spec/var-op-patsub#global-pattern-replacement-with
-stdout: "yy_xx_xx yy_yy_xx\n"
+stdout: |-
+  yy_xx_xx yy_yy_xx
 ---
 s=xx_xx_xx
 echo ${s/xx?/yy_} ${s//xx?/yy_}

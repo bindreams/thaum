@@ -1,7 +1,9 @@
 name: Singleton char ranges with steps
 dialect: bash
 source: oils:spec/brace-expansion#singleton-char-ranges-with-steps
-stdout: "a-\na-\n"
+stdout: |-
+  a-
+  a-
 ---
 echo {a..a..2}-
 echo {a..a..-2}-

@@ -3,7 +3,10 @@ name: shopt --unset errexit { }
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt---unset-errexit
 status: 1
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 shopt --set oil:all
 

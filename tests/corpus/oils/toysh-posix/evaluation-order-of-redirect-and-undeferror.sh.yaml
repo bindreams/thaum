@@ -1,7 +1,8 @@
 name: Evaluation order of redirect and ${undef?error}
 dialect: bash
 source: oils:spec/toysh-posix#evaluation-order-of-redirect-and-undeferror
-stdout: "exists1\n"
+stdout: |-
+  exists1
 ---
 # http://landley.net/notes.html#12-06-2020
 

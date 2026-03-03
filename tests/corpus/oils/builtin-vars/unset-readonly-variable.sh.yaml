@@ -2,7 +2,8 @@ name: Unset readonly variable
 dialect: bash
 source: oils:spec/builtin-vars#unset-readonly-variable
 status: 0
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 # dash and zsh abort the whole program.   OSH doesn't?
 readonly R=foo

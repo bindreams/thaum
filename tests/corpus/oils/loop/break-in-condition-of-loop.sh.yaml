@@ -1,7 +1,8 @@
 name: break in condition of loop
 dialect: bash
 source: oils:spec/loop#break-in-condition-of-loop
-stdout: "done\n"
+stdout: |-
+  done
 ---
 while break; do
   echo x

@@ -2,7 +2,12 @@ name: trap DEBUG not run in forked interpreter for first pipeline part
 dialect: bash
 source: 
   oils:spec/builtin-trap-bash#trap-debug-not-run-in-forked-interpreter-for-first-pipeline-part
-stdout: "  LINENO=8\npipe1\npipe2\n  LINENO=9\nok\n"
+stdout: |2-
+    LINENO=8
+  pipe1
+  pipe2
+    LINENO=9
+  ok
 ---
 
 debuglog() {

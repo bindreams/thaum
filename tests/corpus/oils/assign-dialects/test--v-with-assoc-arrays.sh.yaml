@@ -1,7 +1,17 @@
 name: test -v with assoc arrays
 dialect: bash
 source: oils:spec/assign-dialects#test--v-with-assoc-arrays
-stdout: "A=1\nA[0]=1\n\nA=0\nA[0]=0\n\nA[1]=1\nA[x]=1\n\n"
+stdout: |+
+  A=1
+  A[0]=1
+
+  A=0
+  A[0]=0
+
+  A[1]=1
+  A[x]=1
+
+...
 ---
 
 typeset -A A

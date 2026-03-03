@@ -1,6 +1,7 @@
 name: $'' octal escapes with fewer than 3 chars
 dialect: bash
 source: oils:spec/quote#octal-escapes-with-fewer-than-3-chars
-stdout: " 001 \\t \\t I \\n\n"
+stdout: |2-
+   001 \t \t I \n
 ---
 echo $'\1 \11 \11 \111' | od -A n -c | sed 's/ \+/ /g'

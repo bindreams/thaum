@@ -1,7 +1,9 @@
 name: trap -p in child is BUGGY in bash
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap--p-in-child-is-buggy-in-bash
-stdout: "not shown\nexit\n"
+stdout: |-
+  not shown
+  exit
 ---
 
 # It shows the trap even though it doesn't execute it!

@@ -2,7 +2,9 @@ disabled: true
 name: Eggex flags to ignore case are respected
 dialect: bash
 source: oils:spec/ysh-regex-api#eggex-flags-to-ignore-case-are-respected
-stdout: "yes\nyes\n"
+stdout: |-
+  yes
+  yes
 ---
 shopt -s ysh:upgrade
 

@@ -2,7 +2,9 @@ name: Signal message for killed background job
 dialect: bash
 source: oils:spec/background#signal-message-for-killed-background-job
 status: 0
-stdout: "status=129\nHangup\n"
+stdout: |
+  status=129
+  Hangup
 stderr: "\n"
 ---
 case $SH in dash|mksh) exit ;; esac

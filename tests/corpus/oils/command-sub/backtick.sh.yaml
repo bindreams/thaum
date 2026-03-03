@@ -1,6 +1,7 @@
 name: Backtick
 dialect: bash
 source: oils:spec/command-sub#backtick
-stdout: "FOObarFOO\n"
+stdout: |-
+  FOObarFOO
 ---
 foo=FOO; echo `echo $foo`bar`echo $foo`

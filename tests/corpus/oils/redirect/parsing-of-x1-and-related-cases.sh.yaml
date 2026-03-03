@@ -1,7 +1,14 @@
 name: Parsing of x=1> and related cases
 dialect: bash
 source: oils:spec/redirect#parsing-of-x1-and-related-cases
-stdout: "x=1\nx=1\nx=\n+1\n+1\n+\na1\n"
+stdout: |-
+  x=1
+  x=1
+  x=
+  +1
+  +1
+  +
+  a1
 ---
 
 echo x=1>/dev/stdout

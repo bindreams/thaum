@@ -2,8 +2,14 @@ disabled: true
 name: not operator behaves like Python
 dialect: bash
 source: oils:spec/ysh-expr-bool#not-operator-behaves-like-python
-stdout: "(Bool)   false\n(Bool)   false\n(Bool)   false\n(Bool)   true\n(Bool)   true\n\
-  (Bool)   true\n(Bool)   false\n"
+stdout: |-
+  (Bool)   false
+  (Bool)   false
+  (Bool)   false
+  (Bool)   true
+  (Bool)   true
+  (Bool)   true
+  (Bool)   false
 ---
 
 # consistent with if statement, ternary if, and, or

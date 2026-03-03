@@ -2,7 +2,10 @@ disabled: true
 name: braced var sub ${x:-default}
 dialect: bash
 source: oils:spec/ysh-expr#braced-var-sub-x-default
-stdout: "default\n-default-\n--default--\n"
+stdout: |-
+  default
+  -default-
+  --default--
 ---
 
 # without double quotes

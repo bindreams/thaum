@@ -2,7 +2,9 @@ disabled: true
 name: vm.getDebugStack()
 dialect: bash
 source: oils:spec/ysh-introspect#vmgetdebugstack
-stdout: "1\n2\n"
+stdout: |-
+  1
+  2
 ---
 
 proc p {

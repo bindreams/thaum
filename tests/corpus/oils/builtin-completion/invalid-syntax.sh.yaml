@@ -1,7 +1,8 @@
 name: Invalid syntax
 dialect: bash
 source: oils:spec/builtin-completion#invalid-syntax
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 compgen -A foo
 echo status=$?

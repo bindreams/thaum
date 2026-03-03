@@ -2,7 +2,10 @@ disabled: true
 name: failed builtin
 dialect: bash
 source: oils:spec/ysh-builtin-error#failed-builtin
-stdout: "hi\nok 1\nok 2\n"
+stdout: |-
+  hi
+  ok 1
+  ok 2
 ---
 
 try {

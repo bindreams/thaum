@@ -1,7 +1,14 @@
 name: shift unshift reverse
 dialect: bash
 source: oils:spec/ble-idioms#shift-unshift-reverse
-stdout: "1 2 3 4 5 6\n2 3 4 5 6\n4 5 6\n---\n99 4 5 6\n---\n6 5 4 99\n"
+stdout: |-
+  1 2 3 4 5 6
+  2 3 4 5 6
+  4 5 6
+  ---
+  99 4 5 6
+  ---
+  6 5 4 99
 ---
 
 case $SH in mksh|ash) exit ;; esac

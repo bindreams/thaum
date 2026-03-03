@@ -1,7 +1,9 @@
 name: LC_CTYPE=invalid
 dialect: bash
 source: oils:spec/sh-usage#lcctypeinvalid
-stdout: "LC_CTYPE _x_\n1 err.txt\n"
+stdout: |-
+  LC_CTYPE _x_
+  1 err.txt
 ---
 
 # note: test/spec-common.sh sets LC_ALL

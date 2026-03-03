@@ -3,8 +3,11 @@ name: external and builtin
 dialect: bash
 source: oils:spec/ysh-xtrace#external-and-builtin
 stdout: ''
-stderr: "| command 12345: env 'false'\n; process 12345: status 1\n. builtin 'true'\n\
-  . builtin set '+x'\n"
+stderr: |-
+  | command 12345: env 'false'
+  ; process 12345: status 1
+  . builtin 'true'
+  . builtin set '+x'
 ---
 shopt --set ysh:upgrade
 shopt --unset errexit

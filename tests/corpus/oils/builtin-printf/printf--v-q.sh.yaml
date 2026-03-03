@@ -1,7 +1,8 @@
 name: printf -v %q
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-q
-stdout: "OK\n"
+stdout: |-
+  OK
 ---
 val='"quoted" with spaces and \'
 

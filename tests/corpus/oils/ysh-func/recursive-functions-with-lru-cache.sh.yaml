@@ -2,9 +2,34 @@ disabled: true
 name: Recursive functions with LRU Cache
 dialect: bash
 source: oils:spec/ysh-func#recursive-functions-with-lru-cache
-stdout: "hit: 1\nhit: 2\nhit: 3\nhit: 4\nhit: 5\nhit: 6\nhit: 7\nhit: 8\n55\n[\n \
-  \ [\n    7,\n    13\n  ],\n  [\n    9,\n    34\n  ],\n  [\n    8,\n    21\n  ],\n\
-  \  [\n    10,\n    55\n  ]\n]\n"
+stdout: |-
+  hit: 1
+  hit: 2
+  hit: 3
+  hit: 4
+  hit: 5
+  hit: 6
+  hit: 7
+  hit: 8
+  55
+  [
+    [
+      7,
+      13
+    ],
+    [
+      9,
+      34
+    ],
+    [
+      8,
+      21
+    ],
+    [
+      10,
+      55
+    ]
+  ]
 ---
 source $LIB_YSH/list.ysh
 

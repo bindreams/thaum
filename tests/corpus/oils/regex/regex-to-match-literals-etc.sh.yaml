@@ -1,7 +1,15 @@
 name: Regex to match literals . ^ $ etc.
 dialect: bash
 source: oils:spec/regex#regex-to-match-literals-etc
-stdout: "false\ntrue\nfalse\ntrue\nfalse\ntrue\nfalse\ntrue\n"
+stdout: |-
+  false
+  true
+  false
+  true
+  false
+  true
+  false
+  true
 ---
 [[ 'x' =~ \. ]] || echo false
 [[ '.' =~ \. ]] && echo true

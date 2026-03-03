@@ -2,9 +2,9 @@ disabled: true
 name: Object with longer prototype chain
 dialect: bash
 source: oils:spec/ysh-object#object-with-longer-prototype-chain
-stdout: "(Obj)   (\"foo\":1,\"bar\":2,\"x\":3) --> (\"foo\":42,\"bar\":[1,2]) -->
-  (\"foo\":\"zz\")\n(Obj)   (foo: 1, bar: 2, x: 3) --> (foo: 42, bar: [1, 2]) -->
-  (foo: 'zz')\n"
+stdout: |-
+  (Obj)   ("foo":1,"bar":2,"x":3) --> ("foo":42,"bar":[1,2]) --> ("foo":"zz")
+  (Obj)   (foo: 1, bar: 2, x: 3) --> (foo: 42, bar: [1, 2]) --> (foo: 'zz')
 ---
 
 # prototypal inheritance pattern

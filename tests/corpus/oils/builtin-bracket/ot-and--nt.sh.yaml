@@ -1,7 +1,11 @@
 name: -ot and -nt
 dialect: bash
 source: oils:spec/builtin-bracket#ot-and--nt
-stdout: "older\nnot newer\nnot older than itself\nnot newer than itself\n"
+stdout: |
+  older
+  not newer
+  not older than itself
+  not newer than itself
 environment:
   TMP: /tmp
 ---

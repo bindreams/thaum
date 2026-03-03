@@ -1,7 +1,8 @@
 name: Bad var ref
 dialect: bash
 source: oils:spec/var-ref#bad-var-ref
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 a='bad var name'
 echo ref ${!a}

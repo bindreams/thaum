@@ -1,7 +1,9 @@
 name: alias used in subshell and command sub
 dialect: bash
 source: oils:spec/alias#alias-used-in-subshell-and-command-sub
-stdout: "[ subshell\n[ commandsub\n"
+stdout: |-
+  [ subshell
+  [ commandsub
 ---
 # This spec seems to be contradictoary?
 # http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_03_01

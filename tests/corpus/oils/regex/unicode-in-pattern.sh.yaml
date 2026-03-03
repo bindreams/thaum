@@ -1,7 +1,9 @@
 name: Unicode in pattern
 dialect: bash
 source: oils:spec/regex#unicode-in-pattern
-stdout: "mu\nmu=0\n"
+stdout: |-
+  mu
+  mu=0
 ---
 
 $SH <<'EOF'

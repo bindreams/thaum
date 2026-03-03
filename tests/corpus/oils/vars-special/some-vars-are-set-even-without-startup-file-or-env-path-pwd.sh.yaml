@@ -2,7 +2,11 @@ name: 'Some vars are set, even without startup file, or env: PATH, PWD'
 dialect: bash
 source: 
   oils:spec/vars-special#some-vars-are-set-even-without-startup-file-or-env-path-pwd
-stdout: "path pwd ps4 0\nshellopts 0\nhome ps1 1\nifs 0\n"
+stdout: |-
+  path pwd ps4 0
+  shellopts 0
+  home ps1 1
+  ifs 0
 ---
 
 flags=''

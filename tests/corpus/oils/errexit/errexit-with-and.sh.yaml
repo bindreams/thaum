@@ -1,7 +1,10 @@
 name: errexit with ! and ;
 dialect: bash
 source: oils:spec/errexit#errexit-with-and
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 # AST has extra Sentence nodes; there was a REGRESSION here.
 set -o errexit; echo one; ! true; echo two; ! false; echo three

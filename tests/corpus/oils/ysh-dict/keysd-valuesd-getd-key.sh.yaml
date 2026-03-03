@@ -2,8 +2,11 @@ disabled: true
 name: keys(d), values(d), get(d, key)
 dialect: bash
 source: oils:spec/ysh-dict#keysd-valuesd-getd-key
-stdout: "(List)   [\"a\",\"b\"]\n(List)   [42,99]\n(Int)   42\n(Str)   \"default\"\
-  \n"
+stdout: |-
+  (List)   ["a","b"]
+  (List)   [42,99]
+  (Int)   42
+  (Str)   "default"
 ---
 
 var d = {a: 42, b: 99}

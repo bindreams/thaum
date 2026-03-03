@@ -2,7 +2,11 @@ disabled: true
 name: Block with Bare Assignments
 dialect: bash
 source: oils:spec/ysh-blocks#block-with-bare-assignments
-stdout: "rule foo-python\nrule foo-cc\nrule bar-python\nrule bar-cc\n"
+stdout: |-
+  rule foo-python
+  rule foo-cc
+  rule bar-python
+  rule bar-cc
 ---
 
 # oil:all has parse_equals

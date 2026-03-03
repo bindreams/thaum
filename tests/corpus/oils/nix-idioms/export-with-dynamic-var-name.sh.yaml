@@ -1,8 +1,9 @@
 name: export with dynamic var name +=
 dialect: bash
 source: oils:spec/nix-idioms#export-with-dynamic-var-name
-stdout: "declare -x NIX_LDFLAGS_foo=\" -Lone/lib64\"\ndeclare -x NIX_LDFLAGS_foo=\"\
-  \ -Lone/lib64\"\n"
+stdout: |-
+  declare -x NIX_LDFLAGS_foo=" -Lone/lib64"
+  declare -x NIX_LDFLAGS_foo=" -Lone/lib64"
 ---
 
 orig() {

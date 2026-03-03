@@ -1,8 +1,10 @@
 name: printf -v a[1]
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-a1
-stdout: "status=0\n['a', 'foo', 'c']\n"
-setup: |
+stdout: |
+  status=0
+  ['a', 'foo', 'c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 a=(a b c)
 printf -v 'a[1]' %s 'foo'

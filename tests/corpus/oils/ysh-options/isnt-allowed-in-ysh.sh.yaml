@@ -3,7 +3,9 @@ name: "[[ isn't allowed in ysh"
 dialect: bash
 source: oils:spec/ysh-options#isnt-allowed-in-ysh
 status: 2
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 [[ 3 == 3 ]]
 echo status=$?

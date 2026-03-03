@@ -2,7 +2,11 @@ disabled: true
 name: Repeat {1,3} etc.
 dialect: bash
 source: oils:spec/ysh-regex#repeat-13-etc
-stdout: "[[:digit:]]{2}\n[[:digit:]]{1,3}\n[[:digit:]]{1,}\n[[:digit:]]{,3}\n"
+stdout: |-
+  [[:digit:]]{2}
+  [[:digit:]]{1,3}
+  [[:digit:]]{1,}
+  [[:digit:]]{,3}
 ---
 var pat = null
 

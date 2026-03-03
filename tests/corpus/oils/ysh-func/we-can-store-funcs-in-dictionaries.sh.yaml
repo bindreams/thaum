@@ -2,7 +2,11 @@ disabled: true
 name: We can store funcs in dictionaries
 dialect: bash
 source: oils:spec/ysh-func#we-can-store-funcs-in-dictionaries
-stdout: "This is a DOG\nWoof\nThis is a CAT\nMeow\n"
+stdout: |-
+  This is a DOG
+  Woof
+  This is a CAT
+  Meow
 ---
 func dog_speak() {
   echo "Woof"

@@ -1,7 +1,8 @@
 name: a[expr] in nameref
 dialect: bash
 source: oils:spec/nameref#aexpr-in-nameref
-stdout: "ref=three\n"
+stdout: |-
+  ref=three
 ---
 
 # this confuses code and data

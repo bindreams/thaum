@@ -1,7 +1,9 @@
 name: noglob
 dialect: bash
 source: oils:spec/extglob-files#noglob
-stdout: "@(*)\n@(__nope__*|__nope__?|*|?|[:alpha:]||)\n"
+stdout: |-
+  @(*)
+  @(__nope__*|__nope__?|*|?|[:alpha:]||)
 ---
 shopt -s extglob
 mkdir -p _noglob

@@ -2,7 +2,9 @@ name: ${ echo hi }  without semi-colon
 dialect: bash
 source: oils:spec/command-sub-ksh#echo-hi-without-semi-colon
 status: 127
-stdout: "[no-semi]\n[no-space]\n"
+stdout: |-
+  [no-semi]
+  [no-space]
 ---
 
 x=${ echo no-semi }

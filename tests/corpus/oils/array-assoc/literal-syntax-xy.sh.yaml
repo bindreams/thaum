@@ -1,7 +1,10 @@
 name: Literal syntax ([x]=y)
 dialect: bash
 source: oils:spec/array-assoc#literal-syntax-xy
-stdout: "b\nbar\nc\n"
+stdout: |-
+  b
+  bar
+  c
 ---
 declare -A a
 a=([aa]=b [foo]=bar ['a+1']=c)

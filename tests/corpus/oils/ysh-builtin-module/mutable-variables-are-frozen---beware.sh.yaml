@@ -2,8 +2,14 @@ disabled: true
 name: Mutable variables are frozen - beware!
 dialect: bash
 source: oils:spec/ysh-builtin-module#mutable-variables-are-frozen---beware
-stdout: "[for-xtrace]\ncounter = 5\ncounter = 6\n(Int)   6\ncounter = 7\n(Int)   6\n\
-  counter = 8\n"
+stdout: |-
+  [for-xtrace]
+  counter = 5
+  counter = 6
+  (Int)   6
+  counter = 7
+  (Int)   6
+  counter = 8
 ---
 
 shopt --set ysh:upgrade

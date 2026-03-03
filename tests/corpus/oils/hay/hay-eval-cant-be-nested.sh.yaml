@@ -3,7 +3,8 @@ name: hay eval can't be nested
 dialect: bash
 source: oils:spec/hay#hay-eval-cant-be-nested
 status: 127
-stdout: "foo\n"
+stdout: |-
+  foo
 ---
 shopt --set parse_brace
 

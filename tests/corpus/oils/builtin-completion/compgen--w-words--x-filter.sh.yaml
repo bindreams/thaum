@@ -1,7 +1,9 @@
 name: compgen -W words -X filter
 dialect: bash
 source: oils:spec/builtin-completion#compgen--w-words--x-filter
-stdout: "one\nthree\n"
+stdout: |-
+  one
+  three
 ---
 # WORKAROUND: wrap in bash -i -c because non-interactive bash behaves
 # differently!

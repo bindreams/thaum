@@ -2,11 +2,18 @@ disabled: true
 name: BashArray, new representation for bash array
 dialect: bash
 source: oils:spec/ysh-printing#basharray-new-representation-for-bash-array
-stdout: "(BashArray)\n(BashArray [0]='hello' [5]='5')\n\n(Dict)  {k: (BashArray)}\n\
-  (Dict)  {k: (BashArray [0]='hello' [5]='5')}\n\n{\"type\":\"BashArray\",\"data\"\
-  :{}}\n{\"type\":\"BashArray\",\"data\":{\"0\":\"hello\",\"5\":\"5\"}}\n\n(Dict)\
-  \   {\"k\":{\"type\":\"BashArray\",\"data\":{}}}\n(Dict)   {\"k\":{\"type\":\"BashArray\"\
-  ,\"data\":{\"0\":\"hello\",\"5\":\"5\"}}}\n"
+stdout: |-
+  (BashArray)
+  (BashArray [0]='hello' [5]='5')
+
+  (Dict)  {k: (BashArray)}
+  (Dict)  {k: (BashArray [0]='hello' [5]='5')}
+
+  {"type":"BashArray","data":{}}
+  {"type":"BashArray","data":{"0":"hello","5":"5"}}
+
+  (Dict)   {"k":{"type":"BashArray","data":{}}}
+  (Dict)   {"k":{"type":"BashArray","data":{"0":"hello","5":"5"}}}
 ---
 declare -a empty=()
 declare -a array_1=(hello)

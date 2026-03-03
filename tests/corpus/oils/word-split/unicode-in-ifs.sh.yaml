@@ -1,7 +1,9 @@
 name: Unicode in IFS
 dialect: bash
 source: oils:spec/word-split#unicode-in-ifs
-stdout: "<>\n<x>\n"
+stdout: |-
+  <>
+  <x>
 ---
 
 # bash, zsh, and yash support unicode in IFS, but dash/mksh/ash don't.

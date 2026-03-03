@@ -1,7 +1,8 @@
 name: source looks in PATH for files
 dialect: bash
 source: oils:spec/builtin-eval-source#source-looks-in-path-for-files
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 mkdir -p dir
 echo "echo hi" > dir/cmd

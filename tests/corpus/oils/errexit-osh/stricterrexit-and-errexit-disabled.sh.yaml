@@ -2,7 +2,9 @@ disabled: true
 name: strict_errexit and errexit disabled
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-and-errexit-disabled
-stdout: "before\nx=\n"
+stdout: |-
+  before
+  x=
 ---
 case $SH in dash|bash|mksh|ash) exit ;; esac
 

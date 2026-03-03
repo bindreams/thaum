@@ -1,7 +1,11 @@
 name: printf - NUL byte in value (OSH and zsh agree)
 dialect: bash
 source: oils:spec/nul-bytes#printf---nul-byte-in-value-osh-and-zsh-agree
-stdout: "  \\n\n  0a\n  \\n\n  0a\n"
+stdout: |2-
+    \n
+    0a
+    \n
+    0a
 ---
 case $SH in dash) exit ;; esac
 show_hex() { od -A n -t c -t x1; }

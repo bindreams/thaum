@@ -2,7 +2,9 @@ name: read builtin with no newline returns status 1
 dialect: bash
 source: oils:spec/builtin-read#read-builtin-with-no-newline-returns-status-1
 status: 0
-stdout: "status=1\nZZZ\n"
+stdout: |-
+  status=1
+  ZZZ
 ---
 
 # This is odd because the variable is populated successfully.  OSH/YSH might

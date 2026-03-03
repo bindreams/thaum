@@ -2,7 +2,9 @@ name: User array compared to "$@" (broken unless shopt -s strict_array)
 dialect: bash
 source: 
   oils:spec/dbracket#user-array-compared-to-broken-unless-shopt--s-strictarray
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 # Both are coerced to string!  It treats it more like an  UNQUOTED ${a[@]}.
 

@@ -2,7 +2,9 @@ disabled: true
 name: json write STRING
 dialect: bash
 source: oils:spec/ysh-json#json-write-string
-stdout: "\"foo\"\n\"foo\"\n"
+stdout: |-
+  "foo"
+  "foo"
 ---
 shopt --set parse_proc
 

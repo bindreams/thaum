@@ -2,7 +2,11 @@ disabled: true
 name: write --j8
 dialect: bash
 source: oils:spec/ysh-builtins#write---j8
-stdout: "\"μ\"\n\"x\"\nb'\\yfe\\yff'\n\"y\"\n"
+stdout: |-
+  "μ"
+  "x"
+  b'\yfe\yff'
+  "y"
 ---
 shopt --set ysh:upgrade
 

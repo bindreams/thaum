@@ -1,8 +1,11 @@
 name: sh -c -x 'echo hi' - order is reversed
 dialect: bash
 source: oils:spec/sh-usage#sh--c--x-echo-hi---order-is-reversed
-stdout: "hi\nstatus=127\n"
-stderr: "+ echo hi\n"
+stdout: |
+  hi
+  status=127
+stderr: |-
+  + echo hi
 ---
 case $SH in zsh) exit ;; esac  # different -x format
 

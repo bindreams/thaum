@@ -2,7 +2,8 @@ name: ulimit -f 1 prevents files larger 512 bytes
 dialect: bash
 source: oils:spec/builtin-process#ulimit--f-1-prevents-files-larger-512-bytes
 status: -25
-stdout: "512 status=0\n"
+stdout: |-
+  512 status=0
 ---
 trap - XFSZ  # don't handle this
 

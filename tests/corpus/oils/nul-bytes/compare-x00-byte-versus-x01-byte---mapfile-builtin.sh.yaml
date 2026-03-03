@@ -1,7 +1,10 @@
 name: Compare \x00 byte versus \x01 byte - mapfile builtin
 dialect: bash
 source: oils:spec/nul-bytes#compare-x00-byte-versus-x01-byte---mapfile-builtin
-stdout: "len=2\n 2e\n 2e\n"
+stdout: |-
+  len=2
+   2e
+   2e
 ---
 case $SH in dash|mksh|zsh|ash) exit ;; esac
 

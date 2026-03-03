@@ -3,7 +3,9 @@ name: 'proc with IFS= read -r line - dynamic scope - issue #2012'
 dialect: bash
 source: 
   oils:spec/ysh-bugs#proc-with-ifs-read--r-line---dynamic-scope---issue-2012
-stdout: "zz\nyy\n"
+stdout: |-
+  zz
+  yy
 ---
 
 # 2024-10 - FIXED by the new Env Obj!  Because in YSH, 'line' is NOT created in

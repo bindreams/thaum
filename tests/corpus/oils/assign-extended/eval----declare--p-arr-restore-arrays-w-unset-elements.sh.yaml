@@ -2,8 +2,12 @@ name: eval -- "$(declare -p arr)" (restore arrays w/ unset elements)
 dialect: bash
 source: 
   oils:spec/assign-extended#eval----declare--p-arr-restore-arrays-w-unset-elements
-stdout: "arr[0]: unset\narr[1]: unset\narr[2]: unset\narr[3]: set ... []\narr[4]:
-  set ... [foo]\n"
+stdout: |-
+  arr[0]: unset
+  arr[1]: unset
+  arr[2]: unset
+  arr[3]: set ... []
+  arr[4]: set ... [foo]
 ---
 arr=(1 2 3)
 eval -- "$(arr=(); arr[3]= arr[4]=foo; declare -p arr)"

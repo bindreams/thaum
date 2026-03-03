@@ -2,7 +2,11 @@ name: compgen -A command completes builtins and keywords
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--a-command-completes-builtins-and-keywords
-stdout: "eval\nstatus=0\nwhile\nstatus=0\n"
+stdout: |-
+  eval
+  status=0
+  while
+  status=0
 ---
 compgen -A command eva
 echo status=$?

@@ -1,7 +1,9 @@
 name: a[x]=foo:~ has tilde expansion
 dialect: bash
 source: oils:spec/tilde#axfoo-has-tilde-expansion
-stdout: "foo:/home/bar\nfoo:/home/bar\n"
+stdout: |-
+  foo:/home/bar
+  foo:/home/bar
 ---
 case $SH in dash|zsh) exit ;; esac
 

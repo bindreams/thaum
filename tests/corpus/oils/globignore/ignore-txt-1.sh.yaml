@@ -1,7 +1,8 @@
 name: Ignore ?.txt
 dialect: bash
 source: oils:spec/globignore#ignore-txt
-stdout: "10.txt foo/2.txt foo/20.txt\n"
+stdout: |-
+  10.txt foo/2.txt foo/20.txt
 ---
 touch {1,10}.txt
 mkdir -p foo

@@ -2,7 +2,16 @@ disabled: true
 name: "'call' to ignore return value"
 dialect: bash
 source: oils:spec/ysh-keywords#call-to-ignore-return-value
-stdout: "a\nb\nc\n5\n6\n7\n__\n5\n6\n"
+stdout: |-
+  a
+  b
+  c
+  5
+  6
+  7
+  __
+  5
+  6
 ---
 call 1 + 2 * 3
 

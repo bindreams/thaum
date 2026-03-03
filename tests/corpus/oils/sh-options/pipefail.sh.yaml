@@ -2,7 +2,9 @@ name: pipefail
 dialect: bash
 source: oils:spec/sh-options#pipefail
 status: 0
-stdout: "0\n2\n"
+stdout: |-
+  0
+  2
 ---
 # NOTE: the sleeps are because osh can fail non-deterministically because of a
 # bug.  Same problem as PIPESTATUS.

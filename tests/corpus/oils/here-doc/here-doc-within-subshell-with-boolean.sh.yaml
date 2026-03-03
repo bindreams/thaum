@@ -1,7 +1,8 @@
 name: Here doc within subshell with boolean
 dialect: bash
 source: oils:spec/here-doc#here-doc-within-subshell-with-boolean
-stdout: "0\n"
+stdout: |-
+  0
 ---
 [[ $(cat <<EOF
 foo

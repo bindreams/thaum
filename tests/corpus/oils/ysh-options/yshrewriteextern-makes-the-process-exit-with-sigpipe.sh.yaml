@@ -3,7 +3,8 @@ name: ysh_rewrite_extern makes the process exit with SIGPIPE
 dialect: bash
 source: 
   oils:spec/ysh-options#yshrewriteextern-makes-the-process-exit-with-sigpipe
-stdout: "141\n"
+stdout: |-
+  141
 ---
 shopt --set ysh_rewrite_extern
 

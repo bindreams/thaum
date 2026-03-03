@@ -1,7 +1,8 @@
 name: \x
 dialect: bash
 source: oils:spec/builtin-echo#x
-stdout: " \\ x \\ x g \\n\n"
+stdout: |2-
+   \ x \ x g \n
 ---
 # I consider mksh and zsh a bug because \x is not an escape
 echo -e '\x' '\xg' | od -A n -c | sed 's/ \+/ /g'

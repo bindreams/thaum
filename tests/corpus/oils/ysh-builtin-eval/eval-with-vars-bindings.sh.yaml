@@ -2,7 +2,10 @@ disabled: true
 name: eval with vars bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-with-vars-bindings
-stdout: "(Str)   \"abc\"\n(Str)   \"123\"\n(Str)   \"abc\"\n"
+stdout: |-
+  (Str)   "abc"
+  (Str)   "123"
+  (Str)   "abc"
 ---
 var myVar = "abc"
 call io->eval(^(pp test_ (myVar)))

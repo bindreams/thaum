@@ -2,7 +2,9 @@ disabled: true
 name: Positional args
 dialect: bash
 source: oils:spec/ysh-func#positional-args
-stdout: "pos 1 2\nrest 3 4\n"
+stdout: |-
+  pos 1 2
+  rest 3 4
 ---
 
 func f(x, y, ...rest) {

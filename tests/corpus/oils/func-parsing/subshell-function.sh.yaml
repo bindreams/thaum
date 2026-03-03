@@ -1,7 +1,8 @@
 name: subshell function
 dialect: bash
 source: oils:spec/func-parsing#subshell-function
-stdout: "5 0\n"
+stdout: |-
+  5 0
 ---
 # bash allows this.
 i=0

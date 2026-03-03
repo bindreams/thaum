@@ -1,7 +1,15 @@
 name: Case folding - Unicode characters
 dialect: bash
 source: oils:spec/var-op-bash#case-folding---unicode-characters
-stdout: "u ÀÈ\nU ÀÈ\nl àÈ\nL àè\nu Áé\nU ÁÉ\nl áé\nL áé\n"
+stdout: |-
+  u ÀÈ
+  U ÀÈ
+  l àÈ
+  L àè
+  u Áé
+  U ÁÉ
+  l áé
+  L áé
 ---
 
 # https://www.utf8-chartable.de/unicode-utf8-table.pl

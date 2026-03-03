@@ -2,8 +2,10 @@ name: '|&'
 dialect: bash
 source: oils:spec/pipeline#unnamed
 status: 0
-stdout: "STDERR\nSTDOUT\n"
-setup: |
+stdout: |
+  STDERR
+  STDOUT
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -16,6 +18,5 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 stdout_stderr.py |& cat

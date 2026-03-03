@@ -2,7 +2,14 @@ disabled: true
 name: ${undef=a} and shopt --unset dynamic_scope
 dialect: bash
 source: oils:spec/ysh-scope#undefa-and-shopt---unset-dynamicscope
-stdout: "x=\nx=new\nx=\n---\nx=\nx=\nx=\n"
+stdout: |-
+  x=
+  x=new
+  x=
+  ---
+  x=
+  x=
+  x=
 ---
 
 set-x() {

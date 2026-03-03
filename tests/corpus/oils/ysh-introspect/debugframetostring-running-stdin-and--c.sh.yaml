@@ -2,12 +2,20 @@ disabled: true
 name: DebugFrame.toString() running stdin and -c
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-running-stdin-and--c
-stdout: "  %1 [ stdin ]:1\n    source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh;
-  my-proc\n                                                               ^~~~~~~\n\
-  \  %2 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n      print-stack\n      ^~~~~~~~~~~\n\
-  \n  %1 [ -c flag ]:1\n    source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh;
-  my-proc\n                                                               ^~~~~~~\n\
-  \  %2 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n      print-stack\n      ^~~~~~~~~~~\n"
+stdout: |2-
+    %1 [ stdin ]:1
+      source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh; my-proc
+                                                                 ^~~~~~~
+    %2 MYROOT/spec/testdata/debug-frame-lib.ysh:15
+        print-stack
+        ^~~~~~~~~~~
+
+    %1 [ -c flag ]:1
+      source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh; my-proc
+                                                                 ^~~~~~~
+    %2 MYROOT/spec/testdata/debug-frame-lib.ysh:15
+        print-stack
+        ^~~~~~~~~~~
 ---
 
 # stdin

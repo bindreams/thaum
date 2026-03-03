@@ -2,7 +2,10 @@ name: \s for shell, \v for major.minor version, and \V for full version
 dialect: bash
 source: 
   oils:spec/prompt#s-for-shell-v-for-majorminor-version-and-v-for-full-version
-stdout: "match=0\nmatch=0\nmatch=0\n"
+stdout: |-
+  match=0
+  match=0
+  match=0
 ---
 PS1='foo \s bar'
 echo "${PS1@P}" | egrep -q '^foo (bash|osh) bar$'

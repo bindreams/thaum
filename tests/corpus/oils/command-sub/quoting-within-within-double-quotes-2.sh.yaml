@@ -1,7 +1,10 @@
 name: Quoting ( within `` within double quotes
 dialect: bash
 source: oils:spec/command-sub#quoting-within-within-double-quotes
-stdout: "1 (\n2 (\n3  (\n"
+stdout: |-
+  1 (
+  2 (
+  3  (
 ---
 echo "1 `echo \(`"
 echo "2 `echo \\(`"

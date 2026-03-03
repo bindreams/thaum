@@ -1,7 +1,9 @@
 name: compgen -e P
 dialect: bash
 source: oils:spec/builtin-completion#compgen--e-p
-stdout: "PATH\nPWD\n"
+stdout: |-
+  PATH
+  PWD
 ---
 cd > /dev/null  # for some reason in bash, this makes PIPESTATUS appear!
 compgen -e P | grep -E '^PATH|PWD' | sort

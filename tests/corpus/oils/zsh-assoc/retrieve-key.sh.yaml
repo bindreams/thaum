@@ -1,7 +1,8 @@
 name: retrieve key
 dialect: bash
 source: oils:spec/zsh-assoc#retrieve-key
-stdout: "b\n"
+stdout: |-
+  b
 ---
 typeset -A a
 a=(aa b foo bar a+1 c)

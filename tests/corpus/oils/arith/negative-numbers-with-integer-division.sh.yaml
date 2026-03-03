@@ -1,7 +1,16 @@
 name: Negative numbers with integer division /
 dialect: bash
 source: oils:spec/arith#negative-numbers-with-integer-division
-stdout: "3\n-3\n-3\n3\n---\n6\n-6\n-6\n6\n"
+stdout: |-
+  3
+  -3
+  -3
+  3
+  ---
+  6
+  -6
+  -6
+  6
 ---
 
 echo $(( 10 / 3))

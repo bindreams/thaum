@@ -1,7 +1,8 @@
 name: quoted var expansion with glob meta characters
 dialect: bash
 source: oils:spec/glob#quoted-var-expansion-with-glob-meta-characters
-stdout: "[ _tmp/*.A ]\n"
+stdout: |-
+  [ _tmp/*.A ]
 ---
 touch _tmp/a.A _tmp/aa.A _tmp/b.B
 f="_tmp/*.A"

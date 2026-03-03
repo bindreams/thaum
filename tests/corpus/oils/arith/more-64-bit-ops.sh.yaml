@@ -1,7 +1,15 @@
 name: More 64-bit ops
 dialect: bash
 source: oils:spec/arith#more-64-bit-ops
-stdout: "eq=1\neq=0\ngreater=0\ngreater=0\nge=0\nge=0\nle=1\nle=0\n"
+stdout: |-
+  eq=1
+  eq=0
+  greater=0
+  greater=0
+  ge=0
+  ge=0
+  le=1
+  le=0
 ---
 case $SH in dash) exit ;; esac
 

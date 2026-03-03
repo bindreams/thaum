@@ -3,7 +3,9 @@ name: Multiple digits like [25] are invalid
 dialect: bash
 source: oils:spec/ysh-regex#multiple-digits-like-25-are-invalid
 status: 2
-stdout: "[25]\n[25]\n"
+stdout: |-
+  [25]
+  [25]
 ---
 
 # synonyms

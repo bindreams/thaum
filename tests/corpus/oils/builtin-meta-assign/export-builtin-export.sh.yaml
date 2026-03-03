@@ -1,7 +1,9 @@
 name: export, builtin export
 dialect: bash
 source: oils:spec/builtin-meta-assign#export-builtin-export
-stdout: "a b\na b\n"
+stdout: |-
+  a b
+  a b
 ---
 
 x='a b'

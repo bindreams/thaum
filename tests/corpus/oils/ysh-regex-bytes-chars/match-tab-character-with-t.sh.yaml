@@ -2,7 +2,9 @@ disabled: true
 name: Match tab character with [\t]
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#match-tab-character-with-t
-stdout: "(Str)   \"(a[\\t]b)\"\n   a   a  \\t   b   b  \\n\n"
+stdout: |-
+  (Str)   "(a[\t]b)"
+     a   a  \t   b   b  \n
 ---
 shopt -s ysh:all
 

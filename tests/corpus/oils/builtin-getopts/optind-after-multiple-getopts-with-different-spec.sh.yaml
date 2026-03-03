@@ -2,7 +2,13 @@ name: OPTIND after multiple getopts with different spec
 dialect: bash
 source: 
   oils:spec/builtin-getopts#optind-after-multiple-getopts-with-different-spec
-stdout: ".\nOPTIND=2\n-\n-\nOPTIND=5\nOPTIND=2\n"
+stdout: |-
+  .
+  OPTIND=2
+  -
+  -
+  OPTIND=5
+  OPTIND=2
 ---
 # Wow this is poorly specified!  A fundamental design problem with the global
 # variable OPTIND.

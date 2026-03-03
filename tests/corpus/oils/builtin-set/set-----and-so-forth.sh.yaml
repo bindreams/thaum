@@ -1,7 +1,12 @@
 name: set - - and so forth
 dialect: bash
 source: oils:spec/builtin-set#set-----and-so-forth
-stdout: "a b\na b\na b\n-\n--\n"
+stdout: |-
+  a b
+  a b
+  a b
+  -
+  --
 ---
 set a b
 echo "$@"

@@ -2,7 +2,11 @@ disabled: true
 name: ctx push and set
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#ctx-push-and-set
-stdout: "{\n  \"key1\": \"value1\",\n  \"key2\": \"value2\"\n}\n"
+stdout: |-
+  {
+    "key1": "value1",
+    "key2": "value2"
+  }
 ---
 var mydict = {}
 ctx push (mydict) {

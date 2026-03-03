@@ -1,7 +1,14 @@
 name: unsigned / octal / hex
 dialect: bash
 source: oils:spec/builtin-printf#unsigned-octal-hex
-stdout: "[42]\n[52]\n[2a]\n[2A]\n\n[61]\n[61]\n"
+stdout: |-
+  [42]
+  [52]
+  [2a]
+  [2A]
+
+  [61]
+  [61]
 ---
 printf '[%u]\n' 42
 printf '[%o]\n' 42

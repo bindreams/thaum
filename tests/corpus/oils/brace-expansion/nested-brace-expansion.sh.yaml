@@ -1,6 +1,7 @@
 name: nested brace expansion
 dialect: bash
 source: oils:spec/brace-expansion#nested-brace-expansion
-stdout: "-A- -=a=- -=b=- -B-\n"
+stdout: |-
+  -A- -=a=- -=b=- -B-
 ---
 echo -{A,={a,b}=,B}-

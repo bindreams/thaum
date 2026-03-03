@@ -2,7 +2,11 @@ disabled: true
 name: Combine multi-line command and strings
 dialect: bash
 source: oils:spec/ysh-multiline#combine-multi-line-command-and-strings
-stdout: "FOUR\nTHREE\nTWO\nONE\n"
+stdout: |-
+  FOUR
+  THREE
+  TWO
+  ONE
 ---
 shopt --set ysh:all
 shopt --unset no_parse_osh  # allow $'' for this test

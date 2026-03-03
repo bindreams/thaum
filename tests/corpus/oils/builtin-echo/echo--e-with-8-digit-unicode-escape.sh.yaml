@@ -1,7 +1,8 @@
 name: echo -e with 8 digit unicode escape
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-with-8-digit-unicode-escape
-stdout: "abcdef\n"
+stdout: |-
+  abcdef
 ---
 flags='-e'
 case $SH in dash) flags='' ;; esac

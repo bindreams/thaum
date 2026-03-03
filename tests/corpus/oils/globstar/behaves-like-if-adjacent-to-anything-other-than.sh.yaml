@@ -1,8 +1,12 @@
 name: '** behaves like * if adjacent to anything other than /'
 dialect: bash
 source: oils:spec/globstar#behaves-like-if-adjacent-to-anything-other-than
-stdout: "directory/leaf.md leaf.md\ndirectory/leaf.md\ndirectory/leaf.md\ndirectory/leaf.md\n\
-  directory/leaf.md\n"
+stdout: |-
+  directory/leaf.md leaf.md
+  directory/leaf.md
+  directory/leaf.md
+  directory/leaf.md
+  directory/leaf.md
 ---
 shopt -s globstar
 

@@ -2,7 +2,10 @@ disabled: true
 name: unary plus and minus combined
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-plus-and-minus-combined
-stdout: "-5\n-5\n-3\n"
+stdout: |-
+  -5
+  -5
+  -3
 ---
 
 var a = +-5

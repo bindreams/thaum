@@ -1,7 +1,9 @@
 name: adjacent extglob
 dialect: bash
 source: oils:spec/extglob-match#adjacent-extglob
-stdout: "TRUE\nTRUE\n"
+stdout: |-
+  TRUE
+  TRUE
 ---
 [[ --help == @(--|++)@(help|verbose) ]] && echo TRUE
 [[ ++verbose == @(--|++)@(help|verbose) ]] && echo TRUE

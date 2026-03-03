@@ -2,9 +2,20 @@ disabled: true
 name: Using Hay with --eval flags
 dialect: bash
 source: oils:spec/hay#using-hay-with---eval-flags
-stdout: "{\n  \"type\": \"Package\",\n  \"args\": [\n    \"cpython\"\n  ],\n  \"children\"\
-  : [],\n  \"attrs\": {\n    \"version\": \"3.12\",\n    \"url\": \"https://python.org/release/3.12/\"\
-  ,\n    \"build\": null\n  }\n}\nversion = 3.12, url = https://python.org/release/3.12/\n"
+stdout: |-
+  {
+    "type": "Package",
+    "args": [
+      "cpython"
+    ],
+    "children": [],
+    "attrs": {
+      "version": "3.12",
+      "url": "https://python.org/release/3.12/",
+      "build": null
+    }
+  }
+  version = 3.12, url = https://python.org/release/3.12/
 ---
 shopt --set ysh:all
 

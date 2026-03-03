@@ -2,7 +2,8 @@ disabled: true
 name: 'fastlex: NUL byte inside shebang line'
 dialect: bash
 source: oils:spec/ysh-bugs#fastlex-nul-byte-inside-shebang-line
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 
 # Hm this test doesn't really tickle the bug

@@ -2,8 +2,20 @@ disabled: true
 name: Mixing read --raw-line with read -r
 dialect: bash
 source: oils:spec/ysh-builtins#mixing-read---raw-line-with-read--r
-stdout: "read -r\nREPLY=1\nREPLY=2\n\nread --raw-line\n_reply=1\n_reply=2\n\nMixed\n\
-  REPLY=1\nREPLY=2\n_reply=3\nREPLY=4\n"
+stdout: |-
+  read -r
+  REPLY=1
+  REPLY=2
+
+  read --raw-line
+  _reply=1
+  _reply=2
+
+  Mixed
+  REPLY=1
+  REPLY=2
+  _reply=3
+  REPLY=4
 ---
 
 $SH $REPO_ROOT/spec/testdata/ysh-read-0.sh

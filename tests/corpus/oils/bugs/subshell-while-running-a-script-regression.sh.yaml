@@ -1,7 +1,9 @@
 name: subshell while running a script (regression)
 dialect: bash
 source: oils:spec/bugs#subshell-while-running-a-script-regression
-stdout: "start\nend\n"
+stdout: |-
+  start
+  end
 ---
 # Ensures that spawning a subshell doesn't cause a seek on the file input stream
 # representing the current script (issue #1233).

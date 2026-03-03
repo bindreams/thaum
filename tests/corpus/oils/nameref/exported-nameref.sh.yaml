@@ -1,8 +1,13 @@
 name: exported nameref
 dialect: bash
 source: oils:spec/nameref#exported-nameref
-stdout: "None\nx\n---\nfoo\nx\n"
-setup: |
+stdout: |
+  None
+  x
+  ---
+  foo
+  x
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +16,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 x=foo
 typeset -n -x ref=x

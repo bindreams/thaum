@@ -2,7 +2,8 @@ disabled: true
 name: get() has default null
 dialect: bash
 source: oils:spec/ysh-dict#get-has-default-null
-stdout: "(Null)   null\n"
+stdout: |-
+  (Null)   null
 ---
 
 var d = {a: 42}

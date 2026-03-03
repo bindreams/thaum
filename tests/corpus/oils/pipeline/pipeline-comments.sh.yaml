@@ -1,7 +1,8 @@
 name: Pipeline comments
 dialect: bash
 source: oils:spec/pipeline#pipeline-comments
-stdout: "ABCD\n"
+stdout: |-
+  ABCD
 ---
 echo abcd |    # input
                # blank line

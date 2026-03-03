@@ -2,7 +2,14 @@ name: set +o errexit while it's being ignored (moot with strict_errexit)
 dialect: bash
 source: 
   oils:spec/errexit#set-o-errexit-while-its-being-ignored-moot-with-stricterrexit
-stdout: "1\n2\n3\n4\n5\n6\n7\n"
+stdout: |-
+  1
+  2
+  3
+  4
+  5
+  6
+  7
 ---
 set -o errexit
 if { echo 1; false; echo 2; set +o errexit; echo 3; false; echo 4; }; then

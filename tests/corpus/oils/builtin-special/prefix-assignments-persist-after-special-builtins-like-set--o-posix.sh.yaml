@@ -2,7 +2,9 @@ name: 'Prefix assignments persist after special builtins, like : (set -o posix)'
 dialect: bash
 source: 
   oils:spec/builtin-special#prefix-assignments-persist-after-special-builtins-like-set--o-posix
-stdout: "foo=bar\nz=\n"
+stdout: |-
+  foo=bar
+  z=
 ---
 case $SH in
   bash) set -o posix ;;

@@ -1,7 +1,15 @@
 name: ${x/^} regression
 dialect: bash
 source: oils:spec/var-op-patsub#x-regression
-stdout: "abc\nabc\n^^\n^^^\n!!!\n!!\nb!c\na^c\n"
+stdout: |-
+  abc
+  abc
+  ^^
+  ^^^
+  !!!
+  !!
+  b!c
+  a^c
 ---
 x=abc
 echo ${x/^}

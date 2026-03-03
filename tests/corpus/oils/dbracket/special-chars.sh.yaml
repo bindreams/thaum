@@ -1,7 +1,9 @@
 name: special chars
 dialect: bash
 source: oils:spec/dbracket#special-chars
-stdout: "caret 0\nbang 0\n"
+stdout: |-
+  caret 0
+  bang 0
 ---
 [[ ^ == ^ ]]
 echo caret $?

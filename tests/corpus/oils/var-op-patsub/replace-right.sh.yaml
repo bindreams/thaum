@@ -1,7 +1,9 @@
 name: Replace right ]
 dialect: bash
 source: oils:spec/var-op-patsub#replace-right
-stdout: "--_--\n--_--\n"
+stdout: |-
+  --_--
+  --_--
 ---
 v='--]--'
 x=']'

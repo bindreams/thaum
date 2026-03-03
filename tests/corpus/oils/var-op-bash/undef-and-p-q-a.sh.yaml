@@ -1,7 +1,13 @@
 name: undef and @P @Q @a
 dialect: bash
 source: oils:spec/var-op-bash#undef-and-p-q-a
-stdout: "\nstatus=0\n\nstatus=0\n\nstatus=0\n"
+stdout: |2-
+
+  status=0
+
+  status=0
+
+  status=0
 ---
 $SH -c 'echo ${undef@P}'
 echo status=$?

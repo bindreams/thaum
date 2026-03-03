@@ -1,7 +1,10 @@
 name: Descriptor redirect with spaces
 dialect: bash
 source: oils:spec/redirect#descriptor-redirect-with-spaces
-stderr: "one\ntwo 1\nthree\n"
+stderr: |-
+  one
+  two 1
+  three
 ---
 # Hm this seems like a failure of lookahead!  The second thing should look to a
 # file-like thing.

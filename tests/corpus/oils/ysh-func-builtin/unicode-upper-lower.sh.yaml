@@ -2,7 +2,9 @@ disabled: true
 name: Unicode upper() lower()
 dialect: bash
 source: oils:spec/ysh-func-builtin#unicode-upper-lower
-stdout: "ÀÈ\náé\n"
+stdout: |-
+  ÀÈ
+  áé
 ---
 
 # Adapted from spec/var-op-bash

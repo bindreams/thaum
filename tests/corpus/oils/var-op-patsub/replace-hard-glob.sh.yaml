@@ -1,7 +1,8 @@
 name: Replace hard glob
 dialect: bash
 source: oils:spec/var-op-patsub#replace-hard-glob
-stdout: "aa__cc\n"
+stdout: |-
+  aa__cc
 ---
 s='aa*bb+cc'
 echo ${s//\**+/__}  # Literal *, then any sequence of characters, then literal +

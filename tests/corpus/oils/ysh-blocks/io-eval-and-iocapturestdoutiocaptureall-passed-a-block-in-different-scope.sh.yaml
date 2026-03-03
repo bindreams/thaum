@@ -4,7 +4,14 @@ name: io->eval() and io.captureStdout()/io.captureAll() passed a block in
 dialect: bash
 source: 
   oils:spec/ysh-blocks#io-eval-and-iocapturestdoutiocaptureall-passed-a-block-in-different-scope
-stdout: "i = 42\ni = 42\n(Dict)   {\"x\":\"x\"}\nstdout i = 42\nstdout i = 42\n\n"
+stdout: |+
+  i = 42
+  i = 42
+  (Dict)   {"x":"x"}
+  stdout i = 42
+  stdout i = 42
+
+...
 ---
 shopt --set ysh:upgrade
 

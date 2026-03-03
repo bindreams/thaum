@@ -2,7 +2,8 @@ disabled: true
 name: Range with escaped characters
 dialect: bash
 source: oils:spec/ysh-regex#range-with-escaped-characters
-stdout: " 5b 01 2d 0f 5d 0a\n"
+stdout: |2-
+   5b 01 2d 0f 5d 0a
 ---
 shopt -s ysh:all
 

@@ -2,7 +2,9 @@ name: dotglob (bash option that no_dash_glob is roughly consistent with)
 dialect: bash
 source: 
   oils:spec/glob-bash#dotglob-bash-option-that-nodashglob-is-roughly-consistent-with
-stdout: "other\n.foorc other\n"
+stdout: |
+  other
+  .foorc other
 environment:
   TMP: /tmp
 ---

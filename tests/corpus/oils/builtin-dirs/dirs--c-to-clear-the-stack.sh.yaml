@@ -2,7 +2,11 @@ name: dirs -c to clear the stack
 dialect: bash
 source: oils:spec/builtin-dirs#dirs--c-to-clear-the-stack
 status: 0
-stdout: "--\n/tmp /\n--\n/tmp\n"
+stdout: |-
+  --
+  /tmp /
+  --
+  /tmp
 ---
 set -o errexit
 cd /

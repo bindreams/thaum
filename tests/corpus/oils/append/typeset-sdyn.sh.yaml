@@ -1,7 +1,10 @@
 name: typeset s${dyn}+=
 dialect: bash
 source: oils:spec/append#typeset-sdyn
-stdout: "sx=foo\ntx=foo\ntx=foofoo\n"
+stdout: |-
+  sx=foo
+  tx=foo
+  tx=foofoo
 ---
 
 dyn=x

@@ -3,9 +3,20 @@ name: Background process with fork and & (nondeterministic)
 dialect: bash
 source: oils:spec/ysh-xtrace#background-process-with-fork-and-nondeterministic
 stdout: ''
-stderr: "  . 12345 exec sleep 0.1\n  . 12345 exec sleep 0.1\n  ; process 12345: status
-  0\n  ; process 12345: status 0\n. builtin fork\n. builtin set '+x'\n. builtin shopt
-  -s 'ysh:upgrade'\n< wait\n< wait\n> wait\n> wait\n| fork 12345\n| fork 12345\n"
+stderr: |2-
+    . 12345 exec sleep 0.1
+    . 12345 exec sleep 0.1
+    ; process 12345: status 0
+    ; process 12345: status 0
+  . builtin fork
+  . builtin set '+x'
+  . builtin shopt -s 'ysh:upgrade'
+  < wait
+  < wait
+  > wait
+  > wait
+  | fork 12345
+  | fork 12345
 ---
 shopt --set ysh:upgrade
 set -x

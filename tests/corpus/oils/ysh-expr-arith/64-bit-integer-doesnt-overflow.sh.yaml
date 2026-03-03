@@ -2,7 +2,11 @@ disabled: true
 name: 64-bit integer doesn't overflow
 dialect: bash
 source: oils:spec/ysh-expr-arith#64-bit-integer-doesnt-overflow
-stdout: "2147483648\n4294967296\n6442450944\nmax positive = 9223372036854775807\n"
+stdout: |-
+  2147483648
+  4294967296
+  6442450944
+  max positive = 9223372036854775807
 ---
 
 # same as spec/arith.test.sh case 38

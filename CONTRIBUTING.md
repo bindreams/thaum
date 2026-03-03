@@ -108,10 +108,12 @@ benches/
 ```
 
 ## Documentation style
+
 Follow [Rust API Guidelines C-CRATE-DOC](https://rust-lang.github.io/api-guidelines/documentation.html)
 and [the rustdoc book](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html).
 
 ### Comment types
+
 | Syntax | Scope                      | Use for                                           |
 | ------ | -------------------------- | ------------------------------------------------- |
 | `//!`  | Parent item (module/crate) | File-level docs at the top of every `.rs` file    |
@@ -119,6 +121,7 @@ and [the rustdoc book](https://doc.rust-lang.org/rustdoc/how-to-write-documentat
 | `//`   | None (not rendered)        | Implementation notes, TODOs, non-doc remarks      |
 
 ### File-level docs (`//!`)
+
 Every `.rs` file starts with a `//!` block describing the module's purpose.
 Place it before any `use` statements. One sentence is enough for small modules;
 larger ones benefit from a paragraph and cross-references.
@@ -133,6 +136,7 @@ use crate::...;
 ```
 
 ### Item docs (`///`)
+
 All public items (`pub fn`, `pub struct`, `pub enum`, `pub trait`, `pub type`)
 must have a `///` doc comment. Internal items should have them when the logic
 is non-obvious.
@@ -192,6 +196,7 @@ automatically:
 | `AssignmentValue` | Right side of `=`: `Scalar(Word)` or `BashArray(Vec<Word>)`.                          |
 
 `ExecutionMode` has three variants:
+
 - `Sequential` — newline-terminated or last in list
 - `Terminated` — explicitly terminated with `;` (semantically distinct from newline for `set -e`)
 - `Background` — followed by `&`
@@ -199,9 +204,10 @@ automatically:
 ### Operator precedence
 
 From lowest to highest:
+
 1. `&&` / `||` — builds `And`/`Or` nodes (left-associative)
-2. `!` — wraps in `Not` (applies to entire pipe chain)
-3. `|` — builds `Pipe` nodes (left-associative)
+1. `!` — wraps in `Not` (applies to entire pipe chain)
+1. `|` — builds `Pipe` nodes (left-associative)
 
 ### Lexer/Parser architecture
 
@@ -227,6 +233,7 @@ shrinks from the front (on commit), never from the back.
 **LastScanned** (one-token lookbehind): a `LastScanned` enum with three states —
 `Fragment` (after word/fragment), `Whitespace` (after whitespace/comment), `Other`
 (after operator/newline/start of input). It governs:
+
 - **Whitespace significance**: `Whitespace` tokens are only emitted when the
   previous token was a `Fragment` (i.e. between words). Non-significant whitespace
   is consumed silently. Consecutive `Whitespace` tokens cannot exist.
@@ -235,6 +242,7 @@ shrinks from the front (on commit), never from the back.
 - **Tilde prefix recognition**: `~` at word start after whitespace or `=`.
 
 **Key design rules**:
+
 - The **lexer is context-free** — it produces fragment tokens (`Literal`,
   `SimpleParam`, `DoubleQuoted`, etc.), `Blank`, `IoNumber`, operators, `Newline`,
   `HereDocBody`, and `Eof`. It never promotes words to reserved word tokens.
@@ -259,15 +267,15 @@ shrinks from the front (on commit), never from the back.
 ### Adding a new Bash feature
 
 1. Add a flag to `ShellOptions` in `dialect.rs`
-2. Set it to `true` in the appropriate `Dialect` variants (and `Bash51`/`Bash` at minimum)
-3. If the feature needs new tokens, add them to `token.rs` with `Bash` prefix (e.g. `BashHereStringOp`) and `display_name()`
-4. Update the lexer in `lexer/mod.rs` to recognize them conditionally on the flag
-5. Add AST types to `ast.rs` if needed — use `Bash` prefix on Bash-specific variants (e.g. `BashDoubleBracket`, `BashProcessSubstitution`)
-6. Standalone argument types go in `Atom`, concatenable pieces in `Fragment`, assignment-only types in `AssignmentValue`
-7. Update the parser (likely `parser/compound.rs` or `parser/bash.rs`)
-8. Update the CLI emitter in `cli/yaml_writer.rs`
-9. Write tests with a `ShellOptions` that only enables the new flag
-10. Write a test that POSIX mode rejects the new syntax
+1. Set it to `true` in the appropriate `Dialect` variants (and `Bash51`/`Bash` at minimum)
+1. If the feature needs new tokens, add them to `token.rs` with `Bash` prefix (e.g. `BashHereStringOp`) and `display_name()`
+1. Update the lexer in `lexer/mod.rs` to recognize them conditionally on the flag
+1. Add AST types to `ast.rs` if needed — use `Bash` prefix on Bash-specific variants (e.g. `BashDoubleBracket`, `BashProcessSubstitution`)
+1. Standalone argument types go in `Atom`, concatenable pieces in `Fragment`, assignment-only types in `AssignmentValue`
+1. Update the parser (likely `parser/compound.rs` or `parser/bash.rs`)
+1. Update the CLI emitter in `cli/yaml_writer.rs`
+1. Write tests with a `ShellOptions` that only enables the new flag
+1. Write a test that POSIX mode rejects the new syntax
 
 ### Error messages
 
@@ -288,15 +296,15 @@ whose expansion changes the grammatical structure of surrounding code.
 
 #### Alias Funkiness Taxonomy
 
-| Level | Description | Example | Parseable without expansion? |
-|---|---|---|---|
-| **1. Single word** | Command rename | `alias g="git"` | Yes (identical AST shape) |
-| **2. Multiple words** | Command + flags/args | `alias ll="ls -lah"` | Yes (extra arg nodes) |
-| **3a. Redirections** | Adds I/O redirects | `alias quiet="cmd 2>/dev/null"` | Yes (slightly different AST) |
-| **3b. Command substitution** | `$(...)` in value | `alias gcm="git checkout $(git_main_branch)"` | Yes (substitution is inside a word) |
-| **3c. Trailing space** | Triggers chained alias expansion | `alias sudo="sudo "` | Yes (just a word with trailing space) |
-| **4. Separators** | Contains `;`, `\|`, `&&`, `\|\|` | `alias gwip="git add -A; git rm ..."` | Yes (wrong AST, but parses) |
-| **5. Partial compound** | Unbalanced keywords/braces | `alias LEFT="{"` | **No** (parse error) |
+| Level                        | Description                      | Example                                       | Parseable without expansion?          |
+| ---------------------------- | -------------------------------- | --------------------------------------------- | ------------------------------------- |
+| **1. Single word**           | Command rename                   | `alias g="git"`                               | Yes (identical AST shape)             |
+| **2. Multiple words**        | Command + flags/args             | `alias ll="ls -lah"`                          | Yes (extra arg nodes)                 |
+| **3a. Redirections**         | Adds I/O redirects               | `alias quiet="cmd 2>/dev/null"`               | Yes (slightly different AST)          |
+| **3b. Command substitution** | `$(...)` in value                | `alias gcm="git checkout $(git_main_branch)"` | Yes (substitution is inside a word)   |
+| **3c. Trailing space**       | Triggers chained alias expansion | `alias sudo="sudo "`                          | Yes (just a word with trailing space) |
+| **4. Separators**            | Contains `;`, `\|`, `&&`, `\|\|` | `alias gwip="git add -A; git rm ..."`         | Yes (wrong AST, but parses)           |
+| **5. Partial compound**      | Unbalanced keywords/braces       | `alias LEFT="{"`                              | **No** (parse error)                  |
 
 Levels 1–4 are fully supported. Level 5 is **not supported** and will not be: a
 survey of ~2,500 real-world aliases found 0% at level 5. Both POSIX and Bash allow

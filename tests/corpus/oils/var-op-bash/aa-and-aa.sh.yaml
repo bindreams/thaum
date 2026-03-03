@@ -2,7 +2,8 @@ name: ${!A@a} and ${!A[@]@a}
 dialect: bash
 source: oils:spec/var-op-bash#aa-and-aa
 status: 1
-stdout: "x=\n"
+stdout: |-
+  x=
 ---
 declare -A A=(["x"]=y)
 echo x=${!A[@]@a}

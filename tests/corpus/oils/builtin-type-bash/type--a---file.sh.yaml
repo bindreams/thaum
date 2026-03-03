@@ -1,7 +1,9 @@
 name: type -a -> file
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---file
-stdout: "date is /bin/date\ndate is _tmp/date\n"
+stdout: |-
+  date is /bin/date
+  date is _tmp/date
 ---
 touch _tmp/date
 chmod +x _tmp/date

@@ -2,8 +2,10 @@ disabled: true
 name: '@[maybe(x)]'
 dialect: bash
 source: oils:spec/ysh-func-builtin#maybex
-stdout: "['a', 'X', 'b']\n['a', 'b']\n"
-setup: |
+stdout: |
+  ['a', 'X', 'b']
+  ['a', 'b']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 setvar empty = ''
 setvar x = 'X'

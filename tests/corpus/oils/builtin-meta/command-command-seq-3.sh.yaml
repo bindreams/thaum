@@ -1,6 +1,9 @@
 name: command command seq 3
 dialect: bash
 source: oils:spec/builtin-meta#command-command-seq-3
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 command command seq 3

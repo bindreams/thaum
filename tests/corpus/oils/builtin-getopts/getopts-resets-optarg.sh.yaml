@@ -1,7 +1,9 @@
 name: getopts resets OPTARG
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-resets-optarg
-stdout: "status=0 opt=c OPTARG=foo\nstatus=0 opt=h OPTARG=\n"
+stdout: |-
+  status=0 opt=c OPTARG=foo
+  status=0 opt=h OPTARG=
 ---
 set -- -c foo -h
 getopts 'hc:' opt

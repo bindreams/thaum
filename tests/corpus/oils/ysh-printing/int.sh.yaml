@@ -2,6 +2,7 @@ disabled: true
 name: Int
 dialect: bash
 source: oils:spec/ysh-printing#int
-stdout: "(Int)   -123\n"
+stdout: |-
+  (Int)   -123
 ---
 =  -123

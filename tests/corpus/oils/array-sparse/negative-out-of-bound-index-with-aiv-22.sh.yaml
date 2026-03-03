@@ -3,8 +3,10 @@ dialect: bash
 source: oils:spec/array-sparse#negative-out-of-bound-index-with-aiv-22
 status: 1
 stdout: "\n"
-stderr: "  sp1[-21]=F\n  ^~~~\n[ stdin ]:5: fatal: Index -21 is out of bounds for
-  array of length 10\n"
+stderr: |2-
+    sp1[-21]=F
+    ^~~~
+  [ stdin ]:5: fatal: Index -21 is out of bounds for array of length 10
 ---
 case $SH in mksh) exit ;; esac
 

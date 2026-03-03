@@ -2,7 +2,10 @@ disabled: true
 name: Can't x+= on other YSH types
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-x-on-other-ysh-types
-stdout: "eggex 1\nDict 1\nBashAssoc 1\n"
+stdout: |-
+  eggex 1
+  Dict 1
+  BashAssoc 1
 ---
 
 $SH -c '

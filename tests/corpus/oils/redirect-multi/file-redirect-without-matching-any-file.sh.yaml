@@ -1,7 +1,9 @@
 name: File redirect without matching any file
 dialect: bash
 source: oils:spec/redirect-multi#file-redirect-without-matching-any-file
-stdout: "status=0\nzz-*-xx\n"
+stdout: |-
+  status=0
+  zz-*-xx
 ---
 
 echo hi > zz-*-xx

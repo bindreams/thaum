@@ -2,8 +2,13 @@ disabled: true
 name: filenames are completed
 dialect: bash
 source: oils:spec/ysh-completion#filenames-are-completed
-stdout: "\nTODO: Is the order reversed?  I guess this is file system order, which
-  is\nnondeterministic.  YSH can sort them\n\necho baz \necho bar \n"
+stdout: |2-
+
+  TODO: Is the order reversed?  I guess this is file system order, which is
+  nondeterministic.  YSH can sort them
+
+  echo baz 
+  echo bar 
 ---
 
 touch foo bar baz

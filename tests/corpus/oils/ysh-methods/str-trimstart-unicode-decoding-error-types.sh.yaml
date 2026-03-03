@@ -2,7 +2,12 @@ disabled: true
 name: Str => trimStart(), unicode decoding error types
 dialect: bash
 source: oils:spec/ysh-methods#str-trimstart-unicode-decoding-error-types
-stdout: "status=3\nstatus=3\nstatus=3\nstatus=3\nstatus=3\n"
+stdout: |-
+  status=3
+  status=3
+  status=3
+  status=3
+  status=3
 ---
 var badStrs = [
   b'\yF4\yA2\yA4\yB0',  # Too large of a codepoint

@@ -1,7 +1,9 @@
 name: \D{%H:%M} for strftime
 dialect: bash
 source: oils:spec/prompt#dhm-for-strftime
-stdout: "matched=0\nmatched=0\n"
+stdout: |-
+  matched=0
+  matched=0
 ---
 PS1='foo \D{%H:%M} bar'
 echo "${PS1@P}" | egrep -q 'foo [0-9][0-9]:[0-9][0-9] bar'

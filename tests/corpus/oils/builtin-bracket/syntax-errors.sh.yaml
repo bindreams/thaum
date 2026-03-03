@@ -1,7 +1,12 @@
 name: '] syntax errors'
 dialect: bash
 source: oils:spec/builtin-bracket#syntax-errors
-stdout: "status=2\nstatus=1\nstatus=2\nstatus=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=1
+  status=2
+  status=2
+  status=2
 ---
 [
 echo status=$?

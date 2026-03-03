@@ -2,7 +2,9 @@ disabled: true
 name: Eggex bug in a loop
 dialect: bash
 source: oils:spec/ysh-user-feedback#eggex-bug-in-a-loop
-stdout: "yes\nyes\n"
+stdout: |-
+  yes
+  yes
 ---
 
 # https://oilshell.zulipchat.com/#narrow/stream/121540-oil-discuss/topic/A.20list.20of.20feedback

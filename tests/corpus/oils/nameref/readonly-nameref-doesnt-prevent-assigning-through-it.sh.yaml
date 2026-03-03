@@ -1,7 +1,10 @@
 name: readonly nameref doesn't prevent assigning through it
 dialect: bash
 source: oils:spec/nameref#readonly-nameref-doesnt-prevent-assigning-through-it
-stdout: "ref=XX\nref=XXXX\nx=X\n"
+stdout: |-
+  ref=XX
+  ref=XXXX
+  x=X
 ---
 
 # hm bash also ignores -r when -n is set

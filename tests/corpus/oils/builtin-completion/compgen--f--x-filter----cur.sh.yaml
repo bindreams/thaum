@@ -1,7 +1,11 @@
 name: compgen -f -X filter -- $cur
 dialect: bash
 source: oils:spec/builtin-completion#compgen--f--x-filter----cur
-stdout: "spam.py\nspam.sh\n--\nspam.py\n"
+stdout: |
+  spam.py
+  spam.sh
+  --
+  spam.py
 environment:
   TMP: /tmp
 ---

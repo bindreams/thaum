@@ -2,7 +2,8 @@ name: Arbitrary base 64#a is rejected (unlike in shell arithmetic)
 dialect: bash
 source: 
   oils:spec/builtin-printf#arbitrary-base-64a-is-rejected-unlike-in-shell-arithmetic
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 
 printf '%d\n' '64#a'

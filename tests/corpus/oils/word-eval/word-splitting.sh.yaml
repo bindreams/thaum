@@ -1,8 +1,9 @@
 name: Word splitting
 dialect: bash
 source: oils:spec/word-eval#word-splitting
-stdout: "['1', '23', '4', '5 6']\n"
-setup: |
+stdout: |
+  ['1', '23', '4', '5 6']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 s1='1 2'
 s2='3 4'

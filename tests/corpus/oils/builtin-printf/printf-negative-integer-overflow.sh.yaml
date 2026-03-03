@@ -1,7 +1,14 @@
 name: printf negative integer overflow
 dialect: bash
 source: oils:spec/builtin-printf#printf-negative-integer-overflow
-stdout: "status=1\nstatus=1\n\nstatus=1\nstatus=1\n\n"
+stdout: |+
+  status=1
+  status=1
+
+  status=1
+  status=1
+
+...
 ---
 
 # %i seems like a synonym for %d

@@ -2,7 +2,10 @@ disabled: true
 name: "ERE: 'dot' matches newline"
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#ere-dot-matches-newline
-stdout: "(Bool)  true\n(Bool)  true\n(Bool)  false\n"
+stdout: |-
+  (Bool)  true
+  (Bool)  true
+  (Bool)  false
 ---
 
 = 'z' ~ /dot/

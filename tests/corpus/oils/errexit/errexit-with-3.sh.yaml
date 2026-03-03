@@ -1,7 +1,10 @@
 name: errexit with !
 dialect: bash
 source: oils:spec/errexit#errexit-with
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 set -o errexit
 echo one

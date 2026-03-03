@@ -2,7 +2,11 @@ name: Quoting non-special characters within `` within double quotes
 dialect: bash
 source: 
   oils:spec/command-sub#quoting-non-special-characters-within-within-double-quotes
-stdout: "[1 z]\n[2 z]\n[3 \\z]\n[4 \\z]\n"
+stdout: |-
+  [1 z]
+  [2 z]
+  [3 \z]
+  [4 \z]
 ---
 echo "[1 `echo \z`]"
 echo "[2 `echo \\z`]"

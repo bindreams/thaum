@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-getopts#getopts-silent-error-reporting---invalid-option
 status: 0
-stdout: "status=0 opt=? OPTARG=Z\n"
+stdout: |
+  status=0 opt=? OPTARG=Z
 stderr: "\n"
 ---
 # Leading : in optspec enables silent mode: OPTARG=option char, no error msg

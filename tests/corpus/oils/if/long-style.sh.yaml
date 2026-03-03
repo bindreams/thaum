@@ -1,7 +1,8 @@
 name: Long style
 dialect: bash
 source: oils:spec/if#long-style
-stdout: "elif\n"
+stdout: |-
+  elif
 ---
 if [[ 0 -eq 1 ]]
 then

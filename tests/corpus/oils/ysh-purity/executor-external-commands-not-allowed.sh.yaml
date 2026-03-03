@@ -3,7 +3,10 @@ name: 'Executor: External Commands not allowed'
 dialect: bash
 source: oils:spec/ysh-purity#executor-external-commands-not-allowed
 status: 127
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 
 var cmd = ^(seq 3)

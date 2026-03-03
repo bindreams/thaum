@@ -1,7 +1,8 @@
 name: 'usage: too many args'
 dialect: bash
 source: oils:spec/builtin-umask#usage-too-many-args
-stdout: "fail\n"
+stdout: |-
+  fail
 ---
 
 # most shells don't verify this

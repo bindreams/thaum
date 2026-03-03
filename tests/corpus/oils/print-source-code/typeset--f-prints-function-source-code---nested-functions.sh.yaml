@@ -2,7 +2,9 @@ name: typeset -f prints function source code - nested functions
 dialect: bash
 source: 
   oils:spec/print-source-code#typeset--f-prints-function-source-code---nested-functions
-stdout: "outer\ninner\n"
+stdout: |-
+  outer
+  inner
 ---
 outer() {
   echo outer

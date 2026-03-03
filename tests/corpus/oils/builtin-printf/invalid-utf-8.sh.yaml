@@ -1,8 +1,28 @@
 name: Invalid UTF-8
 dialect: bash
 source: oils:spec/builtin-printf#invalid-utf-8
-stdout: "bytes1\nce\n206\n316\n\nbytes2\nbc\n188\n274\n\noverlong2\nc1\n193\n301\n\
-  \noverlong3\ne0\n224\n340\n\n"
+stdout: |+
+  bytes1
+  ce
+  206
+  316
+
+  bytes2
+  bc
+  188
+  274
+
+  overlong2
+  c1
+  193
+  301
+
+  overlong3
+  e0
+  224
+  340
+
+...
 ---
 
 echo bytes1

@@ -1,8 +1,21 @@
 name: read -d -n - respects delimiter and splits
 dialect: bash
 source: oils:spec/builtin-read#read--d--n---respects-delimiter-and-splits
-stdout: "delim c\n[  a]\n[  a ]\n[  a b]\n\none var\n[a]\n[a]\n[a b]\n\nthree vars\n\
-  [a] [] []\n[a] [] []\n[a] [b] []\n"
+stdout: |-
+  delim c
+  [  a]
+  [  a ]
+  [  a b]
+
+  one var
+  [a]
+  [a]
+  [a b]
+
+  three vars
+  [a] [] []
+  [a] [] []
+  [a] [b] []
 ---
 
 case $SH in dash|zsh|ash) exit ;; esac

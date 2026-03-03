@@ -1,7 +1,8 @@
 name: chdir is a synonym for cd - busybox ash
 dialect: bash
 source: oils:spec/builtin-cd#chdir-is-a-synonym-for-cd---busybox-ash
-stdout: "/tmp\n"
+stdout: |-
+  /tmp
 ---
 
 chdir /tmp

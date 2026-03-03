@@ -1,7 +1,9 @@
 name: \ in unquoted substitutions is preserved
 dialect: bash
 source: oils:spec/glob#in-unquoted-substitutions-is-preserved
-stdout: "\\*\\*.txt\n\\*\\*.txt\n"
+stdout: |-
+  \*\*.txt
+  \*\*.txt
 ---
 v='\*\*.txt'
 echo $v

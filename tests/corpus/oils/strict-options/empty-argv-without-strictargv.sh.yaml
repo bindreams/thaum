@@ -1,7 +1,12 @@
 name: empty argv WITHOUT strict_argv
 dialect: bash
 source: oils:spec/strict-options#empty-argv-without-strictargv
-stdout: "status=0\nVarSub\nCommandSub\nVarSub FAILED\nCommandSub FAILED\n"
+stdout: |-
+  status=0
+  VarSub
+  CommandSub
+  VarSub FAILED
+  CommandSub FAILED
 ---
 x=''
 $x

@@ -2,7 +2,11 @@ disabled: true
 name: dict literal with implicit value
 dialect: bash
 source: oils:spec/ysh-dict#dict-literal-with-implicit-value
-stdout: "len=1\nfoo\nlen=2\nfoo\n"
+stdout: |-
+  len=1
+  foo
+  len=2
+  foo
 ---
 shopt --set parse_ysh_expr_sub
 

@@ -1,7 +1,8 @@
 name: unset PWD; cd /tmp is allowed (regression)
 dialect: bash
 source: oils:spec/builtin-cd#unset-pwd-cd-tmp-is-allowed-regression
-stdout: "/tmp\n"
+stdout: |-
+  /tmp
 ---
 
 unset PWD; cd /tmp

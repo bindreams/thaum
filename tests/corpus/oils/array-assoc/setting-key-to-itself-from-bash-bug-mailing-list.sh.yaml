@@ -1,7 +1,9 @@
 name: setting key to itself (from bash-bug mailing list)
 dialect: bash
 source: oils:spec/array-assoc#setting-key-to-itself-from-bash-bug-mailing-list
-stdout: "value1\nvalue1 value2\n"
+stdout: |-
+  value1
+  value1 value2
 ---
 declare -A foo
 foo=(["key"]="value1")

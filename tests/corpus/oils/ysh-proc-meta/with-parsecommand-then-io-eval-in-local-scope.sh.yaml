@@ -2,7 +2,11 @@ disabled: true
 name: with parseCommand() then io->eval(), in local scope
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-parsecommand-then-io-eval-in-local-scope
-stdout: "in-proc a\nin-proc b\nglobal a\nglobal b\n"
+stdout: |-
+  in-proc a
+  in-proc b
+  global a
+  global b
 ---
 
 proc p {

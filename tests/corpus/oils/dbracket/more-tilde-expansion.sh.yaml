@@ -1,7 +1,13 @@
 name: more tilde expansion
 dialect: bash
 source: oils:spec/dbracket#more-tilde-expansion
-stdout: "status=0\nstatus=1\nunary=1\nstatus=0\nfnmatch=0\nfnmatch=0\n"
+stdout: |-
+  status=0
+  status=1
+  unary=1
+  status=0
+  fnmatch=0
+  fnmatch=0
 ---
 [[ ~ ]]
 echo status=$?

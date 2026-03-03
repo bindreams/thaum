@@ -2,7 +2,8 @@ name: dirs to print using tilde-prefix format
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-to-print-using-tilde-prefix-format
 status: 0
-stdout: "~/oil_test /\n"
+stdout: |-
+  ~/oil_test /
 ---
 cd /
 HOME=/tmp

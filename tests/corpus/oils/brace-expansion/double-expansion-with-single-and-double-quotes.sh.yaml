@@ -1,6 +1,7 @@
 name: double expansion with single and double quotes
 dialect: bash
 source: oils:spec/brace-expansion#double-expansion-with-single-and-double-quotes
-stdout: "a_c a_d b_c b_d\n"
+stdout: |-
+  a_c a_d b_c b_d
 ---
 echo {'a',b}_{c,"d"}

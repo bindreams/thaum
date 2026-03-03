@@ -3,7 +3,8 @@ name: Singleton tuple should be empty list
 dialect: bash
 source: oils:spec/ysh-tuple#singleton-tuple-should-be-empty-list
 status: 2
-stdout: "len=1\n"
+stdout: |-
+  len=1
 ---
 
 var t = [42]

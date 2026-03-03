@@ -1,6 +1,7 @@
 name: Single-quoted
 dialect: bash
 source: oils:spec/quote#single-quoted
-stdout: "single   quoted\n"
+stdout: |-
+  single   quoted
 ---
 echo 'single   quoted'

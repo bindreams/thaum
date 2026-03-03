@@ -1,7 +1,9 @@
 name: 'set -o errtrace: trap ERR with &'
 dialect: bash
 source: oils:spec/builtin-trap-err#set--o-errtrace-trap-err-with
-stdout: "line=8\nasync\n"
+stdout: |-
+  line=8
+  async
 ---
 case $SH in mksh) exit ;; esac
 

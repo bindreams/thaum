@@ -1,7 +1,10 @@
 name: command -v doesn't find executable dir
 dialect: bash
 source: oils:spec/builtin-meta#command--v-doesnt-find-executable-dir
-stdout: "status=1\n/usr/bin/cat\nstatus=0\n"
+stdout: |-
+  status=1
+  /usr/bin/cat
+  status=0
 ---
 
 mkdir -p _tmp

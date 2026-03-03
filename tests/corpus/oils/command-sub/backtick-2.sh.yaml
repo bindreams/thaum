@@ -1,6 +1,7 @@
 name: Backtick 2
 dialect: bash
 source: oils:spec/command-sub#backtick-2
-stdout: "ls\n"
+stdout: |-
+  ls
 ---
 echo `echo -n l; echo -n s`

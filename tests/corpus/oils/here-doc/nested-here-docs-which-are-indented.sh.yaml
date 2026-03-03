@@ -1,7 +1,9 @@
 name: Nested here docs which are indented
 dialect: bash
 source: oils:spec/here-doc#nested-here-docs-which-are-indented
-stdout: "outside\ninside\n"
+stdout: |-
+  outside
+  inside
 ---
 cat <<- EOF
 	outside

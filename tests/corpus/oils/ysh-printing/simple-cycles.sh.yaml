@@ -2,7 +2,9 @@ disabled: true
 name: Simple Cycles
 dialect: bash
 source: oils:spec/ysh-printing#simple-cycles
-stdout: "(List)  ['one', 'two', [...]]\n(Dict)  {dead_end: null, live_end: {...}}\n"
+stdout: |-
+  (List)  ['one', 'two', [...]]
+  (Dict)  {dead_end: null, live_end: {...}}
 ---
 var cyclic_array = ["one", "two", "three"]
 setvar cyclic_array[2] = cyclic_array

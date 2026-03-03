@@ -2,7 +2,9 @@ disabled: true
 name: _error register is initially empty dict
 dialect: bash
 source: oils:spec/ysh-builtin-error#error-register-is-initially-empty-dict
-stdout: "Dict\n0\n"
+stdout: |-
+  Dict
+  0
 ---
 
 echo $[type(_error)]

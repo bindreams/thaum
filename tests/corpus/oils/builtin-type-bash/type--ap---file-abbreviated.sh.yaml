@@ -1,7 +1,9 @@
 name: type -ap -> file; abbreviated
 dialect: bash
 source: oils:spec/builtin-type-bash#type--ap---file-abbreviated
-stdout: "/bin/date\n_tmp/date\n"
+stdout: |-
+  /bin/date
+  _tmp/date
 ---
 touch _tmp/date
 chmod +x _tmp/date

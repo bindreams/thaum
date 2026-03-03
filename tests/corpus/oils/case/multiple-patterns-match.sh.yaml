@@ -1,7 +1,8 @@
 name: Multiple Patterns Match
 dialect: bash
 source: oils:spec/case#multiple-patterns-match
-stdout: "- X\n"
+stdout: |-
+  - X
 ---
 x=foo
 result='-'

@@ -2,7 +2,9 @@ disabled: true
 name: "'builtin' and 'command' with block"
 dialect: bash
 source: oils:spec/ysh-blocks#builtin-and-command-with-block
-stdout: "builtin /\ncommand /\n"
+stdout: |-
+  builtin /
+  command /
 ---
 shopt --set oil:upgrade
 builtin cd / {

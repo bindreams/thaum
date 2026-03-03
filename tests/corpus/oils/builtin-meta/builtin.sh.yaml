@@ -1,7 +1,9 @@
 name: builtin
 dialect: bash
 source: oils:spec/builtin-meta#builtin
-stdout: "hi\n/\n"
+stdout: |-
+  hi
+  /
 ---
 cd () { echo "hi"; }
 cd

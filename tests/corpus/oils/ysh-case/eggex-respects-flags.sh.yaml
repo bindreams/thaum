@@ -2,7 +2,8 @@ disabled: true
 name: eggex respects flags
 dialect: bash
 source: oils:spec/ysh-case#eggex-respects-flags
-stdout: "Python\n"
+stdout: |-
+  Python
 ---
 const x = 'MAIN.PY'
 case (x) {

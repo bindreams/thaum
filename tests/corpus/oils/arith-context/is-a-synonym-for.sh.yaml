@@ -1,6 +1,7 @@
 name: $[ is a synonym for $((
 dialect: bash
 source: oils:spec/arith-context#is-a-synonym-for
-stdout: "3 12\n"
+stdout: |-
+  3 12
 ---
 echo $[1+2] $[3 * 4]

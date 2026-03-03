@@ -1,7 +1,8 @@
 name: Leading redirect in a simple command
 dialect: bash
 source: oils:spec/redirect-command#leading-redirect-in-a-simple-command
-stdout: "hello\n"
+stdout: |
+  hello
 environment:
   TMP: /tmp
 ---

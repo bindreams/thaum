@@ -2,7 +2,8 @@ name: exec without args is a special case of the special case in some shells
 dialect: bash
 source: 
   oils:spec/builtin-special#exec-without-args-is-a-special-case-of-the-special-case-in-some-shells
-stderr: "FOO=\n"
+stderr: |-
+  FOO=
 ---
 
 FOO=bar exec >& 2

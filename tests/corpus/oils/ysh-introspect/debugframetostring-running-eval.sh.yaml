@@ -2,16 +2,32 @@ disabled: true
 name: DebugFrame.toString() running eval
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-running-eval
-stdout: "  %1 [ -c flag ]:1\n    source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh;
-  eval \"my-proc a b\"\n                                                         \
-  \           ^\n  %2 [ eval arg at line 1 of [ -c flag ] ]:1\n    my-proc a b\n \
-  \   ^~~~~~~\n  %3 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n      print-stack\n\
-  \      ^~~~~~~~~~~\n\n  %1 [ -c flag ]:1\n    source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-eval.ysh\n\
-  \    ^~~~~~\n  %2 MYROOT/spec/testdata/debug-frame-eval.ysh:7\n    p3\n    ^~\n\
-  \  %3 MYROOT/spec/testdata/debug-frame-eval.ysh:4\n      eval 'my-proc x y'\n  \
-  \         ^\n  %4 [ eval arg at line 4 of MYROOT/spec/testdata/debug-frame-eval.ysh
-  ]:1\n    my-proc x y\n    ^~~~~~~\n  %5 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n\
-  \      print-stack\n      ^~~~~~~~~~~\n"
+stdout: |2-
+    %1 [ -c flag ]:1
+      source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh; eval "my-proc a b"
+                                                                      ^
+    %2 [ eval arg at line 1 of [ -c flag ] ]:1
+      my-proc a b
+      ^~~~~~~
+    %3 MYROOT/spec/testdata/debug-frame-lib.ysh:15
+        print-stack
+        ^~~~~~~~~~~
+
+    %1 [ -c flag ]:1
+      source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-eval.ysh
+      ^~~~~~
+    %2 MYROOT/spec/testdata/debug-frame-eval.ysh:7
+      p3
+      ^~
+    %3 MYROOT/spec/testdata/debug-frame-eval.ysh:4
+        eval 'my-proc x y'
+             ^
+    %4 [ eval arg at line 4 of MYROOT/spec/testdata/debug-frame-eval.ysh ]:1
+      my-proc x y
+      ^~~~~~~
+    %5 MYROOT/spec/testdata/debug-frame-lib.ysh:15
+        print-stack
+        ^~~~~~~~~~~
 ---
 
 # -c and eval

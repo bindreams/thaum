@@ -1,7 +1,9 @@
 name: $"" is a synonym for ""
 dialect: bash
 source: oils:spec/quote#is-a-synonym-for
-stdout: "foo\nfoo x\n"
+stdout: |-
+  foo
+  foo x
 ---
 echo $"foo"
 x=x

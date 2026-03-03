@@ -2,7 +2,11 @@ disabled: true
 name: Unary Operations
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-operations
-stdout: "-2\n-1\n-2.3\nfalse\n"
+stdout: |-
+  -2
+  -1
+  -2.3
+  false
 ---
 
 var a = ~1

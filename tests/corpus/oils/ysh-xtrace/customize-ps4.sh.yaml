@@ -2,8 +2,14 @@ disabled: true
 name: Customize PS4
 dialect: bash
 source: oils:spec/ysh-xtrace#customize-ps4
-stdout: "1\n2\n3\n"
-stderr: "5 . builtin echo 1\n5 . builtin echo 2\n6 . builtin echo 3\n"
+stdout: |
+  1
+  2
+  3
+stderr: |-
+  5 . builtin echo 1
+  5 . builtin echo 2
+  6 . builtin echo 3
 ---
 shopt -s ysh:upgrade
 set -x

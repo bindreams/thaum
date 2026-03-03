@@ -2,7 +2,14 @@ name: trap ERR
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err
 status: 99
-stdout: "A\nerr [x y] 1\nB\nerr [x y] 42\nC\nD\nafter errexit 99\n"
+stdout: |-
+  A
+  err [x y] 1
+  B
+  err [x y] 42
+  C
+  D
+  after errexit 99
 ---
 err() {
   echo "err [$@] $?"

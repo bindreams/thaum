@@ -2,7 +2,8 @@ disabled: true
 name: $[x] with _ESCAPER
 dialect: bash
 source: oils:spec/ysh-var-sub#x-with-escaper
-stdout: "code echo hi 2&gt;&amp;1\n"
+stdout: |-
+  code echo hi 2&gt;&amp;1
 ---
 shopt --set oil:upgrade
 

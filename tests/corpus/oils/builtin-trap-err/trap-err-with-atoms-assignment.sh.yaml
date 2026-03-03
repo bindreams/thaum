@@ -1,7 +1,11 @@
 name: 'trap ERR with "atoms": assignment (( [['
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-atoms-assignment
-stdout: "line=3\nline=5\nline=7\nok\n"
+stdout: |-
+  line=3
+  line=5
+  line=7
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

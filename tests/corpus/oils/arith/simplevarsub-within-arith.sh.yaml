@@ -1,7 +1,8 @@
 name: SimpleVarSub within arith
 dialect: bash
 source: oils:spec/arith#simplevarsub-within-arith
-stdout: "42\n"
+stdout: |-
+  42
 ---
 j=0
 echo $(($j + 42))

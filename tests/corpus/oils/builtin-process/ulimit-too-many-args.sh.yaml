@@ -1,7 +1,8 @@
 name: ulimit too many args
 dialect: bash
 source: oils:spec/builtin-process#ulimit-too-many-args
-stdout: "pass\n"
+stdout: |-
+  pass
 ---
 
 ulimit 1 2

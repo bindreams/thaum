@@ -2,9 +2,44 @@ disabled: true
 name: and-or chains for typed data
 dialect: bash
 source: oils:spec/ysh-expr-bool#and-or-chains-for-typed-data
-stdout: "s\nNone\nx\ny\ny\n\n42\n0\n42\n0\n0.5\n0.0\n['a']\n[]\n{'d': 1}\n{}\nOR\n\
-  AND\n---\n\"s\"\nnull\nx\ny\ny\n\n42\n0\n42\n0\n0.5\n0.0\n(List)   [\"a\"]\n(List)\
-  \   []\n(Dict)   {\"d\":1}\n(Dict)   {}\nOR\nAND\n"
+stdout: |-
+  s
+  None
+  x
+  y
+  y
+
+  42
+  0
+  42
+  0
+  0.5
+  0.0
+  ['a']
+  []
+  {'d': 1}
+  {}
+  OR
+  AND
+  ---
+  "s"
+  null
+  x
+  y
+  y
+
+  42
+  0
+  42
+  0
+  0.5
+  0.0
+  (List)   ["a"]
+  (List)   []
+  (Dict)   {"d":1}
+  (Dict)   {}
+  OR
+  AND
 ---
 shopt --set parse_ysh_expr_sub
 

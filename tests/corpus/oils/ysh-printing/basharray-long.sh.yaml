@@ -2,9 +2,21 @@ disabled: true
 name: BashArray, long
 dialect: bash
 source: oils:spec/ysh-printing#basharray-long
-stdout: "(BashArray [0]='world' [2]='*.py')\n(BashArray\n    [0]='Lorem'\n    [1]='ipsum'\n\
-  \    [2]='dolor'\n    [3]='sit'\n    [4]='amet,'\n    [5]='consectetur'\n    [6]='adipiscing'\n\
-  \    [7]='elit,'\n    [8]='sed'\n    [9]='do'\n    [10]='eiusmod.'\n)\n"
+stdout: |-
+  (BashArray [0]='world' [2]='*.py')
+  (BashArray
+      [0]='Lorem'
+      [1]='ipsum'
+      [2]='dolor'
+      [3]='sit'
+      [4]='amet,'
+      [5]='consectetur'
+      [6]='adipiscing'
+      [7]='elit,'
+      [8]='sed'
+      [9]='do'
+      [10]='eiusmod.'
+  )
 ---
 declare -a array_3
 array_3[0]="world"

@@ -2,7 +2,10 @@ disabled: true
 name: 'For loop over expression: List'
 dialect: bash
 source: oils:spec/ysh-for#for-loop-over-expression-list
-stdout: "item 1\nitem 2\nitem 3\n"
+stdout: |-
+  item 1
+  item 2
+  item 3
 ---
 var mylist = [1, 2, 3]
 for item in (mylist) {

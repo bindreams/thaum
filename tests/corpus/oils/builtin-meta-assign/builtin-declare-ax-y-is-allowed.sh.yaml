@@ -1,7 +1,10 @@
 name: builtin declare a=(x y) is allowed
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declare-ax-y-is-allowed
-stdout: "declare -a a=(x y)\ndeclare -a a=(x y)\ndeclare -a a=(x y)\n"
+stdout: |-
+  declare -a a=(x y)
+  declare -a a=(x y)
+  declare -a a=(x y)
 ---
 case $SH in dash|zsh|mksh|ash) exit ;; esac
 

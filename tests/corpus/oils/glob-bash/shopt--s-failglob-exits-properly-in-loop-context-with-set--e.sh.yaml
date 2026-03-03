@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/glob-bash#shopt--s-failglob-exits-properly-in-loop-context-with-set--e
 status: 1
-stdout: "*.ZZ\nstatus=0\n"
+stdout: |-
+  *.ZZ
+  status=0
 ---
 set -e
 for x in *.ZZ; do echo $x; done

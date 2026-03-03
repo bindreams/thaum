@@ -2,7 +2,8 @@ disabled: true
 name: Empty tuple
 dialect: bash
 source: oils:spec/ysh-tuple#empty-tuple
-stdout: "length=0\n"
+stdout: |-
+  length=0
 ---
 var t = ()
 echo length=$[len(t)]

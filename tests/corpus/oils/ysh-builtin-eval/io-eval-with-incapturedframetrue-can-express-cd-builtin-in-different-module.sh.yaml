@@ -4,7 +4,8 @@ name: io->eval with in_captured_frame=true can express cd builtin in different
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-eval-with-incapturedframetrue-can-express-cd-builtin-in-different-module
-stdout: "j = 43\n"
+stdout: |-
+  j = 43
 ---
 
 echo >lib.ysh '''

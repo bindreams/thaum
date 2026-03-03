@@ -2,8 +2,22 @@ disabled: true
 name: Comparison converts from Str -> Int or Float
 dialect: bash
 source: oils:spec/ysh-expr-compare#comparison-converts-from-str---int-or-float
-stdout: " i  i true\nsi  i true\n i si true\n---\n f  f true\nsf  f true\n f sf true\n\
-  ---\n i  f false\nsi  f false\n i sf false\n---\n f  i true\nsf  i true\n f si true\n"
+stdout: |2-
+   i  i true
+  si  i true
+   i si true
+  ---
+   f  f true
+  sf  f true
+   f sf true
+  ---
+   i  f false
+  si  f false
+   i sf false
+  ---
+   f  i true
+  sf  i true
+   f si true
 ---
 shopt --set parse_ysh_expr_sub
 

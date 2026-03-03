@@ -1,7 +1,11 @@
 name: (strict_array) declare -A s+=()
 dialect: bash
 source: oils:spec/array-literal#strictarray-declare--a-s
-stdout: "status=0\ndeclare -A s1=(['a']=x ['b']=y)\nstatus=1\ndeclare -- s2=world\n"
+stdout: |-
+  status=0
+  declare -A s1=(['a']=x ['b']=y)
+  status=1
+  declare -- s2=world
 ---
 case $SH in bash) ;; *) shopt --set strict_array ;; esac
 

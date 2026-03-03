@@ -1,7 +1,10 @@
 name: no shebang
 dialect: bash
 source: oils:spec/toysh-posix#no-shebang
-stdout: "hello\nhello\nhello 123\n"
+stdout: |-
+  hello
+  hello
+  hello 123
 ---
 cat > snork << 'EOF'
 echo hello $BLAH

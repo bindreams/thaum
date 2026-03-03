@@ -1,7 +1,9 @@
 name: equality
 dialect: bash
 source: oils:spec/dbracket#equality
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 [[ '*.py' == '*.py' ]] && echo true
 [[ foo.py == '*.py' ]] || echo false

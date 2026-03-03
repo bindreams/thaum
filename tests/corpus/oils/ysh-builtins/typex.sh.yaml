@@ -2,8 +2,19 @@ disabled: true
 name: type(x)
 dialect: bash
 source: oils:spec/ysh-builtins#typex
-stdout: "Int\nStr\nBool\nFloat\nList\nDict\nNull\nFunc\nBuiltinFunc\nBoundFunc\nBoundFunc\n\
-  Range\n"
+stdout: |-
+  Int
+  Str
+  Bool
+  Float
+  List
+  Dict
+  Null
+  Func
+  BuiltinFunc
+  BoundFunc
+  BoundFunc
+  Range
 ---
 shopt --set parse_ysh_expr_sub
 

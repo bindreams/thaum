@@ -1,7 +1,8 @@
 name: Empty expression for (( ))
 dialect: bash
 source: oils:spec/arith-context#empty-expression-for
-stdout: "one\n"
+stdout: |-
+  one
 ---
 
 for (( ; ; )); do

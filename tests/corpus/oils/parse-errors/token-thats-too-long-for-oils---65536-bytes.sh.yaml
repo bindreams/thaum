@@ -1,7 +1,9 @@
 name: Token that's too long for Oils - 65536 bytes
 dialect: bash
 source: oils:spec/parse-errors#token-thats-too-long-for-oils---65536-bytes
-stdout: "status=0\n65536 out\n"
+stdout: |-
+  status=0
+  65536 out
 ---
 
 python2 -c 'print("echo -n %s" % ("x" * 65536))' > tmp.sh

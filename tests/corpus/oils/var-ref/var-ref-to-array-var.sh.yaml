@@ -1,7 +1,9 @@
 name: var ref TO array var
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-array-var
-stdout: "ale\nale bean\n"
+stdout: |-
+  ale
+  ale bean
 ---
 shopt -s compat_array
 

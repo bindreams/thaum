@@ -1,7 +1,8 @@
 name: trap ERR doesn't run with &
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-doesnt-run-with
-stdout: "async\n"
+stdout: |-
+  async
 ---
 
 trap 'echo line=$LINENO' ERR

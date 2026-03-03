@@ -1,8 +1,9 @@
 name: Command with with word splitting in array
 dialect: bash
 source: oils:spec/array#command-with-with-word-splitting-in-array
-stdout: "['1 2', '3', '4']\n"
-setup: |
+stdout: |
+  ['1 2', '3', '4']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 array=('1 2' $(echo '3 4'))
 argv.py "${array[@]}"

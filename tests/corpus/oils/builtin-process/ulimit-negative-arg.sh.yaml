@@ -1,7 +1,9 @@
 name: ulimit negative arg
 dialect: bash
 source: oils:spec/builtin-process#ulimit-negative-arg
-stdout: "unlimited\npass\n"
+stdout: |-
+  unlimited
+  pass
 ---
 
 ulimit -f

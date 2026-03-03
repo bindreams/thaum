@@ -2,7 +2,8 @@ name: history -w writes out the in-memory history to the history file
 dialect: bash
 source: 
   oils:spec/builtin-history#history--w-writes-out-the-in-memory-history-to-the-history-file
-stdout: "found=1\n"
+stdout: |
+  found=1
 environment:
   TMP: /tmp
 ---

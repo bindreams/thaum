@@ -2,7 +2,11 @@ disabled: true
 name: Attribute / Data Blocks (package-manager)
 dialect: bash
 source: oils:spec/hay#attribute-data-blocks-package-manager
-stdout: "level 0 children\n3\nlevel 1 children\n0\n"
+stdout: |-
+  level 0 children
+  3
+  level 1 children
+  0
 ---
 shopt --set parse_proc parse_ysh_expr_sub
 

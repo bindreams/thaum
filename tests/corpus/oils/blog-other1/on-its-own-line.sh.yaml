@@ -1,7 +1,8 @@
 name: '` on its own line'
 dialect: bash
 source: oils:spec/blog-other1#on-its-own-line
-stdout: "hello world\n"
+stdout: |-
+  hello world
 ---
 foo=`cat <<EOM
 hello world

@@ -1,7 +1,9 @@
 name: hostname
 dialect: bash
 source: oils:spec/prompt#hostname
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 
 # NOTE: This test is not hermetic.  On my machine the short and long host name

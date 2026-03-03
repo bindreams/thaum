@@ -1,7 +1,11 @@
 name: ${a[@]:BigInt}
 dialect: bash
 source: oils:spec/array-sparse#abigint
-stdout: "[x][x]\n[y x][y x]\n[z y x][z y x]\n[z y x][z y x]\n"
+stdout: |-
+  [x][x]
+  [y x][y x]
+  [z y x][z y x]
+  [z y x][z y x]
 ---
 case $SH in mksh) exit ;; esac
 

@@ -1,8 +1,12 @@
 name: append to element (BashArray)
 dialect: bash
 source: oils:spec/array-literal#append-to-element-basharray
-stdout: "keys: ['100']\nvals: ['12']\nkeys: ['100']\nvals: ['12:34:56']\n"
-setup: |
+stdout: |
+  keys: ['100']
+  vals: ['12']
+  keys: ['100']
+  vals: ['12:34:56']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 hello=100
 a=([hello]=1 [hello]+=2)

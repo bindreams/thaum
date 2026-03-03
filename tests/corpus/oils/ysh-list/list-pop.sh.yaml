@@ -2,7 +2,8 @@ disabled: true
 name: List pop()
 dialect: bash
 source: oils:spec/ysh-list#list-pop
-stdout: "pass\n"
+stdout: |-
+  pass
 ---
 shopt -s ysh:all
 var l = list(1..<5)

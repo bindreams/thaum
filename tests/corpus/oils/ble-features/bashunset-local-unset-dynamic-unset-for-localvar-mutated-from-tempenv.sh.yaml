@@ -2,9 +2,12 @@ name: '[bash_unset] local-unset / dynamic-unset for localvar (mutated from tempe
 dialect: bash
 source: 
   oils:spec/ble-features#bashunset-local-unset-dynamic-unset-for-localvar-mutated-from-tempenv
-stdout: "# bash-unset (bash-5.1)\n#   local-unset   = local-unset\n#   dynamic-unset
-  = cell-unset\n[global,tempenv,local,(unset)] v: (unset)\n[global,tempenv,local,(unlocal)]
-  v: global\n"
+stdout: |-
+  # bash-unset (bash-5.1)
+  #   local-unset   = local-unset
+  #   dynamic-unset = cell-unset
+  [global,tempenv,local,(unset)] v: (unset)
+  [global,tempenv,local,(unlocal)] v: global
 ---
 unlocal() { unset -v "$1"; }
 

@@ -1,7 +1,8 @@
 name: Pattern replacement
 dialect: bash
 source: oils:spec/var-op-patsub#pattern-replacement
-stdout: "abXX\n"
+stdout: |-
+  abXX
 ---
 v=abcde
 echo ${v/c*/XX}

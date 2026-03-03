@@ -1,10 +1,11 @@
 name: Alias and command sub (bug regression)
 dialect: bash
 source: oils:spec/alias#alias-and-command-sub-bug-regression
-stdout: "['foo', 'bar']\n"
+stdout: |
+  ['foo', 'bar']
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 cd $TMP
 shopt -s expand_aliases

@@ -1,7 +1,9 @@
 name: function name with /
 dialect: bash
 source: oils:spec/assign-extended#function-name-with
-stdout: "ble/foo\nstatus=0\n"
+stdout: |-
+  ble/foo
+  status=0
 ---
 ble/foo() { echo hi; }
 declare -F ble/foo

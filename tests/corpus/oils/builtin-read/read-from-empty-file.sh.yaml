@@ -2,10 +2,12 @@ name: read from empty file
 dialect: bash
 source: oils:spec/builtin-read#read-from-empty-file
 status: 0
-stdout: "['status=1', '']\n['status=1', '']\n"
+stdout: |
+  ['status=1', '']
+  ['status=1', '']
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 echo -n '' > $TMP/empty.txt
 read x < $TMP/empty.txt

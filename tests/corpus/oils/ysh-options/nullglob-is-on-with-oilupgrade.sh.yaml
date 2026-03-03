@@ -2,7 +2,13 @@ disabled: true
 name: nullglob is on with oil:upgrade
 dialect: bash
 source: oils:spec/ysh-options#nullglob-is-on-with-oilupgrade
-stdout: "one\n*.zzz\ntwo\n__\none\ntwo\n"
+stdout: |-
+  one
+  *.zzz
+  two
+  __
+  one
+  two
 ---
 write one *.zzz two
 shopt -s oil:upgrade

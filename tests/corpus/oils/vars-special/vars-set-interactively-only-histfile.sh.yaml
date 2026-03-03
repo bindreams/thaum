@@ -1,7 +1,9 @@
 name: 'Vars set interactively only: $HISTFILE'
 dialect: bash
 source: oils:spec/vars-special#vars-set-interactively-only-histfile
-stdout: "histfile=\nhistfile=yes\n"
+stdout: |-
+  histfile=
+  histfile=yes
 ---
 case $SH in dash|mksh|zsh) exit ;; esac
 

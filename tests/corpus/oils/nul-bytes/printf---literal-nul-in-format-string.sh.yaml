@@ -1,7 +1,13 @@
 name: printf - literal NUL in format string
 dialect: bash
 source: oils:spec/nul-bytes#printf---literal-nul-in-format-string
-stdout: "   x\n  78\n---\n   x\n  78\n---\n"
+stdout: |2-
+     x
+    78
+  ---
+     x
+    78
+  ---
 ---
 case $SH in dash|ash) return ;; esac
 

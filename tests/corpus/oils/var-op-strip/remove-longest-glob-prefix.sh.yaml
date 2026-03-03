@@ -1,7 +1,8 @@
 name: Remove longest glob prefix
 dialect: bash
 source: oils:spec/var-op-strip#remove-longest-glob-prefix
-stdout: "ccdd\n"
+stdout: |-
+  ccdd
 ---
 v=aabbccdd
 echo ${v##*b}

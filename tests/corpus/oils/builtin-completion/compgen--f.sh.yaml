@@ -1,7 +1,13 @@
 name: compgen -f
 dialect: bash
 source: oils:spec/builtin-completion#compgen--f
-stdout: "one\nthree\ntwo\n--\nthree\ntwo\n"
+stdout: |
+  one
+  three
+  two
+  --
+  three
+  two
 environment:
   TMP: /tmp
 ---

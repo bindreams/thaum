@@ -2,7 +2,9 @@ disabled: true
 name: Double Quoted
 dialect: bash
 source: oils:spec/ysh-string#double-quoted
-stdout: "Hello World\nHello World\n"
+stdout: |-
+  Hello World
+  Hello World
 ---
 var name = 'World'
 var g = "Hello $name"

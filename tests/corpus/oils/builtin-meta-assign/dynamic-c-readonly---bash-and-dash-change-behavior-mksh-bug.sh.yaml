@@ -2,7 +2,9 @@ name: Dynamic $c readonly - bash and dash change behavior, mksh bug
 dialect: bash
 source: 
   oils:spec/builtin-meta-assign#dynamic-c-readonly---bash-and-dash-change-behavior-mksh-bug
-stdout: "a b\na b\n"
+stdout: |-
+  a b
+  a b
 ---
 case $SH in zsh) exit ;; esac
 

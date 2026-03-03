@@ -2,7 +2,9 @@ disabled: true
 name: 'proc eval block: return'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-block-return
-stdout: "one\nend func\n"
+stdout: |-
+  one
+  end func
 ---
 shopt -s ysh:all
 

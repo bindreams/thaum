@@ -3,7 +3,9 @@ name: "haynode: shell nodes require block args; attribute nodes don't"
 dialect: bash
 source: 
   oils:spec/hay#haynode-shell-nodes-require-block-args-attribute-nodes-dont
-stdout: "status 0\nstatus 2\n"
+stdout: |-
+  status 0
+  status 2
 ---
 
 shopt --set parse_brace parse_equals parse_proc parse_ysh_expr_sub

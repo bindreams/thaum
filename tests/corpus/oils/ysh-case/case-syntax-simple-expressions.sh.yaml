@@ -3,7 +3,8 @@ name: case syntax, simple expressions
 dialect: bash
 source: oils:spec/ysh-case#case-syntax-simple-expressions
 status: 0
-stdout: "three\n"
+stdout: |-
+  three
 ---
 const x = 3
 case (x) {

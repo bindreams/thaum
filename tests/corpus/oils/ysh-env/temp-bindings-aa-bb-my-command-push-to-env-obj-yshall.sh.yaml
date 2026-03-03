@@ -2,7 +2,9 @@ disabled: true
 name: Temp bindings A=a B=b my-command push to ENV Obj (ysh:all)
 dialect: bash
 source: oils:spec/ysh-env#temp-bindings-aa-bb-my-command-push-to-env-obj-yshall
-stdout: "_A=a\n_B=b\n"
+stdout: |-
+  _A=a
+  _B=b
 ---
 shopt -s ysh:all
 

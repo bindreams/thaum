@@ -2,7 +2,15 @@ disabled: true
 name: builtin cat accept - for stdin
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-cat-accept---for-stdin
-stdout: "FOO\n3\n4\nFOO\nFOO\n---\n5\n6\n"
+stdout: |-
+  FOO
+  3
+  4
+  FOO
+  FOO
+  ---
+  5
+  6
 ---
 case $SH in
   *osh) prefix='builtin' ;;

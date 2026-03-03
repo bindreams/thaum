@@ -1,7 +1,10 @@
 name: Max code point U+10ffff can escaped with $''  printf  echo -e
 dialect: bash
 source: oils:spec/unicode#max-code-point-u10ffff-can-escaped-with-printf-echo--e
-stdout: "'\\xf4\\x8f\\xbf\\xbf'\n'\\xf4\\x8f\\xbf\\xbf'\n'\\xf4\\x8f\\xbf\\xbf'\n"
+stdout: |-
+  '\xf4\x8f\xbf\xbf'
+  '\xf4\x8f\xbf\xbf'
+  '\xf4\x8f\xbf\xbf'
 ---
 
 case $SH in dash|ash) exit ;; esac

@@ -1,7 +1,8 @@
 name: alias not defined
 dialect: bash
 source: oils:spec/alias#alias-not-defined
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 alias e='echo' nonexistentZ
 echo status=$?

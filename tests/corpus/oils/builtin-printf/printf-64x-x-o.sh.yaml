@@ -1,8 +1,18 @@
 name: printf %6.4x X o
 dialect: bash
 source: oils:spec/builtin-printf#printf-64x-x-o
-stdout: "[  002a]\n[002a]\n[    2a]\n--\n[  002A]\n[002A]\n[    2A]\n--\n[  0052]\n\
-  [0052]\n[    52]\n"
+stdout: |-
+  [  002a]
+  [002a]
+  [    2a]
+  --
+  [  002A]
+  [002A]
+  [    2A]
+  --
+  [  0052]
+  [0052]
+  [    52]
 ---
 printf '[%6.4x]\n' 42
 printf '[%.4x]\n' 42

@@ -1,7 +1,9 @@
 name: set -u error can break out of nested evals
 dialect: bash
 source: oils:spec/builtin-set#set--u-error-can-break-out-of-nested-evals
-stdout: "before\nOK\n"
+stdout: |-
+  before
+  OK
 ---
 $SH -c '
 set -u

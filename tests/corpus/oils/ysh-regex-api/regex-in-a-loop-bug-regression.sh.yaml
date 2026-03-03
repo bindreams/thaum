@@ -2,7 +2,9 @@ disabled: true
 name: Regex in a loop (bug regression)
 dialect: bash
 source: oils:spec/ysh-regex-api#regex-in-a-loop-bug-regression
-stdout: "1\n2\n"
+stdout: |-
+  1
+  2
 ---
 
 shopt --set ysh:all

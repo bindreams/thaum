@@ -2,7 +2,10 @@ name: true is not special; prefix assignments don't persist, it can be redefined
 dialect: bash
 source: 
   oils:spec/builtin-special#true-is-not-special-prefix-assignments-dont-persist-it-can-be-redefined
-stdout: "foo=\ntrue func\nfoo=\n"
+stdout: |-
+  foo=
+  true func
+  foo=
 ---
 foo=bar true
 echo foo=$foo

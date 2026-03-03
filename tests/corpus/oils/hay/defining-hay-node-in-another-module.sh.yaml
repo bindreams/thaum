@@ -2,7 +2,10 @@ disabled: true
 name: Defining Hay node in another module
 dialect: bash
 source: oils:spec/hay#defining-hay-node-in-another-module
-stdout: "{\n  \"version\": \"3.3\"\n}\n"
+stdout: |-
+  {
+    "version": "3.3"
+  }
 ---
 shopt --set ysh:all
 

@@ -2,7 +2,11 @@ disabled: true
 name: module-with-hyphens
 dialect: bash
 source: oils:spec/ysh-builtin-module#module-with-hyphens
-stdout: "[for-xtrace]\ncounter = 5\ncounter = 6\n(Int)   6\n"
+stdout: |-
+  [for-xtrace]
+  counter = 5
+  counter = 6
+  (Int)   6
 ---
 shopt --set ysh:upgrade
 

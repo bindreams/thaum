@@ -1,7 +1,10 @@
 name: -x
 dialect: bash
 source: oils:spec/builtin-bracket#x
-stdout: "no\nyes\nbad\n"
+stdout: |
+  no
+  yes
+  bad
 environment:
   TMP: /tmp
 ---

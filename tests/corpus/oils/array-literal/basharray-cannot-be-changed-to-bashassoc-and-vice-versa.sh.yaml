@@ -2,8 +2,12 @@ name: BashArray cannot be changed to BashAssoc and vice versa
 dialect: bash
 source: 
   oils:spec/array-literal#basharray-cannot-be-changed-to-bashassoc-and-vice-versa
-stdout: "status=1\n['1', '2', '3', '4']\nstatus=1\n['x', 'y', 'z']\n"
-setup: |
+stdout: |
+  status=1
+  ['1', '2', '3', '4']
+  status=1
+  ['x', 'y', 'z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 declare -a a=(1 2 3 4)
 eval 'declare -A a=([a]=x [b]=y [c]=z)'

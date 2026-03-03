@@ -1,7 +1,14 @@
 name: compgen -F _set_COMPREPLY
 dialect: bash
 source: oils:spec/array-sparse#compgen--f-setcompreply
-stdout: "0\n1\n3\n5\n7\n8\n9\n"
+stdout: |-
+  0
+  1
+  3
+  5
+  7
+  8
+  9
 ---
 case $SH in mksh) exit ;; esac
 

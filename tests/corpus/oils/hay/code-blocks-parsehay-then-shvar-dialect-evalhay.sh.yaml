@@ -2,8 +2,18 @@ disabled: true
 name: 'Code Blocks: parseHay() then shvar _DIALECT= { evalHay() }'
 dialect: bash
 source: oils:spec/hay#code-blocks-parsehay-then-shvar-dialect-evalhay
-stdout: "level 0 children\n2\n---\nchild 0\nTASK\ncpp\n---\nchild 1\nTASK\npublish-html\n\
-  ---\n"
+stdout: |-
+  level 0 children
+  2
+  ---
+  child 0
+  TASK
+  cpp
+  ---
+  child 1
+  TASK
+  publish-html
+  ---
 ---
 shopt --set parse_brace parse_proc parse_ysh_expr_sub
 

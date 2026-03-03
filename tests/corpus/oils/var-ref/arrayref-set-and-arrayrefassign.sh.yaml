@@ -1,9 +1,16 @@
 name: ${!array_ref:-set} and ${!array_ref:=assign}
 dialect: bash
 source: oils:spec/var-ref#arrayref-set-and-arrayrefassign
-stdout: "==== check ====\n['', '', '']\n['', '', '']\n==== assign ====\n['', '', '']\n\
-  ['', '', '']\n['', '', '']\n['', '', '']\n"
-setup: |
+stdout: |
+  ==== check ====
+  ['', '', '']
+  ['', '', '']
+  ==== assign ====
+  ['', '', '']
+  ['', '', '']
+  ['', '', '']
+  ['', '', '']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +18,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 ref='a[@]'

@@ -3,8 +3,9 @@ name: splice and stringify array
 dialect: bash
 source: oils:spec/ysh-list#splice-and-stringify-array
 status: 1
-stdout: "['a b', 'c']\n"
-setup: |
+stdout: |
+  ['a b', 'c']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt --set parse_at
 shopt --unset no_osh_builtins

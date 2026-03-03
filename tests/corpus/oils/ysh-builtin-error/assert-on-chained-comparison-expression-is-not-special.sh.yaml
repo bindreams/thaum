@@ -3,7 +3,10 @@ name: assert on chained comparison expression is not special
 dialect: bash
 source: 
   oils:spec/ysh-builtin-error#assert-on-chained-comparison-expression-is-not-special
-stdout: "code 3\n\n"
+stdout: |+
+  code 3
+
+...
 ---
 
 try {

@@ -3,8 +3,18 @@ name: procs in a module can call setglobal on globals in that module
 dialect: bash
 source: 
   oils:spec/ysh-builtin-module#procs-in-a-module-can-call-setglobal-on-globals-in-that-module
-stdout: "g1 = g1\ng1 = proc mutated\n\ng2 = g2\ng2 = func mutated\n\nglobals.g1 =
-  null\nglobals.g2 = null\n\nimporter g1 = null\nimporter g2 = null\n"
+stdout: |-
+  g1 = g1
+  g1 = proc mutated
+
+  g2 = g2
+  g2 = func mutated
+
+  globals.g1 = null
+  globals.g2 = null
+
+  importer g1 = null
+  importer g2 = null
 ---
 shopt --set ysh:upgrade
 

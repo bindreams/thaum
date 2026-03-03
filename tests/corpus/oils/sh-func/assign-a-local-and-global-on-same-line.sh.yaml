@@ -2,7 +2,9 @@ name: Assign a local and global on same line
 dialect: bash
 source: oils:spec/sh-func#assign-a-local-and-global-on-same-line
 status: 0
-stdout: "[L G]\n[ G]\n"
+stdout: |-
+  [L G]
+  [ G]
 ---
 myglobal=
 f() {

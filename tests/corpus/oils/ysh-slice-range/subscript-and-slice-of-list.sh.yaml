@@ -2,7 +2,12 @@ disabled: true
 name: subscript and slice of List
 dialect: bash
 source: oils:spec/ysh-slice-range#subscript-and-slice-of-list
-stdout: "(Int)   2\n(List)   [2,3]\nimplicit\n(List)   [1,2]\n(List)   [3,4]\n"
+stdout: |-
+  (Int)   2
+  (List)   [2,3]
+  implicit
+  (List)   [1,2]
+  (List)   [3,4]
 ---
 var mylist = [1,2,3,4]
 pp test_ (mylist[1])

@@ -2,7 +2,9 @@ name: "'umask 0002' sets the umask"
 dialect: bash
 source: oils:spec/builtin-umask#umask-0002-sets-the-umask
 status: 0
-stdout: "664\n644\n"
+stdout: |
+  664
+  644
 stderr: ''
 environment:
   TMP: /tmp

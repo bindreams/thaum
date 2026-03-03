@@ -1,7 +1,14 @@
 name: trap ERR with for,  case, { }
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-for-case
-stdout: "line=4\nline=4\nline=8\nline=12\nline=12\nline=12\nok\n"
+stdout: |-
+  line=4
+  line=4
+  line=8
+  line=12
+  line=12
+  line=12
+  ok
 ---
 
 trap 'echo line=$LINENO' ERR

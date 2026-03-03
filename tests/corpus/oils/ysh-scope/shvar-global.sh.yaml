@@ -2,9 +2,22 @@ disabled: true
 name: shvar global
 dialect: bash
 source: oils:spec/ysh-scope#shvar-global
-stdout: "_ESCAPER=\n_DIALECT=\nblock _ESCAPER=html\nblock _DIALECT=ninja\n_ESCAPER=\n\
-  _DIALECT=\n___\n_ESCAPER=foo\n_DIALECT=bar\nblock _ESCAPER=html\nblock _DIALECT=ninja\n\
-  nested _ESCAPER=nested\nnested _DIALECT=ninja\n_ESCAPER=foo\n_DIALECT=bar\n"
+stdout: |-
+  _ESCAPER=
+  _DIALECT=
+  block _ESCAPER=html
+  block _DIALECT=ninja
+  _ESCAPER=
+  _DIALECT=
+  ___
+  _ESCAPER=foo
+  _DIALECT=bar
+  block _ESCAPER=html
+  block _DIALECT=ninja
+  nested _ESCAPER=nested
+  nested _DIALECT=ninja
+  _ESCAPER=foo
+  _DIALECT=bar
 ---
 shopt --set ysh:upgrade
 shopt --unset nounset

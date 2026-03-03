@@ -1,7 +1,8 @@
 name: current working dir
 dialect: bash
 source: oils:spec/prompt#current-working-dir
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 PS1='\w '
 test "${PS1@P}" = "${PWD} "

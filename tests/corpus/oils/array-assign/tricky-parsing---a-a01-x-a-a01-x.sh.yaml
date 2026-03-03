@@ -1,9 +1,12 @@
 name: Tricky parsing - a[ a[0]=1 ]=X  a[ a[0]+=1 ]+=X
 dialect: bash
 source: oils:spec/array-assign#tricky-parsing---a-a01-x-a-a01-x
-stdout: "assign=42\ndeclare -a a=([0]=\"1\" [1]=\"X\")\ndeclare -a a=([0]=\"1\" [1]=\"\
-  X\" [2]=\"3\" [3]=\"Y\")\n---\ndeclare -a a=([0]=\"2\" [1]=\"X\" [2]=\"3X\" [3]=\"\
-  Y\")\n"
+stdout: |-
+  assign=42
+  declare -a a=([0]="1" [1]="X")
+  declare -a a=([0]="1" [1]="X" [2]="3" [3]="Y")
+  ---
+  declare -a a=([0]="2" [1]="X" [2]="3X" [3]="Y")
 ---
 case $SH in zsh|mksh|ash) exit ;; esac
 

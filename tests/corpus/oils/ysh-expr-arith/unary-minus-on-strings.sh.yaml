@@ -3,7 +3,10 @@ name: unary minus on strings
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-minus-on-strings
 status: 3
-stdout: "-3\n-4\n-5.5\n"
+stdout: |-
+  -3
+  -4
+  -5.5
 ---
 json write (-3)
 json write (-'4')

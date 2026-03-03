@@ -1,7 +1,9 @@
 name: shopt -s nounset works in YSH, not in bash
 dialect: bash
 source: oils:spec/sh-options#shopt--s-nounset-works-in-ysh-not-in-bash
-stdout: "status=0\nset -o nounset\n"
+stdout: |-
+  status=0
+  set -o nounset
 ---
 case $SH in
   *dash|*mksh)

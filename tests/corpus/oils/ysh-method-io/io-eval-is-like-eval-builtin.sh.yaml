@@ -2,7 +2,10 @@ disabled: true
 name: io->eval() is like eval builtin
 dialect: bash
 source: oils:spec/ysh-method-io#io-eval-is-like-eval-builtin
-stdout: "one\ntwo\nstatus=null\n"
+stdout: |-
+  one
+  two
+  status=null
 ---
 
 var c = ^(echo one; echo two)

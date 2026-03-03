@@ -1,7 +1,8 @@
 name: Command sub with here doc
 dialect: bash
 source: oils:spec/command-sub#command-sub-with-here-doc
-stdout: "two one\n"
+stdout: |-
+  two one
 ---
 echo $(<<EOF tac
 one

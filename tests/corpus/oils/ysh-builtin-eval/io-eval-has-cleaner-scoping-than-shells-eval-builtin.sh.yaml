@@ -4,7 +4,8 @@ dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-eval-has-cleaner-scoping-than-shells-eval-builtin
 status: 1
-stdout: "eval string do_not_leak=42\n"
+stdout: |-
+  eval string do_not_leak=42
 ---
 
 #shopt --unset ysh:all

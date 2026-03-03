@@ -2,7 +2,16 @@ disabled: true
 name: '@[glob(x)]'
 dialect: bash
 source: oils:spec/ysh-func-builtin#globx
-stdout: "A\nB\n___\na.z\nb.z\n___\n-.z\na.z\nb.z\n"
+stdout: |-
+  A
+  B
+  ___
+  a.z
+  b.z
+  ___
+  -.z
+  a.z
+  b.z
 ---
 
 # empty glob

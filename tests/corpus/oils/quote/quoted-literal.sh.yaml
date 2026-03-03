@@ -1,6 +1,7 @@
 name: Quoted Literal $
 dialect: bash
 source: oils:spec/quote#quoted-literal
-stdout: "$ $ $\n"
+stdout: |-
+  $ $ $
 ---
 echo $ "$" $

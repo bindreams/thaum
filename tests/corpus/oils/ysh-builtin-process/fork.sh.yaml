@@ -2,7 +2,10 @@ disabled: true
 name: fork
 dialect: bash
 source: oils:spec/ysh-builtin-process#fork
-stdout: "hi\nstatus=42\nok\n"
+stdout: |-
+  hi
+  status=42
+  ok
 ---
 shopt --set oil:upgrade
 shopt --unset errexit

@@ -2,7 +2,11 @@ disabled: true
 name: read --num-bytes
 dialect: bash
 source: oils:spec/ysh-builtins#read---num-bytes
-stdout: "reply=[  a ]\nreply=[  a b]\nx=[  a ]\nx=[  a b]\n"
+stdout: |-
+  reply=[  a ]
+  reply=[  a b]
+  x=[  a ]
+  x=[  a b]
 ---
 
 echo '  a b ' | read --num-bytes 4; echo "reply=[$_reply]"

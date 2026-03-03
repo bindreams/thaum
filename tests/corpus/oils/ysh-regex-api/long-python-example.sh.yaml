@@ -2,8 +2,17 @@ disabled: true
 name: Long Python Example
 dialect: bash
 source: oils:spec/ysh-regex-api#long-python-example
-stdout: "Y\nN\nY decimal\nN decimal\nY binary\nN binary\nY octal\nN octal\nY hex\n\
-  N hex\n"
+stdout: |-
+  Y
+  N
+  Y decimal
+  N decimal
+  Y binary
+  N binary
+  Y octal
+  N octal
+  Y hex
+  N hex
 ---
 
 # https://docs.python.org/3/reference/lexical_analysis.html#integer-literals

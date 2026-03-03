@@ -1,7 +1,13 @@
 name: for loop / case
 dialect: bash
 source: oils:spec/command-sub-ksh#for-loop-case
-stdout: "-a-\n-b-\n-a--b-\n\nsh-case\nsh-case\n"
+stdout: |-
+  -a-
+  -b-
+  -a--b-
+
+  sh-case
+  sh-case
 ---
 
 x=${ for i in a b; do echo -$i-; done; }

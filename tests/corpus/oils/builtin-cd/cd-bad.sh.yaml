@@ -1,7 +1,8 @@
 name: cd BAD/..
 dialect: bash
 source: oils:spec/builtin-cd#cd-bad
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 
 # Odd divergence in shells: dash and mksh normalize the path and don't check

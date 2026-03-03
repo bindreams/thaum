@@ -1,9 +1,17 @@
 name: "IFS='x ' read -a: intermediate spaces (unlimited split)"
 dialect: bash
 source: oils:spec/builtin-read#ifsx-read--a-intermediate-spaces-unlimited-split
-stdout: "['a', 'b']\n['a', '', 'b']\n['a', '', '', 'b']\n['a', '', 'b']\n['a', '',
-  'b']\n['a', 'b']\n['a', '', 'b']\n['a', '', 'b']\n['a', '', '', 'b']\n"
-setup: |
+stdout: |
+  ['a', 'b']
+  ['a', '', 'b']
+  ['a', '', '', 'b']
+  ['a', '', 'b']
+  ['a', '', 'b']
+  ['a', 'b']
+  ['a', '', 'b']
+  ['a', '', 'b']
+  ['a', '', '', 'b']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +19,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in mksh|ash|dash|zsh) exit 99; esac
 IFS='x '

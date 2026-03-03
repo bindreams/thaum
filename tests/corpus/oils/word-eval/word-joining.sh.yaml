@@ -1,8 +1,9 @@
 name: Word joining
 dialect: bash
 source: oils:spec/word-eval#word-joining
-stdout: "['1', '2a1', 'a2_x', 'y', 'z']\n"
-setup: |
+stdout: |
+  ['1', '2a1', 'a2_x', 'y', 'z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 set -- x y z
 s1='1 2'

@@ -3,9 +3,13 @@ dialect: bash
 source: oils:spec/array-sparse#unset--v-ai-with-out-of-bound-negative-index
 status: 1
 stdout: "\n"
-stderr: "  unset -v \"a[-2]\"\n           ^\n[ stdin ]:5: a[-2]: Index is out of bounds
-  for array of length 1\n  unset -v \"a[-3]\"\n           ^\n[ stdin ]:6: a[-3]: Index
-  is out of bounds for array of length 1\n"
+stderr: |2-
+    unset -v "a[-2]"
+             ^
+  [ stdin ]:5: a[-2]: Index is out of bounds for array of length 1
+    unset -v "a[-3]"
+             ^
+  [ stdin ]:6: a[-3]: Index is out of bounds for array of length 1
 ---
 case $SH in mksh) exit ;; esac
 

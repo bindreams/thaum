@@ -1,7 +1,8 @@
 name: Dynamic Scope
 dialect: bash
 source: oils:spec/sh-func#dynamic-scope
-stdout: "g_var\n"
+stdout: |-
+  g_var
 ---
 f() {
   echo $g_var

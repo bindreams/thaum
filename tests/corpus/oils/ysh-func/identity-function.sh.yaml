@@ -2,7 +2,8 @@ disabled: true
 name: Identity function
 dialect: bash
 source: oils:spec/ysh-func#identity-function
-stdout: "\"ysh\"\n"
+stdout: |-
+  "ysh"
 ---
 func id(x) {
   return (x)

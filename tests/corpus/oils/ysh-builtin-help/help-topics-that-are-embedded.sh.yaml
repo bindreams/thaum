@@ -2,9 +2,28 @@ disabled: true
 name: help topics that are embedded
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-topics-that-are-embedded
-stdout: "no args 0\n\n~~~ help\nhelp 0\n\n~~~ oils-usage\noils-usage 0\n\n~~~ osh-usage\n\
-  osh-usage 0\n\n~~~ ysh-usage\nysh-usage 0\n\n~~~ osh-chapters\nosh-chapters 0\n\n\
-  ~~~ ysh-chapters\nysh-chapters 0\n\n"
+stdout: |+
+  no args 0
+
+  ~~~ help
+  help 0
+
+  ~~~ oils-usage
+  oils-usage 0
+
+  ~~~ osh-usage
+  osh-usage 0
+
+  ~~~ ysh-usage
+  ysh-usage 0
+
+  ~~~ osh-chapters
+  osh-chapters 0
+
+  ~~~ ysh-chapters
+  ysh-chapters 0
+
+...
 ---
 
 help > help.txt

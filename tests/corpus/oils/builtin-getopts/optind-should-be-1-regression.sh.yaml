@@ -1,7 +1,9 @@
 name: OPTIND should be >= 1 (regression)
 dialect: bash
 source: oils:spec/builtin-getopts#optind-should-be-1-regression
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 OPTIND=-1
 getopts a: foo

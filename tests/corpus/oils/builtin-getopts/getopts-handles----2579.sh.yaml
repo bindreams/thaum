@@ -1,7 +1,10 @@
 name: "getopts handles '--' #2579"
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-handles----2579
-stdout: "a\nname=?\n3\n"
+stdout: |-
+  a
+  name=?
+  3
 ---
 set -- "-a" "--"
 while getopts "a" name; do

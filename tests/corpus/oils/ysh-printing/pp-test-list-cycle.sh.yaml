@@ -2,7 +2,12 @@ disabled: true
 name: 'pp test_: List cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-list-cycle
-stdout: "(List)   [5,6]\n(List)   [[5,6],[5,6]]\n\n(List)   [42,[...]]\n(List)   [[42,[...]],[42,[...]]]\n"
+stdout: |-
+  (List)   [5,6]
+  (List)   [[5,6],[5,6]]
+
+  (List)   [42,[...]]
+  (List)   [[42,[...]],[42,[...]]]
 ---
 
 var no_cycle = [5, 6]

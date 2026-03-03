@@ -2,7 +2,8 @@ name: set without args and assoc array variables (not in OSH)
 dialect: bash
 source: 
   oils:spec/sh-options#set-without-args-and-assoc-array-variables-not-in-osh
-stdout: "__assoc=([a]=\"b\" [\"k e y\"]=\"v a l\" )\n"
+stdout: |-
+  __assoc=([a]="b" ["k e y"]="v a l" )
 ---
 typeset -A __assoc
 __assoc['k e y']='v a l'

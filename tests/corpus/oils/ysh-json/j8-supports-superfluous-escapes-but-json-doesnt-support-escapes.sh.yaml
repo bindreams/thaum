@@ -3,7 +3,11 @@ name: J8 supports superfluous \" escapes, but JSON doesn't support \' escapes
 dialect: bash
 source: 
   oils:spec/ysh-json#j8-supports-superfluous-escapes-but-json-doesnt-support-escapes
-stdout: "reply=\"\n(Str)   \"''\\b\\f\\n\\r\\t\\\"\\\\\"\npython3=1\njson=1\n"
+stdout: |-
+  reply="
+  (Str)   "''\b\f\n\r\t\"\\"
+  python3=1
+  json=1
 ---
 
 json8 read <<'EOF'

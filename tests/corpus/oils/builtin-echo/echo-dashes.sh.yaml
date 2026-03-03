@@ -1,7 +1,10 @@
 name: echo dashes
 dialect: bash
 source: oils:spec/builtin-echo#echo-dashes
-stdout: "-\n--\n---\n"
+stdout: |-
+  -
+  --
+  ---
 ---
 echo -
 echo --

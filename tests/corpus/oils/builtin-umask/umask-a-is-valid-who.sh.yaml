@@ -2,7 +2,10 @@ name: umask a is valid who
 dialect: bash
 source: oils:spec/builtin-umask#umask-a-is-valid-who
 status: 0
-stdout: "000\n120\n564\n"
+stdout: |-
+  000
+  120
+  564
 ---
 umask 0732
 umask a=rwx

@@ -2,7 +2,8 @@ name: read builtin with too few variables
 dialect: bash
 source: oils:spec/builtin-read#read-builtin-with-too-few-variables
 status: 0
-stdout: "/A/B//\n"
+stdout: |-
+  /A/B//
 ---
 set -o errexit
 set -o nounset  # hm this doesn't change it

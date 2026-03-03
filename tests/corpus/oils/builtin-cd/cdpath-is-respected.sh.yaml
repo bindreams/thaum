@@ -1,7 +1,10 @@
 name: CDPATH is respected
 dialect: bash
 source: oils:spec/builtin-cd#cdpath-is-respected
-stdout: "/tmp/spam/foo\nstatus=0\n/tmp/spam/foo\n"
+stdout: |-
+  /tmp/spam/foo
+  status=0
+  /tmp/spam/foo
 ---
 
 mkdir -p /tmp/spam/foo /tmp/eggs/foo

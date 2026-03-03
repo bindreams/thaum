@@ -1,7 +1,16 @@
 name: Unicode char with '
 dialect: bash
 source: oils:spec/builtin-printf#unicode-char-with
-stdout: "3bc\n956\n1674\n\n4e09\n19977\n47011\n\n"
+stdout: |+
+  3bc
+  956
+  1674
+
+  4e09
+  19977
+  47011
+
+...
 ---
 case $SH in mksh) echo 'weird bug'; exit ;; esac
 

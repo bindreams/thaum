@@ -1,6 +1,7 @@
 name: comment
 dialect: bash
 source: oils:spec/comments#comment
-stdout: "foo\n"
+stdout: |-
+  foo
 ---
 echo foo #comment

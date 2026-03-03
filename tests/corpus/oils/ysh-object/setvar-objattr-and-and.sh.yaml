@@ -2,8 +2,11 @@ disabled: true
 name: setvar obj.attr = and += and ...
 dialect: bash
 source: oils:spec/ysh-object#setvar-objattr-and-and
-stdout: "(Obj)   (\"x\":3,\"y\":4)\n(Obj)   (\"x\":3,\"y\":99)\n(Obj)   (\"x\":3,\"\
-  y\":102)\n(Obj)   (\"x\":15,\"y\":102)\n"
+stdout: |-
+  (Obj)   ("x":3,"y":4)
+  (Obj)   ("x":3,"y":99)
+  (Obj)   ("x":3,"y":102)
+  (Obj)   ("x":15,"y":102)
 ---
 
 var rect = Object(null, {x: 3, y: 4})

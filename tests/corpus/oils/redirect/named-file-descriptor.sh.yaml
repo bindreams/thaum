@@ -2,7 +2,8 @@ name: Named file descriptor
 dialect: bash
 source: oils:spec/redirect#named-file-descriptor
 status: 0
-stdout: "named-fd-contents\n"
+stdout: |
+  named-fd-contents
 environment:
   TMP: /tmp
 ---

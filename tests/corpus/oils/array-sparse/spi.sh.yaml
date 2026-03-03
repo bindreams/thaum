@@ -1,9 +1,18 @@
 name: ${sp[i]}
 dialect: bash
 source: oils:spec/array-sparse#spi
-stdout: "sp[0]: '1', 1, set.\nsp[1]: '2', 2, set.\nsp[8]: '9', 9, set.\nsp[2]: '',
-  (empty), .\nsp[3]: '', (empty), .\nsp[7]: '', (empty), .\nsp[-1]: '9'.\nsp[-2]:
-  ''.\nsp[-3]: '7'.\nsp[-4]: '6'.\nsp[-9]: '1'.\n"
+stdout: |-
+  sp[0]: '1', 1, set.
+  sp[1]: '2', 2, set.
+  sp[8]: '9', 9, set.
+  sp[2]: '', (empty), .
+  sp[3]: '', (empty), .
+  sp[7]: '', (empty), .
+  sp[-1]: '9'.
+  sp[-2]: ''.
+  sp[-3]: '7'.
+  sp[-4]: '6'.
+  sp[-9]: '1'.
 ---
 case $SH in mksh) exit ;; esac
 

@@ -1,7 +1,15 @@
 name: printf %d with + prefix (positive sign)
 dialect: bash
 source: oils:spec/builtin-printf#printf-d-with-prefix-positive-sign
-stdout: "decimal\n42\noctal\n63\nhex lowercase\n171\nhex uppercase\n171\n"
+stdout: |-
+  decimal
+  42
+  octal
+  63
+  hex lowercase
+  171
+  hex uppercase
+  171
 ---
 
 echo decimal

@@ -1,9 +1,15 @@
 name: op-test for ${!array} with array="a" and array="a[0]"
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-array-with-arraya-and-arraya0
-stdout: "ref=a   : 'no-colon' 'with-colon'\nref=a[0]: 'no-colon' 'with-colon'\nref=a\
-  \   : '' 'with-colon'\nref=a[0]: '' 'with-colon'\nref=a   : '' 'with-colon'\nref=a[0]:
-  '' 'with-colon'\nref=a   : '' 'with-colon'\nref=a[0]: '' 'with-colon'\n"
+stdout: |-
+  ref=a   : 'no-colon' 'with-colon'
+  ref=a[0]: 'no-colon' 'with-colon'
+  ref=a   : '' 'with-colon'
+  ref=a[0]: '' 'with-colon'
+  ref=a   : '' 'with-colon'
+  ref=a[0]: '' 'with-colon'
+  ref=a   : '' 'with-colon'
+  ref=a[0]: '' 'with-colon'
 ---
 case $SH in dash|mksh|zsh) exit ;; esac
 

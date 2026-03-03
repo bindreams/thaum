@@ -2,7 +2,10 @@ disabled: true
 name: 'block literal in expression mode: ^(echo $PWD)'
 dialect: bash
 source: oils:spec/ysh-blocks#block-literal-in-expression-mode-echo-pwd
-stdout: "1\none\ntwo\n"
+stdout: |-
+  1
+  one
+  two
 ---
 shopt -s ysh:all
 

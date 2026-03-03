@@ -1,7 +1,8 @@
 name: exec -- 2>&1
 dialect: bash
 source: oils:spec/builtin-process#exec----21
-stdout: "stdout\n"
+stdout: |-
+  stdout
 ---
 exec -- 3>&1
 echo stdout 1>&3

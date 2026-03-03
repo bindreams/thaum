@@ -1,7 +1,11 @@
 name: \(\) in pattern (regression)
 dialect: bash
 source: oils:spec/var-op-patsub#in-pattern-regression
-stdout: "1 z\n2 z\n3 fooz\n4 z\n"
+stdout: |-
+  1 z
+  2 z
+  3 fooz
+  4 z
 ---
 
 # Not extended globs

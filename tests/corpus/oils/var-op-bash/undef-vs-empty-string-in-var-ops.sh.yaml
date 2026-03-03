@@ -1,7 +1,12 @@
 name: undef vs. empty string in var ops
 dialect: bash
 source: oils:spec/var-op-bash#undef-vs-empty-string-in-var-ops
-stdout: "'x' '' 'x'\n'x' '' 'x'\n'x' '' 'x'\nx='x' empty='' x='x'\nr r\n"
+stdout: |-
+  'x' '' 'x'
+  'x' '' 'x'
+  'x' '' 'x'
+  x='x' empty='' x='x'
+  r r
 ---
 
 empty=''

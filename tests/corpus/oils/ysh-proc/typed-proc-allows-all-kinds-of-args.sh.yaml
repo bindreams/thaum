@@ -2,7 +2,11 @@ disabled: true
 name: typed proc allows all kinds of args
 dialect: bash
 source: oils:spec/ysh-proc#typed-proc-allows-all-kinds-of-args
-stdout: "(Str)   \"word\"\n(Int)   42\n(Int)   99\nCommand\n"
+stdout: |-
+  (Str)   "word"
+  (Int)   42
+  (Int)   99
+  Command
 ---
 shopt -s ysh:upgrade
 

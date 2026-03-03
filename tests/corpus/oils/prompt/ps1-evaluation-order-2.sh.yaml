@@ -1,7 +1,8 @@
 name: PS1 evaluation order 2
 dialect: bash
 source: oils:spec/prompt#ps1-evaluation-order-2
-stdout: "status=0\n"
+stdout: |
+  status=0
 environment:
   TMP: /tmp
 ---

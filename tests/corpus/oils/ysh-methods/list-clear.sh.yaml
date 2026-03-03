@@ -2,7 +2,9 @@ disabled: true
 name: List->clear()
 dialect: bash
 source: oils:spec/ysh-methods#list-clear
-stdout: "(List)   []\n(List)   []\n"
+stdout: |-
+  (List)   []
+  (List)   []
 ---
 var empty = []
 var items = [1, 2, 3]

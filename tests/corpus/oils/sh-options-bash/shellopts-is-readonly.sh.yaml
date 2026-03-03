@@ -1,7 +1,8 @@
 name: SHELLOPTS is readonly
 dialect: bash
 source: oils:spec/sh-options-bash#shellopts-is-readonly
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 SHELLOPTS=x
 echo status=$?

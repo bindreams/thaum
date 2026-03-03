@@ -1,8 +1,10 @@
 name: dynamic array parsing is not allowed
 dialect: bash
 source: oils:spec/assign-extended#dynamic-array-parsing-is-not-allowed
-stdout: "status=2\n['']\n"
-setup: |
+stdout: |
+  status=2
+  ['']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 code='x=(1 2 3)'
 typeset -a "$code"  # note: -a flag is required

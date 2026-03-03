@@ -1,7 +1,8 @@
 name: empty ! is treated as literal
 dialect: bash
 source: oils:spec/dbracket#empty-is-treated-as-literal
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 [[ '!' ]]
 echo status=$?

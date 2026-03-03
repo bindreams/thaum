@@ -1,7 +1,8 @@
 name: '[[ has no word splitting'
 dialect: bash
 source: oils:spec/dbracket#has-no-word-splitting
-stdout: "true\n"
+stdout: |-
+  true
 ---
 var='one two'
 [[ 'one two' == $var ]] && echo true

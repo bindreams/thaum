@@ -1,8 +1,18 @@
 name: simple_eval_builtin
 dialect: bash
 source: oils:spec/strict-options#simpleevalbuiltin
-stdout: "status=0\none\nstatus=0\ntwo\nstatus=0\n---\nstatus=2\nstatus=2\ntwo\nstatus=0\n\
-  ---\n"
+stdout: |-
+  status=0
+  one
+  status=0
+  two
+  status=0
+  ---
+  status=2
+  status=2
+  two
+  status=0
+  ---
 ---
 for i in 1 2; do
   eval  # zero args

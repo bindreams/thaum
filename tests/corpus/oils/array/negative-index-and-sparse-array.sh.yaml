@@ -1,7 +1,15 @@
 name: Negative index and sparse array
 dialect: bash
 source: oils:spec/array#negative-index-and-sparse-array
-stdout: "0 2 3\n-1 3\n-2 2\n-3\n-4 0\n-5\n0 2 30\n0 2 72\n"
+stdout: |-
+  0 2 3
+  -1 3
+  -2 2
+  -3
+  -4 0
+  -5
+  0 2 30
+  0 2 72
 ---
 a=(0 1 2 3 4)
 unset a[1]

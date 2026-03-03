@@ -2,7 +2,10 @@ disabled: true
 name: shopt --set verbose_errexit
 dialect: bash
 source: oils:spec/ysh-usage#shopt---set-verboseerrexit
-stdout: " 3 on.txt\n 0 off.txt\n 3 total\n"
+stdout: |2-
+   3 on.txt
+   0 off.txt
+   3 total
 ---
 
 try {

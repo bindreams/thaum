@@ -1,7 +1,8 @@
 name: OPTIND narrowed down
 dialect: bash
 source: oils:spec/builtin-getopts#optind-narrowed-down
-stdout: "a=1 b= c=1 d=1 e=E\n"
+stdout: |-
+  a=1 b= c=1 d=1 e=E
 ---
 FLAG_a=
 FLAG_b=

@@ -1,7 +1,10 @@
 name: Here doc with pipe continued on last line
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-pipe-continued-on-last-line
-stdout: "3\n2\n1\n"
+stdout: |-
+  3
+  2
+  1
 ---
 cat <<EOF |
 1

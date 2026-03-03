@@ -2,8 +2,9 @@ name: 'Bug fix: Test that you can remove everything with glob'
 dialect: bash
 source: 
   oils:spec/var-op-strip#bug-fix-test-that-you-can-remove-everything-with-glob
-stdout: "['', '--x-', '-x--', '']\n"
-setup: |
+stdout: |
+  ['', '--x-', '-x--', '']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 s='--x--'
 argv.py "${s%%-*}" "${s%-*}" "${s#*-}" "${s##*-}"

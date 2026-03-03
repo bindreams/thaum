@@ -1,7 +1,8 @@
 name: Append string to string
 dialect: bash
 source: oils:spec/append#append-string-to-string
-stdout: "abcd\n"
+stdout: |-
+  abcd
 ---
 s='abc'
 s+=d

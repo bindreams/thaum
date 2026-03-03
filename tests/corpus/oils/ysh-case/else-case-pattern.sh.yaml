@@ -3,7 +3,8 @@ name: else case pattern
 dialect: bash
 source: oils:spec/ysh-case#else-case-pattern
 status: 0
-stdout: "else matches all\n"
+stdout: |-
+  else matches all
 ---
 var x = 123
 case (x) {

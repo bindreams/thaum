@@ -1,8 +1,10 @@
 name: set -a exports variables
 dialect: bash
 source: oils:spec/builtin-set#set--a-exports-variables
-stdout: "bar\nqux\n"
-setup: |
+stdout: |
+  bar
+  qux
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 set -a
 FOO=bar

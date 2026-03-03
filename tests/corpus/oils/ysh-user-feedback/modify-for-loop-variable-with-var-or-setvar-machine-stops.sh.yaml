@@ -3,7 +3,11 @@ name: Modify for loop variable with var or setvar? (Machine Stops)
 dialect: bash
 source: 
   oils:spec/ysh-user-feedback#modify-for-loop-variable-with-var-or-setvar-machine-stops
-stdout: "a\nzz\nb\nzz\n"
+stdout: |-
+  a
+  zz
+  b
+  zz
 ---
 
 proc do-var {

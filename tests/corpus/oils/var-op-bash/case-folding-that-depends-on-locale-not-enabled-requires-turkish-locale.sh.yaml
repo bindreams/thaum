@@ -1,8 +1,12 @@
 name: Case folding that depends on locale (not enabled, requires Turkish locale)
 dialect: bash
-source:
+source: 
   oils:spec/var-op-bash#case-folding-that-depends-on-locale-not-enabled-requires-turkish-locale
-stdout: "u I\nU I\nl i\nL i\n"
+stdout: |-
+  u I
+  U I
+  l i
+  L i
 ---
 
 # Hm this works in demo/survey-case-fold.sh

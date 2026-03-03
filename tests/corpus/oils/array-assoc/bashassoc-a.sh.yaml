@@ -1,7 +1,11 @@
 name: BashAssoc a+=()
 dialect: bash
 source: oils:spec/array-assoc#bashassoc-a
-stdout: "apple is red\norange is orange\nlemon is yellow\nbanana is yellow\n"
+stdout: |-
+  apple is red
+  orange is orange
+  lemon is yellow
+  banana is yellow
 ---
 
 declare -A a=([apple]=red [orange]=orange)

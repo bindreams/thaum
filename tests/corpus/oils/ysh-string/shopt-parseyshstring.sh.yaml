@@ -2,7 +2,13 @@ disabled: true
 name: shopt parse_ysh_string
 dialect: bash
 source: oils:spec/ysh-string#shopt-parseyshstring
-stdout: "\\\nr\n\nend\nunset\nr\\\n"
+stdout: |-
+  \
+  r
+
+  end
+  unset
+  r\
 ---
 
 # Ignored prefix

@@ -1,7 +1,11 @@
 name: <> for read/write
 dialect: bash
 source: oils:spec/redirect#for-readwrite
-stdout: "line=first\nCONTENTS\nfirst\nsecond\n"
+stdout: |
+  line=first
+  CONTENTS
+  first
+  second
 environment:
   TMP: /tmp
 ---

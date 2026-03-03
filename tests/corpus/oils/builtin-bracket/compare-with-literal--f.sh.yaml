@@ -1,7 +1,9 @@
 name: '[ compare with literal -f'
 dialect: bash
 source: oils:spec/builtin-bracket#compare-with-literal--f
-stdout: "true\ntrue\n"
+stdout: |-
+  true
+  true
 ---
 # Hm this is the same
 var=-f

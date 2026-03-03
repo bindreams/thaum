@@ -3,7 +3,13 @@ name: read --raw-line, --all, --num-bytes preserve NUL bytes
 dialect: bash
 source: 
   oils:spec/ysh-nul-bytes#read---raw-line---all---num-bytes-preserve-nul-bytes
-stdout: "len=3\n 2e 00 2e\nlen=3\n 2e 00 2e\nlen=3\n 2e 00 2e\n"
+stdout: |-
+  len=3
+   2e 00 2e
+  len=3
+   2e 00 2e
+  len=3
+   2e 00 2e
 ---
 
 proc raw-line {

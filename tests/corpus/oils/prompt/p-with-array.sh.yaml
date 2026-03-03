@@ -1,7 +1,13 @@
 name: '@P with array'
 dialect: bash
 source: oils:spec/prompt#p-with-array
-stdout: "a b c\nstatus=0\na b c\nstatus=0\nx\nstatus=0\n"
+stdout: |-
+  a b c
+  status=0
+  a b c
+  status=0
+  x
+  status=0
 ---
 $SH -c 'echo ${@@P}' dummy a b c
 echo status=$?

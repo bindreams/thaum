@@ -1,8 +1,9 @@
 name: +=
 dialect: bash
 source: oils:spec/array-sparse#unnamed
-stdout: "declare -a sp1=([10]=a [20]=b [99]=c)\ndeclare -a sp1=([10]=a [20]=b [99]=c
-  [100]=1 [101]=2 [102]=3)\n"
+stdout: |-
+  declare -a sp1=([10]=a [20]=b [99]=c)
+  declare -a sp1=([10]=a [20]=b [99]=c [100]=1 [101]=2 [102]=3)
 ---
 sp1[10]=a
 sp1[20]=b

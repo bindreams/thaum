@@ -2,7 +2,11 @@ disabled: true
 name: Type Errors
 dialect: bash
 source: oils:spec/ysh-expr#type-errors
-stdout: "3\n3\n3\n3\n"
+stdout: |-
+  3
+  3
+  3
+  3
 ---
 shopt --set parse_brace parse_ysh_expr_sub
 

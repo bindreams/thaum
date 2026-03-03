@@ -1,7 +1,9 @@
 name: When GLOBIGNORE is set, no_dash_glob isn't respected
 dialect: bash
 source: oils:spec/globignore#when-globignore-is-set-nodashglob-isnt-respected
-stdout: "_tmp foo.txt\n-foo.txt _tmp\n"
+stdout: |-
+  _tmp foo.txt
+  -foo.txt _tmp
 ---
 case $SH in bash) exit ;; esac
 

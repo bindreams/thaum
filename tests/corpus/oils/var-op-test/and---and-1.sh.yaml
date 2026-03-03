@@ -1,7 +1,11 @@
 name: $@ ("" "") and - and +
 dialect: bash
 source: oils:spec/var-op-test#and---and
-stdout: "argv=\nargv=plus\nargv=\nargv=plus\n"
+stdout: |-
+  argv=
+  argv=plus
+  argv=
+  argv=plus
 ---
 set -- "" ""
 echo argv=${@-minus}

@@ -1,7 +1,10 @@
 name: failglob
 dialect: bash
 source: oils:spec/extglob-files#failglob
-stdout: "status=1\nfoo\nstatus=0\n"
+stdout: |-
+  status=1
+  foo
+  status=0
 ---
 shopt -s extglob
 

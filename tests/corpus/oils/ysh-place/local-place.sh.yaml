@@ -2,7 +2,12 @@ disabled: true
 name: Local place
 dialect: bash
 source: oils:spec/ysh-place#local-place
-stdout: "f x=f\nfillPlace x=fillPlace\np x=zzz\n\nglobal x=global\n"
+stdout: |-
+  f x=f
+  fillPlace x=fillPlace
+  p x=zzz
+
+  global x=global
 ---
 
 # Work around stdin buffering issue with read --line

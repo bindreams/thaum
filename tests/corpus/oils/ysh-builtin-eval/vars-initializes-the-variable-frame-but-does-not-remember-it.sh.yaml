@@ -3,7 +3,8 @@ name: vars initializes the variable frame, but does not remember it
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#vars-initializes-the-variable-frame-but-does-not-remember-it
-stdout: "(Dict)   {\"foo\":123}\n"
+stdout: |-
+  (Dict)   {"foo":123}
 ---
 var vars = { 'foo': 123 }
 call io->eval(^(var bar = 321;), vars=vars)

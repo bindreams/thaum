@@ -3,8 +3,20 @@ name: leading spaces are accepted in value given to %d %X, but not trailing
 dialect: bash
 source: 
   oils:spec/builtin-printf#leading-spaces-are-accepted-in-value-given-to-d-x-but-not-trailing-spaces
-stdout: "-123\nstatus=0\n-123\nstatus=1\n---\n63\nstatus=0\n255\nstatus=0\nFF\nstatus=0\n\
-  ff\nstatus=0\n"
+stdout: |-
+  -123
+  status=0
+  -123
+  status=1
+  ---
+  63
+  status=0
+  255
+  status=0
+  FF
+  status=0
+  ff
+  status=0
 ---
 
 case $SH in zsh) exit ;; esac

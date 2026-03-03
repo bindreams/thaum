@@ -3,7 +3,11 @@ name: multiline strings, list, tuple syntax for list, etc.
 dialect: bash
 source: 
   oils:spec/ysh-expr-arith#multiline-strings-list-tuple-syntax-for-list-etc
-stdout: "dq=6\nsq=6\nmylist=3\nmytuple=3\n"
+stdout: |-
+  dq=6
+  sq=6
+  mylist=3
+  mytuple=3
 ---
 shopt --set parse_ysh_expr_sub
 

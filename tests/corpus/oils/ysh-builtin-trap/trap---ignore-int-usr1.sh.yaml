@@ -2,7 +2,9 @@ disabled: true
 name: trap --ignore INT USR1
 dialect: bash
 source: oils:spec/ysh-builtin-trap#trap---ignore-int-usr1
-stdout: "trap -- '' SIGINT\ntrap -- '' SIGUSR1\n"
+stdout: |-
+  trap -- '' SIGINT
+  trap -- '' SIGUSR1
 ---
 
 trap --ignore INT USR1

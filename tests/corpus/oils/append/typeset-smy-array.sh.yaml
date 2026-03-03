@@ -2,8 +2,11 @@ name: typeset s+=(my array)
 dialect: bash
 source: oils:spec/append#typeset-smy-array
 status: 0
-stdout: "abc\nstatus=0\n['abc', 'd', 'e', 'f']\n"
-setup: |
+stdout: |
+  abc
+  status=0
+  ['abc', 'd', 'e', 'f']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 typeset s='abc'
 echo $s

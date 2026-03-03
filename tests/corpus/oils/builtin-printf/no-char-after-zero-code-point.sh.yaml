@@ -1,7 +1,9 @@
 name: No char after ' => zero code point
 dialect: bash
 source: oils:spec/builtin-printf#no-char-after-zero-code-point
-stdout: "0\n0\n"
+stdout: |-
+  0
+  0
 ---
 
 # most shells use 0 here

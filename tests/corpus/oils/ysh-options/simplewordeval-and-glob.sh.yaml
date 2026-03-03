@@ -2,7 +2,11 @@ disabled: true
 name: simple_word_eval and glob
 dialect: bash
 source: oils:spec/ysh-options#simplewordeval-and-glob
-stdout: "1.ff\n2.ff\n1.ff 2.ff\n1.ff 2.ff\n"
+stdout: |-
+  1.ff
+  2.ff
+  1.ff 2.ff
+  1.ff 2.ff
 ---
 shopt -s simple_word_eval
 

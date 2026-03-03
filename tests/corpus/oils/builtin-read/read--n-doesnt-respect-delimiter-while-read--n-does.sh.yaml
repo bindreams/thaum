@@ -2,7 +2,9 @@ name: read -N doesn't respect delimiter, while read -n does
 dialect: bash
 source: 
   oils:spec/builtin-read#read--n-doesnt-respect-delimiter-while-read--n-does
-stdout: "foo\nfooba\n"
+stdout: |-
+  foo
+  fooba
 ---
 case $SH in dash|zsh|ash) exit ;; esac
 

@@ -3,8 +3,11 @@ name: Named captures with m.group()
 dialect: bash
 source: oils:spec/ysh-regex-api#named-captures-with-mgroup
 status: 3
-stdout: "['2020', '08']\n3 7\n8 10\n"
-setup: |
+stdout: |
+  ['2020', '08']
+  3 7
+  8 10
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s ysh:all
 

@@ -1,7 +1,8 @@
 name: read -u 3 -d 5
 dialect: bash
 source: oils:spec/builtin-read#read--u-3--d-5
-stdout: "reply=1234\n"
+stdout: |-
+  reply=1234
 ---
 case $SH in dash|mksh) exit ;; esac
 

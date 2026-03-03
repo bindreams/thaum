@@ -1,7 +1,13 @@
 name: "'set' and 'eval' round trip"
 dialect: bash
 source: oils:spec/builtin-set#set-and-eval-round-trip
-stdout: "[ ]\nOK\nOK\nOK\nOK\nOK\n"
+stdout: |
+  [ ]
+  OK
+  OK
+  OK
+  OK
+  OK
 environment:
   TMP: /tmp
 ---

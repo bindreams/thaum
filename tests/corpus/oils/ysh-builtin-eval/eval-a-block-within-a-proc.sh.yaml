@@ -2,7 +2,8 @@ disabled: true
 name: Eval a block within a proc
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-a-block-within-a-proc
-stdout: "In a block!\n"
+stdout: |-
+  In a block!
 ---
 proc run (;;; block) {
   call io->eval(block)

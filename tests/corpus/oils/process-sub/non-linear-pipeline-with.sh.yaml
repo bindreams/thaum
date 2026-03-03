@@ -1,7 +1,11 @@
 name: Non-linear pipeline with >()
 dialect: bash
 source: oils:spec/process-sub#non-linear-pipeline-with
-stdout: "OUT\nwarning: e2\no2\no1\n"
+stdout: |
+  OUT
+  warning: e2
+  o2
+  o1
 environment:
   TMP: /tmp
 ---

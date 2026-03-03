@@ -2,8 +2,22 @@ disabled: true
 name: Binary operators, with conversions from string
 dialect: bash
 source: oils:spec/ysh-expr-arith#binary-operators-with-conversions-from-string
-stdout: " i  i 3\nsi  i 3\n i si 3\n---\n f  f 1.0\nsf  f 1.0\n f sf 1.0\n---\n i\
-  \  f 6.0\nsi  f 6.0\n i sf 6.0\n---\n f  i 2.5\nsf  i 2.5\n f si 2.5\n"
+stdout: |2-
+   i  i 3
+  si  i 3
+   i si 3
+  ---
+   f  f 1.0
+  sf  f 1.0
+   f sf 1.0
+  ---
+   i  f 6.0
+  si  f 6.0
+   i sf 6.0
+  ---
+   f  i 2.5
+  sf  i 2.5
+   f si 2.5
 ---
 shopt --set parse_ysh_expr_sub
 

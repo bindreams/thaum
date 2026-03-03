@@ -2,11 +2,15 @@ disabled: true
 name: invoke --show with many types
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---show-with-many-types
-stdout: "%.qtt8  name        kind        detail\n        my-name     alias       b'echo
-  my μ \\yff alias'\n        my-name     proc        -\n        my-name     sh-func\
-  \     -\n        myobj       proc        invokable\n        eval        builtin\
-  \     special\n        cd          builtin     -\n        zzz         -        \
-  \   -\n"
+stdout: |-
+  %.qtt8  name        kind        detail
+          my-name     alias       b'echo my μ \yff alias'
+          my-name     proc        -
+          my-name     sh-func     -
+          myobj       proc        invokable
+          eval        builtin     special
+          cd          builtin     -
+          zzz         -           -
 ---
 case $SH in bash) exit ;; esac
 

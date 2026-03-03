@@ -1,7 +1,12 @@
 name: $_ with && and ||
 dialect: bash
 source: oils:spec/vars-special#with-and
-stdout: "hi\nlast=hi\nand=last=hi\nhi\nor=hi\n"
+stdout: |-
+  hi
+  last=hi
+  and=last=hi
+  hi
+  or=hi
 ---
 case $SH in dash|mksh) exit ;; esac
 

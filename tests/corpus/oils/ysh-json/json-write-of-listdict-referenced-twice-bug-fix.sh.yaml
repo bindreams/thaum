@@ -2,8 +2,8 @@ disabled: true
 name: json write of List/Dict referenced twice (bug fix)
 dialect: bash
 source: oils:spec/ysh-json#json-write-of-listdict-referenced-twice-bug-fix
-stdout: "{\"k\":[1,2,3],\"k2\":[1,2,3],\"k3\":{\"foo\":\"bar\"},\"k4\":{\"foo\":\"\
-  bar\"}}\n"
+stdout: |-
+  {"k":[1,2,3],"k2":[1,2,3],"k3":{"foo":"bar"},"k4":{"foo":"bar"}}
 ---
 
 var mylist = [1,2,3]

@@ -1,7 +1,12 @@
 name: Integer constant parsing
 dialect: bash
 source: oils:spec/arith#integer-constant-parsing
-stdout: "298\n10\n511\n8\n6151\n"
+stdout: |-
+  298
+  10
+  511
+  8
+  6151
 ---
 echo $(( 0x12A ))
 echo $(( 0x0A ))

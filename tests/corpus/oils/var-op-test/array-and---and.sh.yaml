@@ -1,10 +1,35 @@
 name: array and - and +
 dialect: bash
 source: oils:spec/var-op-test#array-and---and
-stdout: "empty=minus\na1=\na1[0]=\na2= x\na3=3 4\n---\nempty=\na1=plus\na1[0]=plus\n\
-  a2=plus\na3=plus\n---\nempty=\na1=plus\na2=plus\na3=plus\n---\n['minus']\n[]\n['']\n\
-  ['plus']\n['']\n['plus']\n['', 'x']\n['plus']\n['3', '4']\n['plus']\n"
-setup: |
+stdout: |
+  empty=minus
+  a1=
+  a1[0]=
+  a2= x
+  a3=3 4
+  ---
+  empty=
+  a1=plus
+  a1[0]=plus
+  a2=plus
+  a3=plus
+  ---
+  empty=
+  a1=plus
+  a2=plus
+  a3=plus
+  ---
+  ['minus']
+  []
+  ['']
+  ['plus']
+  ['']
+  ['plus']
+  ['', 'x']
+  ['plus']
+  ['3', '4']
+  ['plus']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +37,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in dash) exit ;; esac
 

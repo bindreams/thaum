@@ -2,8 +2,12 @@ name: Source from a function, mutating argv and defining a local var
 dialect: bash
 source: 
   oils:spec/builtin-eval-source#source-from-a-function-mutating-argv-and-defining-a-local-var
-stdout: "source-argv: args to func\nsource-argv: args to src\nto func\nfoo=foo_val\n\
-  foo=\n"
+stdout: |-
+  source-argv: args to func
+  source-argv: args to src
+  to func
+  foo=foo_val
+  foo=
 ---
 f() {
   . $REPO_ROOT/spec/testdata/source-argv.sh              # no argv

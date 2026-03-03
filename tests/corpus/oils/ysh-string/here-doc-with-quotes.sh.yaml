@@ -2,7 +2,10 @@ disabled: true
 name: here doc with quotes
 dialect: bash
 source: oils:spec/ysh-string#here-doc-with-quotes
-stdout: "\"hello\"\n\"\"\n\"\"\"\n"
+stdout: |-
+  "hello"
+  ""
+  """
 ---
 
 # This has 3 right double quotes

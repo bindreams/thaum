@@ -1,7 +1,8 @@
 name: If
 dialect: posix
 source: oils:spec/if#if
-stdout: "if\n"
+stdout: |-
+  if
 ---
 if true; then
   echo if

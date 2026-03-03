@@ -2,7 +2,11 @@ name: command, builtin - both can be redefined, not special (regression)
 dialect: bash
 source: 
   oils:spec/builtin-special#command-builtin---both-can-be-redefined-not-special-regression
-stdout: "b\nc\nbuiltin-redef echo b\ncommand-redef echo c\n"
+stdout: |-
+  b
+  c
+  builtin-redef echo b
+  command-redef echo c
 ---
 case $SH in dash|ash|yash) exit ;; esac
 

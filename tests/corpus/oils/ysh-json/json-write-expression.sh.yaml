@@ -3,7 +3,9 @@ name: json write expression
 dialect: bash
 source: oils:spec/ysh-json#json-write-expression
 status: 3
-stdout: "[1,2,3]\nstatus=0\n"
+stdout: |-
+  [1,2,3]
+  status=0
 ---
 json write ([1,2,3], space=0)
 echo status=$?

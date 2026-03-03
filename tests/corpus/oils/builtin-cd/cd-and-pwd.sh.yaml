@@ -1,7 +1,8 @@
 name: cd and $PWD
 dialect: bash
 source: oils:spec/builtin-cd#cd-and-pwd
-stdout: "/\n"
+stdout: |-
+  /
 ---
 cd /
 echo $PWD

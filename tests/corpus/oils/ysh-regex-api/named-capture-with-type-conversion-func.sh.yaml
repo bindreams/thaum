@@ -2,7 +2,11 @@ disabled: true
 name: Named Capture with Type Conversion Func
 dialect: bash
 source: oils:spec/ysh-regex-api#named-capture-with-type-conversion-func
-stdout: "-3.14\nInt Float\n-3.14\nInt Float\n"
+stdout: |-
+  -3.14
+  Int Float
+  -3.14
+  Int Float
 ---
 shopt -s ysh:upgrade
 

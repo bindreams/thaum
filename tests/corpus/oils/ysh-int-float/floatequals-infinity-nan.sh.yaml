@@ -2,7 +2,10 @@ disabled: true
 name: floatEquals() INFINITY NAN
 dialect: bash
 source: oils:spec/ysh-int-float#floatequals-infinity-nan
-stdout: "inf\nneg_inf\nnan is not nan\n"
+stdout: |-
+  inf
+  neg_inf
+  nan is not nan
 ---
 
 shopt --set ysh:upgrade

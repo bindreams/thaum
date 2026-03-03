@@ -1,7 +1,8 @@
 name: pwd errors out on args with strict_arg_parse
 dialect: bash
 source: oils:spec/builtin-cd#pwd-errors-out-on-args-with-strictargparse
-stdout: "too many args!\n"
+stdout: |-
+  too many args!
 ---
 shopt -s strict_arg_parse || true
 pwd / >/dev/null || echo 'too many args!'

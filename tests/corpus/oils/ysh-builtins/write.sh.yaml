@@ -3,7 +3,10 @@ name: write --
 dialect: bash
 source: oils:spec/ysh-builtins#write
 status: 2
-stdout: "\n--\ndone\n"
+stdout: |2-
+
+  --
+  done
 ---
 shopt -s ysh:all
 write --

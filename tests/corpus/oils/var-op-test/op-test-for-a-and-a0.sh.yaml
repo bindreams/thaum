@@ -1,9 +1,15 @@
 name: op-test for ${a} and ${a[0]}
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-a-and-a0
-stdout: "a   : 'no-colon' 'with-colon'\na[0]: 'no-colon' 'with-colon'\na   : '' 'with-colon'\n\
-  a[0]: '' 'with-colon'\na   : '' 'with-colon'\na[0]: '' 'with-colon'\na   : '' 'with-colon'\n\
-  a[0]: '' 'with-colon'\n"
+stdout: |-
+  a   : 'no-colon' 'with-colon'
+  a[0]: 'no-colon' 'with-colon'
+  a   : '' 'with-colon'
+  a[0]: '' 'with-colon'
+  a   : '' 'with-colon'
+  a[0]: '' 'with-colon'
+  a   : '' 'with-colon'
+  a[0]: '' 'with-colon'
 ---
 case $SH in dash) exit ;; esac
 

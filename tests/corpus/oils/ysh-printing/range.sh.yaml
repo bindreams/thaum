@@ -2,8 +2,12 @@ disabled: true
 name: Range
 dialect: bash
 source: oils:spec/ysh-printing#range
-stdout: "(Range 1 ..< 100)\n(Dict)  {k: (Range 1 ..< 100)}\n\n<Range>\n(Dict)   {\"\
-  k\":<Range>}\n"
+stdout: |-
+  (Range 1 ..< 100)
+  (Dict)  {k: (Range 1 ..< 100)}
+
+  <Range>
+  (Dict)   {"k":<Range>}
 ---
 var x = 1..<100
 

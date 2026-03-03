@@ -2,7 +2,11 @@ disabled: true
 name: setvar x, y = 1, 2
 dialect: bash
 source: oils:spec/ysh-assign#setvar-x-y-1-2
-stdout: "x=3 y=4\nx=1 y=9\nx=9 y=1\nx=18 y=27\n"
+stdout: |-
+  x=3 y=4
+  x=1 y=9
+  x=9 y=1
+  x=18 y=27
 ---
 
 # Python doesn't allow you to have annotation on each variable!

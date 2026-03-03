@@ -2,7 +2,8 @@ name: '[[ over multiple lines is OK'
 dialect: bash
 source: oils:spec/dbracket#over-multiple-lines-is-ok
 status: 0
-stdout: "true\n"
+stdout: |-
+  true
 ---
 # Hm it seems you can't split anywhere?
 [[ foo == foo

@@ -3,7 +3,20 @@ dialect: bash
 source: oils:spec/var-op-test#afoo-and-afoo---operators-are-equivalent-on-arrays
 # Bash 5.0+ behavior. Bash 4.x had a bug where "${a[@]+foo}" on an array
 # with a single empty element produced empty instead of "foo".
-stdout: "+  //\n+: //\n\n+  //\n+: //\n\n+  /foo/\n+: //\n\n+  /foo/\n+: /foo/\n\n"
+stdout: |+
+  +  //
+  +: //
+
+  +  //
+  +: //
+
+  +  /foo/
+  +: //
+
+  +  /foo/
+  +: /foo/
+
+...
 ---
 
 case $SH in dash) exit ;; esac

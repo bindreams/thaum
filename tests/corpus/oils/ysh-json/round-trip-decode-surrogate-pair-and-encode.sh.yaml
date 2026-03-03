@@ -2,7 +2,11 @@ disabled: true
 name: 'round trip: decode surrogate pair and encode'
 dialect: bash
 source: oils:spec/ysh-json#round-trip-decode-surrogate-pair-and-encode
-stdout: "\"🤦\"\n\"🤦\"\n\"\\u0001\\u0002\"\n\"ĀāĂ\"\n"
+stdout: |-
+  "🤦"
+  "🤦"
+  "\u0001\u0002"
+  "ĀāĂ"
 ---
 
 var j = r'"\ud83e\udd26"'

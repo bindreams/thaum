@@ -1,7 +1,17 @@
 name: trap DEBUG ignores $?
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-debug-ignores
-stdout: "  [8]\nstatus=0\n  [9]\nA\n  [10]\nstatus=0\n  [11]\nB\n  [12]\nstatus=0\n"
+stdout: |2-
+    [8]
+  status=0
+    [9]
+  A
+    [10]
+  status=0
+    [11]
+  B
+    [12]
+  status=0
 ---
 debuglog() {
   echo "  [$@]"

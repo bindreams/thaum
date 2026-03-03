@@ -1,7 +1,8 @@
 name: ${1#'###'}
 dialect: bash
 source: oils:spec/blog1#1
-stdout: "#\n"
+stdout: |-
+  #
 ---
 set -- '####'
 echo ${1#'###'}

@@ -1,6 +1,9 @@
 name: printf with too many arguments
 dialect: bash
 source: oils:spec/builtin-printf#printf-with-too-many-arguments
-stdout: "-a-b-\n-c-d-\n-e--\n"
+stdout: |-
+  -a-b-
+  -c-d-
+  -e--
 ---
 printf -- '-%s-%s-\n' a b c d e

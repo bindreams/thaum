@@ -2,7 +2,9 @@ name: unset and shell funcs
 dialect: bash
 source: oils:spec/assign-extended#unset-and-shell-funcs
 status: 127
-stdout: "bar\ndeclare -f foo\n"
+stdout: |-
+  bar
+  declare -f foo
 ---
 foo() {
   echo bar

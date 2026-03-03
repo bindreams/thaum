@@ -2,7 +2,8 @@ disabled: true
 name: redirect completions are quoted
 dialect: bash
 source: oils:spec/ysh-completion#redirect-completions-are-quoted
-stdout: "\"echo hi > can\\\\'t\\\\ touch\\\\ this\"\n"
+stdout: |-
+  "echo hi > can\\'t\\ touch\\ this"
 ---
 
 touch "can't touch this"

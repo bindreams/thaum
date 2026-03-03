@@ -2,7 +2,12 @@ name: setting errexit in a subshell works but doesn't affect parent shell
 dialect: bash
 source: 
   oils:spec/errexit#setting-errexit-in-a-subshell-works-but-doesnt-affect-parent-shell
-stdout: "1\n2\n3\n5\n6\n"
+stdout: |-
+  1
+  2
+  3
+  5
+  6
 ---
 ( echo 1; false; echo 2; set -o errexit; echo 3; false; echo 4; )
 echo 5

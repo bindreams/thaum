@@ -2,13 +2,30 @@ disabled: true
 name: use builtin and invokable module
 dialect: bash
 source: oils:spec/ysh-xtrace#use-builtin-and-invokable-module
-stdout: "[for-xtrace]\ncounter = 5\n\n[for-xtrace]\ncounter = 5\ncounter = 6\n"
-stderr: "> source for-xtrace.ysh\n  . builtin echo '[for-xtrace]'\n  > proc increment\n\
-  \    . builtin echo 'counter = 5'\n  < proc increment\n< source for-xtrace.ysh\n\
-  . builtin echo\n> use for-xtrace.ysh\n  . builtin echo '[for-xtrace]'\n  > proc
-  increment\n    . builtin echo 'counter = 5'\n  < proc increment\n< use for-xtrace.ysh\n\
-  > module-invoke for-xtrace increment foo bar\n  . builtin echo 'counter = 6'\n<
-  module-invoke for-xtrace\n"
+stdout: |
+  [for-xtrace]
+  counter = 5
+
+  [for-xtrace]
+  counter = 5
+  counter = 6
+stderr: |-
+  > source for-xtrace.ysh
+    . builtin echo '[for-xtrace]'
+    > proc increment
+      . builtin echo 'counter = 5'
+    < proc increment
+  < source for-xtrace.ysh
+  . builtin echo
+  > use for-xtrace.ysh
+    . builtin echo '[for-xtrace]'
+    > proc increment
+      . builtin echo 'counter = 5'
+    < proc increment
+  < use for-xtrace.ysh
+  > module-invoke for-xtrace increment foo bar
+    . builtin echo 'counter = 6'
+  < module-invoke for-xtrace
 ---
 shopt --set ysh:upgrade
 

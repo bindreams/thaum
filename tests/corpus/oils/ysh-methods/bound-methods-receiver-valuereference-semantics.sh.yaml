@@ -3,7 +3,11 @@ name: Bound methods, receiver value/reference semantics
 dialect: bash
 source: oils:spec/ysh-methods#bound-methods-receiver-valuereference-semantics
 status: 0
-stdout: "(List)   [\"foo\"]\n(List)   [\"foo\",\"baz\"]\n(Bool)   true\n(Bool)   true\n"
+stdout: |-
+  (List)   ["foo"]
+  (List)   ["foo","baz"]
+  (Bool)   true
+  (Bool)   true
 ---
 var is_a_ref = { "foo": "bar" }
 const f = is_a_ref => keys

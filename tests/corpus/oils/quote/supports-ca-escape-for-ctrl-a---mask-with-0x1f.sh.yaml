@@ -1,8 +1,18 @@
 name: $'' supports \cA escape for Ctrl-A - mask with 0x1f
 dialect: bash
 source: oils:spec/quote#supports-ca-escape-for-ctrl-a---mask-with-0x1f
-stdout: " 020 031   -\n  10  19  2d\n\n 001 032\n  01  1a\n\n 001 032\n  01  1a\n\n\
-  \  \\r  \\v 002\n  0d  0b  02\n"
+stdout: |2-
+   020 031   -
+    10  19  2d
+
+   001 032
+    01  1a
+
+   001 032
+    01  1a
+
+    \r  \v 002
+    0d  0b  02
 ---
 
 # note: AT&T ksh supports this too

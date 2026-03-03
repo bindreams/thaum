@@ -2,8 +2,9 @@ disabled: true
 name: io->eval(to_dict=true) - local and global
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evaltodicttrue---local-and-global
-stdout: "(Dict)   {\"foo\":42,\"bar\":\"global\"}\n(Dict)   {\"foo\":42,\"g\":\"-global\"\
-  ,\"p\":\"-param\",\"L\":\"-local\"}\n"
+stdout: |-
+  (Dict)   {"foo":42,"bar":"global"}
+  (Dict)   {"foo":42,"g":"-global","p":"-param","L":"-local"}
 ---
 
 var g = 'global'

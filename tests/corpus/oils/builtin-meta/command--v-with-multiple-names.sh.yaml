@@ -1,9 +1,23 @@
 name: command -v with multiple names
 dialect: bash
 source: oils:spec/builtin-meta#command--v-with-multiple-names
-stdout: "echo\nmyfunc\nfor\nstatus=1\n## BUG bash STDOUT:\necho\nmyfunc\nfor\nstatus=0\n\
-  ## BUG-2 dash/ash STDOUT: \necho\nstatus=0\n## OK mksh STDOUT: \necho\nmyfunc\n\
-  status=1\n"
+stdout: |-
+  echo
+  myfunc
+  for
+  status=1
+  ## BUG bash STDOUT:
+  echo
+  myfunc
+  for
+  status=0
+  ## BUG-2 dash/ash STDOUT: 
+  echo
+  status=0
+  ## OK mksh STDOUT: 
+  echo
+  myfunc
+  status=1
 ---
 # ALL FOUR SHELLS behave differently here!
 #

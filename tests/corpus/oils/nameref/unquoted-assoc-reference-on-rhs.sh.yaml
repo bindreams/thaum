@@ -1,8 +1,9 @@
 name: Unquoted assoc reference on RHS
 dialect: bash
 source: oils:spec/nameref#unquoted-assoc-reference-on-rhs
-stdout: "['bar']\n"
-setup: |
+stdout: |
+  ['bar']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 typeset -A bashup_ev_r
 bashup_ev_r['foo']=bar

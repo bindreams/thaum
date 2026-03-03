@@ -2,9 +2,24 @@ disabled: true
 name: Nested temp bindings
 dialect: bash
 source: oils:spec/ysh-env#nested-temp-bindings
-stdout: "> f1 AA=a\n  f2 AA=aaaa BB=bb\nAA=aaaa\nBB=bb\n< f1 AA=a\n\n> p1 AA=a\n \
-  \ p2 AA=aaaa BB=bb\nAA=aaaa\nBB=bb\n< p1 AA=a\n\n> p1 AA=a\n  p2 AA=aaaa BB=bb\n\
-  AA=aaaa\nBB=bb\n< p1 AA=a\n"
+stdout: |-
+  > f1 AA=a
+    f2 AA=aaaa BB=bb
+  AA=aaaa
+  BB=bb
+  < f1 AA=a
+
+  > p1 AA=a
+    p2 AA=aaaa BB=bb
+  AA=aaaa
+  BB=bb
+  < p1 AA=a
+
+  > p1 AA=a
+    p2 AA=aaaa BB=bb
+  AA=aaaa
+  BB=bb
+  < p1 AA=a
 ---
 
 f2() {

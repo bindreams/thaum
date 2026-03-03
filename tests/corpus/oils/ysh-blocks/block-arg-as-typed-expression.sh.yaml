@@ -2,7 +2,9 @@ disabled: true
 name: block arg as typed expression
 dialect: bash
 source: oils:spec/ysh-blocks#block-arg-as-typed-expression
-stdout: "/tmp\n/tmp\n"
+stdout: |-
+  /tmp
+  /tmp
 ---
 
 shopt -s oil:all

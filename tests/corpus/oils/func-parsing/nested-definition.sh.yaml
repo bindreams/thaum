@@ -1,7 +1,8 @@
 name: Nested definition
 dialect: bash
 source: oils:spec/func-parsing#nested-definition
-stdout: "nested\n"
+stdout: |-
+  nested
 ---
 # A function definition is a command, so it can be nested
 fun() {

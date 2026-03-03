@@ -2,7 +2,10 @@ disabled: true
 name: List->reverse() from iterator
 dialect: bash
 source: oils:spec/ysh-methods#list-reverse-from-iterator
-stdout: "2\n1\n0\n"
+stdout: |-
+  2
+  1
+  0
 ---
 var x = list(0 ..< 3)
 call x->reverse()

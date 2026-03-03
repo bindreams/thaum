@@ -2,7 +2,9 @@ disabled: true
 name: Eval block created by calling a proc
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-block-created-by-calling-a-proc
-stdout: "0\n1\n"
+stdout: |-
+  0
+  1
 ---
 proc lazy-block ( ; out; ; block) {
   call out->setValue(block)

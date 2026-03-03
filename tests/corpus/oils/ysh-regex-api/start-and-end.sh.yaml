@@ -2,8 +2,14 @@ disabled: true
 name: _start() and _end()
 dialect: bash
 source: oils:spec/ysh-regex-api#start-and-end
-stdout: "start=3 end=6\n---\nstart=0 end=3\nstart=3 end=6\n---\nstart=0 end=3\nstart=-1
-  end=-1\n"
+stdout: |-
+  start=3 end=6
+  ---
+  start=0 end=3
+  start=3 end=6
+  ---
+  start=0 end=3
+  start=-1 end=-1
 ---
 shopt -s ysh:upgrade
 

@@ -2,7 +2,12 @@ disabled: true
 name: Str.replace(Str, Str)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplacestr-str
-stdout: "AbcA\naBca\nabca\na\nnewanewbnewcnewanew\n"
+stdout: |-
+  AbcA
+  aBca
+  abca
+  a
+  newanewbnewcnewanew
 ---
 shopt --set ysh:all
 

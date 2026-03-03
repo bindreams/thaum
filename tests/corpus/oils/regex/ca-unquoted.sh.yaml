@@ -1,7 +1,8 @@
 name: c|a unquoted
 dialect: bash
 source: oils:spec/regex#ca-unquoted
-stdout: "one\n"
+stdout: |-
+  one
 ---
 
 if [[ a =~ c|a ]]; then

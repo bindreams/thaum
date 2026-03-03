@@ -1,7 +1,8 @@
 name: sh -i
 dialect: bash
 source: oils:spec/prompt#sh--i
-stdout: "match=0\n"
+stdout: |-
+  match=0
 ---
 # Notes:
 # - OSH prompt goes to stdout and bash goes to stderr

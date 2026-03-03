@@ -2,9 +2,16 @@ disabled: true
 name: source
 dialect: bash
 source: oils:spec/ysh-xtrace#source
-stdout: "$1 = a\n$1 = x\n"
-stderr: "> source lib.sh a b c\n  . builtin echo '$1 = a'\n< source lib.sh\n> source
-  lib.sh x $'\\xfe' $'\\xff'\n  . builtin echo '$1 = x'\n< source lib.sh\n"
+stdout: |
+  $1 = a
+  $1 = x
+stderr: |-
+  > source lib.sh a b c
+    . builtin echo '$1 = a'
+  < source lib.sh
+  > source lib.sh x $'\xfe' $'\xff'
+    . builtin echo '$1 = x'
+  < source lib.sh
 ---
 echo 'echo "\$1 = $1"' > lib.sh
 

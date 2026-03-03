@@ -1,7 +1,10 @@
 name: '%(strftime format)T'
 dialect: bash
 source: oils:spec/builtin-printf#strftime-formatt
-stdout: "2019-05-16\n2019-05-15\nstatus=0\n"
+stdout: |-
+  2019-05-16
+  2019-05-15
+  status=0
 ---
 # The result depends on timezone
 export TZ=Asia/Tokyo

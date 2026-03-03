@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#global-assignment-with-command-sub-middle-command-fails
 status: 0
-stdout: "one\ntwo\n"
+stdout: |-
+  one
+  two
 ---
 set -o errexit
 s=$(echo one; false; echo two;)

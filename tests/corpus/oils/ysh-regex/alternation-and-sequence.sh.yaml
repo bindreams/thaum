@@ -2,7 +2,9 @@ disabled: true
 name: Alternation and sequence
 dialect: bash
 source: oils:spec/ysh-regex#alternation-and-sequence
-stdout: "[[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*\n[[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*\n"
+stdout: |-
+  [[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*
+  [[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*
 ---
 var pat = ''
 setvar pat = /s d+ | w*/

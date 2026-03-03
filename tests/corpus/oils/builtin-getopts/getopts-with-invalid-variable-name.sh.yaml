@@ -1,7 +1,8 @@
 name: getopts with invalid variable name
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-with-invalid-variable-name
-stdout: "status=2 opt= OPTARG=foo OPTIND=3\n"
+stdout: |-
+  status=2 opt= OPTARG=foo OPTIND=3
 ---
 set -- -c foo -h
 getopts 'hc:' opt-

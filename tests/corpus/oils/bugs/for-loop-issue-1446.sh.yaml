@@ -1,7 +1,9 @@
 name: 'for loop (issue #1446)'
 dialect: bash
 source: oils:spec/bugs#for-loop-issue-1446
-stdout: "0\n1\n"
+stdout: |-
+  0
+  1
 ---
 case $SH in dash|mksh|ash) exit ;; esac
 

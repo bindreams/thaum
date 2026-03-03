@@ -1,8 +1,10 @@
 name: Multiple here docs with different descriptors
 dialect: bash
 source: oils:spec/here-doc#multiple-here-docs-with-different-descriptors
-stdout: "0: fd0\n3: fd3\n"
-setup: |
+stdout: |
+  0: fd0
+  3: fd3
+setup: |-
   #!/bin/sh
   cat > read_from_fd.py <<'HELPER'
   #!/usr/bin/env python3
@@ -18,7 +20,6 @@ setup: |
       sys.stdout.buffer.write(data)
   HELPER
   chmod +x read_from_fd.py
-
 ---
 read_from_fd.py 0 3 <<EOF 3<<EOF3
 fd0

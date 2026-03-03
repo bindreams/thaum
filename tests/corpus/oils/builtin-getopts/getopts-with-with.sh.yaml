@@ -1,7 +1,9 @@
 name: getopts with with -
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-with-with
-stdout: "-h -\nstatus=0\n"
+stdout: |-
+  -h -
+  status=0
 ---
 set -- -h -
 echo "$@"

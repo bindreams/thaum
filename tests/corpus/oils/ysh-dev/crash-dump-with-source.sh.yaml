@@ -2,7 +2,9 @@ disabled: true
 name: crash dump with source
 dialect: bash
 source: oils:spec/ysh-dev#crash-dump-with-source
-stdout: "crash status=1\nfound crash dump\n"
+stdout: |
+  crash status=1
+  found crash dump
 environment:
   TMP: /tmp
 ---

@@ -2,12 +2,24 @@ disabled: true
 name: pipeline (nondeterministic)
 dialect: bash
 source: oils:spec/ysh-xtrace#pipeline-nondeterministic
-stdout: "2\n"
-stderr: "      . 12345 builtin echo 1\n      . 12345 builtin echo 2\n    . 12345 exec
-  sort\n    < 12345 proc myfunc\n    > 12345 proc myfunc\n  ; process 12345: status
-  0\n  ; process 12345: status 0\n  ; process 12345: status 0\n  | command 12345:
-  wc -l\n  | part 12345\n  | part 12345\n. builtin ':' begin\n. builtin set '+x'\n\
-  < pipeline\n> pipeline\n"
+stdout: |
+  2
+stderr: |2-
+        . 12345 builtin echo 1
+        . 12345 builtin echo 2
+      . 12345 exec sort
+      < 12345 proc myfunc
+      > 12345 proc myfunc
+    ; process 12345: status 0
+    ; process 12345: status 0
+    ; process 12345: status 0
+    | command 12345: wc -l
+    | part 12345
+    | part 12345
+  . builtin ':' begin
+  . builtin set '+x'
+  < pipeline
+  > pipeline
 ---
 shopt --set ysh:upgrade
 set -x

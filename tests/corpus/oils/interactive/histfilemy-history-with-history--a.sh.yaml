@@ -1,7 +1,13 @@
 name: HISTFILE=my-history with history -a
 dialect: bash
 source: oils:spec/interactive#histfilemy-history-with-history--a
-stdout: "2\n\n-- after shell exit --\necho 1\nhistory -a\necho 2\n"
+stdout: |-
+  2
+
+  -- after shell exit --
+  echo 1
+  history -a
+  echo 2
 ---
 
 echo 'echo 1' > my-history

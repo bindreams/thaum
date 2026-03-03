@@ -1,7 +1,9 @@
 name: Lower Case glob
 dialect: bash
 source: oils:spec/var-op-bash#lower-case-glob
-stdout: "ABC DEF\nABC DEF\n"
+stdout: |-
+  ABC DEF
+  ABC DEF
 ---
 
 # Hm with C.UTF-8, this does no case folding?

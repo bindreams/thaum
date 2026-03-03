@@ -1,7 +1,12 @@
 name: kill -terM -SigterM isn't case sensitive
 dialect: bash
 source: oils:spec/builtin-kill#kill--term--sigterm-isnt-case-sensitive
-stdout: "kill=0\nwait=143\nkill=0\nwait=143\n## N-I dash/mksh/zsh STDOUT:\n"
+stdout: |-
+  kill=0
+  wait=143
+  kill=0
+  wait=143
+  ## N-I dash/mksh/zsh STDOUT:
 ---
 case $SH in mksh|dash|zsh) exit ;; esac
 

@@ -1,7 +1,12 @@
 name: -v to test variable (bash)
 dialect: bash
 source: oils:spec/builtin-bracket#v-to-test-variable-bash
-stdout: "global=1\nglobal=0\ndynamic=0\ndynamic=0\ndynamic=1\n"
+stdout: |-
+  global=1
+  global=0
+  dynamic=0
+  dynamic=0
+  dynamic=1
 ---
 test -v nonexistent
 echo global=$?

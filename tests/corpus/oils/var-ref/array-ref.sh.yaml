@@ -2,7 +2,8 @@ name: array ref
 dialect: bash
 source: oils:spec/var-ref#array-ref
 status: 0
-stdout: "ale\n"
+stdout: |-
+  ale
 ---
 
 declare -a array=(ale bean)

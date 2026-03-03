@@ -1,7 +1,8 @@
 name: \ in unquoted substitutions is preserved with set -o noglob
 dialect: bash
 source: oils:spec/glob#in-unquoted-substitutions-is-preserved-with-set--o-noglob
-stdout: "*\\*.txt\n"
+stdout: |-
+  *\*.txt
 ---
 set -f
 v='*\*.txt'

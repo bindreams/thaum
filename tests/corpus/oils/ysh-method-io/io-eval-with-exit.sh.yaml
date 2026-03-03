@@ -2,7 +2,8 @@ disabled: true
 name: io->eval() with exit
 dialect: bash
 source: oils:spec/ysh-method-io#io-eval-with-exit
-stdout: "one\n"
+stdout: |-
+  one
 ---
 
 var c = ^(echo one; exit; echo two)

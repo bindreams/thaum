@@ -1,7 +1,9 @@
 name: Length after unset
 dialect: bash
 source: oils:spec/array#length-after-unset
-stdout: "len=3\nlen=2\n"
+stdout: |-
+  len=3
+  len=2
 ---
 a=(0 1 2 3)
 unset a[-1]

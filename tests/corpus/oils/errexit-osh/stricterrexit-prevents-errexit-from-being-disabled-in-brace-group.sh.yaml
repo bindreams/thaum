@@ -3,7 +3,9 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#stricterrexit-prevents-errexit-from-being-disabled-in-brace-group
 status: 1
-stdout: "foo\nbar\n"
+stdout: |-
+  foo
+  bar
 ---
 set -o errexit
 # false failure is NOT respected either way

@@ -1,6 +1,7 @@
 name: type -a -> keyword
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---keyword
-stdout: "while is a shell keyword\n"
+stdout: |-
+  while is a shell keyword
 ---
 type -a while

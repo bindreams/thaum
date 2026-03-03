@@ -1,8 +1,13 @@
 name: $_ with assignments, arrays, etc.
 dialect: bash
 source: oils:spec/vars-special#with-assignments-arrays-etc
-stdout: "colon [foo]\nbare assign []\ndeclare [s=bar]\narray []\ndeclare array [a]\n\
-  declare flag [d]\n"
+stdout: |-
+  colon [foo]
+  bare assign []
+  declare [s=bar]
+  array []
+  declare array [a]
+  declare flag [d]
 ---
 case $SH in dash|mksh) exit ;; esac
 

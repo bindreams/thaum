@@ -2,7 +2,9 @@ disabled: true
 name: Proc with word params
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-word-params
-stdout: "a b c\nstatus=42\n"
+stdout: |-
+  a b c
+  status=42
 ---
 shopt --set parse_proc
 

@@ -2,7 +2,11 @@ disabled: true
 name: '% operator is remainder'
 dialect: bash
 source: oils:spec/ysh-expr-arith#operator-is-remainder
-stdout: "(Int)   2\n(Int)   -2\n(Int)   1\n(Int)   -1\n"
+stdout: |-
+  (Int)   2
+  (Int)   -2
+  (Int)   1
+  (Int)   -1
 ---
 pp test_ ( 5 % 3)
 pp test_ (-5 % 3)

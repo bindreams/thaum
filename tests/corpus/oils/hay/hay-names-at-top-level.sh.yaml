@@ -2,7 +2,13 @@ disabled: true
 name: hay names at top level
 dialect: bash
 source: oils:spec/hay#hay-names-at-top-level
-stdout: "status=0\n1 one\nstatus=0\n1 two\nstatus=0\n1 three\n"
+stdout: |-
+  status=0
+  1 one
+  status=0
+  1 two
+  status=0
+  1 three
 ---
 shopt --set parse_brace parse_at parse_ysh_expr_sub
 shopt --unset errexit

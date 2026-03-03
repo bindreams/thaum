@@ -1,7 +1,11 @@
 name: -G and -O for effective user ID and group ID
 dialect: bash
 source: oils:spec/builtin-bracket#g-and--o-for-effective-user-id-and-group-id
-stdout: "status=0\nstatus=1\nstatus=0\nstatus=1\n"
+stdout: |
+  status=0
+  status=1
+  status=0
+  status=1
 environment:
   TMP: /tmp
 ---

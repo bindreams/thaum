@@ -2,8 +2,10 @@ name: complete with no args and complete -p both print completion spec
 dialect: bash
 source: 
   oils:spec/builtin-completion#complete-with-no-args-and-complete--p-both-print-completion-spec
-stdout: "complete -W 'foo bar' mycommand\ncomplete -W 'foo bar' mycommand\ncomplete
-  -F myfunc other\n"
+stdout: |-
+  complete -W 'foo bar' mycommand
+  complete -W 'foo bar' mycommand
+  complete -F myfunc other
 ---
 
 set -e

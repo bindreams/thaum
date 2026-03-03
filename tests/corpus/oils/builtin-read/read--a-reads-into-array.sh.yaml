@@ -2,8 +2,12 @@ name: read -a reads into array
 dialect: bash
 source: oils:spec/builtin-read#read--a-reads-into-array
 status: 0
-stdout: "['a', 'b', 'c d']\n['a', 'b', 'c\\\\', 'd']\n[]\n[]\n"
-setup: |
+stdout: |
+  ['a', 'b', 'c d']
+  ['a', 'b', 'c\\', 'd']
+  []
+  []
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +15,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 # read -a is used in bash-completion

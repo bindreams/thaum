@@ -2,7 +2,8 @@ name: myvar=typeset (another form of dynamic assignment)
 dialect: bash
 source: 
   oils:spec/assign-extended#myvartypeset-another-form-of-dynamic-assignment
-stdout: "a\n"
+stdout: |-
+  a
 ---
 myvar=typeset
 x='a b'

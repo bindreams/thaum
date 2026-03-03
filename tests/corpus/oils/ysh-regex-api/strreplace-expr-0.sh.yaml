@@ -2,8 +2,9 @@ disabled: true
 name: Str.replace(*, Expr), $0
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplace-expr-0
-stdout: "class FooBar:  # this class is called FooBar\nclass FooBar:  # this class
-  is called FooBar\n"
+stdout: |-
+  class FooBar:  # this class is called FooBar
+  class FooBar:  # this class is called FooBar
 ---
 shopt --set ysh:all
 

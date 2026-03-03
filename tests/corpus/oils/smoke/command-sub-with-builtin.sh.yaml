@@ -1,6 +1,7 @@
 name: command sub with builtin
 dialect: bash
 source: oils:spec/smoke#command-sub-with-builtin
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 echo $(echo hi)

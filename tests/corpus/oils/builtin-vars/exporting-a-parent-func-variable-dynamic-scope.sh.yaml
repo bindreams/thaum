@@ -1,8 +1,14 @@
 name: Exporting a parent func variable (dynamic scope)
 dialect: bash
 source: oils:spec/builtin-vars#exporting-a-parent-func-variable-dynamic-scope
-stdout: "before inner\nNone\ninner: X\nX\nafter inner\nX\n"
-setup: |
+stdout: |
+  before inner
+  None
+  inner: X
+  X
+  after inner
+  X
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +17,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 # The algorithm is to walk up the stack and export that one.
 inner() {

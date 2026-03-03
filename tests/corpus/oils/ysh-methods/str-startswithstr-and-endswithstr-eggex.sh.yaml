@@ -3,7 +3,13 @@ name: Str => startsWith(Str) and endsWith(Str), eggex
 dialect: bash
 source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex
 status: 0
-stdout: "false false\ntrue true\ntrue true\nfalse false\ntrue true\nfalse false\n"
+stdout: |-
+  false false
+  true true
+  true true
+  false false
+  true true
+  false false
 ---
 func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
 

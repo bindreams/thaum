@@ -1,7 +1,10 @@
 name: hash with args
 dialect: bash
 source: oils:spec/command#hash-with-args
-stdout: "status=0\n/whoami\nstatus=1\n"
+stdout: |-
+  status=0
+  /whoami
+  status=1
 ---
 hash whoami
 echo status=$?

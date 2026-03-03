@@ -1,7 +1,9 @@
 name: simple repetition with *(foo) and +(Foo)
 dialect: bash
 source: oils:spec/extglob-match#simple-repetition-with-foo-and-foo
-stdout: "TRUE\nTRUE\n"
+stdout: |-
+  TRUE
+  TRUE
 ---
 [[ foofoo == *(foo) ]] && echo TRUE
 [[ foofoo == +(foo) ]] && echo TRUE

@@ -20,3 +20,30 @@ repos:
         language: system
         types: [rust]
         pass_filenames: false
+
+      - id: sh-yaml-format
+        name: sh.yaml format
+        entry: scripts/format-sh-yaml.py
+        language: python
+        additional_dependencies: ['ruamel.yaml']
+        files: '\.sh\.yaml$'
+
+  - repo: https://github.com/hukkin/mdformat
+    rev: 0.7.21
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: 3.2.1
+    hooks:
+      - id: editorconfig-checker
+        # Rust indent is enforced by cargo fmt; markdown by mdformat.
+        exclude_types: [rust, markdown]

@@ -1,7 +1,8 @@
 name: Strings have value semantics, not reference semantics
 dialect: bash
 source: oils:spec/append#strings-have-value-semantics-not-reference-semantics
-stdout: "abcd abc\n"
+stdout: |-
+  abcd abc
 ---
 s1='abc'
 s2=$s1

@@ -1,9 +1,20 @@
 name: read and "\ "
 dialect: bash
 source: oils:spec/builtin-read#read-and
-stdout: "-- xs... --\n['', '']\n['', ' ']\n['', '  ']\n['', '   ']\n-- xe... --\n\
-  ['', ' ']\n['', '  ']\n['', '   ']\n['', ' ']\n['', ' ']\n['', ' ']\n"
-setup: |
+stdout: |
+  -- xs... --
+  ['', '']
+  ['', ' ']
+  ['', '  ']
+  ['', '   ']
+  -- xe... --
+  ['', ' ']
+  ['', '  ']
+  ['', '   ']
+  ['', ' ']
+  ['', ' ']
+  ['', ' ']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +22,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 IFS='x '

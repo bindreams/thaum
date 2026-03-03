@@ -3,7 +3,10 @@ name: io->eval with in_captured_frame=true can express cd builtin
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-eval-with-incapturedframetrue-can-express-cd-builtin
-stdout: "/tmp\nmy_pwd=/tmp\nj = 43\n"
+stdout: |-
+  /tmp
+  my_pwd=/tmp
+  j = 43
 ---
 
 proc my-cd (new_dir; ; ; block) {

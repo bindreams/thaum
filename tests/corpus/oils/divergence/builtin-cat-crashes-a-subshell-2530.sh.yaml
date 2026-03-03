@@ -1,7 +1,9 @@
 name: builtin cat crashes a subshell (#2530)
 dialect: bash
 source: oils:spec/divergence#builtin-cat-crashes-a-subshell-2530
-stdout: "141\n141\n"
+stdout: |-
+  141
+  141
 ---
 
 ((/usr/bin/cat </dev/zero; echo $? >&7) | true) 7>&1

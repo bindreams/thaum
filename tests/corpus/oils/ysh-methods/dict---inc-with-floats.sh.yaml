@@ -3,9 +3,13 @@ name: Dict -> inc() with floats
 dialect: bash
 source: oils:spec/ysh-methods#dict---inc-with-floats
 status: 3
-stdout: "(Dict)   {\"a\":4.5}\n(Dict)   {\"a\":8.0}\n(Dict)   {\"a\":8.0,\"b\":3.5}\n\
-  (Dict)   {\"a\":8.0,\"b\":5.5}\n(Dict)   {\"a\":8.0,\"b\":5.5,\"c\":1}\n(Dict) \
-  \  {\"a\":8.0,\"b\":5.5,\"c\":4.0}\n"
+stdout: |-
+  (Dict)   {"a":4.5}
+  (Dict)   {"a":8.0}
+  (Dict)   {"a":8.0,"b":3.5}
+  (Dict)   {"a":8.0,"b":5.5}
+  (Dict)   {"a":8.0,"b":5.5,"c":1}
+  (Dict)   {"a":8.0,"b":5.5,"c":4.0}
 ---
 var histogram = {a: 2.5}
 call histogram->inc('a', 2)

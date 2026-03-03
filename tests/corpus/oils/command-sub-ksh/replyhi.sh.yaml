@@ -2,7 +2,12 @@ name: ${|REPLY=hi}
 dialect: bash
 source: oils:spec/command-sub-ksh#replyhi
 status: 1
-stdout: "[ reply var ]\n\n[from file]\n\n"
+stdout: |+
+  [ reply var ]
+
+  [from file]
+
+...
 ---
 
 x=${|y=" reply var "; REPLY=$y}

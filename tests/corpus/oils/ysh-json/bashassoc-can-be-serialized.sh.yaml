@@ -2,8 +2,18 @@ disabled: true
 name: BashAssoc can be serialized
 dialect: bash
 source: oils:spec/ysh-json#bashassoc-can-be-serialized
-stdout: "{\n  \"type\": \"BashAssoc\",\n  \"data\": {}\n}\n{\n  \"type\": \"BashAssoc\"\
-  ,\n  \"data\": {\n    \"foo\": \"bar\",\n    \"42\": \"43\"\n  }\n}\n"
+stdout: |-
+  {
+    "type": "BashAssoc",
+    "data": {}
+  }
+  {
+    "type": "BashAssoc",
+    "data": {
+      "foo": "bar",
+      "42": "43"
+    }
+  }
 ---
 
 declare -A empty_assoc

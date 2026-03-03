@@ -1,7 +1,11 @@
 name: $- and more options
 dialect: bash
 source: oils:spec/sh-options#and-more-options
-stdout: "yes\nyes\nyes\nyes\n"
+stdout: |-
+  yes
+  yes
+  yes
+  yes
 ---
 set -efuC
 o=$-

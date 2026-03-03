@@ -2,7 +2,8 @@ disabled: true
 name: '... with pipeline'
 dialect: bash
 source: oils:spec/ysh-multiline#with-pipeline
-stdout: "2\n"
+stdout: |-
+  2
 ---
 ... { echo one; echo two; }
   | sort

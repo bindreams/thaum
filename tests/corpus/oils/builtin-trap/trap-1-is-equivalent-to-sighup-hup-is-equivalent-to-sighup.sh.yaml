@@ -3,7 +3,11 @@ dialect: bash
 source: 
   oils:spec/builtin-trap#trap-1-is-equivalent-to-sighup-hup-is-equivalent-to-sighup
 status: 0
-stdout: "status=0\nstatus=0\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
+  status=0
 ---
 trap 'echo HUP' SIGHUP
 echo status=$?

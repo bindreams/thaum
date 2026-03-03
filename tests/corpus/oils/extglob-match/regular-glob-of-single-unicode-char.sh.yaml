@@ -1,7 +1,9 @@
 name: regular glob of single unicode char
 dialect: bash
 source: oils:spec/extglob-match#regular-glob-of-single-unicode-char
-stdout: "0\n0\n"
+stdout: |-
+  0
+  0
 ---
 shopt -s extglob
 [[ __a__ == __?__ ]]

@@ -1,8 +1,15 @@
 name: op-test for ${a[@]} and ${a[*]}
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-a-and-a
-stdout: "a[@]: 'no-colon' 'with-colon'\na[*]: 'no-colon' 'with-colon'\na[@]: '' 'with-colon'\n\
-  a[*]: '' 'with-colon'\na[@]: ' ' ' '\na[*]: ' ' ' '\na[@]: ' ' ' '\na[*]: '' 'with-colon'\n"
+stdout: |-
+  a[@]: 'no-colon' 'with-colon'
+  a[*]: 'no-colon' 'with-colon'
+  a[@]: '' 'with-colon'
+  a[*]: '' 'with-colon'
+  a[@]: ' ' ' '
+  a[*]: ' ' ' '
+  a[@]: ' ' ' '
+  a[*]: '' 'with-colon'
 ---
 case $SH in dash) exit ;; esac
 

@@ -2,8 +2,14 @@ disabled: true
 name: New Obj API
 dialect: bash
 source: oils:spec/ysh-object#new-obj-api
-stdout: "(Obj)   (\"x\":4)\n0\n(Dict)   {\"x\":4}\n0\n(Null)   null\n0\n(Obj)   (\"\
-  y\":5)\n"
+stdout: |-
+  (Obj)   ("x":4)
+  0
+  (Dict)   {"x":4}
+  0
+  (Null)   null
+  0
+  (Obj)   ("y":5)
 ---
 shopt --set ysh:upgrade
 

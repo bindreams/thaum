@@ -1,7 +1,9 @@
 name: local +=
 dialect: bash
 source: oils:spec/append#local
-stdout: "s=foo\ns=foofoo\n"
+stdout: |-
+  s=foo
+  s=foofoo
 ---
 
 f() {

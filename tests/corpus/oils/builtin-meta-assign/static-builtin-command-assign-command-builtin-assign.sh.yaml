@@ -2,7 +2,12 @@ name: static builtin command ASSIGN, command builtin ASSIGN
 dialect: bash
 source: 
   oils:spec/builtin-meta-assign#static-builtin-command-assign-command-builtin-assign
-stdout: "bc=export\nbc=readonly\n--\ncb=export\ncb=readonly\n"
+stdout: |-
+  bc=export
+  bc=readonly
+  --
+  cb=export
+  cb=readonly
 ---
 case $SH in dash|ash|zsh) exit ;; esac
 

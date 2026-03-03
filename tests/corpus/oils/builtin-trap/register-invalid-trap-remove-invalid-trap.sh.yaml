@@ -1,7 +1,9 @@
 name: Register invalid trap, remove invalid trap
 dialect: bash
 source: oils:spec/builtin-trap#register-invalid-trap-remove-invalid-trap
-stdout: "ok\nok\n"
+stdout: |-
+  ok
+  ok
 ---
 trap 'foo' SIGINVALID
 if test $? -ne 0; then

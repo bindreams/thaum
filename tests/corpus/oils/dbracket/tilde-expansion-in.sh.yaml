@@ -1,7 +1,10 @@
 name: tilde expansion in [[
 dialect: bash
 source: oils:spec/dbracket#tilde-expansion-in
-stdout: "status=0\nstatus=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=0
+  status=1
 ---
 HOME=/home/bob
 [[ ~ == /home/bob ]]

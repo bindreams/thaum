@@ -1,7 +1,8 @@
 name: Single backslash
 dialect: bash
 source: oils:spec/prompt#single-backslash
-stdout: "\\\n"
+stdout: |-
+  \
 ---
 PS1='\'
 echo "${PS1@P}"

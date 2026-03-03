@@ -1,7 +1,8 @@
 name: mapfile from directory (bash doesn't handle errors)
 dialect: bash
 source: oils:spec/builtin-read#mapfile-from-directory-bash-doesnt-handle-errors
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 case $SH in dash|ash|mksh|zsh) return ;; esac  # not implemented
 

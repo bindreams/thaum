@@ -1,7 +1,8 @@
 name: read -u syntax error
 dialect: bash
 source: oils:spec/builtin-read#read--u-syntax-error
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 read -u -3
 echo status=$?

@@ -1,7 +1,10 @@
 name: Eval in bash does tilde expansion in array
 dialect: bash
 source: oils:spec/builtin-eval-source#eval-in-bash-does-tilde-expansion-in-array
-stdout: "FALSE\nFALSE\nTRUE\n"
+stdout: |-
+  FALSE
+  FALSE
+  TRUE
 ---
 
 # the "make" plugin in bash-completion relies on this?  wtf?

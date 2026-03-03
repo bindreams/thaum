@@ -2,7 +2,11 @@ disabled: true
 name: setvar obj[INVALID TYPE] =
 dialect: bash
 source: oils:spec/ysh-assign#setvar-objinvalid-type
-stdout: "d.key = 5\noutside1=3\nL[0] = 43\noutside2=3\n"
+stdout: |-
+  d.key = 5
+  outside1=3
+  L[0] = 43
+  outside2=3
 ---
 
 shopt --unset errexit

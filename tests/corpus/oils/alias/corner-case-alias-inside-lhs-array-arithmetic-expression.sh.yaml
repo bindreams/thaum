@@ -1,8 +1,9 @@
 name: 'Corner case: alias inside LHS array arithmetic expression'
 dialect: bash
 source: oils:spec/alias#corner-case-alias-inside-lhs-array-arithmetic-expression
-stdout: "['ZERO', 'ONE']\n"
-setup: |
+stdout: |
+  ['ZERO', 'ONE']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s expand_aliases
 alias zero='echo 0'

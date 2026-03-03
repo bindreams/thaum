@@ -1,7 +1,14 @@
 name: multi-level continue
 dialect: bash
 source: oils:spec/loop#multi-level-continue
-stdout: "1 a\n1 c\n2 a\n2 c\n---\n1 a\n2 a\n"
+stdout: |-
+  1 a
+  1 c
+  2 a
+  2 c
+  ---
+  1 a
+  2 a
 ---
 
 for i in 1 2; do

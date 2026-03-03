@@ -1,7 +1,10 @@
 name: alias with redirects works
 dialect: bash
 source: oils:spec/alias#alias-with-redirects-works
-stdout: "1\n2\n3\n"
+stdout: |
+  1
+  2
+  3
 environment:
   TMP: /tmp
 ---

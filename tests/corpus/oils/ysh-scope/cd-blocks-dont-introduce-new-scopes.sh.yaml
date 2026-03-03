@@ -2,7 +2,9 @@ disabled: true
 name: cd blocks don't introduce new scopes
 dialect: bash
 source: oils:spec/ysh-scope#cd-blocks-dont-introduce-new-scopes
-stdout: "42 0 1\n42 43 44\n"
+stdout: |-
+  42 0 1
+  42 43 44
 ---
 shopt --set ysh:upgrade
 

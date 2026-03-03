@@ -2,7 +2,8 @@ disabled: true
 name: Parsing data - J8 rejects \u{110000}
 dialect: bash
 source: oils:spec/ysh-unicode#parsing-data---j8-rejects-u110000
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 
 json8 read <<EOF

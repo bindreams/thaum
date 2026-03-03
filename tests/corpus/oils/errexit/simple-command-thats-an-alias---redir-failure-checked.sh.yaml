@@ -1,7 +1,8 @@
 name: simple command that's an alias - redir failure checked
 dialect: bash
 source: oils:spec/errexit#simple-command-thats-an-alias---redir-failure-checked
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 
 # bash 5.2 fixed bash 4.4 bug: this is now checked

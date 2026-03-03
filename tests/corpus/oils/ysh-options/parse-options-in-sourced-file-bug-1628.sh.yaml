@@ -2,7 +2,10 @@ disabled: true
 name: 'parse options in sourced file (bug #1628)'
 dialect: bash
 source: oils:spec/ysh-options#parse-options-in-sourced-file-bug-1628
-stdout: "OK\nalias on\nOK\n"
+stdout: |-
+  OK
+  alias on
+  OK
 ---
 
 set -e  # catch errors

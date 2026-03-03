@@ -1,8 +1,9 @@
 name: Dependent export setting
 dialect: bash
 source: oils:spec/builtin-vars#dependent-export-setting
-stdout: "v=None\n"
-setup: |
+stdout: |
+  v=None
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 # FOO is not respected here either.
 export FOO=foo v=$(printenv.py FOO)

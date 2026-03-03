@@ -1,7 +1,10 @@
 name: test -v with dynamic parsing
 dialect: bash
 source: oils:spec/array-assoc#test--v-with-dynamic-parsing
-stdout: "empty=0\nk=0\nnonexistent=1\n"
+stdout: |-
+  empty=0
+  k=0
+  nonexistent=1
 ---
 
 typeset -A assoc

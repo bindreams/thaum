@@ -2,7 +2,11 @@ disabled: true
 name: Group ()
 dialect: bash
 source: oils:spec/ysh-regex#group
-stdout: "(^[[:space:]]|[[:digit:]][[:digit:]])\nyes\nyes\nno\n"
+stdout: |-
+  (^[[:space:]]|[[:digit:]][[:digit:]])
+  yes
+  yes
+  no
 ---
 shopt -s ysh:all
 var pat = ''

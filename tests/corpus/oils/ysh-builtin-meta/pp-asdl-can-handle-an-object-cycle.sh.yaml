@@ -2,7 +2,9 @@ disabled: true
 name: pp asdl_ can handle an object cycle
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-asdl-can-handle-an-object-cycle
-stdout: "{\"cycle\":\ncycle ...\n"
+stdout: |-
+  {"cycle":
+  cycle ...
 ---
 
 shopt -s ysh:upgrade

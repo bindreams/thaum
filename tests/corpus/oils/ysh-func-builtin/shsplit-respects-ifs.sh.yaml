@@ -2,9 +2,11 @@ disabled: true
 name: shSplit() respects IFS
 dialect: bash
 source: oils:spec/ysh-func-builtin#shsplit-respects-ifs
-stdout: "['aa', 'a', 'bb', 'b']\n[' ', '', ' ', ' bb b   ']\n[' aa a ', '', ' ', '\
-  \   ']\n"
-setup: |
+stdout: |
+  ['aa', 'a', 'bb', 'b']
+  [' ', '', ' ', ' bb b   ']
+  [' aa a ', '', ' ', '   ']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 var s = ' aa a bb b   '

@@ -1,7 +1,8 @@
 name: store literal globs in array then expand
 dialect: bash
 source: oils:spec/glob#store-literal-globs-in-array-then-expand
-stdout: "_tmp/a.A _tmp/aa.A _tmp/b.B\n"
+stdout: |-
+  _tmp/a.A _tmp/aa.A _tmp/b.B
 ---
 touch _tmp/a.A _tmp/aa.A _tmp/b.B
 g=("_tmp/*.A" "_tmp/*.B")

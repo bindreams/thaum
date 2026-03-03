@@ -1,7 +1,8 @@
 name: Quoting " within ``
 dialect: bash
 source: oils:spec/command-sub#quoting-within
-stdout: "1 \"\n"
+stdout: |-
+  1 "
 ---
 echo 1 `echo \"`
 #echo 2 `echo \\"`

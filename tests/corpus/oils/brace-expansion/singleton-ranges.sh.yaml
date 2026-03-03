@@ -1,7 +1,12 @@
 name: Singleton ranges
 dialect: bash
 source: oils:spec/brace-expansion#singleton-ranges
-stdout: "1-\n-9-\n-9-\n-9-\na-\n"
+stdout: |-
+  1-
+  -9-
+  -9-
+  -9-
+  a-
 ---
 echo {1..1}-
 echo {-9..-9}-

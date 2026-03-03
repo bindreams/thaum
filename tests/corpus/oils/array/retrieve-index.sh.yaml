@@ -1,8 +1,9 @@
 name: Retrieve index
 dialect: bash
 source: oils:spec/array#retrieve-index
-stdout: "['2 3']\n"
-setup: |
+stdout: |
+  ['2 3']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 a=(1 '2 3')
 argv.py "${a[1]}"

@@ -2,7 +2,14 @@ disabled: true
 name: eval lines with argv bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-lines-with-argv-bindings
-stdout: "b a\nd c\nb a mylocal\nd c mylocal\n\nb a local2\nd c local2\n"
+stdout: |-
+  b a
+  d c
+  b a mylocal
+  d c mylocal
+
+  b a local2
+  d c local2
 ---
 proc my-split (;;; block) {
   while read --raw-line {

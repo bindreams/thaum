@@ -2,7 +2,9 @@ disabled: true
 name: Conflict with extglob @( can be avoided with ,(
 dialect: bash
 source: oils:spec/ysh-command-sub#conflict-with-extglob-can-be-avoided-with
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 
 shopt -s extglob

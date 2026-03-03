@@ -2,7 +2,9 @@ disabled: true
 name: io->eval with argv bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-eval-with-argv-bindings
-stdout: "foo bar baz\n(List)   [\"foo\",\"bar\",\"baz\"]\n"
+stdout: |-
+  foo bar baz
+  (List)   ["foo","bar","baz"]
 ---
 call io->eval(^(echo "$@"), pos_args=:| foo bar baz |)
 call io->eval(^(pp test_ (:| $1 $2 $3 |)), pos_args=:| foo bar baz |)

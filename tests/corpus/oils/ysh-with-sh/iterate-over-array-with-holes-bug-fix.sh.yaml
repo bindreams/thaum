@@ -3,8 +3,10 @@ name: Iterate over array with holes (bug fix)
 dialect: bash
 source: oils:spec/ysh-with-sh#iterate-over-array-with-holes-bug-fix
 status: 3
-stdout: "['a', 'b', 'c']\narray=([0]=a [1]=b [5]=c)\n"
-setup: |
+stdout: |
+  ['a', 'b', 'c']
+  array=([0]=a [1]=b [5]=c)
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 declare -a array=(a b)

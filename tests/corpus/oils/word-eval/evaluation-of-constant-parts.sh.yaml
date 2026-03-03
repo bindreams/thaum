@@ -1,8 +1,9 @@
 name: Evaluation of constant parts
 dialect: bash
 source: oils:spec/word-eval#evaluation-of-constant-parts
-stdout: "['bare', 'sq']\n"
-setup: |
+stdout: |
+  ['bare', 'sq']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,6 +11,5 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py bare 'sq'

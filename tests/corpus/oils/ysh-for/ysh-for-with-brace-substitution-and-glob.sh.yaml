@@ -2,7 +2,11 @@ disabled: true
 name: YSH for with brace substitution and glob
 dialect: bash
 source: oils:spec/ysh-for#ysh-for-with-brace-substitution-and-glob
-stdout: "0 bar.py\n1 foo.py\n2 README.md\n3 foo.md\n"
+stdout: |-
+  0 bar.py
+  1 foo.py
+  2 README.md
+  3 foo.md
 ---
 
 touch {foo,bar}.py

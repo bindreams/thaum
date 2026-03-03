@@ -1,7 +1,9 @@
 name: unset of local reveals variable in higher scope
 dialect: bash
 source: oils:spec/builtin-vars#unset-of-local-reveals-variable-in-higher-scope
-stdout: "x=foo\nx=global\n"
+stdout: |-
+  x=foo
+  x=global
 ---
 
 # OSH has a RARE behavior here (matching yash and mksh), but at least it's

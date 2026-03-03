@@ -1,7 +1,10 @@
 name: Extended glob that doesn't match anything
 dialect: bash
 source: oils:spec/redirect-multi#extended-glob-that-doesnt-match-anything
-stdout: "status=0\nbad_@(*.cc|*.h)\nstatus=1\n"
+stdout: |-
+  status=0
+  bad_@(*.cc|*.h)
+  status=1
 ---
 shopt -s extglob
 rm bad_*

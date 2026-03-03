@@ -2,7 +2,9 @@ name: '[ with op variable'
 dialect: bash
 source: oils:spec/builtin-bracket#with-op-variable
 status: 0
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 # OK -- parsed AFTER evaluation of vars
 op='='

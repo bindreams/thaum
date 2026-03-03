@@ -1,7 +1,10 @@
 name: extglob $IFS 1
 dialect: bash
 source: oils:spec/toysh#extglob-ifs-1
-stdout: "abc)d\nab+( ?d)\nabc)d\n"
+stdout: |-
+  abc)d
+  ab+( ?d)
+  abc)d
 ---
 # http://landley.net/notes.html#12-06-2020
 shopt -s extglob

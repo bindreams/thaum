@@ -2,8 +2,12 @@ disabled: true
 name: expressions and negative indices
 dialect: bash
 source: oils:spec/ysh-slice-range#expressions-and-negative-indices
-stdout: "(Str)   \"5\"\n(List)   [\"2\",\"3\"]\nimplicit\n(List)   [\"1\",\"2\",\"\
-  3\"]\n(List)   [\"4\",\"5\"]\n"
+stdout: |-
+  (Str)   "5"
+  (List)   ["2","3"]
+  implicit
+  (List)   ["1","2","3"]
+  (List)   ["4","5"]
 ---
 var myarray = :|1 2 3 4 5|
 pp test_ (myarray[-1])

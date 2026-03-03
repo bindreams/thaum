@@ -1,8 +1,11 @@
 name: Ignore globs with char classes like [[:alnum:]]
 dialect: bash
 source: oils:spec/globignore#ignore-globs-with-char-classes-like-alnum
-stdout: ".env _testing.py\n20231114.log has space.docx pyproject.toml\n.env 20231114.log
-  _testing.py pyproject.toml\nhas space.docx pyproject.toml\n"
+stdout: |-
+  .env _testing.py
+  20231114.log has space.docx pyproject.toml
+  .env 20231114.log _testing.py pyproject.toml
+  has space.docx pyproject.toml
 ---
 touch {_testing.py,pyproject.toml,20231114.log,.env}
 touch 'has space.docx'

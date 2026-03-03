@@ -3,7 +3,8 @@ name: expression evaluation shortcuts
 dialect: bash
 source: oils:spec/ysh-case#expression-evaluation-shortcuts
 status: 0
-stdout: "no error\n"
+stdout: |-
+  no error
 ---
 var x = 123
 case (x) {

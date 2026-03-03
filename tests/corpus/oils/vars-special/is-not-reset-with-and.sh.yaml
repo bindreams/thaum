@@ -1,7 +1,10 @@
 name: $_ is not reset with (( and [[
 dialect: bash
 source: oils:spec/vars-special#is-not-reset-with-and
-stdout: "simple\n(( simple\n[[ (( simple\n"
+stdout: |-
+  simple
+  (( simple
+  [[ (( simple
 ---
 
 # bash is inconsistent because it does it for pipelines and assignments, but

@@ -1,7 +1,15 @@
 name: Combine DEBUG trap and ERR trap
 dialect: bash
 source: oils:spec/builtin-trap-bash#combine-debug-trap-and-err-trap
-stdout: "6 err\n6 debug\n6 debug\n6 debug\n6 err\n7 err\n7 debug\nafter=1\n"
+stdout: |-
+  6 err
+  6 debug
+  6 debug
+  6 debug
+  6 err
+  7 err
+  7 debug
+  after=1
 ---
 
 case $SH in dash|mksh|ash) exit ;; esac

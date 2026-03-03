@@ -2,7 +2,8 @@ disabled: true
 name: case syntax, complex expressions
 dialect: bash
 source: oils:spec/ysh-case#case-syntax-complex-expressions
-stdout: "three\n"
+stdout: |-
+  three
 ---
 const x = 3
 case (x) {

@@ -2,9 +2,16 @@ disabled: true
 name: Dict (&d) and setvar
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dict-d-and-setvar
-stdout: "Dict proc global outer=xx\ninside Dict outer=xx\n(Dict)   {\"outer2\":\"\
-  outer2\",\"not_declared\":\"yy\"}\nafter Dict outer=zz\n\nDict proc global outer=zz\n\
-  (Dict)   {\"p\":99}\n[p] after Dict outer=p-outer-mutated\nafter p outer=zz\n"
+stdout: |-
+  Dict proc global outer=xx
+  inside Dict outer=xx
+  (Dict)   {"outer2":"outer2","not_declared":"yy"}
+  after Dict outer=zz
+
+  Dict proc global outer=zz
+  (Dict)   {"p":99}
+  [p] after Dict outer=p-outer-mutated
+  after p outer=zz
 ---
 
 proc Dict ( ; out; ; block) {

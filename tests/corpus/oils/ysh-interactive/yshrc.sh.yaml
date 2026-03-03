@@ -2,7 +2,9 @@ disabled: true
 name: yshrc
 dialect: bash
 source: oils:spec/ysh-interactive#yshrc
-stdout: "yshrc\nhello\n"
+stdout: |-
+  yshrc
+  hello
 ---
 cat >$[ENV.TMP]/yshrc <<EOF
 proc f {

@@ -1,7 +1,9 @@
 name: SHELLOPTS and BASHOPTS are non-empty
 dialect: bash
 source: oils:spec/sh-options-bash#shellopts-and-bashopts-are-non-empty
-stdout: "shellopts is set\nbashopts is set\n"
+stdout: |-
+  shellopts is set
+  bashopts is set
 ---
 
 # 2024-06 - tickled by Samuel testing Gentoo

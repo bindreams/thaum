@@ -1,7 +1,8 @@
 name: ( ) ! -a -o with system version of [
 dialect: bash
 source: oils:spec/builtin-bracket#a--o-with-system-version-of
-stdout: "true\n"
+stdout: |-
+  true
 ---
 command [ --version
 command [ -z '' -a '(' ! -z x ')' ] && echo true

@@ -1,7 +1,9 @@
 name: history -c clears in-memory history
 dialect: bash
 source: oils:spec/builtin-history#history--c-clears-in-memory-history
-stdout: "1\n^D\n"
+stdout: |-
+  1
+  ^D
 ---
 
 $SH --norc -i <<'EOF'

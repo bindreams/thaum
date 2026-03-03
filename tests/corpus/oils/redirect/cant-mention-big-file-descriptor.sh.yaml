@@ -1,7 +1,10 @@
 name: can't mention big file descriptor
 dialect: bash
 source: oils:spec/redirect#cant-mention-big-file-descriptor
-stdout: "hi\nhi 99\nhi 100\n"
+stdout: |-
+  hi
+  hi 99
+  hi 100
 ---
 echo hi 9>&1
 # trivia: 23 is the max descriptor for mksh

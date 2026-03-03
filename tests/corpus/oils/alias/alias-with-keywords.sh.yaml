@@ -1,7 +1,8 @@
 name: alias with keywords
 dialect: bash
 source: oils:spec/alias#alias-with-keywords
-stdout: "done\n"
+stdout: |-
+  done
 ---
 # from issue #299
 shopt -s expand_aliases

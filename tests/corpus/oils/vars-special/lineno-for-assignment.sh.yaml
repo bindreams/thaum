@@ -1,7 +1,9 @@
 name: $LINENO for assignment
 dialect: bash
 source: oils:spec/vars-special#lineno-for-assignment
-stdout: "1 1\n2 2\n"
+stdout: |-
+  1 1
+  2 2
 ---
 a1=$LINENO a2=$LINENO
 b1=$LINENO b2=$LINENO

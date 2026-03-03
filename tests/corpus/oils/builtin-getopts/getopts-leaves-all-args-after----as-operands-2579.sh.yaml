@@ -2,7 +2,10 @@ name: "getopts leaves all args after '--' as operands #2579"
 dialect: bash
 source: 
   oils:spec/builtin-getopts#getopts-leaves-all-args-after----as-operands-2579
-stdout: "a\n2\n-c operand\n"
+stdout: |-
+  a
+  2
+  -c operand
 ---
 set -- "-a" "--" "-c" "operand"
 while getopts "a" name; do

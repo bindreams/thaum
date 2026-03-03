@@ -3,10 +3,18 @@ name: Str => trim*() with an eggex pattern trims pattern
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-pattern
 status: 0
-stdout: "\"\", \"\", \"\"\n\"   \", \"   \", \"   \"\n\"xy\", \"xy\", \"xy\"\n\"yz\"\
-  , \"yz\", \"yz\"\n\"\", \"\", \"\"\n\"xyz\", \"xyz\", \"\"\n\"xyzxyz\", \"xyzxyz\"\
-  , \"xyz\"\n\"abcxyz\", \"xyzabc\", \"abc\"\n\"abcxyz\", \"xyzabcxyz\", \"abcxyz\"\
-  \n\"xyzabcxyz\", \"xyzabc\", \"xyzabc\"\n\"abc123\", \"123abc\", \"abc\"\n"
+stdout: |-
+  "", "", ""
+  "   ", "   ", "   "
+  "xy", "xy", "xy"
+  "yz", "yz", "yz"
+  "", "", ""
+  "xyz", "xyz", ""
+  "xyzxyz", "xyzxyz", "xyz"
+  "abcxyz", "xyzabc", "abc"
+  "abcxyz", "xyzabcxyz", "abcxyz"
+  "xyzabcxyz", "xyzabc", "xyzabc"
+  "abc123", "123abc", "abc"
 ---
 func test(s, p) { write --sep ', ' --j8 $[s => trimStart(p)] $[s => trimEnd(p)] $[s => trim(p)] }
 

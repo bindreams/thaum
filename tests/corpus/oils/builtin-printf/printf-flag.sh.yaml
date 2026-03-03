@@ -1,7 +1,13 @@
 name: 'printf # flag'
 dialect: bash
 source: oils:spec/builtin-printf#printf-flag
-stdout: "[0][052]\n[0][0x2a]\n[0][0X2A]\n---\n[3][3.]\n[3][3.00000]\n"
+stdout: |-
+  [0][052]
+  [0][0x2a]
+  [0][0X2A]
+  ---
+  [3][3.]
+  [3][3.00000]
 ---
 # I didn't know these existed -- I only knew about - and 0 !
 # Note: '#' flag for integers outputs a prefix ONLY WHEN the value is non-zero

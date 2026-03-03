@@ -1,7 +1,15 @@
 name: printf %b does backslash escaping
 dialect: bash
 source: oils:spec/builtin-printf#printf-b-does-backslash-escaping
-stdout: "[\\044]\n[$]\n\n[\\x7e]\n[~]\n\n[\\A]\n[\\A]\n"
+stdout: |-
+  [\044]
+  [$]
+
+  [\x7e]
+  [~]
+
+  [\A]
+  [\A]
 ---
 
 printf '[%s]\n' '\044'  # escapes not evaluated

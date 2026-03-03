@@ -1,7 +1,15 @@
 name: Arith lexer mode
 dialect: bash
 source: oils:spec/for-expr#arith-lexer-mode
-stdout: "3\n4\n3\n4\n3\n4\n3\n4\n"
+stdout: |-
+  3
+  4
+  3
+  4
+  3
+  4
+  3
+  4
 ---
 
 # bash is lenient; zsh disagrees

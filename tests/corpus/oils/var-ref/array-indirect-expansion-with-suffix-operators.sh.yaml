@@ -1,12 +1,43 @@
 name: Array indirect expansion with suffix operators
 dialect: bash
 source: oils:spec/var-ref#array-indirect-expansion-with-suffix-operators
-stdout: "==== v1 ====\n['lue']\n['al']\n['value']\n['set']\n['value']\nv1=value\n\
-  ==== v2 ====\n['']\n['']\n['empty']\n['']\n['assign']\nv2=assign\n==== a1 ====\n\
-  ['']\n['']\n['empty']\n['']\n['assign']\n['assign']\n==== a2[0] ====\n['ement']\n\
-  ['le']\n['element']\n['set']\n['element']\n['element']\n==== a3[@] ====\n['3']\n\
-  ['2', '3']\n['1', '2', '3']\n['set']\n['1', '2', '3']\n['1', '2', '3']\n"
-setup: |
+stdout: |
+  ==== v1 ====
+  ['lue']
+  ['al']
+  ['value']
+  ['set']
+  ['value']
+  v1=value
+  ==== v2 ====
+  ['']
+  ['']
+  ['empty']
+  ['']
+  ['assign']
+  v2=assign
+  ==== a1 ====
+  ['']
+  ['']
+  ['empty']
+  ['']
+  ['assign']
+  ['assign']
+  ==== a2[0] ====
+  ['ement']
+  ['le']
+  ['element']
+  ['set']
+  ['element']
+  ['element']
+  ==== a3[@] ====
+  ['3']
+  ['2', '3']
+  ['1', '2', '3']
+  ['set']
+  ['1', '2', '3']
+  ['1', '2', '3']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -14,7 +45,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 declare -A ref=(['dummy']=v1)

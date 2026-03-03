@@ -1,7 +1,11 @@
 name: extglob empty pattern
 dialect: bash
 source: oils:spec/extglob-match#extglob-empty-pattern
-stdout: "TRUE\nTRUE\nFALSE\nFALSE\n"
+stdout: |-
+  TRUE
+  TRUE
+  FALSE
+  FALSE
 ---
 shopt -s extglob
 [[ '' == @() ]] && echo TRUE

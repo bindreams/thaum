@@ -3,7 +3,12 @@ name: $[expr_sub] in expression mode
 dialect: bash
 source: oils:spec/ysh-expr-sub#exprsub-in-expression-mode
 status: 3
-stdout: "(Str)   \"42\"\n(Str)   \"3\"\n(Str)   \"3\"\nd = 15\nlen(e) = 3\n"
+stdout: |-
+  (Str)   "42"
+  (Str)   "3"
+  (Str)   "3"
+  d = 15
+  len(e) = 3
 ---
 
 # Test that $[...] works in expression mode, not just in command/word mode

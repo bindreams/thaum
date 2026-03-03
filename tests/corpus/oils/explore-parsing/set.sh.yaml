@@ -1,7 +1,8 @@
 name: set +
 dialect: bash
 source: oils:spec/explore-parsing#set
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 set + >/dev/null
 echo status=$?

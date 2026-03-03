@@ -1,7 +1,9 @@
 name: -r
 dialect: bash
 source: oils:spec/builtin-bracket#r
-stdout: "yes\nno\n"
+stdout: |
+  yes
+  no
 environment:
   TMP: /tmp
 ---

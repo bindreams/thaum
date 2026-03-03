@@ -2,7 +2,10 @@ name: times shows two formatted lines
 dialect: bash
 source: oils:spec/builtin-times#times-shows-two-formatted-lines
 status: 0
-stdout: "pass\npass\n2\n"
+stdout: |-
+  pass
+  pass
+  2
 ---
 output=$(times)
 echo "$output" | while read line

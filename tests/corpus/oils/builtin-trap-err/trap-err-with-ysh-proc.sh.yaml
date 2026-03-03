@@ -3,7 +3,8 @@ name: trap ERR with YSH proc
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-ysh-proc
 status: 1
-stdout: "err\n"
+stdout: |-
+  err
 ---
 
 case $SH in bash|mksh|ash) exit ;; esac

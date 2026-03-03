@@ -1,7 +1,10 @@
 name: exec builtin with here doc
 dialect: bash
 source: oils:spec/builtin-process#exec-builtin-with-here-doc
-stdout: "x=one\ny=two\nDONE\n"
+stdout: |-
+  x=one
+  y=two
+  DONE
 ---
 # This has in a separate file because both code and data can be read from
 # stdin.

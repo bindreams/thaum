@@ -1,7 +1,11 @@
 name: Logical Ops Short Circuit
 dialect: bash
 source: oils:spec/arith#logical-ops-short-circuit
-stdout: "11\n33\n33\n55\n"
+stdout: |-
+  11
+  33
+  33
+  55
 ---
 x=11
 (( 1 || (x = 22) ))

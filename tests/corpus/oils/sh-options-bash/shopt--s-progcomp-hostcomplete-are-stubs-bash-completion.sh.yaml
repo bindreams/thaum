@@ -2,7 +2,9 @@ name: shopt -s progcomp hostcomplete are stubs (bash-completion)
 dialect: bash
 source: 
   oils:spec/sh-options-bash#shopt--s-progcomp-hostcomplete-are-stubs-bash-completion
-stdout: "status=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
 ---
 
 shopt -s progcomp hostcomplete

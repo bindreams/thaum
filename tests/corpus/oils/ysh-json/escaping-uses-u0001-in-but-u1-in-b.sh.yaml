@@ -2,7 +2,9 @@ disabled: true
 name: Escaping uses \u0001 in "", but \u{1} in b''
 dialect: bash
 source: oils:spec/ysh-json#escaping-uses-u0001-in-but-u1-in-b
-stdout: "\"\\u0001\"\nb'\\u{1}\\yff\\u{1f}'\n"
+stdout: |-
+  "\u0001"
+  b'\u{1}\yff\u{1f}'
 ---
 
 s1=$'\x01'

@@ -3,7 +3,8 @@ name: eval should have a sandboxed mode
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-should-have-a-sandboxed-mode
 status: 1
-stdout: "TODO\n"
+stdout: |-
+  TODO
 ---
 
 proc p (;;; block) {

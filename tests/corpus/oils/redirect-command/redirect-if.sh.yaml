@@ -1,7 +1,8 @@
 name: redirect if
 dialect: bash
 source: oils:spec/redirect-command#redirect-if
-stdout: "if-body\n"
+stdout: |-
+  if-body
 ---
 if true; then
   echo if-body

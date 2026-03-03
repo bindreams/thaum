@@ -1,7 +1,13 @@
 name: Subshell with redirects
 dialect: bash
 source: oils:spec/subshell#subshell-with-redirects
-stdout: "status=0\n1\n2\n3\n4\n5\n"
+stdout: |-
+  status=0
+  1
+  2
+  3
+  4
+  5
 ---
 ( echo 1 ) > a.txt
 ( env echo 2 ) > b.txt

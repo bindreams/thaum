@@ -1,7 +1,9 @@
 name: dirs does not take arguments
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-does-not-take-arguments
-stdout: "failed\nfailed\n"
+stdout: |-
+  failed
+  failed
 ---
 dirs a || echo failed
 dirs -l a || echo failed

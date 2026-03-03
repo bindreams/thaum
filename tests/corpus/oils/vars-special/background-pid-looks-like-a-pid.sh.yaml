@@ -1,7 +1,8 @@
 name: Background PID $! looks like a PID
 dialect: bash
 source: oils:spec/vars-special#background-pid-looks-like-a-pid
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 sleep 0.01 &
 pid=$!

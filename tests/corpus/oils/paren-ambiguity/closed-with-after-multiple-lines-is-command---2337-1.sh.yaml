@@ -2,7 +2,8 @@ name: '$(( closed with ) ) after multiple lines is command - #2337'
 dialect: bash
 source: 
   oils:spec/paren-ambiguity#closed-with-after-multiple-lines-is-command---2337
-stdout: "1 2 3\n"
+stdout: |-
+  1 2 3
 ---
 
 echo $(( echo 1

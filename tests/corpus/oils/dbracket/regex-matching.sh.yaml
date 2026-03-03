@@ -1,7 +1,9 @@
 name: '[[ regex matching'
 dialect: bash
 source: oils:spec/dbracket#regex-matching
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 # mksh doesn't have this syntax of regex matching.  I guess it comes from perl?
 regex='.*\.py'

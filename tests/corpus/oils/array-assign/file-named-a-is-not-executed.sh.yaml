@@ -2,7 +2,8 @@ name: file named a[ is  not executed
 dialect: bash
 source: oils:spec/array-assign#file-named-a-is-not-executed
 status: 1
-stdout: "len=2\n"
+stdout: |-
+  len=2
 ---
 case $SH in zsh|ash) exit ;; esac
 

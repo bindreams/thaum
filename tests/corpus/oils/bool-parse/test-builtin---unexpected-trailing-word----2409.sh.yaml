@@ -1,7 +1,12 @@
 name: test builtin - Unexpected trailing word '--' (#2409)
 dialect: bash
 source: oils:spec/bool-parse#test-builtin---unexpected-trailing-word----2409
-stdout: "status=0\nstatus=0\nstatus=0\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
+  status=0
+  status=0
 ---
 
 # Minimal repro of sqsh build error

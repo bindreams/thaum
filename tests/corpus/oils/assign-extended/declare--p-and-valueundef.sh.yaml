@@ -1,7 +1,9 @@
 name: declare -p and value.Undef
 dialect: bash
 source: oils:spec/assign-extended#declare--p-and-valueundef
-stdout: "declare -- x\ndeclare -- x\n"
+stdout: |-
+  declare -- x
+  declare -- x
 ---
 
 # This is a regression for a crash

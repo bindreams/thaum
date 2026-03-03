@@ -2,7 +2,12 @@ name: continue
 dialect: bash
 source: oils:spec/loop#continue
 status: 0
-stdout: "a\na\nb\nc\nc\n"
+stdout: |-
+  a
+  a
+  b
+  c
+  c
 ---
 for i in a b c; do
   echo $i

@@ -1,7 +1,9 @@
 name: Syntax errors with double quotes within backticks
 dialect: bash
 source: oils:spec/command-sub#syntax-errors-with-double-quotes-within-backticks
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 
 # bash does print syntax errors but somehow it exits 0

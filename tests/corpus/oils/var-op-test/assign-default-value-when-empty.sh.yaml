@@ -1,7 +1,8 @@
 name: Assign default value when empty
 dialect: bash
 source: oils:spec/var-op-test#assign-default-value-when-empty
-stdout: "is empty\n"
+stdout: |-
+  is empty
 ---
 empty=''
 ${empty:=is empty}

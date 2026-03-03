@@ -1,7 +1,11 @@
 name: shopt -s lastpipe and shopt -s no_last_fork interaction
 dialect: bash
 source: oils:spec/pipeline#shopt--s-lastpipe-and-shopt--s-nolastfork-interaction
-stdout: "0\nstatus=1\n0\nstatus=1\n"
+stdout: |-
+  0
+  status=1
+  0
+  status=1
 ---
 
 case $SH in dash) exit ;; esac

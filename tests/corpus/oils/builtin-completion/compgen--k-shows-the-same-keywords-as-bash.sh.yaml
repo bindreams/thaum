@@ -1,8 +1,27 @@
 name: compgen -k shows the same keywords as bash
 dialect: bash
 source: oils:spec/builtin-completion#compgen--k-shows-the-same-keywords-as-bash
-stdout: "!\n[[\n]]\ncase\ndo\ndone\nelif\nelse\nesac\nfi\nfor\nfunction\nif\nin\n\
-  then\ntime\nuntil\nwhile\n{\n}\n"
+stdout: |-
+  !
+  [[
+  ]]
+  case
+  do
+  done
+  elif
+  else
+  esac
+  fi
+  for
+  function
+  if
+  in
+  then
+  time
+  until
+  while
+  {
+  }
 ---
 
 # bash adds ]] and } and coproc

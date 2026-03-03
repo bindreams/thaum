@@ -2,7 +2,12 @@ name: declare -p UNDEF (and typeset) -- prints something to stderr
 dialect: bash
 source: 
   oils:spec/assign-extended#declare--p-undef-and-typeset----prints-something-to-stderr
-stdout: "declare -rx x=\"42\"\ndeclare -rx x=\"42\"\n  2 de\n  2 ty\n  4 total\n"
+stdout: |-
+  declare -rx x="42"
+  declare -rx x="42"
+    2 de
+    2 ty
+    4 total
 ---
 
 x=42

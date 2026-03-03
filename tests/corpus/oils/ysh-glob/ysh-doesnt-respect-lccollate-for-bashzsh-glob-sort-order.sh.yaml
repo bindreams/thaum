@@ -3,8 +3,11 @@ name: YSH doesn't respect LC_COLLATE for bash/zsh glob sort order
 dialect: bash
 source: 
   oils:spec/ysh-glob#ysh-doesnt-respect-lccollate-for-bashzsh-glob-sort-order
-stdout: "bash hello-test.sh hello_preamble.sh\n--- set LC_COLLATE to en_US\nysh  hello-test.sh
-  hello_preamble.sh\nbash hello_preamble.sh hello-test.sh\n"
+stdout: |-
+  bash hello-test.sh hello_preamble.sh
+  --- set LC_COLLATE to en_US
+  ysh  hello-test.sh hello_preamble.sh
+  bash hello_preamble.sh hello-test.sh
 ---
 
 touch hello-test.sh hello_preamble.sh

@@ -1,7 +1,8 @@
 name: BASH_VERSION / OILS_VERSION
 dialect: bash
 source: oils:spec/vars-special#bashversion-oilsversion
-stdout: "matched=0\n"
+stdout: |-
+  matched=0
 ---
 case $SH in
   bash*)

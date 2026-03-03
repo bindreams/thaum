@@ -2,7 +2,9 @@ name: break
 dialect: bash
 source: oils:spec/loop#break
 status: 0
-stdout: "a\nb\n"
+stdout: |-
+  a
+  b
 ---
 for i in a b c; do
   echo $i

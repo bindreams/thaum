@@ -1,7 +1,15 @@
 name: 'bug from pnut: negative number $((-1))'
 dialect: bash
 source: oils:spec/builtin-bracket#bug-from-pnut-negative-number--1
-stdout: "status=0\nstatus=0\n\nstatus=0\nstatus=0\n\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+
+  status=0
+  status=0
+
+  status=0
+  status=0
 ---
 
 # https://lobste.rs/s/lplim1/design_self_compiling_c_transpiler#c_km2ywc

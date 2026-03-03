@@ -3,7 +3,14 @@ name: str() conversion
 dialect: bash
 source: oils:spec/ysh-convert#str-conversion
 status: 3
-stdout: "1234\n1.234\nfoo\n\ntrue\nnull\n[[:digit:]]+\n"
+stdout: |-
+  1234
+  1.234
+  foo
+
+  true
+  null
+  [[:digit:]]+
 ---
 shopt --set parse_ysh_expr_sub
 

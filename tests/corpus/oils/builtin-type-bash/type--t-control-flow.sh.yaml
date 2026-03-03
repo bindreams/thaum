@@ -1,7 +1,11 @@
 name: type -t control flow
 dialect: bash
 source: oils:spec/builtin-type-bash#type--t-control-flow
-stdout: "builtin\nbuiltin\nbuiltin\nbuiltin\n"
+stdout: |-
+  builtin
+  builtin
+  builtin
+  builtin
 ---
 type -t break continue return exit
 

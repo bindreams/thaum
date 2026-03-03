@@ -1,8 +1,15 @@
 name: printf / echo -e do NOT check surrogates at runtime
 dialect: bash
 source: oils:spec/unicode#printf-echo--e-do-not-check-surrogates-at-runtime
-stdout: "status=0\n'\\xed\\xb0\\x80'\nstatus=0\n'\\xed\\xb0\\x80'\nstatus=0\n'\\xed\\\
-  xb0\\x80'\nstatus=0\n'\\xed\\xb0\\x80'\n"
+stdout: |-
+  status=0
+  '\xed\xb0\x80'
+  status=0
+  '\xed\xb0\x80'
+  status=0
+  '\xed\xb0\x80'
+  status=0
+  '\xed\xb0\x80'
 ---
 case $SH in mksh) exit ;; esac
 

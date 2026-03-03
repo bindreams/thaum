@@ -1,7 +1,9 @@
 name: no recursive arith [ 1+2 -eq 3 ]
 dialect: bash
 source: oils:spec/builtin-bracket#no-recursive-arith-12--eq-3
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 
 [ 1+2 -eq 3 ]

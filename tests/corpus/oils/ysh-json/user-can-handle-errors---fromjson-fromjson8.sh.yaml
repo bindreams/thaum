@@ -3,8 +3,12 @@ name: User can handle errors - fromJson() fromJson8()
 dialect: bash
 source: oils:spec/ysh-json#user-can-handle-errors---fromjson-fromjson8
 status: 4
-stdout: "status=4\ndecode error Expected Id.J8_RBracket\nstatus=4\ndecode error Expected
-  Id.J8_RBracket\npositions 1 - 2\n"
+stdout: |-
+  status=4
+  decode error Expected Id.J8_RBracket
+  status=4
+  decode error Expected Id.J8_RBracket
+  positions 1 - 2
 ---
 shopt -s ysh:upgrade
 

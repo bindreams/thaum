@@ -1,7 +1,13 @@
 name: '"\z" as arg'
 dialect: bash
 source: oils:spec/var-op-test#z-as-arg
-stdout: "$\n\\(\n\\z\n\"\n`\n\\\n"
+stdout: |-
+  $
+  \(
+  \z
+  "
+  `
+  \
 ---
 echo "${undef-\$}"
 echo "${undef-\(}"

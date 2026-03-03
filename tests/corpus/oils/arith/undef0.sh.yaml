@@ -1,7 +1,14 @@
 name: undef[0]
 dialect: bash
 source: oils:spec/arith#undef0
-stdout: "ARITH 0\nstatus=0\n\nstatus=1\n\nUNDEF\nstatus=0\n"
+stdout: |-
+  ARITH 0
+  status=0
+
+  status=1
+
+  UNDEF
+  status=0
 ---
 case $SH in dash) exit ;; esac
 

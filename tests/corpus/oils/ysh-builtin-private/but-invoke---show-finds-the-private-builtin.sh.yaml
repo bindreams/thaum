@@ -3,7 +3,8 @@ name: but invoke --show finds the private builtin
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#but-invoke---show-finds-the-private-builtin
-stdout: "        sleep       builtin     private\n"
+stdout: |2-
+          sleep       builtin     private
 ---
 case $SH in bash) exit ;; esac
 

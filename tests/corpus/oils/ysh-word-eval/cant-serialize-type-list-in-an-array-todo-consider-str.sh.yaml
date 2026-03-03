@@ -4,7 +4,10 @@ dialect: bash
 source: 
   oils:spec/ysh-word-eval#cant-serialize-type-list-in-an-array-todo-consider-str
 status: 3
-stdout: "3\ntrue\n___\n"
+stdout: |-
+  3
+  true
+  ___
 ---
 shopt -s ysh:upgrade
 

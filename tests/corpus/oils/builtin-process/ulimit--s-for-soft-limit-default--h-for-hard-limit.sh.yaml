@@ -2,8 +2,27 @@ name: ulimit -S for soft limit (default), -H for hard limit
 dialect: bash
 source: 
   oils:spec/builtin-process#ulimit--s-for-soft-limit-default--h-for-hard-limit
-stdout: "init\n  unlimited\n  unlimited\n\n-S\n  123456\n  unlimited\n\n-H\n  123456\n\
-  \  123457\n\nno flag\n  123455\n  123455\n\nGET\n  123454\n  123454\n  123455\n"
+stdout: |-
+  init
+    unlimited
+    unlimited
+
+  -S
+    123456
+    unlimited
+
+  -H
+    123456
+    123457
+
+  no flag
+    123455
+    123455
+
+  GET
+    123454
+    123454
+    123455
 ---
 case $SH in dash|zsh) exit ;; esac
 

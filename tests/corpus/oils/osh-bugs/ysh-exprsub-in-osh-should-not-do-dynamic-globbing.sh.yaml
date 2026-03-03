@@ -1,7 +1,8 @@
 name: YSH $[expr_sub] in OSH should not do dynamic globbing
 dialect: bash
 source: oils:spec/osh-bugs#ysh-exprsub-in-osh-should-not-do-dynamic-globbing
-stdout: "*.txt\n"
+stdout: |-
+  *.txt
 ---
 
 touch {foo,bar}.txt

@@ -1,7 +1,10 @@
 name: PatSub of negated unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#patsub-of-negated-unescaped-and
-stdout: "[<<<<\n>>>>]\n[<<<<\n"
+stdout: |-
+  [<<<<
+  >>>>]
+  [<<<<
 ---
 x='[foo]'
 echo ${x//[^\[z]/<}  # the right way to do it

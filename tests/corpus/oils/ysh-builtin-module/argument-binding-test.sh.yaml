@@ -2,10 +2,28 @@ disabled: true
 name: argument binding test
 dialect: bash
 source: oils:spec/ysh-builtin-module#argument-binding-test
-stdout: "(List)   [\"w1\",\"w2\"]\n(List)   [\"w3\",\"w4\"]\n\n(List)   [3,4]\n(List)\
-  \   [5,6]\n\n(List)   [7,8]\n(Dict)   {\"n3\":9}\n\n<Command>\n---\n(List)   [\"\
-  w1\",\"w2\"]\n(List)   []\n\n(List)   [3,4]\n(List)   []\n\n(List)   [42,43]\n(Dict)\
-  \   {\"n3\":9}\n\n<Command>\n"
+stdout: |-
+  (List)   ["w1","w2"]
+  (List)   ["w3","w4"]
+
+  (List)   [3,4]
+  (List)   [5,6]
+
+  (List)   [7,8]
+  (Dict)   {"n3":9}
+
+  <Command>
+  ---
+  (List)   ["w1","w2"]
+  (List)   []
+
+  (List)   [3,4]
+  (List)   []
+
+  (List)   [42,43]
+  (Dict)   {"n3":9}
+
+  <Command>
 ---
 shopt --set ysh:upgrade
 

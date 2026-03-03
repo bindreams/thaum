@@ -2,7 +2,10 @@ name: Async for loop
 dialect: bash
 source: oils:spec/background#async-for-loop
 status: 0
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 for i in 1 2 3; do
   echo $i

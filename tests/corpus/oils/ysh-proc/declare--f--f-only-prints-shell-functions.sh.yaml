@@ -3,7 +3,11 @@ name: declare -f -F only prints shell functions
 dialect: bash
 source: oils:spec/ysh-proc#declare--f--f-only-prints-shell-functions
 status: 0
-stdout: "declare -f myfunc\n---\nstatus=1\nstatus=1\n"
+stdout: |-
+  declare -f myfunc
+  ---
+  status=1
+  status=1
 ---
 shopt --set parse_proc
 

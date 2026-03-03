@@ -1,7 +1,11 @@
 name: nested extglob
 dialect: bash
 source: oils:spec/extglob-match#nested-extglob
-stdout: "TRUE\nTRUE\nTRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  TRUE
+  TRUE
+  FALSE
 ---
 [[ --help == --@(help|verbose=@(1|2)) ]] && echo TRUE
 [[ --verbose=1 == --@(help|verbose=@(1|2)) ]] && echo TRUE

@@ -1,7 +1,9 @@
 name: Modify a temporary binding
 dialect: bash
 source: oils:spec/assign#modify-a-temporary-binding
-stdout: "x before = 5\nx after  = 6\n"
+stdout: |-
+  x before = 5
+  x after  = 6
 ---
 # (regression for bug found by Michael Greenberg)
 f() {

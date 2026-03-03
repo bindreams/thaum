@@ -1,7 +1,9 @@
 name: '? matches 0 or 1'
 dialect: bash
 source: oils:spec/extglob-match#matches-0-or-1
-stdout: "TRUE\nFALSE\n"
+stdout: |-
+  TRUE
+  FALSE
 ---
 [[ -- == --?(help|verbose) ]] && echo TRUE
 [[ --oops == --?(help|verbose) ]] || echo FALSE

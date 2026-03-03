@@ -2,7 +2,8 @@ name: dirs test of path alias `.`
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-test-of-path-alias
 status: 0
-stdout: "/tmp /tmp\n"
+stdout: |-
+  /tmp /tmp
 ---
 cd /tmp
 pushd . >/dev/null

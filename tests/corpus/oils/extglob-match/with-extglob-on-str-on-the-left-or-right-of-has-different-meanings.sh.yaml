@@ -2,7 +2,8 @@ name: With extglob on, !($str) on the left or right of == has different meanings
 dialect: bash
 source: 
   oils:spec/extglob-match#with-extglob-on-str-on-the-left-or-right-of-has-different-meanings
-stdout: "TRUE\n"
+stdout: |-
+  TRUE
 ---
 shopt -s extglob
 str='x'

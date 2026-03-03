@@ -2,7 +2,15 @@ disabled: true
 name: Append object onto Array
 dialect: bash
 source: oils:spec/ysh-user-feedback#append-object-onto-array
-stdout: "[\n  {\n    \"1\": \"Test 1\"\n  },\n  {\n    \"2\": \"Test 2\"\n  }\n]\n"
+stdout: |-
+  [
+    {
+      "1": "Test 1"
+    },
+    {
+      "2": "Test 2"
+    }
+  ]
 ---
 var e = []
 

@@ -1,7 +1,9 @@
 name: YSH wait --all
 dialect: bash
 source: oils:spec/background#ysh-wait---all
-stdout: "wait 0\nwait --all 1\n"
+stdout: |-
+  wait 0
+  wait --all 1
 ---
 case $SH in dash|bash|mksh) exit ;; esac
 

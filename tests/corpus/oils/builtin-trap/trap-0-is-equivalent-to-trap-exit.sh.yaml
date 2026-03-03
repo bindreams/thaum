@@ -1,8 +1,11 @@
 name: trap 0 is equivalent to trap EXIT
 dialect: bash
 source: oils:spec/builtin-trap#trap-0-is-equivalent-to-trap-exit
-stdout: "trap -- 'echo EXIT' EXIT\ntrap -- 'echo INT' SIGINT\n---\ntrap -- 'echo INT'
-  SIGINT\n"
+stdout: |-
+  trap -- 'echo EXIT' EXIT
+  trap -- 'echo INT' SIGINT
+  ---
+  trap -- 'echo INT' SIGINT
 ---
 trap "echo INT" INT
 trap "echo EXIT" 0  # EXIT

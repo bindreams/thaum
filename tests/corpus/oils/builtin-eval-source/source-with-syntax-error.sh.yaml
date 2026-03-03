@@ -1,7 +1,8 @@
 name: Source with syntax error
 dialect: bash
 source: oils:spec/builtin-eval-source#source-with-syntax-error
-stdout: "status=2\n"
+stdout: |
+  status=2
 environment:
   TMP: /tmp
 ---

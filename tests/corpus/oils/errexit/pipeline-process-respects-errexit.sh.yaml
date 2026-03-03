@@ -2,7 +2,9 @@ name: pipeline process respects errexit
 dialect: bash
 source: oils:spec/errexit#pipeline-process-respects-errexit
 status: 1
-stdout: "one\n[three]\n"
+stdout: |-
+  one
+  [three]
 ---
 set -o errexit
 # It is respected here.

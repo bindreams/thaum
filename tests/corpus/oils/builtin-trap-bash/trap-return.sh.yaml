@@ -2,7 +2,15 @@ name: trap RETURN
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-return
 status: 42
-stdout: "--\nf\n--\n--\ng\n--\nreturn-helper.sh\nprofile [x y]\n"
+stdout: |-
+  --
+  f
+  --
+  --
+  g
+  --
+  return-helper.sh
+  profile [x y]
 ---
 profile() {
   echo "profile [$@]"

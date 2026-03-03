@@ -1,7 +1,8 @@
 name: echo -ez (invalid flag)
 dialect: bash
 source: oils:spec/builtin-echo#echo--ez-invalid-flag
-stdout: "-ez abc\\n\n"
+stdout: |-
+  -ez abc\n
 ---
 # bash differs from the other three shells, but its behavior is possibly more
 # sensible, if you're going to ignore the error.  It doesn't make sense for

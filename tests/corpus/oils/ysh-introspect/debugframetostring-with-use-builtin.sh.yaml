@@ -2,10 +2,16 @@ disabled: true
 name: DebugFrame.toString() with 'use' builtin
 dialect: bash
 source: oils:spec/ysh-introspect#debugframetostring-with-use-builtin
-stdout: "  %1 [ -c flag ]:1\n    use $[ENV.REPO_ROOT]/spec/testdata/debug-frame-use.ysh\n\
-  \    ^~~\n  %2 MYROOT/spec/testdata/debug-frame-use.ysh:5\n    debug-frame-lib my-proc\n\
-  \                    ^~~~~~~\n  %3 MYROOT/spec/testdata/debug-frame-lib.ysh:15\n\
-  \      print-stack\n      ^~~~~~~~~~~\n"
+stdout: |2-
+    %1 [ -c flag ]:1
+      use $[ENV.REPO_ROOT]/spec/testdata/debug-frame-use.ysh
+      ^~~
+    %2 MYROOT/spec/testdata/debug-frame-use.ysh:5
+      debug-frame-lib my-proc
+                      ^~~~~~~
+    %3 MYROOT/spec/testdata/debug-frame-lib.ysh:15
+        print-stack
+        ^~~~~~~~~~~
 ---
 
 # Work around spec test builtin limitation: line starting with # is treated as

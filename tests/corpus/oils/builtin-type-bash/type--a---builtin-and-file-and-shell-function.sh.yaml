@@ -2,9 +2,23 @@ name: type -a -> builtin and file and shell function
 dialect: bash
 source: 
   oils:spec/builtin-type-bash#type--a---builtin-and-file-and-shell-function
-stdout: "pwd is a shell builtin\npwd is /bin/pwd\npwd is _tmp/pwd\n---\npwd is a function\n\
-  pwd () \n{ \n    echo function-too\n}\npwd is a shell builtin\npwd is /bin/pwd\n\
-  pwd is _tmp/pwd\n---\npwd is a shell builtin\npwd is /bin/pwd\npwd is _tmp/pwd\n"
+stdout: |-
+  pwd is a shell builtin
+  pwd is /bin/pwd
+  pwd is _tmp/pwd
+  ---
+  pwd is a function
+  pwd () 
+  { 
+      echo function-too
+  }
+  pwd is a shell builtin
+  pwd is /bin/pwd
+  pwd is _tmp/pwd
+  ---
+  pwd is a shell builtin
+  pwd is /bin/pwd
+  pwd is _tmp/pwd
 ---
 touch _tmp/pwd
 chmod +x _tmp/pwd

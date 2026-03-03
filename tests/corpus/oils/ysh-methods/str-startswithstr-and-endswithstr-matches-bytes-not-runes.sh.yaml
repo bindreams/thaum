@@ -4,7 +4,11 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-startswithstr-and-endswithstr-matches-bytes-not-runes
 status: 0
-stdout: "true true\ntrue false\nfalse true\ntrue true\n"
+stdout: |-
+  true true
+  true false
+  false true
+  true true
 ---
 func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
 

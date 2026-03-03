@@ -2,8 +2,9 @@ name: 'Multiple words: outer double quotes, inner single quotes'
 dialect: bash
 source: 
   oils:spec/var-sub-quote#multiple-words-outer-double-quotes-inner-single-quotes
-stdout: "[\"'a b c'\"]\n"
-setup: |
+stdout: |
+  ["'a b c'"]
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 argv.py "${Unset:-'a b c'}"
 # WEIRD ONE.

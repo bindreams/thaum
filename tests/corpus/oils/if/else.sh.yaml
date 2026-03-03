@@ -1,7 +1,8 @@
 name: else
 dialect: bash
 source: oils:spec/if#else
-stdout: "else\n"
+stdout: |-
+  else
 ---
 if false; then
   echo if

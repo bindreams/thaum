@@ -2,7 +2,10 @@ disabled: true
 name: Varadic arguments, other args
 dialect: bash
 source: oils:spec/ysh-func#varadic-arguments-other-args
-stdout: "(List)   [1,2,[]]\n(List)   [1,2,[3]]\n(List)   [1,2,[3,4]]\n"
+stdout: |-
+  (List)   [1,2,[]]
+  (List)   [1,2,[3]]
+  (List)   [1,2,[3,4]]
 ---
 func f(a, b, ...args) {
 pp test_ ([a, b, args])

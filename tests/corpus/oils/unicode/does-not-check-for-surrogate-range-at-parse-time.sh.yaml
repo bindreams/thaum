@@ -1,7 +1,9 @@
 name: $'' does not check for surrogate range at parse time
 dialect: bash
 source: oils:spec/unicode#does-not-check-for-surrogate-range-at-parse-time
-stdout: "'\\xed\\xb0\\x80'\n'\\xed\\xb0\\x80'\n"
+stdout: |-
+  '\xed\xb0\x80'
+  '\xed\xb0\x80'
 ---
 
 py-repr() {

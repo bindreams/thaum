@@ -1,7 +1,8 @@
 name: elif
 dialect: bash
 source: oils:spec/if#elif
-stdout: "elif\n"
+stdout: |-
+  elif
 ---
 if (( 0 )); then
   echo if

@@ -2,7 +2,13 @@ name: set - leading single dash is ignored, turns off xtrace verbose (#2364)
 dialect: bash
 source: 
   oils:spec/builtin-set#set---leading-single-dash-is-ignored-turns-off-xtrace-verbose-2364
-stdout: "verbose-on\nxtrace-on\n\na b c\n\nx - y z\n"
+stdout: |-
+  verbose-on
+  xtrace-on
+
+  a b c
+
+  x - y z
 ---
 
 show_options() {

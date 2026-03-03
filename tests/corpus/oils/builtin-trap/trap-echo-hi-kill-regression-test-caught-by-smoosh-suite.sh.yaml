@@ -2,7 +2,11 @@ name: trap 'echo hi' KILL (regression test, caught by smoosh suite)
 dialect: bash
 source: 
   oils:spec/builtin-trap#trap-echo-hi-kill-regression-test-caught-by-smoosh-suite
-stdout: "status=0\nstatus=0\nstatus=0\nstatus=0\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
+  status=0
 ---
 trap 'echo hi' 9
 echo status=$?

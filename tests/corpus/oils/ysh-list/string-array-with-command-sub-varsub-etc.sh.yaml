@@ -2,7 +2,12 @@ disabled: true
 name: string array with command sub, varsub, etc.
 dialect: bash
 source: oils:spec/ysh-list#string-array-with-command-sub-varsub-etc
-stdout: "len=4\n1\nhi\nsq\ndq 1\n"
+stdout: |-
+  len=4
+  1
+  hi
+  sq
+  dq 1
 ---
 shopt -s ysh:all
 

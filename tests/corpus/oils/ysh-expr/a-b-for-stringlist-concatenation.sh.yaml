@@ -2,7 +2,13 @@ disabled: true
 name: a ++ b for string/list concatenation
 dialect: bash
 source: oils:spec/ysh-expr#a-b-for-stringlist-concatenation
-stdout: "string abcde\nlist len=3\n---\nStr Int 3\nList Int 3\nInt Str 3\n"
+stdout: |-
+  string abcde
+  list len=3
+  ---
+  Str Int 3
+  List Int 3
+  Int Str 3
 ---
 shopt -s parse_brace parse_ysh_expr_sub
 

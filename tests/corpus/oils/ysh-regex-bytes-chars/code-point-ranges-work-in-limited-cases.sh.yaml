@@ -2,7 +2,9 @@ disabled: true
 name: Code point ranges work in limited cases
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#code-point-ranges-work-in-limited-cases
-stdout: "(Bool)   false\n(Bool)   true\n"
+stdout: |-
+  (Bool)   false
+  (Bool)   true
 ---
 shopt -s ysh:all
 

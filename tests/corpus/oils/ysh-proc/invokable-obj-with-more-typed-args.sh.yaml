@@ -2,9 +2,14 @@ disabled: true
 name: invokable Obj with more typed args
 dialect: bash
 source: oils:spec/ysh-proc#invokable-obj-with-more-typed-args
-stdout: "sum = 1\n(Dict)   {\"x\":0,\"y\":1}\n(List)   [\"a\",\"b\",42,43]\n\nsum
-  = 5\n(Obj)   (\"x\":2,\"y\":3) --> (\"__invoke__\":<Proc>)\n(List)   [\"a\",\"b\"\
-  ,44,45]\n"
+stdout: |-
+  sum = 1
+  (Dict)   {"x":0,"y":1}
+  (List)   ["a","b",42,43]
+
+  sum = 5
+  (Obj)   ("x":2,"y":3) --> ("__invoke__":<Proc>)
+  (List)   ["a","b",44,45]
 ---
 shopt --set ysh:upgrade
 

@@ -1,7 +1,9 @@
 name: trap '' with multiple signals
 dialect: bash
 source: oils:spec/builtin-trap#trap-with-multiple-signals
-stdout: "trap -- '' SIGUSR1\ntrap -- '' SIGUSR2\n"
+stdout: |-
+  trap -- '' SIGUSR1
+  trap -- '' SIGUSR2
 ---
 
 trap '' USR1 USR2

@@ -2,7 +2,10 @@ name: OSH source code doesn't have to be valid Unicode (like other shells)
 dialect: bash
 source: 
   oils:spec/unicode#osh-source-code-doesnt-have-to-be-valid-unicode-like-other-shells
-stdout: "μ μ μ μ\n--\n bc 20 bc 20 bc 20 bc 0a\n"
+stdout: |-
+  μ μ μ μ
+  --
+   bc 20 bc 20 bc 20 bc 0a
 ---
 
 # Should YSH be different?  It would be nice.

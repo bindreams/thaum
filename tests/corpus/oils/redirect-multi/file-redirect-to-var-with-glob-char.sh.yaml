@@ -2,7 +2,10 @@ name: File redirect to $var with glob char
 dialect: bash
 source: oils:spec/redirect-multi#file-redirect-to-var-with-glob-char
 status: 1
-stdout: "status=0\n==> two-bar <==\nhi\n"
+stdout: |-
+  status=0
+  ==> two-bar <==
+  hi
 ---
 
 touch two-bar

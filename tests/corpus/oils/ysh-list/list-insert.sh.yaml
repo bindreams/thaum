@@ -2,7 +2,8 @@ disabled: true
 name: List insert()
 dialect: bash
 source: oils:spec/ysh-list#list-insert
-stdout: "pass\n"
+stdout: |-
+  pass
 ---
 shopt -s ysh:all
 

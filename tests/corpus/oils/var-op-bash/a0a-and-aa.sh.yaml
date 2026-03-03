@@ -1,7 +1,9 @@
 name: ${a[0]@a} and ${a@a}
 dialect: bash
 source: oils:spec/var-op-bash#a0a-and-aa
-stdout: "attr = 'a'\nattr = 'a'\n"
+stdout: |-
+  attr = 'a'
+  attr = 'a'
 ---
 
 a=(1 2 3)

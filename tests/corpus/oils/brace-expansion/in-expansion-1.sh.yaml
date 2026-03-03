@@ -1,7 +1,8 @@
 name: '{ in expansion'
 dialect: bash
 source: oils:spec/brace-expansion#in-expansion
-stdout: "{{a,b}\n"
+stdout: |-
+  {{a,b}
 ---
 # bash and mksh treat this differently.  bash treats the
 # first { is a prefix.  I think it's harder to read, and \{{a,b} should be

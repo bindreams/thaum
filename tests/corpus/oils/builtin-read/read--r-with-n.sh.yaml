@@ -1,10 +1,11 @@
 name: read -r with \n
 dialect: bash
 source: oils:spec/builtin-read#read--r-with-n
-stdout: "['nline', '\\\\nline']\n"
+stdout: |
+  ['nline', '\\nline']
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 echo '\nline' > $TMP/readr.txt
 read escaped < $TMP/readr.txt

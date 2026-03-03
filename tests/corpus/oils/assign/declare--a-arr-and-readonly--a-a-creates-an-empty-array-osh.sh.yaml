@@ -2,8 +2,11 @@ name: '"declare -a arr" and "readonly -a a" creates an empty array (OSH)'
 dialect: bash
 source: 
   oils:spec/assign#declare--a-arr-and-readonly--a-a-creates-an-empty-array-osh
-stdout: "declare -a arr1=()\ndeclare -ra arr2=()\ndeclare -A dict1=()\ndeclare -rA
-  dict2=()\n"
+stdout: |-
+  declare -a arr1=()
+  declare -ra arr2=()
+  declare -A dict1=()
+  declare -rA dict2=()
 ---
 case $SH in dash|mksh) exit 99 ;; esac # dash/mksh does not support associative arrays
 

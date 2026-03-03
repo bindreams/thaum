@@ -1,9 +1,23 @@
-disabled: { reason: "YSH syntax not in scope" }
+disabled: {reason: "YSH syntax not in scope"}
 name: Control flow must be static in YSH (strict_control_flow)
 dialect: bash
 source: 
   oils:spec/strict-options#control-flow-must-be-static-in-ysh-strictcontrolflow
-stdout: "a\n---\na\ncode=1\n===\na\ncode=1\n===\na\ncode=1\n===\na\ncode=1\n===\n"
+stdout: |-
+  a
+  ---
+  a
+  code=1
+  ===
+  a
+  code=1
+  ===
+  a
+  code=1
+  ===
+  a
+  code=1
+  ===
 ---
 case $SH in bash*|dash|mksh) exit ;; esac
 

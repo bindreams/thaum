@@ -2,10 +2,34 @@ disabled: true
 name: ctx emit
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#ctx-emit
-stdout: "{\n  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n    }\n  ]\n}\n{\n\
-  \  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n    },\n    {\n      \"short_name\"\
-  : \"-c\"\n    }\n  ]\n}\n{\n  \"flag\": [\n    {\n      \"short_name\": \"-v\"\n\
-  \    },\n    {\n      \"short_name\": \"-c\"\n    }\n  ]\n}\n"
+stdout: |-
+  {
+    "flag": [
+      {
+        "short_name": "-v"
+      }
+    ]
+  }
+  {
+    "flag": [
+      {
+        "short_name": "-v"
+      },
+      {
+        "short_name": "-c"
+      }
+    ]
+  }
+  {
+    "flag": [
+      {
+        "short_name": "-v"
+      },
+      {
+        "short_name": "-c"
+      }
+    ]
+  }
 ---
 var p = {}
 ctx push (p) {

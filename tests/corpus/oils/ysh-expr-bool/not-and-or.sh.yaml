@@ -2,7 +2,10 @@ disabled: true
 name: not, and, or
 dialect: bash
 source: oils:spec/ysh-expr-bool#not-and-or
-stdout: "false\nfalse\ntrue\n"
+stdout: |-
+  false
+  false
+  true
 ---
 
 var a = not true

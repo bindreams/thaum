@@ -1,7 +1,8 @@
 name: cd with no arguments
 dialect: bash
 source: oils:spec/builtin-cd#cd-with-no-arguments
-stdout: "OK\n"
+stdout: |
+  OK
 environment:
   TMP: /tmp
 ---

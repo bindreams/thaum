@@ -3,7 +3,9 @@ name: printf %c unicode - prints the first BYTE of a string - it does not
 dialect: bash
 source: 
   oils:spec/builtin-printf#printf-c-unicode---prints-the-first-byte-of-a-string---it-does-not-respect-utf-8
-stdout: "[μμ]\n ce\n"
+stdout: |-
+  [μμ]
+   ce
 ---
 
 # TODO: in YSH, this should be deprecated

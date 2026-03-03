@@ -2,8 +2,10 @@ name: 'Regression: Negative out-of-range index in [[ -v a[index] ]]'
 dialect: bash
 source: oils:spec/array#regression-negative-out-of-range-index-in--v-aindex
 status: 1
-stderr: "  [[ -v e[-1] ]] && echo 'e has -1'\n        ^\n[ stdin ]:2: fatal: -v got
-  index -1, which is out of bounds for array of length 0\n"
+stderr: |2-
+    [[ -v e[-1] ]] && echo 'e has -1'
+          ^
+  [ stdin ]:2: fatal: -v got index -1, which is out of bounds for array of length 0
 ---
 e=()
 [[ -v e[-1] ]] && echo 'e has -1'

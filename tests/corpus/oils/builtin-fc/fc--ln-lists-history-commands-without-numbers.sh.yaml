@@ -1,7 +1,12 @@
 name: fc -ln lists history commands without numbers
 dialect: bash
 source: oils:spec/builtin-fc#fc--ln-lists-history-commands-without-numbers
-stdout: "\t history -r\n\t echo 1\n\t echo 2\n\t echo 3\n^D\n"
+stdout: |-
+  	 history -r
+  	 echo 1
+  	 echo 2
+  	 echo 3
+  ^D
 ---
 printf "echo %s\n" {1..3} > tmp
 

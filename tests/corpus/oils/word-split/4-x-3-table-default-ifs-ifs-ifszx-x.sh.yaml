@@ -1,11 +1,22 @@
 name: "4 x 3 table: (default IFS, IFS='', IFS=zx) x ( $* \"$*\" $@ \"$@\" )"
 dialect: bash
 source: oils:spec/word-split#4-x-3-table-default-ifs-ifs-ifszx-x
-stdout: "['  $*  ', 'a', 'b', 'c']\n[' \"$*\" ', 'a b c ']\n['  $@  ', 'a', 'b', 'c']\n\
-  [' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n[' \"$*\" ', 'a bc']\n['\
-  \  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n\n['  $*  ', 'a b', 'c']\n\
-  [' \"$*\" ', 'a bzcz']\n['  $@  ', 'a b', 'c']\n[' \"$@\" ', 'a b', 'c', '']\n"
-setup: |
+stdout: |
+  ['  $*  ', 'a', 'b', 'c']
+  [' "$*" ', 'a b c ']
+  ['  $@  ', 'a', 'b', 'c']
+  [' "$@" ', 'a b', 'c', '']
+
+  ['  $*  ', 'a b', 'c']
+  [' "$*" ', 'a bc']
+  ['  $@  ', 'a b', 'c']
+  [' "$@" ', 'a b', 'c', '']
+
+  ['  $*  ', 'a b', 'c']
+  [' "$*" ', 'a bzcz']
+  ['  $@  ', 'a b', 'c']
+  [' "$@" ', 'a b', 'c', '']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -13,7 +24,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 setopt SH_WORD_SPLIT  # for zsh

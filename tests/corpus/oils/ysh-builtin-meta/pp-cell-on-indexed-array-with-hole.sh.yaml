@@ -2,8 +2,13 @@ disabled: true
 name: pp cell_ on indexed array with hole
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-cell-on-indexed-array-with-hole
-stdout: "array = (Cell\n  exported:F\n  readonly:F\n  nameref:F\n  val:(value.BashArray
-  d:{3 42 5 99} max_index:5)\n)\n"
+stdout: |-
+  array = (Cell
+    exported:F
+    readonly:F
+    nameref:F
+    val:(value.BashArray d:{3 42 5 99} max_index:5)
+  )
 ---
 declare -a array
 array[3]=42

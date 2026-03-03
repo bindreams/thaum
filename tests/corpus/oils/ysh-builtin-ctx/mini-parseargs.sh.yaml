@@ -2,13 +2,34 @@ disabled: true
 name: mini-parseArgs
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#mini-parseargs
-stdout: "{\n  \"flag\": [\n    {\n      \"short_name\": \"-t\",\n      \"long_name\"\
-  : \"--tsv\",\n      \"type\": \"Bool\",\n      \"help\": \"Output as a TSV\"\n \
-  \   },\n    {\n      \"short_name\": \"-r\",\n      \"long_name\": \"--recursive\"\
-  ,\n      \"type\": \"Bool\",\n      \"help\": \"Recurse into the given directory\"\
-  \n    },\n    {\n      \"short_name\": \"-N\",\n      \"long_name\": \"--count\"\
-  ,\n      \"type\": \"Int\",\n      \"help\": \"Process no more than N files\"\n\
-  \    }\n  ],\n  \"arg\": [\n    {\n      \"name\": \"path\"\n    }\n  ]\n}\n"
+stdout: |-
+  {
+    "flag": [
+      {
+        "short_name": "-t",
+        "long_name": "--tsv",
+        "type": "Bool",
+        "help": "Output as a TSV"
+      },
+      {
+        "short_name": "-r",
+        "long_name": "--recursive",
+        "type": "Bool",
+        "help": "Recurse into the given directory"
+      },
+      {
+        "short_name": "-N",
+        "long_name": "--count",
+        "type": "Int",
+        "help": "Process no more than N files"
+      }
+    ],
+    "arg": [
+      {
+        "name": "path"
+      }
+    ]
+  }
 ---
 proc parser (; place ; ; block_def) {
   var p = {}

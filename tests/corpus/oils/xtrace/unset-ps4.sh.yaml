@@ -1,7 +1,13 @@
 name: unset PS4
 dialect: bash
 source: oils:spec/xtrace#unset-ps4
-stdout: "1\n2\n## STDERR:\n+ echo 1\n+ unset PS4\necho 2\n"
+stdout: |-
+  1
+  2
+  ## STDERR:
+  + echo 1
+  + unset PS4
+  echo 2
 ---
 case $SH in dash) echo 'weird bug'; exit ;; esac
 

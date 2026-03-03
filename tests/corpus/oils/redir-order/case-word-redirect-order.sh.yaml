@@ -1,7 +1,8 @@
 name: case word + redirect order
 dialect: bash
 source: oils:spec/redir-order#case-word-redirect-order
-stdout: "other\n"
+stdout: |-
+  other
 ---
 
 echo hello > OSCFLAGS

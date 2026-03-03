@@ -1,7 +1,9 @@
 name: 'recursive arith: short circuit ?:'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-short-circuit
-stdout: "123:123\n321:321\n"
+stdout: |-
+  123:123
+  321:321
 ---
 # Note: "busybox sh" behaves strangely.
 y=a=123 n=a=321

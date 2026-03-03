@@ -1,8 +1,9 @@
 name: Env value with escaped <
 dialect: bash
 source: oils:spec/assign#env-value-with-escaped
-stdout: "foo<foo\n"
-setup: |
+stdout: |
+  foo<foo
+setup: |-
   #!/bin/sh
   cat > printenv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,6 +12,5 @@ setup: |
       print(os.environ.get(name))
   HELPER
   chmod +x printenv.py
-
 ---
 FOO=foo\<foo printenv.py FOO

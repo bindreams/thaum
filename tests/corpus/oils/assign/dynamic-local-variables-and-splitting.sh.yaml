@@ -1,7 +1,11 @@
 name: dynamic local variables (and splitting)
 dialect: bash
 source: oils:spec/assign#dynamic-local-variables-and-splitting
-stdout: "x='y a=b'\na=''\nx='y a=b'\na=''\n"
+stdout: |-
+  x='y a=b'
+  a=''
+  x='y a=b'
+  a=''
 ---
 f() {
   local "$1"  # Only x is assigned here

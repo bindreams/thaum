@@ -1,7 +1,9 @@
 name: . and .. always filtered when GLOBIGNORE is set
 dialect: bash
 source: oils:spec/globignore#and-always-filtered-when-globignore-is-set
-stdout: ".hidden\n.hidden\n"
+stdout: |-
+  .hidden
+  .hidden
 ---
 # When GLOBIGNORE is set to any non-null value, . and .. are always filtered
 touch .hidden

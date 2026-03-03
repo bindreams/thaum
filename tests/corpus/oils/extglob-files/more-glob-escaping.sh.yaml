@@ -1,8 +1,10 @@
 name: More glob escaping
 dialect: bash
 source: oils:spec/extglob-files#more-glob-escaping
-stdout: "['_*', '_?', '_[:]']\n['_*', '_?', '_[:]']\n"
-setup: |
+stdout: |
+  ['_*', '_?', '_[:]']
+  ['_*', '_?', '_[:]']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 shopt -s extglob
 mkdir -p eg7

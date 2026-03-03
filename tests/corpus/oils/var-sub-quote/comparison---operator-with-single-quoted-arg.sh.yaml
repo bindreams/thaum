@@ -1,7 +1,9 @@
 name: 'comparison: :- operator with single quoted arg'
 dialect: bash
 source: oils:spec/var-sub-quote#comparison---operator-with-single-quoted-arg
-stdout: "a\n'a'\n"
+stdout: |-
+  a
+  'a'
 ---
 echo ${unset:-'a'}
 echo "${unset:-'a'}"

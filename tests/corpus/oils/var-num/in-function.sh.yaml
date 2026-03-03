@@ -1,7 +1,8 @@
 name: In function
 dialect: bash
 source: oils:spec/var-num#in-function
-stdout: "a b\n"
+stdout: |-
+  a b
 ---
 myfunc() {
   echo $1 ${2}

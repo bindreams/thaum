@@ -3,7 +3,13 @@ name: trap ERR - external failure
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---external-failure
 status: 1
-stdout: "[ stdin ]:16\n    f\n    ^\n[ stdin ]:9\n      g\n      ^\n"
+stdout: |-
+  [ stdin ]:16
+      f
+      ^
+  [ stdin ]:9
+        g
+        ^
 ---
 
 source $[ENV.REPO_ROOT]/spec/testdata/debug-frame-lib.ysh

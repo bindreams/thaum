@@ -2,7 +2,13 @@ disabled: true
 name: setvar to swap List and Dict elements
 dialect: bash
 source: oils:spec/ysh-assign#setvar-to-swap-list-and-dict-elements
-stdout: "1 2 3\n2 1 3\n42 1 3\n{\n  \"int\": 2\n}\n"
+stdout: |-
+  1 2 3
+  2 1 3
+  42 1 3
+  {
+    "int": 2
+  }
 ---
 var x = [1, 2, 3]
 echo @x

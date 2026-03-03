@@ -2,10 +2,17 @@ name: declare -p doesn't print binary data, but can be loaded into bash
 dialect: bash
 source: 
   oils:spec/assign-extended#declare--p-doesnt-print-binary-data-but-can-be-loaded-into-bash
-stdout: "declare -- s1=foo\ndeclare -- s2='foo bar'\ndeclare -- s3=$'\\u001f'\ndeclare
-  -- s4=$'\\xfe\\xff'\ndeclare -a a=(foo 'foo bar' $'\\u001f' $'\\xfe\\xff')\ndeclare
-  -A A=([$'\\u001f']=$'\\xfe\\xff' ['foo']='foo bar')\n---\nfoo foo bar\n 1f 20 fe
-  ff\nbash=0\n"
+stdout: |-
+  declare -- s1=foo
+  declare -- s2='foo bar'
+  declare -- s3=$'\u001f'
+  declare -- s4=$'\xfe\xff'
+  declare -a a=(foo 'foo bar' $'\u001f' $'\xfe\xff')
+  declare -A A=([$'\u001f']=$'\xfe\xff' ['foo']='foo bar')
+  ---
+  foo foo bar
+   1f 20 fe ff
+  bash=0
 ---
 
 # bash prints binary data!

@@ -2,7 +2,8 @@ disabled: true
 name: _this_dir not set on stdin
 dialect: bash
 source: oils:spec/ysh-special-vars#thisdir-not-set-on-stdin
-stdout: "not yet\n"
+stdout: |-
+  not yet
 ---
 
 echo ${_this_dir:-'not yet'}

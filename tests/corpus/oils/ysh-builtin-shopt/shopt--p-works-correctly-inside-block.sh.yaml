@@ -2,7 +2,9 @@ disabled: true
 name: shopt -p works correctly inside block
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt--p-works-correctly-inside-block
-stdout: "shopt -u inherit_errexit\nshopt -s inherit_errexit\n"
+stdout: |-
+  shopt -u inherit_errexit
+  shopt -s inherit_errexit
 ---
 shopt --set parse_brace
 

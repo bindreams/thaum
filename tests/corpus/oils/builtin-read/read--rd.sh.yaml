@@ -1,7 +1,9 @@
 name: read -rd
 dialect: bash
 source: oils:spec/builtin-read#read--rd
-stdout: "foo\nbar\n"
+stdout: |-
+  foo
+  bar
 ---
 read -rd '' var <<EOF
 foo

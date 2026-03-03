@@ -1,7 +1,8 @@
 name: kill multiple pids at once
 dialect: bash
 source: oils:spec/builtin-kill#kill-multiple-pids-at-once
-stdout: "0\n"
+stdout: |-
+  0
 ---
 sleep 0.1 &
 pid1=$!

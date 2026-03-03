@@ -1,8 +1,12 @@
 name: declare -a / local -a is empty array
 dialect: bash
 source: oils:spec/array#declare--a-local--a-is-empty-array
-stdout: "[]\n['x']\n[]\n['x']\n"
-setup: |
+stdout: |
+  []
+  ['x']
+  []
+  ['x']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 declare -a myarray
 argv.py "${myarray[@]}"

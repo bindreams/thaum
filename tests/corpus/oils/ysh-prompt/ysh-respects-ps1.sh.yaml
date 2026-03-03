@@ -2,7 +2,9 @@ disabled: true
 name: ysh respects PS1
 dialect: bash
 source: oils:spec/ysh-prompt#ysh-respects-ps1
-stdout: "hi\n^D\n"
+stdout: |
+  hi
+  ^D
 stderr: 'ysh myprompt$ ysh myprompt$ '
 ---
 

@@ -1,7 +1,12 @@
 name: printf %*.*s (width/precision from args)
 dialect: bash
 source: oils:spec/builtin-printf#printf-s-widthprecision-from-args
-stdout: "[    hello]\n[hel]\n[      hel]\n[      hel]\n[      hel]\n"
+stdout: |-
+  [    hello]
+  [hel]
+  [      hel]
+  [      hel]
+  [      hel]
 ---
 printf '[%*s]\n' 9 hello
 printf '[%.*s]\n' 3 hello

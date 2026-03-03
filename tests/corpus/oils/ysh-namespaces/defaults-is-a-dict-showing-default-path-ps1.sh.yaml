@@ -2,7 +2,8 @@ disabled: true
 name: __defaults__ is a Dict, showing default PATH, PS1
 dialect: bash
 source: oils:spec/ysh-namespaces#defaults-is-a-dict-showing-default-path-ps1
-stdout: "(Str)   \"Dict\"\n"
+stdout: |-
+  (Str)   "Dict"
 ---
 
 pp test_ (type(__defaults__))

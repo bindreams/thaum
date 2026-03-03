@@ -2,7 +2,14 @@ disabled: true
 name: redir
 dialect: bash
 source: oils:spec/ysh-builtins#redir
-stdout: "proc\nbuiltin\n---\nbuiltin\nproc\n---\n3\n"
+stdout: |-
+  proc
+  builtin
+  ---
+  builtin
+  proc
+  ---
+  3
 ---
 shopt --set parse_brace parse_proc
 

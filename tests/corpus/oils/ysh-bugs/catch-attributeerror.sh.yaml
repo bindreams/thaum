@@ -3,7 +3,8 @@ name: Catch AttributeError
 dialect: bash
 source: oils:spec/ysh-bugs#catch-attributeerror
 status: 3
-stdout: "s=foo\n"
+stdout: |-
+  s=foo
 ---
 
 var s = 'foo'

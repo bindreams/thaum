@@ -2,7 +2,8 @@ name: Slice undefined
 dialect: bash
 source: oils:spec/var-op-slice#slice-undefined
 status: 1
-stdout: "--\n"
+stdout: |-
+  --
 ---
 echo -${undef:1:2}-
 set -o nounset

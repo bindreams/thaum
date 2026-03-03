@@ -2,8 +2,10 @@ disabled: true
 name: io.libcGlob() does not respect shell filters
 dialect: bash
 source: oils:spec/ysh-method-io#iolibcglob-does-not-respect-shell-filters
-stdout: "(List)   [\"-foo.txt\",\"foo.txt\"]\n(List)   [\"-foo.txt\",\"foo.txt\"]\n\
-  (List)   [\"-foo.txt\",\"foo.txt\"]\n"
+stdout: |-
+  (List)   ["-foo.txt","foo.txt"]
+  (List)   ["-foo.txt","foo.txt"]
+  (List)   ["-foo.txt","foo.txt"]
 ---
 touch -- .gitignore -foo.txt foo.txt
 

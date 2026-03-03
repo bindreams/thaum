@@ -2,7 +2,9 @@ disabled: true
 name: '... with multiline $()'
 dialect: bash
 source: oils:spec/ysh-multiline#with-multiline
-stdout: "one two\n1\n"
+stdout: |-
+  one two
+  1
 ---
 
 # newlines mean the normal thing

@@ -1,7 +1,8 @@
 name: Length of length of ARGS!  2 digit
 dialect: bash
 source: oils:spec/explore-parsing#length-of-length-of-args-2-digit
-stdout: "2\n"
+stdout: |-
+  2
 ---
 fun() { echo ${##}; }
 fun 0 1 2 3 4 5 6 7 8 9

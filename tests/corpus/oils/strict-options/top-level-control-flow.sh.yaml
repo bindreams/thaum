@@ -2,7 +2,16 @@ name: top level control flow
 dialect: bash
 source: oils:spec/strict-options#top-level-control-flow
 status: 0
-stdout: "SUBSHELL\nBREAK\nCONTINUE\nRETURN\n## OK bash STDOUT:\nSUBSHELL\nBREAK\n\
-  CONTINUE\nRETURN\nDONE\n"
+stdout: |-
+  SUBSHELL
+  BREAK
+  CONTINUE
+  RETURN
+  ## OK bash STDOUT:
+  SUBSHELL
+  BREAK
+  CONTINUE
+  RETURN
+  DONE
 ---
 $SH $REPO_ROOT/spec/testdata/top-level-control-flow.sh

@@ -2,7 +2,8 @@ disabled: true
 name: command_sub_errexit stops at first error
 dialect: bash
 source: oils:spec/errexit-osh#commandsuberrexit-stops-at-first-error
-stdout: "OK\n"
+stdout: |-
+  OK
 ---
 case $SH in dash|bash|mksh|ash) exit ;; esac
 

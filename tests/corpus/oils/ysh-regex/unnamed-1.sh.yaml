@@ -2,7 +2,10 @@ disabled: true
 name: /.+/
 dialect: bash
 source: oils:spec/ysh-regex#unnamed
-stdout: ".+\nyes\nno\n"
+stdout: |-
+  .+
+  yes
+  no
 ---
 shopt -s ysh:all
 

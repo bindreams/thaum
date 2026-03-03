@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/array#multiple-subscripts-not-allowed
 status: 2
 stdout: ''
-setup: |
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 # NOTE: bash 4.3 had a bug where it ignored the bad subscript, but now it is
 # fixed.

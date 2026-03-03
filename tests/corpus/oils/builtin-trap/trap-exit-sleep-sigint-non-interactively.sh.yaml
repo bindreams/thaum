@@ -1,7 +1,9 @@
 name: 'trap EXIT, sleep, SIGINT: non-interactively'
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-sleep-sigint-non-interactively
-stdout: "on exit\nstatus=0\n"
+stdout: |-
+  on exit
+  status=0
 ---
 
 $REPO_ROOT/spec/testdata/builtin-trap-exit.sh

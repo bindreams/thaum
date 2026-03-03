@@ -2,7 +2,10 @@ disabled: true
 name: 'parse_brace: brace group in if condition'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-brace-group-in-if-condition
-stdout: "one\ntwo\nthree\n"
+stdout: |-
+  one
+  two
+  three
 ---
 
 # strict_errexit would make this a RUNTIME error

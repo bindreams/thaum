@@ -1,7 +1,13 @@
 name: 'unset -v assoc (related to issue #661)'
 dialect: bash
 source: oils:spec/builtin-vars#unset--v-assoc-related-to-issue-661
-stdout: "1\nkeys=1],a[1\nvals=foo\n0\nkeys=\nvals=\n"
+stdout: |-
+  1
+  keys=1],a[1
+  vals=foo
+  0
+  keys=
+  vals=
 ---
 
 case $SH in dash|mksh|zsh) return ;; esac

@@ -2,7 +2,8 @@ name: getopts missing required argument
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-missing-required-argument
 status: 2
-stdout: "ERROR 3\n"
+stdout: |-
+  ERROR 3
 ---
 set -- -h -c
 while getopts "hc:" opt; do

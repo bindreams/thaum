@@ -1,7 +1,12 @@
 name: flag -n combined ${!ref} -- bash INVERTS
 dialect: bash
 source: oils:spec/nameref#flag--n-combined-ref----bash-inverts
-stdout: "ref=x\n!ref=foo\nNOW A NAMEREF\nref=foo\n!ref=x\n"
+stdout: |-
+  ref=x
+  !ref=foo
+  NOW A NAMEREF
+  ref=foo
+  !ref=x
 ---
 foo=FOO  # should NOT use this
 

@@ -1,7 +1,9 @@
 name: test length
 dialect: bash
 source: oils:spec/array-sparse#test-length
-stdout: "len=4\nlen=5\n"
+stdout: |-
+  len=4
+  len=5
 ---
 sp=(x y z)
 

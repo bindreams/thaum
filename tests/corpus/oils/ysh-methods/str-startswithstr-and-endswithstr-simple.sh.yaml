@@ -3,8 +3,14 @@ name: Str => startsWith(Str) and endsWith(Str), simple
 dialect: bash
 source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-simple
 status: 0
-stdout: "true true\ntrue true\ntrue false\nfalse false\nfalse true\nfalse false\n\
-  false false\n"
+stdout: |-
+  true true
+  true true
+  true false
+  false false
+  false true
+  false false
+  false false
 ---
 func test(s, p) { echo $[s => startsWith(p)] $[s => endsWith(p)] }
 

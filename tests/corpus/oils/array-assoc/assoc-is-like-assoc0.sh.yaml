@@ -1,7 +1,10 @@
 name: ${assoc} is like ${assoc[0]}
 dialect: bash
 source: oils:spec/array-assoc#assoc-is-like-assoc0
-stdout: "a=\na=zzz\na=yyy\n"
+stdout: |-
+  a=
+  a=zzz
+  a=yyy
 ---
 declare -A a
 

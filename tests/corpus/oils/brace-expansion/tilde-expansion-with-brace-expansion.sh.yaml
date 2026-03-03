@@ -1,7 +1,12 @@
 name: Tilde expansion with brace expansion
 dialect: bash
 source: oils:spec/brace-expansion#tilde-expansion-with-brace-expansion
-stdout: "foo~/bar /home/bob/bar\n-- foo~/bar\n-- /home/bob/bar\n== foo~/bar\n== /home/bob/bar\n"
+stdout: |-
+  foo~/bar /home/bob/bar
+  -- foo~/bar
+  -- /home/bob/bar
+  == foo~/bar
+  == /home/bob/bar
 ---
 
 # The brace expansion happens FIRST.  After that, the second token has tilde

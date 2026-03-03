@@ -1,7 +1,10 @@
 name: cd to symlink with -L and -P
 dialect: bash
 source: oils:spec/builtin-cd#cd-to-symlink-with--l-and--p
-stdout: "OK\nOK\nOK\n"
+stdout: |
+  OK
+  OK
+  OK
 environment:
   TMP: /tmp
 ---

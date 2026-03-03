@@ -2,7 +2,12 @@ disabled: true
 name: trap --remove INT EXIT
 dialect: bash
 source: oils:spec/ysh-builtin-trap#trap---remove-int-exit
-stdout: "3 traps.txt\n---\n1 traps.txt\n---\nexit\n"
+stdout: |-
+  3 traps.txt
+  ---
+  1 traps.txt
+  ---
+  exit
 ---
 
 trap --add INT EXIT HUP {

@@ -1,7 +1,11 @@
 name: In Array Literal and for loop
 dialect: bash
 source: oils:spec/extglob-files#in-array-literal-and-for-loop
-stdout: "bar.py\nfoo.py\n---\nzzz bar.py foo.py\n"
+stdout: |-
+  bar.py
+  foo.py
+  ---
+  zzz bar.py foo.py
 ---
 shopt -s extglob
 mkdir -p eg11

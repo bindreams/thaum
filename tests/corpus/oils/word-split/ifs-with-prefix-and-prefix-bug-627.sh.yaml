@@ -1,8 +1,10 @@
 name: "IFS='' with ${!prefix@} and ${!prefix*} (bug #627)"
 dialect: bash
 source: oils:spec/word-split#ifs-with-prefix-and-prefix-bug-627
-stdout: "['at', 'gLwbmGzS_var1', 'gLwbmGzS_var2']\n['star', 'gLwbmGzS_var1', 'gLwbmGzS_var2']\n"
-setup: |
+stdout: |
+  ['at', 'gLwbmGzS_var1', 'gLwbmGzS_var2']
+  ['star', 'gLwbmGzS_var1', 'gLwbmGzS_var2']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in dash | mksh | ash | yash) exit 0 ;; esac
 

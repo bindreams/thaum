@@ -1,7 +1,9 @@
 name: Redirect with brace expansion isn't allowed
 dialect: bash
 source: oils:spec/redirect-multi#redirect-with-brace-expansion-isnt-allowed
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 
 echo hi > a-{one,two}

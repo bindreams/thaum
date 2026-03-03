@@ -3,7 +3,11 @@ name: redirects allowed in words, typed args, and after block
 dialect: bash
 source: 
   oils:spec/ysh-blocks#redirects-allowed-in-words-typed-args-and-after-block
-stdout: "1 /tmp\n2 /tmp\n3 /tmp\n4 /tmp\n"
+stdout: |-
+  1 /tmp
+  2 /tmp
+  3 /tmp
+  4 /tmp
 ---
 shopt -s ysh:upgrade
 

@@ -1,7 +1,11 @@
 name: \j for number of jobs
 dialect: bash
 source: oils:spec/prompt#j-for-number-of-jobs
-stdout: "matched=0\nmatched=0\nsleep 5\nmatched=0\n"
+stdout: |-
+  matched=0
+  matched=0
+  sleep 5
+  matched=0
 ---
 set -m # enable job control
 PS1='foo \j bar'

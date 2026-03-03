@@ -1,6 +1,7 @@
 name: builtin
 dialect: bash
 source: oils:spec/smoke#builtin
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 echo hi

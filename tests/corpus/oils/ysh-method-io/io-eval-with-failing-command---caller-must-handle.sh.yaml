@@ -4,7 +4,10 @@ dialect: bash
 source: 
   oils:spec/ysh-method-io#io-eval-with-failing-command---caller-must-handle
 status: 1
-stdout: "one\n(Dict)   {\"code\":1}\none\n"
+stdout: |-
+  one
+  (Dict)   {"code":1}
+  one
 ---
 
 var c = ^(echo one; false; echo two)

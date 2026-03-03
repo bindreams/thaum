@@ -1,8 +1,10 @@
 name: local a=loc $var c=loc
 dialect: bash
 source: oils:spec/assign#local-aloc-var-cloc
-stdout: "global\n['loc', '', 'loc']\n"
-setup: |
+stdout: |
+  global
+  ['loc', '', 'loc']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 var='b'
 b=global

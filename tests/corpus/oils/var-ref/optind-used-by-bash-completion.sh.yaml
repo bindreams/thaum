@@ -1,7 +1,10 @@
 name: ${!OPTIND} (used by bash completion
 dialect: bash
 source: oils:spec/var-ref#optind-used-by-bash-completion
-stdout: "a\nx\ny\n"
+stdout: |-
+  a
+  x
+  y
 ---
 set -- a b c
 echo ${!OPTIND}

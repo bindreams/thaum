@@ -3,8 +3,12 @@ name: IFS=x and '' and unquoted $@ - reduction of case above - copied into
 dialect: bash
 source: 
   oils:spec/toysh-posix#ifsx-and-and-unquoted---reduction-of-case-above---copied-into-specword-split
-stdout: "['one', '', 'two']\n-one-\n--\n-two-\n"
-setup: |
+stdout: |
+  ['one', '', 'two']
+  -one-
+  --
+  -two-
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -12,7 +16,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 setopt SH_WORD_SPLIT

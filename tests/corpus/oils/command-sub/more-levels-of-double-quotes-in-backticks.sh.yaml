@@ -1,7 +1,10 @@
 name: More levels of double quotes in backticks
 dialect: bash
 source: oils:spec/command-sub#more-levels-of-double-quotes-in-backticks
-stdout: "\\foo\\ -\n\\foo\\ -\n\\\"foo\\\" -\n"
+stdout: |-
+  \foo\ -
+  \foo\ -
+  \"foo\" -
 ---
 
 # Shells don't agree here, some of them give you form feeds!

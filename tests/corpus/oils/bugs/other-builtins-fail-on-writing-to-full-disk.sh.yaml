@@ -1,7 +1,9 @@
 name: other builtins fail on writing to full disk
 dialect: bash
 source: oils:spec/bugs#other-builtins-fail-on-writing-to-full-disk
-stdout: "status=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
 ---
 
 type echo > /dev/full

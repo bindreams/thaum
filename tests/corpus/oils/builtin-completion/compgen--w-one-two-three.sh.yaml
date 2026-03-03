@@ -1,7 +1,18 @@
 name: compgen -W 'one two three'
 dialect: bash
 source: oils:spec/builtin-completion#compgen--w-one-two-three
-stdout: "one\ntwo\nthree\n--\nvendor\nv1\nv2\n--\nvendor\nv1\nv2\n"
+stdout: |-
+  one
+  two
+  three
+  --
+  vendor
+  v1
+  v2
+  --
+  vendor
+  v1
+  v2
 ---
 cd $REPO_ROOT
 compgen -W 'one two three'

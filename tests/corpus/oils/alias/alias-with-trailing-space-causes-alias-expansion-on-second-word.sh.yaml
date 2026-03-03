@@ -2,7 +2,9 @@ name: alias with trailing space causes alias expansion on second word
 dialect: bash
 source: 
   oils:spec/alias#alias-with-trailing-space-causes-alias-expansion-on-second-word
-stdout: "hello world !!!\nhello world punct\n"
+stdout: |-
+  hello world !!!
+  hello world punct
 ---
 shopt -s expand_aliases  # bash requires this
 

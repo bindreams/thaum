@@ -1,6 +1,7 @@
 name: ${var@a} error conditions
 dialect: bash
 source: oils:spec/var-op-bash#vara-error-conditions
-stdout: "[]\n"
+stdout: |-
+  []
 ---
 echo [${?@a}]

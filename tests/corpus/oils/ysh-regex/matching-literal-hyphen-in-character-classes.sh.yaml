@@ -2,7 +2,10 @@ disabled: true
 name: Matching literal hyphen in character classes
 dialect: bash
 source: oils:spec/ysh-regex#matching-literal-hyphen-in-character-classes
-stdout: "pat=[ab-]\nc-d\nab\n"
+stdout: |-
+  pat=[ab-]
+  c-d
+  ab
 ---
 shopt -s ysh:all
 

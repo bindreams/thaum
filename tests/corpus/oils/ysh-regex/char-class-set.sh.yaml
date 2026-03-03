@@ -2,7 +2,11 @@ disabled: true
 name: Char Class Set
 dialect: bash
 source: oils:spec/ysh-regex#char-class-set
-stdout: "[abc]+\nyes\nno\nno\n"
+stdout: |-
+  [abc]+
+  yes
+  no
+  no
 ---
 shopt -s ysh:all
 var pat = ''

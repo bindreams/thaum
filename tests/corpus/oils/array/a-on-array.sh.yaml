@@ -2,8 +2,9 @@ name: ${!a} on array
 dialect: bash
 source: oils:spec/array#a-on-array
 status: 0
-stdout: "['']\n"
-setup: |
+stdout: |
+  ['']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +12,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 
 # bash gives empty string because it's like a[0]

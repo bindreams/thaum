@@ -2,8 +2,10 @@ disabled: true
 name: join()
 dialect: bash
 source: oils:spec/ysh-func-builtin#join
-stdout: "['abc d']\n['a:b:c d']\n"
-setup: |
+stdout: |
+  ['abc d']
+  ['a:b:c d']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -11,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 var x = :|a b 'c d'|
 

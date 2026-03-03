@@ -1,7 +1,8 @@
 name: "[ '(' foo ] is runtime syntax error"
 dialect: bash
 source: oils:spec/builtin-bracket#foo-is-runtime-syntax-error
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 [ '(' foo ]
 echo status=$?

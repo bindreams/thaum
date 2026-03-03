@@ -1,7 +1,15 @@
 name: -h and -L test for symlink
 dialect: bash
 source: oils:spec/builtin-bracket#h-and--l-test-for-symlink
-stdout: "no\nno\nis-file\nsymlink\nsymlink\ndangling\ndangling\ndangling is not file\n"
+stdout: |
+  no
+  no
+  is-file
+  symlink
+  symlink
+  dangling
+  dangling
+  dangling is not file
 environment:
   TMP: /tmp
 ---

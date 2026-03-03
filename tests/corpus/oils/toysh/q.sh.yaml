@@ -1,7 +1,9 @@
 name: '@Q'
 dialect: bash
 source: oils:spec/toysh#q
-stdout: "'a' 'b' 'c' 'd'\n'a' 'b' 'c' 'd'\n"
+stdout: |-
+  'a' 'b' 'c' 'd'
+  'a' 'b' 'c' 'd'
 ---
 # http://landley.net/notes.html#24-06-2020
 

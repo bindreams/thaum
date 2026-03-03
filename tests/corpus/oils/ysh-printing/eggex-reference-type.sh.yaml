@@ -2,7 +2,12 @@ disabled: true
 name: Eggex (reference type)
 dialect: bash
 source: oils:spec/ysh-printing#eggex-reference-type
-stdout: "<Eggex 0x--->\n(Dict)  {k: <Eggex 0x--->}\n\n<Eggex>\n(Dict)   {\"k\":<Eggex>}\n"
+stdout: |-
+  <Eggex 0x--->
+  (Dict)  {k: <Eggex 0x--->}
+
+  <Eggex>
+  (Dict)   {"k":<Eggex>}
 ---
 var pat = /d+/
 

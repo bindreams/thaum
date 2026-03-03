@@ -1,7 +1,9 @@
 name: Tilde expansions in RHS of [k]=v (BashAssoc)
 dialect: bash
 source: oils:spec/array-literal#tilde-expansions-in-rhs-of-kv-bashassoc
-stdout: "/home/user\n/home/user:/home/user:/home/user\n"
+stdout: |-
+  /home/user
+  /home/user:/home/user:/home/user
 ---
 # Note: bash-5.2 has a bug that the tilde doesn't expand on the right hand side
 # of [key]=value.  This problem doesn't happen in bash-3.1..5.1 and bash-5.3.

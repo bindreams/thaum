@@ -1,7 +1,10 @@
 name: ${x@u} U L - upper / lower case (bash 5.1 feature)
 dialect: bash
 source: oils:spec/var-op-bash#xu-u-l---upper-lower-case-bash-51-feature
-stdout: "Abc DEF\nABC DEF\nabc def\n"
+stdout: |-
+  Abc DEF
+  ABC DEF
+  abc def
 ---
 
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html

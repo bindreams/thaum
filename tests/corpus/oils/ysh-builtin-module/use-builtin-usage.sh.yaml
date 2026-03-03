@@ -2,7 +2,13 @@ disabled: true
 name: use builtin usage
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-builtin-usage
-stdout: "no-arg=2\none-arg=1\nextern=0\nbad-flag=2\ntoo-many=2\nno-builtin=1\n"
+stdout: |-
+  no-arg=2
+  one-arg=1
+  extern=0
+  bad-flag=2
+  too-many=2
+  no-builtin=1
 ---
 
 use

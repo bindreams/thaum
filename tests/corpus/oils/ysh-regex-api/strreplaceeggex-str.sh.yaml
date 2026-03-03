@@ -2,7 +2,9 @@ disabled: true
 name: Str.replace(Eggex, Str)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-str
-stdout: "mangled-kebab-case\nsmaller---to---bigger\n"
+stdout: |-
+  mangled-kebab-case
+  smaller---to---bigger
 ---
 shopt --set ysh:all
 

@@ -2,7 +2,11 @@ disabled: true
 name: exit code of var, const, setvar with command sub
 dialect: bash
 source: oils:spec/ysh-assign#exit-code-of-var-const-setvar-with-command-sub
-stdout: "outside1=1\noutside2=1\noutside3=1\noutside4=1\n"
+stdout: |-
+  outside1=1
+  outside2=1
+  outside3=1
+  outside4=1
 ---
 
 # NOTE: This feels PROBLEMATIC without command_sub_errexit feels like it should

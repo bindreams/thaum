@@ -4,7 +4,11 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex-matches-runes
 status: 0
-stdout: "true true\ntrue true\nfalse false\nfalse false\n"
+stdout: |-
+  true true
+  true true
+  false false
+  false false
 ---
 func test(s, p) { echo $[s.startsWith(p)] $[s.endsWith(p)] }
 

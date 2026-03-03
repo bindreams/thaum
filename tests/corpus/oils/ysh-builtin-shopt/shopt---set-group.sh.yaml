@@ -2,12 +2,26 @@ disabled: true
 name: shopt --set GROUP { }
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt---set-group
-stdout: "shopt -u command_sub_errexit\nshopt -u inherit_errexit\nshopt -u strict_errexit\n\
-  shopt -u verbose_errexit\n---\nshopt -s command_sub_errexit\nshopt -s inherit_errexit\n\
-  shopt -s strict_errexit\nshopt -s verbose_errexit\n---\nshopt -s command_sub_errexit\n\
-  shopt -s inherit_errexit\nshopt -u strict_errexit\nshopt -s verbose_errexit\n---\n\
-  shopt -u command_sub_errexit\nshopt -u inherit_errexit\nshopt -s strict_errexit\n\
-  shopt -u verbose_errexit\n"
+stdout: |-
+  shopt -u command_sub_errexit
+  shopt -u inherit_errexit
+  shopt -u strict_errexit
+  shopt -u verbose_errexit
+  ---
+  shopt -s command_sub_errexit
+  shopt -s inherit_errexit
+  shopt -s strict_errexit
+  shopt -s verbose_errexit
+  ---
+  shopt -s command_sub_errexit
+  shopt -s inherit_errexit
+  shopt -u strict_errexit
+  shopt -s verbose_errexit
+  ---
+  shopt -u command_sub_errexit
+  shopt -u inherit_errexit
+  shopt -s strict_errexit
+  shopt -u verbose_errexit
 ---
 shopt --set parse_brace
 

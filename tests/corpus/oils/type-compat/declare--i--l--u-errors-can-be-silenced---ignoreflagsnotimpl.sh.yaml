@@ -2,7 +2,12 @@ name: declare -i -l -u errors can be silenced - ignore_flags_not_impl
 dialect: bash
 source: 
   oils:spec/type-compat#declare--i--l--u-errors-can-be-silenced---ignoreflagsnotimpl
-stdout: "status=2\nfoo=\n\nstatus=0\nbar=2+3\n"
+stdout: |-
+  status=2
+  foo=
+
+  status=0
+  bar=2+3
 ---
 
 declare -i foo=2+3

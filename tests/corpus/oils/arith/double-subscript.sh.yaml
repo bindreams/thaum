@@ -2,7 +2,8 @@ name: Double subscript
 dialect: bash
 source: oils:spec/arith#double-subscript
 status: 1
-stdout: "2\n"
+stdout: |-
+  2
 ---
 a=(1 2 3)
 echo $(( a[1] ))

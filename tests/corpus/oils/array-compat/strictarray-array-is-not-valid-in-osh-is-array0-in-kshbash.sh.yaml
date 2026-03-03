@@ -2,7 +2,8 @@ name: 'strict_array: $array is not valid in OSH, is ${array[0]} in ksh/bash'
 dialect: bash
 source: 
   oils:spec/array-compat#strictarray-array-is-not-valid-in-osh-is-array0-in-kshbash
-stdout: "1\n"
+stdout: |-
+  1
 ---
 shopt -s strict_array
 

@@ -1,7 +1,14 @@
 name: ${#s} respects LC_ALL - length in bytes or code points
 dialect: bash
 source: oils:spec/var-op-len#s-respects-lcall---length-in-bytes-or-code-points
-stdout: "len=1\nlen=2\n\nlen=1\nlen=4\n\n"
+stdout: |+
+  len=1
+  len=2
+
+  len=1
+  len=4
+
+...
 ---
 case $SH in dash) exit ;; esac
 

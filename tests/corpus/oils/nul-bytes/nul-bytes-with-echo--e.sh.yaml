@@ -1,7 +1,9 @@
 name: NUL bytes with echo -e
 dialect: bash
 source: oils:spec/nul-bytes#nul-bytes-with-echo--e
-stdout: "  \\0   -  \\n\n  00  2d  0a\n"
+stdout: |2-
+    \0   -  \n
+    00  2d  0a
 ---
 case $SH in dash) exit ;; esac
 

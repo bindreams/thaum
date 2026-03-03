@@ -3,7 +3,10 @@ name: no_xtrace_osh UNSET, and xtrace_rich set
 dialect: bash
 source: oils:spec/ysh-xtrace#noxtraceosh-unset-and-xtracerich-set
 stdout: "\n"
-stderr: "| command 12345: env 'false'\n; process 12345: status 1\n. builtin set '+x'\n"
+stderr: |-
+  | command 12345: env 'false'
+  ; process 12345: status 1
+  . builtin set '+x'
 ---
 shopt --set ysh:upgrade 
 shopt --unset no_xtrace_osh

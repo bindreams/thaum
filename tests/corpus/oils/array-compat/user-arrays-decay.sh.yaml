@@ -1,8 +1,11 @@
 name: User arrays decay
 dialect: bash
 source: oils:spec/array-compat#user-arrays-decay
-stdout: "['x', 'y', 'z']\n['x y z']\n['x', 'YYY', 'z']\n"
-setup: |
+stdout: |
+  ['x', 'y', 'z']
+  ['x y z']
+  ['x', 'YYY', 'z']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +13,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 declare -a a b
 a=(x y z)

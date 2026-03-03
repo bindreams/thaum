@@ -2,7 +2,9 @@ name: OSH calling bash with SHELLOPTS does not change braceexpand
 dialect: bash
 source: 
   oils:spec/sh-options-bash#osh-calling-bash-with-shellopts-does-not-change-braceexpand
-stdout: "braceexpand on\nbraceexpand on\n"
+stdout: |-
+  braceexpand on
+  braceexpand on
 ---
 
 #echo outside=$SHELLOPTS

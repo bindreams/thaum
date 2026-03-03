@@ -2,11 +2,18 @@ disabled: true
 name: pp value (x) is like = keyword
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-value-x-is-like-keyword
-stdout: "(Str)   'foo'\n(Str)   b'isn\\'t this sq'\n(Str)   '\"dq $myvar\"'\n(Str)\
-  \   b'\\\\ backslash \\\\\\\\'\n(Str)   b'one \\t two \\n'\n(List)\n[\n    123,
-  123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,\n    123,
-  123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,\n    123,
-  123, 123, 123, 123, 123, 123, 123, 123, 123\n]\n"
+stdout: |-
+  (Str)   'foo'
+  (Str)   b'isn\'t this sq'
+  (Str)   '"dq $myvar"'
+  (Str)   b'\\ backslash \\\\'
+  (Str)   b'one \t two \n'
+  (List)
+  [
+      123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,
+      123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123,
+      123, 123, 123, 123, 123, 123, 123, 123, 123, 123
+  ]
 ---
 
 shopt --set ysh:upgrade

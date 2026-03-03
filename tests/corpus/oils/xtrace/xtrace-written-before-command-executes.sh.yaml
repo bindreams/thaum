@@ -2,8 +2,19 @@ name: xtrace written before command executes
 dialect: bash
 source: oils:spec/xtrace#xtrace-written-before-command-executes
 stdout: ''
-stderr: "+ echo one\none\n+ echo two\ntwo\n## OK mksh STDERR:\n# mksh traces redirects!\n\
-  + >&2 \n+ echo one\none\n+ >&2 \n+ echo two\ntwo\n"
+stderr: |-
+  + echo one
+  one
+  + echo two
+  two
+  ## OK mksh STDERR:
+  # mksh traces redirects!
+  + >&2 
+  + echo one
+  one
+  + >&2 
+  + echo two
+  two
 ---
 set -x
 echo one >&2

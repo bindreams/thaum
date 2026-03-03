@@ -1,7 +1,8 @@
 name: No ~ expansion in dynamic assignment
 dialect: bash
 source: oils:spec/tilde#no-expansion-in-dynamic-assignment
-stdout: "~/src\n"
+stdout: |-
+  ~/src
 ---
 HOME=/home/bob
 binding='const=~/src'

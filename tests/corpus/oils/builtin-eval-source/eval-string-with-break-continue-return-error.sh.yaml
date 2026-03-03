@@ -3,8 +3,18 @@ dialect: bash
 source: 
   oils:spec/builtin-eval-source#eval-string-with-break-continue-return-error
 status: 1
-stdout: "--- break\n1\nend func\n--- continue\n1\n2\nend func\n--- return\n1\n---
-  false\n1\n"
+stdout: |-
+  --- break
+  1
+  end func
+  --- continue
+  1
+  2
+  end func
+  --- return
+  1
+  --- false
+  1
 ---
 
 set -e

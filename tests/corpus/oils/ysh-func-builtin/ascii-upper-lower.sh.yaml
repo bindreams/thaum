@@ -2,7 +2,14 @@ disabled: true
 name: ASCII upper() lower()
 dialect: bash
 source: oils:spec/ysh-func-builtin#ascii-upper-lower
-stdout: "abc-\nXYZ!\n\nABC-\nabc-\nXYZ!\nxyz!\n"
+stdout: |-
+  abc-
+  XYZ!
+
+  ABC-
+  abc-
+  XYZ!
+  xyz!
 ---
 
 var x = 'abc-'

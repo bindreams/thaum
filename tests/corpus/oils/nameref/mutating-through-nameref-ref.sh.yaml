@@ -1,7 +1,11 @@
 name: 'mutating through nameref: ref='
 dialect: bash
 source: oils:spec/nameref#mutating-through-nameref-ref
-stdout: "1 ref=y\n2 ref=YY\n3 ref=XXXX\n4 y=XXXX\n"
+stdout: |-
+  1 ref=y
+  2 ref=YY
+  3 ref=XXXX
+  4 y=XXXX
 ---
 x=XX
 y=YY

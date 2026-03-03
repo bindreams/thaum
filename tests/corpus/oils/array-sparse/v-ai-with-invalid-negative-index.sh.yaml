@@ -3,12 +3,16 @@ dialect: bash
 source: oils:spec/array-sparse#v-ai-with-invalid-negative-index
 status: 1
 stdout: "\n"
-stderr: "  ([[ -v sp1[-1] ]]; echo \"$? (expect 1)\")\n         ^~~\n[ stdin ]:4:
-  fatal: -v got index -1, which is out of bounds for array of length 0\n  ([[ -v sp2[-10]
-  ]]; echo \"$? (expect 1)\")\n         ^~~\n[ stdin ]:6: fatal: -v got index -10,
-  which is out of bounds for array of length 9\n  ([[ -v sp3[-10] ]]; echo \"$? (expect
-  1)\")\n         ^~~\n[ stdin ]:9: fatal: -v got index -10, which is out of bounds
-  for array of length 9\n"
+stderr: |2-
+    ([[ -v sp1[-1] ]]; echo "$? (expect 1)")
+           ^~~
+  [ stdin ]:4: fatal: -v got index -1, which is out of bounds for array of length 0
+    ([[ -v sp2[-10] ]]; echo "$? (expect 1)")
+           ^~~
+  [ stdin ]:6: fatal: -v got index -10, which is out of bounds for array of length 9
+    ([[ -v sp3[-10] ]]; echo "$? (expect 1)")
+           ^~~
+  [ stdin ]:9: fatal: -v got index -10, which is out of bounds for array of length 9
 ---
 case $SH in mksh) exit ;; esac
 

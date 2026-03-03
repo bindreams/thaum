@@ -2,7 +2,9 @@ disabled: true
 name: Regression
 dialect: bash
 source: oils:spec/errexit-osh#regression
-stdout: "hi\np\n"
+stdout: |-
+  hi
+  p
 ---
 case $SH in bash|dash|ash|mksh) exit ;; esac
 

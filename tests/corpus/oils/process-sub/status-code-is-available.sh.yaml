@@ -1,7 +1,14 @@
 name: status code is available
 dialect: bash
 source: oils:spec/process-sub#status-code-is-available
-stdout: "1\n2\n1\n2\n3\nstatus 2 3\ndone\n"
+stdout: |-
+  1
+  2
+  1
+  2
+  3
+  status 2 3
+  done
 ---
 
 shopt --set parse_at

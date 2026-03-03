@@ -2,7 +2,11 @@ disabled: true
 name: float() overflow / underflow
 dialect: bash
 source: oils:spec/ysh-convert#float-overflow-underflow
-stdout: "1.2\n3.4\ninf\n-inf\n"
+stdout: |-
+  1.2
+  3.4
+  inf
+  -inf
 ---
 
 var a = float("1.2")

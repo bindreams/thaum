@@ -1,7 +1,8 @@
 name: Remove const suffix
 dialect: bash
 source: oils:spec/var-op-strip#remove-const-suffix
-stdout: "abc ab\n"
+stdout: |-
+  abc ab
 ---
 v=abcd
 echo ${v%d} ${v%%cd}

@@ -1,7 +1,8 @@
 name: Negative start index
 dialect: bash
 source: oils:spec/var-op-slice#negative-start-index
-stdout: "def\n"
+stdout: |-
+  def
 ---
 foo=abcdefg
 echo ${foo: -4:3}

@@ -1,7 +1,10 @@
 name: zsh var sub is rejected at runtime
 dialect: bash
 source: oils:spec/zsh-idioms#zsh-var-sub-is-rejected-at-runtime
-stdout: "status=1\nstatus=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
+  status=1
 ---
 
 eval 'echo z ${(m)foo} z'

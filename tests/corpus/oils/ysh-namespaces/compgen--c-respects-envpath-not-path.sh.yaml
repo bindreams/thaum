@@ -2,7 +2,8 @@ disabled: true
 name: compgen -c respects ENV.PATH, not PATH
 dialect: bash
 source: oils:spec/ysh-namespaces#compgen--c-respects-envpath-not-path
-stdout: "ls\n"
+stdout: |-
+  ls
 ---
 
 setglobal ENV.PATH = '/bin'

@@ -1,7 +1,9 @@
 name: unary assignment with dynamic var name
 dialect: bash
 source: oils:spec/arith#unary-assignment-with-dynamic-var-name
-stdout: "42\nxbar=43\n"
+stdout: |-
+  42
+  xbar=43
 ---
 foo=bar
 xbar=42

@@ -1,6 +1,7 @@
 name: partial leading expansion
 dialect: bash
 source: oils:spec/brace-expansion#partial-leading-expansion
-stdout: "}_a }_b\n"
+stdout: |-
+  }_a }_b
 ---
 echo }_{a,b}

@@ -1,7 +1,8 @@
 name: String length
 dialect: bash
 source: oils:spec/var-op-len#string-length
-stdout: "3\n"
+stdout: |-
+  3
 ---
 v=foo
 echo ${#v}

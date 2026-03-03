@@ -3,7 +3,10 @@ name: Adding to Dict in loop does NOT extend the loop (matches JS)
 dialect: bash
 source: 
   oils:spec/ysh-for#adding-to-dict-in-loop-does-not-extend-the-loop-matches-js
-stdout: "1\n2\n3\n"
+stdout: |-
+  1
+  2
+  3
 ---
 
 # see demo/survey-loop

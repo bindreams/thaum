@@ -2,7 +2,11 @@ disabled: true
 name: Unquoted \y24 escape
 dialect: bash
 source: oils:spec/ysh-string#unquoted-y24-escape
-stdout: "foo $\n36\nfoo @\nfoo A\n"
+stdout: |-
+  foo $
+  36
+  foo @
+  foo A
 ---
 
 var x = 'foo ' ++ \y24

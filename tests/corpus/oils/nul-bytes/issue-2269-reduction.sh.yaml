@@ -1,7 +1,15 @@
 name: Issue 2269 Reduction
 dialect: bash
 source: oils:spec/nul-bytes#issue-2269-reduction
-stdout: "len=1\n 78\nlen=0\n---\nlen=2\n 01 78\nlen=1\n 78\n"
+stdout: |-
+  len=1
+   78
+  len=0
+  ---
+  len=2
+   01 78
+  len=1
+   78
 ---
 
 show_bytes() {

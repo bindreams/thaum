@@ -1,7 +1,9 @@
 name: read -d when there's no delimiter
 dialect: bash
 source: oils:spec/builtin-read#read--d-when-theres-no-delimiter
-stdout: "foo 0\nbar 1\n"
+stdout: |-
+  foo 0
+  bar 1
 ---
 { read -d : part
   echo $part $?

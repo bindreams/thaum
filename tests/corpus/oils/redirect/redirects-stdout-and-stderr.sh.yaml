@@ -1,8 +1,10 @@
 name: '&> redirects stdout and stderr'
 dialect: bash
 source: oils:spec/redirect#redirects-stdout-and-stderr
-stdout: "STDOUT\nSTDERR\n"
-setup: |
+stdout: |
+  STDOUT
+  STDERR
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -15,7 +17,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 tmp="$(basename $SH)-$$.txt"  # unique name for shell and test case
 #echo $tmp

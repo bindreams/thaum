@@ -1,8 +1,12 @@
 name: var ref TO array with arbitrary subscripts
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-array-with-arbitrary-subscripts
-stdout: "works: a[1]\nworks: a[$b]\nworks: a[${c:-1}]\nworks: a[$(echo 1)]\nworks:
-  a[$(( 3 - 2 ))]\n"
+stdout: |-
+  works: a[1]
+  works: a[$b]
+  works: a[${c:-1}]
+  works: a[$(echo 1)]
+  works: a[$(( 3 - 2 ))]
 ---
 shopt -s eval_unsafe_arith compat_array
 

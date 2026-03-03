@@ -1,7 +1,8 @@
 name: getopts doesn't look for flags after args
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-doesnt-look-for-flags-after-args
-stdout: "h=0 c= optind=1 argv=x -h -c y\n"
+stdout: |-
+  h=0 c= optind=1 argv=x -h -c y
 ---
 set -- x -h -c y
 FLAG_h=0

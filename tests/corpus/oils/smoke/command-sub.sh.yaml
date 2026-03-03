@@ -1,6 +1,7 @@
 name: command sub
 dialect: bash
 source: oils:spec/smoke#command-sub
-stdout: "3\n"
+stdout: |-
+  3
 ---
 echo $(expr 3)

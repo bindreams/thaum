@@ -2,7 +2,11 @@ disabled: true
 name: 'Data after internal NUL (issue #2026)'
 dialect: bash
 source: oils:spec/ysh-json#data-after-internal-nul-issue-2026
-stdout: "status=4\nstatus=4\nstatus=1\nstatus=1\n"
+stdout: |-
+  status=4
+  status=4
+  status=1
+  status=1
 ---
 
 $SH <<'EOF'

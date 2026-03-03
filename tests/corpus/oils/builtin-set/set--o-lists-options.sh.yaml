@@ -1,7 +1,8 @@
 name: set -o lists options
 dialect: bash
 source: oils:spec/builtin-set#set--o-lists-options
-stdout: "noexec\n"
+stdout: |-
+  noexec
 ---
 # NOTE: osh doesn't use the same format yet.
 set -o | grep -o noexec

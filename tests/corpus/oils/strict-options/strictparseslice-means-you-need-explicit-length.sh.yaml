@@ -2,7 +2,10 @@ disabled: true
 name: strict_parse_slice means you need explicit  length
 dialect: bash
 source: oils:spec/strict-options#strictparseslice-means-you-need-explicit-length
-stdout: "//\nstatus=0\nstatus=2\n"
+stdout: |-
+  //
+  status=0
+  status=2
 ---
 case $SH in bash*|dash|mksh) exit ;; esac
 

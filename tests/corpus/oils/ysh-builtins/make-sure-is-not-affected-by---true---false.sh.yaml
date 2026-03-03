@@ -2,7 +2,11 @@ disabled: true
 name: Make sure [[ is not affected by --true --false
 dialect: bash
 source: oils:spec/ysh-builtins#make-sure-is-not-affected-by---true---false
-stdout: "dbracket=0\ndbracket=0\nparse error 2\nparse error 2\n"
+stdout: |-
+  dbracket=0
+  dbracket=0
+  parse error 2
+  parse error 2
 ---
 
 set +o errexit

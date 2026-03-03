@@ -1,7 +1,15 @@
 name: noclobber on &>> >>
 dialect: bash
 source: oils:spec/sh-options#noclobber-on
-stdout: "stdout=0\nagain=0\nfoo\nbar\nboth=0\nagain=0\nbaz\nfoo\n"
+stdout: |
+  stdout=0
+  again=0
+  foo
+  bar
+  both=0
+  again=0
+  baz
+  foo
 environment:
   TMP: /tmp
 ---

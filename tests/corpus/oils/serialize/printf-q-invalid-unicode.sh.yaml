@@ -1,7 +1,12 @@
 name: printf %q invalid unicode
 dialect: bash
 source: oils:spec/serialize#printf-q-invalid-unicode
-stdout: "$'\\xce'\n$'\\xceμ'\n$'μ\\xce'\n$'\\xcea'\n$'a\\xce'\n"
+stdout: |-
+  $'\xce'
+  $'\xceμ'
+  $'μ\xce'
+  $'\xcea'
+  $'a\xce'
 ---
 case $SH in ash) return ;; esac
 

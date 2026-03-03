@@ -2,7 +2,13 @@ name: set -o errtrace - trap ERR runs in shell functions
 dialect: bash
 source: 
   oils:spec/builtin-trap-err#set--o-errtrace---trap-err-runs-in-shell-functions
-stdout: "err\nnow with errtrace\nerr\nerr\nerr\nok\n"
+stdout: |-
+  err
+  now with errtrace
+  err
+  err
+  err
+  ok
 ---
 
 trap 'echo err' ERR

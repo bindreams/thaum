@@ -2,7 +2,9 @@ disabled: true
 name: Open proc has ARGV
 dialect: bash
 source: oils:spec/ysh-proc#open-proc-has-argv
-stdout: "ARGV x y z\ndollar-at a b c\n"
+stdout: |-
+  ARGV x y z
+  dollar-at a b c
 ---
 shopt -s ysh:all
 proc foo { 

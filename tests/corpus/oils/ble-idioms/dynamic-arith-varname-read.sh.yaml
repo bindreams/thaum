@@ -1,7 +1,8 @@
 name: 'dynamic arith varname: read'
 dialect: bash
 source: oils:spec/ble-idioms#dynamic-arith-varname-read
-stdout: "x=12 y=34\n"
+stdout: |-
+  x=12 y=34
 ---
 
 vec2_load() {

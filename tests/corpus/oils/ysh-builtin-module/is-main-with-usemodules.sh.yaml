@@ -2,7 +2,9 @@ disabled: true
 name: is-main with use/modules
 dialect: bash
 source: oils:spec/ysh-builtin-module#is-main-with-usemodules
-stdout: "main.ysh is not the main module\nhi from main.ysh\n"
+stdout: |-
+  main.ysh is not the main module
+  hi from main.ysh
 ---
 shopt --set ysh:upgrade
 

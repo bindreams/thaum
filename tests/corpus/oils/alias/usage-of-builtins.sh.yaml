@@ -2,7 +2,9 @@ name: Usage of builtins
 dialect: bash
 source: oils:spec/alias#usage-of-builtins
 status: 127
-stdout: "status=0\nx\n"
+stdout: |-
+  status=0
+  x
 ---
 shopt -s expand_aliases || true
 alias -- foo=echo

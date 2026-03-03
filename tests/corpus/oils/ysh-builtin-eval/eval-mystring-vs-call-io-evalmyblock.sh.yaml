@@ -2,8 +2,16 @@ disabled: true
 name: eval 'mystring' vs. call io->eval(myblock)
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-mystring-vs-call-io-evalmyblock
-stdout: "plain\nplain=0\nplain\nplain=0\n\none\n(Dict)   {\"code\":1}\none\n(Dict)\
-  \   {\"code\":1}\n"
+stdout: |-
+  plain
+  plain=0
+  plain
+  plain=0
+
+  one
+  (Dict)   {"code":1}
+  one
+  (Dict)   {"code":1}
 ---
 
 eval 'echo plain'

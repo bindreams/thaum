@@ -2,7 +2,8 @@ disabled: true
 name: json read uses $_reply var
 dialect: bash
 source: oils:spec/ysh-json#json-read-uses-reply-var
-stdout: "true\n"
+stdout: |-
+  true
 ---
 
 # space before true

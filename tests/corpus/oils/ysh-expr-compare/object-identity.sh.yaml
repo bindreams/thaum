@@ -2,7 +2,12 @@ disabled: true
 name: object identity
 dialect: bash
 source: oils:spec/ysh-expr-compare#object-identity
-stdout: "(Bool)   true\n(Bool)   true\n\n(Bool)   false\n(Bool)   true\n"
+stdout: |-
+  (Bool)   true
+  (Bool)   true
+
+  (Bool)   false
+  (Bool)   true
 ---
 
 var d = {}

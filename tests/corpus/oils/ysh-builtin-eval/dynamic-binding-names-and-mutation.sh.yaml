@@ -2,9 +2,14 @@ disabled: true
 name: dynamic binding names and mutation
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dynamic-binding-names-and-mutation
-stdout: "(Dict)   {\"a\":1,\"z\":\"z\"}\n(Dict)   {\"b\":2,\"z\":\"z\"}\n(Dict)  \
-  \ {\"c\":3,\"z\":\"z\"}\n\n(Dict)   {\"a\":1,\"z\":\"z\",\"d\":0}\n(Dict)   {\"\
-  b\":2,\"z\":\"z\",\"d\":0}\n(Dict)   {\"c\":3,\"z\":\"z\",\"d\":0}\n"
+stdout: |-
+  (Dict)   {"a":1,"z":"z"}
+  (Dict)   {"b":2,"z":"z"}
+  (Dict)   {"c":3,"z":"z"}
+
+  (Dict)   {"a":1,"z":"z","d":0}
+  (Dict)   {"b":2,"z":"z","d":0}
+  (Dict)   {"c":3,"z":"z","d":0}
 ---
 proc foreach (binding, in_; list ;; block) {
   if (in_ !== "in") {

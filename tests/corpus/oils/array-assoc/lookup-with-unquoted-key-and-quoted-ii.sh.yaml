@@ -1,7 +1,9 @@
 name: lookup with unquoted $key and quoted "$i$i"
 dialect: bash
 source: oils:spec/array-assoc#lookup-with-unquoted-key-and-quoted-ii
-stdout: "bar\nb\n"
+stdout: |-
+  bar
+  b
 ---
 declare -A A
 A["aa"]=b

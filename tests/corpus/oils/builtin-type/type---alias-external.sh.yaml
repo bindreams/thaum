@@ -1,7 +1,9 @@
 name: type -> alias external
 dialect: bash
 source: oils:spec/builtin-type#type---alias-external
-stdout: "ll is an alias for ls -l\ndate is _tmp/date\n"
+stdout: |-
+  ll is an alias for ls -l
+  date is _tmp/date
 ---
 
 mkdir -p _tmp

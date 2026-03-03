@@ -1,7 +1,8 @@
 name: printf %q
 dialect: bash
 source: oils:spec/builtin-printf#printf-q
-stdout: "['a b']\n"
+stdout: |-
+  ['a b']
 ---
 x='a b'
 printf '[%q]\n' "$x"

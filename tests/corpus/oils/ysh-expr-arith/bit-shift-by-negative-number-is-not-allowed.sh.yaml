@@ -2,8 +2,15 @@ disabled: true
 name: Bit shift by negative number is not allowed
 dialect: bash
 source: oils:spec/ysh-expr-arith#bit-shift-by-negative-number-is-not-allowed
-stdout: "(Int)   2\n(Int)   1\nfailed 3\n\n(Int)   4\n(Int)   8\n(Int)   16\nfailed
-  3\n"
+stdout: |-
+  (Int)   2
+  (Int)   1
+  failed 3
+
+  (Int)   4
+  (Int)   8
+  (Int)   16
+  failed 3
 ---
 
 shopt -s ysh:upgrade

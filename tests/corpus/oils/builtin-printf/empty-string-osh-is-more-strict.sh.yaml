@@ -1,6 +1,7 @@
 name: empty string (osh is more strict)
 dialect: bash
 source: oils:spec/builtin-printf#empty-string-osh-is-more-strict
-stdout: "0\n"
+stdout: |-
+  0
 ---
 printf '%d\n' ''

@@ -1,7 +1,14 @@
 name: printf -v dynamic scope
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-dynamic-scope
-stdout: "dollar=dollar\n--\ndollar=\\$\nmylocal=mylocal\n--\ndollar=\\$\nmylocal=\n"
+stdout: |-
+  dollar=dollar
+  --
+  dollar=\$
+  mylocal=mylocal
+  --
+  dollar=\$
+  mylocal=
 ---
 case $SH in mksh|zsh|dash|ash) echo not implemented; exit ;; esac
 # OK so printf is like assigning to a var.

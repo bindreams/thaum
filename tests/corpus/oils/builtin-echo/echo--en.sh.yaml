@@ -1,6 +1,8 @@
 name: echo -en
 dialect: bash
 source: oils:spec/builtin-echo#echo--en
-stdout: "abc\ndef\n"
+stdout: |-
+  abc
+  def
 ---
 echo -en 'abc\ndef\n'

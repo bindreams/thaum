@@ -3,7 +3,8 @@ dialect: bash
 source: 
   oils:spec/builtin-getopts#getopts-silent-error-reporting---missing-required-argument
 status: 0
-stdout: "status=0 opt=: OPTARG=a\n"
+stdout: |
+  status=0 opt=: OPTARG=a
 stderr: "\n"
 ---
 # Silent mode returns ':' and sets OPTARG to option char

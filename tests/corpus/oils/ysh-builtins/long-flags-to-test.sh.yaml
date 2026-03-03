@@ -2,7 +2,12 @@ disabled: true
 name: long flags to test
 dialect: bash
 source: oils:spec/ysh-builtins#long-flags-to-test
-stdout: "status=0\nstatus=0\nstatus=0\nstatus=1\nstatus=2\n"
+stdout: |-
+  status=0
+  status=0
+  status=0
+  status=1
+  status=2
 ---
 # no options necessary!
 

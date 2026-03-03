@@ -2,7 +2,11 @@ disabled: true
 name: cd builtin respects ENV.HOME, not HOME
 dialect: bash
 source: oils:spec/ysh-namespaces#cd-builtin-respects-envhome-not-home
-stdout: "code=1\n\ncode=0\n/tmp\n"
+stdout: |-
+  code=1
+
+  code=0
+  /tmp
 ---
 
 try { cd }

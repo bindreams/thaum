@@ -1,7 +1,12 @@
 name: Nested function stdout redirect
 dialect: bash
 source: oils:spec/redirect-command#nested-function-stdout-redirect
-stdout: "i1\ni2\n--\no1\no2\n"
+stdout: |
+  i1
+  i2
+  --
+  o1
+  o2
 environment:
   TMP: /tmp
 ---

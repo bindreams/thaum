@@ -1,7 +1,11 @@
 name: ${undef:-~}
 dialect: bash
 source: oils:spec/tilde#undef
-stdout: "/home/bar\n/home/bar/z\n~\n~\n"
+stdout: |-
+  /home/bar
+  /home/bar/z
+  ~
+  ~
 ---
 HOME=/home/bar
 echo ${undef:-~}

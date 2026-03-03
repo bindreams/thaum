@@ -1,7 +1,9 @@
 name: test with extra args is syntax error
 dialect: bash
 source: oils:spec/builtin-bracket#test-with-extra-args-is-syntax-error
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 test -n x ]
 echo status=$?

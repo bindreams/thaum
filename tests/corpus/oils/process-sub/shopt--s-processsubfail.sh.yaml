@@ -2,7 +2,16 @@ name: shopt -s process_sub_fail
 dialect: bash
 source: oils:spec/process-sub#shopt--s-processsubfail
 status: 3
-stdout: "a\nb\nstatus=0 ps 2 3\n__\na\nb\nstatus=3 ps 2 3\na\nb\n"
+stdout: |-
+  a
+  b
+  status=0 ps 2 3
+  __
+  a
+  b
+  status=3 ps 2 3
+  a
+  b
 ---
 
 case $SH in bash*|zsh) exit ;; esac

@@ -1,7 +1,8 @@
 name: -a -a
 dialect: bash
 source: oils:spec/blog2#a--a
-stdout: "status=1\n"
+stdout: |-
+  status=1
 ---
 [ -a -a ]
 echo status=$?

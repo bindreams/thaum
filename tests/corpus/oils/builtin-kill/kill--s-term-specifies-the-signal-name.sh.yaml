@@ -1,7 +1,9 @@
 name: kill -s TERM specifies the signal name
 dialect: bash
 source: oils:spec/builtin-kill#kill--s-term-specifies-the-signal-name
-stdout: "kill=0\nwait=143\n"
+stdout: |-
+  kill=0
+  wait=143
 ---
 sleep 0.1 &
 pid=$!

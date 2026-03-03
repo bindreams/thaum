@@ -3,7 +3,10 @@ name: Parsing source code - YSH rejects \u{110000}
 dialect: bash
 source: oils:spec/ysh-unicode#parsing-source-code---ysh-rejects-u110000
 status: 2
-stdout: "status max=0\nstatus too_big=1\n(Str)   \"􏿿\"\n"
+stdout: |-
+  status max=0
+  status too_big=1
+  (Str)   "􏿿"
 ---
 
 # Sanity check first: Python interpreter DOES check big code points,

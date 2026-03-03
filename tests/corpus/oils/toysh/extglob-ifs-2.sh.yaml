@@ -1,7 +1,9 @@
 name: extglob $IFS 2
 dialect: bash
 source: oils:spec/toysh#extglob-ifs-2
-stdout: "=+(c=\n=d)=\n"
+stdout: |-
+  =+(c=
+  =d)=
 ---
 # http://landley.net/notes.html#17-05-2020
 

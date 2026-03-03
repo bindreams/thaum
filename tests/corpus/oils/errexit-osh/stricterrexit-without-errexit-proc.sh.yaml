@@ -2,7 +2,8 @@ name: strict_errexit without errexit proc
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-without-errexit-proc
 status: 1
-stdout: "myproc\n"
+stdout: |-
+  myproc
 ---
 myproc() {
   echo myproc

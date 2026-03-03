@@ -1,7 +1,10 @@
 name: 'Issue #1069 [53] BUG: a[1 + 1]=2, etc. fails'
 dialect: bash
 source: oils:spec/ble-idioms#issue-1069-53-bug-a1-12-etc-fails
-stdout: "status=0, a[1]=hello\nstatus=0, a[2]=hello\nstatus=0, a[3]=hello\n"
+stdout: |-
+  status=0, a[1]=hello
+  status=0, a[2]=hello
+  status=0, a[3]=hello
 ---
 case $SH in ash|dash|yash) exit 99 ;; esac
 a=()

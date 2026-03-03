@@ -2,7 +2,9 @@ disabled: true
 name: bool() more
 dialect: bash
 source: oils:spec/ysh-convert#bool-more
-stdout: "false\ntrue\n"
+stdout: |-
+  false
+  true
 ---
 var a = bool( :|| )
 var b = bool( :|foo| )

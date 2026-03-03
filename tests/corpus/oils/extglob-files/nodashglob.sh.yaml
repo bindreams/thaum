@@ -1,7 +1,9 @@
 name: no_dash_glob
 dialect: bash
 source: oils:spec/extglob-files#nodashglob
-stdout: "-dash bar foo\nbar foo\n"
+stdout: |-
+  -dash bar foo
+  bar foo
 ---
 shopt -s extglob
 mkdir -p opts

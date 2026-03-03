@@ -1,7 +1,8 @@
 name: globstar is off -> ** is treated like *
 dialect: bash
 source: oils:spec/globstar#globstar-is-off---is-treated-like
-stdout: "c/leaf.md\n"
+stdout: |-
+  c/leaf.md
 ---
 case $SH in zsh) exit ;; esac
 

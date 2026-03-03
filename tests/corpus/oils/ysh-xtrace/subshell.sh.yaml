@@ -3,9 +3,16 @@ name: subshell
 dialect: bash
 source: oils:spec/ysh-xtrace#subshell
 stdout: ''
-stderr: "    . 12345 builtin ':' p\n  + 12345 exit 3\n  . 12345 builtin ':' 1\n  <
-  12345 proc p\n  > 12345 proc p\n. builtin ':' begin\n. builtin set '+x'\n; process
-  12345: status 3\n| forkwait 12345\n"
+stderr: |2-
+      . 12345 builtin ':' p
+    + 12345 exit 3
+    . 12345 builtin ':' 1
+    < 12345 proc p
+    > 12345 proc p
+  . builtin ':' begin
+  . builtin set '+x'
+  ; process 12345: status 3
+  | forkwait 12345
 ---
 shopt --set ysh:upgrade
 shopt --unset errexit

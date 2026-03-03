@@ -2,7 +2,9 @@ name: compgen -A command completes external commands
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--a-command-completes-external-commands
-stdout: "xargs\nstatus=0\n"
+stdout: |-
+  xargs
+  status=0
 ---
 # NOTE: this test isn't hermetic
 compgen -A command xarg | uniq

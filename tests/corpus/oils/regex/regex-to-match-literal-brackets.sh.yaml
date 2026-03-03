@@ -1,7 +1,9 @@
 name: Regex to match literal brackets []
 dialect: bash
 source: oils:spec/regex#regex-to-match-literal-brackets
-stdout: "true\ntrue\n"
+stdout: |-
+  true
+  true
 ---
 
 # bash-completion relies on this, so we're making it match bash.

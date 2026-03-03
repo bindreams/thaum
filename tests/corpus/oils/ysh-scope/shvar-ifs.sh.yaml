@@ -2,7 +2,11 @@ disabled: true
 name: shvar IFS
 dialect: bash
 source: oils:spec/ysh-scope#shvar-ifs
-stdout: " 20 09 0a 0a\ninside IFS=w\nmylocal=x\n 20 09 0a 0a\n"
+stdout: |2-
+   20 09 0a 0a
+  inside IFS=w
+  mylocal=x
+   20 09 0a 0a
 ---
 shopt --set ysh:upgrade
 

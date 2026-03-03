@@ -1,7 +1,11 @@
 name: the word 'in' can be the loop variable
 dialect: bash
 source: oils:spec/loop#the-word-in-can-be-the-loop-variable
-stdout: "a\nb\nc\nfinished=c\n"
+stdout: |-
+  a
+  b
+  c
+  finished=c
 ---
 
 for in in a b c; do

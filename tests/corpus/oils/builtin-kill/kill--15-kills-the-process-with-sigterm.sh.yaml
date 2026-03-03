@@ -1,7 +1,9 @@
 name: kill -15 kills the process with SIGTERM
 dialect: bash
 source: oils:spec/builtin-kill#kill--15-kills-the-process-with-sigterm
-stdout: "kill=0\nwait=143\n"
+stdout: |-
+  kill=0
+  wait=143
 ---
 case $SH in mksh) exit ;; esac  # mksh is flaky
 

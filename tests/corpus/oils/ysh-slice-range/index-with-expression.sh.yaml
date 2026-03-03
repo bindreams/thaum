@@ -2,7 +2,8 @@ disabled: true
 name: Index with expression
 dialect: bash
 source: oils:spec/ysh-slice-range#index-with-expression
-stdout: "3\n"
+stdout: |-
+  3
 ---
 var mydict = {['5']: 3}
 var val = mydict["$[2+3]"]

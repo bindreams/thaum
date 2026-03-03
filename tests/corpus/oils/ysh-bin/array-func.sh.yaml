@@ -2,6 +2,8 @@ disabled: true
 name: Array func
 dialect: bash
 source: oils:spec/ysh-bin#array-func
-stdout: "foo\nbar\n"
+stdout: |-
+  foo
+  bar
 ---
 write @[split('foo bar')]

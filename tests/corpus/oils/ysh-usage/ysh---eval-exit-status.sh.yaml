@@ -3,7 +3,8 @@ name: ysh --eval exit status
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-exit-status
 status: 99
-stdout: "hi\n"
+stdout: |-
+  hi
 ---
 
 echo 'echo hi; exit 99; echo bye' >e.ysh

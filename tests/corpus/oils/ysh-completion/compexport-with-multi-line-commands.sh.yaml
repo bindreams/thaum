@@ -2,7 +2,8 @@ disabled: true
 name: compexport with multi-line commands
 dialect: bash
 source: oils:spec/ysh-completion#compexport-with-multi-line-commands
-stdout: "\"complete \"\n"
+stdout: |-
+  "complete "
 ---
 
 # TODO: Why do we get 3 copies of echo?

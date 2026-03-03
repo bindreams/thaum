@@ -1,7 +1,9 @@
 name: 2>&1 with no command
 dialect: bash
 source: oils:spec/redirect#21-with-no-command
-stdout: "status=42\nstatus=0\n"
+stdout: |
+  status=42
+  status=0
 stderr: ''
 ---
 ( exit 42 )  # status is reset after this

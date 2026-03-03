@@ -2,7 +2,9 @@ disabled: true
 name: builtin sleep usage errors
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-sleep-usage-errors
-stdout: "status=2\nstatus=2\n"
+stdout: |-
+  status=2
+  status=2
 ---
 case $SH in bash) exit ;; esac
 

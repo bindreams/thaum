@@ -3,8 +3,20 @@ name: compgen -A function shows user-defined invokables - shell funcs, Proc, Obj
 dialect: bash
 source: 
   oils:spec/ysh-proc#compgen--a-function-shows-user-defined-invokables---shell-funcs-proc-obj
-stdout: "my-shell-func\nmyproc\n---\ndefine-inner\ninner\nmy-shell-func\nmyproc\n\
-  ---\ndefine-inner\nmy-shell-func\nmyinvoke\nmyobj\nmyproc\n"
+stdout: |-
+  my-shell-func
+  myproc
+  ---
+  define-inner
+  inner
+  my-shell-func
+  myproc
+  ---
+  define-inner
+  my-shell-func
+  myinvoke
+  myobj
+  myproc
 ---
 shopt --set ysh:upgrade
 

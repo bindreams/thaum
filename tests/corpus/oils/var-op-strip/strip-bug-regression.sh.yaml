@@ -1,8 +1,12 @@
 name: strip * (bug regression)
 dialect: bash
 source: oils:spec/var-op-strip#strip-bug-regression
-stdout: "['abc']\n['']\n['abc']\n['']\n"
-setup: |
+stdout: |
+  ['abc']
+  ['']
+  ['abc']
+  ['']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +14,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 x=abc
 argv.py "${x#*}"

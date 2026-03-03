@@ -2,7 +2,8 @@ disabled: true
 name: builtin rm -f allows empty arg list
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-rm--f-allows-empty-arg-list
-stdout: "status=0\n"
+stdout: |-
+  status=0
 ---
 case $SH in
   *osh) prefix='builtin' ;;

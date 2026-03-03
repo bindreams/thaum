@@ -1,7 +1,9 @@
 name: array assignment with dynamic array name
 dialect: bash
 source: oils:spec/arith#array-assignment-with-dynamic-array-name
-stdout: "42\nxbar[5]=42\n"
+stdout: |-
+  42
+  xbar[5]=42
 ---
 foo=bar
 echo $(( x$foo[5] = 42 ))

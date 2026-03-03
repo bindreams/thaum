@@ -2,7 +2,8 @@ disabled: true
 name: Float Literal with _
 dialect: bash
 source: oils:spec/ysh-int-float#float-literal-with
-stdout: "ok\n"
+stdout: |-
+  ok
 ---
 
 shopt -s ysh:upgrade

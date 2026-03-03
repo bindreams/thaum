@@ -1,10 +1,13 @@
 name: (( )) with redirect
 dialect: bash
 source: oils:spec/dparen#with-redirect
-stdout: "52\n--\nSTDERR\n"
+stdout: |
+  52
+  --
+  STDERR
 environment:
   TMP: /tmp
-setup: |
+setup: |-
   #!/bin/sh
   cat > stdout_stderr.py <<'HELPER'
   #!/usr/bin/env python3
@@ -17,7 +20,6 @@ setup: |
   sys.exit(status)
   HELPER
   chmod +x stdout_stderr.py
-
 ---
 (( a = $(stdout_stderr.py 42) + 10 )) 2>$TMP/x.txt
 echo $a

@@ -2,7 +2,13 @@ disabled: true
 name: Obj API
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#obj-api
-stdout: "(Obj)   (\"x\":4)\n0\n(Dict)   {\"x\":4}\n0\n(Null)   null\n0\n"
+stdout: |-
+  (Obj)   ("x":4)
+  0
+  (Dict)   {"x":4}
+  0
+  (Null)   null
+  0
 ---
 shopt --set ysh:upgrade
 

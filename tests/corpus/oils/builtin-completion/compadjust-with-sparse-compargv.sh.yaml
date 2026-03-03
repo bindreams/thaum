@@ -1,8 +1,9 @@
 name: compadjust with sparse COMP_ARGV
 dialect: bash
 source: oils:spec/builtin-completion#compadjust-with-sparse-compargv
-stdout: "['0', '2', '5', '9']\n"
-setup: |
+stdout: |
+  ['0', '2', '5', '9']
+setup: |-
   #!/bin/sh
   cat > argv.py <<'HELPER'
   #!/usr/bin/env python3
@@ -10,7 +11,6 @@ setup: |
   print(sys.argv[1:])
   HELPER
   chmod +x argv.py
-
 ---
 case $SH in bash) exit ;; esac
 

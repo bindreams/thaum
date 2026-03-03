@@ -3,7 +3,8 @@ name: history -r reads from the history file, and appends it to the current
 dialect: bash
 source: 
   oils:spec/builtin-history#history--r-reads-from-the-history-file-and-appends-it-to-the-current-history
-stdout: "20\n"
+stdout: |
+  20
 environment:
   TMP: /tmp
 ---

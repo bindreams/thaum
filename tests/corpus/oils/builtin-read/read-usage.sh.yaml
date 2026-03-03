@@ -1,7 +1,8 @@
 name: read usage
 dialect: bash
 source: oils:spec/builtin-read#read-usage
-stdout: "status=2\n"
+stdout: |-
+  status=2
 ---
 read -n -1
 echo status=$?

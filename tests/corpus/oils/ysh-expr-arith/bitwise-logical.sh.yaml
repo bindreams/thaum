@@ -2,7 +2,11 @@ disabled: true
 name: Bitwise logical
 dialect: bash
 source: oils:spec/ysh-expr-arith#bitwise-logical
-stdout: "1\n7\n6\n-8\n"
+stdout: |-
+  1
+  7
+  6
+  -8
 ---
 var a = 0b0101 & 0b0011
 echo $a

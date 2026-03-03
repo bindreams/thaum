@@ -1,7 +1,9 @@
 name: Pipeline group quirk
 dialect: bash
 source: oils:spec/builtin-trap-err#pipeline-group-quirk
-stdout: "group2\nok\n"
+stdout: |-
+  group2
+  ok
 ---
 
 # Oh this is because it's run for the PIPELINE, not for the last thing!  Hmmm

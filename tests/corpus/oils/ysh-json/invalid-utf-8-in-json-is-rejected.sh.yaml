@@ -2,7 +2,11 @@ disabled: true
 name: Invalid UTF-8 in JSON is rejected
 dialect: bash
 source: oils:spec/ysh-json#invalid-utf-8-in-json-is-rejected
-stdout: "status=1\nstatus=1\nstatus=1\nstatus=1\n"
+stdout: |-
+  status=1
+  status=1
+  status=1
+  status=1
 ---
 
 echo $'"\xff"' | json read

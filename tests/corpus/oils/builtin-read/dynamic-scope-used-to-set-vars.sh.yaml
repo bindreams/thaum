@@ -1,7 +1,8 @@
 name: dynamic scope used to set vars
 dialect: bash
 source: oils:spec/builtin-read#dynamic-scope-used-to-set-vars
-stdout: "ref: refs/heads/dev/andy\n"
+stdout: |-
+  ref: refs/heads/dev/andy
 ---
 f() {
   read head << EOF

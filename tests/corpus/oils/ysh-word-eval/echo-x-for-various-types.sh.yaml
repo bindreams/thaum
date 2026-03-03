@@ -2,7 +2,10 @@ disabled: true
 name: echo $x for various types
 dialect: bash
 source: oils:spec/ysh-word-eval#echo-x-for-various-types
-stdout: "true\n42\n3.14\n"
+stdout: |-
+  true
+  42
+  3.14
 ---
 const mybool = true
 const myint = 42

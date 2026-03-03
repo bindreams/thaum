@@ -1,7 +1,11 @@
 name: read -t 0 tests if input is available
 dialect: bash
 source: oils:spec/builtin-read#read--t-0-tests-if-input-is-available
-stdout: "0\n0\nreply=\n0\n"
+stdout: |-
+  0
+  0
+  reply=
+  0
 ---
 case $SH in dash|zsh|mksh) exit ;; esac
 

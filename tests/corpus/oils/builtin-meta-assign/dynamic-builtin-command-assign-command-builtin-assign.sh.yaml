@@ -2,8 +2,18 @@ name: dynamic builtin command ASSIGN, command builtin ASSIGN
 dialect: bash
 source: 
   oils:spec/builtin-meta-assign#dynamic-builtin-command-assign-command-builtin-assign
-stdout: "bc=export\nbc=readonly\n--\ncb=export\ncb=readonly\n--\nbce=export\nbcr=readonly\n\
-  --\ncbe=export\ncbr=readonly\n"
+stdout: |-
+  bc=export
+  bc=readonly
+  --
+  cb=export
+  cb=readonly
+  --
+  bce=export
+  bcr=readonly
+  --
+  cbe=export
+  cbr=readonly
 ---
 case $SH in dash|ash|zsh) exit ;; esac
 

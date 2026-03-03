@@ -2,7 +2,14 @@ disabled: true
 name: "''' in Command Mode"
 dialect: bash
 source: oils:spec/ysh-string#in-command-mode
-stdout: "--\ntwo = $two\n'\n'' '\n\\u{61}\n\n"
+stdout: |+
+  --
+  two = $two
+  '
+  '' '
+  \u{61}
+
+...
 ---
 
 echo --

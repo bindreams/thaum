@@ -2,7 +2,9 @@ disabled: true
 name: ASCII control chars can't appear literally in messages
 dialect: bash
 source: oils:spec/ysh-json#ascii-control-chars-cant-appear-literally-in-messages
-stdout: "status=4\nASCII control chars\n"
+stdout: |-
+  status=4
+  ASCII control chars
 ---
 shopt -s ysh:upgrade
 

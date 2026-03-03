@@ -1,7 +1,9 @@
 name: Hex literals with -eq
 dialect: bash
 source: oils:spec/dbracket#hex-literals-with--eq
-stdout: "true\nfalse\n"
+stdout: |-
+  true
+  false
 ---
 shopt -u strict_arith || true
 decimal=15

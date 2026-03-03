@@ -2,7 +2,11 @@ disabled: true
 name: 'Max code point: json, json8, = keyword, pp test_'
 dialect: bash
 source: oils:spec/ysh-unicode#max-code-point-json-json8-keyword-pp-test
-stdout: "\"􏿿\"\n\"􏿿\"\n(Str)   '􏿿'\n(Str)   \"􏿿\"\n"
+stdout: |-
+  "􏿿"
+  "􏿿"
+  (Str)   '􏿿'
+  (Str)   "􏿿"
 ---
 
 var max = u'\u{10ffff}'

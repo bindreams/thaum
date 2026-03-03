@@ -1,7 +1,11 @@
 name: \(\) in pattern (regression)
 dialect: bash
 source: oils:spec/dbracket#in-pattern-regression
-stdout: "match1\nmatch2\nmatch1\nmatch2\n"
+stdout: |-
+  match1
+  match2
+  match1
+  match2
 ---
 if [[ 'foo()' == *\(\) ]]; then echo match1; fi
 if [[ 'foo()' == *'()' ]]; then echo match2; fi

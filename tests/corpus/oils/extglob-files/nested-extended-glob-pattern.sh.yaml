@@ -1,7 +1,9 @@
 name: Nested extended glob pattern
 dialect: bash
 source: oils:spec/extglob-files#nested-extended-glob-pattern
-stdout: "eg6/ab eg6/az\neg6/ac eg6/ad eg6/az\n"
+stdout: |-
+  eg6/ab eg6/az
+  eg6/ac eg6/ad eg6/az
 ---
 shopt -s extglob
 mkdir -p eg6

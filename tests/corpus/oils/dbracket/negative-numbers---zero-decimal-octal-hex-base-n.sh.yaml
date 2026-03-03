@@ -1,7 +1,12 @@
 name: negative numbers - zero, decimal, octal, hex, base N
 dialect: bash
 source: oils:spec/dbracket#negative-numbers---zero-decimal-octal-hex-base-n
-stdout: "zero=0\ndecimal=0\noctal=0\nhex=0\nbaseN=0\n"
+stdout: |-
+  zero=0
+  decimal=0
+  octal=0
+  hex=0
+  baseN=0
 ---
 
 [[ -0 -eq 0 ]]; echo zero=$?

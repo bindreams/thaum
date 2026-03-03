@@ -2,7 +2,21 @@ disabled: true
 name: Nested io.stdin
 dialect: bash
 source: oils:spec/ysh-bugs#nested-iostdin
-stdout: "x=a\nx=b\nx=a\nx=b\n---\nx=a\nx=b\nx=a\nx=b\n---\nx=a\nx=b\nx=a\nx=b\n"
+stdout: |-
+  x=a
+  x=b
+  x=a
+  x=b
+  ---
+  x=a
+  x=b
+  x=a
+  x=b
+  ---
+  x=a
+  x=b
+  x=a
+  x=b
 ---
 
 proc bug {

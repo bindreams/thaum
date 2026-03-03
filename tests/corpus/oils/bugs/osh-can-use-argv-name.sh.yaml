@@ -1,7 +1,8 @@
 name: OSH can use ARGV name
 dialect: bash
 source: oils:spec/bugs#osh-can-use-argv-name
-stdout: "len=2\n"
+stdout: |-
+  len=2
 ---
 case $SH in dash|ash) exit ;; esac
 

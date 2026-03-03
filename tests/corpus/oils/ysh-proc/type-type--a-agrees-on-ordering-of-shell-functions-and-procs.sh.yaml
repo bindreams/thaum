@@ -3,7 +3,12 @@ name: type / type -a agrees on ordering of shell functions and procs
 dialect: bash
 source: 
   oils:spec/ysh-proc#type-type--a-agrees-on-ordering-of-shell-functions-and-procs
-stdout: "sh-func\nfunction\n\nYSH proc\nproc\n"
+stdout: |-
+  sh-func
+  function
+
+  YSH proc
+  proc
 ---
 shopt --set ysh:upgrade
 

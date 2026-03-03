@@ -1,7 +1,9 @@
 name: -k for sticky bit
 dialect: bash
 source: oils:spec/builtin-bracket#k-for-sticky-bit
-stdout: "status=0\nstatus=1\n"
+stdout: |-
+  status=0
+  status=1
 ---
 # not isolated: /tmp usually has sticky bit on
 # https://en.wikipedia.org/wiki/Sticky_bit

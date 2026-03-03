@@ -1,7 +1,12 @@
 name: Condition that's greater than 32 bits
 dialect: bash
 source: oils:spec/for-expr#condition-thats-greater-than-32-bits
-stdout: "4294967296\n4294967297\n4294967298\n4294967299\n4294967300\n"
+stdout: |-
+  4294967296
+  4294967297
+  4294967298
+  4294967299
+  4294967300
 ---
 
 iters=0

@@ -1,7 +1,15 @@
 name: 'Empty expression in ${a[@]: : }'
 dialect: bash
 source: oils:spec/arith-context#empty-expression-in-a
-stdout: "slice a b c d e f\nstatus=0\n\nslice\nstatus=0\n\nslice\nstatus=0\n"
+stdout: |-
+  slice a b c d e f
+  status=0
+
+  slice
+  status=0
+
+  slice
+  status=0
 ---
 
 a=(a b c d e f)

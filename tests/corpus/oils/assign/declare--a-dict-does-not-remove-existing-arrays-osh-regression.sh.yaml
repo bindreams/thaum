@@ -2,7 +2,8 @@ name: declare -A dict does not remove existing arrays (OSH regression)
 dialect: bash
 source: 
   oils:spec/assign#declare--a-dict-does-not-remove-existing-arrays-osh-regression
-stdout: "dict:3\n"
+stdout: |-
+  dict:3
 ---
 case $SH in dash|mksh) exit 99 ;; esac # dash/mksh does not support associative arrays
 

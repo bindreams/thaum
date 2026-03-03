@@ -1,7 +1,8 @@
 name: ~ expansion in readonly assignment
 dialect: bash
 source: oils:spec/tilde#expansion-in-readonly-assignment
-stdout: "/home/bob/src\n"
+stdout: |-
+  /home/bob/src
 ---
 # dash fails here!
 # http://stackoverflow.com/questions/8441473/tilde-expansion-doesnt-work-when-i-logged-into-gui

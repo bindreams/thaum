@@ -1,7 +1,8 @@
 name: nounset with "$@"
 dialect: bash
 source: oils:spec/builtin-set#nounset-with
-stdout: "a b c\n"
+stdout: |-
+  a b c
 ---
 set a b c
 set -u  # shouldn't touch argv

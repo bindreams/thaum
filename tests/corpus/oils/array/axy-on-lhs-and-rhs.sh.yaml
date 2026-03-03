@@ -1,7 +1,9 @@
 name: a[$x$y] on LHS and RHS
 dialect: bash
 source: oils:spec/array#axy-on-lhs-and-rhs
-stdout: "foo\n1\n"
+stdout: |-
+  foo
+  1
 ---
 x=1
 y=2

@@ -1,7 +1,10 @@
 name: $LINENO in other for loops
 dialect: bash
 source: oils:spec/vars-special#lineno-in-other-for-loops
-stdout: "3 a\n3 b\n3 c\n"
+stdout: |-
+  3 a
+  3 b
+  3 c
 ---
 set -- a b c
 for x; do

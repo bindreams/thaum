@@ -1,7 +1,8 @@
 name: Right Anchored Pattern replacement with %
 dialect: bash
 source: oils:spec/var-op-patsub#right-anchored-pattern-replacement-with
-stdout: "xx_yy_xx xx_xx_yy\n"
+stdout: |-
+  xx_yy_xx xx_xx_yy
 ---
 s=xx_xx_xx
 echo ${s/?xx/_yy} ${s/%?xx/_yy}

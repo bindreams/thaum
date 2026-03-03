@@ -2,7 +2,9 @@ name: 'test builtin: ( == ) is confusing: equality test or non-empty string test
 dialect: bash
 source: 
   oils:spec/bool-parse#test-builtin-is-confusing-equality-test-or-non-empty-string-test
-stdout: "status=1\nstatus=0\n"
+stdout: |-
+  status=1
+  status=0
 ---
 
 # here it's equality

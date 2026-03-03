@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 import io
+import re
 import sys
 import traceback
 
@@ -41,9 +42,14 @@ def format_file(path: str) -> bool:
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    if "\n---\n" not in content:
+    # Split at the first ^---$ line.  Everything before (including the
+    # trailing \n) is the YAML header; the --- and everything after is the
+    # shell-script body.
+    m = re.search(r"^---$", content, re.MULTILINE)
+    if m is None:
         raise ValueError(f"{path} does not contain a '---' separator")
-    header_text, body = content.split("\n---\n", 1)
+    header_text = content[: m.start()]  # includes trailing \n
+    body = content[m.start() :]  # starts with "---\n..."
 
     yaml = YAML(typ="rt")
     yaml.preserve_quotes = True
@@ -81,7 +87,6 @@ def format_file(path: str) -> bool:
     # Round-trip the header through ruamel.yaml and reassemble the file.
     buffer = io.StringIO()
     yaml.dump(header, buffer)
-    buffer.write("---\n")
     buffer.write(body)
     result = buffer.getvalue()
 

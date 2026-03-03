@@ -1,2 +1,7 @@
 [profile.default]
 slow-timeout = { period = "30s", terminate-after = 2 }
+
+# Docker image builds can take minutes on first run (cached afterwards).
+[[profile.default.overrides]]
+filter = "test(~docker)"
+slow-timeout = { period = "120s", terminate-after = 2 }

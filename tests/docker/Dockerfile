@@ -3,7 +3,7 @@ FROM rust:alpine AS builder
 RUN apk add --no-cache musl-dev git
 WORKDIR /src
 COPY ./ ./
-RUN git clean -fdx
+RUN git clean -fdX
 RUN cargo build --features cli --release
 
 FROM alpine:latest

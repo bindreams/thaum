@@ -1,4 +1,4 @@
-//! Precondition functions for bench smoke tests.
+//! Precondition functions for infrastructure tests.
 
 use std::path::PathBuf;
 
@@ -12,4 +12,12 @@ pub fn thaum_binary_path() -> PathBuf {
 
 pub fn thaum() -> Result<(), String> {
     testutil::probe_path(thaum_binary_path())
+}
+
+pub fn docker() -> Result<(), String> {
+    if testutil::docker::available() {
+        Ok(())
+    } else {
+        Err("Docker not available".into())
+    }
 }

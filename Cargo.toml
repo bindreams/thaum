@@ -74,8 +74,7 @@ name = "corpus"
 harness = false
 
 [[test]]
-name = "bench"
-path = "tests/bench.rs"
+name = "infra"
 harness = false
 
 [[bench]]

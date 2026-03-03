@@ -1,7 +1,7 @@
 name: incomplete trailing expansion
 dialect: bash
 source: oils:spec/brace-expansion#incomplete-trailing-expansion
-stdout: |-
+stdout: |
   a_{ b_{
 ---
 echo {a,b}_{

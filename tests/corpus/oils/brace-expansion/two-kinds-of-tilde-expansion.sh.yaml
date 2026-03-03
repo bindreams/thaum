@@ -1,7 +1,7 @@
 name: Two kinds of tilde expansion
 dialect: bash
 source: oils:spec/brace-expansion#two-kinds-of-tilde-expansion
-stdout: |-
+stdout: |
   /home/bob/src /root
   -- /home/bob/src
   -- /root

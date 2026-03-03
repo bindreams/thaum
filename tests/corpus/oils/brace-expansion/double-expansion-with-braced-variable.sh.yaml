@@ -1,7 +1,7 @@
 name: double expansion with braced variable
 dialect: bash
 source: oils:spec/brace-expansion#double-expansion-with-braced-variable
-stdout: |-
+stdout: |
   A_c A_d b_c b_d
 ---
 # This fixes it

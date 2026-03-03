@@ -1,7 +1,7 @@
 name: expansion on RHS of assignment
 dialect: bash
 source: oils:spec/brace-expansion#expansion-on-rhs-of-assignment
-stdout: |-
+stdout: |
   {X,Y}
 ---
 # I think bash's behavior is more consistent.  No splitting either.

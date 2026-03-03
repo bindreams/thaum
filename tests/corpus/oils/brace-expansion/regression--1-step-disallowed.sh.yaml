@@ -1,4 +1,6 @@
 name: 'regression: -1 step disallowed'
+disabled:
+  reason: YSH-specific behavior; bash treats invalid sequences as literal
 dialect: bash
 source: oils:spec/brace-expansion#regression--1-step-disallowed
 status: 2

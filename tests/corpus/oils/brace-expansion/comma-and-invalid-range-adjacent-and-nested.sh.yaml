@@ -1,7 +1,7 @@
 name: comma and invalid range (adjacent and nested)
 dialect: bash
 source: oils:spec/brace-expansion#comma-and-invalid-range-adjacent-and-nested
-stdout: |-
+stdout: |
   -a{1...3}- -b{1...3}-
   -a- -{1...3}-
   a{} b{}

@@ -2,7 +2,7 @@ name: '} in expansion'
 dialect: bash
 source: oils:spec/brace-expansion#in-expansion
 status: 0
-stdout: |-
+stdout: |
   a} b}
 ---
 # hm they treat this the SAME.  Leftmost { is matched by first }, and then

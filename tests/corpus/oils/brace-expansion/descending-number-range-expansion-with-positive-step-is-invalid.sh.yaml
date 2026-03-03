@@ -1,4 +1,6 @@
 name: Descending number range expansion with positive step is invalid
+disabled:
+  reason: YSH-specific behavior; bash treats invalid sequences as literal
 dialect: bash
 source: 
   oils:spec/brace-expansion#descending-number-range-expansion-with-positive-step-is-invalid

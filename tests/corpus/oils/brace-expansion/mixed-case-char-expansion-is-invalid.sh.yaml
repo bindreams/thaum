@@ -1,4 +1,6 @@
 name: Mixed case char expansion is invalid
+disabled:
+  reason: YSH-specific behavior; bash treats invalid sequences as literal
 dialect: bash
 source: oils:spec/brace-expansion#mixed-case-char-expansion-is-invalid
 status: 2

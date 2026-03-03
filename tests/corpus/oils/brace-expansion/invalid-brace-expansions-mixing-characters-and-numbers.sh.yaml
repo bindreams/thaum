@@ -2,7 +2,7 @@ name: Invalid brace expansions mixing characters and numbers
 dialect: bash
 source: 
   oils:spec/brace-expansion#invalid-brace-expansions-mixing-characters-and-numbers
-stdout: |-
+stdout: |
   {1..a}
   {z..3}
 ---

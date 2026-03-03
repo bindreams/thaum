@@ -1,4 +1,6 @@
 name: Char ranges with steps of the wrong sign
+disabled:
+  reason: YSH-specific behavior; bash treats invalid sequences as literal
 dialect: bash
 source: oils:spec/brace-expansion#char-ranges-with-steps-of-the-wrong-sign
 status: 2

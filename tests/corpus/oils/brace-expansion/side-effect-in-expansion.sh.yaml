@@ -1,7 +1,7 @@
 name: Side effect in expansion
 dialect: bash
 source: oils:spec/brace-expansion#side-effect-in-expansion
-stdout: |-
+stdout: |
   a-0 b-1 c-2
 ---
 # bash is the only one that does it first.  I guess since this is

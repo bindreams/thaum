@@ -1,7 +1,7 @@
 name: no expansion
 dialect: bash
 source: oils:spec/brace-expansion#no-expansion
-stdout: |-
+stdout: |
   {foo}
 ---
 echo {foo}

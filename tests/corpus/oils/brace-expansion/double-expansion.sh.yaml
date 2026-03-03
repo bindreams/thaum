@@ -1,7 +1,7 @@
 name: double expansion
 dialect: bash
 source: oils:spec/brace-expansion#double-expansion
-stdout: |-
+stdout: |
   a_c a_d b_c b_d
 ---
 echo {a,b}_{c,d}

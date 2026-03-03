@@ -1,7 +1,7 @@
 name: Adjacent comma and range works
 dialect: bash
 source: oils:spec/brace-expansion#adjacent-comma-and-range-works
-stdout: |-
+stdout: |
   -a1- -a2- -a3- -b1- -b2- -b3-
 ---
 echo -{a,b}{1..3}-

@@ -1,7 +1,7 @@
 name: Tilde expansion with brace expansion
 dialect: bash
 source: oils:spec/brace-expansion#tilde-expansion-with-brace-expansion
-stdout: |-
+stdout: |
   foo~/bar /home/bob/bar
   -- foo~/bar
   -- /home/bob/bar

@@ -1,7 +1,7 @@
 name: Empty expansion
 dialect: bash
 source: oils:spec/brace-expansion#empty-expansion
-stdout: |-
+stdout: |
   aXb ab aYb
 ---
 echo a{X,,Y}b

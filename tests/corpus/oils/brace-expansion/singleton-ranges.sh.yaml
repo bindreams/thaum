@@ -1,7 +1,7 @@
 name: Singleton ranges
 dialect: bash
 source: oils:spec/brace-expansion#singleton-ranges
-stdout: |-
+stdout: |
   1-
   -9-
   -9-

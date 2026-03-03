@@ -1,7 +1,7 @@
 name: quoted { in expansion
 dialect: bash
 source: oils:spec/brace-expansion#quoted-in-expansion
-stdout: |-
+stdout: |
   {a {b
 ---
 echo \{{a,b}

@@ -1,7 +1,7 @@
 name: Fixed width number range expansion
 dialect: bash
 source: oils:spec/brace-expansion#fixed-width-number-range-expansion
-stdout: |-
+stdout: |
   -01- -02- -03-
   -09- -10- -11- -12-
   -12- -11- -10- -09- -08- -07-

@@ -1,7 +1,7 @@
 name: Tilde expansion come before var expansion
 dialect: bash
 source: oils:spec/brace-expansion#tilde-expansion-come-before-var-expansion
-stdout: |-
+stdout: |
   /home/bob
   ~
 ---

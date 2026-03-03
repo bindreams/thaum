@@ -2,7 +2,7 @@ name: Descending number range expansion with negative step
 dialect: bash
 source: 
   oils:spec/brace-expansion#descending-number-range-expansion-with-negative-step
-stdout: |-
+stdout: |
   -8- -5- -2-
 ---
 echo -{8..1..-3}-

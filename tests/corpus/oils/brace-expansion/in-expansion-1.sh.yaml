@@ -1,7 +1,7 @@
 name: '{ in expansion'
 dialect: bash
 source: oils:spec/brace-expansion#in-expansion
-stdout: |-
+stdout: |
   {{a,b}
 ---
 # bash and mksh treat this differently.  bash treats the

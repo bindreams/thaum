@@ -1,7 +1,7 @@
 name: double expansion with simple var -- bash bug
 dialect: bash
 source: oils:spec/brace-expansion#double-expansion-with-simple-var----bash-bug
-stdout: |-
+stdout: |
   A_c A_d b_c b_d
 ---
 # bash is inconsistent with the above

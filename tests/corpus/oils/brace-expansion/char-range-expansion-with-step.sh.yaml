@@ -1,7 +1,7 @@
 name: Char range expansion with step
 dialect: bash
 source: oils:spec/brace-expansion#char-range-expansion-with-step
-stdout: |-
+stdout: |
   -a- -c- -e-
 ---
 echo -{a..e..2}-

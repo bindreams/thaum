@@ -1,8 +1,10 @@
 //! CLI argument parsing (via clap) and dispatch to `lex`, `parse`, `exec`, and
-//! `exec-ast` subcommands.
+//! `exec-ast` subcommands. Also handles shell impersonation when the binary is
+//! invoked as `sh`, `bash`, or `dash` (via symlink or argv[0]).
 
 mod color;
 mod error_fmt;
+mod impersonation;
 
 use std::io::{self, Read};
 use std::{fs, process};
@@ -18,21 +20,9 @@ use thaum::exec::{ExecError, Executor, ProcessIo};
 #[derive(Parser)]
 #[command(name = "thaum")]
 struct Cli {
-    /// Enable Bash dialect (default: POSIX, alias for --bash51)
-    #[arg(long, global = true)]
-    bash: bool,
-
-    /// Enable Bash 4.4 dialect
-    #[arg(long, global = true)]
-    bash44: bool,
-
-    /// Enable Bash 5.0 dialect
-    #[arg(long, global = true)]
-    bash50: bool,
-
-    /// Enable Bash 5.1 dialect
-    #[arg(long, global = true)]
-    bash51: bool,
+    /// Shell dialect
+    #[arg(long, global = true, value_name = "DIALECT", default_value = "posix")]
+    dialect: DialectArg,
 
     /// Suppress normal output (lex: skip table, parse: skip YAML). Errors still reported.
     #[arg(long, global = true)]
@@ -48,6 +38,33 @@ struct Cli {
 
     /// Script file (or "-" for stdin)
     file: Option<String>,
+}
+
+#[derive(Clone, Copy, clap::ValueEnum)]
+enum DialectArg {
+    Posix,
+    Dash,
+    #[value(name = "bash")]
+    Bash,
+    #[value(name = "bash4.4")]
+    Bash44,
+    #[value(name = "bash5.0")]
+    Bash50,
+    #[value(name = "bash5.1")]
+    Bash51,
+}
+
+impl DialectArg {
+    fn to_dialect(self) -> thaum::Dialect {
+        match self {
+            DialectArg::Posix => thaum::Dialect::Posix,
+            DialectArg::Dash => thaum::Dialect::Dash,
+            DialectArg::Bash => thaum::Dialect::Bash,
+            DialectArg::Bash44 => thaum::Dialect::Bash44,
+            DialectArg::Bash50 => thaum::Dialect::Bash50,
+            DialectArg::Bash51 => thaum::Dialect::Bash51,
+        }
+    }
 }
 
 #[derive(clap::Subcommand)]
@@ -101,7 +118,7 @@ enum PayloadFormat {
     Binary,
 }
 
-// Internal resolved args (kept from the original code) ================================================================
+// Internal resolved args ==============================================================================================
 
 #[derive(Clone, Copy, PartialEq)]
 enum Subcommand {
@@ -136,7 +153,7 @@ impl CliArgs {
 
 impl Cli {
     fn resolve(self) -> CliArgs {
-        let dialect = resolve_dialect(self.bash, self.bash44, self.bash50, self.bash51);
+        let dialect = self.dialect.to_dialect();
         let quiet = self.quiet;
         let mut args = match self.subcmd {
             None => resolve_source(Subcommand::Parse, dialect, false, self.c, self.file),
@@ -156,25 +173,6 @@ impl Cli {
         };
         args.quiet = quiet;
         args
-    }
-}
-
-/// Resolve the dialect from mutually exclusive CLI flags. The most specific
-/// versioned flag wins; `--bash` alone means latest (Bash51).
-fn resolve_dialect(bash: bool, bash44: bool, bash50: bool, bash51: bool) -> thaum::Dialect {
-    let count = [bash, bash44, bash50, bash51].iter().filter(|&&b| b).count();
-    if count > 1 {
-        eprintln!("error: specify at most one of --bash, --bash44, --bash50, --bash51");
-        process::exit(2);
-    }
-    if bash44 {
-        thaum::Dialect::Bash44
-    } else if bash50 {
-        thaum::Dialect::Bash50
-    } else if bash51 || bash {
-        thaum::Dialect::Bash
-    } else {
-        thaum::Dialect::Posix
     }
 }
 
@@ -253,9 +251,8 @@ fn load_source(cli: &CliArgs) -> (String, String) {
 
 /// CLI entry point: parses clap args and dispatches to the selected subcommand.
 pub fn run() {
-    // If invoked as "sh" (e.g. via symlink), impersonate POSIX sh.
-    if invoked_as_sh() {
-        run_as_sh();
+    if let Some(mode) = impersonation::detect() {
+        impersonation::run(mode);
         return;
     }
 
@@ -270,67 +267,7 @@ pub fn run() {
     }
 }
 
-/// Check whether the binary was invoked via an argv[0] whose filename is "sh".
-fn invoked_as_sh() -> bool {
-    let Some(argv0) = std::env::args_os().next() else {
-        return false;
-    };
-    let filename = std::path::Path::new(&argv0)
-        .file_stem()
-        .unwrap_or_default()
-        .to_string_lossy();
-    filename == "sh"
-}
-
-/// Minimal POSIX sh impersonation. Supports:
-/// - `sh -c 'command'`  — execute string
-/// - `sh script [args]` — execute file with positional params
-/// - `sh` (stdin pipe)  — read and execute stdin
-fn run_as_sh() {
-    let raw_args: Vec<String> = std::env::args().skip(1).collect();
-
-    let args = if raw_args.first().map(|s| s.as_str()) == Some("-c") {
-        if raw_args.len() < 2 {
-            eprintln!("sh: -c: option requires an argument");
-            process::exit(2);
-        }
-        CliArgs {
-            subcommand: Subcommand::Exec,
-            dialect: thaum::Dialect::Posix,
-            verbose: false,
-            quiet: false,
-            command_str: Some(raw_args[1].clone()),
-            file_arg: None,
-            script_args: raw_args[2..].to_vec(),
-            payload_format: PayloadFormat::Json,
-        }
-    } else if let Some(file) = raw_args.first() {
-        CliArgs {
-            subcommand: Subcommand::Exec,
-            dialect: thaum::Dialect::Posix,
-            verbose: false,
-            quiet: false,
-            command_str: None,
-            file_arg: Some(file.clone()),
-            script_args: raw_args[1..].to_vec(),
-            payload_format: PayloadFormat::Json,
-        }
-    } else {
-        // No args — read from stdin.
-        CliArgs {
-            subcommand: Subcommand::Exec,
-            dialect: thaum::Dialect::Posix,
-            verbose: false,
-            quiet: false,
-            command_str: None,
-            file_arg: Some("-".to_string()),
-            script_args: Vec::new(),
-            payload_format: PayloadFormat::Json,
-        }
-    };
-
-    do_exec(&args);
-}
+// Subcommand dispatch =================================================================================================
 
 fn do_lex(cli: &CliArgs) {
     use thaum::lexer::Lexer;

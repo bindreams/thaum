@@ -95,6 +95,19 @@ pub enum Dialect {
     Bash,
 }
 
+impl std::fmt::Display for Dialect {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Dialect::Posix => write!(f, "posix"),
+            Dialect::Dash => write!(f, "dash"),
+            Dialect::Bash44 => write!(f, "bash4.4"),
+            Dialect::Bash50 => write!(f, "bash5.0"),
+            Dialect::Bash51 => write!(f, "bash5.1"),
+            Dialect::Bash => write!(f, "bash"),
+        }
+    }
+}
+
 impl Dialect {
     /// Get the `ShellOptions` for this dialect.
     pub fn options(&self) -> ShellOptions {

@@ -358,13 +358,13 @@ fn cli_exec_parse_error() {
 
 #[testutil::test]
 fn cli_exec_with_bash_flag() {
-    let (_, _, code) = run_exec_with_args(&["exec", "--bash", "-"], "true");
+    let (_, _, code) = run_exec_with_args(&["exec", "--dialect=bash", "-"], "true");
     assert_eq!(code, 0);
 }
 
 #[testutil::test]
 fn cli_exec_bash_flag_before_exec() {
-    let (_, _, code) = run_exec_with_args(&["--bash", "exec", "-"], "true");
+    let (_, _, code) = run_exec_with_args(&["--dialect=bash", "exec", "-"], "true");
     assert_eq!(code, 0);
 }
 
@@ -421,7 +421,7 @@ fn cli_parse_subcommand_with_c() {
 
 #[testutil::test]
 fn cli_parse_subcommand_with_bash_c() {
-    let (stdout, _, code) = run_cli(&["parse", "--bash", "-c", "[[ -n hello ]]"]);
+    let (stdout, _, code) = run_cli(&["parse", "--dialect=bash", "-c", "[[ -n hello ]]"]);
     assert_eq!(code, 0);
     assert_valid_output(&stdout);
     assert!(stdout.contains("type: BashDoubleBracket"));
@@ -461,7 +461,7 @@ fn cli_parse_subcommand_stdin() {
 
 #[testutil::test]
 fn cli_parse_subcommand_bash() {
-    let (stdout, _, code) = run_exec_with_args(&["parse", "--bash", "-"], "[[ -n x ]]");
+    let (stdout, _, code) = run_exec_with_args(&["parse", "--dialect=bash", "-"], "[[ -n x ]]");
     assert_eq!(code, 0);
     assert_valid_output(&stdout);
     assert!(stdout.contains("type: BashDoubleBracket"));
@@ -527,7 +527,7 @@ fn cli_lex_io_number() {
 
 #[testutil::test]
 fn cli_lex_with_bash_flag() {
-    let (stdout, _, code) = run_cli(&["lex", "--bash", "-c", "cmd |& cat"]);
+    let (stdout, _, code) = run_cli(&["lex", "--dialect=bash", "-c", "cmd |& cat"]);
     assert_eq!(code, 0);
     assert!(stdout.contains("BashPipeAmpersand"));
 }

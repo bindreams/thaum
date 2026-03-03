@@ -8,6 +8,11 @@
 /// Runtime evaluation of `ArithExpr` nodes (`(( ))`, `$(( ))`, `for (( ; ; ))`).
 pub mod arithmetic;
 pub(crate) mod bash_test;
+/// Brace expansion: `{a,b,c}` comma lists and `{1..5}` sequences.
+pub(crate) mod brace_expansion;
+#[cfg(test)]
+#[path = "exec/brace_expansion_tests.rs"]
+mod brace_expansion_tests;
 /// Shell builtins that only need `Environment` (not the full `Executor`).
 pub mod builtins;
 mod child_io;

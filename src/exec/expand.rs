@@ -151,16 +151,23 @@ pub fn expand_word(word: &Word, env: &mut Environment) -> Result<String, ExecErr
 /// Tracks quoting context through `ExpandedSegment`s and applies IFS splitting
 /// only to unquoted portions.
 pub fn expand_word_to_fields(word: &Word, env: &mut Environment) -> Result<Vec<String>, ExecError> {
-    let mut segments = Vec::new();
-    for fragment in &word.parts {
-        expand_fragment_to_segments(fragment, env, &mut segments)?;
+    // Step 1: Brace expansion — turns one word into possibly multiple words.
+    let expanded_words = super::brace_expansion::expand_braces(&word.parts);
+
+    let mut all_fields = Vec::new();
+    for parts in &expanded_words {
+        // Steps 2-5: tilde, parameter, IFS splitting for each brace-expanded word.
+        let mut segments = Vec::new();
+        for fragment in parts {
+            expand_fragment_to_segments(fragment, env, &mut segments)?;
+        }
+        let ifs = env.get_ifs();
+        all_fields.extend(segments_to_fields(&segments, ifs));
     }
-    let ifs = env.get_ifs();
-    let fields = segments_to_fields(&segments, ifs);
-    if fields.is_empty() {
+    if all_fields.is_empty() {
         Ok(Vec::new())
     } else {
-        Ok(fields)
+        Ok(all_fields)
     }
 }
 
@@ -229,8 +236,10 @@ fn expand_fragment_to_segments(
         Fragment::BashExtGlob { .. } => {
             return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
         }
-        Fragment::BashBraceExpansion(_) => {
-            return Err(ExecError::UnsupportedFeature("bash brace expansion".to_string()));
+        Fragment::BashBraceExpansion(kind) => {
+            // After expand_braces(), no BashBraceExpansion should remain.
+            debug_assert!(false, "BashBraceExpansion should be resolved by expand_braces");
+            out.push(ExpandedSegment::Quoted(super::brace_expansion::kind_to_literal(kind)));
         }
     }
     Ok(())
@@ -501,8 +510,47 @@ fn expand_fragment(fragment: &Fragment, env: &mut Environment, out: &mut String)
         Fragment::BashExtGlob { .. } => {
             return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
         }
-        Fragment::BashBraceExpansion(_) => {
-            return Err(ExecError::UnsupportedFeature("bash brace expansion".to_string()));
+        Fragment::BashBraceExpansion(kind) => {
+            // Brace expansion doesn't apply in assignment/redirect context.
+            // Reconstruct literal text, expanding inner fragments normally.
+            expand_brace_kind_literal(kind, env, out)?;
+        }
+    }
+    Ok(())
+}
+
+/// Reconstruct brace expansion as literal text for non-splitting contexts.
+///
+/// Inner fragments (parameters, etc.) are expanded, but the braces and
+/// commas/dots remain literal — matching bash behavior in assignments.
+fn expand_brace_kind_literal(
+    kind: &crate::ast::BraceExpansionKind,
+    env: &mut Environment,
+    out: &mut String,
+) -> Result<(), ExecError> {
+    match kind {
+        crate::ast::BraceExpansionKind::List(items) => {
+            out.push('{');
+            for (i, item_frags) in items.iter().enumerate() {
+                if i > 0 {
+                    out.push(',');
+                }
+                for frag in item_frags {
+                    expand_fragment(frag, env, out)?;
+                }
+            }
+            out.push('}');
+        }
+        crate::ast::BraceExpansionKind::Sequence { start, end, step } => {
+            out.push('{');
+            out.push_str(start);
+            out.push_str("..");
+            out.push_str(end);
+            if let Some(s) = step {
+                out.push_str("..");
+                out.push_str(s);
+            }
+            out.push('}');
         }
     }
     Ok(())
@@ -648,8 +696,9 @@ fn expand_fragment_in_double_quotes(
         Fragment::BashExtGlob { .. } => {
             return Err(ExecError::UnsupportedFeature("bash extended glob".to_string()));
         }
-        Fragment::BashBraceExpansion(_) => {
-            return Err(ExecError::UnsupportedFeature("bash brace expansion".to_string()));
+        Fragment::BashBraceExpansion(kind) => {
+            // Inside double quotes, braces are literal.
+            expand_brace_kind_literal(kind, env, out)?;
         }
     }
     Ok(())

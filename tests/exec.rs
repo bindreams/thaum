@@ -9,6 +9,8 @@ mod arrays;
 mod bash;
 #[path = "exec/basic.rs"]
 mod basic;
+#[path = "exec/brace_expansion.rs"]
+mod brace_expansion;
 #[path = "exec/expansion.rs"]
 mod expansion;
 #[path = "exec/external.rs"]

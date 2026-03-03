@@ -1326,6 +1326,7 @@ dependencies = [
  "homedir",
  "icu",
  "jiff",
+ "libc",
  "libtest-mimic",
  "nix",
  "pretty_assertions",

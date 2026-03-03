@@ -195,4 +195,61 @@ mod posix_quoting {
         assert_eq!(status, 0);
         assert_eq!(std::fs::read_to_string(&file_path).unwrap(), "hello\n");
     }
+
+    /// Verify that `CommandEx.cwd` sets the child's working directory.
+    #[testutil::test]
+    fn spawn_with_cwd(#[fixture(temp_dir)] dir: &Path) {
+        use std::io::Read;
+        // "pwd" prints the working directory. Use /bin/pwd to avoid shell
+        // builtins — we're testing the spawn layer, not the shell.
+        let mut cmd = super::super::CommandEx::new(vec![OsString::from("pwd")]);
+        cmd.cwd = Some(dir.to_path_buf());
+        cmd.fds.insert(1, super::super::Fd::Pipe);
+        let mut child = cmd.spawn().expect("spawn failed");
+
+        let mut stdout_pipe = child.take_pipe(1).expect("no stdout pipe");
+        let mut output = String::new();
+        stdout_pipe.read_to_string(&mut output).unwrap();
+        let status = child.wait().expect("wait failed");
+        assert_eq!(status, 0);
+
+        // Canonicalize both paths to handle symlinks (e.g. /tmp -> /private/tmp on macOS).
+        let expected = dir.canonicalize().unwrap();
+        let actual = Path::new(output.trim()).canonicalize().unwrap();
+        assert_eq!(actual, expected, "child CWD should match requested CWD");
+    }
+
+    /// Regression test: concurrent spawns with different CWDs must not race.
+    ///
+    /// Before the fix, CwdGuard temporarily changed the process-global CWD,
+    /// causing concurrent threads to interfere. With addchdir_np (or the
+    /// mutex fallback), each child gets its own CWD atomically.
+    #[testutil::test]
+    fn spawn_concurrent_cwd_no_race() {
+        use std::io::Read;
+        let handles: Vec<_> = (0..20)
+            .map(|_| {
+                let dir = tempfile::tempdir().unwrap();
+                let dir_path = dir.path().canonicalize().unwrap();
+                std::thread::spawn(move || {
+                    let mut cmd = super::super::CommandEx::new(vec![OsString::from("pwd")]);
+                    cmd.cwd = Some(dir.path().to_path_buf());
+                    cmd.fds.insert(1, super::super::Fd::Pipe);
+                    let mut child = cmd.spawn().expect("spawn failed");
+
+                    let mut stdout_pipe = child.take_pipe(1).expect("no stdout pipe");
+                    let mut output = String::new();
+                    stdout_pipe.read_to_string(&mut output).unwrap();
+                    let status = child.wait().expect("wait failed");
+                    assert_eq!(status, 0);
+
+                    let actual = std::path::Path::new(output.trim()).canonicalize().unwrap();
+                    assert_eq!(actual, dir_path, "child CWD mismatch — race condition detected");
+                })
+            })
+            .collect();
+        for h in handles {
+            h.join().expect("thread panicked — CWD race detected");
+        }
+    }
 }

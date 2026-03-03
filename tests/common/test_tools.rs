@@ -88,6 +88,7 @@ fn test_tools() -> Result<TestTools, String> {
         ("false", "test-false"),
         ("cat", "test-cat"),
         ("env", "test-env"),
+        ("pwd", "test-pwd"),
         ("touch", "test-touch"),
         ("sh", "thaum"), // thaum impersonates sh when invoked as "sh"
     ];

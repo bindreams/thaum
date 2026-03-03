@@ -381,6 +381,7 @@ fn debug_assert_commandline_roundtrips(cmdline: &OsStr, expected_argv: &[OsStrin
 // Platform spawn ==================================================================
 
 /// RAII guard that restores the process CWD on drop.
+/// Used only on the mutex fallback path when `addchdir_np` is unavailable.
 #[cfg(unix)]
 struct CwdGuard {
     prev: std::path::PathBuf,
@@ -411,9 +412,9 @@ fn set_cloexec(file: &File) {
     use std::os::fd::AsRawFd;
     let fd = file.as_raw_fd();
     unsafe {
-        let flags = nix::libc::fcntl(fd, nix::libc::F_GETFD);
+        let flags = libc::fcntl(fd, libc::F_GETFD);
         if flags >= 0 {
-            nix::libc::fcntl(fd, nix::libc::F_SETFD, flags | nix::libc::FD_CLOEXEC);
+            libc::fcntl(fd, libc::F_SETFD, flags | libc::FD_CLOEXEC);
         }
     }
 }
@@ -422,18 +423,131 @@ fn set_cloexec(file: &File) {
 #[cfg(unix)]
 fn close_raw_fds(fds: &[std::os::fd::RawFd]) {
     for &fd in fds {
-        unsafe { nix::libc::close(fd) };
+        unsafe { libc::close(fd) };
+    }
+}
+
+// addchdir_np runtime detection =======================================================
+
+/// Signature of `posix_spawn_file_actions_addchdir_np` (glibc 2.29+, musl).
+#[cfg(unix)]
+type AddchdirFn = unsafe extern "C" fn(*mut libc::posix_spawn_file_actions_t, *const libc::c_char) -> libc::c_int;
+
+/// Probe for `posix_spawn_file_actions_addchdir_np` at runtime via `dlsym`.
+///
+/// Returns `Some(fn)` on glibc 2.29+ and recent musl; `None` on macOS,
+/// FreeBSD, and older glibc. The result is cached in a `OnceLock` so the
+/// `dlsym` call happens at most once per process.
+#[cfg(unix)]
+fn probe_addchdir_np() -> Option<AddchdirFn> {
+    use std::sync::OnceLock;
+    static FUNC: OnceLock<Option<AddchdirFn>> = OnceLock::new();
+    *FUNC.get_or_init(|| {
+        let name = c"posix_spawn_file_actions_addchdir_np";
+        let ptr = unsafe { libc::dlsym(libc::RTLD_DEFAULT, name.as_ptr()) };
+        if ptr.is_null() {
+            None
+        } else {
+            // SAFETY: dlsym returned a non-null pointer for a function with
+            // the expected C signature.
+            Some(unsafe { std::mem::transmute::<*mut libc::c_void, AddchdirFn>(ptr) })
+        }
+    })
+}
+
+/// Mutex for the CWD fallback path. When `addchdir_np` is unavailable, the
+/// process-global CWD must be changed temporarily. The mutex serializes
+/// concurrent spawns so their CWD changes don't interfere.
+#[cfg(unix)]
+static SPAWN_CWD_MUTEX: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+// RAII wrapper for libc posix_spawn_file_actions_t ====================================
+
+/// RAII wrapper around `libc::posix_spawn_file_actions_t`. Calls
+/// `posix_spawn_file_actions_destroy` on drop.
+#[cfg(unix)]
+struct SpawnFileActions {
+    inner: libc::posix_spawn_file_actions_t,
+}
+
+#[cfg(unix)]
+impl SpawnFileActions {
+    fn init() -> io::Result<Self> {
+        let mut inner = std::mem::MaybeUninit::uninit();
+        let res = unsafe { libc::posix_spawn_file_actions_init(inner.as_mut_ptr()) };
+        if res != 0 {
+            return Err(io::Error::from_raw_os_error(res));
+        }
+        Ok(Self {
+            inner: unsafe { inner.assume_init() },
+        })
+    }
+
+    fn add_dup2(&mut self, fd: i32, new_fd: i32) -> io::Result<()> {
+        let res = unsafe { libc::posix_spawn_file_actions_adddup2(&mut self.inner, fd, new_fd) };
+        if res != 0 {
+            return Err(io::Error::from_raw_os_error(res));
+        }
+        Ok(())
+    }
+
+    fn as_ptr(&self) -> *const libc::posix_spawn_file_actions_t {
+        &self.inner
+    }
+
+    fn as_mut_ptr(&mut self) -> *mut libc::posix_spawn_file_actions_t {
+        &mut self.inner
     }
 }
 
 #[cfg(unix)]
+impl Drop for SpawnFileActions {
+    fn drop(&mut self) {
+        unsafe { libc::posix_spawn_file_actions_destroy(&mut self.inner) };
+    }
+}
+
+// RAII wrapper for libc posix_spawnattr_t =============================================
+
+#[cfg(unix)]
+struct SpawnAttr {
+    inner: libc::posix_spawnattr_t,
+}
+
+#[cfg(unix)]
+impl SpawnAttr {
+    fn init() -> io::Result<Self> {
+        let mut inner = std::mem::MaybeUninit::uninit();
+        let res = unsafe { libc::posix_spawnattr_init(inner.as_mut_ptr()) };
+        if res != 0 {
+            return Err(io::Error::from_raw_os_error(res));
+        }
+        Ok(Self {
+            inner: unsafe { inner.assume_init() },
+        })
+    }
+
+    fn as_ptr(&self) -> *const libc::posix_spawnattr_t {
+        &self.inner
+    }
+}
+
+#[cfg(unix)]
+impl Drop for SpawnAttr {
+    fn drop(&mut self) {
+        unsafe { libc::posix_spawnattr_destroy(&mut self.inner) };
+    }
+}
+
+// spawn_impl ==========================================================================
+
+#[cfg(unix)]
 fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
-    use nix::spawn::{posix_spawnp, PosixSpawnFileActions};
     use std::ffi::CString;
     use std::os::fd::IntoRawFd;
     use std::os::unix::ffi::OsStrExt;
 
-    let mut file_actions = PosixSpawnFileActions::init().map_err(io::Error::other)?;
+    let mut file_actions = SpawnFileActions::init()?;
 
     let mut pipes: HashMap<i32, File> = HashMap::new();
     // Raw FDs that must be closed in the parent after spawn (or on error).
@@ -445,12 +559,9 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
                 let write_raw = write_end.into_raw_fd();
                 raw_fds_to_close.push(write_raw);
-                file_actions.add_dup2(write_raw, fd_num).map_err(|e| {
+                file_actions.add_dup2(write_raw, fd_num).inspect_err(|_| {
                     close_raw_fds(&raw_fds_to_close);
-                    io::Error::other(e)
                 })?;
-                // Parent reads from this pipe. Set CLOEXEC on the parent's
-                // read-end so it isn't leaked to the child.
                 let parent_file = File::from(read_end);
                 set_cloexec(&parent_file);
                 pipes.insert(fd_num, parent_file);
@@ -459,12 +570,9 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
                 let read_raw = read_end.into_raw_fd();
                 raw_fds_to_close.push(read_raw);
-                file_actions.add_dup2(read_raw, fd_num).map_err(|e| {
+                file_actions.add_dup2(read_raw, fd_num).inspect_err(|_| {
                     close_raw_fds(&raw_fds_to_close);
-                    io::Error::other(e)
                 })?;
-                // Parent writes to this pipe. Set CLOEXEC on the parent's
-                // write-end so it isn't leaked to the child.
                 let parent_file = File::from(write_end);
                 set_cloexec(&parent_file);
                 pipes.insert(fd_num, parent_file);
@@ -472,24 +580,36 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
             Fd::File(file) => {
                 let raw_fd = file.try_clone()?.into_raw_fd();
                 raw_fds_to_close.push(raw_fd);
-                file_actions.add_dup2(raw_fd, fd_num).map_err(|e| {
+                file_actions.add_dup2(raw_fd, fd_num).inspect_err(|_| {
                     close_raw_fds(&raw_fds_to_close);
-                    io::Error::other(e)
                 })?;
             }
         }
     }
 
-    // Change directory before spawn if requested. We save and restore since
-    // posix_spawn_file_actions_addchdir_np is not portable.
-    // NOTE: set_current_dir is process-global, so concurrent threads would
-    // observe the changed directory. This is safe because thaum is
-    // single-threaded, but would need revisiting if concurrency is added.
-    let _cwd_guard = if let Some(ref cwd) = cmd.cwd {
-        Some(CwdGuard::set(cwd)?)
+    // Set child CWD. Prefer addchdir_np (no process-global side effects);
+    // fall back to mutex + CwdGuard on platforms where it's unavailable.
+    let _cwd_lock;
+    let _cwd_guard;
+    if let Some(ref cwd) = cmd.cwd {
+        if let Some(addchdir) = probe_addchdir_np() {
+            let cwd_cstr =
+                CString::new(cwd.as_os_str().as_bytes()).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+            let res = unsafe { addchdir(file_actions.as_mut_ptr(), cwd_cstr.as_ptr()) };
+            if res != 0 {
+                return Err(io::Error::from_raw_os_error(res));
+            }
+            _cwd_lock = None;
+            _cwd_guard = None;
+        } else {
+            // Fallback: change process CWD under a mutex to prevent races.
+            _cwd_lock = Some(SPAWN_CWD_MUTEX.lock().unwrap_or_else(|e| e.into_inner()));
+            _cwd_guard = Some(CwdGuard::set(cwd)?);
+        }
     } else {
-        None
-    };
+        _cwd_lock = None;
+        _cwd_guard = None;
+    }
 
     let argv_c: Vec<CString> = cmd
         .argv
@@ -510,26 +630,49 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
 
     let path_c = CString::new(cmd.path.as_bytes()).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
 
-    let attrs = nix::spawn::PosixSpawnAttr::init().map_err(io::Error::other)?;
+    let attrs = SpawnAttr::init()?;
 
-    let result = posix_spawnp(&path_c, &file_actions, &attrs, &argv_c, &envp_c).map_err(|e| {
-        let kind = match e {
-            nix::Error::ENOENT => io::ErrorKind::NotFound,
-            nix::Error::EACCES => io::ErrorKind::PermissionDenied,
-            _ => io::ErrorKind::Other,
-        };
-        io::Error::new(kind, e)
-    });
+    let argv_ptrs: Vec<*mut libc::c_char> = argv_c
+        .iter()
+        .map(|c| c.as_ptr() as *mut libc::c_char)
+        .chain(std::iter::once(std::ptr::null_mut()))
+        .collect();
+    let envp_ptrs: Vec<*mut libc::c_char> = envp_c
+        .iter()
+        .map(|c| c.as_ptr() as *mut libc::c_char)
+        .chain(std::iter::once(std::ptr::null_mut()))
+        .collect();
+
+    let mut pid: libc::pid_t = 0;
+    let res = unsafe {
+        libc::posix_spawnp(
+            &mut pid,
+            path_c.as_ptr(),
+            file_actions.as_ptr(),
+            attrs.as_ptr(),
+            argv_ptrs.as_ptr(),
+            envp_ptrs.as_ptr(),
+        )
+    };
 
     // Close raw FDs in the parent so readers get EOF.
     close_raw_fds(&raw_fds_to_close);
 
-    // CWD is restored when _cwd_guard drops (here or on early return).
+    // CWD guard and mutex lock are dropped here (on success or error).
     drop(_cwd_guard);
+    drop(_cwd_lock);
 
-    let pid = result?;
+    if res != 0 {
+        let kind = match res {
+            libc::ENOENT => io::ErrorKind::NotFound,
+            libc::EACCES => io::ErrorKind::PermissionDenied,
+            _ => io::ErrorKind::Other,
+        };
+        return Err(io::Error::new(kind, io::Error::from_raw_os_error(res)));
+    }
+
     Ok(ChildEx {
-        inner: ChildInner::Pid(pid.as_raw()),
+        inner: ChildInner::Pid(pid),
         pipes,
     })
 }

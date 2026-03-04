@@ -15,11 +15,32 @@ fn project_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR"))
 }
 
-/// Build an untagged Docker image and return its ID. Caller must remove it.
-fn build_image(dockerfile: &Path) -> String {
-    thaum::testkit::docker::build_image(dockerfile, project_root(), None)
-        .unwrap_or_else(|e| panic!("Docker build failed for {}: {e}", dockerfile.display()))
+// Fixtures ====================================================================
+
+/// A built Docker image, removed on drop.
+pub struct DockerImage {
+    pub id: String,
 }
+
+impl Drop for DockerImage {
+    fn drop(&mut self) {
+        thaum::testkit::docker::remove_image(&self.id);
+    }
+}
+
+#[skuld::fixture(scope = process, name = "infra_corpus_image", requires = [preconditions::docker])]
+fn corpus_image() -> Result<DockerImage, String> {
+    let dockerfile = project_root().join("tests/docker/Dockerfile");
+    thaum::testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
+}
+
+#[skuld::fixture(scope = process, name = "infra_bench_image", requires = [preconditions::docker])]
+fn bench_image() -> Result<DockerImage, String> {
+    let dockerfile = project_root().join("benches/docker/Dockerfile");
+    thaum::testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
+}
+
+// Helpers =====================================================================
 
 /// Start a detached container from an image, returning the container ID.
 fn start_container(image_id: &str) -> String {
@@ -38,7 +59,11 @@ fn start_container(image_id: &str) -> String {
         .stderr(Stdio::piped())
         .output()
         .expect("failed to run docker");
-    assert!(output.status.success(), "docker run failed");
+    assert!(
+        output.status.success(),
+        "docker run failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     String::from_utf8_lossy(&output.stdout).trim().to_string()
 }
 
@@ -68,45 +93,31 @@ fn kill_container(container_id: &str) {
 
 // Tests -----------------------------------------------------------------------
 
-#[skuld::test(requires = [preconditions::docker])]
-fn corpus_image_builds() {
-    let dockerfile = project_root().join("tests/docker/Dockerfile");
-    let id = build_image(&dockerfile);
-    thaum::testkit::docker::remove_image(&id);
+#[skuld::test]
+fn corpus_image_builds(#[fixture(infra_corpus_image)] image: &DockerImage) {
+    assert!(!image.id.is_empty(), "corpus image should have an ID");
 }
 
-#[skuld::test(requires = [preconditions::docker])]
-fn bench_image_builds() {
-    let dockerfile = project_root().join("benches/docker/Dockerfile");
-    let id = build_image(&dockerfile);
-    thaum::testkit::docker::remove_image(&id);
+#[skuld::test]
+fn bench_image_builds(#[fixture(infra_bench_image)] image: &DockerImage) {
+    assert!(!image.id.is_empty(), "bench image should have an ID");
 }
 
-#[skuld::test(requires = [preconditions::docker])]
-fn corpus_container_lifecycle() {
-    let dockerfile = project_root().join("tests/docker/Dockerfile");
-    let image_id = build_image(&dockerfile);
-
-    let container_id = start_container(&image_id);
+#[skuld::test]
+fn corpus_container_lifecycle(#[fixture(infra_corpus_image)] image: &DockerImage) {
+    let container_id = start_container(&image.id);
     let (stdout, code) = exec_in(&container_id, &["echo", "ok"]);
-
     kill_container(&container_id);
-    thaum::testkit::docker::remove_image(&image_id);
 
     assert_eq!(code, 0, "echo should exit 0");
     assert_eq!(stdout.trim(), "ok", "echo should output 'ok'");
 }
 
-#[skuld::test(requires = [preconditions::docker])]
-fn corpus_thaum_available() {
-    let dockerfile = project_root().join("tests/docker/Dockerfile");
-    let image_id = build_image(&dockerfile);
-
-    let container_id = start_container(&image_id);
+#[skuld::test]
+fn corpus_thaum_available(#[fixture(infra_corpus_image)] image: &DockerImage) {
+    let container_id = start_container(&image.id);
     let (stdout, code) = exec_in(&container_id, &["thaum", "--version"]);
-
     kill_container(&container_id);
-    thaum::testkit::docker::remove_image(&image_id);
 
     assert_eq!(code, 0, "thaum --version should exit 0");
     assert!(

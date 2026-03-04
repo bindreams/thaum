@@ -4,7 +4,7 @@ use crate::*;
 
 // $- (option flags) ===================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_dash_default() {
     // With no options set, $- should be a non-empty string (at minimum hB for bash defaults,
     // but our shell may start with a different set).
@@ -17,26 +17,26 @@ fn dollar_dash_default() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_dash_reflects_errexit() {
     let (out, _) = exec_ok("set -e; echo $-");
     assert!(out.trim().contains('e'), "$- should contain 'e' after set -e");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_dash_reflects_nounset() {
     let (out, _) = exec_ok("set -u; echo $-");
     assert!(out.trim().contains('u'), "$- should contain 'u' after set -u");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_dash_reflects_xtrace() {
     // xtrace output goes to stderr, not stdout; just check the flag is present
     let (out, _) = exec_ok("set -x; echo $-");
     assert!(out.trim().contains('x'), "$- should contain 'x' after set -x");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_dash_not_affected_by_nounset() {
     // $- is a special parameter, so set -u should not cause an error
     let (out, _) = exec_ok("set -u; echo $-");
@@ -45,19 +45,19 @@ fn dollar_dash_not_affected_by_nounset() {
 
 // $_ (last argument) ==================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_underscore_last_arg() {
     let (out, _) = exec_ok("echo a b c\necho $_");
     assert_eq!(out, "a b c\nc\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_underscore_after_single_arg_command() {
     let (out, _) = exec_ok("echo hello\necho $_");
     assert_eq!(out, "hello\nhello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dollar_underscore_after_no_arg_command() {
     // After a command with no arguments (like `true`), $_ is the command name itself
     let (out, _) = exec_ok("true\necho $_");
@@ -66,14 +66,14 @@ fn dollar_underscore_after_no_arg_command() {
 
 // RANDOM ==============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn random_returns_number_in_range() {
     let (out, _) = bash_exec_ok("echo $RANDOM");
     let val: i32 = out.trim().parse().expect("RANDOM should be a number");
     assert!((0..=32767).contains(&val), "RANDOM={val} out of 0..32767");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn random_differs_on_consecutive_reads() {
     // Two consecutive reads of RANDOM should (almost certainly) differ.
     let (out, _) = bash_exec_ok("echo $RANDOM $RANDOM");
@@ -84,7 +84,7 @@ fn random_differs_on_consecutive_reads() {
     assert_ne!(parts[0], parts[1], "two RANDOM reads should differ");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn random_seed_produces_deterministic_sequence() {
     // Setting RANDOM seeds the LCG — same seed should yield same first value.
     let (out1, _) = bash_exec_ok("RANDOM=42; echo $RANDOM");
@@ -92,14 +92,14 @@ fn random_seed_produces_deterministic_sequence() {
     assert_eq!(out1, out2, "same seed should produce same RANDOM");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn random_unset_kills_special_behavior() {
     // After unset, RANDOM should become a plain variable.
     let (out, _) = bash_exec_ok("unset RANDOM; RANDOM=42; echo $RANDOM");
     assert_eq!(out.trim(), "42", "unset RANDOM should kill special behavior");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn random_not_affected_by_nounset() {
     let (out, _) = bash_exec_ok("set -u; echo $RANDOM");
     let val: i32 = out.trim().parse().expect("RANDOM should be a number");
@@ -108,14 +108,14 @@ fn random_not_affected_by_nounset() {
 
 // SECONDS =============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn seconds_returns_nonnegative() {
     let (out, _) = bash_exec_ok("echo $SECONDS");
     let val: i64 = out.trim().parse().expect("SECONDS should be a number");
     assert!(val >= 0, "SECONDS should be >= 0");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn seconds_assignment_resets_timer() {
     // Setting SECONDS=0 resets; subsequent read should be 0 (or very small).
     let (out, _) = bash_exec_ok("SECONDS=0; echo $SECONDS");
@@ -123,7 +123,7 @@ fn seconds_assignment_resets_timer() {
     assert!(val <= 2, "SECONDS after reset should be small, got {val}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn seconds_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset SECONDS; SECONDS=100; echo $SECONDS");
     assert_eq!(out.trim(), "100", "unset SECONDS should kill timer behavior");
@@ -131,7 +131,7 @@ fn seconds_unset_kills_special_behavior() {
 
 // EPOCHSECONDS ========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn epochseconds_returns_valid_timestamp() {
     let (out, _) = bash_exec_ok("echo $EPOCHSECONDS");
     let val: u64 = out.trim().parse().expect("EPOCHSECONDS should be a number");
@@ -139,7 +139,7 @@ fn epochseconds_returns_valid_timestamp() {
     assert!(val > 1_577_836_800, "EPOCHSECONDS too small: {val}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn epochseconds_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset EPOCHSECONDS; EPOCHSECONDS=42; echo $EPOCHSECONDS");
     assert_eq!(out.trim(), "42");
@@ -147,7 +147,7 @@ fn epochseconds_unset_kills_special_behavior() {
 
 // EPOCHREALTIME =======================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn epochrealtime_format() {
     let (out, _) = bash_exec_ok("echo $EPOCHREALTIME");
     let s = out.trim();
@@ -165,7 +165,7 @@ fn epochrealtime_format() {
     assert!(secs > 1_577_836_800, "EPOCHREALTIME timestamp too small: {secs}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn epochrealtime_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset EPOCHREALTIME; EPOCHREALTIME=1.23; echo $EPOCHREALTIME");
     assert_eq!(out.trim(), "1.23");
@@ -173,14 +173,14 @@ fn epochrealtime_unset_kills_special_behavior() {
 
 // SRANDOM =============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn srandom_returns_u32() {
     let (out, _) = bash_exec_ok("echo $SRANDOM");
     let val: u64 = out.trim().parse().expect("SRANDOM should be a number");
     assert!(val <= u32::MAX as u64, "SRANDOM out of u32 range: {val}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn srandom_differs_on_consecutive_reads() {
     let (out, _) = bash_exec_ok("echo $SRANDOM $SRANDOM");
     let parts: Vec<&str> = out.split_whitespace().collect();
@@ -188,7 +188,7 @@ fn srandom_differs_on_consecutive_reads() {
     assert_ne!(parts[0], parts[1], "two SRANDOM reads should differ");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn srandom_assign_ignored() {
     // Assigning to SRANDOM should be silently ignored — next read is still random.
     let (out, _) = bash_exec_ok("SRANDOM=42; echo $SRANDOM");
@@ -198,7 +198,7 @@ fn srandom_assign_ignored() {
     assert!(val <= u32::MAX as u64);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn srandom_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset SRANDOM; SRANDOM=42; echo $SRANDOM");
     assert_eq!(out.trim(), "42");
@@ -206,14 +206,14 @@ fn srandom_unset_kills_special_behavior() {
 
 // BASHPID =============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn bashpid_returns_current_pid() {
     let (out, _) = bash_exec_ok("echo $BASHPID");
     let val: u32 = out.trim().parse().expect("BASHPID should be a number");
     assert!(val > 0, "BASHPID should be positive");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bashpid_assign_silently_ignored() {
     // Assigning to BASHPID should be silently ignored.
     let (out, _) = bash_exec_ok("BASHPID=42; echo $BASHPID");
@@ -221,7 +221,7 @@ fn bashpid_assign_silently_ignored() {
     assert_ne!(val, 42, "BASHPID assignment should be ignored");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bashpid_unset_works() {
     // After unset, BASHPID should be empty.
     let (out, _) = bash_exec_ok("unset BASHPID; echo \"x${BASHPID}x\"");
@@ -230,7 +230,7 @@ fn bashpid_unset_works() {
 
 // LINENO ==============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn lineno_increments_per_line() {
     let script = "echo $LINENO\necho $LINENO\necho $LINENO";
     let (out, _) = bash_exec_ok(script);
@@ -243,7 +243,7 @@ fn lineno_increments_per_line() {
     assert!(n3 > n2, "LINENO should increase: {n2} → {n3}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn lineno_unset_kills_special_behavior() {
     let (out, _) = bash_exec_ok("unset LINENO; LINENO=42; echo $LINENO");
     assert_eq!(out.trim(), "42");
@@ -251,21 +251,21 @@ fn lineno_unset_kills_special_behavior() {
 
 // PPID ================================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn ppid_is_set() {
     let (out, _) = bash_exec_ok("echo $PPID");
     let val: u32 = out.trim().parse().expect("PPID should be a number");
     assert!(val > 0, "PPID should be positive");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn ppid_is_readonly() {
     // PPID should reject assignment.
     let status = bash_exec_result("PPID=42 2>/dev/null");
     assert_ne!(status, 0, "PPID assignment should fail");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn ppid_cannot_be_unset() {
     let status = bash_exec_result("unset PPID 2>/dev/null");
     assert_ne!(status, 0, "unset PPID should fail");
@@ -273,7 +273,7 @@ fn ppid_cannot_be_unset() {
 
 // getopts =============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_basic_single_options() {
     let script = r#"
 while getopts "abc" opt -- -a -b -c; do
@@ -284,7 +284,7 @@ done
     assert_eq!(out, "a\nb\nc\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_grouped_options() {
     let script = r#"
 while getopts "abc" opt -- -abc; do
@@ -295,7 +295,7 @@ done
     assert_eq!(out, "a\nb\nc\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_option_with_argument_separate() {
     let script = r#"
 getopts "a:" opt -- -a VALUE
@@ -305,7 +305,7 @@ echo "$opt $OPTARG"
     assert_eq!(out.trim(), "a VALUE");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_option_with_argument_concatenated() {
     let script = r#"
 getopts "a:" opt -- -aVALUE
@@ -315,7 +315,7 @@ echo "$opt $OPTARG"
     assert_eq!(out.trim(), "a VALUE");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_unknown_option_verbose() {
     // Unknown option in verbose mode: name=?, stderr diagnostic
     let script = r#"
@@ -326,7 +326,7 @@ echo $opt
     assert_eq!(out.trim(), "?");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_silent_mode_unknown() {
     // Silent mode (leading :): name=?, OPTARG=offending char
     let script = r#"
@@ -337,7 +337,7 @@ echo "$opt $OPTARG"
     assert_eq!(out.trim(), "? z");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_silent_mode_missing_arg() {
     // Silent mode: missing argument → name=:, OPTARG=option char
     let script = r#"
@@ -348,7 +348,7 @@ echo "$opt $OPTARG"
     assert_eq!(out.trim(), ": a");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_double_dash_terminates() {
     let script = r#"
 getopts "a" opt -- -- -a
@@ -358,7 +358,7 @@ echo "status=$?"
     assert_eq!(out.trim(), "status=1");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_non_option_terminates() {
     let script = r#"
 getopts "a" opt -- foo -a
@@ -368,7 +368,7 @@ echo "status=$?"
     assert_eq!(out.trim(), "status=1");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_optind_reset() {
     // After processing, OPTIND can be reset to 1 to re-parse.
     let script = r#"
@@ -382,7 +382,7 @@ echo $opt
     assert_eq!(out, "a\na\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_uses_positional_params_by_default() {
     let script = r#"
 set -- -a -b
@@ -394,7 +394,7 @@ done
     assert_eq!(out, "a\nb\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn getopts_grouped_with_required_arg() {
     // -abc where a requires arg → OPTARG=bc
     let script = r#"
@@ -407,7 +407,7 @@ echo "$opt $OPTARG"
 
 // Bash static variables ===============================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn bash_version_is_set() {
     let (out, _) = bash_exec_ok("echo $BASH_VERSION");
     let ver = out.trim();
@@ -416,20 +416,20 @@ fn bash_version_is_set() {
     assert!(ver.contains('.'), "BASH_VERSION should contain a dot: {ver}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_versinfo_is_array() {
     let (out, _) = bash_exec_ok("echo ${BASH_VERSINFO[0]}");
     let major: u32 = out.trim().parse().expect("BASH_VERSINFO[0] should be a number");
     assert!(major >= 1, "major version should be >= 1");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_versinfo_is_readonly() {
     let status = bash_exec_result("BASH_VERSINFO=(1 2 3) 2>/dev/null");
     assert_ne!(status, 0, "BASH_VERSINFO should be readonly");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uid_is_set() {
     let (out, _) = bash_exec_ok("echo $UID");
     let val: u32 = out.trim().parse().expect("UID should be a number");
@@ -437,32 +437,32 @@ fn uid_is_set() {
     assert!(val <= 65534, "UID out of range: {val}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uid_is_readonly() {
     let status = bash_exec_result("UID=42 2>/dev/null");
     assert_ne!(status, 0, "UID should be readonly");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn euid_is_set() {
     let (out, _) = bash_exec_ok("echo $EUID");
     let val: u32 = out.trim().parse().expect("EUID should be a number");
     assert!(val <= 65534, "EUID out of range: {val}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn euid_is_readonly() {
     let status = bash_exec_result("EUID=42 2>/dev/null");
     assert_ne!(status, 0, "EUID should be readonly");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn hostname_is_set() {
     let (out, _) = bash_exec_ok("echo $HOSTNAME");
     assert!(!out.trim().is_empty(), "HOSTNAME should be non-empty");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn hosttype_is_set() {
     let (out, _) = bash_exec_ok("echo $HOSTTYPE");
     let ht = out.trim();
@@ -474,14 +474,14 @@ fn hosttype_is_set() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn ostype_is_set() {
     let (out, _) = bash_exec_ok("echo $OSTYPE");
     let ost = out.trim();
     assert!(!ost.is_empty(), "OSTYPE should be set");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn machtype_is_set() {
     let (out, _) = bash_exec_ok("echo $MACHTYPE");
     let mt = out.trim();
@@ -490,21 +490,21 @@ fn machtype_is_set() {
     assert!(mt.contains('-'), "MACHTYPE should contain a dash: {mt}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn hostname_can_be_overwritten() {
     // HOSTNAME is Category E — can be freely assigned
     let (out, _) = bash_exec_ok("HOSTNAME=myhost; echo $HOSTNAME");
     assert_eq!(out.trim(), "myhost");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn groups_is_array() {
     let (out, _) = bash_exec_ok("echo ${GROUPS[0]}");
     let gid: u32 = out.trim().parse().expect("GROUPS[0] should be a number");
     assert!(gid <= 65534, "GID out of range: {gid}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn groups_assign_silently_ignored() {
     // GROUPS is Category D — assign silently ignored
     let (out1, _) = bash_exec_ok("echo ${GROUPS[0]}");
@@ -514,19 +514,19 @@ fn groups_assign_silently_ignored() {
 
 // PIPESTATUS ==========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn pipestatus_single_command() {
     let (out, _) = bash_exec_ok("true; echo ${PIPESTATUS[0]}");
     assert_eq!(out.trim(), "0");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pipestatus_failed_command() {
     let (out, _) = bash_exec_ok("false; echo ${PIPESTATUS[0]}");
     assert_eq!(out.trim(), "1");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pipestatus_unset_repopulates() {
     // Category B: unset is temporary — next command repopulates.
     let (out, _) = bash_exec_ok("unset PIPESTATUS; true; echo ${PIPESTATUS[0]}");
@@ -535,26 +535,26 @@ fn pipestatus_unset_repopulates() {
 
 // SHELLOPTS ===========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn shellopts_is_set() {
     let (out, _) = bash_exec_ok("echo $SHELLOPTS");
     let opts = out.trim();
     assert!(!opts.is_empty(), "SHELLOPTS should be set");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn shellopts_contains_errexit_after_set_e() {
     let (out, _) = bash_exec_ok("set -e; echo $SHELLOPTS");
     assert!(out.contains("errexit"), "SHELLOPTS should contain 'errexit'");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn shellopts_is_readonly() {
     let status = bash_exec_result("SHELLOPTS=x 2>/dev/null");
     assert_ne!(status, 0, "SHELLOPTS should be readonly");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn shellopts_cannot_be_unset() {
     let status = bash_exec_result("unset SHELLOPTS 2>/dev/null");
     assert_ne!(status, 0, "unset SHELLOPTS should fail");
@@ -562,7 +562,7 @@ fn shellopts_cannot_be_unset() {
 
 // BASHOPTS ============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn bashopts_is_set() {
     let (out, _) = bash_exec_ok("echo $BASHOPTS");
     // Could be empty if no shopt options are enabled, but the variable should exist.
@@ -570,13 +570,13 @@ fn bashopts_is_set() {
     let _ = out.trim();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bashopts_is_readonly() {
     let status = bash_exec_result("BASHOPTS=x 2>/dev/null");
     assert_ne!(status, 0, "BASHOPTS should be readonly");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bashopts_cannot_be_unset() {
     let status = bash_exec_result("unset BASHOPTS 2>/dev/null");
     assert_ne!(status, 0, "unset BASHOPTS should fail");
@@ -584,19 +584,19 @@ fn bashopts_cannot_be_unset() {
 
 // FUNCNAME ============================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn funcname_in_function() {
     let (out, _) = bash_exec_ok("f() { echo ${FUNCNAME[0]}; }; f");
     assert_eq!(out.trim(), "f");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn funcname_nested() {
     let (out, _) = bash_exec_ok("f() { g; }; g() { echo ${FUNCNAME[0]} ${FUNCNAME[1]}; }; f");
     assert_eq!(out.trim(), "g f");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn funcname_main_at_bottom() {
     let (out, _) = bash_exec_ok("f() { echo ${FUNCNAME[@]}; }; f");
     let parts: Vec<&str> = out.split_whitespace().collect();
@@ -604,7 +604,7 @@ fn funcname_main_at_bottom() {
     assert_eq!(parts.last(), Some(&"main"), "bottom of FUNCNAME should be 'main'");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn funcname_empty_outside_function() {
     let (out, _) = bash_exec_ok("echo \"x${FUNCNAME[0]}x\"");
     assert_eq!(out.trim(), "xx", "FUNCNAME should be empty outside a function");
@@ -612,7 +612,7 @@ fn funcname_empty_outside_function() {
 
 // BASH_SOURCE =========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn bash_source_cannot_be_unset() {
     let status = bash_exec_result("unset BASH_SOURCE 2>/dev/null");
     assert_ne!(status, 0, "unset BASH_SOURCE should fail");
@@ -620,13 +620,13 @@ fn bash_source_cannot_be_unset() {
 
 // BASH_LINENO =========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn bash_lineno_cannot_be_unset() {
     let status = bash_exec_result("unset BASH_LINENO 2>/dev/null");
     assert_ne!(status, 0, "unset BASH_LINENO should fail");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_lineno_tracks_call_site() {
     // f is defined on line 1, called on line 2.
     // BASH_LINENO[0] should be 2 (the line where f was called).
@@ -634,7 +634,7 @@ fn bash_lineno_tracks_call_site() {
     assert_eq!(out.trim(), "2", "BASH_LINENO[0] should be the call site line");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_lineno_nested_calls() {
     // g defined line 1, f defined line 2, f called at line 3.
     // Inside g: BASH_LINENO = [2, 3] (g called at line 2 inside f, f called at line 3).
@@ -643,14 +643,14 @@ fn bash_lineno_nested_calls() {
     assert_eq!(out.trim(), "2 3", "BASH_LINENO should show nested call sites");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_source_empty_at_top_level() {
     // Outside functions, BASH_SOURCE should be empty.
     let (out, _) = bash_exec_ok("echo \"x${BASH_SOURCE[0]}x\"");
     assert_eq!(out.trim(), "xx");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_source_in_sourced_file(#[fixture(temp_dir)] dir: &Path) {
     // source a file, and inside it BASH_SOURCE[0] should be the filename.
     let file = dir.join("lib.sh");
@@ -663,7 +663,7 @@ fn bash_source_in_sourced_file(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(out.trim(), expected);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_lineno_in_sourced_file_calling_function(#[fixture(temp_dir)] dir: &Path) {
     // Source a file that defines and calls a function.
     // BASH_LINENO inside the function should reflect the sourced file's lines.
@@ -676,7 +676,7 @@ fn bash_lineno_in_sourced_file_calling_function(#[fixture(temp_dir)] dir: &Path)
     assert_eq!(out.trim(), "2", "BASH_LINENO should track line in sourced file");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_lineno_source_from_function(#[fixture(temp_dir)] dir: &Path) {
     // A function on line 1 sources a file. Inside the sourced file, BASH_LINENO
     // should reflect the sourced file's own line numbers, not the function's
@@ -698,7 +698,7 @@ fn bash_lineno_source_from_function(#[fixture(temp_dir)] dir: &Path) {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_source_tracks_definition_file(#[fixture(temp_dir)] dir: &Path) {
     // A function defined in lib.sh should show lib.sh in BASH_SOURCE,
     // even when called from the main script (not from lib.sh).
@@ -716,7 +716,7 @@ fn bash_source_tracks_definition_file(#[fixture(temp_dir)] dir: &Path) {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_source_nested_source(#[fixture(temp_dir)] dir: &Path) {
     // source a.sh which sources b.sh. Inside b.sh, BASH_SOURCE should stack.
     let b = dir.join("b.sh");
@@ -736,7 +736,7 @@ fn bash_source_nested_source(#[fixture(temp_dir)] dir: &Path) {
 
 // pushd/popd/dirs + DIRSTACK ==========================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn dirs_shows_current_dir() {
     let (out, _) = bash_exec_ok("dirs");
     assert!(
@@ -745,7 +745,7 @@ fn dirs_shows_current_dir() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pushd_and_popd_basic() {
     // Canonicalize because /tmp may be a symlink (e.g. /private/tmp on macOS).
     let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
@@ -756,27 +756,27 @@ fn pushd_and_popd_basic() {
     assert_ne!(lines[1], real_tmp, "popd should restore original dir");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dirstack_tracks_pushd() {
     let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; echo ${DIRSTACK[0]}");
     assert_eq!(out.trim(), real_tmp);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn popd_empty_stack_fails() {
     let status = bash_exec_result("popd 2>/dev/null");
     assert_ne!(status, 0, "popd with empty stack should fail");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pushd_no_args_swaps_top_two() {
     let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; pushd /var > /dev/null; pushd > /dev/null; echo $PWD");
     assert_eq!(out.trim(), real_tmp, "pushd with no args should swap top two");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dirs_c_clears_stack() {
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; dirs -c; dirs -p");
     let lines: Vec<&str> = out.trim().lines().collect();
@@ -784,14 +784,14 @@ fn dirs_c_clears_stack() {
     assert_eq!(lines.len(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dirs_v_shows_indices() {
     let (out, _) = bash_exec_ok("pushd /tmp > /dev/null; dirs -v");
     // Should have indices like " 0  /tmp"
     assert!(out.contains(" 0"), "dirs -v should show index 0");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pushd_n_no_cd() {
     let (out, _) = bash_exec_ok("pushd -n /tmp > /dev/null; echo $PWD");
     // With -n, pushd should NOT change directory.
@@ -800,7 +800,7 @@ fn pushd_n_no_cd() {
 
 // COMP_WORDBREAKS =====================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn comp_wordbreaks_initialized() {
     let (out, _) = bash_exec_ok("echo \"x${COMP_WORDBREAKS}x\"");
     let inner = out.trim();
@@ -808,13 +808,13 @@ fn comp_wordbreaks_initialized() {
     assert_ne!(inner, "xx", "COMP_WORDBREAKS should be initialized");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn comp_wordbreaks_can_be_unset() {
     let (out, _) = bash_exec_ok("unset COMP_WORDBREAKS; echo \"x${COMP_WORDBREAKS}x\"");
     assert_eq!(out.trim(), "xx");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn comp_vars_not_set_by_default() {
     // COMP_WORDS, COMP_CWORD, etc. should not be set outside completion context.
     let (out, _) = bash_exec_ok("echo \"x${COMP_WORDS}x\"");
@@ -823,19 +823,19 @@ fn comp_vars_not_set_by_default() {
 
 // declare -p attribute accuracy =======================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn declare_p_shows_readonly() {
     let (out, _) = bash_exec_ok("readonly X=42; declare -p X");
     assert!(out.contains("-r"), "declare -p should show -r for readonly: {out}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn declare_p_shows_exported() {
     let (out, _) = bash_exec_ok("export Y=hi; declare -p Y");
     assert!(out.contains("-x"), "declare -p should show -x for exported: {out}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn declare_p_shows_array() {
     let (out, _) = bash_exec_ok("declare -a ARR=(a b c); declare -p ARR");
     assert!(out.contains("-a"), "declare -p should show -a for array: {out}");
@@ -845,13 +845,13 @@ fn declare_p_shows_array() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn declare_p_shows_assoc_array() {
     let (out, _) = bash_exec_ok("declare -A MAP=([k]=v); declare -p MAP");
     assert!(out.contains("-A"), "declare -p should show -A for assoc array: {out}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn declare_p_plain_var() {
     let (out, _) = bash_exec_ok("Z=hello; declare -p Z");
     assert!(

@@ -5,20 +5,20 @@ use super::*;
 use icu::locale::Locale;
 use pattern::{trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix};
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
 fn c() -> Locale {
     locale::parse_posix_locale("C")
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pattern_match_literal() {
     let l = c();
     assert!(shell_pattern_match("hello", "hello", &l));
     assert!(!shell_pattern_match("hello", "world", &l));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pattern_match_star() {
     let l = c();
     assert!(shell_pattern_match("hello", "*", &l));
@@ -28,7 +28,7 @@ fn pattern_match_star() {
     assert!(!shell_pattern_match("hello", "h*x", &l));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pattern_match_question() {
     let l = c();
     assert!(shell_pattern_match("hello", "hell?", &l));
@@ -36,7 +36,7 @@ fn pattern_match_question() {
     assert!(!shell_pattern_match("hello", "hell", &l));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pattern_match_bracket() {
     let l = c();
     assert!(shell_pattern_match("hello", "[h]ello", &l));
@@ -47,7 +47,7 @@ fn pattern_match_bracket() {
 
 // Trim prefix/suffix tests --------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn trim_smallest_prefix_star_slash() {
     let l = c();
     // ${var#*/} — remove shortest prefix ending in /
@@ -57,28 +57,28 @@ fn trim_smallest_prefix_star_slash() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_largest_prefix_star_slash() {
     let l = c();
     // ${var##*/} — remove longest prefix ending in /
     assert_eq!(trim_largest_prefix("/usr/bin:/usr/local/bin", "*/", &l), "bin");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_smallest_suffix_dot_star() {
     let l = c();
     // ${var%.*} — remove shortest suffix starting with .
     assert_eq!(trim_smallest_suffix("archive.tar.gz", ".*", &l), "archive.tar");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_largest_suffix_dot_star() {
     let l = c();
     // ${var%%.*} — remove longest suffix starting with .
     assert_eq!(trim_largest_suffix("archive.tar.gz", ".*", &l), "archive");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_no_match_returns_original() {
     let l = c();
     assert_eq!(trim_smallest_prefix("hello", "xyz", &l), "hello");
@@ -87,7 +87,7 @@ fn trim_no_match_returns_original() {
     assert_eq!(trim_largest_suffix("hello", "xyz", &l), "hello");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_empty_pattern_matches_empty_string() {
     let l = c();
     // Empty pattern matches empty string, which is a prefix/suffix of everything
@@ -97,21 +97,21 @@ fn trim_empty_pattern_matches_empty_string() {
     assert_eq!(trim_largest_suffix("hello", "", &l), "hello");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_prefix_basename() {
     let l = c();
     // Common idiom: ${path##*/} extracts basename
     assert_eq!(trim_largest_prefix("/a/b/c.txt", "*/", &l), "c.txt");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_suffix_extension() {
     let l = c();
     // Common idiom: ${file%.*} removes extension
     assert_eq!(trim_smallest_suffix("file.txt", ".*", &l), "file");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn trim_suffix_dirname() {
     let l = c();
     // ${path%/*} extracts dirname

@@ -1,8 +1,8 @@
 use super::*;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
-#[testutil::test]
+#[skuld::test]
 fn echo_simple() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -21,7 +21,7 @@ fn echo_simple() {
     assert_eq!(String::from_utf8(out).unwrap(), "hello world\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn echo_n_flag() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -40,7 +40,7 @@ fn echo_n_flag() {
     assert_eq!(String::from_utf8(out).unwrap(), "no newline");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn echo_no_args() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -51,7 +51,7 @@ fn echo_no_args() {
     assert_eq!(String::from_utf8(out).unwrap(), "\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn true_returns_zero() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -61,7 +61,7 @@ fn true_returns_zero() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn false_returns_one() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -71,7 +71,7 @@ fn false_returns_one() {
     assert_eq!(status, 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn colon_returns_zero() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -81,7 +81,7 @@ fn colon_returns_zero() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn exit_default() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -91,7 +91,7 @@ fn exit_default() {
     assert!(matches!(result, Err(ExecError::ExitRequested(0))));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn exit_with_code() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -101,7 +101,7 @@ fn exit_with_code() {
     assert!(matches!(result, Err(ExecError::ExitRequested(42))));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn export_sets_and_exports() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -112,7 +112,7 @@ fn export_sets_and_exports() {
     assert!(env.is_exported("FOO"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn unset_removes_var() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -123,7 +123,7 @@ fn unset_removes_var() {
     assert_eq!(env.get_var("X"), None);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn shift_removes_params() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -134,7 +134,7 @@ fn shift_removes_params() {
     assert_eq!(env.positional_params(), &["b".to_string(), "c".to_string()]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_string_non_empty() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -144,7 +144,7 @@ fn test_string_non_empty() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_string_empty() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -154,7 +154,7 @@ fn test_string_empty() {
     assert_eq!(status, 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_string_equals() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -172,7 +172,7 @@ fn test_string_equals() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_int_eq() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -190,7 +190,7 @@ fn test_int_eq() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_bracket_syntax() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();
@@ -208,7 +208,7 @@ fn test_bracket_syntax() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_bracket_missing_close() {
     let mut env = Environment::new();
     let mut sin = std::io::empty();

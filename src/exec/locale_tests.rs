@@ -1,7 +1,7 @@
 use super::*;
 use crate::exec::environment::Environment;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
 fn make_env() -> Environment {
     Environment::new()
@@ -9,7 +9,7 @@ fn make_env() -> Environment {
 
 // Locale resolution tests ---------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn locale_resolution_lc_all_overrides() {
     let mut env = make_env();
     let _ = env.set_var("LANG", "en_US.UTF-8");
@@ -20,7 +20,7 @@ fn locale_resolution_lc_all_overrides() {
     assert_eq!(to_uppercase("i", &locale), "\u{0130}"); // İ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn locale_resolution_specific_overrides_lang() {
     let mut env = make_env();
     let _ = env.set_var("LANG", "en_US.UTF-8");
@@ -29,7 +29,7 @@ fn locale_resolution_specific_overrides_lang() {
     assert_eq!(to_uppercase("i", &locale), "\u{0130}"); // İ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn locale_resolution_lang_fallback() {
     let mut env = make_env();
     let _ = env.set_var("LANG", "tr_TR.UTF-8");
@@ -37,7 +37,7 @@ fn locale_resolution_lang_fallback() {
     assert_eq!(to_uppercase("i", &locale), "\u{0130}"); // İ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn locale_resolution_default_c() {
     let env = make_env();
     let locale = ctype_locale(&env);
@@ -45,7 +45,7 @@ fn locale_resolution_default_c() {
     assert_eq!(to_uppercase("i", &locale), "I");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collate_locale_resolves() {
     let mut env = make_env();
     let _ = env.set_var("LC_COLLATE", "de_DE.UTF-8");
@@ -57,37 +57,37 @@ fn collate_locale_resolves() {
 
 // Case conversion tests -----------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn uppercase_ascii() {
     let locale = parse_posix_locale("C");
     assert_eq!(to_uppercase("hello", &locale), "HELLO");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn lowercase_ascii() {
     let locale = parse_posix_locale("C");
     assert_eq!(to_lowercase("HELLO", &locale), "hello");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uppercase_unicode_accents() {
     let locale = parse_posix_locale("C");
     assert_eq!(to_uppercase("caf\u{00e9}", &locale), "CAF\u{00c9}"); // café -> CAFÉ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn turkish_i_uppercase() {
     let locale = parse_posix_locale("tr_TR.UTF-8");
     assert_eq!(to_uppercase("i", &locale), "\u{0130}"); // İ (dotted capital I)
 }
 
-#[testutil::test]
+#[skuld::test]
 fn turkish_i_lowercase() {
     let locale = parse_posix_locale("tr_TR.UTF-8");
     assert_eq!(to_lowercase("I", &locale), "\u{0131}"); // ı (dotless small i)
 }
 
-#[testutil::test]
+#[skuld::test]
 fn german_eszett_uppercase() {
     let locale = parse_posix_locale("de_DE.UTF-8");
     // German ß uppercases to SS (or ẞ depending on convention)
@@ -95,13 +95,13 @@ fn german_eszett_uppercase() {
     assert!(result == "SS" || result == "\u{1e9e}", "got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn empty_string_uppercase() {
     let locale = parse_posix_locale("C");
     assert_eq!(to_uppercase("", &locale), "");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn empty_string_lowercase() {
     let locale = parse_posix_locale("C");
     assert_eq!(to_lowercase("", &locale), "");
@@ -109,50 +109,50 @@ fn empty_string_lowercase() {
 
 // Capitalize / uncapitalize tests -------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn capitalize_ascii() {
     let locale = parse_posix_locale("C");
     assert_eq!(capitalize("hello", &locale), "Hello");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uncapitalize_ascii() {
     let locale = parse_posix_locale("C");
     assert_eq!(uncapitalize("HELLO", &locale), "hELLO");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn capitalize_empty() {
     let locale = parse_posix_locale("C");
     assert_eq!(capitalize("", &locale), "");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uncapitalize_empty() {
     let locale = parse_posix_locale("C");
     assert_eq!(uncapitalize("", &locale), "");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn capitalize_single_char() {
     let locale = parse_posix_locale("C");
     assert_eq!(capitalize("h", &locale), "H");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn uncapitalize_single_char() {
     let locale = parse_posix_locale("C");
     assert_eq!(uncapitalize("H", &locale), "h");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn capitalize_multibyte_first_char() {
     let locale = parse_posix_locale("C");
     // é (2 bytes in UTF-8) followed by ASCII
     assert_eq!(capitalize("\u{00e9}cole", &locale), "\u{00c9}cole");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn capitalize_turkish() {
     let locale = parse_posix_locale("tr_TR");
     assert_eq!(capitalize("istanbul", &locale), "\u{0130}stanbul");
@@ -160,60 +160,60 @@ fn capitalize_turkish() {
 
 // parse_posix_locale tests --------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_c() {
     let locale = parse_posix_locale("C");
     // C locale maps to root/undefined
     assert_eq!(locale, Locale::UNKNOWN);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_posix() {
     let locale = parse_posix_locale("POSIX");
     assert_eq!(locale, Locale::UNKNOWN);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_empty() {
     let locale = parse_posix_locale("");
     assert_eq!(locale, Locale::UNKNOWN);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_with_charset() {
     let locale = parse_posix_locale("en_US.UTF-8");
     assert_eq!(locale.id.language, icu::locale::subtags::language!("en"));
     assert_eq!(locale.id.region, Some(icu::locale::subtags::region!("US")));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_without_charset() {
     let locale = parse_posix_locale("tr_TR");
     assert_eq!(locale.id.language, icu::locale::subtags::language!("tr"));
     assert_eq!(locale.id.region, Some(icu::locale::subtags::region!("TR")));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_language_only() {
     let locale = parse_posix_locale("de");
     assert_eq!(locale.id.language, icu::locale::subtags::language!("de"));
     assert_eq!(locale.id.region, None);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_whitespace_trimmed() {
     let locale = parse_posix_locale("  en_US.UTF-8  ");
     assert_eq!(locale.id.language, icu::locale::subtags::language!("en"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_invalid_falls_back() {
     // Garbage input should not panic — it falls back to UNKNOWN.
     let locale = parse_posix_locale("!!!");
     assert_eq!(locale, Locale::UNKNOWN);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_posix_locale_lenient_best_effort() {
     // ICU4X's BCP47 parser is lenient: "not-a-real-locale" parses as
     // language "not" with extension subtags.  We just verify no panic.
@@ -222,25 +222,25 @@ fn parse_posix_locale_lenient_best_effort() {
 
 // Decimal separator ---------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn decimal_separator_c_locale() {
     let locale = parse_posix_locale("C");
     assert_eq!(decimal_separator(&locale), '.');
 }
 
-#[testutil::test]
+#[skuld::test]
 fn decimal_separator_german() {
     let locale = parse_posix_locale("de_DE.UTF-8");
     assert_eq!(decimal_separator(&locale), ',');
 }
 
-#[testutil::test]
+#[skuld::test]
 fn decimal_separator_english() {
     let locale = parse_posix_locale("en_US.UTF-8");
     assert_eq!(decimal_separator(&locale), '.');
 }
 
-#[testutil::test]
+#[skuld::test]
 fn decimal_separator_french() {
     // French uses comma as decimal separator
     let locale = parse_posix_locale("fr_FR.UTF-8");
@@ -249,7 +249,7 @@ fn decimal_separator_french() {
     assert!(sep == ',' || sep == '.', "got: {sep}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn numeric_locale_resolution() {
     let mut env = make_env();
     let _ = env.set_var("LC_NUMERIC", "de_DE.UTF-8");
@@ -271,267 +271,267 @@ fn tr() -> Locale {
 
 // C locale: upper (ASCII only) ----------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_ascii_a() {
     assert!(is_char_class('A', "upper", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_ascii_z() {
     assert!(is_char_class('Z', "upper", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_ascii_a_lower() {
     assert!(!is_char_class('a', "upper", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_accent_c() {
     assert!(!is_char_class('\u{00c9}', "upper", &c())); // É
 }
 
 // C locale: lower (ASCII only) ----------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_ascii_a() {
     assert!(is_char_class('a', "lower", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_ascii_z() {
     assert!(is_char_class('z', "lower", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_ascii_upper_a() {
     assert!(!is_char_class('A', "lower", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_accent_c() {
     assert!(!is_char_class('\u{00e9}', "lower", &c())); // é
 }
 
 // C locale: alpha (ASCII only) ----------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alpha_ascii() {
     assert!(is_char_class('m', "alpha", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alpha_digit_no() {
     assert!(!is_char_class('5', "alpha", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alpha_accent_c() {
     assert!(!is_char_class('\u{00e9}', "alpha", &c())); // é
 }
 
 // C locale: digit (locale-invariant) ----------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_digit_5() {
     assert!(is_char_class('5', "digit", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_digit_a_no() {
     assert!(!is_char_class('a', "digit", &c()));
 }
 
 // C locale: alnum -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alnum_letter() {
     assert!(is_char_class('A', "alnum", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alnum_digit() {
     assert!(is_char_class('9', "alnum", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alnum_punct_no() {
     assert!(!is_char_class('!', "alnum", &c()));
 }
 
 // C locale: space -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_space_space() {
     assert!(is_char_class(' ', "space", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_space_tab() {
     assert!(is_char_class('\t', "space", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_space_newline() {
     assert!(is_char_class('\n', "space", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_space_a_no() {
     assert!(!is_char_class('a', "space", &c()));
 }
 
 // C locale: blank -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_blank_space() {
     assert!(is_char_class(' ', "blank", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_blank_tab() {
     assert!(is_char_class('\t', "blank", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_blank_newline_no() {
     assert!(!is_char_class('\n', "blank", &c()));
 }
 
 // C locale: punct -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_punct_bang() {
     assert!(is_char_class('!', "punct", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_punct_dot() {
     assert!(is_char_class('.', "punct", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_punct_a_no() {
     assert!(!is_char_class('a', "punct", &c()));
 }
 
 // C locale: cntrl (locale-invariant) ----------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_cntrl_null() {
     assert!(is_char_class('\0', "cntrl", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_cntrl_bel() {
     assert!(is_char_class('\x07', "cntrl", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_cntrl_a_no() {
     assert!(!is_char_class('a', "cntrl", &c()));
 }
 
 // C locale: xdigit (locale-invariant) ---------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_xdigit_0() {
     assert!(is_char_class('0', "xdigit", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_xdigit_f() {
     assert!(is_char_class('f', "xdigit", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_xdigit_upper_f() {
     assert!(is_char_class('F', "xdigit", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_xdigit_g_no() {
     assert!(!is_char_class('g', "xdigit", &c()));
 }
 
 // C locale: graph -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_graph_a() {
     assert!(is_char_class('a', "graph", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_graph_bang() {
     assert!(is_char_class('!', "graph", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_graph_space_no() {
     assert!(!is_char_class(' ', "graph", &c()));
 }
 
 // C locale: print -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_print_a() {
     assert!(is_char_class('a', "print", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_print_space() {
     assert!(is_char_class(' ', "print", &c()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_print_cntrl_no() {
     assert!(!is_char_class('\x07', "print", &c()));
 }
 
 // UTF-8 locale: Unicode classification --------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_accent_utf8() {
     assert!(is_char_class('\u{00c9}', "upper", &utf8())); // É
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_accent_utf8() {
     assert!(is_char_class('\u{00e9}', "lower", &utf8())); // é
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alpha_accent_utf8() {
     assert!(is_char_class('\u{00f1}', "alpha", &utf8())); // ñ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_alpha_cjk_utf8() {
     assert!(is_char_class('\u{65e5}', "alpha", &utf8())); // 日
 }
 
 // Turkish locale ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_upper_dotted_i_turkish() {
     assert!(is_char_class('\u{0130}', "upper", &tr())); // İ
 }
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_lower_dotless_i_turkish() {
     assert!(is_char_class('\u{0131}', "lower", &tr())); // ı
 }
 
 // Unknown class returns false -----------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn char_class_unknown() {
     assert!(!is_char_class('A', "bogus", &c()));
 }
 
 // Strftime locale tests -----------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn time_locale_resolves_lc_time() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
@@ -539,7 +539,7 @@ fn time_locale_resolves_lc_time() {
     assert_eq!(locale.id.language, icu::locale::subtags::language!("de"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn time_locale_lc_all_overrides_lc_time() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
@@ -548,7 +548,7 @@ fn time_locale_lc_all_overrides_lc_time() {
     assert_eq!(locale.id.language, icu::locale::subtags::language!("fr"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_year_c_locale() {
     let env = make_env();
     // Timestamp 1_000_000_000 is 2001-09-09 in UTC
@@ -556,7 +556,7 @@ fn strftime_year_c_locale() {
     assert_eq!(result, "2001");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_weekday_german() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
@@ -568,7 +568,7 @@ fn strftime_weekday_german() {
     assert_eq!(result, "Sonntag", "got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_weekday_abbreviated_german() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
@@ -578,7 +578,7 @@ fn strftime_weekday_abbreviated_german() {
     assert!(result == "So" || result == "So.", "got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_month_french() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
@@ -589,7 +589,7 @@ fn strftime_month_french() {
     assert_eq!(result, "septembre", "got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_month_abbreviated_french() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
@@ -599,7 +599,7 @@ fn strftime_month_abbreviated_french() {
     assert_eq!(result, "sept.", "got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_c_locale_english_weekday() {
     let env = make_env();
     // C locale should use English names via jiff
@@ -622,7 +622,7 @@ fn strftime_c_locale_english_weekday() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_mixed_codes() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "de_DE.UTF-8");
@@ -634,14 +634,14 @@ fn strftime_mixed_codes() {
     assert!(result.ends_with("2001"), "Expected year 2001, got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_literal_text_preserved() {
     let env = make_env();
     let result = strftime_locale("hello", 0, &env);
     assert_eq!(result, "hello");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn strftime_percent_h_is_month_abbreviated() {
     let mut env = make_env();
     let _ = env.set_var("LC_TIME", "fr_FR.UTF-8");
@@ -654,7 +654,7 @@ fn strftime_percent_h_is_month_abbreviated() {
 
 // Timezone resolution tests -------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn resolve_timezone_exported_iana_name() {
     let mut env = make_env();
     let _ = env.set_var("TZ", "UTC");
@@ -665,7 +665,7 @@ fn resolve_timezone_exported_iana_name() {
     assert_eq!(result, "Sonntag", "TZ=UTC should give Sunday; got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn resolve_timezone_empty_is_utc() {
     let mut env = make_env();
     let _ = env.set_var("TZ", "");
@@ -676,7 +676,7 @@ fn resolve_timezone_empty_is_utc() {
     assert_eq!(result, "Sonntag", "TZ='' should be UTC (Sunday); got: {result}");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn resolve_timezone_not_exported_uses_system() {
     let mut env = make_env();
     let _ = env.set_var("TZ", "UTC");
@@ -687,7 +687,7 @@ fn resolve_timezone_not_exported_uses_system() {
     assert!(!result.is_empty(), "should produce a weekday name");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn resolve_timezone_unset_uses_system() {
     let env = make_env();
     // No TZ set at all — should use system timezone
@@ -695,7 +695,7 @@ fn resolve_timezone_unset_uses_system() {
     assert!(!result.is_empty(), "should produce a weekday name");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn resolve_timezone_colon_prefix_stripped() {
     let mut env = make_env();
     let _ = env.set_var("TZ", ":UTC");

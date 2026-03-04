@@ -26,10 +26,10 @@ use thaum::exec::{CapturedIo, Environment, ExecError, Executor};
 use thaum::Dialect;
 
 fn main() {
-    testutil::run_all();
+    skuld::run_all();
 }
 
-testutil::default_labels!(lex, parse, exec);
+skuld::default_labels!(lex, parse, exec);
 
 /// Find the thaum binary for subshell tests.
 ///

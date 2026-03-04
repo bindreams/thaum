@@ -1,6 +1,6 @@
 use std::ffi::OsString;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
 #[cfg(unix)]
 mod posix_quoting {
@@ -30,17 +30,17 @@ mod posix_quoting {
         }
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn simple_args() {
         roundtrip(&["echo", "hello", "world"]);
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn args_with_spaces() {
         roundtrip(&["echo", "hello world", "foo bar"]);
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn args_with_single_quotes() {
         let argv = vec![OsString::from("echo"), OsString::from("it's")];
         let cmd = super::super::CommandEx::new(argv);
@@ -50,7 +50,7 @@ mod posix_quoting {
         assert!(s.contains("'it'\\''s'"), "got: {s}");
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn empty_arg() {
         let argv = vec![OsString::from("echo"), OsString::from("")];
         let cmd = super::super::CommandEx::new(argv);
@@ -60,12 +60,12 @@ mod posix_quoting {
         assert!(s.contains("''"), "got: {s}");
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn args_with_special_chars() {
         roundtrip(&["echo", "hello\nworld", "tab\there", "$HOME"]);
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn input_pipe_cat() {
         use std::io::{Read, Write};
         // Test InputPipe: write to stdin, capture stdout.
@@ -92,7 +92,7 @@ mod posix_quoting {
     /// Regression test: multiple pipes (stdout + stderr) on the same child.
     /// Without CLOEXEC on parent-side pipe ends, the child inherits both
     /// parent ends and never sees EOF — causing a deadlock.
-    #[testutil::test]
+    #[skuld::test]
     fn multi_pipe_stdout_stderr() {
         use std::io::Read;
         let mut cmd = super::super::CommandEx::new(vec![
@@ -122,7 +122,7 @@ mod posix_quoting {
     /// Regression test: stdin pipe + stdout pipe simultaneously.
     /// The child reads stdin and echoes it to stdout. Without CLOEXEC,
     /// the child inherits the parent's write-end of stdin, preventing EOF.
-    #[testutil::test]
+    #[skuld::test]
     fn stdin_pipe_with_stdout_pipe() {
         use std::io::{Read, Write};
         let mut cmd = super::super::CommandEx::new(vec![
@@ -147,7 +147,7 @@ mod posix_quoting {
         assert_eq!(status, 0);
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn spawn_echo() {
         let argv = vec![OsString::from("echo"), OsString::from("hello")];
         let mut cmd = super::super::CommandEx::new(argv);
@@ -161,7 +161,7 @@ mod posix_quoting {
         assert_eq!(output, "hello\n");
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn spawn_with_env() {
         let mut cmd = super::super::CommandEx::new(vec![
             OsString::from("sh"),
@@ -179,7 +179,7 @@ mod posix_quoting {
         assert_eq!(output, "works\n");
     }
 
-    #[testutil::test]
+    #[skuld::test]
     fn spawn_fd3_inheritance(#[fixture(temp_dir)] dir: &Path) {
         let file_path = dir.join("fd3.txt");
         let file = std::fs::File::create(&file_path).unwrap();
@@ -197,7 +197,7 @@ mod posix_quoting {
     }
 
     /// Verify that `CommandEx.cwd` sets the child's working directory.
-    #[testutil::test]
+    #[skuld::test]
     fn spawn_with_cwd(#[fixture(temp_dir)] dir: &Path) {
         use std::io::Read;
         // "pwd" prints the working directory. Use /bin/pwd to avoid shell
@@ -224,7 +224,7 @@ mod posix_quoting {
     /// Before the fix, CwdGuard temporarily changed the process-global CWD,
     /// causing concurrent threads to interfere. With addchdir_np (or the
     /// mutex fallback), each child gets its own CWD atomically.
-    #[testutil::test]
+    #[skuld::test]
     fn spawn_concurrent_cwd_no_race() {
         use std::io::Read;
         let handles: Vec<_> = (0..20)

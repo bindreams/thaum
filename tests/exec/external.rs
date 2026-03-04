@@ -6,21 +6,21 @@ use crate::*;
 
 // External command output capture =====================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn external_echo_captured(#[fixture(test_tools)] tools: &Path) {
     let (out, _err, status) = exec_with_tools("echo hello", tools);
     assert_eq!(status, 0);
     assert_eq!(out, "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_echo_with_args(#[fixture(test_tools)] tools: &Path) {
     let (out, _, status) = exec_with_tools("echo a b c", tools);
     assert_eq!(status, 0);
     assert_eq!(out, "a b c\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_stderr_captured(#[fixture(test_tools)] tools: &Path) {
     let (out, err, status) = exec_with_tools("sh -c 'echo err >&2'", tools);
     assert_eq!(status, 0);
@@ -28,7 +28,7 @@ fn external_stderr_captured(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(err, "err\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_both_streams_captured(#[fixture(test_tools)] tools: &Path) {
     let (out, err, status) = exec_with_tools("sh -c 'echo out; echo err >&2'", tools);
     assert_eq!(status, 0);
@@ -36,7 +36,7 @@ fn external_both_streams_captured(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(err, "err\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_large_stderr_no_deadlock(#[fixture(test_tools)] tools: &Path) {
     // Generate >64KB on stderr + stdout to stress-test concurrent pipe reading.
     // The pipe buffer is typically 64KB on Linux; if reads are sequential, this deadlocks.
@@ -57,7 +57,7 @@ fn external_large_stderr_no_deadlock(#[fixture(test_tools)] tools: &Path) {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_exit_status(#[fixture(test_tools)] tools: &Path) {
     let (_, _, status) = exec_with_tools("true", tools);
     assert_eq!(status, 0);
@@ -65,7 +65,7 @@ fn external_exit_status(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(status, 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_not_found(#[fixture(test_tools)] tools: &Path) {
     let (_, err, status) = exec_with_tools("nonexistent_command_xyz_123", tools);
     assert_eq!(status, 127);
@@ -75,7 +75,7 @@ fn external_not_found(#[fixture(test_tools)] tools: &Path) {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn external_with_redirect_bypasses_pipe(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("stdout.txt");
     let f = file.to_string_lossy().replace('\\', "/");
@@ -88,7 +88,7 @@ fn external_with_redirect_bypasses_pipe(#[fixture(test_tools)] tools: &Path, #[f
 
 // cat through pipeline ------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
     let (out, _, status) = exec_with_tools("echo hello | cat", tools);
     assert_eq!(status, 0);
@@ -97,14 +97,14 @@ fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
 
 // sh -c tests (thaum sh impersonation) -------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn sh_dash_c_basic(#[fixture(test_tools)] tools: &Path) {
     let (out, _, status) = exec_with_tools("sh -c 'echo hello from sh'", tools);
     assert_eq!(status, 0);
     assert_eq!(out, "hello from sh\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sh_dash_c_exit_status(#[fixture(test_tools)] tools: &Path) {
     let (_, _, status) = exec_with_tools("sh -c 'exit 42'", tools);
     assert_eq!(status, 42);

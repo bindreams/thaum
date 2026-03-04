@@ -4,24 +4,24 @@
 
 ```sh
 pip install pre-commit && pre-commit install   # one-time setup
-cargo nextest run --features cli               # all tests (excludes conformance)
-cargo nextest run -P conformance --features cli # conformance tests (requires Docker image)
-cargo test --features cli                      # also works (same harness)
+cargo nextest run --features cli,testkit               # all tests (excludes conformance)
+cargo nextest run -P conformance --features cli,testkit # conformance tests (requires Docker image)
+cargo test --features cli,testkit                      # also works (same harness)
 pre-commit run --all-files                     # lint + format + #[test] guard
 ```
 
 ### Test macro
 
-Use `#[testutil::test]` instead of `#[test]`. All test binaries use `harness = false`
-with the `testutil` custom harness. A bare `#[test]` compiles but silently never runs.
+Use `#[skuld::test]` instead of `#[test]`. All test binaries use `harness = false`
+with the `skuld` custom harness. A bare `#[test]` compiles but silently never runs.
 
 ```rust
-#[testutil::test]                                     // simple test
-#[testutil::test(requires = [preconditions::docker])]  // runtime precondition
-#[testutil::test(labels = [slow])]                     // label for filtering
+#[skuld::test]                                     // simple test
+#[skuld::test(requires = [preconditions::docker])]  // runtime precondition
+#[skuld::test(labels = [slow])]                     // label for filtering
 ```
 
-For dynamic tests (e.g. corpus YAML files), use `testutil::TestRunner::add()`.
+For dynamic tests (e.g. corpus YAML files), use `skuld::TestRunner::add()`.
 
 ### Benchmarks
 
@@ -98,7 +98,7 @@ tests/
   common/           — shared test helpers (parse_ok, first_cmd, docker)
   parse.rs + parse/ — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
   exec.rs + exec/   — execution tests (basic, expansion, arrays, printf, bash)
-  cli.rs + cli/     — CLI output format regression tests (requires --features cli)
+  cli.rs + cli/     — CLI output format regression tests (requires --features cli,testkit)
   corpus.rs         — oils corpus test runner (custom harness)
 benches/
   bench.rs        — unified benchmark binary (callgrind + hyperfine backends)

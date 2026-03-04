@@ -6,7 +6,7 @@
 #[path = "common/mod.rs"]
 mod common;
 
-// Infrastructure test modules. Each uses #[testutil::test] with appropriate
+// Infrastructure test modules. Each uses #[skuld::test] with appropriate
 // `requires` preconditions so tests skip gracefully when tools are unavailable.
 #[path = "infra/bench_callgrind.rs"]
 mod bench_callgrind;
@@ -16,5 +16,5 @@ mod docker;
 pub mod preconditions;
 
 fn main() {
-    testutil::run_all();
+    skuld::run_all();
 }

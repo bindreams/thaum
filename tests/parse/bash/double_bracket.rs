@@ -18,7 +18,7 @@ fn parse_test_expr(input: &str) -> BashTestExpr {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_unary_file_exists() {
     let expr = parse_test_expr("[[ -e /tmp/foo ]]");
     assert!(matches!(
@@ -30,7 +30,7 @@ fn test_expr_unary_file_exists() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_unary_string_empty() {
     let expr = parse_test_expr("[[ -z $var ]]");
     assert!(matches!(
@@ -42,7 +42,7 @@ fn test_expr_unary_string_empty() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_unary_string_nonempty() {
     let expr = parse_test_expr("[[ -n hello ]]");
     assert!(matches!(
@@ -54,7 +54,7 @@ fn test_expr_unary_string_nonempty() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_string_equals() {
     let expr = parse_test_expr(r#"[[ $a == hello ]]"#);
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -64,7 +64,7 @@ fn test_expr_binary_string_equals() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_string_not_equals() {
     let expr = parse_test_expr("[[ $a != $b ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -74,7 +74,7 @@ fn test_expr_binary_string_not_equals() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_int_eq() {
     let expr = parse_test_expr("[[ $x -eq 0 ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -84,7 +84,7 @@ fn test_expr_binary_int_eq() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_int_lt() {
     let expr = parse_test_expr("[[ $x -lt 10 ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -94,7 +94,7 @@ fn test_expr_binary_int_lt() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_less_than() {
     // < and > are lexed as RedirectFromFile / RedirectToFile tokens
     let expr = parse_test_expr("[[ $a < $b ]]");
@@ -105,7 +105,7 @@ fn test_expr_binary_less_than() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_greater_than() {
     let expr = parse_test_expr("[[ $a > $b ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -115,7 +115,7 @@ fn test_expr_binary_greater_than() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_regex_match() {
     let expr = parse_test_expr("[[ $str =~ ^[0-9]+$ ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -125,7 +125,7 @@ fn test_expr_binary_regex_match() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_regex_with_unquoted_parens() {
     // Parentheses in a =~ regex are capturing groups, not shell syntax.
     // Source: /usr/bin/socat-chain.sh
@@ -133,7 +133,7 @@ fn test_expr_regex_with_unquoted_parens() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_regex_with_alternation_in_parens() {
     // Pipe inside regex parens is alternation, not a shell pipe.
     // Source: /usr/lib/snapd/complete.sh
@@ -141,7 +141,7 @@ fn test_expr_regex_with_alternation_in_parens() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_regex_with_escaped_parens() {
     // Mixed escaped and unescaped parens in regex.
     // Source: /usr/local/go/.../mkerrors.bash
@@ -149,7 +149,7 @@ fn test_expr_regex_with_escaped_parens() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_file_newer() {
     let expr = parse_test_expr("[[ a.txt -nt b.txt ]]");
     if let BashTestExpr::Binary { op, .. } = &expr {
@@ -159,7 +159,7 @@ fn test_expr_binary_file_newer() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_logical_or() {
     let expr = parse_test_expr("[[ -f a || -f b ]]");
     if let BashTestExpr::Or { left, right } = &expr {
@@ -182,7 +182,7 @@ fn test_expr_logical_or() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_logical_not() {
     let expr = parse_test_expr("[[ ! -f foo ]]");
     if let BashTestExpr::Not(inner) = &expr {
@@ -198,7 +198,7 @@ fn test_expr_logical_not() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_double_not() {
     // [[ ! ! -f foo ]] → Not(Not(Unary(-f, foo)))
     let expr = parse_test_expr("[[ ! ! -f foo ]]");
@@ -209,7 +209,7 @@ fn test_expr_double_not() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_grouped() {
     let expr = parse_test_expr("[[ ( -f foo ) ]]");
     if let BashTestExpr::Group(inner) = &expr {
@@ -227,14 +227,14 @@ fn test_expr_grouped() {
 
 // [[ ]] multi-line and edge cases -------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn dbracket_multiline_and() {
     // [[ over multiple lines with &&
     let expr = parse_test_expr("[[ foo == foo\n&& bar == bar\n]]");
     assert!(matches!(expr, BashTestExpr::And { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dbracket_multiline_or() {
     // [[ over multiple lines with ||
     let expr = parse_test_expr("[[ -f a\n|| -d b\n]]");
@@ -250,7 +250,7 @@ fn dbracket_multiline_or() {
 //     assert!(matches!(expr, BashTestExpr::Word(_)));
 // }
 
-#[testutil::test]
+#[skuld::test]
 fn dbracket_string_gt_no_space() {
     // [[ b>a ]] — string > comparison with no spaces around >
     let expr = parse_test_expr("[[ b>a ]]");
@@ -263,7 +263,7 @@ fn dbracket_string_gt_no_space() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn dbracket_string_lt_no_space() {
     // [[ a<b ]] — string < comparison
     let expr = parse_test_expr("[[ a<b ]]");
@@ -276,14 +276,14 @@ fn dbracket_string_lt_no_space() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_bare_word() {
     // [[ word ]] → implicit -n test
     let expr = parse_test_expr("[[ hello ]]");
     assert!(matches!(expr, BashTestExpr::Word(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_precedence_and_binds_tighter_than_or() {
     // [[ -f a || -d b && -d c ]] → Or(-f a, And(-d b, -d c))
     let expr = parse_test_expr("[[ -f a || -d b && -d c ]]");
@@ -301,7 +301,7 @@ fn test_expr_precedence_and_binds_tighter_than_or() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_not_binds_tighter_than_and() {
     // [[ ! -f a && -d b ]] → And(Not(Unary(-f, a)), Unary(-d, b))
     let expr = parse_test_expr("[[ ! -f a && -d b ]]");
@@ -319,7 +319,7 @@ fn test_expr_not_binds_tighter_than_and() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_grouped_or_overrides_precedence() {
     // [[ ( -f a || -d b ) && -e c ]] → And(Group(Or(...)), Unary(-e, c))
     let expr = parse_test_expr("[[ ( -f a || -d b ) && -e c ]]");
@@ -337,7 +337,7 @@ fn test_expr_grouped_or_overrides_precedence() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_binary_eq_single_equals() {
     // [[ $a = pattern ]] — single = is the same as ==
     let expr = parse_test_expr("[[ $a = hello ]]");
@@ -348,7 +348,7 @@ fn test_expr_binary_eq_single_equals() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_unclosed_double_bracket_is_error() {
     let opts = ShellOptions {
         double_brackets: true,
@@ -358,7 +358,7 @@ fn test_expr_unclosed_double_bracket_is_error() {
     assert!(result.is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_chained_and() {
     // [[ -f a && -d b && -e c ]] → And(And(-f a, -d b), -e c)
     let expr = parse_test_expr("[[ -f a && -d b && -e c ]]");
@@ -376,7 +376,7 @@ fn test_expr_chained_and() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_chained_or() {
     // [[ -f a || -d b || -e c ]] → Or(Or(-f a, -d b), -e c)
     let expr = parse_test_expr("[[ -f a || -d b || -e c ]]");
@@ -394,7 +394,7 @@ fn test_expr_chained_or() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_all_unary_ops() {
     // Verify all unary operators are recognized
     let cases: Vec<(&str, UnaryTestOp)> = vec![
@@ -434,7 +434,7 @@ fn test_expr_all_unary_ops() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_expr_all_binary_word_ops() {
     // Verify all binary operators that come as Word tokens
     let cases: Vec<(&str, BinaryTestOp)> = vec![

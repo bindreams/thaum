@@ -15,7 +15,7 @@ use std::process::{Command, Stdio};
 // Precondition ================================================================
 
 fn docker_available() -> Result<(), String> {
-    if testutil::docker::available() {
+    if thaum::testkit::docker::available() {
         Ok(())
     } else {
         Err("Docker not available".into())
@@ -32,17 +32,17 @@ pub struct CorpusImage {
 
 impl Drop for CorpusImage {
     fn drop(&mut self) {
-        testutil::docker::remove_image(&self.id);
+        thaum::testkit::docker::remove_image(&self.id);
         eprintln!("corpus: removed Docker image {}", &self.id[..12.min(self.id.len())]);
     }
 }
 
-#[testutil::fixture(scope = process, requires = [docker_available])]
+#[skuld::fixture(scope = process, requires = [docker_available])]
 fn corpus_image() -> Result<CorpusImage, String> {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
     eprintln!("corpus: building Docker image...");
-    let id = testutil::docker::build_image(&dockerfile, manifest_dir, None)?;
+    let id = thaum::testkit::docker::build_image(&dockerfile, manifest_dir, None)?;
     eprintln!("corpus: built Docker image {}", &id[..12.min(id.len())]);
     Ok(CorpusImage { id })
 }
@@ -68,7 +68,7 @@ impl Drop for CorpusSandbox {
     }
 }
 
-#[testutil::fixture(scope = process, requires = [docker_available])]
+#[skuld::fixture(scope = process, requires = [docker_available])]
 fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox, String> {
     let output = Command::new("docker")
         .args([

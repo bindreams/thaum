@@ -2,7 +2,7 @@ use super::*;
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use crate::exec::environment::Environment;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
 // Helpers -------------------------------------------------------------------------------------------------------------
 
@@ -65,19 +65,19 @@ fn group(inner: ArithExpr) -> ArithExpr {
 
 // Number literals -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_number_positive() {
     let mut env = Environment::new();
     assert_eq!(evaluate_arith_expr(&num(42), &mut env).unwrap(), 42);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_number_negative() {
     let mut env = Environment::new();
     assert_eq!(evaluate_arith_expr(&num(-7), &mut env).unwrap(), -7);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_number_zero() {
     let mut env = Environment::new();
     assert_eq!(evaluate_arith_expr(&num(0), &mut env).unwrap(), 0);
@@ -85,34 +85,34 @@ fn eval_number_zero() {
 
 // Variable lookup -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_unset_is_zero() {
     let mut env = Environment::new();
     assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_empty_is_zero() {
     let mut env = Environment::new();
     env.set_var("x", "").unwrap();
     assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_numeric() {
     let mut env = Environment::new();
     env.set_var("x", "42").unwrap();
     assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), 42);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_negative() {
     let mut env = Environment::new();
     env.set_var("x", "-10").unwrap();
     assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), -10);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_non_numeric_follows_chain() {
     // In bash, `x=abc` makes `$((x))` resolve through `abc` (as a variable
     // name). Since `abc` is unset, the result is 0.
@@ -123,42 +123,42 @@ fn eval_variable_non_numeric_follows_chain() {
 
 // Basic arithmetic ----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_add() {
     let mut env = Environment::new();
     let expr = binary(num(3), ArithBinaryOp::Add, num(4));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 7);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_sub() {
     let mut env = Environment::new();
     let expr = binary(num(10), ArithBinaryOp::Sub, num(3));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 7);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_mul() {
     let mut env = Environment::new();
     let expr = binary(num(6), ArithBinaryOp::Mul, num(7));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 42);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_div() {
     let mut env = Environment::new();
     let expr = binary(num(15), ArithBinaryOp::Div, num(4));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 3);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_mod() {
     let mut env = Environment::new();
     let expr = binary(num(17), ArithBinaryOp::Mod, num(5));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 2);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_div_by_zero() {
     let mut env = Environment::new();
     let expr = binary(num(1), ArithBinaryOp::Div, num(0));
@@ -166,7 +166,7 @@ fn eval_div_by_zero() {
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_mod_by_zero() {
     let mut env = Environment::new();
     let expr = binary(num(1), ArithBinaryOp::Mod, num(0));
@@ -174,7 +174,7 @@ fn eval_mod_by_zero() {
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_add_wrapping_overflow() {
     let mut env = Environment::new();
     let expr = binary(num(i64::MAX), ArithBinaryOp::Add, num(1));
@@ -183,21 +183,21 @@ fn eval_add_wrapping_overflow() {
 
 // Exponentiation ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_exp_positive() {
     let mut env = Environment::new();
     let expr = binary(num(2), ArithBinaryOp::Exp, num(10));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1024);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_exp_zero() {
     let mut env = Environment::new();
     let expr = binary(num(5), ArithBinaryOp::Exp, num(0));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_exp_negative_is_error() {
     let mut env = Environment::new();
     let expr = binary(num(2), ArithBinaryOp::Exp, num(-1));
@@ -205,7 +205,7 @@ fn eval_exp_negative_is_error() {
     assert!(matches!(err, ExecError::InvalidNumber(_, _)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_exp_one() {
     let mut env = Environment::new();
     let expr = binary(num(1), ArithBinaryOp::Exp, num(1000));
@@ -214,21 +214,21 @@ fn eval_exp_one() {
 
 // Comparison ----------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_eq_true() {
     let mut env = Environment::new();
     let expr = binary(num(5), ArithBinaryOp::Eq, num(5));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_eq_false() {
     let mut env = Environment::new();
     let expr = binary(num(5), ArithBinaryOp::Eq, num(3));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_ne() {
     let mut env = Environment::new();
     assert_eq!(
@@ -241,7 +241,7 @@ fn eval_ne() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_lt() {
     let mut env = Environment::new();
     assert_eq!(
@@ -254,7 +254,7 @@ fn eval_lt() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_le() {
     let mut env = Environment::new();
     assert_eq!(
@@ -267,7 +267,7 @@ fn eval_le() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_gt() {
     let mut env = Environment::new();
     assert_eq!(
@@ -280,7 +280,7 @@ fn eval_gt() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_ge() {
     let mut env = Environment::new();
     assert_eq!(
@@ -295,14 +295,14 @@ fn eval_ge() {
 
 // Logical operators with short-circuit --------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_and_true() {
     let mut env = Environment::new();
     let expr = binary(num(1), ArithBinaryOp::LogAnd, num(1));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_and_short_circuit() {
     let mut env = Environment::new();
     // 0 && (x=5) should not assign x
@@ -315,14 +315,14 @@ fn eval_log_and_short_circuit() {
     assert_eq!(env.get_var("x"), None);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_or_false() {
     let mut env = Environment::new();
     let expr = binary(num(0), ArithBinaryOp::LogOr, num(0));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_or_short_circuit() {
     let mut env = Environment::new();
     // 1 || (x=5) should not assign x
@@ -333,35 +333,35 @@ fn eval_log_or_short_circuit() {
 
 // Bitwise operators ---------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_bit_and() {
     let mut env = Environment::new();
     let expr = binary(num(0b1100), ArithBinaryOp::BitAnd, num(0b1010));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0b1000);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_bit_or() {
     let mut env = Environment::new();
     let expr = binary(num(0b1100), ArithBinaryOp::BitOr, num(0b1010));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0b1110);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_bit_xor() {
     let mut env = Environment::new();
     let expr = binary(num(0b1100), ArithBinaryOp::BitXor, num(0b1010));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0b0110);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_shift_left() {
     let mut env = Environment::new();
     let expr = binary(num(1), ArithBinaryOp::ShiftLeft, num(4));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 16);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_shift_right() {
     let mut env = Environment::new();
     let expr = binary(num(16), ArithBinaryOp::ShiftRight, num(2));
@@ -370,42 +370,42 @@ fn eval_shift_right() {
 
 // Unary prefix --------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_negate() {
     let mut env = Environment::new();
     let expr = prefix(ArithUnaryOp::Negate, num(5));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), -5);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_unary_plus() {
     let mut env = Environment::new();
     let expr = prefix(ArithUnaryOp::Plus, num(5));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 5);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_not_zero() {
     let mut env = Environment::new();
     let expr = prefix(ArithUnaryOp::LogNot, num(0));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_log_not_nonzero() {
     let mut env = Environment::new();
     let expr = prefix(ArithUnaryOp::LogNot, num(42));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_bit_not() {
     let mut env = Environment::new();
     let expr = prefix(ArithUnaryOp::BitNot, num(0));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), -1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_prefix_increment() {
     let mut env = Environment::new();
     env.set_var("x", "5").unwrap();
@@ -415,7 +415,7 @@ fn eval_prefix_increment() {
     assert_eq!(env.get_var("x"), Some("6"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_prefix_decrement() {
     let mut env = Environment::new();
     env.set_var("x", "5").unwrap();
@@ -426,7 +426,7 @@ fn eval_prefix_decrement() {
 
 // Unary postfix -------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_postfix_increment() {
     let mut env = Environment::new();
     env.set_var("x", "5").unwrap();
@@ -436,7 +436,7 @@ fn eval_postfix_increment() {
     assert_eq!(env.get_var("x"), Some("6"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_postfix_decrement() {
     let mut env = Environment::new();
     env.set_var("x", "5").unwrap();
@@ -447,21 +447,21 @@ fn eval_postfix_decrement() {
 
 // Ternary -------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_ternary_true_branch() {
     let mut env = Environment::new();
     let expr = ternary(num(1), num(10), num(20));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 10);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_ternary_false_branch() {
     let mut env = Environment::new();
     let expr = ternary(num(0), num(10), num(20));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 20);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_ternary_lazy() {
     let mut env = Environment::new();
     // 1 ? (x=10) : (x=20) should only evaluate (x=10)
@@ -476,7 +476,7 @@ fn eval_ternary_lazy() {
 
 // Assignment ----------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_simple() {
     let mut env = Environment::new();
     let expr = assign("x", ArithAssignOp::Assign, num(42));
@@ -484,7 +484,7 @@ fn eval_assign_simple() {
     assert_eq!(env.get_var("x"), Some("42"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_add() {
     let mut env = Environment::new();
     env.set_var("x", "10").unwrap();
@@ -493,7 +493,7 @@ fn eval_assign_add() {
     assert_eq!(env.get_var("x"), Some("15"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_sub() {
     let mut env = Environment::new();
     env.set_var("x", "10").unwrap();
@@ -502,7 +502,7 @@ fn eval_assign_sub() {
     assert_eq!(env.get_var("x"), Some("7"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_mul() {
     let mut env = Environment::new();
     env.set_var("x", "6").unwrap();
@@ -511,7 +511,7 @@ fn eval_assign_mul() {
     assert_eq!(env.get_var("x"), Some("42"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_div() {
     let mut env = Environment::new();
     env.set_var("x", "15").unwrap();
@@ -520,7 +520,7 @@ fn eval_assign_div() {
     assert_eq!(env.get_var("x"), Some("3"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_div_by_zero() {
     let mut env = Environment::new();
     env.set_var("x", "10").unwrap();
@@ -529,7 +529,7 @@ fn eval_assign_div_by_zero() {
     assert!(matches!(err, ExecError::DivisionByZero));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_assign_readonly_error() {
     let mut env = Environment::new();
     env.set_var("x", "10").unwrap();
@@ -541,7 +541,7 @@ fn eval_assign_readonly_error() {
 
 // Group ---------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_group() {
     let mut env = Environment::new();
     let expr = group(binary(num(2), ArithBinaryOp::Add, num(3)));
@@ -550,14 +550,14 @@ fn eval_group() {
 
 // Comma ---------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_comma_returns_right() {
     let mut env = Environment::new();
     let expr = comma(num(1), num(2));
     assert_eq!(evaluate_arith_expr(&expr, &mut env).unwrap(), 2);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_comma_evaluates_left_side_effect() {
     let mut env = Environment::new();
     let expr = comma(assign("x", ArithAssignOp::Assign, num(42)), num(0));
@@ -567,7 +567,7 @@ fn eval_comma_evaluates_left_side_effect() {
 
 // Variable with expression --------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_in_expression() {
     let mut env = Environment::new();
     env.set_var("a", "10").unwrap();
@@ -578,14 +578,14 @@ fn eval_variable_in_expression() {
 
 // parse_i64 edge cases ------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_hex() {
     let mut env = Environment::new();
     env.set_var("x", "0xFF").unwrap();
     assert_eq!(evaluate_arith_expr(&var("x"), &mut env).unwrap(), 255);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn eval_variable_octal() {
     let mut env = Environment::new();
     env.set_var("x", "010").unwrap();

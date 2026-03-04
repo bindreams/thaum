@@ -19,7 +19,7 @@ mod redirects;
 mod word_expansion;
 
 fn main() {
-    testutil::run_all();
+    skuld::run_all();
 }
 
-testutil::default_labels!(lex, parse);
+skuld::default_labels!(lex, parse);

@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 
 use super::preconditions;
 
-testutil::default_labels!(bench);
+skuld::default_labels!(bench);
 
 fn scripts_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/scripts")
@@ -50,7 +50,7 @@ fn run_callgrind(subcmd: &str, script_body: &str) -> thaum::callgrind_parser::Ca
     thaum::callgrind_parser::parse(&text).expect("cannot parse callgrind output")
 }
 
-#[testutil::test(requires = [preconditions::valgrind, preconditions::thaum])]
+#[skuld::test(requires = [preconditions::valgrind, preconditions::thaum])]
 fn callgrind_trivial_lex() {
     let body = read_script_body("trivial.sh.yaml");
     let metrics = run_callgrind("lex", &body);
@@ -62,7 +62,7 @@ fn callgrind_trivial_lex() {
     );
 }
 
-#[testutil::test(requires = [preconditions::valgrind, preconditions::thaum])]
+#[skuld::test(requires = [preconditions::valgrind, preconditions::thaum])]
 fn callgrind_all_stages() {
     let body = read_script_body("trivial.sh.yaml");
 

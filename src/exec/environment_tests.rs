@@ -1,8 +1,8 @@
 use super::*;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
-#[testutil::test]
+#[skuld::test]
 fn get_set_var() {
     let mut env = Environment::new();
     assert_eq!(env.get_var("FOO"), None);
@@ -14,7 +14,7 @@ fn get_set_var() {
     assert_eq!(env.get_var("FOO"), Some("baz"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn unset_var() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -22,7 +22,7 @@ fn unset_var() {
     assert_eq!(env.get_var("FOO"), None);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn readonly_prevents_set() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -35,7 +35,7 @@ fn readonly_prevents_set() {
     assert_eq!(env.get_var("FOO"), Some("bar"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn readonly_prevents_unset() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -45,7 +45,7 @@ fn readonly_prevents_unset() {
     assert!(matches!(err, ExecError::ReadonlyVariable(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn export_var() {
     let mut env = Environment::new();
     env.set_var("FOO", "bar").unwrap();
@@ -58,7 +58,7 @@ fn export_var() {
     assert!(exported.iter().any(|(k, v)| k == "FOO" && v == "bar"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn export_nonexistent_creates_empty() {
     let mut env = Environment::new();
     env.export_var("NEW");
@@ -66,7 +66,7 @@ fn export_nonexistent_creates_empty() {
     assert!(env.is_exported("NEW"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_params() {
     let mut env = Environment::new();
     env.set_last_exit_status(42);
@@ -83,7 +83,7 @@ fn special_params() {
     assert_eq!(env.get_special("0"), Some("sh".to_string()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn scope_push_pop_does_not_restore_vars_in_posix() {
     let mut env = Environment::new();
     env.set_var("X", "outer").unwrap();
@@ -106,7 +106,7 @@ fn scope_push_pop_does_not_restore_vars_in_posix() {
     assert_eq!(env.get_special("1"), None);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn scope_push_pop_restores_positional() {
     let mut env = Environment::new();
     env.set_positional_params(vec!["orig1".into(), "orig2".into()]);
@@ -118,25 +118,25 @@ fn scope_push_pop_restores_positional() {
     assert_eq!(env.positional_params(), &["orig1".to_string(), "orig2".to_string()]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn default_ifs() {
     let env = Environment::new();
     assert_eq!(env.ifs(), " \t\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn cwd_is_set() {
     let env = Environment::new();
     assert!(env.cwd().is_absolute());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn pid_is_set() {
     let env = Environment::new();
     assert_eq!(env.get_special("$"), Some(std::process::id().to_string()));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_param_dash_default() {
     let env = Environment::new();
     let flags = env.get_special("-").expect("$- should return Some");
@@ -147,7 +147,7 @@ fn special_param_dash_default() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_param_dash_with_errexit() {
     let mut env = Environment::new();
     env.set_errexit(true);
@@ -155,7 +155,7 @@ fn special_param_dash_with_errexit() {
     assert!(flags.contains('e'), "flags should contain 'e' when errexit is on");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_param_dash_with_nounset() {
     let mut env = Environment::new();
     env.set_nounset(true);
@@ -163,7 +163,7 @@ fn special_param_dash_with_nounset() {
     assert!(flags.contains('u'), "flags should contain 'u' when nounset is on");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_param_dash_with_xtrace() {
     let mut env = Environment::new();
     env.set_xtrace(true);
@@ -171,7 +171,7 @@ fn special_param_dash_with_xtrace() {
     assert!(flags.contains('x'), "flags should contain 'x' when xtrace is on");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn special_param_dash_with_multiple_options() {
     let mut env = Environment::new();
     env.set_errexit(true);
@@ -184,7 +184,7 @@ fn special_param_dash_with_multiple_options() {
 }
 
 #[cfg(unix)]
-#[testutil::test]
+#[skuld::test]
 fn bash_vars_groups_is_populated() {
     let mut env = Environment::new();
     env.initialize_bash_vars();

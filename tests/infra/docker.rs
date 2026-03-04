@@ -9,7 +9,7 @@ use std::process::{Command, Stdio};
 
 use super::preconditions;
 
-testutil::default_labels!(infra, docker);
+skuld::default_labels!(infra, docker);
 
 fn project_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -17,7 +17,7 @@ fn project_root() -> &'static Path {
 
 /// Build an untagged Docker image and return its ID. Caller must remove it.
 fn build_image(dockerfile: &Path) -> String {
-    testutil::docker::build_image(dockerfile, project_root(), None)
+    thaum::testkit::docker::build_image(dockerfile, project_root(), None)
         .unwrap_or_else(|e| panic!("Docker build failed for {}: {e}", dockerfile.display()))
 }
 
@@ -68,21 +68,21 @@ fn kill_container(container_id: &str) {
 
 // Tests -----------------------------------------------------------------------
 
-#[testutil::test(requires = [preconditions::docker])]
+#[skuld::test(requires = [preconditions::docker])]
 fn corpus_image_builds() {
     let dockerfile = project_root().join("tests/docker/Dockerfile");
     let id = build_image(&dockerfile);
-    testutil::docker::remove_image(&id);
+    thaum::testkit::docker::remove_image(&id);
 }
 
-#[testutil::test(requires = [preconditions::docker])]
+#[skuld::test(requires = [preconditions::docker])]
 fn bench_image_builds() {
     let dockerfile = project_root().join("benches/docker/Dockerfile");
     let id = build_image(&dockerfile);
-    testutil::docker::remove_image(&id);
+    thaum::testkit::docker::remove_image(&id);
 }
 
-#[testutil::test(requires = [preconditions::docker])]
+#[skuld::test(requires = [preconditions::docker])]
 fn corpus_container_lifecycle() {
     let dockerfile = project_root().join("tests/docker/Dockerfile");
     let image_id = build_image(&dockerfile);
@@ -91,13 +91,13 @@ fn corpus_container_lifecycle() {
     let (stdout, code) = exec_in(&container_id, &["echo", "ok"]);
 
     kill_container(&container_id);
-    testutil::docker::remove_image(&image_id);
+    thaum::testkit::docker::remove_image(&image_id);
 
     assert_eq!(code, 0, "echo should exit 0");
     assert_eq!(stdout.trim(), "ok", "echo should output 'ok'");
 }
 
-#[testutil::test(requires = [preconditions::docker])]
+#[skuld::test(requires = [preconditions::docker])]
 fn corpus_thaum_available() {
     let dockerfile = project_root().join("tests/docker/Dockerfile");
     let image_id = build_image(&dockerfile);
@@ -106,7 +106,7 @@ fn corpus_thaum_available() {
     let (stdout, code) = exec_in(&container_id, &["thaum", "--version"]);
 
     kill_container(&container_id);
-    testutil::docker::remove_image(&image_id);
+    thaum::testkit::docker::remove_image(&image_id);
 
     assert_eq!(code, 0, "thaum --version should exit 0");
     assert!(

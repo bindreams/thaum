@@ -31,6 +31,10 @@ pub mod visit;
 /// Word expansion helpers (brace-param parsing, command substitution).
 pub mod word;
 
+/// Test and benchmark infrastructure (Docker helpers, etc.).
+#[cfg(feature = "testkit")]
+pub mod testkit;
+
 pub use ast::Program;
 pub use dialect::{Dialect, ShellOptions};
 pub use error::ParseError;
@@ -52,5 +56,5 @@ pub fn parse_with_options(input: &str, options: ShellOptions) -> Result<Program,
 
 #[cfg(test)]
 fn main() {
-    testutil::run_all();
+    skuld::run_all();
 }

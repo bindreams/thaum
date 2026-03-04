@@ -25,8 +25,8 @@ pub fn image_available(image: &str) -> bool {
 
 /// Build a Docker image. Returns the image ID.
 ///
-/// If `tag` is provided, the image is tagged (e.g. `thaum-corpus-exec`).
-/// If `None`, the untagged image ID is returned (for one-shot use).
+/// If `tag` is provided, the image is tagged. If `None`, the untagged image ID
+/// is returned (for one-shot use).
 pub fn build_image(dockerfile: &Path, context: &Path, tag: Option<&str>) -> Result<String, String> {
     let mut cmd = Command::new("docker");
     cmd.arg("build").arg("--quiet");

@@ -73,7 +73,7 @@ fn link_or_copy(src: &Path, dst: &Path) -> Result<(), String> {
     }
 }
 
-#[testutil::fixture(scope = process, deref)]
+#[skuld::fixture(scope = process, deref)]
 fn test_tools() -> Result<TestTools, String> {
     let bin_dir = cargo_bin_dir();
     let dir = tempfile::Builder::new()

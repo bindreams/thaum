@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "testutil", "testutil/macros"]
+members = ["."]
 
 [package]
 name = "thaum"
@@ -14,6 +14,7 @@ harness = false
 default = []
 cli = ["dep:colored", "dep:clap"]
 bench = ["dep:clap"]
+testkit = []
 
 [dependencies]
 thiserror = "2"
@@ -54,7 +55,7 @@ pretty_assertions = "1"
 serde_yaml2 = "0.1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
-testutil = { path = "testutil" }
+skuld = { git = "https://github.com/bindreams/skuld" }
 clap = { version = "4", features = ["derive"] }
 tempfile = "3.26.0"
 
@@ -74,10 +75,12 @@ harness = false
 [[test]]
 name = "corpus"
 harness = false
+required-features = ["testkit"]
 
 [[test]]
 name = "infra"
 harness = false
+required-features = ["testkit"]
 
 [[bench]]
 name = "bench"

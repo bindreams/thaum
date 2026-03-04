@@ -6,7 +6,7 @@ mod double_bracket;
 use thaum::ast::*;
 use thaum::{parse, parse_with, Dialect, ShellOptions};
 
-#[testutil::test]
+#[skuld::test]
 fn bash_here_string() {
     let opts = ShellOptions {
         here_strings: true,
@@ -22,12 +22,12 @@ fn bash_here_string() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_here_string() {
     assert!(parse("cat <<< hello").is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_ampersand_redirect() {
     let prog = parse_with("cmd &> /dev/null", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -39,7 +39,7 @@ fn bash_ampersand_redirect() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_ampersand_append_redirect() {
     let prog = parse_with("cmd &>> log", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -51,7 +51,7 @@ fn bash_ampersand_append_redirect() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_ampersand_is_background() {
     let result = parse("cmd &> /dev/null");
     if let Ok(prog) = &result {
@@ -59,7 +59,7 @@ fn posix_ampersand_is_background() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_double_brackets() {
     let opts = ShellOptions {
         double_brackets: true,
@@ -85,7 +85,7 @@ fn bash_double_brackets() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_double_brackets_with_and() {
     let prog = parse_with(r#"[[ -f foo && -d bar ]]"#, Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -118,7 +118,7 @@ fn bash_double_brackets_with_and() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_double_brackets_requires_space() {
     // [[-f is NOT [[ -f — bash requires whitespace after [[.
     // Without space, [[-f is a literal command name.
@@ -126,14 +126,14 @@ fn bash_double_brackets_requires_space() {
     assert!(matches!(&prog.lines[0][0].expression, Expression::Command(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_double_brackets() {
     let prog = parse("[[ -f foo ]]").unwrap();
     let stmt = &prog.lines[0][0];
     assert!(matches!(stmt.expression, Expression::Command(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_arithmetic_command() {
     let opts = ShellOptions {
         arithmetic_command: true,
@@ -159,7 +159,7 @@ fn bash_arithmetic_command() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_double_paren_is_subshell() {
     let result = parse("(( x + 1 ))");
     if let Ok(prog) = &result {
@@ -173,7 +173,7 @@ fn posix_double_paren_is_subshell() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_nested_subshell_not_arithmetic() {
     // `( (echo hello) )` — space-separated parens are nested subshells, not `((`.
     // The lexer produces two separate LParen tokens; the parser must not
@@ -183,14 +183,14 @@ fn bash_nested_subshell_not_arithmetic() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_nested_subshell_in_pipeline() {
     // Source: /usr/share/doc/socat/examples/test.sh
     let input = "( (echo a; echo b) | cat ) &";
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_function_keyword() {
     let prog = parse_with("function greet { echo hello; }", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -201,7 +201,7 @@ fn bash_function_keyword() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_function_keyword_with_parens() {
     let prog = parse_with("function greet() { echo hello; }", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -212,7 +212,7 @@ fn bash_function_keyword_with_parens() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_function_keyword() {
     let result = parse("function greet { echo hello; }");
     if let Ok(prog) = &result {
@@ -220,7 +220,7 @@ fn posix_rejects_function_keyword() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_process_substitution_input() {
     let opts = ShellOptions {
         process_substitution: true,
@@ -249,7 +249,7 @@ fn bash_process_substitution_input() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_process_substitution_output() {
     let opts = ShellOptions {
         process_substitution: true,
@@ -271,7 +271,7 @@ fn bash_process_substitution_output() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn process_substitution_requires_whitespace() {
     // In bash, `<(` is process substitution only when preceded by whitespace.
     // `foo<(sort a)` has no space before `<`, so `<` is treated as a redirect
@@ -295,7 +295,7 @@ fn process_substitution_requires_whitespace() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_process_substitution() {
     let result = parse("diff <(sort a)");
     if let Ok(prog) = &result {
@@ -308,7 +308,7 @@ fn posix_rejects_process_substitution() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_extended_case_fall_through() {
     let prog = parse_with("case x in\na) echo a;;&\nb) echo b;;\nesac", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -325,7 +325,7 @@ fn bash_extended_case_fall_through() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_extended_case_continue() {
     let prog = parse_with("case x in\na) echo a;&\nb) echo b;;\nesac", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -341,7 +341,7 @@ fn bash_extended_case_continue() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_select_loop() {
     let opts = ShellOptions {
         select: true,
@@ -364,7 +364,7 @@ fn bash_select_loop() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_select_no_in() {
     let opts = ShellOptions {
         select: true,
@@ -384,7 +384,7 @@ fn bash_select_no_in() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_select() {
     let result = parse("select opt in a b c; do echo $opt; done");
     if let Ok(prog) = &result {
@@ -392,7 +392,7 @@ fn posix_rejects_select() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_coproc_simple() {
     let opts = ShellOptions {
         coproc: true,
@@ -412,7 +412,7 @@ fn bash_coproc_simple() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_coproc_named() {
     let opts = ShellOptions {
         coproc: true,
@@ -438,7 +438,7 @@ fn bash_coproc_named() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_coproc() {
     let result = parse("coproc cat");
     if let Ok(prog) = &result {
@@ -446,7 +446,7 @@ fn posix_rejects_coproc() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_array_assignment() {
     let opts = ShellOptions {
         arrays: true,
@@ -467,7 +467,7 @@ fn bash_array_assignment() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_array_assignment_empty() {
     let opts = ShellOptions {
         arrays: true,
@@ -487,7 +487,7 @@ fn bash_array_assignment_empty() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_array_assignment_with_command() {
     let opts = ShellOptions {
         arrays: true,
@@ -505,7 +505,7 @@ fn bash_array_assignment_with_command() {
 
 // |& pipe stderr ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_pipe_stderr() {
     // cmd1 |& cmd2 — pipe both stdout and stderr
     let opts = ShellOptions {
@@ -523,7 +523,7 @@ fn bash_pipe_stderr() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_pipe_stderr_in_chain() {
     // a |& b | c — first pipe has stderr, second doesn't
     let opts = ShellOptions {
@@ -553,7 +553,7 @@ fn bash_pipe_stderr_in_chain() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_pipe_ampersand_is_background() {
     // In POSIX, `cmd1 |& cmd2` is `cmd1 |` (pipe) then `& cmd2` (background).
     // `cmd1 |` alone is an error (missing right side of pipe).
@@ -572,7 +572,7 @@ fn posix_pipe_ampersand_is_background() {
 
 // $'...' ANSI-C quoting -----------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_ansi_c_quoting() {
     let opts = ShellOptions {
         ansi_c_quoting: true,
@@ -595,7 +595,7 @@ fn bash_ansi_c_quoting() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_ansi_c_quoting_concatenated() {
     // prefix$'\n'suffix — three fragments
     let opts = ShellOptions {
@@ -618,7 +618,7 @@ fn bash_ansi_c_quoting_concatenated() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_dollar_single_quote_is_dollar_plus_string() {
     // In POSIX, $'...' is just $ followed by a single-quoted string
     let prog = parse(r"echo $'hello'").unwrap();
@@ -633,7 +633,7 @@ fn posix_dollar_single_quote_is_dollar_plus_string() {
 
 // $"..." locale translation -------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_locale_quoted() {
     let opts = ShellOptions {
         locale_translation: true,
@@ -658,7 +658,7 @@ fn bash_locale_quoted() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_dollar_double_quote_is_dollar_plus_string() {
     // In POSIX, $"..." is just $ followed by a double-quoted string
     let prog = parse(r#"echo $"hello""#).unwrap();
@@ -672,7 +672,7 @@ fn posix_dollar_double_quote_is_dollar_plus_string() {
 
 // extglob -------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_extglob_zero_or_more() {
     let opts = ShellOptions {
         extglob: true,
@@ -697,7 +697,7 @@ fn bash_extglob_zero_or_more() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_extglob_not() {
     let opts = ShellOptions {
         extglob: true,
@@ -722,7 +722,7 @@ fn bash_extglob_not() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_extglob_in_word() {
     // file.@(txt|md) — extglob after a literal prefix
     let opts = ShellOptions {
@@ -749,7 +749,7 @@ fn bash_extglob_in_word() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_extglob() {
     // TODO: In POSIX, *(foo) is glob * followed by subshell (foo). Our parser
     // currently errors because * becomes a word and ( starts a subshell which
@@ -770,7 +770,7 @@ fn posix_rejects_extglob() {
 
 // brace expansion -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_brace_expansion_list() {
     let prog = parse_with("echo {a,b,c}", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -791,7 +791,7 @@ fn bash_brace_expansion_list() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_brace_expansion_sequence() {
     let prog = parse_with("echo {1..5}", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -812,7 +812,7 @@ fn bash_brace_expansion_sequence() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_brace_expansion_step() {
     let prog = parse_with("echo {0..10..2}", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -833,7 +833,7 @@ fn bash_brace_expansion_step() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_brace_expansion_in_word() {
     let prog = parse_with("echo file{1,2,3}.txt", Dialect::Bash).unwrap();
     let stmt = &prog.lines[0][0];
@@ -853,7 +853,7 @@ fn bash_brace_expansion_in_word() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_brace_is_literal() {
     let prog = parse("echo {a,b,c}").unwrap();
     let stmt = &prog.lines[0][0];

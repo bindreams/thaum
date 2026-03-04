@@ -49,7 +49,7 @@ Place contracts on every function where there is a meaningful invariant to check
 
 ## Test macro
 
-Use `#[testutil::test]` instead of `#[test]` everywhere. All test binaries use `harness = false` with the testutil custom harness. Do NOT use bare `#[test]` — it compiles but silently never runs.
+Use `#[skuld::test]` instead of `#[test]` everywhere. All test binaries use `harness = false` with the skuld custom harness. Do NOT use bare `#[test]` — it compiles but silently never runs.
 
 Optional arguments:
 
@@ -58,18 +58,18 @@ Optional arguments:
 - `labels = [docker, slow]` — prepended as `[docker][slow]` for nextest filtering
 - `ignore` or `ignore = "reason"` — statically ignore the test
 
-For dynamic test generation (e.g. corpus tests from data files), use `testutil::TestRunner::add()`.
+For dynamic test generation (e.g. corpus tests from data files), use `skuld::TestRunner::add()`.
 
 ## Pre-commit checklist
 
 Before every commit, run `pre-commit run --all-files` and fix any issues. This checks:
 
-1. No stray `#[test]` — use `#[testutil::test]` instead
+1. No stray `#[test]` — use `#[skuld::test]` instead
 1. `cargo fmt` — formatting is correct
 1. `cargo clippy` — no linter warnings
 
 Additionally:
-4\. Run `cargo nextest run --features cli`: all tests pass
+4\. Run `cargo nextest run --features cli,testkit`: all tests pass
 5\. Update stale information in documentation:
 
 - `README.md`: General information for new users

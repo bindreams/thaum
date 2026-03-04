@@ -6,41 +6,41 @@ use crate::*;
 
 // Basic command execution ---------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn true_command() {
     assert_eq!(exec_status("true"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn false_command() {
     assert_eq!(exec_status("false"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn colon_noop() {
     assert_eq!(exec_status(":"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn exit_zero() {
     assert_eq!(exec_status("exit 0"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn exit_nonzero() {
     assert_eq!(exec_status("exit 42"), 42);
 }
 
 // Variable assignment -------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn variable_assignment_and_echo() {
     let (out, status) = exec_ok("X=hello; echo $X");
     assert_eq!(status, 0);
     assert_eq!(out, "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn variable_used_in_later_command() {
     // X=hello; exit status of assignment is 0
     let program = thaum::parse("X=hello\ntrue").unwrap();
@@ -53,51 +53,51 @@ fn variable_used_in_later_command() {
 
 // AND/OR lists --------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn and_list_both_true() {
     assert_eq!(exec_status("true && true"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn and_list_first_false() {
     assert_eq!(exec_status("false && true"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn and_list_second_false() {
     assert_eq!(exec_status("true && false"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn or_list_first_false() {
     assert_eq!(exec_status("false || true"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn or_list_first_true() {
     assert_eq!(exec_status("true || false"), 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn or_list_both_false() {
     assert_eq!(exec_status("false || false"), 1);
 }
 
 // Not -----------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn not_true() {
     assert_eq!(exec_status("! true"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn not_false() {
     assert_eq!(exec_status("! false"), 0);
 }
 
 // Multiple statements -------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn multiple_statements_last_status() {
     assert_eq!(exec_status("true; false"), 1);
     assert_eq!(exec_status("false; true"), 0);
@@ -106,7 +106,7 @@ fn multiple_statements_last_status() {
 
 // exit status propagation ---------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn exit_status_variable() {
     let program = thaum::parse("false\ntrue").unwrap();
     let mut executor = Executor::new();
@@ -119,7 +119,7 @@ fn exit_status_variable() {
 
 // If statements -------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn if_true_branch() {
     let program = thaum::parse("if true; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
@@ -128,7 +128,7 @@ fn if_true_branch() {
     assert_eq!(executor.env().get_var("X"), Some("yes"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn if_false_branch() {
     let program = thaum::parse("if false; then X=yes; else X=no; fi").unwrap();
     let mut executor = Executor::new();
@@ -137,7 +137,7 @@ fn if_false_branch() {
     assert_eq!(executor.env().get_var("X"), Some("no"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn if_no_else_false() {
     let program = thaum::parse("if false; then X=yes; fi").unwrap();
     let mut executor = Executor::new();
@@ -149,7 +149,7 @@ fn if_no_else_false() {
 
 // While loop ----------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn while_loop_counts() {
     // Arithmetic expansion not yet implemented, so use a simpler test.
     // This test currently tests the while structure only.
@@ -162,7 +162,7 @@ fn while_loop_counts() {
 
 // For loop ------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn for_loop_over_words() {
     let program = thaum::parse("RESULT=\nfor i in a b c; do RESULT=${RESULT}${i}; done").unwrap();
     let mut executor = Executor::new();
@@ -173,7 +173,7 @@ fn for_loop_over_words() {
 
 // Case statement ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn case_exact_match() {
     let program = thaum::parse(
         r#"
@@ -190,7 +190,7 @@ esac
     assert_eq!(executor.env().get_var("X"), Some("matched"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn case_wildcard_match() {
     let program = thaum::parse(
         r#"
@@ -209,7 +209,7 @@ esac
 
 // Brace group ---------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn brace_group() {
     let program = thaum::parse("{ X=inside; }").unwrap();
     let mut executor = Executor::new();
@@ -220,7 +220,7 @@ fn brace_group() {
 
 // Function definition and call ----------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn function_define_and_call() {
     let program = thaum::parse("greet() { X=hello; }\ngreet").unwrap();
     let mut executor = Executor::new();
@@ -231,7 +231,7 @@ fn function_define_and_call() {
 
 // Export --------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn export_builtin() {
     let program = thaum::parse("export FOO=bar").unwrap();
     let mut executor = Executor::new();
@@ -243,7 +243,7 @@ fn export_builtin() {
 
 // Unset ---------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn unset_builtin() {
     let program = thaum::parse("X=hello\nunset X").unwrap();
     let mut executor = Executor::new();
@@ -254,26 +254,26 @@ fn unset_builtin() {
 
 // External command (basic smoke test) — moved to exec/external.rs -------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn external_command_not_found() {
     assert_eq!(exec_status("nonexistent_command_xyz_123"), 127);
 }
 
 // Test builtin --------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn test_builtin_string() {
     assert_eq!(exec_status("test hello"), 0);
     assert_eq!(exec_status("test ''"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn test_builtin_eq() {
     assert_eq!(exec_status("test 5 -eq 5"), 0);
     assert_eq!(exec_status("test 5 -eq 6"), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bracket_test_syntax() {
     assert_eq!(exec_status("[ hello ]"), 0);
     assert_eq!(exec_status("[ 3 -gt 2 ]"), 0);
@@ -282,7 +282,7 @@ fn bracket_test_syntax() {
 
 // Break/continue ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn break_in_while() {
     let program = thaum::parse(
         r#"
@@ -301,7 +301,7 @@ done
     assert_eq!(executor.env().get_var("X"), Some("1"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn continue_in_for() {
     let program = thaum::parse(
         r#"
@@ -323,7 +323,7 @@ done
 
 // Command substitution ------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_builtin() {
     let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
@@ -332,7 +332,7 @@ fn command_substitution_builtin() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_external(#[fixture(test_tools)] tools: &Path) {
     let program = thaum::parse("X=$(echo world)").unwrap();
     let mut executor = crate::test_executor_with_tools(tools);
@@ -341,7 +341,7 @@ fn command_substitution_external(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(executor.env().get_var("X"), Some("world"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_strips_trailing_newlines() {
     let program = thaum::parse("X=$(echo hello)").unwrap();
     let mut executor = Executor::new();
@@ -351,7 +351,7 @@ fn command_substitution_strips_trailing_newlines() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_in_argument() {
     // Test that $(...) works in command arguments
     let program = thaum::parse("X=$(echo inner)\nY=${X}").unwrap();
@@ -362,7 +362,7 @@ fn command_substitution_in_argument() {
     assert_eq!(executor.env().get_var("Y"), Some("inner"));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_exit_status() {
     let program = thaum::parse("X=$(false)").unwrap();
     let mut executor = Executor::new();
@@ -373,14 +373,14 @@ fn command_substitution_exit_status() {
     assert_eq!(executor.env().get_var("X"), Some(""));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn heredoc_basic() {
     let (out, status) = exec_ok("read VAR <<EOF\nhello\nEOF\necho $VAR");
     assert_eq!(status, 0);
     assert_eq!(out, "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn unsupported_compound_redirect() {
     expect_unsupported("if true; then echo hi; fi > /dev/null");
 }
@@ -392,7 +392,7 @@ fn shell_path(p: &std::path::Path) -> String {
     p.to_string_lossy().replace('\\', "/")
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_builtin_stdout_to_file(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("stdout.txt");
 
@@ -403,7 +403,7 @@ fn redirect_builtin_stdout_to_file(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_builtin_append(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("append.txt");
     let f = shell_path(&file);
@@ -414,7 +414,7 @@ fn redirect_builtin_append(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "first\nsecond\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_stdin_from_file(#[fixture(temp_dir)] dir: &Path) {
     let file = dir.join("input.txt");
     std::fs::write(&file, "from-file\n").unwrap();
@@ -424,7 +424,7 @@ fn redirect_stdin_from_file(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(out, "from-file\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_dup_stdout_to_stderr_file(#[fixture(temp_dir)] dir: &Path) {
     // > file 2>&1 — redirect stdout to file, then dup stderr to same file
     let file = dir.join("combined.txt");
@@ -436,7 +436,7 @@ fn redirect_dup_stdout_to_stderr_file(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_fd3_and_dup_to_stdout(#[fixture(temp_dir)] dir: &Path) {
     // echo hello 3>/tmp/file >&3 — open FD 3 to file, dup stdout to FD 3
     let file = dir.join("fd3.txt");
@@ -448,7 +448,7 @@ fn redirect_fd3_and_dup_to_stdout(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_creates_empty_file(#[fixture(temp_dir)] dir: &Path) {
     // `> file` with no command creates/truncates the file
     let file = dir.join("empty.txt");
@@ -463,14 +463,14 @@ fn redirect_creates_empty_file(#[fixture(temp_dir)] dir: &Path) {
 
 // Unsupported features produce explicit errors ------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn unsupported_background() {
     expect_unsupported("echo hello &");
 }
 
 // Dialect gating -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_declare() {
     // declare is bash-only — POSIX mode should not recognize it as a builtin.
     // Use "declare x=1" alone (no trailing echo) so the exit status reflects
@@ -490,7 +490,7 @@ fn posix_rejects_declare() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_shopt() {
     let prog = thaum::parse("shopt -s expand_aliases").unwrap();
     let options = thaum::Dialect::Posix.options();
@@ -506,7 +506,7 @@ fn posix_rejects_shopt() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_allows_alias() {
     // alias is POSIX — should work in POSIX mode
     let prog = thaum::parse("alias").unwrap();
@@ -519,7 +519,7 @@ fn posix_allows_alias() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_allows_test_builtin() {
     let prog = thaum::parse("test -n hello").unwrap();
     let options = thaum::Dialect::Posix.options();
@@ -531,7 +531,7 @@ fn posix_allows_test_builtin() {
     assert_eq!(status, 0);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_allows_declare() {
     // Bash mode — declare should work
     let (out, status) = bash_exec_ok("declare x=hello; echo $x");

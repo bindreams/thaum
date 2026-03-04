@@ -7,7 +7,7 @@ mod common;
 mod output;
 
 fn main() {
-    testutil::run_all();
+    skuld::run_all();
 }
 
-testutil::default_labels!(lex, parse, cli);
+skuld::default_labels!(lex, parse, cli);

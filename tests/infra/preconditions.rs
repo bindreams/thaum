@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 pub fn valgrind() -> Result<(), String> {
-    testutil::probe_executable("valgrind")
+    skuld::probe_executable("valgrind")
 }
 
 pub fn thaum_binary_path() -> PathBuf {
@@ -11,11 +11,11 @@ pub fn thaum_binary_path() -> PathBuf {
 }
 
 pub fn thaum() -> Result<(), String> {
-    testutil::probe_path(thaum_binary_path())
+    skuld::probe_path(thaum_binary_path())
 }
 
 pub fn docker() -> Result<(), String> {
-    if testutil::docker::available() {
+    if thaum::testkit::docker::available() {
         Ok(())
     } else {
         Err("Docker not available".into())

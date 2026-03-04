@@ -2,7 +2,7 @@ use crate::common::*;
 use thaum::ast::*;
 use thaum::parse;
 
-#[testutil::test]
+#[skuld::test]
 fn if_with_test_command() {
     let compound = first_compound(r#"if [ "$x" = "yes" ]; then echo matched; fi"#);
     if let CompoundCommand::IfClause {
@@ -16,7 +16,7 @@ fn if_with_test_command() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn nested_if() {
     let input = r#"if true; then
     if false; then
@@ -37,7 +37,7 @@ fi"#;
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn if_elif_else() {
     let compound = first_compound(
         r#"if [ -f /etc/config ]; then
@@ -56,7 +56,7 @@ fi"#,
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn if_with_newlines() {
     assert!(matches!(
         first_compound("if\ntrue\nthen\necho yes\nfi"),
@@ -64,7 +64,7 @@ fn if_with_newlines() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn while_read_loop() {
     assert!(matches!(
         first_compound("while read line; do\n    echo \"$line\"\ndone"),
@@ -72,7 +72,7 @@ fn while_read_loop() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn for_loop_with_glob() {
     let compound = first_compound("for f in *.txt; do echo $f; done");
     if let CompoundCommand::ForClause {
@@ -92,7 +92,7 @@ fn for_loop_with_glob() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn for_loop_with_newline_instead_of_semicolon() {
     if let CompoundCommand::ForClause { words, .. } = &first_compound("for i in a b c\ndo\necho $i\ndone") {
         assert_eq!(words.as_ref().unwrap().len(), 3);
@@ -101,7 +101,7 @@ fn for_loop_with_newline_instead_of_semicolon() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn case_with_multiple_patterns() {
     let input = r#"case "$1" in
     start|begin)
@@ -123,7 +123,7 @@ esac"#;
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn empty_case_arms() {
     let compound = first_compound("case x in\na) ;;\nb) ;;\nesac");
     if let CompoundCommand::CaseClause { arms, .. } = &compound {
@@ -134,7 +134,7 @@ fn empty_case_arms() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn case_pattern_backslash_newline_with_indent() {
     // Case pattern continued across lines with `\<newline>` and indentation.
     // Source: /usr/bin/gzexe, /usr/bin/nroff, /usr/bin/xzgrep, /usr/bin/zgrep,
@@ -146,7 +146,7 @@ fn case_pattern_backslash_newline_with_indent() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn brace_group_with_redirect() {
     let e = first_expr("{ echo hello; echo world; } > output.txt");
     if let Expression::Compound {
@@ -161,7 +161,7 @@ fn brace_group_with_redirect() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn until_loop() {
     assert!(matches!(
         first_compound("until false; do echo waiting; done"),
@@ -169,7 +169,7 @@ fn until_loop() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn for_without_in_clause() {
     // `for var; do ...; done` iterates over $@
     let compound = first_compound("for arg; do echo $arg; done");
@@ -181,7 +181,7 @@ fn for_without_in_clause() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn deeply_nested_compound() {
     let input = r#"if true; then
     while true; do
@@ -196,7 +196,7 @@ fi"#;
     assert!(!prog.lines.is_empty());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_empty_then_fi() {
     let compound = first_compound_bash("if true; then\nfi");
     if let CompoundCommand::IfClause { then_body, .. } = &compound {
@@ -206,7 +206,7 @@ fn bash_empty_then_fi() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_empty_do_done() {
     let compound = first_compound_bash("while false; do\ndone");
     if let CompoundCommand::WhileClause { body, .. } = &compound {
@@ -216,7 +216,7 @@ fn bash_empty_do_done() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_empty_for_body() {
     let compound = first_compound_bash("for i in a b; do\ndone");
     if let CompoundCommand::ForClause { body, .. } = &compound {
@@ -226,12 +226,12 @@ fn bash_empty_for_body() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_empty_then_fi() {
     assert!(parse("if true; then\nfi").is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_empty_do_done() {
     assert!(parse("while false; do\ndone").is_err());
 }

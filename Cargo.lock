@@ -1220,6 +1220,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "skuld"
+version = "0.1.0"
+source = "git+https://github.com/bindreams/skuld#5169e6bc1ead3fc7af9307d7ad9c2bf87741e7ac"
+dependencies = [
+ "clap",
+ "inventory",
+ "libtest-mimic",
+ "skuld-macros",
+ "tempfile",
+]
+
+[[package]]
+name = "skuld-macros"
+version = "0.1.0"
+source = "git+https://github.com/bindreams/skuld#5169e6bc1ead3fc7af9307d7ad9c2bf87741e7ac"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "smallvec"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1294,26 +1316,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "testutil"
-version = "0.1.0"
-dependencies = [
- "clap",
- "inventory",
- "libtest-mimic",
- "tempfile",
- "testutil-macros",
-]
-
-[[package]]
-name = "testutil-macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "thaum"
 version = "0.1.0"
 dependencies = [
@@ -1334,9 +1336,9 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml2",
+ "skuld",
  "strum",
  "tempfile",
- "testutil",
  "thiserror 2.0.18",
  "windows 0.62.2",
  "yaml-rust2",

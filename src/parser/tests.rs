@@ -4,7 +4,7 @@
 use super::*;
 use pretty_assertions::assert_eq;
 
-testutil::default_labels!(lex, parse);
+skuld::default_labels!(lex, parse);
 
 fn parse_ok(input: &str) -> Program {
     parse(input).unwrap_or_else(|e| panic!("parse failed for {input:?}: {e}"))
@@ -34,7 +34,7 @@ fn first_compound(input: &str) -> CompoundCommand {
 
 // Simple commands -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_single_word_command() {
     let cmd = first_cmd("ls");
     assert_eq!(cmd.arguments.len(), 1);
@@ -49,13 +49,13 @@ fn parse_single_word_command() {
     assert!(cmd.redirects.is_empty());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_command_with_args() {
     let cmd = first_cmd("echo hello world");
     assert_eq!(cmd.arguments.len(), 3);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_assignment_only() {
     let cmd = first_cmd("FOO=bar");
     assert_eq!(cmd.assignments.len(), 1);
@@ -63,14 +63,14 @@ fn parse_assignment_only() {
     assert!(cmd.arguments.is_empty());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_assignment_before_command() {
     let cmd = first_cmd("FOO=bar echo hello");
     assert_eq!(cmd.assignments.len(), 1);
     assert_eq!(cmd.arguments.len(), 2);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_multiple_assignments() {
     let cmd = first_cmd("A=1 B=2 cmd");
     assert_eq!(cmd.assignments.len(), 2);
@@ -79,12 +79,12 @@ fn parse_multiple_assignments() {
 
 // Pipelines -----------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_simple_pipeline() {
     assert!(matches!(first_expr("ls | grep foo"), Expression::Pipe { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_multi_stage_pipeline() {
     let e = first_expr("a | b | c | d");
     if let Expression::Pipe { left, .. } = &e {
@@ -98,12 +98,12 @@ fn parse_multi_stage_pipeline() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_negated_pipeline() {
     assert!(matches!(first_expr("! cmd"), Expression::Not(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_negated_pipe() {
     if let Expression::Not(inner) = &first_expr("! a | b") {
         assert!(matches!(inner.as_ref(), Expression::Pipe { .. }));
@@ -114,17 +114,17 @@ fn parse_negated_pipe() {
 
 // And-Or --------------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_and() {
     assert!(matches!(first_expr("a && b"), Expression::And { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_or() {
     assert!(matches!(first_expr("a || b"), Expression::Or { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_mixed_and_or() {
     if let Expression::Or { left, .. } = &first_expr("a && b || c") {
         assert!(matches!(left.as_ref(), Expression::And { .. }));
@@ -133,7 +133,7 @@ fn parse_mixed_and_or() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_pipe_binds_tighter_than_and() {
     if let Expression::And { left, right, .. } = &first_expr("a | b && c | d") {
         assert!(matches!(left.as_ref(), Expression::Pipe { .. }));
@@ -145,7 +145,7 @@ fn parse_pipe_binds_tighter_than_and() {
 
 // Execution modes -----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_semicolon_list() {
     let prog = parse_ok("a; b");
     assert_eq!(prog.lines.len(), 1);
@@ -154,14 +154,14 @@ fn parse_semicolon_list() {
     assert_eq!(prog.lines[0][1].mode, ExecutionMode::Sequential);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_background() {
     let prog = parse_ok("cmd &");
     assert_eq!(prog.lines[0].len(), 1);
     assert_eq!(prog.lines[0][0].mode, ExecutionMode::Background);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_background_then_foreground() {
     let prog = parse_ok("a & b");
     assert_eq!(prog.lines[0].len(), 2);
@@ -169,7 +169,7 @@ fn parse_background_then_foreground() {
     assert_eq!(prog.lines[0][1].mode, ExecutionMode::Sequential);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_newline_separator() {
     let prog = parse_ok("a\nb");
     assert_eq!(prog.lines.len(), 2);
@@ -177,21 +177,21 @@ fn parse_newline_separator() {
 
 // Redirections --------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_input_redirect() {
     let cmd = first_cmd("cmd < file");
     assert_eq!(cmd.redirects.len(), 1);
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::Input(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_output_redirect() {
     let cmd = first_cmd("cmd > file");
     assert_eq!(cmd.redirects.len(), 1);
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::Output(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_fd_redirect() {
     let cmd = first_cmd("cmd 2>&1");
     assert_eq!(cmd.redirects.len(), 1);
@@ -199,7 +199,7 @@ fn parse_fd_redirect() {
     assert!(matches!(&cmd.redirects[0].kind, RedirectKind::DupOutput(_)));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_multiple_redirects() {
     let cmd = first_cmd("cmd < in > out 2>> err");
     assert_eq!(cmd.redirects.len(), 3);
@@ -207,7 +207,7 @@ fn parse_multiple_redirects() {
 
 // Compound commands ---------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_if_then_fi() {
     assert!(matches!(
         first_compound("if true; then echo yes; fi"),
@@ -215,7 +215,7 @@ fn parse_if_then_fi() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_if_then_else_fi() {
     if let CompoundCommand::IfClause { else_body, .. } = first_compound("if true; then echo yes; else echo no; fi") {
         assert!(else_body.is_some());
@@ -224,7 +224,7 @@ fn parse_if_then_else_fi() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_if_elif_else_fi() {
     if let CompoundCommand::IfClause { elifs, else_body, .. } =
         first_compound("if a; then b; elif c; then d; elif e; then f; else g; fi")
@@ -236,7 +236,7 @@ fn parse_if_elif_else_fi() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_while_loop() {
     assert!(matches!(
         first_compound("while true; do echo loop; done"),
@@ -244,7 +244,7 @@ fn parse_while_loop() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_until_loop() {
     assert!(matches!(
         first_compound("until false; do echo loop; done"),
@@ -252,7 +252,7 @@ fn parse_until_loop() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_for_loop_with_list() {
     if let CompoundCommand::ForClause { variable, words, .. } = &first_compound("for i in a b c; do echo $i; done") {
         assert_eq!(variable, "i");
@@ -262,7 +262,7 @@ fn parse_for_loop_with_list() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_brace_group() {
     assert!(matches!(
         first_compound("{ echo hello; }"),
@@ -270,7 +270,7 @@ fn parse_brace_group() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_subshell() {
     assert!(matches!(
         first_compound("(echo hello)"),
@@ -280,7 +280,7 @@ fn parse_subshell() {
 
 // Here-documents ------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_heredoc() {
     let cmd = first_cmd("cat <<EOF\nhello world\nEOF\n");
     assert_eq!(cmd.redirects.len(), 1);
@@ -294,45 +294,45 @@ fn parse_heredoc() {
 
 // Error cases ---------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_error_unexpected_token() {
     assert!(parse(";;").is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_error_unclosed_if() {
     assert!(parse("if true; then echo yes").is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_error_unclosed_paren() {
     assert!(parse("(echo hello").is_err());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_error_unclosed_brace() {
     assert!(parse("{ echo hello").is_err());
 }
 
 // Edge cases ----------------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn parse_reserved_word_as_argument() {
     let cmd = first_cmd("echo if then else");
     assert_eq!(cmd.arguments.len(), 4);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_empty_input() {
     assert!(parse_ok("").lines.is_empty());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_only_newlines() {
     assert!(parse_ok("\n\n\n").lines.is_empty());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_compound_redirect() {
     if let Expression::Compound { redirects, .. } = &first_expr("if true; then echo yes; fi > output") {
         assert_eq!(redirects.len(), 1);
@@ -341,17 +341,17 @@ fn parse_compound_redirect() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_pipeline_with_newlines() {
     assert!(matches!(first_expr("echo hello |\ngrep h"), Expression::Pipe { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_and_or_with_newlines() {
     assert!(matches!(first_expr("true &&\necho yes"), Expression::And { .. }));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_for_with_newlines() {
     assert!(matches!(
         first_compound("for i in a b c\ndo\necho $i\ndone"),
@@ -359,7 +359,7 @@ fn parse_for_with_newlines() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parse_case_with_empty_arm() {
     if let CompoundCommand::CaseClause { arms, .. } = &first_compound("case x in\na) ;;\nesac") {
         assert_eq!(arms.len(), 1);

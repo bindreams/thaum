@@ -1,9 +1,9 @@
 use super::*;
 use crate::ast::Expression;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
-#[testutil::test]
+#[skuld::test]
 fn flatten_single() {
     let expr = Expression::Command(crate::ast::Command {
         assignments: vec![],
@@ -15,7 +15,7 @@ fn flatten_single() {
     assert_eq!(stages.len(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn flatten_two_stage() {
     let a = Expression::Command(crate::ast::Command {
         assignments: vec![],
@@ -38,7 +38,7 @@ fn flatten_two_stage() {
     assert_eq!(stages.len(), 2);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn flatten_three_stage() {
     let a = Expression::Command(crate::ast::Command {
         assignments: vec![],

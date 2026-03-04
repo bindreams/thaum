@@ -629,20 +629,20 @@ fn main() {
     // Check if corpus execution is available. For Docker mode, this only runs
     // `docker info` (fast, idempotent).
     let exec_available = no_sandbox
-        || testutil::collect_fixture_requires(&["corpus_sandbox"])
+        || skuld::collect_fixture_requires(&["corpus_sandbox"])
             .iter()
             .all(|check| check().is_ok());
 
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).
     if exec_available && !no_sandbox {
-        testutil::warm_up("corpus_sandbox");
+        skuld::warm_up("corpus_sandbox");
     }
 
     let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");
     let files = discover_corpus_files(&corpus_dir);
 
-    let mut runner = testutil::TestRunner::new();
+    let mut runner = skuld::TestRunner::new();
     runner.strip_args(&["--no-sandbox"]);
 
     for path in files {
@@ -684,7 +684,7 @@ fn main() {
             // Docker mode: delegate the entire test to the corpus binary inside Docker.
             let display_name_for_docker = display_name.clone();
             runner.add(display_name, &labels, ignored, move || {
-                let sandbox: &common::docker::CorpusSandbox = testutil::fixture("corpus_sandbox");
+                let sandbox: &common::docker::CorpusSandbox = skuld::fixture("corpus_sandbox");
                 if let Err(e) = run_exec_docker(&sandbox.container_id, &display_name_for_docker) {
                     panic!("{}", e.message().unwrap_or("test failed"));
                 }

@@ -2,7 +2,7 @@ use crate::ast::{BraceExpansionKind, Fragment};
 
 use super::brace_expansion::expand_braces;
 
-testutil::default_labels!(exec);
+skuld::default_labels!(exec);
 
 /// Helper: extract literal strings from expansion results.
 fn to_strings(result: &[Vec<Fragment>]) -> Vec<String> {
@@ -23,7 +23,7 @@ fn to_strings(result: &[Vec<Fragment>]) -> Vec<String> {
 
 // List expansion ======================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn list_simple() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::List(vec![
         vec![Fragment::Literal("a".into())],
@@ -34,7 +34,7 @@ fn list_simple() {
     assert_eq!(to_strings(&result), vec!["a", "b", "c"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn list_with_prefix_suffix() {
     let frags = vec![
         Fragment::Literal("-".into()),
@@ -48,7 +48,7 @@ fn list_with_prefix_suffix() {
     assert_eq!(to_strings(&result), vec!["-a-", "-b-"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn list_empty_items() {
     let frags = vec![
         Fragment::Literal("a".into()),
@@ -65,7 +65,7 @@ fn list_empty_items() {
 
 // Cartesian product ===================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn cartesian_product() {
     let frags = vec![
         Fragment::BashBraceExpansion(BraceExpansionKind::List(vec![
@@ -82,7 +82,7 @@ fn cartesian_product() {
     assert_eq!(to_strings(&result), vec!["a_c", "a_d", "b_c", "b_d"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn triple_cartesian() {
     let make_01 = || {
         Fragment::BashBraceExpansion(BraceExpansionKind::List(vec![
@@ -100,7 +100,7 @@ fn triple_cartesian() {
 
 // Nested expansion ====================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn nested_list() {
     // {A,={a,b}=,B}
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::List(vec![
@@ -121,7 +121,7 @@ fn nested_list() {
 
 // Sequence expansion ==================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_numeric() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "1".into(),
@@ -132,7 +132,7 @@ fn sequence_numeric() {
     assert_eq!(to_strings(&result), vec!["1", "2", "3", "4", "5"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_descending() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "5".into(),
@@ -143,7 +143,7 @@ fn sequence_descending() {
     assert_eq!(to_strings(&result), vec!["5", "4", "3", "2", "1"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_with_step() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "1".into(),
@@ -154,7 +154,7 @@ fn sequence_with_step() {
     assert_eq!(to_strings(&result), vec!["1", "4", "7", "10"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_descending_with_negative_step() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "8".into(),
@@ -165,7 +165,7 @@ fn sequence_descending_with_negative_step() {
     assert_eq!(to_strings(&result), vec!["8", "5", "2"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_singleton() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "5".into(),
@@ -176,7 +176,7 @@ fn sequence_singleton() {
     assert_eq!(to_strings(&result), vec!["5"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_negative_singleton() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "-9".into(),
@@ -189,7 +189,7 @@ fn sequence_negative_singleton() {
 
 // Zero-padding ========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_zero_padding() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "01".into(),
@@ -200,7 +200,7 @@ fn sequence_zero_padding() {
     assert_eq!(to_strings(&result), vec!["01", "02", "03"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_zero_padding_descending() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "12".into(),
@@ -211,7 +211,7 @@ fn sequence_zero_padding_descending() {
     assert_eq!(to_strings(&result), vec!["12", "11", "10", "09", "08", "07"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_zero_padding_cross_boundary() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "09".into(),
@@ -224,7 +224,7 @@ fn sequence_zero_padding_cross_boundary() {
 
 // Character sequences =================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_char() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "a".into(),
@@ -235,7 +235,7 @@ fn sequence_char() {
     assert_eq!(to_strings(&result), vec!["a", "b", "c", "d", "e"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_char_descending() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "e".into(),
@@ -246,7 +246,7 @@ fn sequence_char_descending() {
     assert_eq!(to_strings(&result), vec!["e", "d", "c", "b", "a"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_char_with_step() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "a".into(),
@@ -259,7 +259,7 @@ fn sequence_char_with_step() {
 
 // Invalid sequences (literal fallback) ================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_invalid_step_zero() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "1".into(),
@@ -270,7 +270,7 @@ fn sequence_invalid_step_zero() {
     assert_eq!(to_strings(&result), vec!["{1..5..0}"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_invalid_step_wrong_sign() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "1".into(),
@@ -281,7 +281,7 @@ fn sequence_invalid_step_wrong_sign() {
     assert_eq!(to_strings(&result), vec!["{1..5..-1}"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_invalid_non_numeric() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "foo".into(),
@@ -292,7 +292,7 @@ fn sequence_invalid_non_numeric() {
     assert_eq!(to_strings(&result), vec!["{foo..bar}"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_invalid_mixed_case_chars() {
     let frags = vec![Fragment::BashBraceExpansion(BraceExpansionKind::Sequence {
         start: "a".into(),
@@ -305,7 +305,7 @@ fn sequence_invalid_mixed_case_chars() {
 
 // Passthrough =========================================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn no_brace_passthrough() {
     let frags = vec![Fragment::Literal("hello".into())];
     let result = expand_braces(&frags);
@@ -313,7 +313,7 @@ fn no_brace_passthrough() {
     assert_eq!(to_strings(&result), vec!["hello"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn mixed_fragments_passthrough() {
     let frags = vec![
         Fragment::Literal("prefix".into()),
@@ -326,7 +326,7 @@ fn mixed_fragments_passthrough() {
 
 // Sequence with prefix/suffix =========================================================================================
 
-#[testutil::test]
+#[skuld::test]
 fn sequence_with_prefix_suffix() {
     let frags = vec![
         Fragment::Literal("-".into()),

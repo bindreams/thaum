@@ -22,12 +22,12 @@ fn parse_arith_cmd(input: &str) -> ArithExpr {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_number_literal() {
     assert_eq!(parse_arith_cmd("(( 42 ))"), ArithExpr::Number(42));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_variable() {
     assert_eq!(
         parse_arith_cmd("(( x + 1 ))"),
@@ -39,7 +39,7 @@ fn arith_variable() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_operator_precedence() {
     // 2 + 3 * 4 → Binary(Add, 2, Binary(Mul, 3, 4))
     assert_eq!(
@@ -56,7 +56,7 @@ fn arith_operator_precedence() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_assignment() {
     assert_eq!(
         parse_arith_cmd("(( x = 5 ))"),
@@ -68,7 +68,7 @@ fn arith_assignment() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_compound_assignment() {
     assert_eq!(
         parse_arith_cmd("(( x += 3 ))"),
@@ -80,7 +80,7 @@ fn arith_compound_assignment() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_ternary() {
     assert_eq!(
         parse_arith_cmd("(( x > 0 ? 1 : 0 ))"),
@@ -96,7 +96,7 @@ fn arith_ternary() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_pre_increment() {
     assert_eq!(
         parse_arith_cmd("(( ++x ))"),
@@ -107,7 +107,7 @@ fn arith_pre_increment() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_post_increment() {
     assert_eq!(
         parse_arith_cmd("(( x++ ))"),
@@ -118,7 +118,7 @@ fn arith_post_increment() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_exponentiation() {
     assert_eq!(
         parse_arith_cmd("(( 2 ** 10 ))"),
@@ -130,7 +130,7 @@ fn arith_exponentiation() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_parenthesized() {
     assert_eq!(
         parse_arith_cmd("(( (1 + 2) * 3 ))"),
@@ -146,7 +146,7 @@ fn arith_parenthesized() {
     );
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_in_word_context() {
     // echo $(( x + 1 )) — the arithmetic expansion should be parsed
     let prog = parse_with("echo $(( x + 1 ))", Dialect::Bash).unwrap();
@@ -172,7 +172,7 @@ fn arith_in_word_context() {
 
 // arithmetic for loop -------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn bash_arithmetic_for_basic() {
     let opts = ShellOptions {
         arithmetic_for: true,
@@ -202,7 +202,7 @@ fn bash_arithmetic_for_basic() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bash_arithmetic_for_empty_parts() {
     let opts = ShellOptions {
         arithmetic_for: true,
@@ -230,7 +230,7 @@ fn bash_arithmetic_for_empty_parts() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn posix_rejects_arithmetic_for() {
     let result = parse("for ((i=0; i<10; i++)); do echo $i; done");
     assert!(result.is_err());
@@ -238,14 +238,14 @@ fn posix_rejects_arithmetic_for() {
 
 // parameter expansion inside arithmetic -------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn arith_brace_param_expansion() {
     // `(( ${x} + 1 ))` — simple brace expansion in arithmetic.
     let input = "(( ${x} + 1 ))";
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_string_length_param() {
     // `(( ${#x} ))` — string length in arithmetic context.
     // Source: /usr/sbin/lvmdump uses `(( ! ${#files[@]} ))`
@@ -253,7 +253,7 @@ fn arith_string_length_param() {
     assert!(parse_with(input, Dialect::Bash).is_ok());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_length() {
     // `(( ${#arr[@]} ))` — array length in arithmetic context.
     // Source: /usr/sbin/lvmdump
@@ -263,43 +263,43 @@ fn arith_array_length() {
 
 // Array subscripts in arithmetic --------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_basic() {
     parse_with("(( a[0] ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_in_expansion() {
     parse_with("echo $(( a[0] + a[1] ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_assignment() {
     parse_with("(( a[0] = 5 ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_increment() {
     parse_with("(( a[0]++ ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_compound_key() {
     parse_with("(( A[K] = V ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_expr_key() {
     parse_with("(( a[i+1] ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_array_subscript_comma() {
     // Multiple array subscript operations with comma operator
     parse_with("(( a[0]++, ++a[1], a[2]--, --a[3] ))", Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn bracket_glob_word_order() {
     // Verify bracket glob produces correct fragment order: Literal, Glob, Literal(content])
     let prog = parse_with("echo a[0-9]", Dialect::Bash).unwrap();
@@ -319,7 +319,7 @@ fn bracket_glob_word_order() {
 
 // << inside (( )) is left-shift, not heredoc --------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn arith_left_shift_not_heredoc() {
     // << inside (( )) is left-shift, not a heredoc operator.
     let prog = parse_with("(( 1 << 32 ))\necho ok", Dialect::Bash).unwrap();
@@ -333,14 +333,14 @@ fn arith_left_shift_not_heredoc() {
     ));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn for_arith_left_shift_not_heredoc() {
     // << inside for (( )) is left-shift, not a heredoc.
     let input = "x=0\n\nfor ((i = 1 << 32; i; ++i)); do\nbreak\ndone";
     parse_with(input, Dialect::Bash).unwrap();
 }
 
-#[testutil::test]
+#[skuld::test]
 fn double_paren_subshell_not_arithmetic() {
     // ((/path/cmd ...)) — (( followed by / means subshell-of-subshell, not arithmetic.
     // The speculative arithmetic attempt fails (no )) found), so it falls back to subshell.
@@ -356,38 +356,38 @@ fn double_paren_subshell_not_arithmetic() {
 
 // Arithmetic features: (( )) must parse as BashArithmeticCommand, not Subshell ----------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn arith_empty_expression() {
     // (( )) is valid bash — evaluates to 0 (exit status 1).
     let expr = parse_arith_cmd("(( ))");
     assert_eq!(expr, ArithExpr::Number(0));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_single_quoted_value() {
     // Single-quoted string as rhs inside (( )).
     parse_arith_cmd("(( A['y'] = 'y' ))");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_command_sub() {
     // $() inside (( )).
     parse_arith_cmd("(( a = $(echo 1) + 2 ))");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_dollar_positional() {
     // $N (positional parameter) inside (( )).
     parse_arith_cmd("(( A[$key] += $2 ))");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_literal_subscript() {
     // 1[2] should parse as arithmetic, not fall back to subshell.
     parse_arith_cmd("(( 1[2] = 3 ))");
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arith_redirect_after_dparen() {
     // Redirect after (( )) with $() inside.
     let prog = parse_with("(( a = $(echo 42) + 10 )) 2>/dev/null", Dialect::Bash).unwrap();
@@ -402,21 +402,21 @@ fn arith_redirect_after_dparen() {
 
 // [[ ]] edge cases ----------------------------------------------------------------------------------------------------
 
-#[testutil::test]
+#[skuld::test]
 fn double_bracket_close_as_literal_word() {
     // ]] outside [[ ]] is a regular word, not BashDblRBracket.
     let prog = parse_with("dbracket=[[\n$dbracket foo == foo ]]", Dialect::Bash).unwrap();
     assert!(prog.lines.len() >= 2);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn glob_posix_char_class_not_double_bracket() {
     // [[:punct:]] is a POSIX character class in a glob, not [[ ]].
     let prog = parse_with("echo *.[[:punct:]]", Dialect::Bash).unwrap();
     assert_eq!(prog.lines[0].len(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn regex_with_parens_in_grouped_double_bracket() {
     // [[ (foo =~ bar) ]] — grouped test expression with =~ inside.
     let prog = parse_with("[[ (foo =~ bar) ]]", Dialect::Bash).unwrap();
@@ -431,7 +431,7 @@ fn regex_with_parens_in_grouped_double_bracket() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn glob_bracket_with_quoted_close() {
     // ] inside quotes doesn't close a bracket expression.
     // bash treats [hello"]" as the literal word [hello] (no glob match).

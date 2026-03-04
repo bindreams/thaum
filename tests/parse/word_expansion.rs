@@ -1,13 +1,13 @@
 use crate::common::*;
 use thaum::ast::*;
 
-#[testutil::test]
+#[skuld::test]
 fn tilde_expansion_in_assignment() {
     let cmd = first_cmd("HOME=~user");
     assert_eq!(cmd.assignments.len(), 1);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn parameter_expansion_variations() {
     let cmd = first_cmd("echo ${var:-default} ${var:=value} ${#var} ${var%suffix}");
     assert_eq!(cmd.arguments.len(), 5);
@@ -19,7 +19,7 @@ fn parameter_expansion_variations() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn nested_quoting_and_expansion() {
     let cmd = first_cmd(r#"echo "hello ${name:-world}""#);
     assert_eq!(cmd.arguments.len(), 2);
@@ -31,7 +31,7 @@ fn nested_quoting_and_expansion() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_in_word() {
     let cmd = first_cmd("echo $(date +%Y-%m-%d)");
     assert_eq!(cmd.arguments.len(), 2);
@@ -41,7 +41,7 @@ fn command_substitution_in_word() {
         .any(|p| matches!(p, Fragment::CommandSubstitution(_))));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn command_substitution_with_pipeline() {
     let cmd = first_cmd("echo $(ls | grep foo)");
     assert_eq!(cmd.arguments.len(), 2);
@@ -53,7 +53,7 @@ fn command_substitution_with_pipeline() {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn arithmetic_in_echo() {
     let cmd = first_cmd("echo $((1 + 2))");
     assert_eq!(cmd.arguments.len(), 2);
@@ -63,7 +63,7 @@ fn arithmetic_in_echo() {
         .any(|p| matches!(p, Fragment::ArithmeticExpansion(_))));
 }
 
-#[testutil::test]
+#[skuld::test]
 fn escaped_backtick_in_cmd_sub_double_quotes() {
     // Inside $(), a double-quoted string containing \` (escaped backtick)
     // followed by a single quote must not confuse the quoting context.

@@ -1,7 +1,7 @@
 use super::*;
 use crate::dialect::Dialect;
 
-testutil::default_labels!(lex, parse);
+skuld::default_labels!(lex, parse);
 
 fn parse_bash(input: &str) -> Program {
     crate::parse_with(input, Dialect::Bash).unwrap()
@@ -18,7 +18,7 @@ impl<'ast> Visit<'ast> for StmtCounter {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn count_statements() {
     let prog = parse_bash("echo a; echo b; echo c");
     let mut c = StmtCounter(0);
@@ -26,7 +26,7 @@ fn count_statements() {
     assert_eq!(c.0, 3);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn count_statements_nested() {
     let prog = parse_bash("if true; then echo a; echo b; fi");
     let mut c = StmtCounter(0);
@@ -48,7 +48,7 @@ impl<'ast> Visit<'ast> for CmdNames {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_pipeline_commands() {
     let prog = parse_bash("ls -la | grep foo | wc -l");
     let mut v = CmdNames(vec![]);
@@ -56,7 +56,7 @@ fn collect_pipeline_commands() {
     assert_eq!(v.0, vec!["ls", "grep", "wc"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_if_body_commands() {
     let prog = parse_bash("if true; then echo hello; elif false; then echo bye; fi");
     let mut v = CmdNames(vec![]);
@@ -64,7 +64,7 @@ fn collect_if_body_commands() {
     assert_eq!(v.0, vec!["true", "echo", "false", "echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_for_body_commands() {
     let prog = parse_bash("for x in a b c; do echo $x; done");
     let mut v = CmdNames(vec![]);
@@ -72,7 +72,7 @@ fn collect_for_body_commands() {
     assert_eq!(v.0, vec!["echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_while_commands() {
     let prog = parse_bash("while read line; do echo $line; done");
     let mut v = CmdNames(vec![]);
@@ -80,7 +80,7 @@ fn collect_while_commands() {
     assert_eq!(v.0, vec!["read", "echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_function_body_commands() {
     let prog = parse_bash("greet() { echo hello; echo world; }");
     let mut v = CmdNames(vec![]);
@@ -88,7 +88,7 @@ fn collect_function_body_commands() {
     assert_eq!(v.0, vec!["echo", "echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_case_body_commands() {
     let prog = parse_bash("case $x in a) echo a;; b) echo b;; esac");
     let mut v = CmdNames(vec![]);
@@ -96,7 +96,7 @@ fn collect_case_body_commands() {
     assert_eq!(v.0, vec!["echo", "echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_and_or_commands() {
     let prog = parse_bash("true && echo ok || echo fail");
     let mut v = CmdNames(vec![]);
@@ -104,7 +104,7 @@ fn collect_and_or_commands() {
     assert_eq!(v.0, vec!["true", "echo", "echo"]);
 }
 
-#[testutil::test]
+#[skuld::test]
 fn collect_negated_command() {
     let prog = parse_bash("! false");
     let mut v = CmdNames(vec![]);
@@ -129,7 +129,7 @@ impl<'ast> Visit<'ast> for TopLevelOnly {
     }
 }
 
-#[testutil::test]
+#[skuld::test]
 fn override_stops_descent() {
     let prog = parse_bash("if true; then echo inner; fi");
     let mut v = TopLevelOnly(vec![]);

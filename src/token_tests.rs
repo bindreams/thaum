@@ -1,6 +1,6 @@
 use super::*;
 
-#[testutil::test]
+#[skuld::test]
 fn fragment_tokens_recognized() {
     assert!(Token::Literal("x".into()).is_fragment());
     assert!(Token::SingleQuoted("x".into()).is_fragment());
@@ -12,7 +12,7 @@ fn fragment_tokens_recognized() {
     assert!(!Token::Eof.is_fragment());
 }
 
-#[testutil::test]
+#[skuld::test]
 fn redirect_ops_recognized() {
     assert!(Token::RedirectFromFile.is_redirect_op());
     assert!(Token::RedirectToFile.is_redirect_op());

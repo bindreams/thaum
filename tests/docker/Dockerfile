@@ -6,8 +6,8 @@ COPY ./ ./
 RUN git clean -fdX
 RUN <<-EOF
 	set -e
-	cargo build --features cli --release
-	cargo test --release --test corpus --features cli --no-run
+	cargo build --features cli,testkit --release
+	cargo test --release --test corpus --features cli,testkit --no-run
 	find target/release/deps -name 'corpus-*' -type f ! -name '*.d' \
 		| head -1 | xargs -I{} cp {} target/release/corpus-test
 EOF

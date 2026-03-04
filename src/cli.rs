@@ -18,7 +18,7 @@ use thaum::exec::{ExecError, Executor, ProcessIo};
 
 /// Shell script parser and executor
 #[derive(Parser)]
-#[command(name = "thaum")]
+#[command(name = "thaum", version)]
 struct Cli {
     /// Shell dialect
     #[arg(long, global = true, value_name = "DIALECT", default_value = "posix")]

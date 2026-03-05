@@ -1,7 +1,7 @@
 name: -k for sticky bit
 dialect: bash
 source: oils:spec/builtin-bracket#k-for-sticky-bit
-stdout: |-
+stdout: |
   status=0
   status=1
 ---

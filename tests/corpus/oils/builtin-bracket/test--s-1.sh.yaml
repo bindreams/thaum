@@ -1,7 +1,7 @@
 name: test -S
 dialect: bash
 source: oils:spec/builtin-bracket#test--s
-stdout: |-
+stdout: |
   status=1
 ---
 test -S /dev/zero

@@ -77,7 +77,7 @@ pub fn run_builtin(
         "shopt" => builtin_shopt(args, env, stderr),
         "alias" => builtin_alias(args, env, stdout),
         "unalias" => builtin_unalias(args, env, stderr),
-        "test" | "[" => builtin_test(name, args, stderr),
+        "test" | "[" => builtin_test(name, args, env, stderr),
         "readonly" => builtin_readonly(args, env, stdout),
         "local" => builtin_local(args, env),
         "declare" | "typeset" => builtin_declare(args, env, stdout, stderr),
@@ -471,7 +471,7 @@ fn builtin_set(args: &[String], env: &mut Environment) -> Result<i32, ExecError>
     Ok(0)
 }
 
-fn builtin_test(name: &str, args: &[String], stderr: &mut dyn Write) -> Result<i32, ExecError> {
+fn builtin_test(name: &str, args: &[String], env: &mut Environment, stderr: &mut dyn Write) -> Result<i32, ExecError> {
     // If invoked as `[`, the last arg must be `]`
     let args = if name == "[" {
         if args.last().map(|s| s.as_str()) != Some("]") {
@@ -483,103 +483,14 @@ fn builtin_test(name: &str, args: &[String], stderr: &mut dyn Write) -> Result<i
         args
     };
 
-    let result = evaluate_test(args);
-    Ok(if result { 0 } else { 1 })
-}
-
-/// Evaluate a POSIX test expression.
-fn evaluate_test(args: &[String]) -> bool {
-    match args.len() {
-        0 => false,
-        1 => {
-            // `test STRING` — true if string is non-empty
-            !args[0].is_empty()
+    match super::test_builtin::run(args, env) {
+        Ok(true) => Ok(0),
+        Ok(false) => Ok(1),
+        Err(msg) => {
+            let _ = writeln!(stderr, "{msg}");
+            Ok(2)
         }
-        2 => {
-            // Unary operators
-            match args[0].as_str() {
-                "!" => !evaluate_test(&args[1..]),
-                "-n" => !args[1].is_empty(),
-                "-z" => args[1].is_empty(),
-                "-e" => std::path::Path::new(&args[1]).exists(),
-                "-f" => std::path::Path::new(&args[1]).is_file(),
-                "-d" => std::path::Path::new(&args[1]).is_dir(),
-                "-r" => {
-                    // Readable check (simplified: just check existence)
-                    std::path::Path::new(&args[1]).exists()
-                }
-                "-w" => std::path::Path::new(&args[1]).exists(),
-                "-x" => {
-                    #[cfg(unix)]
-                    {
-                        use std::os::unix::fs::PermissionsExt;
-                        std::fs::metadata(&args[1])
-                            .map(|m| m.permissions().mode() & 0o111 != 0)
-                            .unwrap_or(false)
-                    }
-                    #[cfg(not(unix))]
-                    {
-                        // Check PATHEXT on Windows for executable extensions.
-                        let ext = std::path::Path::new(&args[1])
-                            .extension()
-                            .and_then(|e| e.to_str())
-                            .unwrap_or("");
-                        let pathext = std::env::var("PATHEXT").unwrap_or_else(|_| ".COM;.EXE;.BAT;.CMD".to_string());
-                        std::path::Path::new(&args[1]).exists()
-                            && pathext
-                                .split(';')
-                                .any(|pe| pe.strip_prefix('.').is_some_and(|pe| pe.eq_ignore_ascii_case(ext)))
-                    }
-                }
-                "-s" => std::fs::metadata(&args[1]).map(|m| m.len() > 0).unwrap_or(false),
-                "-L" | "-h" => std::fs::symlink_metadata(&args[1])
-                    .map(|m| m.file_type().is_symlink())
-                    .unwrap_or(false),
-                _ => false,
-            }
-        }
-        3 => {
-            // Binary operators
-            match args[1].as_str() {
-                "=" | "==" => args[0] == args[2],
-                "!=" => args[0] != args[2],
-                "-eq" => parse_int(&args[0]) == parse_int(&args[2]),
-                "-ne" => parse_int(&args[0]) != parse_int(&args[2]),
-                "-lt" => parse_int(&args[0]) < parse_int(&args[2]),
-                "-le" => parse_int(&args[0]) <= parse_int(&args[2]),
-                "-gt" => parse_int(&args[0]) > parse_int(&args[2]),
-                "-ge" => parse_int(&args[0]) >= parse_int(&args[2]),
-                "-nt" => {
-                    // File newer than
-                    let a = std::fs::metadata(&args[0]).and_then(|m| m.modified()).ok();
-                    let b = std::fs::metadata(&args[2]).and_then(|m| m.modified()).ok();
-                    matches!((a, b), (Some(a), Some(b)) if a > b)
-                }
-                "-ot" => {
-                    let a = std::fs::metadata(&args[0]).and_then(|m| m.modified()).ok();
-                    let b = std::fs::metadata(&args[2]).and_then(|m| m.modified()).ok();
-                    matches!((a, b), (Some(a), Some(b)) if a < b)
-                }
-                _ => {
-                    // Unknown operator
-                    false
-                }
-            }
-        }
-        4 => {
-            // `! expr` with 3-arg expression
-            if args[0] == "!" {
-                !evaluate_test(&args[1..])
-            } else {
-                false
-            }
-        }
-        _ => false,
     }
-}
-
-fn parse_int(s: &str) -> i64 {
-    s.parse().unwrap_or(0)
 }
 
 fn builtin_readonly(args: &[String], env: &mut Environment, stdout: &mut dyn Write) -> Result<i32, ExecError> {

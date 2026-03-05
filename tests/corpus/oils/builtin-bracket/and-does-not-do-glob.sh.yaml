@@ -1,7 +1,7 @@
 name: == and = does not do glob
 dialect: bash
 source: oils:spec/builtin-bracket#and-does-not-do-glob
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

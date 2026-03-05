@@ -49,7 +49,7 @@ pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, _io: &mut IoContex
     }
 }
 
-fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> bool {
+pub(crate) fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> bool {
     use std::path::Path;
     match op {
         // String tests
@@ -140,7 +140,7 @@ fn evaluate_unary(op: UnaryTestOp, s: &str, env: &crate::exec::Environment) -> b
     }
 }
 
-fn evaluate_binary(
+pub(crate) fn evaluate_binary(
     left: &str,
     op: BinaryTestOp,
     right: &str,

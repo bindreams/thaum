@@ -1,7 +1,7 @@
 name: -t 1 for stdout
 dialect: bash
 source: oils:spec/builtin-bracket#t-1-for-stdout
-stdout: |-
+stdout: |
   status=1
 ---
 # There is no way to get a terminal in the test environment?

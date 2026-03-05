@@ -2,7 +2,7 @@ name: No octal, hex, base N conversion - leading 0 is a regular decimal
 dialect: bash
 source: 
   oils:spec/builtin-bracket#no-octal-hex-base-n-conversion---leading-0-is-a-regular-decimal
-stdout: |-
+stdout: |
   59
   -59
 

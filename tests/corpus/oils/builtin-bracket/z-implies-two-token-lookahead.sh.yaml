@@ -1,7 +1,7 @@
 name: -z '>' implies two token lookahead
 dialect: bash
 source: oils:spec/builtin-bracket#z-implies-two-token-lookahead
-stdout: |-
+stdout: |
   true
   false
   true

@@ -1,7 +1,7 @@
 name: -a as unary operator (alias of -e)
 dialect: bash
 source: oils:spec/builtin-bracket#a-as-unary-operator-alias-of--e
-stdout: |-
+stdout: |
   status=0
   status=1
 ---

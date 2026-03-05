@@ -280,6 +280,41 @@ fn bracket_test_syntax() {
     assert_eq!(exec_status("[ 2 -gt 3 ]"), 1);
 }
 
+#[skuld::test]
+fn test_builtin_logical_and_or() {
+    assert_eq!(exec_status("[ foo -a bar ]"), 0);
+    assert_eq!(exec_status("[ foo -a '' ]"), 1);
+    assert_eq!(exec_status("[ '' -o bar ]"), 0);
+    assert_eq!(exec_status("[ '' -o '' ]"), 1);
+}
+
+#[skuld::test]
+fn test_builtin_parentheses() {
+    assert_eq!(exec_status(r"[ \( foo \) ]"), 0);
+    assert_eq!(exec_status(r"[ \( '' \) ]"), 1);
+    assert_eq!(exec_status(r"[ ! \( '' \) ]"), 0);
+}
+
+#[skuld::test]
+fn test_builtin_complex_expr() {
+    assert_eq!(exec_status("[ -n foo -a -n bar ]"), 0);
+    assert_eq!(exec_status("[ -z '' -o -n bar ]"), 0);
+}
+
+#[skuld::test]
+fn test_builtin_file_operators() {
+    assert_eq!(exec_status("[ -d / ]"), 0);
+    assert_eq!(exec_status("[ -e / ]"), 0);
+    assert_eq!(exec_status("[ -a / ]"), 0); // -a as unary file-exists
+    assert_eq!(exec_status("[ -f / ]"), 1); // / is directory, not regular file
+}
+
+#[skuld::test]
+fn test_builtin_syntax_error_exit_2() {
+    assert_eq!(exec_status("[ '(' foo ]"), 2);
+    assert_eq!(exec_status("["), 2);
+}
+
 // Break/continue ------------------------------------------------------------------------------------------------------
 
 #[skuld::test]

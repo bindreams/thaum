@@ -1,7 +1,7 @@
 name: operator/operand ambiguity with -a
 dialect: bash
 source: oils:spec/builtin-bracket#operatoroperand-ambiguity-with--a
-stdout: |-
+stdout: |
   status=0
 ---
 # bash parses it as '-z' AND '-a'.  It's a syntax error in mksh but somehow a

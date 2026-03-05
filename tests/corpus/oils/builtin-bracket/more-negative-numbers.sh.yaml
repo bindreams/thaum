@@ -1,7 +1,7 @@
 name: More negative numbers
 dialect: bash
 source: oils:spec/builtin-bracket#more-negative-numbers
-stdout: |-
+stdout: |
   status=0
   status=0
 ---

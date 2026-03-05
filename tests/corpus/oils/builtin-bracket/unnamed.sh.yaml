@@ -1,7 +1,7 @@
 name: ( )
 dialect: bash
 source: oils:spec/builtin-bracket#unnamed
-stdout: |-
+stdout: |
   status=0
 ---
 [ -z '' -a '(' ! -z x ')' ]

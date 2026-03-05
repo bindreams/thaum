@@ -1,7 +1,7 @@
 name: 'bug from pnut: negative number $((-1))'
 dialect: bash
 source: oils:spec/builtin-bracket#bug-from-pnut-negative-number--1
-stdout: |-
+stdout: |
   status=0
   status=0
 

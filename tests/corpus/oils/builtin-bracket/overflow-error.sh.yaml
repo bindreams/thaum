@@ -1,7 +1,7 @@
 name: Overflow error
 dialect: bash
 source: oils:spec/builtin-bracket#overflow-error
-stdout: |-
+stdout: |
   status=2
 ---
 test -t 12345678910

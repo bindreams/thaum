@@ -1,7 +1,7 @@
 name: '] syntax errors'
 dialect: bash
 source: oils:spec/builtin-bracket#syntax-errors
-stdout: |-
+stdout: |
   status=2
   status=1
   status=2

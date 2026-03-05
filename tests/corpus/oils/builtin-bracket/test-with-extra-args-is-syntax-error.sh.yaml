@@ -1,7 +1,7 @@
 name: test with extra args is syntax error
 dialect: bash
 source: oils:spec/builtin-bracket#test-with-extra-args-is-syntax-error
-stdout: |-
+stdout: |
   status=2
   status=2
 ---

@@ -1,7 +1,7 @@
 name: 'one arg: empty string is false.  Equivalent to -n.'
 dialect: bash
 source: oils:spec/builtin-bracket#one-arg-empty-string-is-false-equivalent-to--n
-stdout: |-
+stdout: |
   true
   false
 ---

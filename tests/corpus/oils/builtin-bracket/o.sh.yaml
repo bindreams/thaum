@@ -1,7 +1,7 @@
 name: -o
 dialect: bash
 source: oils:spec/builtin-bracket#o
-stdout: |-
+stdout: |
   status=0
 ---
 [ -z x -o ! -z x ]

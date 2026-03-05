@@ -41,6 +41,11 @@ pub mod redirect;
 mod special_builtins;
 /// Subshell serialization payload for cross-process `thaum exec-ast`.
 pub mod subshell;
+/// POSIX `test`/`[` builtin evaluator (recursive descent over args).
+pub(crate) mod test_builtin;
+#[cfg(test)]
+#[path = "exec/test_builtin_tests.rs"]
+mod test_builtin_tests;
 
 pub use environment::Environment;
 pub use error::ExecError;

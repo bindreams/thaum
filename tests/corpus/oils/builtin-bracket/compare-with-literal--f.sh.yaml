@@ -1,7 +1,7 @@
 name: '[ compare with literal -f'
 dialect: bash
 source: oils:spec/builtin-bracket#compare-with-literal--f
-stdout: |-
+stdout: |
   true
   true
 ---

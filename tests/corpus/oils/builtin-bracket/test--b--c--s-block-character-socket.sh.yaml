@@ -1,7 +1,7 @@
 name: test -b -c -S (block, character, socket)
 dialect: bash
 source: oils:spec/builtin-bracket#test--b--c--s-block-character-socket
-stdout: |-
+stdout: |
   -b
   status=1
   status=1

@@ -208,16 +208,16 @@ impl Executor {
             self.fd_table.remove(fd);
         }
         if let Some(f) = active.stdin {
-            self.fd_table.insert(0, f);
+            self.fd_table.insert(0, f.into_inner());
         }
         if let Some(f) = active.stdout {
-            self.fd_table.insert(1, f);
+            self.fd_table.insert(1, f.into_inner());
         }
         if let Some(f) = active.stderr {
-            self.fd_table.insert(2, f);
+            self.fd_table.insert(2, f.into_inner());
         }
         for (fd, file) in active.extra_fds {
-            self.fd_table.insert(fd, file);
+            self.fd_table.insert(fd, file.into_inner());
         }
     }
 

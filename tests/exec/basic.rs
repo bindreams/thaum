@@ -469,6 +469,34 @@ fn brace_group_redirect_stdin() {
     assert_eq!(captured.stdout_string(), "alpha beta\n");
 }
 
+// FD 3+ read tests ----------------------------------------------------------------------------------------------------
+
+#[skuld::test]
+fn read_from_fd3_via_exec_redirect(#[fixture(temp_dir)] dir: &Path) {
+    let file = dir.join("input.txt");
+    std::fs::write(&file, "one\ntwo\nthree\n").unwrap();
+    let script = format!(
+        "exec 3< {f}; read A <&3; read B <&3; read C <&3; exec 3<&-; echo $A $B $C",
+        f = shell_path(&file)
+    );
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "one two three\n");
+}
+
+#[skuld::test]
+fn while_read_from_fd3(#[fixture(temp_dir)] dir: &Path) {
+    let file = dir.join("input.txt");
+    std::fs::write(&file, "alpha\nbeta\n").unwrap();
+    let script = format!(
+        "exec 3< {f}; while read LINE <&3; do echo \"got: $LINE\"; done; exec 3<&-",
+        f = shell_path(&file)
+    );
+    let (out, status) = exec_ok(&script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "got: alpha\ngot: beta\n");
+}
+
 // Redirect tests ------------------------------------------------------------------------------------------------------
 
 /// Convert a path to a forward-slash string suitable for embedding in shell scripts.

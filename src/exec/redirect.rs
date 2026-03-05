@@ -8,6 +8,97 @@ use std::io::{self, Read, Write};
 use crate::ast::{Redirect, RedirectKind};
 use crate::exec::error::ExecError;
 use crate::exec::expand;
+
+// BufferedFile ========================================================================================================
+
+/// File handle with a read-ahead buffer.
+///
+/// Wraps `std::fs::File` with transparent 8 KB buffering for `Read`. External
+/// command FD setup calls [`try_clone()`](BufferedFile::try_clone) on the inner
+/// File, bypassing the buffer — the OS fd position is shared via `dup()`.
+pub(super) struct BufferedFile {
+    file: File,
+    buf: Vec<u8>,
+    pos: usize,
+    /// When true, reads bypass the buffer and go directly to the OS.
+    /// Used for cloned FDs (`<&N`/`>&N`) where the OS fd position is
+    /// shared between multiple consumers.
+    passthrough: bool,
+}
+
+impl BufferedFile {
+    pub fn new(file: File) -> Self {
+        BufferedFile {
+            file,
+            buf: Vec::new(),
+            pos: 0,
+            passthrough: false,
+        }
+    }
+
+    /// Create without read buffering. For cloned FDs where the OS fd
+    /// position is shared — buffering would over-read and desync.
+    pub fn passthrough(file: File) -> Self {
+        BufferedFile {
+            file,
+            buf: Vec::new(),
+            pos: 0,
+            passthrough: true,
+        }
+    }
+
+    /// Clone the underlying OS file descriptor (for child process inheritance).
+    pub fn try_clone(&self) -> io::Result<File> {
+        self.file.try_clone()
+    }
+
+    /// Consume this wrapper and return the inner `File`.
+    pub fn into_inner(self) -> File {
+        self.file
+    }
+}
+
+impl Read for BufferedFile {
+    fn read(&mut self, dest: &mut [u8]) -> io::Result<usize> {
+        if self.passthrough {
+            return self.file.read(dest);
+        }
+        // Serve from buffer if available.
+        if self.pos < self.buf.len() {
+            let available = &self.buf[self.pos..];
+            let n = dest.len().min(available.len());
+            dest[..n].copy_from_slice(&available[..n]);
+            self.pos += n;
+            return Ok(n);
+        }
+        // For large reads, bypass the buffer entirely.
+        if dest.len() >= 8192 {
+            return self.file.read(dest);
+        }
+        // Refill buffer from file.
+        self.buf.resize(8192, 0);
+        self.pos = 0;
+        let n = self.file.read(&mut self.buf)?;
+        if n == 0 {
+            self.buf.clear();
+            return Ok(0);
+        }
+        self.buf.truncate(n);
+        let to_copy = dest.len().min(n);
+        dest[..to_copy].copy_from_slice(&self.buf[..to_copy]);
+        self.pos = to_copy;
+        Ok(to_copy)
+    }
+}
+
+impl Write for BufferedFile {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.file.write(buf)
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        self.file.flush()
+    }
+}
 use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
 
@@ -17,10 +108,10 @@ use crate::exec::Executor;
 /// the IoContext; FDs 3+ are stored in `extra_fds` for dup resolution and
 /// child process inheritance.
 pub(super) struct ActiveRedirects {
-    pub stdin: Option<File>,
-    pub stdout: Option<File>,
-    pub stderr: Option<File>,
-    pub extra_fds: HashMap<i32, File>,
+    pub stdin: Option<BufferedFile>,
+    pub stdout: Option<BufferedFile>,
+    pub stderr: Option<BufferedFile>,
+    pub extra_fds: HashMap<i32, BufferedFile>,
     /// FDs explicitly closed via `N>&-` / `N<&-`. Used by `exec` redirect-only
     /// mode to remove persistent FDs from the fd_table.
     pub closed_fds: HashSet<i32>,
@@ -118,6 +209,7 @@ impl Executor {
                         close_write_fd(&mut active, dest_fd);
                     } else if let Ok(src_fd) = target.parse::<i32>() {
                         let cloned = clone_fd_for_write(&active, &self.fd_table, src_fd)?;
+                        // Cloned FDs share OS position — don't buffer reads.
                         assign_write_fd(&mut active, dest_fd, cloned)?;
                     } else {
                         return Err(ExecError::BadRedirect(format!("{target}: ambiguous redirect")));
@@ -130,7 +222,8 @@ impl Executor {
                         close_read_fd(&mut active, dest_fd);
                     } else if let Ok(src_fd) = target.parse::<i32>() {
                         let cloned = clone_fd_for_read(&active, &self.fd_table, src_fd)?;
-                        assign_read_fd(&mut active, dest_fd, cloned)?;
+                        // Cloned FDs share OS position — don't buffer reads.
+                        assign_read_bf(&mut active, dest_fd, BufferedFile::passthrough(cloned))?;
                     } else {
                         return Err(ExecError::BadRedirect(format!("{target}: ambiguous redirect")));
                     }
@@ -156,8 +249,8 @@ impl Executor {
                     let resolved = self.resolve_path(&path);
                     let file = File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
-                    active.stdout = Some(file);
-                    active.stderr = Some(clone);
+                    active.stdout = Some(BufferedFile::new(file));
+                    active.stderr = Some(BufferedFile::new(clone));
                 }
                 RedirectKind::BashAppendAll(word) => {
                     // &>> file — append both stdout and stderr to file
@@ -169,8 +262,8 @@ impl Executor {
                         .open(&resolved)
                         .map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
-                    active.stdout = Some(file);
-                    active.stderr = Some(clone);
+                    active.stdout = Some(BufferedFile::new(file));
+                    active.stderr = Some(BufferedFile::new(clone));
                 }
             }
         }
@@ -179,24 +272,29 @@ impl Executor {
     }
 }
 
-/// Assign a file to the appropriate read FD slot.
+/// Assign a file to the appropriate read FD slot (buffered).
 fn assign_read_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
+    assign_read_bf(active, fd, BufferedFile::new(file))
+}
+
+/// Assign a pre-wrapped BufferedFile to the appropriate read FD slot.
+fn assign_read_bf(active: &mut ActiveRedirects, fd: i32, bf: BufferedFile) -> Result<(), ExecError> {
     match fd {
-        0 => active.stdin = Some(file),
+        0 => active.stdin = Some(bf),
         n => {
-            active.extra_fds.insert(n, file);
+            active.extra_fds.insert(n, bf);
         }
     }
     Ok(())
 }
 
-/// Assign a file to the appropriate write FD slot.
+/// Assign a file to the appropriate write FD slot (passthrough — no read buffering).
 fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
     match fd {
-        1 => active.stdout = Some(file),
-        2 => active.stderr = Some(file),
+        1 => active.stdout = Some(BufferedFile::passthrough(file)),
+        2 => active.stderr = Some(BufferedFile::passthrough(file)),
         n => {
-            active.extra_fds.insert(n, file);
+            active.extra_fds.insert(n, BufferedFile::passthrough(file));
         }
     }
     Ok(())

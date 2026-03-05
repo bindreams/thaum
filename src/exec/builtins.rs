@@ -381,27 +381,30 @@ fn builtin_shift(args: &[String], env: &mut Environment, stderr: &mut dyn Write)
 }
 
 fn builtin_read(args: &[String], env: &mut Environment, stdin: &mut dyn Read) -> Result<i32, ExecError> {
-    use std::io::BufRead;
     // Minimal `read VAR` implementation: read one line from stdin.
+    // Reads one byte at a time to avoid consuming past the newline delimiter.
+    // This matches POSIX shell behavior (read(fd, &c, 1)) and is necessary
+    // because stdin may be a pipe/FIFO shared across multiple `read` calls.
     let var_name = args.first().map(|s| s.as_str()).unwrap_or("REPLY");
 
-    let mut reader = std::io::BufReader::new(stdin);
-    let mut line = String::new();
-    match reader.read_line(&mut line) {
-        Ok(0) => Ok(1), // EOF
-        Ok(_) => {
-            // Remove trailing newline
-            if line.ends_with('\n') {
-                line.pop();
-                if line.ends_with('\r') {
-                    line.pop();
-                }
-            }
-            env.set_var(var_name, &line)?;
-            Ok(0)
+    let mut line = Vec::new();
+    let mut buf = [0u8; 1];
+    let got_data = loop {
+        match stdin.read(&mut buf) {
+            Ok(0) => break !line.is_empty(),
+            Ok(_) if buf[0] == b'\n' => break true,
+            Ok(_) => line.push(buf[0]),
+            Err(e) => return Err(ExecError::Io(e)),
         }
-        Err(e) => Err(ExecError::Io(e)),
+    };
+    if !got_data {
+        return Ok(1); // EOF with no data
     }
+    if line.last() == Some(&b'\r') {
+        line.pop();
+    }
+    env.set_var(var_name, &String::from_utf8_lossy(&line))?;
+    Ok(0)
 }
 
 fn builtin_set(args: &[String], env: &mut Environment) -> Result<i32, ExecError> {

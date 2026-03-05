@@ -431,6 +431,18 @@ fn heredoc_basic() {
 }
 
 #[skuld::test]
+fn consecutive_reads_from_stdin() {
+    // Two `read` calls on the same stdin must each get their own line.
+    // Regression: BufReader over-read consumed both lines on the first call.
+    let program = thaum::parse("read A; read B; echo $A $B").unwrap();
+    let mut executor = test_executor();
+    let mut captured = CapturedIo::with_stdin(b"first\nsecond\n");
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
+    assert_eq!(status, 0);
+    assert_eq!(captured.stdout_string(), "first second\n");
+}
+
+#[skuld::test]
 fn unsupported_compound_redirect() {
     expect_unsupported("if true; then echo hi; fi > /dev/null");
 }

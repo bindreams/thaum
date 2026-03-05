@@ -51,6 +51,21 @@ fn variable_used_in_later_command() {
     assert_eq!(executor.env().get_var("X"), Some("hello"));
 }
 
+#[skuld::test]
+fn assignment_with_command_sub_returns_sub_status() {
+    let (out, _) = exec_ok("x=$(false); echo $?");
+    assert_eq!(out, "1\n");
+    let (out, _) = exec_ok("x=$(true); echo $?");
+    assert_eq!(out, "0\n");
+}
+
+#[skuld::test]
+fn while_with_failing_assignment_does_not_loop() {
+    let (out, status) = exec_ok("while x=$(false); do echo loop; done");
+    assert_eq!(out, "");
+    assert_eq!(status, 0); // while returns 0 when body never executes
+}
+
 // AND/OR lists --------------------------------------------------------------------------------------------------------
 
 #[skuld::test]

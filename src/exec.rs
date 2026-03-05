@@ -731,7 +731,9 @@ impl Executor {
             for assignment in &cmd.assignments {
                 self.execute_assignment(assignment)?;
             }
-            return Ok(0);
+            // POSIX: bare assignments return the exit status of the last
+            // command substitution executed during value expansion.
+            return Ok(self.env.last_exit_status());
         }
 
         // Update $_ to the last argument of this simple command.

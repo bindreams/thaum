@@ -4,160 +4,12 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use libtest_mimic::Failed;
-use serde::Deserialize;
 use thaum::exec::{CapturedIo, ExecError, Executor};
+use thaum::testkit::sh_yaml::{Disabled, ParseErrorSpec, ShYaml};
 use yaml_rust2::Yaml;
 
 /// Whether --no-sandbox was passed on the command line.
 static NO_SANDBOX: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-
-// Test spec schema ----------------------------------------------------------------------------------------------------
-
-/// Supports `disabled: true` or `disabled: { reason: "..." }`. Default: false.
-#[derive(Deserialize)]
-#[serde(untagged)]
-enum Disabled {
-    Bool(bool),
-    WithReason { reason: String },
-}
-
-/// Spec for the `parse-error` YAML field.
-///
-/// ```yaml
-/// parse-error: true                          # just assert parsing fails
-/// parse-error: "missing 'then' to close 'if'"  # exact message match
-/// parse-error: { contains: "unexpected token" } # substring match
-/// parse-error: { regex: "missing '\\w+'" }      # regex match
-/// parse-error: { contains: "}", at: "1:1" }     # message + location
-/// ```
-#[derive(Deserialize)]
-#[serde(untagged)]
-enum ParseErrorSpec {
-    Bool(bool),
-    Exact(String),
-    Pattern(ParseErrorPattern),
-}
-
-#[derive(Deserialize)]
-struct ParseErrorPattern {
-    contains: Option<String>,
-    regex: Option<String>,
-    at: Option<String>,
-}
-
-impl Default for Disabled {
-    fn default() -> Self {
-        Disabled::Bool(false)
-    }
-}
-
-impl Disabled {
-    fn is_disabled(&self) -> bool {
-        match self {
-            Disabled::Bool(b) => *b,
-            Disabled::WithReason { .. } => true,
-        }
-    }
-}
-
-#[derive(Deserialize)]
-struct TestSpec {
-    name: String,
-    #[serde(default)]
-    #[allow(dead_code)]
-    tags: Vec<String>,
-    dialect: String,
-    #[allow(dead_code)]
-    source: Option<String>,
-
-    #[serde(default)]
-    disabled: Disabled,
-
-    #[serde(rename = "is-valid", default = "default_true")]
-    is_valid: bool,
-    error_contains: Option<String>,
-
-    #[serde(rename = "parse-error")]
-    parse_error: Option<ParseErrorSpec>,
-
-    /// Environment variables set before setup/execution.  Values undergo
-    /// shell-style expansion so `PATH: "/my/bin:$PATH"` works.
-    #[serde(default)]
-    environment: std::collections::HashMap<String, String>,
-
-    /// Setup script executed before the test. Runs as a file in a fresh temp
-    /// directory (shebang selects interpreter). The same directory becomes cwd
-    /// for the main test script.
-    setup: Option<String>,
-
-    // ast is parsed separately from the raw YAML header using yaml_rust2
-    // to avoid version mismatches with serde_yaml2's wrapper type.
-    status: Option<i32>,
-    stdout: Option<OutputMatcher>,
-    stderr: Option<OutputMatcher>,
-}
-
-fn default_true() -> bool {
-    true
-}
-
-impl TestSpec {
-    fn dialect(&self) -> Result<thaum::Dialect, String> {
-        match self.dialect.as_str() {
-            "posix" => Ok(thaum::Dialect::Posix),
-            "dash" => Ok(thaum::Dialect::Dash),
-            "bash44" => Ok(thaum::Dialect::Bash44),
-            "bash50" => Ok(thaum::Dialect::Bash50),
-            "bash51" => Ok(thaum::Dialect::Bash51),
-            "bash" => Ok(thaum::Dialect::Bash),
-            other => Err(format!("unknown dialect: {other:?}")),
-        }
-    }
-}
-
-#[derive(Deserialize)]
-#[serde(untagged)]
-enum OutputMatcher {
-    Exact(String),
-    Pattern(OutputPattern),
-}
-
-#[derive(Deserialize)]
-struct OutputPattern {
-    regex: Option<String>,
-    contains: Option<String>,
-}
-
-impl OutputMatcher {
-    fn check(&self, actual: &str, field_name: &str) -> Result<(), Failed> {
-        match self {
-            OutputMatcher::Exact(expected) => {
-                if actual != expected {
-                    return Err(
-                        format!("{field_name} mismatch:\n  expected: {expected:?}\n  actual:   {actual:?}").into(),
-                    );
-                }
-            }
-            OutputMatcher::Pattern(pat) => {
-                if let Some(substr) = &pat.contains {
-                    if !actual.contains(substr.as_str()) {
-                        return Err(format!("{field_name} does not contain {substr:?}:\n  actual: {actual:?}").into());
-                    }
-                }
-                if let Some(re_str) = &pat.regex {
-                    let re =
-                        regex::Regex::new(re_str).map_err(|e| format!("{field_name} invalid regex {re_str:?}: {e}"))?;
-                    if !re.is_match(actual) {
-                        return Err(
-                            format!("{field_name} does not match regex {re_str:?}:\n  actual: {actual:?}").into(),
-                        );
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
-}
 
 // YAML subset matching (using yaml_rust2::Yaml) -----------------------------------------------------------------------
 
@@ -230,48 +82,7 @@ fn parse_yaml(s: &str) -> Result<Yaml, String> {
     docs.into_iter().next().ok_or_else(|| "empty YAML document".to_string())
 }
 
-// File parsing --------------------------------------------------------------------------------------------------------
-
-struct ParsedTestFile {
-    spec: TestSpec,
-    ast: Option<Yaml>,
-    shell_input: String,
-}
-
-fn parse_test_file(path: &Path) -> Result<ParsedTestFile, String> {
-    let content = std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {}", path.display(), e))?;
-
-    let separator_pos = content
-        .find("\n---\n")
-        .or_else(|| content.find("\n---"))
-        .ok_or_else(|| {
-            format!(
-                "{}: missing `---` separator between YAML header and shell code",
-                path.display()
-            )
-        })?;
-
-    let yaml_header = &content[..separator_pos];
-    // Skip past "\n---\n" (or "\n---" at end of file)
-    let shell_start = separator_pos + "\n---".len();
-    let shell_input = if content[shell_start..].starts_with('\n') {
-        content[shell_start + 1..].to_string()
-    } else {
-        content[shell_start..].to_string()
-    };
-
-    let spec: TestSpec =
-        serde_yaml2::from_str(yaml_header).map_err(|e| format!("{}: invalid YAML header: {}", path.display(), e))?;
-
-    // Parse `ast:` field separately using yaml_rust2 (YAML 1.2) to get
-    // a dynamic Yaml value for subset matching.
-    let ast = extract_ast_field(yaml_header)?;
-
-    Ok(ParsedTestFile { spec, ast, shell_input })
-}
-
 /// Extract the `ast:` field from the YAML header as a yaml_rust2::Yaml value.
-/// Returns None if the field is absent.
 fn extract_ast_field(yaml_header: &str) -> Result<Option<Yaml>, String> {
     let doc = parse_yaml(yaml_header)?;
     match doc {
@@ -349,11 +160,7 @@ fn check_parse_error(spec: &ParseErrorSpec, err: &thaum::ParseError, source: &st
 ///
 /// Creates a temp directory (auto-cleaned on drop), sets up environment
 /// variables, runs setup scripts, then executes via `Executor` with `CapturedIo`.
-fn run_exec_native(
-    spec: &TestSpec,
-    input: &str,
-    dialect: thaum::Dialect,
-) -> Result<common::docker::ExecResult, Failed> {
+fn run_exec_native(spec: &ShYaml, input: &str, dialect: thaum::Dialect) -> Result<common::docker::ExecResult, Failed> {
     let dir = tempfile::tempdir().map_err(|e| format!("failed to create temp dir: {e}"))?;
     let saved_cwd = std::env::current_dir().ok();
     std::env::set_current_dir(dir.path()).map_err(|e| format!("chdir: {e}"))?;
@@ -496,9 +303,8 @@ fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker
 
 // Test execution ======================================================================================================
 
-fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
-    let spec = &parsed.spec;
-    let input = &parsed.shell_input;
+fn run_test(spec: &ShYaml) -> Result<(), Failed> {
+    let input = &spec.body;
     let dialect = spec.dialect().map_err(|e| e.to_string())?;
 
     // 1. Parse
@@ -517,13 +323,13 @@ fn run_test(parsed: &ParsedTestFile) -> Result<(), Failed> {
         let program = parse_result.map_err(|e| format!("expected parse: ok, but got error: {e}"))?;
 
         // 2. AST assertion (optional)
-        if let Some(expected_yaml) = &parsed.ast {
+        if let Some(expected_yaml) = extract_ast_field(&spec.raw_header)? {
             let mapper = thaum::format::SourceMapper::new(input);
             let writer = thaum::format::YamlWriter::new_verbose(&mapper, "<test>");
             let actual_yaml_str = writer.write_program(&program);
             let actual_yaml = parse_yaml(&actual_yaml_str)
                 .map_err(|e| format!("failed to re-parse verbose YAML: {e}\n---\n{actual_yaml_str}"))?;
-            yaml_is_subset(expected_yaml, &actual_yaml, "")
+            yaml_is_subset(&expected_yaml, &actual_yaml, "")
                 .map_err(|msg| format!("AST mismatch: {msg}\n\nActual verbose YAML:\n{actual_yaml_str}"))?;
         }
 
@@ -653,7 +459,7 @@ fn main() {
             .replace(".sh.yaml", "")
             .replace('\\', "/");
 
-        let parsed = match parse_test_file(&path) {
+        let parsed = match ShYaml::load(&path) {
             Ok(p) => p,
             Err(e) => {
                 eprintln!("warning: skipping {rel}: {e}");
@@ -661,16 +467,16 @@ fn main() {
             }
         };
 
-        let test_name = parsed.spec.name.clone();
-        let disabled = parsed.spec.disabled.is_disabled();
-        let display_name = match &parsed.spec.disabled {
+        let test_name = parsed.name.clone();
+        let disabled = parsed.disabled.is_disabled();
+        let display_name = match &parsed.disabled {
             Disabled::WithReason { reason } => {
                 format!("{rel} ({test_name}) [disabled: {reason}]")
             }
             _ => format!("{rel} ({test_name})"),
         };
 
-        let has_exec = parsed.spec.status.is_some() || parsed.spec.stdout.is_some() || parsed.spec.stderr.is_some();
+        let has_exec = parsed.status.is_some() || parsed.stdout.is_some() || parsed.stderr.is_some();
         let labels: Vec<&str> = if has_exec {
             vec!["corpus", "lex", "parse", "exec"]
         } else {

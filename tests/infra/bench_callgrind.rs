@@ -15,12 +15,9 @@ fn scripts_dir() -> PathBuf {
 /// Read a `.sh.yaml` benchmark script and return the shell body (after `---`).
 fn read_script_body(name: &str) -> String {
     let path = scripts_dir().join(name);
-    let content = std::fs::read_to_string(&path).unwrap();
-    content
-        .split("\n---\n")
-        .nth(1)
-        .unwrap_or_else(|| panic!("{name}: missing --- separator"))
-        .to_string()
+    thaum::testkit::sh_yaml::ShYaml::load(&path)
+        .unwrap_or_else(|e| panic!("{e}"))
+        .body
 }
 
 /// Run a single callgrind invocation and return the parsed metrics.

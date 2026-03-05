@@ -254,56 +254,29 @@ pub struct Script {
 
 /// Load benchmark scripts from a path (file or directory).
 pub fn load_scripts(path: &std::path::Path) -> Vec<Script> {
+    use thaum::testkit::sh_yaml::ShYaml;
+
     if path.is_dir() {
-        let mut entries: Vec<_> = std::fs::read_dir(path)
-            .unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()))
-            .filter_map(|e| e.ok())
-            .filter(|e| {
-                let name = e.file_name();
-                let name = name.to_string_lossy();
-                name.ends_with(".sh.yaml") || name.ends_with(".sh")
-            })
-            .collect();
-        entries.sort_by_key(|e| e.file_name());
-        entries.iter().map(|e| load_single(&e.path())).collect()
+        let specs = ShYaml::load_dir(path).unwrap_or_else(|e| panic!("{e}"));
+        specs.into_iter().map(Script::from_sh_yaml).collect()
     } else {
-        vec![load_single(path)]
+        let spec = ShYaml::load(path).unwrap_or_else(|e| panic!("{e}"));
+        vec![Script::from_sh_yaml(spec)]
     }
 }
 
-fn load_single(path: &std::path::Path) -> Script {
-    let content = std::fs::read_to_string(path).unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()));
-
-    let file_name = path.file_name().unwrap().to_string_lossy();
-
-    if file_name.ends_with(".sh.yaml") {
-        let name = file_name.strip_suffix(".sh.yaml").unwrap().to_string();
-        let sep = content.find("\n---\n").expect("missing --- separator in .sh.yaml");
-        let header = &content[..sep];
-        let body = content[sep + 5..].to_string();
-        let dialect = header
-            .lines()
-            .find_map(|l| l.strip_prefix("dialect:").map(str::trim))
-            .unwrap_or("bash")
-            .to_string();
-
+impl Script {
+    fn from_sh_yaml(spec: thaum::testkit::sh_yaml::ShYaml) -> Self {
         let sh_path = std::env::temp_dir()
             .join("thaum-bench-scripts")
-            .join(format!("{name}.sh"));
+            .join(format!("{}.sh", spec.name));
         std::fs::create_dir_all(sh_path.parent().unwrap()).ok();
-        std::fs::write(&sh_path, &body).expect("cannot write temp script");
+        std::fs::write(&sh_path, &spec.body).expect("cannot write temp script");
 
         Script {
-            name,
-            dialect,
+            name: spec.name,
+            dialect: spec.dialect,
             path: sh_path,
-        }
-    } else {
-        let name = file_name.strip_suffix(".sh").unwrap_or(&file_name).to_string();
-        Script {
-            name,
-            dialect: "bash".to_string(),
-            path: path.to_path_buf(),
         }
     }
 }

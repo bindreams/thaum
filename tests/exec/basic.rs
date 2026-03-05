@@ -443,8 +443,30 @@ fn consecutive_reads_from_stdin() {
 }
 
 #[skuld::test]
-fn unsupported_compound_redirect() {
-    expect_unsupported("if true; then echo hi; fi > /dev/null");
+fn while_read_loop_with_heredoc() {
+    let script = "while read LINE; do echo \"got: $LINE\"; done <<EOF\nfirst\nsecond\nEOF";
+    let (out, status) = exec_ok(script);
+    assert_eq!(status, 0);
+    assert_eq!(out, "got: first\ngot: second\n");
+}
+
+#[skuld::test]
+fn if_redirect_output_to_file(#[fixture(temp_dir)] dir: &Path) {
+    let file = dir.join("out.txt");
+    let script = format!("if true; then echo yes; fi > {}", shell_path(&file));
+    let (out, _) = exec_ok(&script);
+    assert_eq!(out, ""); // stdout captured by redirect
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "yes\n");
+}
+
+#[skuld::test]
+fn brace_group_redirect_stdin() {
+    let program = thaum::parse("{ read A; read B; echo $A $B; } <<EOF\nalpha\nbeta\nEOF").unwrap();
+    let mut executor = test_executor();
+    let mut captured = CapturedIo::new();
+    let status = executor.execute(&program, &mut captured.context()).unwrap();
+    assert_eq!(status, 0);
+    assert_eq!(captured.stdout_string(), "alpha beta\n");
 }
 
 // Redirect tests ------------------------------------------------------------------------------------------------------

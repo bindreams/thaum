@@ -15,11 +15,16 @@ impl Executor {
         redirects: &[Redirect],
         io: &mut IoContext<'_>,
     ) -> Result<i32, ExecError> {
-        if !redirects.is_empty() {
-            return Err(ExecError::UnsupportedFeature(
-                "redirections on compound commands".to_string(),
-            ));
+        if redirects.is_empty() {
+            return self.execute_compound_body(body, io);
         }
+        let mut active = self.resolve_redirects(redirects)?;
+        let mut redirected_io = active.apply_to_io(io);
+        self.execute_compound_body(body, &mut redirected_io)
+    }
+
+    /// Execute the body of a compound command (dispatch by variant).
+    fn execute_compound_body(&mut self, body: &CompoundCommand, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
         match body {
             CompoundCommand::BraceGroup { body, .. } => self.execute_lines(body, io),
 

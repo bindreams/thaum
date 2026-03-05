@@ -250,6 +250,8 @@ pub struct Script {
     pub dialect: String,
     /// Path to a plain .sh file (for hyperfine/valgrind to invoke).
     pub path: std::path::PathBuf,
+    /// Setup script to run before the benchmark (creates data files, etc.).
+    pub setup: Option<String>,
 }
 
 /// Load benchmark scripts from a path (file or directory).
@@ -277,7 +279,37 @@ impl Script {
             name: spec.name,
             dialect: spec.dialect,
             path: sh_path,
+            setup: spec.setup,
         }
+    }
+
+    /// Run the setup script (if any) in a temp directory and return its path.
+    /// The caller should use this as the working directory for the benchmark.
+    /// Returns None if there is no setup script.
+    pub fn run_setup(&self) -> Option<std::path::PathBuf> {
+        let setup_body = self.setup.as_ref()?;
+        let dir = std::env::temp_dir().join("thaum-bench-setup").join(&self.name);
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("cannot create setup dir");
+        let setup_path = dir.join(".setup");
+        std::fs::write(&setup_path, setup_body).expect("cannot write setup script");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&setup_path, std::fs::Permissions::from_mode(0o755)).ok();
+        }
+        let status = std::process::Command::new(&setup_path)
+            .current_dir(&dir)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::inherit())
+            .status()
+            .unwrap_or_else(|e| panic!("setup script for '{}' failed to run: {e}", self.name));
+        assert!(
+            status.success(),
+            "setup script for '{}' exited with {status}",
+            self.name
+        );
+        Some(dir)
     }
 }
 

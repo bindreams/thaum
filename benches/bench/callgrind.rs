@@ -47,6 +47,7 @@ pub fn run(thaum_binary: &std::path::Path, scripts: &[Script], kinds: &[Kind]) -
     for script in scripts {
         let script_content = std::fs::read_to_string(&script.path)
             .unwrap_or_else(|e| panic!("cannot read {}: {e}", script.path.display()));
+        let setup_dir = script.run_setup();
 
         let mut measurements: HashMap<Kind, Value> = HashMap::new();
 
@@ -76,6 +77,9 @@ pub fn run(thaum_binary: &std::path::Path, scripts: &[Script], kinds: &[Kind]) -
             cmd.arg("-"); // read from stdin
 
             cmd.stdin(Stdio::piped()).stdout(Stdio::null()).stderr(Stdio::null());
+            if let Some(ref dir) = setup_dir {
+                cmd.current_dir(dir);
+            }
 
             eprintln!("  callgrind: {} ({subcmd})", script.name);
 

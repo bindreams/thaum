@@ -31,6 +31,7 @@ pub fn run(scripts: &[Script], kinds: &[Kind]) -> Vec<BenchResult> {
 
     for script in scripts {
         let shells = shells_for_dialect(&script.dialect);
+        let setup_dir = script.run_setup();
         let mut measurements: HashMap<Kind, Value> = HashMap::new();
 
         for &stage in &[Stage::Lex, Stage::Parse, Stage::Exec, Stage::Total] {
@@ -77,6 +78,10 @@ pub fn run(scripts: &[Script], kinds: &[Kind]) -> Vec<BenchResult> {
                     cmd.args(["--command-name", sh])
                         .arg(format!("{sh} {}", script.path.display()));
                 }
+            }
+
+            if let Some(ref dir) = setup_dir {
+                cmd.current_dir(dir);
             }
 
             let status = cmd

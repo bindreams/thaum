@@ -3,11 +3,11 @@
 # requires-python = ">=3.9"
 # dependencies = ["ruamel.yaml"]
 # ///
-"""Format .sh.yaml test files.
+"""Enforce indentation in .sh.yaml test files.
 
-Converts stdout/stderr fields from quoted strings with escape sequences
-to YAML block scalars (|) for readability. Uses ruamel.yaml round-trip
-mode to preserve key order, comments, and quoting of unmodified fields.
+Re-indents the YAML header (everything before the `---` separator) to use
+two-space indentation with indented list items. All other formatting
+(quoting, block scalars, key order) is preserved via ruamel.yaml round-trip.
 
 Usage:
     uv run scripts/format-sh-yaml.py tests/**/*.sh.yaml
@@ -20,21 +20,6 @@ import sys
 import traceback
 
 from ruamel.yaml import YAML
-from ruamel.yaml.scalarstring import LiteralScalarString
-
-# Control characters that are NOT allowed in YAML block scalars.
-# Block scalars permit TAB (0x09), LF (0x0A), CR (0x0D), and NEL (0x85).
-# All other C0/C1 controls must stay in double-quoted strings with escapes.
-_BLOCK_SCALAR_FORBIDDEN = set()
-_BLOCK_SCALAR_FORBIDDEN |= {chr(c) for c in range(0x00, 0x09)}  # NUL..BS
-_BLOCK_SCALAR_FORBIDDEN |= {chr(c) for c in range(0x0B, 0x0D)}  # VT, FF
-_BLOCK_SCALAR_FORBIDDEN |= {chr(c) for c in range(0x0E, 0x20)}  # SO..US
-_BLOCK_SCALAR_FORBIDDEN.add(chr(0x7F))  # DEL
-
-
-def _needs_quoting(value: str) -> bool:
-    """Return True if the value contains characters that can't be in a block scalar."""
-    return bool(_BLOCK_SCALAR_FORBIDDEN.intersection(value))
 
 
 def format_file(path: str) -> bool:
@@ -53,36 +38,11 @@ def format_file(path: str) -> bool:
 
     yaml = YAML(typ="rt")
     yaml.preserve_quotes = True
+    yaml.indent(mapping=2, sequence=4, offset=2)
     header = yaml.load(header_text)
 
     if not isinstance(header, dict):
         raise ValueError(f"{path}: root element is not a mapping")
-
-    for field in ("stdout", "stderr"):
-        value = header.get(field)
-        if not isinstance(value, str):
-            continue
-        if "\n" not in value:
-            continue
-        # Block scalar | can't losslessly represent whitespace-only values.
-        if not value.strip():
-            continue
-        # Already a LiteralScalarString — no conversion needed.
-        if isinstance(value, LiteralScalarString):
-            continue
-        # Values with control characters must stay double-quoted.
-        if _needs_quoting(value):
-            continue
-
-        header[field] = LiteralScalarString(value)
-
-    # Re-create all block scalars from their plain string value to discard
-    # ruamel.yaml's round-trip metadata (stale chomping indicators). This
-    # ensures the dumper picks |/|- based on the actual value content.
-    for key in list(header.keys()):
-        value = header[key]
-        if isinstance(value, LiteralScalarString):
-            header[key] = LiteralScalarString(str(value))
 
     # Round-trip the header through ruamel.yaml and reassemble the file.
     buffer = io.StringIO()
@@ -101,7 +61,7 @@ def format_file(path: str) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Format .sh.yaml test files: convert stdout/stderr to block scalars."
+        description="Enforce indentation in .sh.yaml test files."
     )
     parser.add_argument("files", nargs="+", metavar="FILE", help=".sh.yaml files to format")
     args = parser.parse_args()

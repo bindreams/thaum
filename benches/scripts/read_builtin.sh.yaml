@@ -5,7 +5,7 @@ setup: |
   random.seed(42)
   chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   with open('data.txt', 'w') as f:
-      for _ in range(1_000_000):
+      for _ in range(100_000):
           f.write(''.join(random.choices(chars, k=1000)) + '\n')
 ---
 count=0

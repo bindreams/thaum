@@ -1,7 +1,12 @@
 dialect: posix
 setup: |
-  #!/bin/sh
-  seq 1 1000000 > data.txt
+  #!/usr/bin/env python3
+  import random
+  random.seed(42)
+  chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  with open('data.txt', 'w') as f:
+      for _ in range(1_000_000):
+          f.write(''.join(random.choices(chars, k=1000)) + '\n')
 ---
 count=0
 while read LINE; do

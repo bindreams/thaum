@@ -76,6 +76,9 @@ pub struct ShellOptions {
     /// attribute (Oils behavior). When false (Bash default), `+r` silently
     /// fails -- readonly is permanent for the shell session.
     pub typeset_can_unset_readonly: bool,
+    /// When true, prompt strings (PS1/PS2/PS4) support Bash escape sequences
+    /// like `\u`, `\h`, `\w`, `\$`, etc. POSIX does not define these.
+    pub bash_prompt_escapes: bool,
 }
 
 /// A named set of shell options.
@@ -159,6 +162,7 @@ impl Dialect {
                 parameter_transform_51: true,
                 array_empty_element_alternative_bug: false,
                 typeset_can_unset_readonly: false,
+                bash_prompt_escapes: true,
             },
         }
     }

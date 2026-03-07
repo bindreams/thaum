@@ -5,6 +5,7 @@
 mod color;
 mod error_fmt;
 mod impersonation;
+pub(crate) mod interactive;
 
 use std::io::{self, Read};
 use std::{fs, process};
@@ -205,8 +206,17 @@ fn resolve_source(
 
 fn resolve_exec(dialect: thaum::Dialect, c: Option<String>, args: Vec<String>) -> CliArgs {
     if c.is_none() && args.is_empty() {
-        eprintln!("error: provide either -c <script> or a file argument");
-        process::exit(2);
+        // No -c and no file args: interactive mode or stdin pipe.
+        return CliArgs {
+            subcommand: Subcommand::Exec,
+            dialect,
+            verbose: false,
+            quiet: false,
+            command_str: None,
+            file_arg: None,
+            script_args: Vec::new(),
+            payload_format: PayloadFormat::Json,
+        };
     }
 
     let (file_arg, script_args) = if c.is_some() {
@@ -418,20 +428,42 @@ fn do_parse(cli: &CliArgs) {
 fn do_exec(cli: &CliArgs) {
     let dialect = cli.dialect();
     let options = dialect.options();
-    let (source, filename) = load_source(cli);
-    let mapper = SourceMapper::new(&source);
 
-    let program = match thaum::parse_with(&source, dialect) {
+    // No -c and no file: interactive mode (if on a terminal) or read stdin as script.
+    if cli.command_str.is_none() && cli.file_arg.is_none() {
+        if is_stdin_terminal() {
+            interactive::run(dialect, false);
+            return;
+        }
+        // Piped stdin: read as non-interactive script (fall through with "-").
+        let (source, filename) = (read_source("-"), "<stdin>".to_string());
+        return exec_script(dialect, options, &source, &filename, &cli.script_args);
+    }
+
+    let (source, filename) = load_source(cli);
+    exec_script(dialect, options, &source, &filename, &cli.script_args);
+}
+
+fn exec_script(
+    dialect: thaum::Dialect,
+    options: thaum::ShellOptions,
+    source: &str,
+    filename: &str,
+    script_args: &[String],
+) {
+    let mapper = SourceMapper::new(source);
+
+    let program = match thaum::parse_with(source, dialect) {
         Ok(ast) => ast,
         Err(e) => {
-            error_fmt::print_error(&e, &source, &filename, &mapper);
+            error_fmt::print_error(&e, source, filename, &mapper);
             process::exit(1);
         }
     };
 
     let mut executor = Executor::with_options(options);
-    executor.env_mut().set_program_name(filename);
-    executor.env_mut().set_positional_params(cli.script_args.clone());
+    executor.env_mut().set_program_name(filename.to_string());
+    executor.env_mut().set_positional_params(script_args.to_vec());
 
     let mut process_io = ProcessIo::new();
     match executor.execute(&program, &mut process_io.context()) {
@@ -446,6 +478,10 @@ fn do_exec(cli: &CliArgs) {
             process::exit(2);
         }
     }
+}
+
+fn is_stdin_terminal() -> bool {
+    thaum::exec::platform::is_fd_terminal(0) && thaum::exec::platform::is_fd_terminal(2)
 }
 
 fn do_exec_ast(cli: &CliArgs) {

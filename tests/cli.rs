@@ -3,6 +3,8 @@
 #[path = "common/mod.rs"]
 mod common;
 
+#[path = "cli/interactive.rs"]
+mod interactive;
 #[path = "cli/output.rs"]
 mod output;
 

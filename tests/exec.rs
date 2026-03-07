@@ -17,6 +17,8 @@ mod brace_expansion;
 mod expansion;
 #[path = "exec/external.rs"]
 mod external;
+#[path = "exec/interactive.rs"]
+mod interactive;
 #[path = "exec/printf.rs"]
 mod printf;
 #[path = "exec/variables.rs"]

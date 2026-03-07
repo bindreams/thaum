@@ -110,7 +110,7 @@ pub fn run(mode: Impersonation) {
         Impersonation::Dash => thaum::Dialect::Dash,
     };
 
-    let (dialect, c, file_and_args) = match mode {
+    let (dialect, c, file_and_args, force_interactive, login) = match mode {
         Impersonation::Bash => {
             let cli = BashCli::parse();
             if cli.version {
@@ -122,7 +122,7 @@ pub fn run(mode: Impersonation) {
                 process::exit(0);
             }
             let d = if cli.posix { thaum::Dialect::Posix } else { dialect };
-            (d, cli.c, cli.args)
+            (d, cli.c, cli.args, cli.i, cli.l)
         }
         Impersonation::Sh | Impersonation::Dash => {
             let shell_name = match mode {
@@ -144,9 +144,18 @@ pub fn run(mode: Impersonation) {
                 }
             }
             let cli = PosixShellCli::parse();
-            (dialect, cli.c, cli.args)
+            (dialect, cli.c, cli.args, cli.i, cli.l)
         }
     };
+
+    // No -c and no file args: check for interactive mode.
+    if c.is_none() && file_and_args.is_empty() {
+        let is_tty = super::is_stdin_terminal();
+        if force_interactive || is_tty {
+            super::interactive::run(dialect, login);
+            return;
+        }
+    }
 
     let args = if let Some(cmd) = c {
         CliArgs {
@@ -171,7 +180,7 @@ pub fn run(mode: Impersonation) {
             payload_format: PayloadFormat::Json,
         }
     } else {
-        // No args — read from stdin.
+        // No args, not interactive — read from stdin as script.
         CliArgs {
             subcommand: Subcommand::Exec,
             dialect,

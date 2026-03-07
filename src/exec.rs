@@ -35,8 +35,11 @@ pub(crate) mod numeric;
 mod pattern;
 /// Pipeline execution: flatten pipe trees, spawn stages with piped I/O.
 pub mod pipeline;
-mod platform;
+/// Platform-specific helpers (TTY detection, process spawning, etc.).
+pub mod platform;
 pub(crate) mod printf;
+/// Prompt escape sequence expansion for Bash's PS1/PS2/PS4.
+pub mod prompt;
 pub mod redirect;
 mod special_builtins;
 /// Subshell serialization payload for cross-process `thaum exec-ast`.

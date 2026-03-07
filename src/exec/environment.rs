@@ -153,6 +153,7 @@ pub struct Environment {
     scope_stack: Vec<Scope>,
     aliases: HashMap<String, String>,
     expand_aliases: bool,
+    interactive: bool,
     errexit: bool,
     nounset: bool,
     xtrace: bool,
@@ -238,6 +239,7 @@ impl Environment {
             scope_stack: Vec::new(),
             aliases: HashMap::new(),
             expand_aliases: false,
+            interactive: false,
             errexit: false,
             nounset: false,
             xtrace: false,
@@ -1027,13 +1029,16 @@ impl Environment {
     /// `h` = hashall (always on for now).
     fn option_flags_string(&self) -> String {
         let mut flags = String::new();
-        // Bash outputs flags in a specific order: himBHs (roughly alphabetical
+        // Bash outputs flags in a specific order: ehimBHs (roughly alphabetical
         // with capitals after lowercase). We follow a similar convention.
         if self.errexit {
             flags.push('e');
         }
         // h (hashall) — we hash by default
         flags.push('h');
+        if self.interactive {
+            flags.push('i');
+        }
         if self.nounset {
             flags.push('u');
         }
@@ -1508,6 +1513,39 @@ impl Environment {
         &self.aliases
     }
 
+    /// Whether the shell is in interactive mode.
+    pub fn is_interactive(&self) -> bool {
+        self.interactive
+    }
+
+    /// Set interactive mode. Also enables alias expansion (bash behavior:
+    /// aliases are on by default in interactive shells).
+    pub fn set_interactive(&mut self, enabled: bool) {
+        self.interactive = enabled;
+        if enabled {
+            self.expand_aliases = true;
+        }
+    }
+
+    /// Set default prompt variables for interactive mode.
+    ///
+    /// POSIX: PS1=`$ ` (or `# ` for root), PS2=`> `, PS4=`+ `.
+    /// Bash: PS1=`\s-\v\$ `, PS2=`> `, PS4=`+ `.
+    pub fn set_interactive_defaults(&mut self, options: &crate::ShellOptions) {
+        if options.bash_prompt_escapes {
+            let _ = self.set_var("PS1", r"\s-\v\$ ");
+        } else {
+            #[cfg(unix)]
+            let is_root = nix::unistd::getuid().is_root();
+            #[cfg(not(unix))]
+            let is_root = false;
+            let ps1 = if is_root { "# " } else { "$ " };
+            let _ = self.set_var("PS1", ps1);
+        }
+        let _ = self.set_var("PS2", "> ");
+        let _ = self.set_var("PS4", "+ ");
+    }
+
     /// Whether alias expansion is enabled.
     pub fn expand_aliases_enabled(&self) -> bool {
         self.expand_aliases
@@ -1642,6 +1680,7 @@ impl Environment {
             last_exit_status: self.last_exit_status,
             aliases: self.aliases.clone(),
             expand_aliases: self.expand_aliases,
+            interactive: self.interactive,
             errexit: self.errexit,
             nounset: self.nounset,
             xtrace: self.xtrace,
@@ -1670,6 +1709,7 @@ impl Environment {
             scope_stack: Vec::new(),
             aliases: s.aliases,
             expand_aliases: s.expand_aliases,
+            interactive: s.interactive,
             errexit: s.errexit,
             nounset: s.nounset,
             xtrace: s.xtrace,
@@ -1696,6 +1736,8 @@ pub struct SerializedEnvironment {
     pub last_exit_status: i32,
     pub aliases: HashMap<String, String>,
     pub expand_aliases: bool,
+    #[serde(default)]
+    pub interactive: bool,
     pub errexit: bool,
     pub nounset: bool,
     pub xtrace: bool,

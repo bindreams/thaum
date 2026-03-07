@@ -14,6 +14,8 @@ pub mod exec;
 pub mod fold;
 /// AST formatting as YAML for structured output.
 pub mod format;
+/// Pure logic for interactive shell mode (incomplete-input detection, etc.).
+pub mod interactive;
 /// Context-free shell tokenizer with buffered token stream.
 pub mod lexer;
 /// Recursive-descent parser that promotes keywords from grammatical context.

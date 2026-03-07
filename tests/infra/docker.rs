@@ -24,20 +24,20 @@ pub struct DockerImage {
 
 impl Drop for DockerImage {
     fn drop(&mut self) {
-        thaum::testkit::docker::remove_image(&self.id);
+        thaum_testkit::docker::remove_image(&self.id);
     }
 }
 
 #[skuld::fixture(scope = process, name = "infra_corpus_image", requires = [preconditions::docker])]
 fn corpus_image() -> Result<DockerImage, String> {
     let dockerfile = project_root().join("tests/docker/Dockerfile");
-    thaum::testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
+    thaum_testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
 }
 
 #[skuld::fixture(scope = process, name = "infra_bench_image", requires = [preconditions::docker])]
 fn bench_image() -> Result<DockerImage, String> {
     let dockerfile = project_root().join("benches/docker/Dockerfile");
-    thaum::testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
+    thaum_testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
 }
 
 // Helpers =====================================================================

@@ -131,15 +131,15 @@ impl ShYaml {
         Ok(results)
     }
 
-    /// Parse the dialect string into a [`Dialect`](crate::Dialect).
-    pub fn dialect(&self) -> Result<crate::Dialect, String> {
+    /// Parse the dialect string into a [`Dialect`](thaum::Dialect).
+    pub fn dialect(&self) -> Result<thaum::Dialect, String> {
         match self.dialect.as_str() {
-            "posix" => Ok(crate::Dialect::Posix),
-            "dash" => Ok(crate::Dialect::Dash),
-            "bash44" => Ok(crate::Dialect::Bash44),
-            "bash50" => Ok(crate::Dialect::Bash50),
-            "bash51" => Ok(crate::Dialect::Bash51),
-            "bash" => Ok(crate::Dialect::Bash),
+            "posix" => Ok(thaum::Dialect::Posix),
+            "dash" => Ok(thaum::Dialect::Dash),
+            "bash44" => Ok(thaum::Dialect::Bash44),
+            "bash50" => Ok(thaum::Dialect::Bash50),
+            "bash51" => Ok(thaum::Dialect::Bash51),
+            "bash" => Ok(thaum::Dialect::Bash),
             other => Err(format!("unknown dialect: {other:?}")),
         }
     }

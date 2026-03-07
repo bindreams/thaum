@@ -15,13 +15,13 @@ fn scripts_dir() -> PathBuf {
 /// Read a `.sh.yaml` benchmark script and return the shell body (after `---`).
 fn read_script_body(name: &str) -> String {
     let path = scripts_dir().join(name);
-    thaum::testkit::sh_yaml::ShYaml::load(&path)
+    thaum_testkit::sh_yaml::ShYaml::load(&path)
         .unwrap_or_else(|e| panic!("{e}"))
         .body
 }
 
 /// Run a single callgrind invocation and return the parsed metrics.
-fn run_callgrind(subcmd: &str, script_body: &str) -> thaum::callgrind_parser::CallgrindMetrics {
+fn run_callgrind(subcmd: &str, script_body: &str) -> thaum_testkit::callgrind_parser::CallgrindMetrics {
     let tmp = tempfile::tempdir().expect("failed to create temp dir");
     let out_file = tmp.path().join(format!("{subcmd}.callgrind.out"));
 
@@ -44,7 +44,7 @@ fn run_callgrind(subcmd: &str, script_body: &str) -> thaum::callgrind_parser::Ca
     assert!(status.success(), "valgrind failed for {subcmd}");
 
     let text = std::fs::read_to_string(&out_file).expect("cannot read callgrind output");
-    thaum::callgrind_parser::parse(&text).expect("cannot parse callgrind output")
+    thaum_testkit::callgrind_parser::parse(&text).expect("cannot parse callgrind output")
 }
 
 #[skuld::test(requires = [preconditions::valgrind, preconditions::thaum])]

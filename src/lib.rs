@@ -4,8 +4,6 @@
 
 /// Typed abstract syntax tree for POSIX sh and Bash.
 pub mod ast;
-/// Callgrind output file parser for instruction-count benchmarks.
-pub mod callgrind_parser;
 /// Feature-flag system for shell dialect differences (POSIX vs. Bash).
 pub mod dialect;
 /// Lexer and parser error types with source spans.
@@ -30,10 +28,6 @@ pub mod token;
 pub mod visit;
 /// Word expansion helpers (brace-param parsing, command substitution).
 pub mod word;
-
-/// Test and benchmark infrastructure (Docker helpers, etc.).
-#[cfg(feature = "testkit")]
-pub mod testkit;
 
 pub use ast::Program;
 pub use dialect::{Dialect, ShellOptions};

@@ -256,7 +256,7 @@ pub struct Script {
 
 /// Load benchmark scripts from a path (file or directory).
 pub fn load_scripts(path: &std::path::Path) -> Vec<Script> {
-    use thaum::testkit::sh_yaml::ShYaml;
+    use thaum_testkit::sh_yaml::ShYaml;
 
     if path.is_dir() {
         let specs = ShYaml::load_dir(path).unwrap_or_else(|e| panic!("{e}"));
@@ -268,7 +268,7 @@ pub fn load_scripts(path: &std::path::Path) -> Vec<Script> {
 }
 
 impl Script {
-    fn from_sh_yaml(spec: thaum::testkit::sh_yaml::ShYaml) -> Self {
+    fn from_sh_yaml(spec: thaum_testkit::sh_yaml::ShYaml) -> Self {
         let sh_path = std::env::temp_dir()
             .join("thaum-bench-scripts")
             .join(format!("{}.sh", spec.name));
@@ -310,92 +310,5 @@ impl Script {
             self.name
         );
         Some(dir)
-    }
-}
-
-#[cfg(test)]
-#[allow(unused_imports)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn glob_exact() {
-        assert!(glob_matches("lex.instructions", "lex.instructions"));
-        assert!(!glob_matches("lex.instructions", "parse.instructions"));
-    }
-
-    #[test]
-    fn glob_star() {
-        assert!(glob_matches("*", "lex.instructions"));
-        assert!(glob_matches("lex.*", "lex.instructions"));
-        assert!(glob_matches("lex.*", "lex.walltime"));
-        assert!(glob_matches("*.instructions", "lex.instructions"));
-        assert!(glob_matches("*.instructions", "exec.instructions"));
-        assert!(!glob_matches("*.instructions", "exec.walltime"));
-    }
-
-    #[test]
-    fn resolve_star() {
-        let kinds = resolve_kinds("*");
-        assert_eq!(kinds.len(), Stage::ALL.len() * Metric::ALL.len());
-    }
-
-    #[test]
-    fn resolve_stage_star() {
-        let kinds = resolve_kinds("lex.*");
-        assert!(kinds.iter().all(|k| k.stage == Stage::Lex));
-        assert_eq!(kinds.len(), Metric::ALL.len());
-    }
-
-    #[test]
-    fn resolve_metric_star() {
-        let kinds = resolve_kinds("*.walltime");
-        assert!(kinds.iter().all(|k| k.metric == Metric::Walltime));
-        assert_eq!(kinds.len(), Stage::ALL.len());
-    }
-
-    #[test]
-    fn resolve_comma_separated() {
-        let kinds = resolve_kinds("lex.instructions,exec.walltime");
-        assert_eq!(kinds.len(), 2);
-        assert_eq!(
-            kinds[0],
-            Kind {
-                stage: Stage::Lex,
-                metric: Metric::Instructions
-            }
-        );
-        assert_eq!(
-            kinds[1],
-            Kind {
-                stage: Stage::Exec,
-                metric: Metric::Walltime
-            }
-        );
-    }
-
-    #[test]
-    fn resolve_deduplicates() {
-        let kinds = resolve_kinds("lex.instructions,lex.*");
-        // lex.instructions appears in both, but only once in result.
-        let count = kinds
-            .iter()
-            .filter(|k| k.stage == Stage::Lex && k.metric == Metric::Instructions)
-            .count();
-        assert_eq!(count, 1);
-    }
-
-    #[test]
-    fn resolve_bare_metric_name() {
-        let kinds = resolve_kinds("instructions");
-        assert!(kinds.iter().all(|k| k.metric == Metric::Instructions));
-        assert_eq!(kinds.len(), Stage::ALL.len());
-    }
-
-    #[test]
-    fn resolve_bare_stage_name() {
-        let kinds = resolve_kinds("lex");
-        assert!(kinds.iter().all(|k| k.stage == Stage::Lex));
-        assert_eq!(kinds.len(), Metric::ALL.len());
     }
 }

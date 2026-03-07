@@ -2,9 +2,7 @@
 //! Not every binary uses every function, so unused warnings are expected.
 #![allow(dead_code)]
 
-#[cfg(feature = "testkit")]
 pub mod docker;
-pub mod test_tools;
 
 use thaum::ast::*;
 use thaum::{parse, parse_with, Dialect};

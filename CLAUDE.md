@@ -69,7 +69,7 @@ Before every commit, run `pre-commit run --all-files` and fix any issues. This c
 1. `cargo clippy` — no linter warnings
 
 Additionally:
-4\. Run `cargo nextest run --features cli,testkit`: all tests pass
+4\. Run `cargo nextest run --features cli`: all tests pass
 5\. Update stale information in documentation:
 
 - `README.md`: General information for new users
@@ -124,3 +124,4 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
 - `tests/parse.rs` + `tests/parse/` — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
 - `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash)
 - `tests/cli.rs` + `tests/cli/` — CLI output tests
+- `crates/testkit/` — test infrastructure (sh_yaml parser, Docker helpers, callgrind parser, test tool binaries, test_tools fixture)

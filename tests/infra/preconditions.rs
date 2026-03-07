@@ -15,7 +15,7 @@ pub fn thaum() -> Result<(), String> {
 }
 
 pub fn docker() -> Result<(), String> {
-    if thaum::testkit::docker::available() {
+    if thaum_testkit::docker::available() {
         Ok(())
     } else {
         Err("Docker not available".into())

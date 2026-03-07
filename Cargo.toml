@@ -1,5 +1,5 @@
 [workspace]
-members = ["."]
+members = [".", "crates/testkit"]
 
 [package]
 name = "thaum"
@@ -13,8 +13,6 @@ harness = false
 [features]
 default = []
 cli = ["dep:colored", "dep:clap"]
-bench = ["dep:clap", "testkit"]
-testkit = ["dep:serde_yaml2", "dep:yaml-rust2"]
 
 [dependencies]
 thiserror = "2"
@@ -26,8 +24,6 @@ bincode = "1"
 colored = { version = "3", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 regex = "1"
-serde_yaml2 = { version = "0.1", optional = true }
-yaml-rust2 = { version = "0.8", optional = true }
 icu = "2"
 jiff = "0.2"
 gettext = "0.4"
@@ -54,12 +50,12 @@ windows = { version = "0.62", features = [
 
 [dev-dependencies]
 pretty_assertions = "1"
-serde_yaml2 = "0.1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
 skuld = { git = "https://github.com/bindreams/skuld" }
 clap = { version = "4", features = ["derive"] }
 tempfile = "3.26.0"
+thaum-testkit = { path = "crates/testkit" }
 
 [[test]]
 name = "parse"
@@ -77,12 +73,10 @@ harness = false
 [[test]]
 name = "corpus"
 harness = false
-required-features = ["testkit"]
 
 [[test]]
 name = "infra"
 harness = false
-required-features = ["testkit"]
 
 [[bench]]
 name = "bench"
@@ -94,43 +88,3 @@ path = "src/main.rs"
 required-features = ["cli"]
 test = false
 
-[[bin]]
-name = "thaum-bench"
-path = "benches/bench.rs"
-required-features = ["bench"]
-test = false
-
-[[bin]]
-name = "test-echo"
-path = "tests/tools/echo.rs"
-test = false
-
-[[bin]]
-name = "test-true"
-path = "tests/tools/true.rs"
-test = false
-
-[[bin]]
-name = "test-false"
-path = "tests/tools/false.rs"
-test = false
-
-[[bin]]
-name = "test-cat"
-path = "tests/tools/cat.rs"
-test = false
-
-[[bin]]
-name = "test-env"
-path = "tests/tools/env.rs"
-test = false
-
-[[bin]]
-name = "test-pwd"
-path = "tests/tools/pwd.rs"
-test = false
-
-[[bin]]
-name = "test-touch"
-path = "tests/tools/touch.rs"
-test = false

@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 
 use libtest_mimic::Failed;
 use thaum::exec::{CapturedIo, ExecError, Executor};
-use thaum::testkit::sh_yaml::{Disabled, ParseErrorSpec, ShYaml};
+use thaum_testkit::sh_yaml::{Disabled, ParseErrorSpec, ShYaml};
 use yaml_rust2::Yaml;
 
 /// Whether --no-sandbox was passed on the command line.

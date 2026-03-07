@@ -15,7 +15,7 @@ use std::process::{Command, Stdio};
 // Precondition ================================================================
 
 fn docker_available() -> Result<(), String> {
-    if thaum::testkit::docker::available() {
+    if thaum_testkit::docker::available() {
         Ok(())
     } else {
         Err("Docker not available".into())
@@ -32,7 +32,7 @@ pub struct CorpusImage {
 
 impl Drop for CorpusImage {
     fn drop(&mut self) {
-        thaum::testkit::docker::remove_image(&self.id);
+        thaum_testkit::docker::remove_image(&self.id);
         eprintln!("corpus: removed Docker image {}", &self.id[..12.min(self.id.len())]);
     }
 }
@@ -42,7 +42,7 @@ fn corpus_image() -> Result<CorpusImage, String> {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
     eprintln!("corpus: building Docker image...");
-    let id = thaum::testkit::docker::build_image(&dockerfile, manifest_dir, None)?;
+    let id = thaum_testkit::docker::build_image(&dockerfile, manifest_dir, None)?;
     eprintln!("corpus: built Docker image {}", &id[..12.min(id.len())]);
     Ok(CorpusImage { id })
 }

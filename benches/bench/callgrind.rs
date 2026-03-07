@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use thaum::callgrind_parser;
+use thaum_testkit::callgrind_parser;
 
 use super::types::{BenchResult, Kind, Metric, Script, Stage, Value};
 
@@ -151,26 +151,5 @@ fn metric_for(m: &callgrind_parser::CallgrindMetrics, metric: Metric) -> Option<
         Metric::RamHits => Some(Value::Count(m.ram_hits())),
         Metric::EstCycles => Some(Value::Count(m.est_cycles())),
         Metric::Walltime => None,
-    }
-}
-
-#[cfg(test)]
-#[allow(dead_code, unused_imports)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn stage_to_subcommand_mapping() {
-        assert_eq!(stage_to_subcommand(Stage::Lex), "lex");
-        assert_eq!(stage_to_subcommand(Stage::Parse), "parse");
-        assert_eq!(stage_to_subcommand(Stage::Exec), "exec");
-    }
-
-    #[test]
-    fn dialect_to_flags_mapping() {
-        assert_eq!(dialect_to_flags("bash"), &["--bash"]);
-        assert_eq!(dialect_to_flags("bash44"), &["--bash44"]);
-        assert_eq!(dialect_to_flags("posix"), &[] as &[&str]);
-        assert_eq!(dialect_to_flags("unknown"), &[] as &[&str]);
     }
 }

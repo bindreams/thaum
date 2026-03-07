@@ -1335,13 +1335,25 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "serde_yaml2",
  "skuld",
  "strum",
  "tempfile",
+ "thaum-testkit",
  "thiserror 2.0.18",
  "windows 0.62.2",
  "yaml-rust2",
+]
+
+[[package]]
+name = "thaum-testkit"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "serde",
+ "serde_yaml2",
+ "skuld",
+ "tempfile",
+ "thaum",
 ]
 
 [[package]]

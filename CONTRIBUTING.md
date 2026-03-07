@@ -3,7 +3,7 @@
 ## Development setup
 
 ```sh
-pip install pre-commit && pre-commit install   # one-time setup
+pip install pre-commit && pre-commit install   # one-time setup (installs pre-commit + commit-msg hooks)
 cargo nextest run --features cli               # all tests (excludes conformance)
 cargo nextest run -P conformance --features cli # conformance tests (requires Docker image)
 cargo test --features cli                      # also works (same harness)

@@ -64,6 +64,8 @@ For dynamic test generation (e.g. corpus tests from data files), use `skuld::Tes
 
 Before every commit, run `pre-commit run --all-files` and fix any issues. This checks:
 
+1. No LLM `Co-Authored-By` trailers in commit messages
+1. No LLM git author identity
 1. No stray `#[test]` — use `#[skuld::test]` instead
 1. `cargo fmt` — formatting is correct
 1. `cargo clippy` — no linter warnings

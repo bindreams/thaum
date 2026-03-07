@@ -20,7 +20,7 @@ pub(crate) fn run(args: &[String], env: &mut Environment) -> Result<bool, String
     }
 }
 
-// POSIX arg-count rules =======================================================
+// POSIX arg-count rules ===============================================================================================
 
 /// 2 args: `! EXPR` | `UNARY_OP WORD` | bare non-empty string test on first arg.
 fn eval_two(args: &[String], env: &mut Environment) -> Result<bool, String> {
@@ -77,7 +77,7 @@ fn eval_four(args: &[String], env: &mut Environment) -> Result<bool, String> {
     eval_recursive(args, env)
 }
 
-// Recursive descent for 5+ args ==============================================
+// Recursive descent for 5+ args =======================================================================================
 
 fn eval_recursive(args: &[String], env: &mut Environment) -> Result<bool, String> {
     let mut eval = TestEvaluator { args, pos: 0, env };
@@ -193,7 +193,7 @@ impl<'a> TestEvaluator<'a> {
     }
 }
 
-// Shared evaluation ===========================================================
+// Shared evaluation ===================================================================================================
 
 fn eval_unary(op: UnaryTestOp, operand: &str, env: &Environment) -> bool {
     super::bash_test::evaluate_unary(op, operand, env)
@@ -222,7 +222,7 @@ fn is_binary_test_op(s: &str) -> bool {
     )
 }
 
-// Operator mapping ============================================================
+// Operator mapping ====================================================================================================
 
 fn str_to_unary_op(s: &str) -> Option<UnaryTestOp> {
     match s {

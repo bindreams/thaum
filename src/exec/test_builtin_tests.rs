@@ -28,7 +28,7 @@ fn bracket_status(args: &[&str]) -> i32 {
     run_builtin("[", &owned, &mut env, &mut sin, &mut out, &mut err).unwrap()
 }
 
-// 0-arg and 1-arg basics =====================================================
+// 0-arg and 1-arg basics ==============================================================================================
 
 #[skuld::test]
 fn zero_args_is_false() {
@@ -54,7 +54,7 @@ fn one_arg_operator_like_strings_are_true() {
     assert_eq!(test_status(&["]"]), 0);
 }
 
-// Unary operators (2-arg) =====================================================
+// Unary operators (2-arg) =============================================================================================
 
 #[skuld::test]
 fn unary_n_nonempty() {
@@ -141,7 +141,7 @@ fn negation_two_args() {
     assert_eq!(test_status(&["!", ""]), 0); // ! empty = true
 }
 
-// Binary operators (3-arg) ====================================================
+// Binary operators (3-arg) ============================================================================================
 
 #[skuld::test]
 fn binary_string_equals() {
@@ -174,7 +174,7 @@ fn binary_int_comparisons() {
     assert_eq!(test_status(&["5", "-eq", "3"]), 1);
 }
 
-// 4-arg forms =================================================================
+// 4-arg forms =========================================================================================================
 
 #[skuld::test]
 fn four_arg_negation() {
@@ -188,7 +188,7 @@ fn four_arg_parenthesized_unary() {
     assert_eq!(test_status(&["(", "-z", "", ")"]), 0);
 }
 
-// Logical connectives =========================================================
+// Logical connectives =================================================================================================
 
 #[skuld::test]
 fn logical_and() {
@@ -212,7 +212,7 @@ fn negation_of_unary() {
     assert_eq!(test_status(&["!", "-z", ""]), 1);
 }
 
-// Parentheses grouping ========================================================
+// Parentheses grouping ================================================================================================
 
 #[skuld::test]
 fn parenthesized_string() {
@@ -226,7 +226,7 @@ fn parenthesized_negation() {
     assert_eq!(test_status(&["!", "(", "", ")"]), 0);
 }
 
-// Complex multi-arg expressions ===============================================
+// Complex multi-arg expressions =======================================================================================
 
 #[skuld::test]
 fn complex_and_with_unary_ops() {
@@ -263,7 +263,7 @@ fn parenthesized_and_or() {
     assert_eq!(test_status(&["(", "-n", "foo", ")", "-a", "(", "-n", "bar", ")"]), 0);
 }
 
-// Bracket syntax ==============================================================
+// Bracket syntax ======================================================================================================
 
 #[skuld::test]
 fn bracket_basic() {
@@ -276,7 +276,7 @@ fn bracket_missing_close() {
     assert_eq!(bracket_status(&["hello"]), 2);
 }
 
-// Error handling (exit code 2) ================================================
+// Error handling (exit code 2) ========================================================================================
 
 #[skuld::test]
 fn error_unknown_unary_op() {

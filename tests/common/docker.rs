@@ -12,7 +12,7 @@
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-// Precondition ================================================================
+// Precondition ========================================================================================================
 
 fn docker_available() -> Result<(), String> {
     if thaum_testkit::docker::available() {
@@ -22,7 +22,7 @@ fn docker_available() -> Result<(), String> {
     }
 }
 
-// Corpus image fixture (process-scoped) =======================================
+// Corpus image fixture (process-scoped) ===============================================================================
 
 /// A Docker image built from `tests/docker/Dockerfile`. Untagged — identified
 /// by raw image ID. Removed on drop (build cache stays).
@@ -47,7 +47,7 @@ fn corpus_image() -> Result<CorpusImage, String> {
     Ok(CorpusImage { id })
 }
 
-// Corpus sandbox fixture (process-scoped) =====================================
+// Corpus sandbox fixture (process-scoped) =============================================================================
 
 /// A running Docker container for corpus test execution. Killed on drop.
 pub struct CorpusSandbox {
@@ -99,7 +99,7 @@ fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox
     Ok(CorpusSandbox { container_id })
 }
 
-// ExecResult ==================================================================
+// ExecResult ==========================================================================================================
 
 /// Result from running a test script (used by `run_exec_native` in corpus.rs).
 #[derive(Debug)]

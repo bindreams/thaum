@@ -17,7 +17,7 @@ use windows::Win32::Storage::FileSystem::{
 };
 use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
 
-// File ownership ==================================================================
+// File ownership ======================================================================================================
 
 pub fn file_owned_by_current_user(path: &str) -> bool {
     file_sid_matches(path, true)
@@ -77,7 +77,7 @@ fn file_sid_matches(path: &str, check_owner: bool) -> bool {
     unsafe { EqualSid(file_sid, PSID(token_sid.as_ptr() as _)) }.is_ok()
 }
 
-// Same-file check =================================================================
+// Same-file check =====================================================================================================
 
 pub fn files_are_same(path_a: &str, path_b: &str) -> bool {
     let (Some(a), Some(b)) = (file_info(path_a), file_info(path_b)) else {
@@ -110,7 +110,7 @@ fn file_info(path: &str) -> Option<BY_HANDLE_FILE_INFORMATION> {
     Some(unsafe { info.assume_init() })
 }
 
-// Named pipe detection ============================================================
+// Named pipe detection ================================================================================================
 
 pub fn is_named_pipe(path: &str) -> bool {
     let wide: Vec<u16> = path.encode_utf16().chain(std::iter::once(0)).collect();
@@ -132,7 +132,7 @@ pub fn is_named_pipe(path: &str) -> bool {
     file_type == FILE_TYPE_PIPE
 }
 
-// Token queries ===================================================================
+// Token queries =======================================================================================================
 
 /// Get the current user's SID as a byte vector.
 fn current_token_user_sid() -> Option<Vec<u8>> {
@@ -184,7 +184,7 @@ pub fn current_group_rids() -> Vec<u32> {
         .collect()
 }
 
-// Helpers =========================================================================
+// Helpers =============================================================================================================
 
 fn open_process_token() -> Option<HANDLE> {
     let mut token = HANDLE::default();

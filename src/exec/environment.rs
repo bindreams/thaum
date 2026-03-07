@@ -161,7 +161,7 @@ pub struct Environment {
     /// When true, `typeset +r` / `declare +r` removes the readonly attribute.
     typeset_can_unset_readonly: bool,
 
-    // Dynamic variable state -----
+    // Dynamic variable state ------------------------------------------------------------------------------------------
     /// Tracks which Category-A dynamic variables still have special behavior.
     /// When a variable is unset, it is removed from this set permanently.
     special_active: HashSet<String>,
@@ -395,7 +395,7 @@ impl Environment {
         let _ = self.set_var("COMP_WORDBREAKS", " \t\n\"'@><=;|&(:");
     }
 
-    // Variable chain resolution -------------------------------------------------------------------------------------------
+    // Variable chain resolution ---------------------------------------------------------------------------------------
 
     /// Follow a chain of variable lookups with cycle detection.
     ///

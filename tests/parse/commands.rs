@@ -182,7 +182,7 @@ fn case_inside_command_substitution() {
     assert_eq!(prog.lines[0].len(), 1);
 }
 
-// Append assignment (+=) =============================================================
+// Append assignment (+=) ==============================================================================================
 
 #[skuld::test]
 fn append_scalar_assignment() {

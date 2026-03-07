@@ -11,7 +11,7 @@ use std::fs::File;
 use std::io;
 use std::path::PathBuf;
 
-// Fd ==============================================================================
+// Fd ==================================================================================================================
 
 /// What to do with a file descriptor in the child process.
 pub(crate) enum Fd {
@@ -25,7 +25,7 @@ pub(crate) enum Fd {
     File(File),
 }
 
-// CommandEx =======================================================================
+// CommandEx ===========================================================================================================
 
 /// Description of a child process to spawn. All fields are public; callers
 /// build the struct, then consume it with `spawn(self)`.
@@ -97,7 +97,7 @@ impl CommandEx {
     }
 }
 
-// ChildEx =========================================================================
+// ChildEx =============================================================================================================
 
 /// A spawned child process with optional pipe endpoints.
 pub(crate) struct ChildEx {
@@ -182,7 +182,7 @@ impl ChildEx {
     }
 }
 
-// Process replacement =============================================================
+// Process replacement =================================================================================================
 
 impl CommandEx {
     /// Replace the current process image with this command (Unix `execvp`).
@@ -274,7 +274,7 @@ impl CommandEx {
     }
 }
 
-// Command-line quoting ============================================================
+// Command-line quoting ================================================================================================
 
 /// POSIX shell quoting: single-quote each argument, escaping embedded `'`.
 #[cfg(unix)]
@@ -378,7 +378,7 @@ fn debug_assert_commandline_roundtrips(cmdline: &OsStr, expected_argv: &[OsStrin
     );
 }
 
-// Platform spawn ==================================================================
+// Platform spawn ======================================================================================================
 
 /// RAII guard that restores the process CWD on drop.
 /// Used only on the mutex fallback path when `addchdir_np` is unavailable.
@@ -427,7 +427,7 @@ fn close_raw_fds(fds: &[std::os::fd::RawFd]) {
     }
 }
 
-// addchdir_np runtime detection =======================================================
+// addchdir_np runtime detection =======================================================================================
 
 /// Signature of `posix_spawn_file_actions_addchdir_np` (glibc 2.29+, musl).
 #[cfg(unix)]
@@ -461,7 +461,7 @@ fn probe_addchdir_np() -> Option<AddchdirFn> {
 #[cfg(unix)]
 static SPAWN_CWD_MUTEX: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
-// RAII wrapper for libc posix_spawn_file_actions_t ====================================
+// RAII wrapper for libc posix_spawn_file_actions_t ====================================================================
 
 /// RAII wrapper around `libc::posix_spawn_file_actions_t`. Calls
 /// `posix_spawn_file_actions_destroy` on drop.
@@ -507,7 +507,7 @@ impl Drop for SpawnFileActions {
     }
 }
 
-// RAII wrapper for libc posix_spawnattr_t =============================================
+// RAII wrapper for libc posix_spawnattr_t =============================================================================
 
 #[cfg(unix)]
 struct SpawnAttr {
@@ -539,7 +539,7 @@ impl Drop for SpawnAttr {
     }
 }
 
-// spawn_impl ==========================================================================
+// spawn_impl ==========================================================================================================
 
 #[cfg(unix)]
 fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
@@ -694,7 +694,7 @@ fn spawn_impl(_cmd: CommandEx) -> io::Result<ChildEx> {
 #[path = "command_ex/spawn_windows.rs"]
 mod spawn_windows;
 
-// Tests ===========================================================================
+// Tests ===============================================================================================================
 
 #[cfg(test)]
 #[path = "command_ex_tests.rs"]

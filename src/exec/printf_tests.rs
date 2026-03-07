@@ -173,7 +173,7 @@ fn test_parse_int_empty() {
     assert_eq!(parse_int_arg(""), (0, false));
 }
 
-// LC_NUMERIC decimal separator tests ==========================================
+// LC_NUMERIC decimal separator tests ==================================================================================
 
 #[skuld::test]
 fn test_float_output_comma_separator() {

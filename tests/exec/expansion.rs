@@ -326,7 +326,7 @@ fn exec_rejects_unknown_flags() {
     assert_eq!(exec_status("(exec -z true 2>/dev/null)"), 2);
 }
 
-// exec redirect-only mode -----------------------------------------------------------------------------------------
+// exec redirect-only mode ---------------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn exec_redirect_fd3_persists(#[fixture(temp_dir)] dir: &Path) {

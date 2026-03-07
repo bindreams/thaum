@@ -1,3 +1,13 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Rust build artifacts
 /target
+
+# Claude Code
 CLAUDE.local.md
 .claude/*.local.*

@@ -7,6 +7,20 @@ repos:
         language: pygrep
         types: [rust]
 
+      - id: format-section-comments-test
+        name: section comment hook tests
+        entry: pytest scripts/format-section-comments.py -q --tb=short --no-header
+        language: python
+        additional_dependencies: ['pytest']
+        pass_filenames: false
+        always_run: true
+
+      - id: format-section-comments
+        name: section comment format
+        entry: scripts/format-section-comments.py
+        language: python
+        types: [rust]
+
       - id: cargo-fmt
         name: cargo fmt
         entry: cargo fmt -- --check
@@ -21,7 +35,15 @@ repos:
         types: [rust]
         pass_filenames: false
 
-      - id: sh-yaml-format
+      - id: format-sh-yaml-test
+        name: sh.yaml hook tests
+        entry: pytest scripts/format-sh-yaml.py -q --tb=short --no-header
+        language: python
+        additional_dependencies: ['pytest', 'ruamel.yaml']
+        pass_filenames: false
+        always_run: true
+
+      - id: format-sh-yaml
         name: sh.yaml format
         entry: scripts/format-sh-yaml.py
         language: python

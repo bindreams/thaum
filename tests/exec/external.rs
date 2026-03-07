@@ -95,7 +95,7 @@ fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(out, "hello\n");
 }
 
-// sh -c tests (thaum sh impersonation) -------------------------------------------------------------------------------
+// sh -c tests (thaum sh impersonation) --------------------------------------------------------------------------------
 
 #[skuld::test]
 fn sh_dash_c_basic(#[fixture(test_tools)] tools: &Path) {

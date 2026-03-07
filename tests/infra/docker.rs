@@ -15,7 +15,7 @@ fn project_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR"))
 }
 
-// Fixtures ====================================================================
+// Fixtures ============================================================================================================
 
 /// A built Docker image, removed on drop.
 pub struct DockerImage {
@@ -40,7 +40,7 @@ fn bench_image() -> Result<DockerImage, String> {
     thaum_testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
 }
 
-// Helpers =====================================================================
+// Helpers =============================================================================================================
 
 /// Start a detached container from an image, returning the container ID.
 fn start_container(image_id: &str) -> String {
@@ -91,7 +91,7 @@ fn kill_container(container_id: &str) {
         .status();
 }
 
-// Tests -----------------------------------------------------------------------
+// Tests ---------------------------------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn corpus_image_builds(#[fixture(infra_corpus_image)] image: &DockerImage) {

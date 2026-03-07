@@ -115,7 +115,7 @@ fn translate_empty_textdomaindir() {
     assert_eq!(translate("hello world", &env), "hello world");
 }
 
-// locale_variants tests -------------------------------------------------------
+// locale_variants tests -----------------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn locale_variants_full() {
@@ -148,7 +148,7 @@ fn default_textdomaindir_not_empty_on_unix() {
     }
 }
 
-// resolve_messages_locale tests -----------------------------------------------
+// resolve_messages_locale tests ---------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn locale_lc_all_overrides_lc_messages() {

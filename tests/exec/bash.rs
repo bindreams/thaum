@@ -449,7 +449,7 @@ fn set_e_off() {
     assert_eq!(out, "ok\n");
 }
 
-// Case modification operators (${var^}, ${var^^}, ${var,}, ${var,,}) ---------------------------------------------------
+// Case modification operators (${var^}, ${var^^}, ${var,}, ${var,,}) --------------------------------------------------
 
 #[skuld::test]
 fn case_mod_upper_first() {
@@ -493,7 +493,7 @@ fn case_mod_unset() {
     assert_eq!(out, "\n");
 }
 
-// POSIX character classes in case =================================================================================
+// POSIX character classes in case =====================================================================================
 
 #[skuld::test]
 fn case_char_class_upper() {
@@ -538,7 +538,7 @@ fn case_char_class_alnum_with_star() {
     assert_eq!(out, "y\n");
 }
 
-// Character classes in parameter expansion ========================================================================
+// Character classes in parameter expansion ============================================================================
 
 #[skuld::test]
 fn trim_char_class_alpha_prefix() {
@@ -552,7 +552,7 @@ fn trim_char_class_digit_suffix() {
     assert_eq!(out, "hello\n");
 }
 
-// Regex =~ with character classes =================================================================================
+// Regex =~ with character classes =====================================================================================
 
 #[skuld::test]
 fn regex_char_class_digit() {
@@ -578,7 +578,7 @@ fn regex_char_class_upper() {
     assert_eq!(status, 0);
 }
 
-// Locale sensitivity of character classes =========================================================================
+// Locale sensitivity of character classes =============================================================================
 
 #[skuld::test]
 fn case_char_class_upper_accent_c_locale() {
@@ -753,7 +753,7 @@ fn indirect_assoc_keys() {
     assert!(keys.contains(&"j"));
 }
 
-// Versioned dialect tests -----------------------------------------------------------------------------------------
+// Versioned dialect tests ---------------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn bash_is_bash51() {

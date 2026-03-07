@@ -48,7 +48,7 @@ pub struct ShellOptions {
     /// Allow empty compound bodies (`if true; then fi`, `while false; do done`).
     pub empty_compound_body: bool,
 
-    // Execution-specific flags --------------------------------------------------------
+    // Execution-specific flags ----------------------------------------------------------------------------------------
     /// `declare` / `typeset` builtins (Bash).
     pub declare_builtin: bool,
     /// `shopt` builtin (Bash).

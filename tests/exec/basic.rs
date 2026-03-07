@@ -267,7 +267,7 @@ fn unset_builtin() {
     assert_eq!(executor.env().get_var("X"), None);
 }
 
-// External command (basic smoke test) — moved to exec/external.rs -------------------------------------------------------
+// External command (basic smoke test) — moved to exec/external.rs -----------------------------------------------------
 
 #[skuld::test]
 fn external_command_not_found() {
@@ -580,7 +580,7 @@ fn unsupported_background() {
     expect_unsupported("echo hello &");
 }
 
-// Dialect gating -----------------------------------------------------------------------------------------------------
+// Dialect gating ------------------------------------------------------------------------------------------------------
 
 #[skuld::test]
 fn posix_rejects_declare() {

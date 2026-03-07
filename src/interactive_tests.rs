@@ -207,6 +207,30 @@ fn context_command_after_and() {
 }
 
 #[skuld::test]
+fn context_command_after_or() {
+    assert_eq!(find_completion_context("ls || ", 6), CompletionContext::Command);
+}
+
+#[skuld::test]
+fn context_command_partial_after_or() {
+    assert_eq!(find_completion_context("a || gr", 7), CompletionContext::Command);
+}
+
+#[skuld::test]
+fn context_command_after_and_then_or() {
+    // The last separator is ||, so 'c' is in command position.
+    assert_eq!(find_completion_context("a && b || c", 11), CompletionContext::Command);
+}
+
+#[skuld::test]
+fn context_argument_after_double_separator() {
+    assert_eq!(
+        find_completion_context("a && b || echo fo", 17),
+        CompletionContext::Argument
+    );
+}
+
+#[skuld::test]
 fn context_variable_after_dollar() {
     assert_eq!(find_completion_context("echo $HO", 8), CompletionContext::Variable);
 }

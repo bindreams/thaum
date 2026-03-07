@@ -44,7 +44,7 @@ fn classify_as_incomplete(error: &ParseError) -> bool {
 /// Check whether a command line should be saved to history based on HISTCONTROL.
 ///
 /// `histcontrol` is the colon-separated value of `$HISTCONTROL`. Supported
-/// values: `ignorespace`, `ignoredups`, `ignoreboth`, `erasedups`.
+/// values: `ignorespace`, `ignoredups`, `ignoreboth`.
 pub fn should_save_to_history(line: &str, histcontrol: &str, prev_line: Option<&str>) -> bool {
     if line.is_empty() {
         return false;
@@ -52,15 +52,22 @@ pub fn should_save_to_history(line: &str, histcontrol: &str, prev_line: Option<&
 
     for control in histcontrol.split(':') {
         match control.trim() {
-            "ignorespace" | "ignoreboth" => {
+            "ignorespace" => {
                 if line.starts_with(' ') {
                     return false;
                 }
             }
-            _ => {}
-        }
-        match control.trim() {
-            "ignoredups" | "ignoreboth" => {
+            "ignoredups" => {
+                if let Some(prev) = prev_line {
+                    if line == prev {
+                        return false;
+                    }
+                }
+            }
+            "ignoreboth" => {
+                if line.starts_with(' ') {
+                    return false;
+                }
                 if let Some(prev) = prev_line {
                     if line == prev {
                         return false;
@@ -88,6 +95,10 @@ pub enum CompletionContext {
 }
 
 /// Determine what kind of completion is appropriate at `pos` in `line`.
+///
+/// NOTE: This is a best-effort heuristic. It does not account for quoting
+/// (a `$` or `|` inside quotes will be misidentified). Good enough for basic
+/// tab completion; a proper implementation would need a partial parse.
 pub fn find_completion_context(line: &str, pos: usize) -> CompletionContext {
     let prefix = &line[..pos];
 
@@ -111,8 +122,18 @@ pub fn find_completion_context(line: &str, pos: usize) -> CompletionContext {
         return CompletionContext::Command;
     }
 
-    // Count words in the current simple command (after last separator)
-    let last_sep = trimmed.rfind(['|', ';', '&']).map(|i| i + 1).unwrap_or(0);
+    // Count words in the current simple command (after last separator).
+    // Take the maximum end-position across all separator types so that
+    // a later || is not shadowed by an earlier &&.
+    let last_sep = [
+        trimmed.rfind("&&").map(|i| i + 2),
+        trimmed.rfind("||").map(|i| i + 2),
+        trimmed.rfind(['|', ';', '&']).map(|i| i + 1),
+    ]
+    .into_iter()
+    .flatten()
+    .max()
+    .unwrap_or(0);
     let cmd_part = &trimmed[last_sep..].trim_start();
     let word_count = cmd_part.split_whitespace().count();
 

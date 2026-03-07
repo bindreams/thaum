@@ -8,7 +8,7 @@ use rustyline::completion::{Completer, FilenameCompleter, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::highlight::Highlighter;
 use rustyline::hint::Hinter;
-use rustyline::history::DefaultHistory;
+use rustyline::history::{DefaultHistory, History};
 use rustyline::validate::{ValidationContext, ValidationResult, Validator};
 use rustyline::{Context, Editor, Helper};
 
@@ -29,6 +29,7 @@ impl Completer for ShellHelper {
     type Candidate = Pair;
 
     fn complete(&self, line: &str, pos: usize, _ctx: &Context<'_>) -> rustyline::Result<(usize, Vec<Pair>)> {
+        // TODO: use find_completion_context() to route to command/variable completers
         self.file_completer.complete(line, pos, _ctx)
     }
 }
@@ -57,7 +58,7 @@ impl Validator for ShellHelper {
 impl Helper for ShellHelper {}
 
 /// Run the interactive REPL.
-pub fn run(dialect: Dialect, _login: bool) {
+pub fn run(dialect: Dialect, login: bool) {
     setup_signals();
 
     let options = dialect.options();
@@ -82,7 +83,7 @@ pub fn run(dialect: Dialect, _login: bool) {
 
     let mut process_io = ProcessIo::new();
 
-    source_startup_files(&mut executor, &mut process_io, &options, _login);
+    source_startup_files(&mut executor, &mut process_io, &options, login);
 
     // Load history from HISTFILE
     let histfile = resolve_histfile(&executor);
@@ -101,7 +102,7 @@ pub fn run(dialect: Dialect, _login: bool) {
         }
 
         let ps1_template = executor.env().get_var("PS1").unwrap_or("$ ").to_string();
-        let prompt_ctx = build_prompt_context(&executor, command_number);
+        let prompt_ctx = build_prompt_context(&executor, command_number, editor.history().len());
         let prompt = prompt::expand_prompt_escapes(&ps1_template, &prompt_ctx, &options);
 
         match editor.readline(&prompt) {
@@ -185,7 +186,7 @@ pub fn run(dialect: Dialect, _login: bool) {
 }
 
 /// Build the prompt context from the executor's current state.
-fn build_prompt_context(executor: &Executor, command_number: usize) -> PromptContext {
+fn build_prompt_context(executor: &Executor, command_number: usize, history_len: usize) -> PromptContext {
     let env = executor.env();
 
     #[cfg(unix)]
@@ -226,7 +227,7 @@ fn build_prompt_context(executor: &Executor, command_number: usize) -> PromptCon
             .into(),
         version_patch: env!("CARGO_PKG_VERSION").into(),
         uid,
-        history_number: 0, // TODO: wire to rustyline history length
+        history_number: history_len,
         command_number,
         jobs_count: 0, // TODO: wire to job table
         tty_name,
@@ -293,8 +294,13 @@ fn source_file_if_exists(executor: &mut Executor, io: &mut ProcessIo, options: &
     let Ok(source) = std::fs::read_to_string(path) else {
         return false;
     };
-    if let Ok(program) = thaum::parse_with_options(&source, options.clone()) {
-        let _ = executor.execute(&program, &mut io.context());
+    match thaum::parse_with_options(&source, options.clone()) {
+        Ok(program) => {
+            let _ = executor.execute(&program, &mut io.context());
+        }
+        Err(e) => {
+            eprintln!("thaum: {path}: {e}");
+        }
     }
     true
 }
@@ -310,7 +316,7 @@ fn execute_prompt_command(executor: &mut Executor, process_io: &mut ProcessIo) {
         return;
     }
 
-    // Parse and execute PROMPT_COMMAND. Errors are printed but don't affect the shell.
+    // Parse and execute PROMPT_COMMAND. Errors are silently ignored.
     if let Ok(program) = thaum::parse(&cmd) {
         let _ = executor.execute(&program, &mut process_io.context());
     }
@@ -323,6 +329,12 @@ fn setup_signals() {
         use signal_hook::consts::{SIGQUIT, SIGTERM};
         // POSIX: interactive shells ignore SIGTERM and SIGQUIT.
         // SIGINT is handled by rustyline (returns Err(Interrupted)).
+        //
+        // signal_hook::flag::register() replaces the default signal handler
+        // (which would kill the process) with one that just sets the AtomicBool.
+        // We don't need to read the flag — the goal is simply to prevent
+        // the default termination behavior. The Arc is captured and retained
+        // by signal-hook's internal closure.
         let _ = signal_hook::flag::register(SIGTERM, std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)));
         let _ = signal_hook::flag::register(SIGQUIT, std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)));
     }

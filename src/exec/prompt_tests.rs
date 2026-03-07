@@ -176,6 +176,55 @@ fn mixed_escapes_and_literal() {
     assert_eq!(result, "testuser@myhost:~/src$ ");
 }
 
+// Date/time escapes ===================================================================================================
+
+#[skuld::test]
+fn escape_d_date_format() {
+    let ctx = bash_ctx();
+    let result = expand_prompt_escapes(r"\d", &ctx, &Dialect::Bash.options());
+    // \d produces "Weekday Month Day" format, e.g. "Mon Jan 01"
+    assert!(result.len() >= 8, "\\d too short: {result:?}");
+    assert_eq!(result.split_whitespace().count(), 3);
+}
+
+#[skuld::test]
+fn escape_t_time_24h_format() {
+    let ctx = bash_ctx();
+    let result = expand_prompt_escapes(r"\t", &ctx, &Dialect::Bash.options());
+    // \t produces "HH:MM:SS" in 24-hour format
+    assert_eq!(result.len(), 8, "\\t should be HH:MM:SS: {result:?}");
+    assert_eq!(result.chars().filter(|&c| c == ':').count(), 2);
+}
+
+#[skuld::test]
+fn escape_big_t_time_12h_format() {
+    let ctx = bash_ctx();
+    let result = expand_prompt_escapes(r"\T", &ctx, &Dialect::Bash.options());
+    // \T produces "HH:MM:SS" in 12-hour format
+    assert_eq!(result.len(), 8, "\\T should be HH:MM:SS: {result:?}");
+    assert_eq!(result.chars().filter(|&c| c == ':').count(), 2);
+}
+
+#[skuld::test]
+fn escape_at_time_ampm_format() {
+    let ctx = bash_ctx();
+    let result = expand_prompt_escapes(r"\@", &ctx, &Dialect::Bash.options());
+    // \@ produces "HH:MM AM/PM" format
+    assert!(
+        result.ends_with("AM") || result.ends_with("PM"),
+        "\\@ should end with AM/PM: {result:?}"
+    );
+}
+
+#[skuld::test]
+fn escape_big_a_time_24h_short_format() {
+    let ctx = bash_ctx();
+    let result = expand_prompt_escapes(r"\A", &ctx, &Dialect::Bash.options());
+    // \A produces "HH:MM" in 24-hour format
+    assert_eq!(result.len(), 5, "\\A should be HH:MM: {result:?}");
+    assert_eq!(result.chars().filter(|&c| c == ':').count(), 1);
+}
+
 // POSIX mode ==========================================================================================================
 
 #[skuld::test]

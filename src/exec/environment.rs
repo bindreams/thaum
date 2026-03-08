@@ -5,6 +5,7 @@
 //! spawning.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 
 use contracts::debug_ensures;
@@ -12,6 +13,98 @@ use serde::{Deserialize, Serialize};
 
 use crate::ast::{CompoundCommand, FunctionDef};
 use crate::exec::error::ExecError;
+
+// VarName =============================================================================================================
+
+/// Shell variable name. Case-insensitive `Hash`/`Eq` on Windows (matching the
+/// OS API); case-sensitive on Unix (POSIX).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(transparent)]
+pub(crate) struct VarName(String);
+
+impl VarName {
+    fn new(s: impl Into<String>) -> Self {
+        Self(s.into())
+    }
+
+    fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+#[cfg(windows)]
+impl PartialEq for VarName {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.eq_ignore_ascii_case(&other.0)
+    }
+}
+
+#[cfg(windows)]
+impl Hash for VarName {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for b in self.0.bytes() {
+            b.to_ascii_uppercase().hash(state);
+        }
+    }
+}
+
+#[cfg(not(windows))]
+impl PartialEq for VarName {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+#[cfg(not(windows))]
+impl Hash for VarName {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.hash(state);
+    }
+}
+
+impl Eq for VarName {}
+
+// VarMap ==============================================================================================================
+
+/// Shell variable storage. Wraps `HashMap<VarName, ShellVar>` and exposes
+/// `&str`-based methods so callers don't need to construct `VarName` manually.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(transparent)]
+pub(crate) struct VarMap {
+    inner: HashMap<VarName, ShellVar>,
+}
+
+impl VarMap {
+    fn new() -> Self {
+        Self { inner: HashMap::new() }
+    }
+
+    fn get(&self, key: &str) -> Option<&ShellVar> {
+        self.inner.get(&VarName::new(key))
+    }
+
+    fn get_mut(&mut self, key: &str) -> Option<&mut ShellVar> {
+        self.inner.get_mut(&VarName::new(key))
+    }
+
+    fn insert(&mut self, key: String, value: ShellVar) -> Option<ShellVar> {
+        self.inner.insert(VarName::new(key), value)
+    }
+
+    fn remove(&mut self, key: &str) -> Option<ShellVar> {
+        self.inner.remove(&VarName::new(key))
+    }
+
+    fn iter(&self) -> impl Iterator<Item = (&str, &ShellVar)> {
+        self.inner.iter().map(|(k, v)| (k.as_str(), v))
+    }
+
+    fn keys(&self) -> impl Iterator<Item = &str> {
+        self.inner.keys().map(|k| k.as_str())
+    }
+}
+
+// ===========================================================================================================
 
 /// Dynamic variables whose special behavior is initially active and can be
 /// killed by `unset` (Category A), plus BASHPID (Category D).
@@ -117,7 +210,7 @@ pub struct DeclareAttrs {
 #[derive(Debug, Clone)]
 struct Scope {
     /// Variables saved for restoration (used by `local` — Bash extension).
-    saved: HashMap<String, Option<ShellVar>>,
+    saved: HashMap<VarName, Option<ShellVar>>,
     /// Positional parameters saved from the caller.
     saved_positional: Vec<String>,
     /// Function name for this scope (used by FUNCNAME).
@@ -142,7 +235,7 @@ pub struct CallInfo {
 /// and a scope stack for function calls.
 #[derive(Debug)]
 pub struct Environment {
-    variables: HashMap<String, ShellVar>,
+    variables: VarMap,
     functions: HashMap<String, StoredFunction>,
     positional_params: Vec<String>,
     program_name: String,
@@ -227,7 +320,7 @@ impl Environment {
         let pid = std::process::id();
 
         let mut env = Environment {
-            variables: HashMap::new(),
+            variables: VarMap::new(),
             functions: HashMap::new(),
             positional_params: Vec::new(),
             program_name: String::from("sh"),
@@ -967,7 +1060,7 @@ impl Environment {
         self.variables
             .iter()
             .filter(|(_, v)| v.exported)
-            .map(|(k, v)| (k.clone(), v.scalar_str().to_string()))
+            .map(|(k, v)| (k.to_string(), v.scalar_str().to_string()))
             .collect()
     }
 
@@ -976,7 +1069,7 @@ impl Environment {
         self.variables
             .iter()
             .filter(|(_, v)| v.readonly)
-            .map(|(k, v)| (k.clone(), v.scalar_str().to_string()))
+            .map(|(k, v)| (k.to_string(), v.scalar_str().to_string()))
             .collect()
     }
 
@@ -984,13 +1077,13 @@ impl Environment {
     pub fn all_vars(&self) -> Vec<(String, String)> {
         self.variables
             .iter()
-            .map(|(k, v)| (k.clone(), v.scalar_str().to_string()))
+            .map(|(k, v)| (k.to_string(), v.scalar_str().to_string()))
             .collect()
     }
 
     /// Return all variable names.
     pub fn all_var_names(&self) -> Vec<String> {
-        self.variables.keys().cloned().collect()
+        self.variables.keys().map(|k| k.to_string()).collect()
     }
 
     // Special parameters ----------------------------------------------------------------------------------------------
@@ -1170,10 +1263,10 @@ impl Environment {
             for (name, saved) in scope.saved {
                 match saved {
                     Some(var) => {
-                        self.variables.insert(name, var);
+                        self.variables.insert(name.0, var);
                     }
                     None => {
-                        self.variables.remove(&name);
+                        self.variables.remove(name.as_str());
                     }
                 }
             }
@@ -1240,9 +1333,9 @@ impl Environment {
             .last_mut()
             .ok_or_else(|| ExecError::BadSubstitution("local: can only be used in a function".to_string()))?;
 
-        if !scope.saved.contains_key(name) {
+        if let std::collections::hash_map::Entry::Vacant(entry) = scope.saved.entry(VarName::new(name)) {
             let current = self.variables.get(name).cloned();
-            scope.saved.insert(name.to_string(), current.clone());
+            entry.insert(current.clone());
 
             let value = current
                 .as_ref()
@@ -1729,7 +1822,7 @@ impl Environment {
 /// Serializable subset of `Environment` for cross-process transfer.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SerializedEnvironment {
-    pub variables: HashMap<String, ShellVar>,
+    pub(crate) variables: VarMap,
     pub functions: HashMap<String, StoredFunction>,
     pub positional_params: Vec<String>,
     pub program_name: String,

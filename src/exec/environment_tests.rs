@@ -183,6 +183,81 @@ fn special_param_dash_with_multiple_options() {
     assert!(flags.contains('x'));
 }
 
+// Case sensitivity ====================================================================================================
+
+#[skuld::test]
+fn var_case_sensitivity_matches_platform() {
+    let mut env = Environment::new();
+    env.set_var("TestVar", "hello").unwrap();
+
+    if cfg!(windows) {
+        assert_eq!(env.get_var("TESTVAR"), Some("hello"));
+        assert_eq!(env.get_var("testvar"), Some("hello"));
+        assert_eq!(env.get_var("TestVar"), Some("hello"));
+    } else {
+        assert_eq!(env.get_var("TestVar"), Some("hello"));
+        assert_eq!(env.get_var("TESTVAR"), None);
+        assert_eq!(env.get_var("testvar"), None);
+    }
+}
+
+#[skuld::test]
+fn var_case_insensitive_overwrite_on_windows() {
+    let mut env = Environment::new();
+    env.set_var("Path", "first").unwrap();
+    env.set_var("PATH", "second").unwrap();
+
+    if cfg!(windows) {
+        assert_eq!(env.get_var("Path"), Some("second"));
+        assert_eq!(env.get_var("PATH"), Some("second"));
+    } else {
+        assert_eq!(env.get_var("Path"), Some("first"));
+        assert_eq!(env.get_var("PATH"), Some("second"));
+    }
+}
+
+#[skuld::test]
+fn var_unset_case_insensitive_on_windows() {
+    let mut env = Environment::new();
+    env.set_var("MyVar", "value").unwrap();
+
+    if cfg!(windows) {
+        env.unset_var("myvar").unwrap();
+        assert_eq!(env.get_var("MyVar"), None);
+    } else {
+        env.unset_var("myvar").unwrap();
+        assert_eq!(env.get_var("MyVar"), Some("value"));
+    }
+}
+
+#[skuld::test]
+fn inherit_from_process_path_accessible() {
+    let mut env = Environment::new();
+    env.inherit_from_process();
+    assert!(
+        env.get_var("PATH").is_some(),
+        "PATH should be set after inherit_from_process"
+    );
+}
+
+#[skuld::test]
+fn scope_save_restore_case_insensitive_on_windows() {
+    let mut env = Environment::new();
+    env.set_var("TestVar", "outer").unwrap();
+    env.push_scope(vec![]);
+    env.declare_local("TestVar").unwrap();
+    env.set_var("TestVar", "inner").unwrap();
+
+    if cfg!(windows) {
+        assert_eq!(env.get_var("testvar"), Some("inner"));
+    }
+
+    env.pop_scope();
+    assert_eq!(env.get_var("TestVar"), Some("outer"));
+}
+
+// Bash-specific variables =============================================================================================
+
 #[cfg(unix)]
 #[skuld::test]
 fn bash_vars_groups_is_populated() {

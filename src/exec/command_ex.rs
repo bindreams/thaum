@@ -165,8 +165,7 @@ impl ChildEx {
                     return Err(err);
                 }
                 let mut code: u32 = 0;
-                unsafe { GetExitCodeProcess(*handle, &mut code) }
-                    .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+                unsafe { GetExitCodeProcess(*handle, &mut code) }.map_err(|e| io::Error::other(e.to_string()))?;
                 debug_assert!(
                     unsafe { windows::Win32::Foundation::CloseHandle(*handle) }.is_ok(),
                     "CloseHandle failed — possible double-close"

@@ -1,12 +1,11 @@
-use std::ffi::OsString;
-
 skuld::default_labels!(exec);
 
 #[cfg(unix)]
 mod posix_quoting {
+    use std::ffi::OsString;
     use std::path::Path;
 
-    use super::*;
+    use skuld::temp_dir;
 
     fn roundtrip(args: &[&str]) {
         let argv: Vec<OsString> = args.iter().map(OsString::from).collect();

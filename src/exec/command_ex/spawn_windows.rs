@@ -204,7 +204,7 @@ fn build_env_block(env: &HashMap<OsString, OsString>) -> Vec<u16> {
         })
         .collect();
     // Environment block must be sorted (case-insensitive) per Windows convention.
-    entries.sort_by(|a, b| a.cmp(b));
+    entries.sort();
 
     let mut block: Vec<u16> = Vec::new();
     for entry in entries {
@@ -218,14 +218,12 @@ fn build_env_block(env: &HashMap<OsString, OsString>) -> Vec<u16> {
 fn create_pipe() -> io::Result<(HANDLE, HANDLE)> {
     let mut read_handle = HANDLE::default();
     let mut write_handle = HANDLE::default();
-    unsafe { CreatePipe(&mut read_handle, &mut write_handle, None, 0) }
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    unsafe { CreatePipe(&mut read_handle, &mut write_handle, None, 0) }.map_err(io::Error::other)?;
     Ok((read_handle, write_handle))
 }
 
 /// Mark a handle as inheritable by child processes.
 fn make_inheritable(handle: HANDLE) -> io::Result<()> {
     use windows::Win32::Foundation::{SetHandleInformation, HANDLE_FLAG_INHERIT};
-    unsafe { SetHandleInformation(handle, HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT) }
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+    unsafe { SetHandleInformation(handle, HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT) }.map_err(io::Error::other)
 }

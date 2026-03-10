@@ -226,7 +226,7 @@ pub(super) fn os_pipe() -> Result<(std::fs::File, std::fs::File), ExecError> {
         let mut read_handle = windows::Win32::Foundation::HANDLE::default();
         let mut write_handle = windows::Win32::Foundation::HANDLE::default();
         unsafe { CreatePipe(&mut read_handle, &mut write_handle, None, 0) }
-            .map_err(|e| ExecError::Io(std::io::Error::new(std::io::ErrorKind::Other, e)))?;
+            .map_err(|e| ExecError::Io(std::io::Error::other(e)))?;
         Ok((unsafe { std::fs::File::from_raw_handle(read_handle.0 as _) }, unsafe {
             std::fs::File::from_raw_handle(write_handle.0 as _)
         }))

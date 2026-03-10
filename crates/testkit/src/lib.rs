@@ -7,7 +7,6 @@
 pub mod callgrind_parser;
 pub mod docker;
 pub mod sh_yaml;
-pub mod test_tools;
 
 #[cfg(test)]
 fn main() {

@@ -1,9 +1,11 @@
-//! Cross-platform test tool fixture.
+//! Cross-platform test tool binaries and fixture.
 //!
 //! Provides a process-scoped `test_tools` fixture that returns a directory
 //! containing symlinks (Unix) or copies (Windows) of minimal tool binaries
 //! (`echo`, `true`, `false`, `cat`, `env`, `sh`). Tests use this directory
 //! as `PATH` to avoid depending on system binaries.
+//!
+//! The binaries are built automatically via a self-invoking `build.rs`.
 
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
@@ -35,7 +37,12 @@ fn exe_name(name: &str) -> String {
     }
 }
 
-/// Find the cargo target directory where built binaries live.
+/// Directory containing the test tool binaries, built by `build.rs`.
+fn tool_bin_dir() -> &'static Path {
+    Path::new(env!("TEST_TOOLS_BIN_DIR"))
+}
+
+/// Find the cargo target directory where `thaum` and other root-crate binaries live.
 fn cargo_bin_dir() -> PathBuf {
     std::env::current_exe()
         .expect("current_exe()")
@@ -74,14 +81,17 @@ fn link_or_copy(src: &Path, dst: &Path) -> Result<(), String> {
 }
 
 #[skuld::fixture(scope = process, deref)]
-fn test_tools() -> Result<TestTools, String> {
-    let bin_dir = cargo_bin_dir();
+pub fn test_tools() -> Result<TestTools, String> {
+    let tool_dir = tool_bin_dir();
+    let cargo_dir = cargo_bin_dir();
+
     let dir = tempfile::Builder::new()
         .prefix("thaum-test-tools-")
         .tempdir()
         .map_err(|e| format!("create test_tools dir: {e}"))?;
     let dir = dir.keep(); // Persist — cleanup via TestTools::drop
 
+    // Test tool binaries (built by our build.rs into a nested target dir).
     let tools: &[(&str, &str)] = &[
         ("echo", "test-echo"),
         ("true", "test-true"),
@@ -90,14 +100,24 @@ fn test_tools() -> Result<TestTools, String> {
         ("env", "test-env"),
         ("pwd", "test-pwd"),
         ("touch", "test-touch"),
-        ("sh", "thaum"), // thaum impersonates sh when invoked as "sh"
     ];
 
     for &(name, bin_name) in tools {
-        let src = bin_dir.join(exe_name(bin_name));
+        let src = tool_dir.join(exe_name(bin_name));
         let dst = dir.join(exe_name(name));
         link_or_copy(&src, &dst)?;
     }
 
+    // thaum binary (built by the root crate, lives in the standard cargo output dir).
+    // Tests invoke it as "sh" to exercise the shell-as-external-command path.
+    let thaum_src = cargo_dir.join(exe_name("thaum"));
+    let sh_dst = dir.join(exe_name("sh"));
+    link_or_copy(&thaum_src, &sh_dst)?;
+
     Ok(TestTools { dir })
+}
+
+#[cfg(test)]
+fn main() {
+    skuld::run_all();
 }

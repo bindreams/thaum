@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/testkit"]
+members = [".", "crates/testkit", "crates/test-tools"]
 
 [package]
 name = "thaum"
@@ -58,6 +58,7 @@ skuld = { git = "https://github.com/bindreams/skuld" }
 clap = { version = "4", features = ["derive"] }
 tempfile = "3.26.0"
 thaum-testkit = { path = "crates/testkit" }
+thaum-test-tools = { path = "crates/test-tools" }
 expectrl = "0.8.0"
 
 [[test]]

@@ -1,0 +1,47 @@
+[package]
+name = "thaum-test-tools"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+skuld = { git = "https://github.com/bindreams/skuld" }
+tempfile = "3.26.0"
+
+[lib]
+harness = false
+
+[[bin]]
+name = "test-echo"
+path = "src/tools/echo.rs"
+test = false
+
+[[bin]]
+name = "test-true"
+path = "src/tools/true.rs"
+test = false
+
+[[bin]]
+name = "test-false"
+path = "src/tools/false.rs"
+test = false
+
+[[bin]]
+name = "test-cat"
+path = "src/tools/cat.rs"
+test = false
+
+[[bin]]
+name = "test-pwd"
+path = "src/tools/pwd.rs"
+test = false
+
+[[bin]]
+name = "test-env"
+path = "src/tools/env.rs"
+test = false
+
+[[bin]]
+name = "test-touch"
+path = "src/tools/touch.rs"
+test = false

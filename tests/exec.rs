@@ -1,5 +1,8 @@
 //! Execution tests: verify runtime behavior of the thaum executor.
 
+pub use skuld::temp_dir;
+pub use thaum_test_tools::test_tools;
+
 #[path = "common/mod.rs"]
 mod common;
 

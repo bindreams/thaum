@@ -1,13 +1,15 @@
 //! PTY-based integration tests for interactive mode.
 //!
-//! These tests spawn the thaum binary in a pseudo-terminal via `expectrl` and
-//! verify real interactive behavior: prompts, continuation, signals.
+//! These tests spawn the thaum binary in a pseudo-terminal via `thaum_expect`
+//! and verify real interactive behavior: prompts, continuation, signals.
+//! VT escape sequences are stripped before pattern matching, which is essential
+//! on Windows where ConPTY interleaves cursor-movement sequences into output.
 
 use std::time::Duration;
 
-use expectrl::Expect;
+use thaum_expect::PtySession;
 
-fn spawn_thaum_interactive() -> impl Expect {
+fn spawn_thaum_interactive() -> PtySession {
     let bin = env!("CARGO_BIN_EXE_thaum");
     let mut cmd = std::process::Command::new(bin);
     cmd.arg("exec");
@@ -15,7 +17,7 @@ fn spawn_thaum_interactive() -> impl Expect {
     cmd.env("PS2", "> ");
     cmd.env("NO_COLOR", "1");
     cmd.env("HOME", "/tmp/claude/thaum-test-home");
-    let mut session = expectrl::Session::spawn(cmd).expect("failed to spawn thaum");
+    let mut session = PtySession::spawn(cmd).expect("failed to spawn thaum");
     session.set_expect_timeout(Some(Duration::from_secs(5)));
     session
 }
@@ -23,7 +25,7 @@ fn spawn_thaum_interactive() -> impl Expect {
 #[skuld::test(labels = [interactive])]
 fn repl_echo_hello() {
     let mut session = spawn_thaum_interactive();
-    session.expect("$ ").expect("expected initial prompt");
+    session.expect("$").expect("expected initial prompt");
     session.send_line("echo hello").expect("send failed");
     session.expect("hello").expect("expected 'hello' output");
     session.send_line("exit").expect("send exit failed");
@@ -32,9 +34,9 @@ fn repl_echo_hello() {
 #[skuld::test(labels = [interactive])]
 fn repl_variable_persists_across_lines() {
     let mut session = spawn_thaum_interactive();
-    session.expect("$ ").expect("expected initial prompt");
+    session.expect("$").expect("expected initial prompt");
     session.send_line("X=world").expect("send failed");
-    session.expect("$ ").expect("expected prompt after assignment");
+    session.expect("$").expect("expected prompt after assignment");
     session.send_line("echo $X").expect("send failed");
     session.expect("world").expect("expected 'world' output");
     session.send_line("exit").expect("send exit failed");
@@ -43,10 +45,10 @@ fn repl_variable_persists_across_lines() {
 #[skuld::test(labels = [interactive])]
 fn repl_syntax_error_continues() {
     let mut session = spawn_thaum_interactive();
-    session.expect("$ ").expect("expected initial prompt");
+    session.expect("$").expect("expected initial prompt");
     session.send_line("if true; then fi").expect("send failed");
     // Should get an error but not exit
-    session.expect("$ ").expect("expected re-prompt after syntax error");
+    session.expect("$").expect("expected re-prompt after syntax error");
     session.send_line("echo ok").expect("send failed");
     session.expect("ok").expect("expected 'ok' after recovery");
     session.send_line("exit").expect("send exit failed");

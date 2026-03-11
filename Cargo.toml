@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/testkit", "crates/test-tools"]
+members = [".", "crates/testkit", "crates/test-tools", "crates/expect"]
 
 [package]
 name = "thaum"
@@ -59,7 +59,7 @@ clap = { version = "4", features = ["derive"] }
 tempfile = "3.26.0"
 thaum-testkit = { path = "crates/testkit" }
 thaum-test-tools = { path = "crates/test-tools" }
-expectrl = "0.8.0"
+thaum-expect = { path = "crates/expect" }
 
 [[test]]
 name = "parse"

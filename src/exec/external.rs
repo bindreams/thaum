@@ -1,7 +1,11 @@
 //! External (non-builtin) command execution via fork/exec. Sets up redirections,
 //! exported environment variables, and extra FD mappings before spawning.
-//! Stdout and stderr are piped and relayed through `IoContext` so that output
-//! is captured correctly in both live and test (CapturedIo) contexts.
+//!
+//! In **capturing mode** (`IoContext::capturing == true`, used by `CapturedIo`
+//! in tests), stdout and stderr are piped and relayed through `IoContext`.
+//! In **live mode** (`capturing == false`, used by `ProcessIo`), external
+//! commands inherit the parent's stdout/stderr handles directly, which is
+//! required for interactive programs and real-time output.
 
 use crate::exec::child_io;
 use crate::exec::command_ex::{CommandEx, Fd};
@@ -75,11 +79,15 @@ impl Executor {
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
         }
 
-        // If stdout/stderr are not explicitly redirected, pipe them so we can
-        // relay output through IoContext (capturing it for tests, writing it
-        // to the real streams for live execution).
-        child_cmd.fds.entry(1).or_insert(Fd::Pipe);
-        child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+        // In capturing mode (tests / CapturedIo), pipe stdout/stderr so we
+        // can relay output through IoContext. In live mode (ProcessIo),
+        // let the child inherit parent handles directly — required for
+        // interactive programs like cmd.exe / pwsh.exe and for real-time
+        // output from long-running commands.
+        if io.capturing {
+            child_cmd.fds.entry(1).or_insert(Fd::Pipe);
+            child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+        }
 
         match child_cmd.spawn() {
             Ok(mut child) => {

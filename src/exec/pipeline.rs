@@ -176,12 +176,15 @@ fn spawn_pipeline_stage(
 
             if pipe_stdout {
                 child_cmd.fds.insert(1, Fd::Pipe);
-            } else {
-                // Last pipeline stage: pipe stdout to relay through IoContext.
+            } else if io.capturing {
+                // Last pipeline stage in capturing mode: pipe stdout to relay
+                // through IoContext.
                 child_cmd.fds.entry(1).or_insert(Fd::Pipe);
             }
-            // Always pipe stderr (unless redirected) to relay through IoContext.
-            child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+            if io.capturing {
+                // Pipe stderr to relay through IoContext (capturing mode only).
+                child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+            }
 
             match child_cmd.spawn() {
                 Ok(mut child) => {

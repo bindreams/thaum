@@ -352,6 +352,7 @@ impl Executor {
                 Some(f) => f as &mut dyn std::io::Write,
                 None => io.stderr,
             },
+            io.capturing,
         );
 
         self.execute_expression_inner(expr, &mut persistent_io)

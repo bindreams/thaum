@@ -137,7 +137,12 @@ impl ActiveRedirects {
     /// Build an IoContext that uses redirect file handles for FDs 0-2 where
     /// present, falling back to the original `io` streams.
     pub fn apply_to_io<'a>(&'a mut self, io: &'a mut IoContext<'_>) -> IoContext<'a> {
-        let IoContext { stdin, stdout, stderr } = io;
+        let IoContext {
+            stdin,
+            stdout,
+            stderr,
+            capturing,
+        } = io;
         IoContext::new(
             match self.stdin.as_mut() {
                 Some(f) => f as &mut dyn Read,
@@ -151,6 +156,7 @@ impl ActiveRedirects {
                 Some(f) => f as &mut dyn Write,
                 None => *stderr,
             },
+            *capturing,
         )
     }
 }

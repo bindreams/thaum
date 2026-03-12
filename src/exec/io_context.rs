@@ -11,12 +11,26 @@ pub struct IoContext<'io> {
     pub stdin: &'io mut dyn Read,
     pub stdout: &'io mut dyn Write,
     pub stderr: &'io mut dyn Write,
+    /// When true, external commands pipe their output through this IoContext
+    /// for capturing. When false (live mode), external commands inherit the
+    /// parent process's stdout/stderr handles directly.
+    pub capturing: bool,
 }
 
 impl<'io> IoContext<'io> {
     /// Create an I/O context from arbitrary Read/Write implementations.
-    pub fn new(stdin: &'io mut dyn Read, stdout: &'io mut dyn Write, stderr: &'io mut dyn Write) -> Self {
-        IoContext { stdin, stdout, stderr }
+    pub fn new(
+        stdin: &'io mut dyn Read,
+        stdout: &'io mut dyn Write,
+        stderr: &'io mut dyn Write,
+        capturing: bool,
+    ) -> Self {
+        IoContext {
+            stdin,
+            stdout,
+            stderr,
+            capturing,
+        }
     }
 }
 
@@ -38,11 +52,15 @@ impl ProcessIo {
     }
 
     /// Borrow the process streams as an `IoContext` for executor use.
+    ///
+    /// The returned context has `capturing: false`, so external commands
+    /// inherit parent stdout/stderr handles directly.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
             stdout: &mut self.stdout,
             stderr: &mut self.stderr,
+            capturing: false,
         }
     }
 }
@@ -86,11 +104,15 @@ impl CapturedIo {
     }
 
     /// Borrow the capture buffers as an `IoContext` for executor use.
+    ///
+    /// The returned context has `capturing: true`, so external commands
+    /// pipe their output through the capture buffers.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
             stdout: &mut self.stdout,
             stderr: &mut self.stderr,
+            capturing: true,
         }
     }
 
@@ -104,3 +126,7 @@ impl CapturedIo {
         String::from_utf8_lossy(&self.stderr).into_owned()
     }
 }
+
+#[cfg(test)]
+#[path = "io_context_tests.rs"]
+mod tests;

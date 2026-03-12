@@ -36,6 +36,19 @@ impl Executor {
         let mut child_cmd = CommandEx::new(argv);
         child_cmd.cwd = Some(self.env.cwd().to_path_buf());
 
+        // On Windows, resolve the command via PATH + PATHEXT since CreateProcessW
+        // does not search PATH when lpApplicationName is non-NULL.
+        #[cfg(windows)]
+        if !name.contains('/') && !name.contains('\\') {
+            let path_var = self.env.get_var("PATH").unwrap_or("");
+            let pathext = self.env.get_var("PATHEXT");
+            if let Some(resolved) =
+                crate::exec::command_ex::resolve_windows::resolve_command(name.as_ref(), path_var, pathext)
+            {
+                child_cmd.path = resolved.into_os_string();
+            }
+        }
+
         // Build environment from exported variables + prefix assignments.
         let mut env: std::collections::HashMap<std::ffi::OsString, std::ffi::OsString> = self
             .env

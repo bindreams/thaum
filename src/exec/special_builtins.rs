@@ -186,6 +186,19 @@ impl Executor {
 
         #[cfg(not(unix))]
         {
+            // Resolve command via PATH + PATHEXT on Windows (CreateProcessW
+            // does not search PATH when lpApplicationName is non-NULL).
+            #[cfg(windows)]
+            if !cmd_name.contains('/') && !cmd_name.contains('\\') {
+                let path_var = self.env.get_var("PATH").unwrap_or("");
+                let pathext = self.env.get_var("PATHEXT");
+                if let Some(resolved) =
+                    crate::exec::command_ex::resolve_windows::resolve_command(cmd_name.as_ref(), path_var, pathext)
+                {
+                    cmd.path = resolved.into_os_string();
+                }
+            }
+
             match cmd.spawn() {
                 Ok(mut child) => {
                     let code = child.wait().map_err(ExecError::Io)?;

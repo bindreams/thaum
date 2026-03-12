@@ -95,6 +95,18 @@ fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(out, "hello\n");
 }
 
+// PATH resolution (genuinely external commands) -----------------------------------------------------------------------
+
+/// `env` is NOT a builtin — this exercises real PATH resolution + process spawning.
+/// On Windows, this validates that resolve_command finds `env.exe` via PATH.
+#[skuld::test]
+fn external_env_found_via_path(#[fixture(test_tools)] tools: &Path) {
+    let (out, _, status) = exec_with_tools("env", tools);
+    assert_eq!(status, 0);
+    // env prints exported vars; the test executor exports `_`, so at minimum we get `_=env`.
+    assert!(!out.is_empty(), "env should produce output, got empty");
+}
+
 // Non-capturing I/O (live mode) ---------------------------------------------------------------------------------------
 
 /// When the IoContext is non-capturing, external commands should inherit parent

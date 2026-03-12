@@ -693,8 +693,16 @@ fn spawn_impl(_cmd: CommandEx) -> io::Result<ChildEx> {
 #[path = "command_ex/spawn_windows.rs"]
 mod spawn_windows;
 
+#[cfg(windows)]
+#[path = "command_ex/resolve_windows.rs"]
+pub(crate) mod resolve_windows;
+
 // Tests ===============================================================================================================
 
 #[cfg(test)]
 #[path = "command_ex_tests.rs"]
 mod tests;
+
+#[cfg(all(test, windows))]
+#[path = "command_ex/resolve_windows_tests.rs"]
+mod resolve_windows_tests;

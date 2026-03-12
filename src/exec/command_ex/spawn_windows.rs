@@ -60,12 +60,26 @@ pub(super) fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let mut si: STARTUPINFOW = unsafe { std::mem::zeroed() };
     si.cb = std::mem::size_of::<STARTUPINFOW>() as u32;
 
-    // Set standard handles if specified in the fd table.
+    // Set standard handles if specified in the fd table. For handles not
+    // in the table, fall back to the parent's current std handles via
+    // GetStdHandle (not INVALID_HANDLE_VALUE, which would leave the child
+    // with a broken handle).
     if handle_table.contains_key(&0) || handle_table.contains_key(&1) || handle_table.contains_key(&2) {
+        use windows::Win32::System::Console::{GetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE};
+
         si.dwFlags |= STARTF_USESTDHANDLES;
-        si.hStdInput = handle_table.get(&0).map(|h| h.0).unwrap_or(INVALID_HANDLE_VALUE);
-        si.hStdOutput = handle_table.get(&1).map(|h| h.0).unwrap_or(INVALID_HANDLE_VALUE);
-        si.hStdError = handle_table.get(&2).map(|h| h.0).unwrap_or(INVALID_HANDLE_VALUE);
+        si.hStdInput = handle_table
+            .get(&0)
+            .map(|h| h.0)
+            .unwrap_or_else(|| unsafe { GetStdHandle(STD_INPUT_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
+        si.hStdOutput = handle_table
+            .get(&1)
+            .map(|h| h.0)
+            .unwrap_or_else(|| unsafe { GetStdHandle(STD_OUTPUT_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
+        si.hStdError = handle_table
+            .get(&2)
+            .map(|h| h.0)
+            .unwrap_or_else(|| unsafe { GetStdHandle(STD_ERROR_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
     }
 
     // Build lpReserved2 for FDs 3+ (CRT fd table).

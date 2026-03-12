@@ -138,7 +138,7 @@ mod platform {
 
     impl PtyInner {
         pub fn spawn(cmd: Command) -> io::Result<Self> {
-            let process = ptyprocess::PtyProcess::spawn(cmd).map_err(|e| io::Error::other(e))?;
+            let process = ptyprocess::PtyProcess::spawn(cmd).map_err(io::Error::other)?;
             Ok(PtyInner { process })
         }
 
@@ -146,7 +146,7 @@ mod platform {
         pub fn read_with_timeout(&mut self, buf: &mut Vec<u8>, timeout: Option<Duration>) -> io::Result<usize> {
             use std::os::fd::AsRawFd;
 
-            let fd = self.process.get_pty_handle().as_raw_fd();
+            let fd = self.process.get_raw_handle().map_err(io::Error::other)?.as_raw_fd();
             let timeout_ms = timeout.map(|d| d.as_millis() as i32).unwrap_or(-1);
 
             let mut pollfd = libc::pollfd {
@@ -164,17 +164,21 @@ mod platform {
             }
 
             let mut tmp = [0u8; 4096];
-            let n = self.process.get_pty_handle().read(&mut tmp)?;
+            let n = self
+                .process
+                .get_raw_handle()
+                .map_err(io::Error::other)?
+                .read(&mut tmp)?;
             buf.extend_from_slice(&tmp[..n]);
             Ok(n)
         }
 
         pub fn write_all(&mut self, data: &[u8]) -> io::Result<()> {
-            self.process.get_pty_handle().write_all(data)
+            self.process.get_raw_handle().map_err(io::Error::other)?.write_all(data)
         }
 
         pub fn flush(&mut self) -> io::Result<()> {
-            self.process.get_pty_handle().flush()
+            self.process.get_raw_handle().map_err(io::Error::other)?.flush()
         }
     }
 }

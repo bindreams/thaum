@@ -8,6 +8,7 @@ publish = false
 regex = "1"
 
 [target.'cfg(unix)'.dependencies]
+libc = "0.2"
 ptyprocess = "0.5"
 
 [target.'cfg(windows)'.dependencies]

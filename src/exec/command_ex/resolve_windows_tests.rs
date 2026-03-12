@@ -14,7 +14,7 @@ fn touch(path: &Path) {
     std::fs::write(path, b"").unwrap();
 }
 
-// Mode A: PATHEXT unset (MSYS2 rules) =========================================================================
+// Mode A: PATHEXT unset (MSYS2 rules) =================================================================================
 
 #[skuld::test]
 fn msys_extensionless_wins_over_exe(#[fixture(temp_dir)] dir: &Path) {
@@ -68,7 +68,7 @@ fn msys_no_exe_append_when_name_has_extension(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(result, Some(dir.join("mytool.bat")));
 }
 
-// Mode B: PATHEXT set (cmd.exe rules) =========================================================================
+// Mode B: PATHEXT set (cmd.exe rules) =================================================================================
 
 #[skuld::test]
 fn cmd_pathext_order_within_one_dir(#[fixture(temp_dir)] dir: &Path) {
@@ -121,7 +121,7 @@ fn cmd_explicit_extension_found(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(result, Some(dir.join("mytool.bat")));
 }
 
-// Common ======================================================================================================
+// Common ==============================================================================================================
 
 #[skuld::test]
 fn not_found_returns_none(#[fixture(temp_dir)] dir: &Path) {

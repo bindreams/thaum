@@ -1525,6 +1525,7 @@ name = "thaum-expect"
 version = "0.1.0"
 dependencies = [
  "conpty",
+ "libc",
  "ptyprocess",
  "regex",
  "skuld",

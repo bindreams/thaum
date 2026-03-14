@@ -2,7 +2,7 @@ name: Recursive name evaluation is a result of runtime parse/eval
 dialect: bash
 source: 
   oils:spec/arith#recursive-name-evaluation-is-a-result-of-runtime-parseeval
-stdout: |-
+stdout: |
   6 6 6 6
 ---
 foo=5

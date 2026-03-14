@@ -1,7 +1,7 @@
 name: IFS 5
 dialect: bash
 source: oils:spec/toysh-posix#ifs-5
-stdout: |-
+stdout: |
   ==
 ---
 cc() { for i in $*; do echo -$i-; done;}; cc "" "" "" "" ""

@@ -2,7 +2,7 @@ name: -eq does dynamic arithmetic parsing (not supported in OSH)
 dialect: bash
 source: 
   oils:spec/dbracket#eq-does-dynamic-arithmetic-parsing-not-supported-in-osh
-stdout: |-
+stdout: |
   true
   true
 ---

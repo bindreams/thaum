@@ -1,7 +1,7 @@
 name: trap accepts/ignores --
 dialect: bash
 source: oils:spec/builtin-trap#trap-acceptsignores
-stdout: |-
+stdout: |
   ok
   hi
 ---

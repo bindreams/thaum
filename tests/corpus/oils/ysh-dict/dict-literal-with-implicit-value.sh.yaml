@@ -2,7 +2,7 @@ disabled: true
 name: dict literal with implicit value
 dialect: bash
 source: oils:spec/ysh-dict#dict-literal-with-implicit-value
-stdout: |-
+stdout: |
   len=1
   foo
   len=2

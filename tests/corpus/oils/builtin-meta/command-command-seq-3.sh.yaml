@@ -1,7 +1,7 @@
 name: command command seq 3
 dialect: bash
 source: oils:spec/builtin-meta#command-command-seq-3
-stdout: |-
+stdout: |
   1
   2
   3

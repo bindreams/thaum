@@ -1,7 +1,7 @@
 name: Julia example from spec/oil-user-feedback
 dialect: bash
 source: oils:spec/blog1#julia-example-from-specoil-user-feedback
-stdout: |-
+stdout: |
   git branch -D foo baz
 ---
 

@@ -2,7 +2,7 @@ disabled: true
 name: or BashArray, or BashAssoc
 dialect: bash
 source: oils:spec/ysh-expr-bool#or-basharray-or-bashassoc
-stdout: |-
+stdout: |
   {"type":"BashArray","data":{"0":"1","1":"2","2":"3"}}
   {"type":"BashAssoc","data":{"k":"v"}}
 ---

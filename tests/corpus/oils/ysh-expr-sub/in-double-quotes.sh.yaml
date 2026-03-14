@@ -2,7 +2,7 @@ disabled: true
 name: In Double quotes
 dialect: bash
 source: oils:spec/ysh-expr-sub#in-double-quotes
-stdout: |-
+stdout: |
   func 3
   key 42
   key 42

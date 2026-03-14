@@ -1,7 +1,7 @@
 name: In Array Literal and for loop
 dialect: bash
 source: oils:spec/extglob-files#in-array-literal-and-for-loop
-stdout: |-
+stdout: |
   bar.py
   foo.py
   ---

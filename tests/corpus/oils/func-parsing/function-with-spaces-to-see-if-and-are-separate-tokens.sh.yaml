@@ -2,7 +2,7 @@ name: Function with spaces, to see if ( and ) are separate tokens.
 dialect: bash
 source: 
   oils:spec/func-parsing#function-with-spaces-to-see-if-and-are-separate-tokens
-stdout: |-
+stdout: |
   in-func
 ---
 # NOTE: Newline after ( is not OK.

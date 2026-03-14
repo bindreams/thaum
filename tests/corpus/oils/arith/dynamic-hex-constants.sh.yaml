@@ -1,7 +1,7 @@
 name: Dynamic hex constants
 dialect: bash
 source: oils:spec/arith#dynamic-hex-constants
-stdout: |-
+stdout: |
   171
 ---
 zero=0

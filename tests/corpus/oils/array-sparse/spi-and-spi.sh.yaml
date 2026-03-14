@@ -1,7 +1,7 @@
 name: ((sp[i])) and ((sp[i]++))
 dialect: bash
 source: oils:spec/array-sparse#spi-and-spi
-stdout: |-
+stdout: |
   1
   2
   0

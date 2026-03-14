@@ -1,7 +1,7 @@
 name: printf -v syntax error
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-syntax-error
-stdout: |-
+stdout: |
   status=2
 ---
 printf -v 'a[' %s 'foo'

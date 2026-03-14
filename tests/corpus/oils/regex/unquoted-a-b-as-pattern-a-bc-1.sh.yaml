@@ -1,7 +1,7 @@
 name: unquoted [a  b] as pattern, [a  b|c]
 dialect: bash
 source: oils:spec/regex#unquoted-a-b-as-pattern-a-bc
-stdout: |-
+stdout: |
   yes
   [ab]=0
   [a b]=2

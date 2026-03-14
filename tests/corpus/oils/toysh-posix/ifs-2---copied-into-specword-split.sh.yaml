@@ -1,7 +1,7 @@
 name: IFS 2 - copied into spec/word-split
 dialect: bash
 source: oils:spec/toysh-posix#ifs-2---copied-into-specword-split
-stdout: |-
+stdout: |
   =x=
   =abc=
   =def=

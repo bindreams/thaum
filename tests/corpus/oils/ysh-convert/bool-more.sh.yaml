@@ -2,7 +2,7 @@ disabled: true
 name: bool() more
 dialect: bash
 source: oils:spec/ysh-convert#bool-more
-stdout: |-
+stdout: |
   false
   true
 ---

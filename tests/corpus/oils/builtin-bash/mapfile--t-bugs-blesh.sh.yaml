@@ -1,7 +1,7 @@
 name: mapfile -t bugs (ble.sh)
 dialect: bash
 source: oils:spec/builtin-bash#mapfile--t-bugs-blesh
-stdout: |-
+stdout: |
   len=3
   len=2
   len=2

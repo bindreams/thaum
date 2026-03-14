@@ -1,7 +1,7 @@
 name: "'sh -c -z' does not try to run -z"
 dialect: bash
 source: oils:spec/sh-usage#sh--c--z-does-not-try-to-run--z
-stdout: |-
+stdout: |
   flag-parsing-error
   0=-z 1=
   status=0

@@ -2,7 +2,7 @@ disabled: true
 name: setvar mylist[1] = 42
 dialect: bash
 source: oils:spec/ysh-assign#setvar-mylist1-42
-stdout: |-
+stdout: |
   1 42 3
 ---
 shopt -s ysh:all

@@ -1,7 +1,7 @@
 name: fc -l lists history commands with default page size
 dialect: bash
 source: oils:spec/builtin-fc#fc--l-lists-history-commands-with-default-page-size
-stdout: |-
+stdout: |
   2	 echo 1
   3	 echo 2
   4	 echo 3

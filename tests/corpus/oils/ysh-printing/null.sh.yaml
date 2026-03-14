@@ -2,7 +2,7 @@ disabled: true
 name: 'Null'
 dialect: bash
 source: oils:spec/ysh-printing#null
-stdout: |-
+stdout: |
   (Null)  null
 ---
 = null

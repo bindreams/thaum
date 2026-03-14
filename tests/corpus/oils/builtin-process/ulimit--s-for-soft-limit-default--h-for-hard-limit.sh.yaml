@@ -2,7 +2,7 @@ name: ulimit -S for soft limit (default), -H for hard limit
 dialect: bash
 source: 
   oils:spec/builtin-process#ulimit--s-for-soft-limit-default--h-for-hard-limit
-stdout: |-
+stdout: |
   init
     unlimited
     unlimited

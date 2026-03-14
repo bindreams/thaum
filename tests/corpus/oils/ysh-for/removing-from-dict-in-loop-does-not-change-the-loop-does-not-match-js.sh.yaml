@@ -3,7 +3,7 @@ name: Removing from Dict in loop does NOT change the loop (does NOT match JS)
 dialect: bash
 source: 
   oils:spec/ysh-for#removing-from-dict-in-loop-does-not-change-the-loop-does-not-match-js
-stdout: |-
+stdout: |
   1
   2
   3

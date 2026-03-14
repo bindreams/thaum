@@ -2,7 +2,7 @@ name: Assigning whole raray (( b = a ))
 dialect: bash
 source: oils:spec/dparen#assigning-whole-raray-b-a
 status: 0
-stdout: |-
+stdout: |
   4 5 6
   4
 ---

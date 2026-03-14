@@ -1,7 +1,7 @@
 name: Only case without ;;
 dialect: bash
 source: oils:spec/posix#only-case-without
-stdout: |-
+stdout: |
   A
 ---
 foo=a

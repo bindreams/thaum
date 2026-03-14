@@ -1,7 +1,7 @@
 name: Syntax errors with double quotes within backticks
 dialect: bash
 source: oils:spec/command-sub#syntax-errors-with-double-quotes-within-backticks
-stdout: |-
+stdout: |
   status=2
   status=2
 ---

@@ -2,7 +2,7 @@ name: "'unset PWD; pwd' before any cd (tickles a rare corner case)"
 dialect: bash
 source: 
   oils:spec/builtin-cd#unset-pwd-pwd-before-any-cd-tickles-a-rare-corner-case
-stdout: |-
+stdout: |
   /tmp/oil-spec-test/pwd-2
 ---
 dir=/tmp/oil-spec-test/pwd-2

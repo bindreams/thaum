@@ -1,7 +1,7 @@
 name: ~ expansion in assignment
 dialect: bash
 source: oils:spec/tilde#expansion-in-assignment
-stdout: |-
+stdout: |
   /home/bob/src
 ---
 HOME=/home/bob

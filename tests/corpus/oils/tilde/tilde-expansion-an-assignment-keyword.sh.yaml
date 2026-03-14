@@ -1,7 +1,7 @@
 name: tilde expansion an assignment keyword
 dialect: bash
 source: oils:spec/tilde#tilde-expansion-an-assignment-keyword
-stdout: |-
+stdout: |
   foo:/home/bar
 ---
 HOME=/home/bar

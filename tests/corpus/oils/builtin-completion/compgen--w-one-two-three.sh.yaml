@@ -1,7 +1,7 @@
 name: compgen -W 'one two three'
 dialect: bash
 source: oils:spec/builtin-completion#compgen--w-one-two-three
-stdout: |-
+stdout: |
   one
   two
   three

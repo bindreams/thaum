@@ -1,7 +1,7 @@
 name: trap ERR does not run in errexit situations
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-does-not-run-in-errexit-situations
-stdout: |-
+stdout: |
   until
   line=16
   line=20

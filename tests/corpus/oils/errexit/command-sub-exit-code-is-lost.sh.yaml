@@ -1,7 +1,7 @@
 name: Command sub exit code is lost
 dialect: bash
 source: oils:spec/errexit#command-sub-exit-code-is-lost
-stdout: |-
+stdout: |
   ft
   status=0
   f

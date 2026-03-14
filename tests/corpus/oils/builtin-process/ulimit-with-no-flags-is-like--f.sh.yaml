@@ -1,7 +1,7 @@
 name: ulimit with no flags is like -f
 dialect: bash
 source: oils:spec/builtin-process#ulimit-with-no-flags-is-like--f
-stdout: |-
+stdout: |
   status=0
   status=0
   diff=0

@@ -2,7 +2,7 @@ disabled: true
 name: io->eval() with exit
 dialect: bash
 source: oils:spec/ysh-method-io#io-eval-with-exit
-stdout: |-
+stdout: |
   one
 ---
 

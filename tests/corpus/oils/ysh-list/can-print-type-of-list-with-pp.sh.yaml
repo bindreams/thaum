@@ -2,7 +2,7 @@ disabled: true
 name: Can print type of List with pp
 dialect: bash
 source: oils:spec/ysh-list#can-print-type-of-list-with-pp
-stdout: |-
+stdout: |
   (List)   ["true"]
   (List)   []
 ---

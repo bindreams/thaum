@@ -1,7 +1,7 @@
 name: 'eval in the exit trap (regression for issue #293)'
 dialect: bash
 source: oils:spec/builtin-trap#eval-in-the-exit-trap-regression-for-issue-293
-stdout: |-
+stdout: |
   hi
 ---
 trap 'eval "echo hi"' 0

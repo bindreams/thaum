@@ -2,7 +2,7 @@ disabled: true
 name: Integer literals with underscores
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-literals-with-underscores
-stdout: |-
+stdout: |
   SHELL
   65536
   21

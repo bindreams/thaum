@@ -2,7 +2,7 @@ name: return "" (a lot of disagreement)
 dialect: bash
 source: oils:spec/sh-func#return-a-lot-of-disagreement
 status: 0
-stdout: |-
+stdout: |
   f
   status=0
 ---

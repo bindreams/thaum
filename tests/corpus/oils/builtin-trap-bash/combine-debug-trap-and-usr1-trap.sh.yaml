@@ -1,7 +1,7 @@
 name: Combine DEBUG trap and USR1 trap
 dialect: bash
 source: oils:spec/builtin-trap-bash#combine-debug-trap-and-usr1-trap
-stdout: |-
+stdout: |
   6 dbg
   1 dbg
   1 dbg

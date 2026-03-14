@@ -1,7 +1,7 @@
 name: ${x@Q}
 dialect: bash
 source: oils:spec/var-op-bash#xq
-stdout: |-
+stdout: |
   OK
 ---
 x="FOO'BAR spam\"eggs"

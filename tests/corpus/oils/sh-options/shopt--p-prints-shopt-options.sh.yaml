@@ -1,7 +1,7 @@
 name: shopt -p prints 'shopt' options
 dialect: bash
 source: oils:spec/sh-options#shopt--p-prints-shopt-options
-stdout: |-
+stdout: |
   shopt -u nullglob
   shopt -s nullglob
 ---

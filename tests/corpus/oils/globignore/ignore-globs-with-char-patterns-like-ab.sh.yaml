@@ -1,7 +1,7 @@
 name: Ignore globs with char patterns like [!ab]
 dialect: bash
 source: oils:spec/globignore#ignore-globs-with-char-patterns-like-ab
-stdout: |-
+stdout: |
   A B C D c d
   D a b c d
   a b

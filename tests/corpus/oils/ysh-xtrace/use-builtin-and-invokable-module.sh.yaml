@@ -9,7 +9,7 @@ stdout: |
   [for-xtrace]
   counter = 5
   counter = 6
-stderr: |-
+stderr: |
   > source for-xtrace.ysh
     . builtin echo '[for-xtrace]'
     > proc increment

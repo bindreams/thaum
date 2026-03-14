@@ -1,7 +1,7 @@
 name: . and .. always filtered when GLOBIGNORE is set
 dialect: bash
 source: oils:spec/globignore#and-always-filtered-when-globignore-is-set
-stdout: |-
+stdout: |
   .hidden
   .hidden
 ---

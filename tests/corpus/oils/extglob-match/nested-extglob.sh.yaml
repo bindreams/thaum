@@ -1,7 +1,7 @@
 name: nested extglob
 dialect: bash
 source: oils:spec/extglob-match#nested-extglob
-stdout: |-
+stdout: |
   TRUE
   TRUE
   TRUE

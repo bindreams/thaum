@@ -1,7 +1,7 @@
 name: unset readonly -- one line
 dialect: bash
 source: oils:spec/bugs#unset-readonly----one-line
-stdout: |-
+stdout: |
   hi
 ---
 readonly x=1; unset x; echo hi

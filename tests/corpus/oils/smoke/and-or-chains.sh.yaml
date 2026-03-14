@@ -1,7 +1,7 @@
 name: and-or chains
 dialect: bash
 source: oils:spec/smoke#and-or-chains
-stdout: |-
+stdout: |
   1
   2
   4

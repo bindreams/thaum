@@ -1,7 +1,7 @@
 name: Unquoted words
 dialect: bash
 source: oils:spec/quote#unquoted-words
-stdout: |-
+stdout: |
   unquoted words
 ---
 echo unquoted    words

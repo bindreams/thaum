@@ -1,7 +1,7 @@
 name: \l for TTY device basename
 dialect: bash
 source: oils:spec/prompt#l-for-tty-device-basename
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \l bar'

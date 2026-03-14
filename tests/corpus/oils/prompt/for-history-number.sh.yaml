@@ -1,7 +1,7 @@
 name: \! for history number
 dialect: bash
 source: oils:spec/prompt#for-history-number
-stdout: |-
+stdout: |
   matched=0
   matched=0
 ---

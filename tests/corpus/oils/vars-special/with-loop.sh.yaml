@@ -1,7 +1,7 @@
 name: $_ with loop
 dialect: bash
 source: oils:spec/vars-special#with-loop
-stdout: |-
+stdout: |
   init
   begin=init
   prev=begin=init

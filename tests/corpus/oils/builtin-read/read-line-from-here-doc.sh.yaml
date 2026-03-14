@@ -2,7 +2,7 @@ name: read line from here doc
 dialect: bash
 source: oils:spec/builtin-read#read-line-from-here-doc
 status: 0
-stdout: |-
+stdout: |
   [A		B C D E]
 ---
 

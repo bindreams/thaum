@@ -1,7 +1,7 @@
 name: PROMPT_COMMAND that writes to BASH_REMATCH
 dialect: bash
 source: oils:spec/interactive#promptcommand-that-writes-to-bashrematch
-stdout: |-
+stdout: |
   ---
   one
   ---

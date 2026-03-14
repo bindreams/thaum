@@ -1,7 +1,7 @@
 name: ${!OPTIND} (used by bash completion
 dialect: bash
 source: oils:spec/var-ref#optind-used-by-bash-completion
-stdout: |-
+stdout: |
   a
   x
   y

@@ -2,7 +2,7 @@ disabled: true
 name: 64-bit operations
 dialect: bash
 source: oils:spec/ysh-expr-arith#64-bit-operations
-stdout: |-
+stdout: |
   i = 4294967296, s = 4294967296
   equal
 ---

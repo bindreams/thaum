@@ -2,7 +2,7 @@ disabled: true
 name: Char Class Ranges
 dialect: bash
 source: oils:spec/ysh-regex#char-class-ranges
-stdout: |-
+stdout: |
   [0-9a-f]+
   [0-9a-f]+
   yes

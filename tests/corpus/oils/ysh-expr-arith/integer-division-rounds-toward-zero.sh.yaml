@@ -2,7 +2,7 @@ disabled: true
 name: Integer Division (rounds toward zero)
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-division-rounds-toward-zero
-stdout: |-
+stdout: |
   (Int)   2
   (Int)   -2
   (Int)   -2

@@ -1,7 +1,7 @@
 name: Integers near 31, 32, 62 bits
 dialect: bash
 source: oils:spec/for-expr#integers-near-31-32-62-bits
-stdout: |-
+stdout: |
   2147483646
   2147483647
   2147483648

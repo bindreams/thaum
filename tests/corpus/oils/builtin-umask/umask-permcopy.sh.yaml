@@ -2,7 +2,7 @@ name: umask permcopy
 dialect: bash
 source: oils:spec/builtin-umask#umask-permcopy
 status: 0
-stdout: |-
+stdout: |
   111
   666
   444

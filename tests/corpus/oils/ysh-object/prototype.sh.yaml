@@ -2,7 +2,7 @@ disabled: true
 name: prototype()
 dialect: bash
 source: oils:spec/ysh-object#prototype
-stdout: |-
+stdout: |
   (Null)   null
   (Obj)   ("area":<Func>)
 ---

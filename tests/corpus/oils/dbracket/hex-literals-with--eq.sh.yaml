@@ -1,7 +1,7 @@
 name: Hex literals with -eq
 dialect: bash
 source: oils:spec/dbracket#hex-literals-with--eq
-stdout: |-
+stdout: |
   true
   false
 ---

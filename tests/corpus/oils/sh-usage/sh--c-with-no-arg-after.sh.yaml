@@ -1,7 +1,7 @@
 name: sh -c with no arg after --
 dialect: bash
 source: oils:spec/sh-usage#sh--c-with-no-arg-after
-stdout: |-
+stdout: |
   failed
   failed
 ---

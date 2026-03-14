@@ -2,7 +2,7 @@ disabled: true
 name: "'' means the same thing as u''"
 dialect: bash
 source: oils:spec/ysh-json#means-the-same-thing-as-u
-stdout: |-
+stdout: |
   (Str)   ""
   (Str)   "μ"
   status=1

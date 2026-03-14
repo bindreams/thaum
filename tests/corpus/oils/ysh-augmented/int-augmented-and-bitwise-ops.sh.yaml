@@ -2,7 +2,7 @@ disabled: true
 name: Int Augmented //= %= **= and bitwise ops
 dialect: bash
 source: oils:spec/ysh-augmented#int-augmented-and-bitwise-ops
-stdout: |-
+stdout: |
   x=3
   x=1
   x=1000

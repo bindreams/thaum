@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-trim-with-a-string-pattern-trims-bytes-not-runes
 status: 0
-stdout: |-
+stdout: |
   "", "", ""
   b'\ya3', "Σ", b'\ya3'
   "Σ", b'\yce', b'\yce'

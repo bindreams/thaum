@@ -1,7 +1,7 @@
 name: glob can expand to command and arg
 dialect: bash
 source: oils:spec/glob#glob-can-expand-to-command-and-arg
-stdout: |-
+stdout: |
   spec/testdata/echo.sz
 ---
 cd $REPO_ROOT

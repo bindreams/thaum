@@ -2,7 +2,7 @@ disabled: true
 name: BashArray, short
 dialect: bash
 source: oils:spec/ysh-printing#basharray-short
-stdout: |-
+stdout: |
   (BashArray)
   (BashArray [0]='hello')
 

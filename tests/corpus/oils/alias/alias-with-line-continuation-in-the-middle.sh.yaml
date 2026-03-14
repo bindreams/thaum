@@ -1,7 +1,7 @@
 name: alias with line continuation in the middle
 dialect: bash
 source: oils:spec/alias#alias-with-line-continuation-in-the-middle
-stdout: |-
+stdout: |
   ONE TWO ONE TWO THREE two one
 ---
 shopt -s expand_aliases

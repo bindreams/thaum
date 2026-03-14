@@ -1,7 +1,7 @@
 name: $[$undefined] is a synonym for $(($undefined (#2566)
 dialect: bash
 source: oils:spec/arith-context#undefined-is-a-synonym-for-undefined-2566
-stdout: |-
+stdout: |
   0
 ---
 a[0]=$[1+3]

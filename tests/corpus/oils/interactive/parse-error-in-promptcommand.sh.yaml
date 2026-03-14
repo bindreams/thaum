@@ -1,7 +1,7 @@
 name: parse error in PROMPT_COMMAND
 dialect: bash
 source: oils:spec/interactive#parse-error-in-promptcommand
-stdout: |-
+stdout: |
   one
   two
   ^D

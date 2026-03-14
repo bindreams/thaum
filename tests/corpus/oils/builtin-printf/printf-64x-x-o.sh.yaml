@@ -1,7 +1,7 @@
 name: printf %6.4x X o
 dialect: bash
 source: oils:spec/builtin-printf#printf-64x-x-o
-stdout: |-
+stdout: |
   [  002a]
   [002a]
   [    2a]

@@ -3,7 +3,7 @@ name: external and builtin
 dialect: bash
 source: oils:spec/ysh-xtrace#external-and-builtin
 stdout: ''
-stderr: |-
+stderr: |
   | command 12345: env 'false'
   ; process 12345: status 1
   . builtin 'true'

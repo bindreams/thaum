@@ -1,7 +1,7 @@
 name: make a lisp example
 dialect: bash
 source: oils:spec/regex#make-a-lisp-example
-stdout: |-
+stdout: |
   status=0
   m=(
 ---

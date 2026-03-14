@@ -2,7 +2,7 @@ disabled: true
 name: help List/append, runes, etc.
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-listappend-runes-etc
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

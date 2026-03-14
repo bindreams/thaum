@@ -3,7 +3,7 @@ name: 'round trip: read/write with ysh, read/write with Python 3 (bug regression
 dialect: bash
 source: 
   oils:spec/ysh-json#round-trip-readwrite-with-ysh-readwrite-with-python-3-bug-regression
-stdout: |-
+stdout: |
   diff=0
 ---
 

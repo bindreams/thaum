@@ -1,7 +1,7 @@
 name: IFS 4
 dialect: bash
 source: oils:spec/toysh-posix#ifs-4
-stdout: |-
+stdout: |
   / /
 
   /x/

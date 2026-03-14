@@ -1,7 +1,7 @@
 name: More Smooshing 1
 dialect: bash
 source: oils:spec/builtin-getopts#more-smooshing-1
-stdout: |-
+stdout: |
   OPTIND=1 opt=a OPTARG=
   OPTIND=3 opt=b OPTARG=hi
   OPTIND=5 opt=c OPTARG=hello

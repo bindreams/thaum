@@ -1,7 +1,7 @@
 name: $(<file) idiom with process sub
 dialect: bash
 source: oils:spec/process-sub#file-idiom-with-process-sub
-stdout: |-
+stdout: |
   FOO
   hi
 ---

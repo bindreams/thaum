@@ -1,7 +1,7 @@
 name: Alias trailing newline
 dialect: bash
 source: oils:spec/alias#alias-trailing-newline
-stdout: |-
+stdout: |
   1
   2
   3

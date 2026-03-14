@@ -2,7 +2,7 @@ disabled: true
 name: Mixing read --raw-line with read -r
 dialect: bash
 source: oils:spec/ysh-builtins#mixing-read---raw-line-with-read--r
-stdout: |-
+stdout: |
   read -r
   REPLY=1
   REPLY=2

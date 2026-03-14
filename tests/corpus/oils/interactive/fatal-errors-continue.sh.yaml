@@ -2,7 +2,7 @@ name: fatal errors continue
 dialect: bash
 source: oils:spec/interactive#fatal-errors-continue
 status: 42
-stdout: |-
+stdout: |
   one
 ---
 # NOTE: tried here doc, but sys.stdin.isatty() fails.  Could we fake it?

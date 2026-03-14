@@ -2,7 +2,7 @@ name: Lazy Evaluation of Alternative
 dialect: bash
 source: oils:spec/var-op-test#lazy-evaluation-of-alternative
 status: 0
-stdout: |-
+stdout: |
   x
   0
   0

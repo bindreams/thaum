@@ -1,7 +1,7 @@
 name: global assignment when last status is failure
 dialect: bash
 source: oils:spec/errexit-osh#global-assignment-when-last-status-is-failure
-stdout: |-
+stdout: |
   status=0
 ---
 # this is a bug I introduced

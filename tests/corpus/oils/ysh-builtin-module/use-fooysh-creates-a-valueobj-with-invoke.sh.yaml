@@ -2,7 +2,7 @@ disabled: true
 name: use foo.ysh creates a value.Obj with __invoke__
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh-creates-a-valueobj-with-invoke
-stdout: |-
+stdout: |
   caller_no_leak = null
   log hello
   die hello there

@@ -2,7 +2,7 @@ disabled: true
 name: Bit shift by negative number is not allowed
 dialect: bash
 source: oils:spec/ysh-expr-arith#bit-shift-by-negative-number-is-not-allowed
-stdout: |-
+stdout: |
   (Int)   2
   (Int)   1
   failed 3

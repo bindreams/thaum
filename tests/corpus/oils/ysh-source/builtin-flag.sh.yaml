@@ -2,7 +2,7 @@ disabled: true
 name: --builtin flag
 dialect: bash
 source: oils:spec/ysh-source#builtin-flag
-stdout: |-
+stdout: |
   2
 ---
 shopt --set ysh:upgrade

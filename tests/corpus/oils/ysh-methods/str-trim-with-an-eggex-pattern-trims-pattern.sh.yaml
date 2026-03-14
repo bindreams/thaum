@@ -3,7 +3,7 @@ name: Str => trim*() with an eggex pattern trims pattern
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-pattern
 status: 0
-stdout: |-
+stdout: |
   "", "", ""
   "   ", "   ", "   "
   "xy", "xy", "xy"

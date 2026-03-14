@@ -1,7 +1,7 @@
 name: Extended glob in ${x%PATTERN}
 dialect: bash
 source: oils:spec/extglob-match#extended-glob-in-xpattern
-stdout: |-
+stdout: |
   strip %  foo
   strip %% foo
   strip #  .py

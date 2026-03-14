@@ -1,7 +1,7 @@
 name: trap ERR with for,  case, { }
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-with-for-case
-stdout: |-
+stdout: |
   line=4
   line=4
   line=8

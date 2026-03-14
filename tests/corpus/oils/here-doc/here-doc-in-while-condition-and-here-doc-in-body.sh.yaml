@@ -1,7 +1,7 @@
 name: Here doc in while condition and here doc in body
 dialect: bash
 source: oils:spec/here-doc#here-doc-in-while-condition-and-here-doc-in-body
-stdout: |-
+stdout: |
   1
   2
   3

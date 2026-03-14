@@ -1,7 +1,7 @@
 name: 'Unrecoverable: divide by zero in case'
 dialect: bash
 source: oils:spec/fatal-errors#unrecoverable-divide-by-zero-in-case
-stdout: |-
+stdout: |
   outside=1
   ---
   outside=1

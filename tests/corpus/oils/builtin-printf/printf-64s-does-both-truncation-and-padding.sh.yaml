@@ -1,7 +1,7 @@
 name: printf %6.4s does both truncation and padding
 dialect: bash
 source: oils:spec/builtin-printf#printf-64s-does-both-truncation-and-padding
-stdout: |-
+stdout: |
   [   foo]
   [   foo]
   [foo   ]

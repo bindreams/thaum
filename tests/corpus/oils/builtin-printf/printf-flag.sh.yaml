@@ -1,7 +1,7 @@
 name: 'printf # flag'
 dialect: bash
 source: oils:spec/builtin-printf#printf-flag
-stdout: |-
+stdout: |
   [0][052]
   [0][0x2a]
   [0][0X2A]

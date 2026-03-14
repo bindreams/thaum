@@ -2,7 +2,7 @@ disabled: true
 name: use --extern is a no-op, for static analysis
 dialect: bash
 source: oils:spec/ysh-builtin-module#use---extern-is-a-no-op-for-static-analysis
-stdout: |-
+stdout: |
   status=0
   status=0
 ---

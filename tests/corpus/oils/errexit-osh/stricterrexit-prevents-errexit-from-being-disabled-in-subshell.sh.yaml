@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#stricterrexit-prevents-errexit-from-being-disabled-in-subshell
 status: 1
-stdout: |-
+stdout: |
   foo
   bar
 ---

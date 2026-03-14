@@ -1,7 +1,7 @@
 name: command export,readonly
 dialect: bash
 source: oils:spec/builtin-meta-assign#command-exportreadonly
-stdout: |-
+stdout: |
   c=export
   c=readonly
   --

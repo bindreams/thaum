@@ -2,7 +2,7 @@ name: read -n from pipe
 dialect: bash
 source: oils:spec/builtin-read#read--n-from-pipe
 status: 0
-stdout: |-
+stdout: |
   reply=abc
 ---
 case $SH in dash|ash|zsh) exit ;; esac

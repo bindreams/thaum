@@ -2,7 +2,7 @@ disabled: true
 name: 'top level: setvar creates global'
 dialect: bash
 source: oils:spec/ysh-assign#top-level-setvar-creates-global
-stdout: |-
+stdout: |
   x=global
   x=g2
 ---

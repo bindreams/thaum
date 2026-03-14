@@ -1,7 +1,7 @@
 name: Ambiguous colon in slice
 dialect: bash
 source: oils:spec/arith-context#ambiguous-colon-in-slice
-stdout: |-
+stdout: |
   2
   c
 ---

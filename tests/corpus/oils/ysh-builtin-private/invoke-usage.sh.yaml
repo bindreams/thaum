@@ -2,7 +2,7 @@ disabled: true
 name: invoke usage
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke-usage
-stdout: |-
+stdout: |
   status=2
   status=2
 

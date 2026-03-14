@@ -2,7 +2,7 @@ disabled: true
 name: Functions can be shadowed
 dialect: bash
 source: oils:spec/ysh-func#functions-can-be-shadowed
-stdout: |-
+stdout: |
   1 + 2 + 3 = 6
   mysum=6
   mysum=1

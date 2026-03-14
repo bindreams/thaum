@@ -1,7 +1,7 @@
 name: Double Quotes in Command Sub in Double Quotes
 dialect: bash
 source: oils:spec/command-sub#double-quotes-in-command-sub-in-double-quotes
-stdout: |-
+stdout: |
   x hi
   x hi
   x "hi"

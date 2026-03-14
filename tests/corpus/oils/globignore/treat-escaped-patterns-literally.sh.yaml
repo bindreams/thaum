@@ -1,7 +1,7 @@
 name: treat escaped patterns literally
 dialect: bash
 source: oils:spec/globignore#treat-escaped-patterns-literally
-stdout: |-
+stdout: |
   escape-10.txt
 ---
 touch {escape-10.txt,escape*.txt}

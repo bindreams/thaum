@@ -1,7 +1,7 @@
 name: Alias that is && || ;
 dialect: bash
 source: oils:spec/alias#alias-that-is
-stdout: |-
+stdout: |
   one
   two
   1

@@ -2,7 +2,7 @@ name: 'bash bug: "i+1" and i+1 are the same key'
 dialect: bash
 source: oils:spec/array-assoc#bash-bug-i1-and-i1-are-the-same-key
 status: 1
-stdout: |-
+stdout: |
   array[i]=6
   array[i+1]=7
 ---

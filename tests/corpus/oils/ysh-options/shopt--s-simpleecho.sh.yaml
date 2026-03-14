@@ -2,7 +2,7 @@ disabled: true
 name: shopt -s simple_echo
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-simpleecho
-stdout: |-
+stdout: |
   one two
 
   one   two

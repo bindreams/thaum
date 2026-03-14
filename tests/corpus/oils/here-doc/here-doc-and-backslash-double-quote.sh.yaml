@@ -1,7 +1,7 @@
 name: Here doc and backslash double quote
 dialect: bash
 source: oils:spec/here-doc#here-doc-and-backslash-double-quote
-stdout: |-
+stdout: |
   a \"quote\"
 ---
 cat <<EOF

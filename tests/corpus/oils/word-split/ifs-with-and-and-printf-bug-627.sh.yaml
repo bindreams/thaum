@@ -1,7 +1,7 @@
 name: "IFS='' with $@ and $* and printf (bug #627)"
 dialect: bash
 source: oils:spec/word-split#ifs-with-and-and-printf-bug-627
-stdout: |-
+stdout: |
   [a]
   [b c]
   [a]

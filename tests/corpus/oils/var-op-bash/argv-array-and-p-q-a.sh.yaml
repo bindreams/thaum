@@ -1,7 +1,7 @@
 name: argv array and @P @Q @a
 dialect: bash
 source: oils:spec/var-op-bash#argv-array-and-p-q-a
-stdout: |-
+stdout: |
   a b c
   status=0
   'a' 'b\nc'

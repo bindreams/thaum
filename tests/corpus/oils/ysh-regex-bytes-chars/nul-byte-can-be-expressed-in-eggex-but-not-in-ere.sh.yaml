@@ -3,7 +3,7 @@ name: NUL byte can be expressed in Eggex, but not in ERE
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#nul-byte-can-be-expressed-in-eggex-but-not-in-ere
-stdout: |-
+stdout: |
   (Bool)   true
   status=1
   (Bool)   true

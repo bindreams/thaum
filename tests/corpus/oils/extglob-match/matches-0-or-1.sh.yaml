@@ -1,7 +1,7 @@
 name: '? matches 0 or 1'
 dialect: bash
 source: oils:spec/extglob-match#matches-0-or-1
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

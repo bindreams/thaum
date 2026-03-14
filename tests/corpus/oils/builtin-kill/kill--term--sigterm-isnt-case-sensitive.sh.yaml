@@ -1,7 +1,7 @@
 name: kill -terM -SigterM isn't case sensitive
 dialect: bash
 source: oils:spec/builtin-kill#kill--term--sigterm-isnt-case-sensitive
-stdout: |-
+stdout: |
   kill=0
   wait=143
   kill=0

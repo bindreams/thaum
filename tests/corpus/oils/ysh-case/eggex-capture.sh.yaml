@@ -3,7 +3,7 @@ name: eggex capture
 dialect: bash
 source: oils:spec/ysh-case#eggex-capture
 status: 0
-stdout: |-
+stdout: |
   g0=/foo. g1=oo
   g0=ar g1=ar
   no match

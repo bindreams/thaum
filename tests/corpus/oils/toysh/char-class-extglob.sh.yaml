@@ -1,7 +1,7 @@
 name: char class / extglob
 dialect: bash
 source: oils:spec/toysh#char-class-extglob
-stdout: |-
+stdout: |
   [hello]
   b
   +

@@ -1,7 +1,7 @@
 name: case in subshell
 dialect: bash
 source: oils:spec/command-sub#case-in-subshell
-stdout: |-
+stdout: |
   letter
 ---
 # Hm this subhell has to know about the closing ) and stuff like that.

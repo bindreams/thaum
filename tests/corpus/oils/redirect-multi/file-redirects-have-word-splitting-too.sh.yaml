@@ -1,7 +1,7 @@
 name: File redirects have word splitting too!
 dialect: bash
 source: oils:spec/redirect-multi#file-redirects-have-word-splitting-too
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

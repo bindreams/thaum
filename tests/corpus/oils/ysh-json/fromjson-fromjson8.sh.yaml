@@ -3,7 +3,7 @@ name: fromJson() fromJson8()
 dialect: bash
 source: oils:spec/ysh-json#fromjson-fromjson8
 status: 4
-stdout: |-
+stdout: |
   (List)   [42,1.5,null,true,"hi"]
   (List)   [42,1.5,null,true,"hi"]
   (List)   [42,1.5,null,true,"hi",""]

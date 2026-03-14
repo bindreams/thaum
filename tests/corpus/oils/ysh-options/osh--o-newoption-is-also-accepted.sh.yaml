@@ -2,7 +2,7 @@ disabled: true
 name: osh -o new_option is also accepted
 dialect: bash
 source: oils:spec/ysh-options#osh--o-newoption-is-also-accepted
-stdout: |-
+stdout: |
   nullglob
   0 flag nullglob
   upgrade

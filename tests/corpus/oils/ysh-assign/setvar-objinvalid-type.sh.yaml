@@ -2,7 +2,7 @@ disabled: true
 name: setvar obj[INVALID TYPE] =
 dialect: bash
 source: oils:spec/ysh-assign#setvar-objinvalid-type
-stdout: |-
+stdout: |
   d.key = 5
   outside1=3
   L[0] = 43

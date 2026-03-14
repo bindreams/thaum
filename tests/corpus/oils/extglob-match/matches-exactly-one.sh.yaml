@@ -1,7 +1,7 @@
 name: '@ matches exactly one'
 dialect: bash
 source: oils:spec/extglob-match#matches-exactly-one
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

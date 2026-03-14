@@ -2,7 +2,7 @@ name: bad arg to break
 dialect: bash
 source: oils:spec/loop#bad-arg-to-break
 status: 1
-stdout: |-
+stdout: |
   hi
 ---
 x=oops

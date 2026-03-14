@@ -3,7 +3,7 @@ name: module itself is invokable Obj, which can contain invokable obj!
 dialect: bash
 source: 
   oils:spec/ysh-builtin-module#module-itself-is-invokable-obj-which-can-contain-invokable-obj
-stdout: |-
+stdout: |
   caller_no_leak = null
   sum = 8
 ---

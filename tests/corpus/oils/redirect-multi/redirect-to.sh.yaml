@@ -1,7 +1,7 @@
 name: Redirect to ''
 dialect: bash
 source: oils:spec/redirect-multi#redirect-to
-stdout: |-
+stdout: |
   status=1
 ---
 echo hi > ''

@@ -2,7 +2,7 @@ name: shopt -s process_sub_fail
 dialect: bash
 source: oils:spec/process-sub#shopt--s-processsubfail
 status: 3
-stdout: |-
+stdout: |
   a
   b
   status=0 ps 2 3

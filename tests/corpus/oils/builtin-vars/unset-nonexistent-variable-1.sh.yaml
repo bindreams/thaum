@@ -1,7 +1,7 @@
 name: Unset nonexistent variable
 dialect: bash
 source: oils:spec/builtin-vars#unset-nonexistent-variable
-stdout: |-
+stdout: |
   status=0
 ---
 unset _nonexistent__

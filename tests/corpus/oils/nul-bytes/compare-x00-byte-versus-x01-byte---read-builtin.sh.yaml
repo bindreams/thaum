@@ -1,7 +1,7 @@
 name: Compare \x00 byte versus \x01 byte - read builtin
 dialect: bash
 source: oils:spec/nul-bytes#compare-x00-byte-versus-x01-byte---read-builtin
-stdout: |-
+stdout: |
   len=3
    2e 01 2e
   len=2

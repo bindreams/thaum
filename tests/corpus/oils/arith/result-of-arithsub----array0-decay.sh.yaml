@@ -2,7 +2,7 @@ name: result of ArithSub -- array[0] decay
 dialect: bash
 source: oils:spec/arith#result-of-arithsub----array0-decay
 status: 0
-stdout: |-
+stdout: |
   declared
   4
 ---

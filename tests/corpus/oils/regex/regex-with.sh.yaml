@@ -1,7 +1,7 @@
 name: Regex with |
 dialect: bash
 source: oils:spec/regex#regex-with
-stdout: |-
+stdout: |
   true
 ---
 [[ 'bar' =~ foo|bar ]] && echo true

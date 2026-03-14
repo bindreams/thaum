@@ -2,7 +2,7 @@ disabled: true
 name: pp proc
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-proc
-stdout: |-
+stdout: |
   proc_name	doc_comment
   f	"doc ' comment with \" quotes"
   g	""

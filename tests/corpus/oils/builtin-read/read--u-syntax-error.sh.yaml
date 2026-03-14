@@ -1,7 +1,7 @@
 name: read -u syntax error
 dialect: bash
 source: oils:spec/builtin-read#read--u-syntax-error
-stdout: |-
+stdout: |
   status=2
 ---
 read -u -3

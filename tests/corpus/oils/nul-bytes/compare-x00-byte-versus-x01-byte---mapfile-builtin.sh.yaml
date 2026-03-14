@@ -1,7 +1,7 @@
 name: Compare \x00 byte versus \x01 byte - mapfile builtin
 dialect: bash
 source: oils:spec/nul-bytes#compare-x00-byte-versus-x01-byte---mapfile-builtin
-stdout: |-
+stdout: |
   len=2
    2e
    2e

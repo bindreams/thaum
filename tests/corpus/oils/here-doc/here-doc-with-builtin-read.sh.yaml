@@ -1,7 +1,7 @@
 name: Here doc with builtin 'read'
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-builtin-read
-stdout: |-
+stdout: |
   =val1= =val2=
 ---
 # read can't be run in a subshell.

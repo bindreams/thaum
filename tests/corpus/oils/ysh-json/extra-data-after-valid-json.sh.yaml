@@ -2,7 +2,7 @@ disabled: true
 name: Extra data after valid JSON
 dialect: bash
 source: oils:spec/ysh-json#extra-data-after-valid-json
-stdout: |-
+stdout: |
   num space 0
   obj space 0
   num comment 0

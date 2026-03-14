@@ -1,7 +1,7 @@
 name: Quoting ( within `` within double quotes
 dialect: bash
 source: oils:spec/command-sub#quoting-within-within-double-quotes
-stdout: |-
+stdout: |
   1 (
   2 (
   3  (

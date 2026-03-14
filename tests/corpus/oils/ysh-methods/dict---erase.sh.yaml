@@ -3,7 +3,7 @@ name: Dict -> erase()
 dialect: bash
 source: oils:spec/ysh-methods#dict---erase
 status: 0
-stdout: |-
+stdout: |
   (Dict)   {"title":"The Histories"}
   (Dict)   {"title":"The Histories"}
 ---

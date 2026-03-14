@@ -2,7 +2,7 @@ disabled: true
 name: Command Closures in a different module
 dialect: bash
 source: oils:spec/ysh-closures#command-closures-in-a-different-module
-stdout: |-
+stdout: |
   global!
   global local!
 ---

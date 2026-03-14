@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/glob-bash#shopt--s-failglob-exits-properly-in-loop-context-with-set--e
 status: 1
-stdout: |-
+stdout: |
   *.ZZ
   status=0
 ---

@@ -1,7 +1,7 @@
 name: '** behaves like * if adjacent to anything other than /'
 dialect: bash
 source: oils:spec/globstar#behaves-like-if-adjacent-to-anything-other-than
-stdout: |-
+stdout: |
   directory/leaf.md leaf.md
   directory/leaf.md
   directory/leaf.md

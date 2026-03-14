@@ -2,7 +2,7 @@ name: Async for loop
 dialect: bash
 source: oils:spec/background#async-for-loop
 status: 0
-stdout: |-
+stdout: |
   1
   2
   3

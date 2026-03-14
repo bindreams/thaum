@@ -2,7 +2,7 @@ disabled: true
 name: json write ARRAY
 dialect: bash
 source: oils:spec/ysh-json#json-write-array
-stdout: |-
+stdout: |
   [
     "foo.cc",
     "foo.h"

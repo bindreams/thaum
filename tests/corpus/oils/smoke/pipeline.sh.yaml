@@ -1,7 +1,7 @@
 name: pipeline
 dialect: bash
 source: oils:spec/smoke#pipeline
-stdout: |-
+stdout: |
   1
 ---
 hostname | wc -l

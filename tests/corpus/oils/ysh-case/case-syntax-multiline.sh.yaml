@@ -3,7 +3,7 @@ name: case syntax, multiline
 dialect: bash
 source: oils:spec/ysh-case#case-syntax-multiline
 status: 0
-stdout: |-
+stdout: |
   Python
 ---
 const x = "hello.py"

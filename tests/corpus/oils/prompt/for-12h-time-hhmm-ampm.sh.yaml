@@ -1,7 +1,7 @@
 name: \@ for 12h time (HH:MM AM/PM)
 dialect: bash
 source: oils:spec/prompt#for-12h-time-hhmm-ampm
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \@ bar'

@@ -1,7 +1,7 @@
 name: '[bash_unset] localvar-inherit from tempenv'
 dialect: bash
 source: oils:spec/ble-features#bashunset-localvar-inherit-from-tempenv
-stdout: |-
+stdout: |
   # init.bash
   #   init.unset   for local
   #   init.inherit for tempenv

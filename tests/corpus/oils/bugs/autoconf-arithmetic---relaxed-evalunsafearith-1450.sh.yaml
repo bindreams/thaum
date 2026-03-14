@@ -1,7 +1,7 @@
 name: autoconf arithmetic - relaxed eval_unsafe_arith (#1450)
 dialect: bash
 source: oils:spec/bugs#autoconf-arithmetic---relaxed-evalunsafearith-1450
-stdout: |-
+stdout: |
   2
 ---
 

@@ -1,7 +1,7 @@
 name: Subshell function
 dialect: bash
 source: oils:spec/sh-func#subshell-function
-stdout: |-
+stdout: |
   status=42
   status=42
 ---

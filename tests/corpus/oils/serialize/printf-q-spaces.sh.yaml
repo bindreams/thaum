@@ -1,7 +1,7 @@
 name: printf %q spaces
 dialect: bash
 source: oils:spec/serialize#printf-q-spaces
-stdout: |-
+stdout: |
   'one two'
 ---
 case $SH in ash) return ;; esac  # yash and ash don't implement this

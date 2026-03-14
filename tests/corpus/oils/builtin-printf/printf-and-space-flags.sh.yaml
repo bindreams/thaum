@@ -1,7 +1,7 @@
 name: printf + and space flags
 dialect: bash
 source: oils:spec/builtin-printf#printf-and-space-flags
-stdout: |-
+stdout: |
   [+42]
   [-42]
   [ 42]

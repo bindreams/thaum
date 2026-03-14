@@ -3,7 +3,7 @@ name: only one branch is evaluated
 dialect: bash
 source: oils:spec/ysh-case#only-one-branch-is-evaluated
 status: 0
-stdout: |-
+stdout: |
   a
 ---
 var x = "42"

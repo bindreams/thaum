@@ -1,7 +1,7 @@
 name: set -e enabled in function (regression)
 dialect: bash
 source: oils:spec/errexit#set--e-enabled-in-function-regression
-stdout: |-
+stdout: |
   should be executed
   should be executed
 ---

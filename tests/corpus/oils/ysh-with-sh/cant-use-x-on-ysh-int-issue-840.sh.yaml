@@ -3,7 +3,7 @@ name: "Can't use x+= on YSH Int (issue #840)"
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-use-x-on-ysh-int-issue-840
 status: 1
-stdout: |-
+stdout: |
   sh_str=2
   sh_str=21
   sh_str=211

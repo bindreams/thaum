@@ -2,7 +2,7 @@ name: -A function prints functions
 dialect: bash
 source: oils:spec/builtin-completion#a-function-prints-functions
 status: 0
-stdout: |-
+stdout: |
   __ec
   _ab
   add

@@ -1,7 +1,7 @@
 name: Reveal existence of "temp frame" (All shells disagree here!!!)
 dialect: bash
 source: oils:spec/assign#reveal-existence-of-temp-frame-all-shells-disagree-here
-stdout: |-
+stdout: |
   x=temp-binding
   x=mutated-temp
   x=local

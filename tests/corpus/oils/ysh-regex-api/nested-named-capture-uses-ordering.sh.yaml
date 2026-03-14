@@ -2,7 +2,7 @@ disabled: true
 name: Nested Named Capture Uses ( ordering
 dialect: bash
 source: oils:spec/ysh-regex-api#nested-named-capture-uses-ordering
-stdout: |-
+stdout: |
   0 when: 2023-10
   1 2023-10
   2 2023-10

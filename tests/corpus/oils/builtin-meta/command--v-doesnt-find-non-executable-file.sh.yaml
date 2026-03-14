@@ -1,7 +1,7 @@
 name: command -v doesn't find non-executable file
 dialect: bash
 source: oils:spec/builtin-meta#command--v-doesnt-find-non-executable-file
-stdout: |-
+stdout: |
   status=1
   _tmp/executable
   status=0

@@ -1,7 +1,7 @@
 name: dynamic glob - http://landley.net/notes.html#08-05-2020
 dialect: bash
 source: oils:spec/toysh-posix#dynamic-glob---httplandleynetnoteshtml08-05-2020
-stdout: |-
+stdout: |
   foo
   **.?z
 ---

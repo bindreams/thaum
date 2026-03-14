@@ -3,7 +3,7 @@ name: Approximate equality of Str x {Str, Int, Bool} with ~==
 dialect: bash
 source: 
   oils:spec/ysh-expr-compare#approximate-equality-of-str-x-str-int-bool-with
-stdout: |-
+stdout: |
   Str-Str
   Str-Int
   Str-Negative

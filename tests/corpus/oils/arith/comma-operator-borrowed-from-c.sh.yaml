@@ -1,7 +1,7 @@
 name: Comma operator (borrowed from C)
 dialect: bash
 source: oils:spec/arith#comma-operator-borrowed-from-c
-stdout: |-
+stdout: |
   3
 ---
 a=1

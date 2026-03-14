@@ -1,7 +1,7 @@
 name: printf floating point with - and 0
 dialect: bash
 source: oils:spec/builtin-printf#printf-floating-point-with---and-0
-stdout: |-
+stdout: |
   [  3.1400]
   [003.1400]
   [  3.1400]

@@ -2,7 +2,7 @@ name: HISTFILE=my-history loads history from that file, and writes back to it
 dialect: bash
 source: 
   oils:spec/interactive#histfilemy-history-loads-history-from-that-file-and-writes-back-to-it
-stdout: |-
+stdout: |
   2
       1  echo 1
       2  echo 2

@@ -2,7 +2,7 @@ name: simple command / assign - redir failure DOES respect errexit
 dialect: bash
 source: 
   oils:spec/errexit#simple-command-assign---redir-failure-does-respect-errexit
-stdout: |-
+stdout: |
   status=1
   status=1
   status=1

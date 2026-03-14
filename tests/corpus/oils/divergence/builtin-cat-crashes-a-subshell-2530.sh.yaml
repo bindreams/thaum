@@ -1,7 +1,7 @@
 name: builtin cat crashes a subshell (#2530)
 dialect: bash
 source: oils:spec/divergence#builtin-cat-crashes-a-subshell-2530
-stdout: |-
+stdout: |
   141
   141
 ---

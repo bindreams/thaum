@@ -3,7 +3,7 @@ name: typed args
 dialect: bash
 source: oils:spec/ysh-case#typed-args
 status: 0
-stdout: |-
+stdout: |
   string
 ---
 const x = "0"

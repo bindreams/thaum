@@ -1,7 +1,7 @@
 name: echo backslashes
 dialect: bash
 source: oils:spec/builtin-echo#echo-backslashes
-stdout: |-
+stdout: |
   \
   \
   \\

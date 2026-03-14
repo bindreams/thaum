@@ -1,7 +1,7 @@
 name: var ref to $1 and $2 with 1 and 2
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-1-and-2-with-1-and-2
-stdout: |-
+stdout: |
   ref1=one
   ref2=two
 ---

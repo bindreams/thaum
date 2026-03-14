@@ -1,7 +1,7 @@
 name: trap ERR and pipeline
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-pipeline
-stdout: |-
+stdout: |
   line=3
   line=5
 ---

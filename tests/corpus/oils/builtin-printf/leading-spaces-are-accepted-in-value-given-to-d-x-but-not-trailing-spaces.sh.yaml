@@ -3,7 +3,7 @@ name: leading spaces are accepted in value given to %d %X, but not trailing
 dialect: bash
 source: 
   oils:spec/builtin-printf#leading-spaces-are-accepted-in-value-given-to-d-x-but-not-trailing-spaces
-stdout: |-
+stdout: |
   -123
   status=0
   -123

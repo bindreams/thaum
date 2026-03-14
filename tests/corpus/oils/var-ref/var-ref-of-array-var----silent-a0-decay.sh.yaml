@@ -2,7 +2,7 @@ name: var ref OF array var -- silent a[0] decay
 dialect: bash
 source: oils:spec/var-ref#var-ref-of-array-var----silent-a0-decay
 status: 0
-stdout: |-
+stdout: |
   first=
   first=zzz
 ---

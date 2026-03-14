@@ -3,7 +3,7 @@ name: Functions can be nested
 dialect: bash
 source: oils:spec/ysh-func#functions-can-be-nested
 status: 1
-stdout: |-
+stdout: |
   0
 ---
 proc build {

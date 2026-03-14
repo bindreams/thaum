@@ -1,7 +1,7 @@
 name: Dynamic alias definition
 dialect: bash
 source: oils:spec/alias#dynamic-alias-definition
-stdout: |-
+stdout: |
   X
 ---
 shopt -s expand_aliases  # bash requires this

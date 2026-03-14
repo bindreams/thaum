@@ -2,7 +2,7 @@ disabled: true
 name: runproc typed args
 dialect: bash
 source: oils:spec/ysh-builtin-meta#runproc-typed-args
-stdout: |-
+stdout: |
   hi from p
 
   ty

@@ -3,7 +3,7 @@ name: usage errors
 dialect: bash
 source: oils:spec/ysh-json#usage-errors
 status: 3
-stdout: |-
+stdout: |
   status=2
 ---
 

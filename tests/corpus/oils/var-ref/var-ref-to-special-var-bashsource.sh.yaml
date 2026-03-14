@@ -1,7 +1,7 @@
 name: var ref to special var BASH_SOURCE
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-special-var-bashsource
-stdout: |-
+stdout: |
   lineno=2
 ---
 ref='LINENO'

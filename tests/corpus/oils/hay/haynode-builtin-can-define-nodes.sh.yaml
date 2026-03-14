@@ -2,7 +2,7 @@ disabled: true
 name: haynode builtin can define nodes
 dialect: bash
 source: oils:spec/hay#haynode-builtin-can-define-nodes
-stdout: |-
+stdout: |
   level 0 children
   1
   level 1 children

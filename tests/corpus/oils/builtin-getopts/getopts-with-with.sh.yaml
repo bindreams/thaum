@@ -1,7 +1,7 @@
 name: getopts with with -
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-with-with
-stdout: |-
+stdout: |
   -h -
   status=0
 ---

@@ -1,7 +1,7 @@
 name: fc errors out on too many args with strict_arg_parse
 dialect: bash
 source: oils:spec/builtin-fc#fc-errors-out-on-too-many-args-with-strictargparse
-stdout: |-
+stdout: |
   too many args!
 ---
 shopt -s strict_arg_parse || true

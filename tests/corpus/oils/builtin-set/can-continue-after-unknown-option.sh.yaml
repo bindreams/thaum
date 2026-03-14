@@ -2,7 +2,7 @@ name: can continue after unknown option
 dialect: bash
 source: oils:spec/builtin-set#can-continue-after-unknown-option
 status: 0
-stdout: |-
+stdout: |
   hello
 ---
 #

@@ -1,7 +1,7 @@
 name: not a comment without leading space x
 dialect: bash
 source: oils:spec/comments#not-a-comment-without-leading-space-x
-stdout: |-
+stdout: |
   foo#not_comment
 ---
 echo foo#not_comment

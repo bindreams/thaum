@@ -2,7 +2,7 @@ disabled: true
 name: shopt --set GROUP { }
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt---set-group
-stdout: |-
+stdout: |
   shopt -u command_sub_errexit
   shopt -u inherit_errexit
   shopt -u strict_errexit

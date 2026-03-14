@@ -1,7 +1,7 @@
 name: typeset s+=
 dialect: bash
 source: oils:spec/append#typeset-s
-stdout: |-
+stdout: |
   s=foo
   t=foo
   t=foofoo

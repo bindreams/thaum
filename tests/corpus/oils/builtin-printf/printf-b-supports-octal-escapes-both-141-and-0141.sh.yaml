@@ -2,7 +2,7 @@ name: printf %b supports octal escapes, both \141 and \0141
 dialect: bash
 source: 
   oils:spec/builtin-printf#printf-b-supports-octal-escapes-both-141-and-0141
-stdout: |-
+stdout: |
   three a
   four  a
 

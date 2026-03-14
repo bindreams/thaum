@@ -1,7 +1,7 @@
 name: Command substitution in default
 dialect: bash
 source: oils:spec/posix#command-substitution-in-default
-stdout: |-
+stdout: |
   /bin
 ---
 echo ${x:-$(ls -d /bin)}

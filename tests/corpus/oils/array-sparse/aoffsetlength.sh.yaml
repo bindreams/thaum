@@ -1,7 +1,7 @@
 name: ${a[@]:offset:length}
 dialect: bash
 source: oils:spec/array-sparse#aoffsetlength
-stdout: |-
+stdout: |
   ==== ${a[@]:offset} ====
   [v0 v1 v5 v6 v8 v9][v0 v1 v5 v6 v8 v9]
   [v5 v6 v8 v9][v5 v6 v8 v9]

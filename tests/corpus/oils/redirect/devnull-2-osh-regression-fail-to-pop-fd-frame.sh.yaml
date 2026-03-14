@@ -1,7 +1,7 @@
 name: ': >/dev/null 2> / (OSH regression: fail to pop fd frame)'
 dialect: bash
 source: oils:spec/redirect#devnull-2-osh-regression-fail-to-pop-fd-frame
-stdout: |-
+stdout: |
   hello
 ---
 # oil 0.8.pre4 fails to restore fds after redirection failure. In the

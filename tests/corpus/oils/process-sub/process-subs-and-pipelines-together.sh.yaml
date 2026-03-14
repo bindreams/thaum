@@ -1,7 +1,7 @@
 name: process subs and pipelines together
 dialect: bash
 source: oils:spec/process-sub#process-subs-and-pipelines-together
-stdout: |-
+stdout: |
   1
   2
   1

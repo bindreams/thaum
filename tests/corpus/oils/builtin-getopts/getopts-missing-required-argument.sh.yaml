@@ -2,7 +2,7 @@ name: getopts missing required argument
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-missing-required-argument
 status: 2
-stdout: |-
+stdout: |
   ERROR 3
 ---
 set -- -h -c

@@ -2,7 +2,7 @@ disabled: true
 name: Block with Bare Assignments
 dialect: bash
 source: oils:spec/ysh-blocks#block-with-bare-assignments
-stdout: |-
+stdout: |
   rule foo-python
   rule foo-cc
   rule bar-python

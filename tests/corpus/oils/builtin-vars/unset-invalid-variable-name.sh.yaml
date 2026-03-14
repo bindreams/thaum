@@ -1,7 +1,7 @@
 name: Unset invalid variable name
 dialect: bash
 source: oils:spec/builtin-vars#unset-invalid-variable-name
-stdout: |-
+stdout: |
   status=2
 ---
 unset %

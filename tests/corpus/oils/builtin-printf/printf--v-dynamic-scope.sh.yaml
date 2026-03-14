@@ -1,7 +1,7 @@
 name: printf -v dynamic scope
 dialect: bash
 source: oils:spec/builtin-printf#printf--v-dynamic-scope
-stdout: |-
+stdout: |
   dollar=dollar
   --
   dollar=\$

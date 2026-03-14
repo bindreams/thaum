@@ -2,7 +2,7 @@ name: Mutually recursive namerefs detected on READ
 dialect: bash
 source: oils:spec/nameref#mutually-recursive-namerefs-detected-on-read
 status: 1
-stdout: |-
+stdout: |
   defined
 ---
 typeset -n ref1=ref2

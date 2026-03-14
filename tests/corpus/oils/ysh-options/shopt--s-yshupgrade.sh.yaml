@@ -2,7 +2,7 @@ disabled: true
 name: shopt -s ysh:upgrade
 dialect: bash
 source: oils:spec/ysh-options#shopt--s-yshupgrade
-stdout: |-
+stdout: |
   set -o errexit
   set -o nounset
   set -o pipefail

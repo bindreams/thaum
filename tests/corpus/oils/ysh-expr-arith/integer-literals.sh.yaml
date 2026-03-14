@@ -2,7 +2,7 @@ disabled: true
 name: Integer literals
 dialect: bash
 source: oils:spec/ysh-expr-arith#integer-literals
-stdout: |-
+stdout: |
   123 3 83 255
 ---
 var d = 123

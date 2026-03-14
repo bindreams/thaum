@@ -2,7 +2,7 @@ disabled: true
 name: block doesn't have its own scope
 dialect: bash
 source: oils:spec/ysh-blocks#block-doesnt-have-its-own-scope
-stdout: |-
+stdout: |
   x=1
   x=42
   x=42

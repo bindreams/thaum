@@ -1,7 +1,7 @@
 name: 'local: middle command fails and keeps going'
 dialect: bash
 source: oils:spec/errexit-osh#local-middle-command-fails-and-keeps-going
-stdout: |-
+stdout: |
   good
   status=0
   one two

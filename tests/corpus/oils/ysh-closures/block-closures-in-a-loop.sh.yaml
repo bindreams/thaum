@@ -2,7 +2,7 @@ disabled: true
 name: Block Closures in a Loop !
 dialect: bash
 source: oils:spec/ysh-closures#block-closures-in-a-loop
-stdout: |-
+stdout: |
   x: i = 0, j = 2
   x: i = 1, j = 3
   x: i = 2, j = 4

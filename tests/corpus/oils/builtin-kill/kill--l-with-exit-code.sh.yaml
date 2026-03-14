@@ -1,7 +1,7 @@
 name: kill -l with exit code
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-with-exit-code
-stdout: |-
+stdout: |
   ABRT
 ---
 kill -l 134 # 128 + 6 (ABRT)

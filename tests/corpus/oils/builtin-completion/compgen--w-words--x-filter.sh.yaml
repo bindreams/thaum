@@ -1,7 +1,7 @@
 name: compgen -W words -X filter
 dialect: bash
 source: oils:spec/builtin-completion#compgen--w-words--x-filter
-stdout: |-
+stdout: |
   one
   three
 ---

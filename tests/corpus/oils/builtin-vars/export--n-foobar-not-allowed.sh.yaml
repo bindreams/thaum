@@ -1,7 +1,7 @@
 name: export -n foo=bar not allowed
 dialect: bash
 source: oils:spec/builtin-vars#export--n-foobar-not-allowed
-stdout: |-
+stdout: |
   status=2
   old
 ---

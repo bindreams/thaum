@@ -2,7 +2,7 @@ disabled: true
 name: Parse { var x = 42 }
 dialect: bash
 source: oils:spec/ysh-expr#parse-var-x-42
-stdout: |-
+stdout: |
   x=1
 ---
 shopt -s ysh:upgrade

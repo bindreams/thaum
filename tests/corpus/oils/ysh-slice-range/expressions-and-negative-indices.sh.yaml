@@ -2,7 +2,7 @@ disabled: true
 name: expressions and negative indices
 dialect: bash
 source: oils:spec/ysh-slice-range#expressions-and-negative-indices
-stdout: |-
+stdout: |
   (Str)   "5"
   (List)   ["2","3"]
   implicit

@@ -1,7 +1,7 @@
 name: test -v with strings
 dialect: bash
 source: oils:spec/assign-dialects#test--v-with-strings
-stdout: |-
+stdout: |
   str=1
   str=0
 ---

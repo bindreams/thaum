@@ -2,7 +2,7 @@ disabled: true
 name: procs shadow sh-funcs
 dialect: bash
 source: oils:spec/ysh-proc#procs-shadow-sh-funcs
-stdout: |-
+stdout: |
   proc
 ---
 shopt -s ysh:upgrade

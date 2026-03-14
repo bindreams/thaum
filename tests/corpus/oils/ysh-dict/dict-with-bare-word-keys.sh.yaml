@@ -2,7 +2,7 @@ disabled: true
 name: dict with 'bare word' keys
 dialect: bash
 source: oils:spec/ysh-dict#dict-with-bare-word-keys
-stdout: |-
+stdout: |
   len=0
   len=1
   len=2

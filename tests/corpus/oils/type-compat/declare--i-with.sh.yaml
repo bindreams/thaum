@@ -1,7 +1,7 @@
 name: declare -i with +=
 dialect: bash
 source: oils:spec/type-compat#declare--i-with
-stdout: |-
+stdout: |
   [1  2 ]
   [3]
   [2]

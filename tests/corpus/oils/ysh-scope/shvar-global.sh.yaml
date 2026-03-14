@@ -2,7 +2,7 @@ disabled: true
 name: shvar global
 dialect: bash
 source: oils:spec/ysh-scope#shvar-global
-stdout: |-
+stdout: |
   _ESCAPER=
   _DIALECT=
   block _ESCAPER=html

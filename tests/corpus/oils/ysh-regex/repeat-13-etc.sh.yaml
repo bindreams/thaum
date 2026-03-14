@@ -2,7 +2,7 @@ disabled: true
 name: Repeat {1,3} etc.
 dialect: bash
 source: oils:spec/ysh-regex#repeat-13-etc
-stdout: |-
+stdout: |
   [[:digit:]]{2}
   [[:digit:]]{1,3}
   [[:digit:]]{1,}

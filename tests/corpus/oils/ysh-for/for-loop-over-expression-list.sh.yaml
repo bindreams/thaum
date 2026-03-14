@@ -2,7 +2,7 @@ disabled: true
 name: 'For loop over expression: List'
 dialect: bash
 source: oils:spec/ysh-for#for-loop-over-expression-list
-stdout: |-
+stdout: |
   item 1
   item 2
   item 3

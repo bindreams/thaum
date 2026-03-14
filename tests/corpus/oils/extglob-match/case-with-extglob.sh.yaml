@@ -1,7 +1,7 @@
 name: case with extglob
 dialect: bash
 source: oils:spec/extglob-match#case-with-extglob
-stdout: |-
+stdout: |
   A
   A
   U

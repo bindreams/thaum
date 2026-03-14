@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-word-eval#cant-serialize-type-list-in-an-array-todo-consider-str
 status: 3
-stdout: |-
+stdout: |
   3
   true
   ___

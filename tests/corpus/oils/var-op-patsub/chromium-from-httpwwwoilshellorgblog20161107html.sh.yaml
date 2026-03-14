@@ -1,7 +1,7 @@
 name: Chromium from http://www.oilshell.org/blog/2016/11/07.html
 dialect: bash
 source: oils:spec/var-op-patsub#chromium-from-httpwwwoilshellorgblog20161107html
-stdout: |-
+stdout: |
   \/foo\/bar\/baz
   \/foo\/bar\/baz
 ---

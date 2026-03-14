@@ -1,7 +1,7 @@
 name: shell obeys --help (regression for OSH)
 dialect: bash
 source: oils:spec/sh-usage#shell-obeys---help-regression-for-osh
-stdout: |-
+stdout: |
   yes
 ---
 n=$($SH --help | wc -l)

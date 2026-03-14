@@ -1,7 +1,7 @@
 name: retrieve key
 dialect: bash
 source: oils:spec/zsh-assoc#retrieve-key
-stdout: |-
+stdout: |
   b
 ---
 typeset -A a

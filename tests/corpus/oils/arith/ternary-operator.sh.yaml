@@ -1,7 +1,7 @@
 name: Ternary operator
 dialect: bash
 source: oils:spec/arith#ternary-operator
-stdout: |-
+stdout: |
   10
 ---
 a=1

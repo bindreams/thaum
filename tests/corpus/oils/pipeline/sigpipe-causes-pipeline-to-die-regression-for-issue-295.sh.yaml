@@ -2,7 +2,7 @@ name: 'SIGPIPE causes pipeline to die (regression for issue #295)'
 dialect: bash
 source: 
   oils:spec/pipeline#sigpipe-causes-pipeline-to-die-regression-for-issue-295
-stdout: |-
+stdout: |
   141 0
 ---
 cat /dev/urandom | sleep 0.1

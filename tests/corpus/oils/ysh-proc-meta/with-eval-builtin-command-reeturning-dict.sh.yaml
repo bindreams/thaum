@@ -2,7 +2,7 @@ disabled: true
 name: with eval builtin command, reeturning Dict
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-eval-builtin-command-reeturning-dict
-stdout: |-
+stdout: |
   prefix a
   prefix b
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: hay crash when source file has a syntax error
 dialect: bash
 source: oils:spec/hay#hay-crash-when-source-file-has-a-syntax-error
-stdout: |-
+stdout: |
   OK
 ---
 shopt --set ysh:all

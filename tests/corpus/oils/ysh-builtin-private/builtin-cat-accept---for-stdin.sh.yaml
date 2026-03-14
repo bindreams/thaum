@@ -2,7 +2,7 @@ disabled: true
 name: builtin cat accept - for stdin
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-cat-accept---for-stdin
-stdout: |-
+stdout: |
   FOO
   3
   4

@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-expr-compare#bool-conversion----explicit-allowed-implicit-not-allowed
 status: 3
-stdout: |-
+stdout: |
   <
   <=
 ---

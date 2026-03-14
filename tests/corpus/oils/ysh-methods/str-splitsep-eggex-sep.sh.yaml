@@ -2,7 +2,7 @@ disabled: true
 name: Str => split(sep), eggex sep
 dialect: bash
 source: oils:spec/ysh-methods#str-splitsep-eggex-sep
-stdout: |-
+stdout: |
   (List)   ["a","b","c"]
   (List)   ["","",""]
   (List)   ["a","b","c<d"]

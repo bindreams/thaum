@@ -1,7 +1,7 @@
 name: Exporting a variable doesn't change it
 dialect: bash
 source: oils:spec/builtin-vars#exporting-a-variable-doesnt-change-it
-stdout: |-
+stdout: |
   not changed
 ---
 old=$PATH

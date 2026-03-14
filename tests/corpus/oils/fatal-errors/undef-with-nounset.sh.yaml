@@ -1,7 +1,7 @@
 name: ${undef} with nounset
 dialect: bash
 source: oils:spec/fatal-errors#undef-with-nounset
-stdout: |-
+stdout: |
   outside=1
 ---
 

@@ -1,7 +1,7 @@
 name: ?() matches 0 or 1
 dialect: bash
 source: oils:spec/extglob-files#matches-0-or-1
-stdout: |-
+stdout: |
   foo. foo.cc foo.h
 ---
 shopt -s extglob

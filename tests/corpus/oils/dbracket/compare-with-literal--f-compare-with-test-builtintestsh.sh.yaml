@@ -2,7 +2,7 @@ name: '[[ compare with literal -f (compare with test-builtin.test.sh)'
 dialect: bash
 source: 
   oils:spec/dbracket#compare-with-literal--f-compare-with-test-builtintestsh
-stdout: |-
+stdout: |
   true
   true
 ---

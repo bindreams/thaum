@@ -1,7 +1,7 @@
 name: $LINENO in other for loops
 dialect: bash
 source: oils:spec/vars-special#lineno-in-other-for-loops
-stdout: |-
+stdout: |
   3 a
   3 b
   3 c

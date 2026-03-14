@@ -1,7 +1,7 @@
 name: Other flag parsers are not affected by - rule
 dialect: bash
 source: oils:spec/sh-usage#other-flag-parsers-are-not-affected-by---rule
-stdout: |-
+stdout: |
   reply=foo
 ---
 

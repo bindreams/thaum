@@ -2,7 +2,7 @@ disabled: true
 name: echo $x for various types
 dialect: bash
 source: oils:spec/ysh-word-eval#echo-x-for-various-types
-stdout: |-
+stdout: |
   true
   42
   3.14

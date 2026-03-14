@@ -2,7 +2,7 @@ disabled: true
 name: list() from Dict
 dialect: bash
 source: oils:spec/ysh-convert#list-from-dict
-stdout: |-
+stdout: |
   a
   foo
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: '""" and $""" in Expression Mode'
 dialect: bash
 source: oils:spec/ysh-string#and-in-expression-mode
-stdout: |-
+stdout: |
   line1=line1
   line2=line2
   [one "

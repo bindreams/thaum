@@ -2,7 +2,7 @@ disabled: true
 name: d+  digit+  !d+  !digit+
 dialect: bash
 source: oils:spec/ysh-regex#d-digit-d-digit
-stdout: |-
+stdout: |
   [[:digit:]]+
   yes
   no

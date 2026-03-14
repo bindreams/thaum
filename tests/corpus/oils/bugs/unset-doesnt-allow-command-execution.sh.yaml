@@ -2,7 +2,7 @@ name: unset doesn't allow command execution
 dialect: bash
 source: oils:spec/bugs#unset-doesnt-allow-command-execution
 status: 1
-stdout: |-
+stdout: |
   len=1
 ---
 

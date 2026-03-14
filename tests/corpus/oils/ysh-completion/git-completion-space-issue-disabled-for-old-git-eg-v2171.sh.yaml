@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-completion#git-completion-space-issue-disabled-for-old-git-eg-v2171
 status: 0
-stdout: |-
+stdout: |
   status=0
   "git cherry "
   "git cherry-pick "

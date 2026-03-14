@@ -2,7 +2,7 @@ name: Dynamic $c readonly - bash and dash change behavior, mksh bug
 dialect: bash
 source: 
   oils:spec/builtin-meta-assign#dynamic-c-readonly---bash-and-dash-change-behavior-mksh-bug
-stdout: |-
+stdout: |
   a b
   a b
 ---

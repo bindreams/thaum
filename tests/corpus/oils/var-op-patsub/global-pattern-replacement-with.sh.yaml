@@ -1,7 +1,7 @@
 name: Global Pattern replacement with /
 dialect: bash
 source: oils:spec/var-op-patsub#global-pattern-replacement-with
-stdout: |-
+stdout: |
   yy_xx_xx yy_yy_xx
 ---
 s=xx_xx_xx

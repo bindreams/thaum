@@ -2,7 +2,7 @@ disabled: true
 name: io->eval() is like eval builtin
 dialect: bash
 source: oils:spec/ysh-method-io#io-eval-is-like-eval-builtin
-stdout: |-
+stdout: |
   one
   two
   status=null

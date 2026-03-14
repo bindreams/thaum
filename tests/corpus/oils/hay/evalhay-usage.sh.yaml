@@ -2,7 +2,7 @@ disabled: true
 name: evalHay() usage
 dialect: bash
 source: oils:spec/hay#evalhay-usage
-stdout: |-
+stdout: |
   status 3
   status 3
   status 3

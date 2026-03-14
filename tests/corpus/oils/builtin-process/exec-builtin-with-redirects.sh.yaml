@@ -2,7 +2,7 @@ name: exec builtin with redirects
 dialect: bash
 source: oils:spec/builtin-process#exec-builtin-with-redirects
 stdout: ''
-stderr: |-
+stderr: |
   to stderr
 ---
 exec 1>&2

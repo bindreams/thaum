@@ -1,7 +1,7 @@
 name: $HOSTNAME
 dialect: bash
 source: oils:spec/vars-special#hostname
-stdout: |-
+stdout: |
   status=0
 ---
 test "$HOSTNAME" = "$(hostname)"

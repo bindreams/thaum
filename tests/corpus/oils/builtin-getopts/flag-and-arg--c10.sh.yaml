@@ -1,7 +1,7 @@
 name: 'flag and arg: -c10'
 dialect: bash
 source: oils:spec/builtin-getopts#flag-and-arg--c10
-stdout: |-
+stdout: |
   OPTIND=2 opt=c OPTARG=10
   OPTIND=2 opt=? OPTARG=
 ---

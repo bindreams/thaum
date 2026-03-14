@@ -1,7 +1,7 @@
 name: Multiple Patterns Match
 dialect: bash
 source: oils:spec/case#multiple-patterns-match
-stdout: |-
+stdout: |
   - X
 ---
 x=foo

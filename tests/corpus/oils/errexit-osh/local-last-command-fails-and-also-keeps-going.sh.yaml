@@ -1,7 +1,7 @@
 name: 'local: last command fails and also keeps going'
 dialect: bash
 source: oils:spec/errexit-osh#local-last-command-fails-and-also-keeps-going
-stdout: |-
+stdout: |
   good
   status=0
   one

@@ -2,7 +2,7 @@ disabled: true
 name: Can read from ENV Obj
 dialect: bash
 source: oils:spec/ysh-env#can-read-from-env-obj
-stdout: |-
+stdout: |
   (Str)   "Obj"
   ok
 ---

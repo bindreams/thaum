@@ -2,7 +2,7 @@ name: continue in subshell aborts with errexit
 dialect: bash
 source: oils:spec/loop#continue-in-subshell-aborts-with-errexit
 status: 1
-stdout: |-
+stdout: |
   > 1
 ---
 # The other shells don't let you recover from this programming error!

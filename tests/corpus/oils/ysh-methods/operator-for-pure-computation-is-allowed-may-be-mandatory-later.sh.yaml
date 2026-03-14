@@ -3,7 +3,7 @@ name: => operator for pure computation is allowed (may be mandatory later)
 dialect: bash
 source: 
   oils:spec/ysh-methods#operator-for-pure-computation-is-allowed-may-be-mandatory-later
-stdout: |-
+stdout: |
   yes
   ok
 ---

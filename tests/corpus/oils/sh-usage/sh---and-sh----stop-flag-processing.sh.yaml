@@ -5,7 +5,7 @@ stdout: |
   foo
   -
   foo
-stderr: |-
+stderr: |
   echo foo
   + echo foo
   -

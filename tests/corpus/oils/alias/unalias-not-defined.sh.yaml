@@ -1,7 +1,7 @@
 name: unalias not defined
 dialect: bash
 source: oils:spec/alias#unalias-not-defined
-stdout: |-
+stdout: |
   status=1
 ---
 alias e=echo ll='ls -l'

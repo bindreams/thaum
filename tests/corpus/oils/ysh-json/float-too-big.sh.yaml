@@ -2,7 +2,7 @@ disabled: true
 name: Float too big
 dialect: bash
 source: oils:spec/ysh-json#float-too-big
-stdout: |-
+stdout: |
   status=0
   (Float)   INFINITY
   status=0

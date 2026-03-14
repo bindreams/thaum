@@ -1,7 +1,7 @@
 name: Here doc in middle.  And redirects in the middle.
 dialect: bash
 source: oils:spec/here-doc#here-doc-in-middle-and-redirects-in-the-middle
-stderr: |-
+stderr: |
   foo
   here
   bar

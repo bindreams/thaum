@@ -1,7 +1,7 @@
 name: unset of local reveals variable in higher scope
 dialect: bash
 source: oils:spec/builtin-vars#unset-of-local-reveals-variable-in-higher-scope
-stdout: |-
+stdout: |
   x=foo
   x=global
 ---

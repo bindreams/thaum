@@ -3,7 +3,7 @@ name: captureAll() doesn't fail
 dialect: bash
 source: oils:spec/ysh-method-io#captureall-doesnt-fail
 status: 0
-stdout: |-
+stdout: |
   (Dict)   {"code":0}
   (Dict)   {"stdout":"out\n","stderr":"err\n","status":1}
 ---

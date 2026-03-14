@@ -3,7 +3,7 @@ name: ysh --eval runtime error
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-runtime-error
 status: 1
-stdout: |-
+stdout: |
   flag --eval
 ---
 

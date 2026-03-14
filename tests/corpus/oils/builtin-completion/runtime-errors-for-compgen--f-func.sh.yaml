@@ -1,7 +1,7 @@
 name: Runtime errors for compgen -F func
 dialect: bash
 source: oils:spec/builtin-completion#runtime-errors-for-compgen--f-func
-stdout: |-
+stdout: |
   status=1
 ---
 _foo() {

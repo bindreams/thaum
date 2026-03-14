@@ -1,7 +1,7 @@
 name: '[[ equality matching'
 dialect: bash
 source: oils:spec/nocasematch-match#equality-matching
-stdout: |-
+stdout: |
   0
   0
   0

@@ -2,7 +2,7 @@ disabled: true
 name: Proc Inside Block
 dialect: bash
 source: oils:spec/hay-meta#proc-inside-block
-stdout: |-
+stdout: |
   p
   p
 ---

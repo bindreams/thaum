@@ -3,7 +3,7 @@ name: Str => startsWith(Str) and endsWith(Str), simple
 dialect: bash
 source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-simple
 status: 0
-stdout: |-
+stdout: |
   true true
   true true
   true false

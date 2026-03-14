@@ -2,7 +2,7 @@ disabled: true
 name: 'Char class special: ^ - ] \'
 dialect: bash
 source: oils:spec/ysh-regex#char-class-special
-stdout: |-
+stdout: |
   caret=[x^]
   caret2=[x^]
   caret3=[x^]

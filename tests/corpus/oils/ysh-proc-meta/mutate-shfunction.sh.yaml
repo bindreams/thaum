@@ -2,7 +2,7 @@ disabled: true
 name: Mutate __sh_function__
 dialect: bash
 source: oils:spec/ysh-proc-meta#mutate-shfunction
-stdout: |-
+stdout: |
   sh-func
 ---
 

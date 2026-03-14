@@ -2,7 +2,7 @@ disabled: true
 name: Dict (&d) { ... } converts frame to dict
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dict-d-converts-frame-to-dict
-stdout: |-
+stdout: |
   (Dict)   {"bare":42,"k":"k-block-mutated","k3":"k3"}
   (Dict)   {"c":101}
 ---

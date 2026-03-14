@@ -1,7 +1,7 @@
 name: Local OPTIND
 dialect: bash
 source: oils:spec/builtin-getopts#local-optind
-stdout: |-
+stdout: |
   loop 2
 ---
 # minimal test case extracted from bash-completion

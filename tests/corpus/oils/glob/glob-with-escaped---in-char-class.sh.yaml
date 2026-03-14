@@ -1,7 +1,7 @@
 name: glob with escaped - in char class
 dialect: bash
 source: oils:spec/glob#glob-with-escaped---in-char-class
-stdout: |-
+stdout: |
   _tmp/c.C _tmp/c.C _tmp/foo.-
 ---
 touch _tmp/foo.-

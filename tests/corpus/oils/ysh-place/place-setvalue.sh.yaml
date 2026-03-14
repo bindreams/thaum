@@ -2,7 +2,7 @@ disabled: true
 name: place->setValue()
 dialect: bash
 source: oils:spec/ysh-place#place-setvalue
-stdout: |-
+stdout: |
   f x=f
   fillPlace x=fillPlace
   p x=zzz

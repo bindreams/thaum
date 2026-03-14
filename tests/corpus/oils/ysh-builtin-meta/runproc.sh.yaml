@@ -2,7 +2,7 @@ disabled: true
 name: runproc
 dialect: bash
 source: oils:spec/ysh-builtin-meta#runproc
-stdout: |-
+stdout: |
   f
   1
   2

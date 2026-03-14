@@ -1,7 +1,7 @@
 name: Subshell with redirects
 dialect: bash
 source: oils:spec/subshell#subshell-with-redirects
-stdout: |-
+stdout: |
   status=0
   1
   2

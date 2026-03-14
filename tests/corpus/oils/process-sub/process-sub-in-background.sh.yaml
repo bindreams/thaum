@@ -1,7 +1,7 @@
 name: process sub in background &
 dialect: bash
 source: oils:spec/process-sub#process-sub-in-background
-stdout: |-
+stdout: |
   1
   2
   3

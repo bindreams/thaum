@@ -2,7 +2,7 @@ disabled: true
 name: List remove() does nothing if element does not exist
 dialect: bash
 source: oils:spec/ysh-list#list-remove-does-nothing-if-element-does-not-exist
-stdout: |-
+stdout: |
   pass
 ---
 shopt -s ysh:all

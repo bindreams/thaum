@@ -1,7 +1,7 @@
 name: $SHELL is set to what is in /etc/passwd
 dialect: bash
 source: oils:spec/vars-bash#shell-is-set-to-what-is-in-etcpasswd
-stdout: |-
+stdout: |
   SHELL is set
   SHELL is set
   SHELL is set

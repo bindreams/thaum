@@ -2,7 +2,7 @@ disabled: true
 name: Big floats like 1e309 and -1e309 go to Inf / -Inf
 dialect: bash
 source: oils:spec/ysh-int-float#big-floats-like-1e309-and--1e309-go-to-inf--inf
-stdout: |-
+stdout: |
   inf
   -inf
 ---

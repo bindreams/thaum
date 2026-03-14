@@ -2,7 +2,7 @@ disabled: true
 name: Simple Expr Closure
 dialect: bash
 source: oils:spec/ysh-closures#simple-expr-closure
-stdout: |-
+stdout: |
   43
 ---
 shopt --set ysh:upgrade

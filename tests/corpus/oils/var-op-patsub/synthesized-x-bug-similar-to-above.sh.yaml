@@ -1,7 +1,7 @@
 name: Synthesized ${x///} bug (similar to above)
 dialect: bash
 source: oils:spec/var-op-patsub#synthesized-x-bug-similar-to-above
-stdout: |-
+stdout: |
   ambiguous: slash brace } hi
   quoted:    slash brace } hi
 ---

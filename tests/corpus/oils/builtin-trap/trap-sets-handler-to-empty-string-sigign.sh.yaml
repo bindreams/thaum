@@ -1,7 +1,7 @@
 name: trap '' sets handler to empty string (SIG_IGN)
 dialect: bash
 source: oils:spec/builtin-trap#trap-sets-handler-to-empty-string-sigign
-stdout: |-
+stdout: |
   trap -- '' SIGUSR1
 ---
 

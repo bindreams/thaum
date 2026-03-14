@@ -1,7 +1,7 @@
 name: Brace group in background, wait all
 dialect: bash
 source: oils:spec/background#brace-group-in-background-wait-all
-stdout: |-
+stdout: |
   status=0
 ---
 { sleep 0.09; exit 9; } &

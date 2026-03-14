@@ -2,7 +2,7 @@ name: bash 'type' gets confused - says 'function', but runs builtin
 dialect: bash
 source: 
   oils:spec/builtin-special#bash-type-gets-confused---says-function-but-runs-builtin
-stdout: |-
+stdout: |
   TRUE
   builtin
   function

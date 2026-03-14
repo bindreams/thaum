@@ -2,7 +2,7 @@ disabled: true
 name: BashAssoc, long
 dialect: bash
 source: oils:spec/ysh-printing#bashassoc-long
-stdout: |-
+stdout: |
   (BashAssoc)
   (BashAssoc ['1']='one')
   (BashAssoc ['1']='one' ['two']='2' ['3']='three')

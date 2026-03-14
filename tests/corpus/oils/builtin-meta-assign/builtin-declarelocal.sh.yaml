@@ -1,7 +1,7 @@
 name: builtin declare,local
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declarelocal
-stdout: |-
+stdout: |
   s=declare
   s=local
 ---

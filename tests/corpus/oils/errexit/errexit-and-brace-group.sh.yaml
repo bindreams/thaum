@@ -1,7 +1,7 @@
 name: errexit and brace group { }
 dialect: bash
 source: oils:spec/errexit#errexit-and-brace-group
-stdout: |-
+stdout: |
   status=1
 ---
 set -o errexit

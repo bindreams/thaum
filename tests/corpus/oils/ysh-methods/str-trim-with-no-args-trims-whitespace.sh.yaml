@@ -3,7 +3,7 @@ name: Str => trim*() with no args trims whitespace
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-with-no-args-trims-whitespace
 status: 0
-stdout: |-
+stdout: |
   "", "", ""
   "", "", ""
   "mystr", "mystr", "mystr"

@@ -1,7 +1,7 @@
 name: Function def and execution with here doc
 dialect: bash
 source: oils:spec/here-doc#function-def-and-execution-with-here-doc
-stdout: |-
+stdout: |
   before
   1
   2

@@ -1,7 +1,7 @@
 name: \A for 24h time (HH:MM)
 dialect: bash
 source: oils:spec/prompt#a-for-24h-time-hhmm
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \A bar'

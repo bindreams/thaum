@@ -2,7 +2,7 @@ name: trap EXIT calling exit
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-calling-exit
 status: 42
-stdout: |-
+stdout: |
   cleanup [x y z]
 ---
 cleanup() {

@@ -1,7 +1,7 @@
 name: autoconf word split (#1449)
 dialect: bash
 source: oils:spec/bugs#autoconf-word-split-1449
-stdout: |-
+stdout: |
   --- $()
   [-n]
   [my sed command]

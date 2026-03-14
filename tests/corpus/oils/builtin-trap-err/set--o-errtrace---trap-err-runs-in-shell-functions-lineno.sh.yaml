@@ -2,7 +2,7 @@ name: set -o errtrace - trap ERR runs in shell functions (LINENO)
 dialect: bash
 source: 
   oils:spec/builtin-trap-err#set--o-errtrace---trap-err-runs-in-shell-functions-lineno
-stdout: |-
+stdout: |
   line=14
   now with errtrace
   line=4

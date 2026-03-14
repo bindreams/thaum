@@ -2,7 +2,7 @@ disabled: true
 name: Augmented assignment with floats
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-with-floats
-stdout: |-
+stdout: |
   43.5
   45.0
   48.0

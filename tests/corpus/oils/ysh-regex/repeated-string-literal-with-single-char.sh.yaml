@@ -2,7 +2,7 @@ disabled: true
 name: Repeated String Literal With Single Char
 dialect: bash
 source: oils:spec/ysh-regex#repeated-string-literal-with-single-char
-stdout: |-
+stdout: |
   ^f+$
   ^(f)+$
   yes

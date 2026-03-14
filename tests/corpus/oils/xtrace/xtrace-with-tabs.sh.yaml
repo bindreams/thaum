@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#xtrace-with-tabs
 stdout: |
   [	]
-stderr: |-
+stderr: |
   + echo $'[\t]'
 ---
 case $SH in dash) exit ;; esac

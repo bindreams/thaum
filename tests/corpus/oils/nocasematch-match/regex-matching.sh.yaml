@@ -1,7 +1,7 @@
 name: '[[ regex matching'
 dialect: bash
 source: oils:spec/nocasematch-match#regex-matching
-stdout: |-
+stdout: |
   0
   0
   0

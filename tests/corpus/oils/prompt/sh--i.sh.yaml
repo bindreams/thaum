@@ -1,7 +1,7 @@
 name: sh -i
 dialect: bash
 source: oils:spec/prompt#sh--i
-stdout: |-
+stdout: |
   match=0
 ---
 # Notes:

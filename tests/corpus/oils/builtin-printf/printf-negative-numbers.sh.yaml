@@ -1,7 +1,7 @@
 name: printf negative numbers
 dialect: bash
 source: oils:spec/builtin-printf#printf-negative-numbers
-stdout: |-
+stdout: |
   [-42] status=0
   [-42] status=0
   [-42] status=0

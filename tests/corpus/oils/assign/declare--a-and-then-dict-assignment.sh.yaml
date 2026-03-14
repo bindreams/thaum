@@ -2,7 +2,7 @@ name: "'declare -A' and then dict assignment"
 dialect: bash
 source: oils:spec/assign#declare--a-and-then-dict-assignment
 status: 0
-stdout: |-
+stdout: |
   value
 ---
 declare -A foo

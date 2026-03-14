@@ -2,7 +2,7 @@ disabled: true
 name: pp cell_ on indexed array with hole
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-cell-on-indexed-array-with-hole
-stdout: |-
+stdout: |
   array = (Cell
     exported:F
     readonly:F

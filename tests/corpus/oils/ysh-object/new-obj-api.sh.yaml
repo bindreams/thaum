@@ -2,7 +2,7 @@ disabled: true
 name: New Obj API
 dialect: bash
 source: oils:spec/ysh-object#new-obj-api
-stdout: |-
+stdout: |
   (Obj)   ("x":4)
   0
   (Dict)   {"x":4}

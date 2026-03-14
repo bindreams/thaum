@@ -2,7 +2,7 @@ disabled: true
 name: --tool syntax-tree respects frontend/syntax_abbrev.py
 dialect: bash
 source: oils:spec/ysh-usage#tool-syntax-tree-respects-frontendsyntaxabbrevpy
-stdout: |-
+stdout: |
   (C (w <Lit_Chars echo>) (w (SQ sq)))
   (C
     (w <Lit_Chars echo>)

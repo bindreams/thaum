@@ -1,7 +1,7 @@
 name: declare -pnrx
 dialect: bash
 source: oils:spec/assign-extended#declare--pnrx
-stdout: |-
+stdout: |
   [declare -pn]
   declare -n test_var4=test_var1
   [declare -pr]

@@ -1,7 +1,7 @@
 name: 2&>1 (is it a redirect or is it like a&>1)
 dialect: bash
 source: oils:spec/redirect#21-is-it-a-redirect-or-is-it-like-a1
-stdout: |-
+stdout: |
   status=127
 ---
 2&>1

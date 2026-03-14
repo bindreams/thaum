@@ -3,7 +3,7 @@ name: redirects allowed in words, typed args, and after block
 dialect: bash
 source: 
   oils:spec/ysh-blocks#redirects-allowed-in-words-typed-args-and-after-block
-stdout: |-
+stdout: |
   1 /tmp
   2 /tmp
   3 /tmp

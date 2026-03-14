@@ -2,7 +2,7 @@ disabled: true
 name: Exponentiation is right associative
 dialect: bash
 source: oils:spec/ysh-expr-arith#exponentiation-is-right-associative
-stdout: |-
+stdout: |
   a=81 b=81
 ---
 

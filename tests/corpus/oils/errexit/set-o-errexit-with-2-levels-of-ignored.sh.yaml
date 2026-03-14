@@ -1,7 +1,7 @@
 name: set +o errexit with 2 levels of ignored
 dialect: bash
 source: oils:spec/errexit#set-o-errexit-with-2-levels-of-ignored
-stdout: |-
+stdout: |
   1
   2
   3

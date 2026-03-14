@@ -1,7 +1,7 @@
 name: shopt -u expand_aliases and eval
 dialect: bash
 source: oils:spec/ble-idioms#shopt--u-expandaliases-and-eval
-stdout: |-
+stdout: |
   hello
 ---
 case $SH in zsh|mksh|ash|dash|yash) exit ;; esac

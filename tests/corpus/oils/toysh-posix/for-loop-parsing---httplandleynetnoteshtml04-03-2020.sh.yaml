@@ -2,7 +2,7 @@ name: for loop parsing - http://landley.net/notes.html#04-03-2020
 dialect: bash
 source: 
   oils:spec/toysh-posix#for-loop-parsing---httplandleynetnoteshtml04-03-2020
-stdout: |-
+stdout: |
   one
   two
   three

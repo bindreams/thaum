@@ -2,7 +2,7 @@ disabled: true
 name: captureStdout() is like $()
 dialect: bash
 source: oils:spec/ysh-method-io#capturestdout-is-like
-stdout: |-
+stdout: |
   (Str)   "one\ncaptured"
 ---
 

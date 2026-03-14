@@ -1,7 +1,7 @@
 name: '*() matches 0 or more'
 dialect: bash
 source: oils:spec/extglob-files#matches-0-or-more
-stdout: |-
+stdout: |
   eg1/_ eg1/_One eg1/_OneOne eg1/_OneTwo eg1/_TwoTwo
 ---
 shopt -s extglob

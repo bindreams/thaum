@@ -2,7 +2,7 @@ disabled: true
 name: error in context
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#error-in-context
-stdout: |-
+stdout: |
   status=100
 ---
 var a = {}

@@ -1,7 +1,7 @@
 name: trap foo gives non-zero error
 dialect: bash
 source: oils:spec/builtin-trap#trap-foo-gives-non-zero-error
-stdout: |-
+stdout: |
   ok
 ---
 trap 'foo'

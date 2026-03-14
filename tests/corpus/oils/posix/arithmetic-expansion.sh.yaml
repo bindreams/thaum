@@ -1,7 +1,7 @@
 name: Arithmetic expansion
 dialect: bash
 source: oils:spec/posix#arithmetic-expansion
-stdout: |-
+stdout: |
   3
   2
   1

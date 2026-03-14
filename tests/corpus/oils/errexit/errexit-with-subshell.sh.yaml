@@ -2,7 +2,7 @@ name: errexit with subshell
 dialect: bash
 source: oils:spec/errexit#errexit-with-subshell
 status: 1
-stdout: |-
+stdout: |
   one
 ---
 set -o errexit

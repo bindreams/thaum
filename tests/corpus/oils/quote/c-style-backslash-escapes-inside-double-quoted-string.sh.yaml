@@ -1,7 +1,7 @@
 name: C-style backslash escapes inside double quoted string
 dialect: bash
 source: oils:spec/quote#c-style-backslash-escapes-inside-double-quoted-string
-stdout: |-
+stdout: |
   \a \b
 ---
 # mksh and dash implement POSIX incompatible extensions.  $ ` " \ <newline>

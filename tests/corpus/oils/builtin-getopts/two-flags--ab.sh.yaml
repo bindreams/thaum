@@ -1,7 +1,7 @@
 name: 'two flags: -ab'
 dialect: bash
 source: oils:spec/builtin-getopts#two-flags--ab
-stdout: |-
+stdout: |
   OPTIND=1 opt=a OPTARG=
   OPTIND=2 opt=b OPTARG=
 ---

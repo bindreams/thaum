@@ -1,7 +1,7 @@
 name: here doc stripping tabs
 dialect: bash
 source: oils:spec/here-doc#here-doc-stripping-tabs
-stdout: |-
+stdout: |
   1
   2
   3  # 2 tabs are both stripped

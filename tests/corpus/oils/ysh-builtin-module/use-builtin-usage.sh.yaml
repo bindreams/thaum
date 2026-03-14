@@ -2,7 +2,7 @@ disabled: true
 name: use builtin usage
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-builtin-usage
-stdout: |-
+stdout: |
   no-arg=2
   one-arg=1
   extern=0

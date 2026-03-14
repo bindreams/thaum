@@ -2,7 +2,7 @@ disabled: true
 name: precedence of 1:3 vs bitwise operator
 dialect: bash
 source: oils:spec/ysh-slice-range#precedence-of-13-vs-bitwise-operator
-stdout: |-
+stdout: |
   (Range 3 ..< 7)
 ---
 = 3..<3|4

@@ -2,7 +2,7 @@ name: times shows two formatted lines
 dialect: bash
 source: oils:spec/builtin-times#times-shows-two-formatted-lines
 status: 0
-stdout: |-
+stdout: |
   pass
   pass
   2

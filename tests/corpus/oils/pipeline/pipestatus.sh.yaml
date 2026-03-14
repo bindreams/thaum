@@ -1,7 +1,7 @@
 name: PIPESTATUS
 dialect: bash
 source: oils:spec/pipeline#pipestatus
-stdout: |-
+stdout: |
   1 2 3
 ---
 return3() {

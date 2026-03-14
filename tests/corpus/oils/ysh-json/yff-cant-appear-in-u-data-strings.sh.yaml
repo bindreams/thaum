@@ -3,7 +3,7 @@ name: \yff can't appear in u'' data strings
 dialect: bash
 source: oils:spec/ysh-json#yff-cant-appear-in-u-data-strings
 status: 1
-stdout: |-
+stdout: |
   (Str)   b'\yfe'
 ---
 

@@ -1,7 +1,7 @@
 name: special builtins are called out
 dialect: bash
 source: oils:spec/builtin-type#special-builtins-are-called-out
-stdout: |-
+stdout: |
   cd is a shell builtin
   eval is a special shell builtin
   : is a special shell builtin

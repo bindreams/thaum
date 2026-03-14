@@ -2,7 +2,7 @@ name: Using an array itself as the index on RHS
 dialect: bash
 source: oils:spec/array#using-an-array-itself-as-the-index-on-rhs
 status: 0
-stdout: |-
+stdout: |
   2
 ---
 shopt -u strict_arith

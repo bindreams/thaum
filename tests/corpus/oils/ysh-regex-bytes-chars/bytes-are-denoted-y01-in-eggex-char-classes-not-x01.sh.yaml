@@ -3,7 +3,7 @@ name: Bytes are denoted \y01 in Eggex char classes (not \x01)
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#bytes-are-denoted-y01-in-eggex-char-classes-not-x01
-stdout: |-
+stdout: |
   (Bool)   true
   (Bool)   false
 ---

@@ -3,7 +3,7 @@ name: type / type -a builtin on invokables - shell func, proc, invokable
 dialect: bash
 source: 
   oils:spec/ysh-proc#type-type--a-builtin-on-invokables---shell-func-proc-invokable
-stdout: |-
+stdout: |
   function
   proc
   proc

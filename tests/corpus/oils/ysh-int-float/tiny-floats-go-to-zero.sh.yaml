@@ -2,7 +2,7 @@ disabled: true
 name: Tiny floats go to zero
 dialect: bash
 source: oils:spec/ysh-int-float#tiny-floats-go-to-zero
-stdout: |-
+stdout: |
   float=0.0
 ---
 

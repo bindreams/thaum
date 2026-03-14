@@ -1,7 +1,7 @@
 name: Escaped backslash
 dialect: bash
 source: oils:spec/prompt#escaped-backslash
-stdout: |-
+stdout: |
   \
 ---
 PS1='\\'

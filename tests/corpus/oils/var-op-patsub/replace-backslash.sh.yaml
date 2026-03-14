@@ -1,7 +1,7 @@
 name: Replace backslash
 dialect: bash
 source: oils:spec/var-op-patsub#replace-backslash
-stdout: |-
+stdout: |
   [_]
   [\_]
   [\_]

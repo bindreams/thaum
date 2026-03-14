@@ -1,7 +1,7 @@
 name: 'compgen with actions: alias, setopt'
 dialect: bash
 source: oils:spec/builtin-completion#compgen-with-actions-alias-setopt
-stdout: |-
+stdout: |
   v_alias
   v_alias2
   verbose

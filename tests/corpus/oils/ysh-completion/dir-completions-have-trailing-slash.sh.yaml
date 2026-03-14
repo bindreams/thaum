@@ -2,7 +2,7 @@ disabled: true
 name: dir completions have trailing slash
 dialect: bash
 source: oils:spec/ysh-completion#dir-completions-have-trailing-slash
-stdout: |-
+stdout: |
   "cd can\\'t\\ touch\\ this/"
 ---
 

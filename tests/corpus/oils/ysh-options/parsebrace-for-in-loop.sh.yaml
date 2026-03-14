@@ -2,7 +2,7 @@ disabled: true
 name: 'parse_brace: for-in loop'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-for-in-loop
-stdout: |-
+stdout: |
   one
   two
   three

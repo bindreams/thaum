@@ -1,7 +1,7 @@
 name: non-{ } function bodies can be serialized (rare)
 dialect: bash
 source: oils:spec/print-source-code#non--function-bodies-can-be-serialized-rare
-stdout: |-
+stdout: |
   subshell body
 ---
 

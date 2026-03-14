@@ -3,7 +3,7 @@ name: compgen -A builtin doesn't find private builtins
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#compgen--a-builtin-doesnt-find-private-builtins
-stdout: |-
+stdout: |
   status=1
 ---
 

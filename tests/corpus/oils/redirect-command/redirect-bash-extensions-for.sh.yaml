@@ -1,7 +1,7 @@
 name: 'redirect bash extensions:   [[  ((  for (('
 dialect: bash
 source: oils:spec/redirect-command#redirect-bash-extensions-for
-stdout: |-
+stdout: |
   0 dbracket
   0 dparen
   1 for-expr

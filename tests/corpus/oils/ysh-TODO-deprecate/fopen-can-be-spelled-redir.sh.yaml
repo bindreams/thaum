@@ -2,7 +2,7 @@ disabled: true
 name: fopen can be spelled redir
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#fopen-can-be-spelled-redir
-stdout: |-
+stdout: |
   2
   1
 ---

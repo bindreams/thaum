@@ -1,7 +1,7 @@
 name: For loop starts pipeline
 dialect: bash
 source: oils:spec/pipeline#for-loop-starts-pipeline
-stdout: |-
+stdout: |
   two
   one
 ---

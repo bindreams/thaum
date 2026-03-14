@@ -1,7 +1,7 @@
 name: compgen -A builtin
 dialect: bash
 source: oils:spec/builtin-completion#compgen--a-builtin
-stdout: |-
+stdout: |
   getopts
 ---
 compgen -A builtin g

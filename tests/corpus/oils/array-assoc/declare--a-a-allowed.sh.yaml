@@ -1,7 +1,7 @@
 name: declare -A A=() allowed
 dialect: bash
 source: oils:spec/array-assoc#declare--a-a-allowed
-stdout: |-
+stdout: |
   len=0
   len=1
   unset len=0

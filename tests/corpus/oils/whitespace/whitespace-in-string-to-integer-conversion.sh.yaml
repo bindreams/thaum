@@ -1,7 +1,7 @@
 name: whitespace in string to integer conversion
 dialect: bash
 source: oils:spec/whitespace#whitespace-in-string-to-integer-conversion
-stdout: |-
+stdout: |
   43
   failed
 ---

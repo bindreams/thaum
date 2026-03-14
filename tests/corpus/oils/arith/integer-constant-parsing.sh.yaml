@@ -1,7 +1,7 @@
 name: Integer constant parsing
 dialect: bash
 source: oils:spec/arith#integer-constant-parsing
-stdout: |-
+stdout: |
   298
   10
   511

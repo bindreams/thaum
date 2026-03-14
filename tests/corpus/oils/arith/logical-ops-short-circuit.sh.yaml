@@ -1,7 +1,7 @@
 name: Logical Ops Short Circuit
 dialect: bash
 source: oils:spec/arith#logical-ops-short-circuit
-stdout: |-
+stdout: |
   11
   33
   33

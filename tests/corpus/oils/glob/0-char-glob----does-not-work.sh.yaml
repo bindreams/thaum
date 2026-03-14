@@ -1,7 +1,7 @@
 name: 0 char glob -- does NOT work
 dialect: bash
 source: oils:spec/glob#0-char-glob----does-not-work
-stdout: |-
+stdout: |
   []bin
 ---
 echo []bin

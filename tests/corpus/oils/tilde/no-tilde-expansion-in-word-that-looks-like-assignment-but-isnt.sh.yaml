@@ -2,7 +2,7 @@ name: No tilde expansion in word that looks like assignment but isn't
 dialect: bash
 source: 
   oils:spec/tilde#no-tilde-expansion-in-word-that-looks-like-assignment-but-isnt
-stdout: |-
+stdout: |
   x=~
 ---
 # bash and mksh mistakenly expand here!

@@ -3,7 +3,7 @@ name: hay reset
 dialect: bash
 source: oils:spec/hay#hay-reset
 status: 127
-stdout: |-
+stdout: |
   package 0
   reset 0
 ---

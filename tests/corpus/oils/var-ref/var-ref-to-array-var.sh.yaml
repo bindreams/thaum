@@ -1,7 +1,7 @@
 name: var ref TO array var
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-array-var
-stdout: |-
+stdout: |
   ale
   ale bean
 ---

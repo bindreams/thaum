@@ -2,7 +2,7 @@ name: '(( closed with ) ) after multiple lines is command - #2337'
 dialect: bash
 source: 
   oils:spec/paren-ambiguity#closed-with-after-multiple-lines-is-command---2337
-stdout: |-
+stdout: |
   1
   2
   3

@@ -2,7 +2,7 @@ disabled: true
 name: setvar obj.attr = and += and ...
 dialect: bash
 source: oils:spec/ysh-object#setvar-objattr-and-and
-stdout: |-
+stdout: |
   (Obj)   ("x":3,"y":4)
   (Obj)   ("x":3,"y":99)
   (Obj)   ("x":3,"y":102)

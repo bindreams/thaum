@@ -1,7 +1,7 @@
 name: no_dash_glob
 dialect: bash
 source: oils:spec/extglob-files#nodashglob
-stdout: |-
+stdout: |
   -dash bar foo
   bar foo
 ---

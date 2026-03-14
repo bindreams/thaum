@@ -1,7 +1,7 @@
 name: \# for command number
 dialect: bash
 source: oils:spec/prompt#for-command-number
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \# bar'

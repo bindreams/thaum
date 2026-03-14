@@ -1,7 +1,7 @@
 name: readonly +
 dialect: bash
 source: oils:spec/explore-parsing#readonly
-stdout: |-
+stdout: |
   status=0
 ---
 

@@ -2,7 +2,7 @@ disabled: true
 name: splice with capital letters
 dialect: bash
 source: oils:spec/ysh-regex#splice-with-capital-letters
-stdout: |-
+stdout: |
   [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
   yes
   no

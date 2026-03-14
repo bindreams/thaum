@@ -1,7 +1,7 @@
 name: "[[ '(' ]] is treated as literal"
 dialect: bash
 source: oils:spec/dbracket#is-treated-as-literal
-stdout: |-
+stdout: |
   status=0
 ---
 [[ '(' ]]

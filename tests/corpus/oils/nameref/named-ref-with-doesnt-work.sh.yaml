@@ -1,7 +1,7 @@
 name: named ref with $# doesn't work
 dialect: bash
 source: oils:spec/nameref#named-ref-with-doesnt-work
-stdout: |-
+stdout: |
   ref=#
   ref=#
 ---

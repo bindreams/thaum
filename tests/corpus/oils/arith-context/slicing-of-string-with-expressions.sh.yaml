@@ -1,7 +1,7 @@
 name: Slicing of string with expressions
 dialect: bash
 source: oils:spec/arith-context#slicing-of-string-with-expressions
-stdout: |-
+stdout: |
   abcd abcd b
 ---
 # mksh accepts ${s:0} and ${s:$zero} but not ${s:zero}

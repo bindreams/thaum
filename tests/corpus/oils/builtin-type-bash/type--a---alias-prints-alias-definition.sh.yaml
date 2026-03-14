@@ -1,7 +1,7 @@
 name: type -a -> alias; prints alias definition
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---alias-prints-alias-definition
-stdout: |-
+stdout: |
   ll is an alias for "ls -lha"
 ---
 shopt -s expand_aliases

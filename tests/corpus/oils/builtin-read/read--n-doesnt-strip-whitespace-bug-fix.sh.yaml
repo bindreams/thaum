@@ -1,7 +1,7 @@
 name: read -n doesn't strip whitespace (bug fix)
 dialect: bash
 source: oils:spec/builtin-read#read--n-doesnt-strip-whitespace-bug-fix
-stdout: |-
+stdout: |
   [  a ]
   [  a b]
   [  a b ]

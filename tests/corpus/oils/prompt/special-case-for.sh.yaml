@@ -1,7 +1,7 @@
 name: special case for $
 dialect: bash
 source: oils:spec/prompt#special-case-for
-stdout: |-
+stdout: |
   $
   $
   $

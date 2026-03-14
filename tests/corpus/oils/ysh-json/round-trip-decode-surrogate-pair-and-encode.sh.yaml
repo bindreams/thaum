@@ -2,7 +2,7 @@ disabled: true
 name: 'round trip: decode surrogate pair and encode'
 dialect: bash
 source: oils:spec/ysh-json#round-trip-decode-surrogate-pair-and-encode
-stdout: |-
+stdout: |
   "🤦"
   "🤦"
   "\u0001\u0002"

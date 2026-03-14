@@ -1,7 +1,7 @@
 name: mutate array by reference
 dialect: bash
 source: oils:spec/nameref#mutate-array-by-reference
-stdout: |-
+stdout: |
   a ZZZ c d
 ---
 set1() {

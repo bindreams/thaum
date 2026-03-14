@@ -2,7 +2,7 @@ disabled: true
 name: Shift operators
 dialect: bash
 source: oils:spec/ysh-expr-arith#shift-operators
-stdout: |-
+stdout: |
   16
   1
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: compexport with multi-line commands
 dialect: bash
 source: oils:spec/ysh-completion#compexport-with-multi-line-commands
-stdout: |-
+stdout: |
   "complete "
 ---
 

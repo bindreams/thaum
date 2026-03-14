@@ -3,7 +3,7 @@ name: compgen -A function shows user-defined invokables - shell funcs, Proc, Obj
 dialect: bash
 source: 
   oils:spec/ysh-proc#compgen--a-function-shows-user-defined-invokables---shell-funcs-proc-obj
-stdout: |-
+stdout: |
   my-shell-func
   myproc
   ---

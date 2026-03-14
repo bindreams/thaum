@@ -1,7 +1,7 @@
 name: ${x//~/~root}
 dialect: bash
 source: oils:spec/tilde#xroot
-stdout: |-
+stdout: |
   /root
   /root
   [/root]

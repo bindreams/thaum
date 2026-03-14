@@ -1,7 +1,7 @@
 name: Wait on background process PID
 dialect: bash
 source: oils:spec/background#wait-on-background-process-pid
-stdout: |-
+stdout: |
   status=7
   status=9
 ---

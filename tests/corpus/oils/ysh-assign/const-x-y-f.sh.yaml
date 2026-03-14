@@ -3,7 +3,7 @@ name: const x, y = f()
 dialect: bash
 source: oils:spec/ysh-assign#const-x-y-f
 status: 1
-stdout: |-
+stdout: |
   a=3 b=4
 ---
 

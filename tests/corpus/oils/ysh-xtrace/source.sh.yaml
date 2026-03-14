@@ -5,7 +5,7 @@ source: oils:spec/ysh-xtrace#source
 stdout: |
   $1 = a
   $1 = x
-stderr: |-
+stderr: |
   > source lib.sh a b c
     . builtin echo '$1 = a'
   < source lib.sh

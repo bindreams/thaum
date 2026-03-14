@@ -2,7 +2,7 @@ name: Exit code when command sub evaluates to empty str, e.g. `false` (#2416)
 dialect: bash
 source: 
   oils:spec/exit-status#exit-code-when-command-sub-evaluates-to-empty-str-eg-false-2416
-stdout: |-
+stdout: |
   0
   1
   0

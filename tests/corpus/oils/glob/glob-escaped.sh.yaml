@@ -1,7 +1,7 @@
 name: glob escaped
 dialect: bash
 source: oils:spec/glob#glob-escaped
-stdout: |-
+stdout: |
   _tmp/[abc] _tmp/?
 ---
 # - mksh doesn't support [[:punct:]] ?

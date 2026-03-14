@@ -2,7 +2,7 @@ disabled: true
 name: dynamic binding names and mutation
 dialect: bash
 source: oils:spec/ysh-builtin-eval#dynamic-binding-names-and-mutation
-stdout: |-
+stdout: |
   (Dict)   {"a":1,"z":"z"}
   (Dict)   {"b":2,"z":"z"}
   (Dict)   {"c":3,"z":"z"}

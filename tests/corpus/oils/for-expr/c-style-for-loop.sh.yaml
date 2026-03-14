@@ -2,7 +2,7 @@ name: C-style for loop
 dialect: bash
 source: oils:spec/for-expr#c-style-for-loop
 status: 0
-stdout: |-
+stdout: |
   1
   2
   4

@@ -3,7 +3,7 @@ name: '@[expr_splice] in expression mode'
 dialect: bash
 source: oils:spec/ysh-expr-sub#exprsplice-in-expression-mode
 status: 3
-stdout: |-
+stdout: |
   (List)   ["1","2","3","99"]
   (List)   ["4","5","6"]
 ---

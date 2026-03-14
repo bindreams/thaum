@@ -2,7 +2,7 @@ disabled: true
 name: setglobal a[i] += and d.key +=
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai-and-dkey
-stdout: |-
+stdout: |
   (List)   [5]
   (Dict)   {"k":5}
 ---

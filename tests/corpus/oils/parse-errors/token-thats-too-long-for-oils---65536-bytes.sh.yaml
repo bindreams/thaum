@@ -1,7 +1,7 @@
 name: Token that's too long for Oils - 65536 bytes
 dialect: bash
 source: oils:spec/parse-errors#token-thats-too-long-for-oils---65536-bytes
-stdout: |-
+stdout: |
   status=0
   65536 out
 ---

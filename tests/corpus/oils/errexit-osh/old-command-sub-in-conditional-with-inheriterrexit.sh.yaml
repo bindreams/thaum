@@ -1,7 +1,7 @@
 name: 'OLD: command sub in conditional, with inherit_errexit'
 dialect: bash
 source: oils:spec/errexit-osh#old-command-sub-in-conditional-with-inheriterrexit
-stdout: |-
+stdout: |
   1 2
   A
   done

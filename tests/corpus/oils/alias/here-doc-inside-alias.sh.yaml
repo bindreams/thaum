@@ -1,7 +1,7 @@
 name: here doc inside alias
 dialect: bash
 source: oils:spec/alias#here-doc-inside-alias
-stdout: |-
+stdout: |
   hi
 ---
 shopt -s expand_aliases

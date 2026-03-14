@@ -1,7 +1,7 @@
 name: Performance demo
 dialect: bash
 source: oils:spec/array-sparse#performance-demo
-stdout: |-
+stdout: |
   BashArray
   len: 6
   subst: foo 25 26 27 bar sparse

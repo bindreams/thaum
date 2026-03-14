@@ -1,7 +1,7 @@
 name: Unset wrong type
 dialect: bash
 source: oils:spec/builtin-vars#unset-wrong-type
-stdout: |-
+stdout: |
   undef 1
   undef 1
   array 0

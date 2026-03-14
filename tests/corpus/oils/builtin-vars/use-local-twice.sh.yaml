@@ -1,7 +1,7 @@
 name: Use local twice
 dialect: bash
 source: oils:spec/builtin-vars#use-local-twice
-stdout: |-
+stdout: |
   bar
 ---
 f() {

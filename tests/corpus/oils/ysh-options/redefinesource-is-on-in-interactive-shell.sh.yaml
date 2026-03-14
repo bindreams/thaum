@@ -2,7 +2,7 @@ disabled: true
 name: redefine_source is on in interactive shell
 dialect: bash
 source: oils:spec/ysh-options#redefinesource-is-on-in-interactive-shell
-stdout: |-
+stdout: |
   common
   common
   status=0

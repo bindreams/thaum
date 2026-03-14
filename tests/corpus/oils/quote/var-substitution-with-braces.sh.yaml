@@ -1,7 +1,7 @@
 name: Var substitution with braces
 dialect: bash
 source: oils:spec/quote#var-substitution-with-braces
-stdout: |-
+stdout: |
   foobar
 ---
 FOO=bar

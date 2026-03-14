@@ -1,7 +1,7 @@
 name: var ref to $@ with @
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-with
-stdout: |-
+stdout: |
   ref=one two
 ---
 set -- one two

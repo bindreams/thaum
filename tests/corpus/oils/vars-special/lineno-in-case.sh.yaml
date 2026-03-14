@@ -1,7 +1,7 @@
 name: $LINENO in case
 dialect: bash
 source: oils:spec/vars-special#lineno-in-case
-stdout: |-
+stdout: |
   got line 1
 ---
 case $LINENO in

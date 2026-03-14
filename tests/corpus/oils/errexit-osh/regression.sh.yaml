@@ -2,7 +2,7 @@ disabled: true
 name: Regression
 dialect: bash
 source: oils:spec/errexit-osh#regression
-stdout: |-
+stdout: |
   hi
   p
 ---

@@ -1,7 +1,7 @@
 name: lookup with single quoted string
 dialect: bash
 source: oils:spec/array-assoc#lookup-with-single-quoted-string
-stdout: |-
+stdout: |
   c
 ---
 declare -A a

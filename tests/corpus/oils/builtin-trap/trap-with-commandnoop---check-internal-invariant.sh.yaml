@@ -1,7 +1,7 @@
 name: trap with command.NoOp - check internal invariant
 dialect: bash
 source: oils:spec/builtin-trap#trap-with-commandnoop---check-internal-invariant
-stdout: |-
+stdout: |
   0 zz
 ---
 

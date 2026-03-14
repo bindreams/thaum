@@ -2,7 +2,7 @@ name: type of relative path
 dialect: bash
 source: oils:spec/builtin-type#type-of-relative-path
 status: 1
-stdout: |-
+stdout: |
   _tmp/ex is _tmp/ex
 ---
 

@@ -3,7 +3,7 @@ name: don't execute empty command
 dialect: bash
 source: oils:spec/ysh-bugs#dont-execute-empty-command
 status: 127
-stdout: |-
+stdout: |
   type -a returned 1
 ---
 

@@ -2,7 +2,7 @@ disabled: true
 name: Julia port
 dialect: bash
 source: oils:spec/ysh-user-feedback#julia-port
-stdout: |-
+stdout: |
   git
   branch
   -D

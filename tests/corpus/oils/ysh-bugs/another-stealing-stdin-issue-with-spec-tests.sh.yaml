@@ -2,7 +2,7 @@ disabled: true
 name: Another "stealing stdin" issue with spec tests
 dialect: bash
 source: oils:spec/ysh-bugs#another-stealing-stdin-issue-with-spec-tests
-stdout: |-
+stdout: |
   (Str)   "1"
   (Str)   "2"
   (Str)   "3"

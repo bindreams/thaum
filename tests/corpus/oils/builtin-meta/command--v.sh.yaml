@@ -1,7 +1,7 @@
 name: command -v
 dialect: bash
 source: oils:spec/builtin-meta#command--v
-stdout: |-
+stdout: |
   echo
   0
   myfunc

@@ -1,7 +1,7 @@
 name: history -c clears in-memory history
 dialect: bash
 source: oils:spec/builtin-history#history--c-clears-in-memory-history
-stdout: |-
+stdout: |
   1
   ^D
 ---

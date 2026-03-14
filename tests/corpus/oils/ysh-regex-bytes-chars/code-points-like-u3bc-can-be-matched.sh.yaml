@@ -2,7 +2,7 @@ disabled: true
 name: Code points like \u{3bc} can be matched
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#code-points-like-u3bc-can-be-matched
-stdout: |-
+stdout: |
   (Bool)   false
   (Bool)   true
 

@@ -1,7 +1,7 @@
 name: (( status bug
 dialect: bash
 source: oils:spec/bugs#status-bug
-stdout: |-
+stdout: |
   status=0
   yes
 ---

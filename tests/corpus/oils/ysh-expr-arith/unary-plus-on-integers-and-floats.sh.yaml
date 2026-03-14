@@ -2,7 +2,7 @@ disabled: true
 name: Unary plus on integers and floats
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-plus-on-integers-and-floats
-stdout: |-
+stdout: |
   1
   42
   2.5

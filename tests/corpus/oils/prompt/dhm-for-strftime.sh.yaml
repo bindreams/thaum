@@ -1,7 +1,7 @@
 name: \D{%H:%M} for strftime
 dialect: bash
 source: oils:spec/prompt#dhm-for-strftime
-stdout: |-
+stdout: |
   matched=0
   matched=0
 ---

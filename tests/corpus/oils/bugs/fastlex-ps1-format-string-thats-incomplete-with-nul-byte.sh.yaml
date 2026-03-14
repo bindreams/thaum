@@ -1,7 +1,7 @@
 name: "fastlex: PS1 format string that's incomplete / with NUL byte"
 dialect: bash
 source: oils:spec/bugs#fastlex-ps1-format-string-thats-incomplete-with-nul-byte
-stdout: |-
+stdout: |
   x=\D{%H:%M
 ---
 case $SH in bash) exit ;; esac

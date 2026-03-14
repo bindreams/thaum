@@ -2,7 +2,7 @@ disabled: true
 name: Str => trim*(), unicode decoding errors
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-unicode-decoding-errors
-stdout: |-
+stdout: |
   trim
   status=0
   status=3

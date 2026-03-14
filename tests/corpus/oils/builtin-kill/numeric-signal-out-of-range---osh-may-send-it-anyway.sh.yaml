@@ -2,7 +2,7 @@ name: Numeric signal out of range - OSH may send it anyway
 dialect: bash
 source: 
   oils:spec/builtin-kill#numeric-signal-out-of-range---osh-may-send-it-anyway
-stdout: |-
+stdout: |
   kill=1
   wait=0
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: Nested temp bindings
 dialect: bash
 source: oils:spec/ysh-env#nested-temp-bindings
-stdout: |-
+stdout: |
   > f1 AA=a
     f2 AA=aaaa BB=bb
   AA=aaaa

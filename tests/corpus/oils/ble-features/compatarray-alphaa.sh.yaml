@@ -1,7 +1,7 @@
 name: '[compat_array] ${alpha@a}'
 dialect: bash
 source: oils:spec/ble-features#compatarray-alphaa
-stdout: |-
+stdout: |
   type=A
   type=A
 ---

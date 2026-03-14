@@ -1,7 +1,7 @@
 name: adjacent extglob
 dialect: bash
 source: oils:spec/extglob-match#adjacent-extglob
-stdout: |-
+stdout: |
   TRUE
   TRUE
 ---

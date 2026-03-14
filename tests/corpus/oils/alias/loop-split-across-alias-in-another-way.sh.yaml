@@ -2,7 +2,7 @@ disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by
 name: Loop split across alias in another way
 dialect: bash
 source: oils:spec/alias#loop-split-across-alias-in-another-way
-stdout: |-
+stdout: |
   1
   2
   3

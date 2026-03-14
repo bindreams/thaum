@@ -3,7 +3,7 @@ name: io->eval(to_dict=true) with dollar0, pos_args, vars - dict ordering bug
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-evaltodicttrue-with-dollar0-posargs-vars---dict-ordering-bug
-stdout: |-
+stdout: |
   {
     "foo": "global",
     "z": "zero",

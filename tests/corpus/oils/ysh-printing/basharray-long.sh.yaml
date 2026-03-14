@@ -2,7 +2,7 @@ disabled: true
 name: BashArray, long
 dialect: bash
 source: oils:spec/ysh-printing#basharray-long
-stdout: |-
+stdout: |
   (BashArray [0]='world' [2]='*.py')
   (BashArray
       [0]='Lorem'

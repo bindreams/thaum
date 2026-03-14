@@ -1,7 +1,7 @@
 name: echo -e with octal escape
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-with-octal-escape
-stdout: |-
+stdout: |
   abcd$e
 ---
 flags='-e'

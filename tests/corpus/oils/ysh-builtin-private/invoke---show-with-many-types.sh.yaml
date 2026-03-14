@@ -2,7 +2,7 @@ disabled: true
 name: invoke --show with many types
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke---show-with-many-types
-stdout: |-
+stdout: |
   %.qtt8  name        kind        detail
           my-name     alias       b'echo my μ \yff alias'
           my-name     proc        -

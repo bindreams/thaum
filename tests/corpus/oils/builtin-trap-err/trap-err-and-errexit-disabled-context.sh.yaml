@@ -1,7 +1,7 @@
 name: trap ERR and errexit disabled context
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-errexit-disabled-context
-stdout: |-
+stdout: |
   line=3
   a
   b

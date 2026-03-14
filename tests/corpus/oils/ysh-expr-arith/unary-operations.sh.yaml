@@ -2,7 +2,7 @@ disabled: true
 name: Unary Operations
 dialect: bash
 source: oils:spec/ysh-expr-arith#unary-operations
-stdout: |-
+stdout: |
   -2
   -1
   -2.3

@@ -2,7 +2,7 @@ name: 'Issue #1069 [59] - Assigning Str to BashArray/BashAssoc should not remove
 dialect: bash
 source: 
   oils:spec/ble-idioms#issue-1069-59---assigning-str-to-basharraybashassoc-should-not-remove-basharraybashassoc
-stdout: |-
+stdout: |
   declare -a a=([0]="99" [1]="2" [2]="3")
   declare -A A=([0]="99" [k]="v" )
 ---

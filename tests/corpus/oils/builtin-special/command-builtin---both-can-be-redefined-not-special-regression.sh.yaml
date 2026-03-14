@@ -2,7 +2,7 @@ name: command, builtin - both can be redefined, not special (regression)
 dialect: bash
 source: 
   oils:spec/builtin-special#command-builtin---both-can-be-redefined-not-special-regression
-stdout: |-
+stdout: |
   b
   c
   builtin-redef echo b

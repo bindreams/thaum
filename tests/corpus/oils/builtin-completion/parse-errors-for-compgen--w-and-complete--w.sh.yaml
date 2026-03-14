@@ -1,7 +1,7 @@
 name: Parse errors for compgen -W and complete -W
 dialect: bash
 source: oils:spec/builtin-completion#parse-errors-for-compgen--w-and-complete--w
-stdout: |-
+stdout: |
   status=2
   status=2
 ---

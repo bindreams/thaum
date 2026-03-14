@@ -1,7 +1,7 @@
 name: ${x//~homedir/}
 dialect: bash
 source: oils:spec/var-op-patsub#xhomedir
-stdout: |-
+stdout: |
   z/git/oilshell
   z/git/oilshell
 ---

@@ -3,7 +3,7 @@ name: Dict => values()
 dialect: bash
 source: oils:spec/ysh-methods#dict-values
 status: 0
-stdout: |-
+stdout: |
   (List)   ["bonjour","ami","chat"]
 ---
 var en2fr = {}

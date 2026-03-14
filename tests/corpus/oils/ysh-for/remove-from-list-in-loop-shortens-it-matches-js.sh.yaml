@@ -2,7 +2,7 @@ disabled: true
 name: Remove from List in loop shortens it (matches JS)
 dialect: bash
 source: oils:spec/ysh-for#remove-from-list-in-loop-shortens-it-matches-js
-stdout: |-
+stdout: |
   1
   2
   3

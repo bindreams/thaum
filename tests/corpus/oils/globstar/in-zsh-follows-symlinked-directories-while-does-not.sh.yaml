@@ -1,7 +1,7 @@
 name: in zsh, ***/ follows symlinked directories, while **/ does not
 dialect: bash
 source: oils:spec/globstar#in-zsh-follows-symlinked-directories-while-does-not
-stdout: |-
+stdout: |
   directory-2/leaf-2.md
   directory-1/symlink/leaf-2.md directory-2/leaf-2.md
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: Named args with ...rest
 dialect: bash
 source: oils:spec/ysh-func#named-args-with-rest
-stdout: |-
+stdout: |
   x=3
   (Dict)   {}
   x=4

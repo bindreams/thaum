@@ -2,7 +2,7 @@ disabled: true
 name: search() and leftMatch() accept ERE string
 dialect: bash
 source: oils:spec/ysh-regex-api#search-and-leftmatch-accept-ere-string
-stdout: |-
+stdout: |
   g0 2 6 hi5-
   g1 2 4 hi
   g2 4 5 5

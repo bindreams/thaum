@@ -2,7 +2,7 @@ name: local and inherit_errexit / command_sub_errexit
 dialect: bash
 source: oils:spec/errexit-osh#local-and-inheriterrexit-commandsuberrexit
 status: 1
-stdout: |-
+stdout: |
   good
 ---
 # I've run into this problem a lot.

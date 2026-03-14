@@ -2,7 +2,7 @@ disabled: true
 name: Scope of Variables Inside Hay Blocks
 dialect: bash
 source: oils:spec/hay#scope-of-variables-inside-hay-blocks
-stdout: |-
+stdout: |
   location = https://example.com/downloads/foo.tar.gz
   backup = https://archive.example.com/downloads/foo.tar.gz
   deps location https://example.com/downloads/spam.tar.gz

@@ -2,7 +2,7 @@ name: '"readonly -a arr" and "readonly -A dict" should not not remove existing a
 dialect: bash
 source: 
   oils:spec/assign#readonly--a-arr-and-readonly--a-dict-should-not-not-remove-existing-arrays
-stdout: |-
+stdout: |
   arr:3
   dict:3
 ---

@@ -3,7 +3,7 @@ name: Module with runtime error
 dialect: bash
 source: oils:spec/ysh-builtin-module#module-with-runtime-error
 status: 1
-stdout: |-
+stdout: |
   runtime-error before
 ---
 

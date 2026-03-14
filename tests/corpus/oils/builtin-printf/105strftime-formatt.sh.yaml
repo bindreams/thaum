@@ -1,7 +1,7 @@
 name: '%10.5(strftime format)T'
 dialect: bash
 source: oils:spec/builtin-printf#105strftime-formatt
-stdout: |-
+stdout: |
   [     2019-]
   [     2019-]
   status=0

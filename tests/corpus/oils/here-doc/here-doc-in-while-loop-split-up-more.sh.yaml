@@ -1,7 +1,7 @@
 name: Here doc in while loop split up more
 dialect: bash
 source: oils:spec/here-doc#here-doc-in-while-loop-split-up-more
-stdout: |-
+stdout: |
   1
   2
   3

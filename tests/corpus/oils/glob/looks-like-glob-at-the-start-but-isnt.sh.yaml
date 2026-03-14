@@ -1,7 +1,7 @@
 name: looks like glob at the start, but isn't
 dialect: bash
 source: oils:spec/glob#looks-like-glob-at-the-start-but-isnt
-stdout: |-
+stdout: |
   [bin
 ---
 echo [bin

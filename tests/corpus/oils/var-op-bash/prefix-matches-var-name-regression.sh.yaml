@@ -1,7 +1,7 @@
 name: ${!prefix@} matches var name (regression)
 dialect: bash
 source: oils:spec/var-op-bash#prefix-matches-var-name-regression
-stdout: |-
+stdout: |
   hello1 hello2 hello3
   hello hello1 hello2 hello3
 ---

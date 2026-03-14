@@ -1,7 +1,7 @@
 name: \command readonly - similar issue
 dialect: bash
 source: oils:spec/builtin-meta-assign#command-readonly---similar-issue
-stdout: |-
+stdout: |
   a b
   a b
   a b

@@ -2,7 +2,7 @@ name: Open multiple descriptors with exec
 dialect: bash
 source: oils:spec/redirect#open-multiple-descriptors-with-exec
 status: 0
-stdout: |-
+stdout: |
   three
   four
 ---

@@ -1,7 +1,7 @@
 name: "'umask' without args prints the umask"
 dialect: bash
 source: oils:spec/builtin-umask#umask-without-args-prints-the-umask
-stdout: |-
+stdout: |
   022
   status=0
 ---

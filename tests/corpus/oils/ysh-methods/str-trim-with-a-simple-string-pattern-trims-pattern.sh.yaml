@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-trim-with-a-simple-string-pattern-trims-pattern
 status: 0
-stdout: |-
+stdout: |
   "", "", ""
   "   ", "   ", "   "
   "xy", "xy", "xy"

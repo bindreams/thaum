@@ -2,7 +2,7 @@ name: umask permcopy running value
 dialect: bash
 source: oils:spec/builtin-umask#umask-permcopy-running-value
 status: 0
-stdout: |-
+stdout: |
   111
   777
 ---

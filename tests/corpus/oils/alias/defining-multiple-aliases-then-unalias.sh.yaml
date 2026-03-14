@@ -1,7 +1,7 @@
 name: defining multiple aliases, then unalias
 dialect: bash
 source: oils:spec/alias#defining-multiple-aliases-then-unalias
-stdout: |-
+stdout: |
   status=0
   x X
   y Y

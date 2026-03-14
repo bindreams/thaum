@@ -2,7 +2,7 @@ disabled: true
 name: Object() creates prototype chain
 dialect: bash
 source: oils:spec/ysh-object#object-creates-prototype-chain
-stdout: |-
+stdout: |
   (List)   [3,4]
   area1 = 12
   (List)   [10,20]

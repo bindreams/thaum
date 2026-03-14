@@ -1,7 +1,7 @@
 name: typeset -f prints function source code
 dialect: bash
 source: oils:spec/print-source-code#typeset--f-prints-function-source-code
-stdout: |-
+stdout: |
   serialized
 ---
 : prefix; myfunc() { echo serialized; }

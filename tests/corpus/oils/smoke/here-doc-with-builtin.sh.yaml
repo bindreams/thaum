@@ -1,7 +1,7 @@
 name: here doc with builtin
 dialect: bash
 source: oils:spec/smoke#here-doc-with-builtin
-stdout: |-
+stdout: |
   var = value
 ---
 read var <<EOF

@@ -2,7 +2,7 @@ name: Array coerces to string (shopt -s strict_array to disallow)
 dialect: bash
 source: 
   oils:spec/dbracket#array-coerces-to-string-shopt--s-strictarray-to-disallow
-stdout: |-
+stdout: |
   true
   false
 ---

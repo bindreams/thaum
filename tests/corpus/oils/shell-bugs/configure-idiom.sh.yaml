@@ -1,7 +1,7 @@
 name: ./configure idiom
 dialect: bash
 source: oils:spec/shell-bugs#configure-idiom
-stdout: |-
+stdout: |
   supports -f
   env
 ---

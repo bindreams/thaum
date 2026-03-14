@@ -1,7 +1,7 @@
 name: printf %b with truncated octal escapes
 dialect: bash
 source: oils:spec/builtin-printf#printf-b-with-truncated-octal-escapes
-stdout: |-
+stdout: |
   -8
   -8
 

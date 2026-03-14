@@ -1,7 +1,7 @@
 name: set - - and so forth
 dialect: bash
 source: oils:spec/builtin-set#set-----and-so-forth
-stdout: |-
+stdout: |
   a b
   a b
   a b

@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/builtin-getopts#getopts-normal-mode---missing-required-argument-compare-with-silent
 status: 0
-stdout: |-
+stdout: |
   status=0 opt=? OPTARG=
 ---
 # Normal mode returns '?', OPTARG is empty

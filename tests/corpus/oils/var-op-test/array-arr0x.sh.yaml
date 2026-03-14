@@ -1,7 +1,7 @@
 name: array ${arr[0]=x}
 dialect: bash
 source: oils:spec/var-op-test#array-arr0x
-stdout: |-
+stdout: |
   0
   1
 ---

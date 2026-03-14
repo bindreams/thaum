@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex-matches-runes
 status: 0
-stdout: |-
+stdout: |
   true true
   true true
   false false

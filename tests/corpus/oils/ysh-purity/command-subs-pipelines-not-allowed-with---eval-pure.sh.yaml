@@ -3,7 +3,7 @@ name: Command subs, pipelines not allowed with --eval-pure
 dialect: bash
 source: oils:spec/ysh-purity#command-subs-pipelines-not-allowed-with---eval-pure
 status: 0
-stdout: |-
+stdout: |
   command sub
   command-sub.sh=5
   command-sub.ysh=5

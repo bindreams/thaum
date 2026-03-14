@@ -1,7 +1,7 @@
 name: 1 char glob
 dialect: bash
 source: oils:spec/glob#1-char-glob
-stdout: |-
+stdout: |
   bin
 ---
 cd $REPO_ROOT

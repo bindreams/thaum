@@ -1,7 +1,7 @@
 name: Dynamic var names - result of runtime parse/eval
 dialect: bash
 source: oils:spec/arith#dynamic-var-names---result-of-runtime-parseeval
-stdout: |-
+stdout: |
   11
 ---
 foo=5

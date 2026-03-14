@@ -1,7 +1,7 @@
 name: 'OLD: command sub in redirect in conditional'
 dialect: bash
 source: oils:spec/errexit-osh#old-command-sub-in-redirect-in-conditional
-stdout: |-
+stdout: |
   2
   tmp_contents
 ---

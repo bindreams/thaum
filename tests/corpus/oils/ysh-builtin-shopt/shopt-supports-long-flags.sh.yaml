@@ -2,7 +2,7 @@ disabled: true
 name: shopt supports long flags
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt-supports-long-flags
-stdout: |-
+stdout: |
   shopt -u nullglob
   shopt -s nullglob
   shopt -u nullglob

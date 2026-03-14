@@ -1,7 +1,7 @@
 name: test length
 dialect: bash
 source: oils:spec/array-sparse#test-length
-stdout: |-
+stdout: |
   len=4
   len=5
 ---

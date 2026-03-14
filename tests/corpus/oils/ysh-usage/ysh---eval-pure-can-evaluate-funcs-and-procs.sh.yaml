@@ -2,7 +2,7 @@ disabled: true
 name: ysh --eval-pure can evaluate funcs and procs
 dialect: bash
 source: oils:spec/ysh-usage#ysh---eval-pure-can-evaluate-funcs-and-procs
-stdout: |-
+stdout: |
   my-proc
   myFunc
 ---

@@ -1,7 +1,7 @@
 name: Replace fixed strings
 dialect: bash
 source: oils:spec/var-op-patsub#replace-fixed-strings
-stdout: |-
+stdout: |
   yy_xx yy_yy yy_xx xx_yy
 ---
 s=xx_xx

@@ -1,7 +1,7 @@
 name: Expansion of alias with variable
 dialect: bash
 source: oils:spec/alias#expansion-of-alias-with-variable
-stdout: |-
+stdout: |
   y hi
 ---
 shopt -s expand_aliases  # bash requires this

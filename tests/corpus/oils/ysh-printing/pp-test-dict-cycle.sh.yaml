@@ -2,7 +2,7 @@ disabled: true
 name: 'pp test_: Dict cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-dict-cycle
-stdout: |-
+stdout: |
   (Dict)   {"z":99}
   (List)   [{"z":99},{"z":99}]
 

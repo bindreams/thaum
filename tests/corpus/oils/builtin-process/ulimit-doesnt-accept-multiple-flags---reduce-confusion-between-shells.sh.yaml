@@ -2,7 +2,7 @@ name: ulimit doesn't accept multiple flags - reduce confusion between shells
 dialect: bash
 source: 
   oils:spec/builtin-process#ulimit-doesnt-accept-multiple-flags---reduce-confusion-between-shells
-stdout: |-
+stdout: |
   status=2
   status=2
   status=2

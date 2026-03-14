@@ -1,7 +1,7 @@
 name: PS1 evaluation order
 dialect: bash
 source: oils:spec/prompt#ps1-evaluation-order
-stdout: |-
+stdout: |
   \h
 ---
 x='\'

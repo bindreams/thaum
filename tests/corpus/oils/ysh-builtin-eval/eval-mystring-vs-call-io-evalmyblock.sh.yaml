@@ -2,7 +2,7 @@ disabled: true
 name: eval 'mystring' vs. call io->eval(myblock)
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-mystring-vs-call-io-evalmyblock
-stdout: |-
+stdout: |
   plain
   plain=0
   plain

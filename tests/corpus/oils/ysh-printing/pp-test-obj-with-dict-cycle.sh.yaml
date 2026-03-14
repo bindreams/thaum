@@ -2,7 +2,7 @@ disabled: true
 name: 'pp test_: Obj with dict cycle'
 dialect: bash
 source: oils:spec/ysh-printing#pp-test-obj-with-dict-cycle
-stdout: |-
+stdout: |
   (Obj)   ("z":99) --> ("__foo__":null)
   (List)   [("z":99) --> ("__foo__":null),("z":99) --> ("__foo__":null)]
 

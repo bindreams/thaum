@@ -2,7 +2,7 @@ disabled: true
 name: setglobal a[i] inside proc
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-ai-inside-proc
-stdout: |-
+stdout: |
   BEFORE mutate global
   (List)   [0]
   local that is ignored

@@ -2,7 +2,7 @@ name: 'trap -p is like trap: it prints the handlers and full signal names'
 dialect: bash
 source: 
   oils:spec/builtin-trap#trap--p-is-like-trap-it-prints-the-handlers-and-full-signal-names
-stdout: |-
+stdout: |
   trap -- 'echo EXIT' EXIT
   trap -- 'echo INT' SIGINT
   EXIT

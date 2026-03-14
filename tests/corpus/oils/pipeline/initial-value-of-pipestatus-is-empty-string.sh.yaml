@@ -1,7 +1,7 @@
 name: Initial value of PIPESTATUS is empty string
 dialect: bash
 source: oils:spec/pipeline#initial-value-of-pipestatus-is-empty-string
-stdout: |-
+stdout: |
   pipestatus
 ---
 case $SH in dash|zsh) exit ;; esac

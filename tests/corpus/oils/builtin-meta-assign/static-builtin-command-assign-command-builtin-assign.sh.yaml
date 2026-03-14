@@ -2,7 +2,7 @@ name: static builtin command ASSIGN, command builtin ASSIGN
 dialect: bash
 source: 
   oils:spec/builtin-meta-assign#static-builtin-command-assign-command-builtin-assign
-stdout: |-
+stdout: |
   bc=export
   bc=readonly
   --

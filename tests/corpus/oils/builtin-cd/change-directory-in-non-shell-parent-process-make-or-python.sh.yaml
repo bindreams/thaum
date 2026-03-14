@@ -2,7 +2,7 @@ name: Change directory in non-shell parent process (make or Python)
 dialect: bash
 source: 
   oils:spec/builtin-cd#change-directory-in-non-shell-parent-process-make-or-python
-stdout: |-
+stdout: |
   /cpan/Encode/Byte
 ---
 

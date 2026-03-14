@@ -2,7 +2,7 @@ name: readonly var can't be assigned through nameref
 dialect: bash
 source: oils:spec/nameref#readonly-var-cant-be-assigned-through-nameref
 status: 1
-stdout: |-
+stdout: |
   ref=X
   ref=XX
 ---

@@ -1,7 +1,7 @@
 name: weird flag parsing -oo errexit noglob
 dialect: bash
 source: oils:spec/sh-usage#weird-flag-parsing--oo-errexit-noglob
-stdout: |-
+stdout: |
   e
   f
   e

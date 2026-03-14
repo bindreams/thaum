@@ -3,7 +3,7 @@ name: multiline strings, list, tuple syntax for list, etc.
 dialect: bash
 source: 
   oils:spec/ysh-expr-arith#multiline-strings-list-tuple-syntax-for-list-etc
-stdout: |-
+stdout: |
   dq=6
   sq=6
   mylist=3

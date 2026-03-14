@@ -2,7 +2,7 @@ disabled: true
 name: Unquoted \u{3bc} escape
 dialect: bash
 source: oils:spec/ysh-string#unquoted-u3bc-escape
-stdout: |-
+stdout: |
   mu μ
   mu μ
   mu μ

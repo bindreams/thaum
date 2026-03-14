@@ -1,7 +1,7 @@
 name: declare -pg
 dialect: bash
 source: oils:spec/assign-extended#declare--pg
-stdout: |-
+stdout: |
   declare -- test_var1=global
 ---
 test_var1=global

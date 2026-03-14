@@ -1,7 +1,7 @@
 name: Arith word part
 dialect: bash
 source: oils:spec/arith#arith-word-part
-stdout: |-
+stdout: |
   2bar2
 ---
 foo=1; echo $((foo+1))bar$(($foo+1))

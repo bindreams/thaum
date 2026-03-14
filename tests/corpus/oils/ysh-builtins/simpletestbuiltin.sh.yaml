@@ -2,7 +2,7 @@ disabled: true
 name: simple_test_builtin
 dialect: bash
 source: oils:spec/ysh-builtins#simpletestbuiltin
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

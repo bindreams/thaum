@@ -1,7 +1,7 @@
 name: read -n from directory
 dialect: bash
 source: oils:spec/builtin-read#read--n-from-directory
-stdout: |-
+stdout: |
   status=1
 ---
 

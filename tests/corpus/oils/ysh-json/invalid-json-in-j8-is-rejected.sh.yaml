@@ -2,7 +2,7 @@ disabled: true
 name: Invalid JSON in J8 is rejected
 dialect: bash
 source: oils:spec/ysh-json#invalid-json-in-j8-is-rejected
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

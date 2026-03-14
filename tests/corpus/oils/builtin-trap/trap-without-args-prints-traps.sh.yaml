@@ -1,7 +1,7 @@
 name: trap without args prints traps
 dialect: bash
 source: oils:spec/builtin-trap#trap-without-args-prints-traps
-stdout: |-
+stdout: |
   status=0
   trap -- 'echo exit' EXIT
   status=0

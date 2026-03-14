@@ -1,7 +1,7 @@
 name: history -a
 dialect: bash
 source: oils:spec/builtin-history#history--a
-stdout: |-
+stdout: |
   1
   HISTFILE=tmp
   echo 1

@@ -2,7 +2,7 @@ disabled: true
 name: 'proc eval string: return'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-string-return
-stdout: |-
+stdout: |
   one
   end func
 ---

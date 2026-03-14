@@ -2,7 +2,7 @@ disabled: true
 name: pp test_ supports BashArray, BashAssoc
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-test-supports-basharray-bashassoc
-stdout: |-
+stdout: |
   {"type":"BashArray","data":{"0":"a","1":"b","2":"c"}}
   {"type":"BashArray","data":{"0":"a","1":"b","2":"c","5":"z"}}
   {"type":"BashAssoc","data":{"k":"v","k2":"v2"}}

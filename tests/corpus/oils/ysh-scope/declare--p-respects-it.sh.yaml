@@ -2,7 +2,7 @@ disabled: true
 name: declare -p respects it
 dialect: bash
 source: oils:spec/ysh-scope#declare--p-respects-it
-stdout: |-
+stdout: |
   declare -- ___g=G
   declare -- ___x=X
   declare -- ___y=Y

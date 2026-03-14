@@ -2,7 +2,7 @@ disabled: true
 name: Capture is acceptable as a group
 dialect: bash
 source: oils:spec/ysh-regex#capture-is-acceptable-as-a-group
-stdout: |-
+stdout: |
   (^[[:space:]]|[[:digit:]][[:digit:]])
 ---
 shopt -s ysh:all

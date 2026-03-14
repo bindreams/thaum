@@ -2,7 +2,7 @@ disabled: true
 name: Command sub paren parsing bug (#1387)
 dialect: bash
 source: oils:spec/ysh-bugs#command-sub-paren-parsing-bug-1387
-stdout: |-
+stdout: |
   true
   3
   125

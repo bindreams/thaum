@@ -2,7 +2,7 @@ name: type -P builtin -> not a file but file found
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-builtin---not-a-file-but-file-found
 status: 1
-stdout: |-
+stdout: |
   _tmp/mv
   _tmp/tar
   _tmp/grep

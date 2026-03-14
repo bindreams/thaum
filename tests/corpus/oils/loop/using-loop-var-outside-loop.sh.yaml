@@ -2,7 +2,7 @@ name: using loop var outside loop
 dialect: bash
 source: oils:spec/loop#using-loop-var-outside-loop
 status: 0
-stdout: |-
+stdout: |
   a
   b
   c

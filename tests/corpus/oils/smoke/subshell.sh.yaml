@@ -2,7 +2,7 @@ name: subshell
 dialect: bash
 source: oils:spec/smoke#subshell
 status: 0
-stdout: |-
+stdout: |
   1
   2
 ---

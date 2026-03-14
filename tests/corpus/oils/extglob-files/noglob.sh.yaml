@@ -1,7 +1,7 @@
 name: noglob
 dialect: bash
 source: oils:spec/extglob-files#noglob
-stdout: |-
+stdout: |
   @(*)
   @(__nope__*|__nope__?|*|?|[:alpha:]||)
 ---

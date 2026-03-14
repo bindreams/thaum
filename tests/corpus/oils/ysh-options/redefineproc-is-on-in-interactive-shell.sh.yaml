@@ -5,7 +5,7 @@ source: oils:spec/ysh-options#redefineproc-is-on-in-interactive-shell
 stdout: |
   common
   redefinition
-stderr: |-
+stderr: |
   hi
 ---
 

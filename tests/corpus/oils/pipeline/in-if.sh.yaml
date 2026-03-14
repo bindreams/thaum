@@ -2,7 +2,7 @@ name: '! in if'
 dialect: bash
 source: oils:spec/pipeline#in-if
 status: 0
-stdout: |-
+stdout: |
   hi
   FALSE
 ---

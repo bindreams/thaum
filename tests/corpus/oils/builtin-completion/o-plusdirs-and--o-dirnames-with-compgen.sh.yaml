@@ -1,7 +1,7 @@
 name: -o plusdirs and -o dirnames with compgen
 dialect: bash
 source: oils:spec/builtin-completion#o-plusdirs-and--o-dirnames-with-compgen
-stdout: |-
+stdout: |
   b1
   b2
   benchmarks

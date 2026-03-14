@@ -1,7 +1,7 @@
 name: file matching
 dialect: bash
 source: oils:spec/nocasematch-match#file-matching
-stdout: |-
+stdout: |
   [A] [b]
 ---
 shopt -s nocasematch

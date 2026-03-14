@@ -2,7 +2,7 @@ disabled: true
 name: Alternation and sequence
 dialect: bash
 source: oils:spec/ysh-regex#alternation-and-sequence
-stdout: |-
+stdout: |
   [[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*
   [[:space:]][[:digit:]]+|[[:alpha:][:digit:]_]*
 ---

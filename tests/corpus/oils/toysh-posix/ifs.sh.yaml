@@ -1,7 +1,7 @@
 name: IFS
 dialect: bash
 source: oils:spec/toysh-posix#ifs
-stdout: |-
+stdout: |
   agd
   { ,y,z="${ ,y,z"}
 ---

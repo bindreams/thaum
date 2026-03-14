@@ -3,7 +3,7 @@ name: 'parse_equals: allows bare assignment in Caps blocks'
 dialect: bash
 source: 
   oils:spec/ysh-options-assign#parseequals-allows-bare-assignment-in-caps-blocks
-stdout: |-
+stdout: |
   x=
   y=foo
 ---

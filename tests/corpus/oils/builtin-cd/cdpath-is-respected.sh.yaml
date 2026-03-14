@@ -1,7 +1,7 @@
 name: CDPATH is respected
 dialect: bash
 source: oils:spec/builtin-cd#cdpath-is-respected
-stdout: |-
+stdout: |
   /tmp/spam/foo
   status=0
   /tmp/spam/foo

@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/errexit#set-errexit-while-its-ignored-in-a-subshell-moot-with-stricterrexit
 status: 1
-stdout: |-
+stdout: |
   1
   2
   3

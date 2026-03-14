@@ -2,7 +2,7 @@ disabled: true
 name: Empty array and assignment builtin (regression)
 dialect: bash
 source: oils:spec/ysh-old#empty-array-and-assignment-builtin-regression
-stdout: |-
+stdout: |
   z=1
 ---
 shopt --unset no_osh_builtins

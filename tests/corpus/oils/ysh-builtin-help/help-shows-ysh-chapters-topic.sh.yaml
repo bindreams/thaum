@@ -2,7 +2,7 @@ disabled: true
 name: help shows 'ysh-chapters' topic
 dialect: bash
 source: oils:spec/ysh-builtin-help#help-shows-ysh-chapters-topic
-stdout: |-
+stdout: |
   ~~~ ysh-chapters ~~~
   status=0
 ---

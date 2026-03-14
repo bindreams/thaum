@@ -3,7 +3,7 @@ name: "@() can't have any tokens after it"
 dialect: bash
 source: oils:spec/ysh-command-sub#cant-have-any-tokens-after-it
 status: 2
-stdout: |-
+stdout: |
   1
   2
 ---

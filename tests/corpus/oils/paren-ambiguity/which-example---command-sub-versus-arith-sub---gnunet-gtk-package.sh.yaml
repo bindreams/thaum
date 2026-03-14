@@ -2,7 +2,7 @@ name: $((which example - command sub versus arith sub - gnunet-gtk package
 dialect: bash
 source: 
   oils:spec/paren-ambiguity#which-example---command-sub-versus-arith-sub---gnunet-gtk-package
-stdout: |-
+stdout: |
   bye
 ---
 

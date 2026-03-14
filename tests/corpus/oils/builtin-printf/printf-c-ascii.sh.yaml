@@ -1,7 +1,7 @@
 name: printf %c ASCII
 dialect: bash
 source: oils:spec/builtin-printf#printf-c-ascii
-stdout: |-
+stdout: |
   a
   A
   AZ

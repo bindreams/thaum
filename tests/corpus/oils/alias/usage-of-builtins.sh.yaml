@@ -2,7 +2,7 @@ name: Usage of builtins
 dialect: bash
 source: oils:spec/alias#usage-of-builtins
 status: 127
-stdout: |-
+stdout: |
   status=0
   x
 ---

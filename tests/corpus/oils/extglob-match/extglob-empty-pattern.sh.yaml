@@ -1,7 +1,7 @@
 name: extglob empty pattern
 dialect: bash
 source: oils:spec/extglob-match#extglob-empty-pattern
-stdout: |-
+stdout: |
   TRUE
   TRUE
   FALSE

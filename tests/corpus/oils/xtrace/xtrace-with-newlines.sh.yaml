@@ -1,7 +1,7 @@
 name: xtrace with newlines
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-newlines
-stdout: |-
+stdout: |
   [
   ]
   ## STDERR: 

@@ -1,7 +1,7 @@
 name: \T for 12h time (HH:MM:SS)
 dialect: bash
 source: oils:spec/prompt#t-for-12h-time-hhmmss
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \T bar'

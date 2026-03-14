@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#reading-in-ps4
 stdout: |
   ok
-stderr: |-
+stderr: |
   [last=0] false
   [last=1] echo ok
 ---

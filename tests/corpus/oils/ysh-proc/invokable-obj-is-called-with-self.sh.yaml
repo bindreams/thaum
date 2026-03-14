@@ -2,7 +2,7 @@ disabled: true
 name: invokable Obj is called with self
 dialect: bash
 source: oils:spec/ysh-proc#invokable-obj-is-called-with-self
-stdout: |-
+stdout: |
   sum = 8
 ---
 shopt --set ysh:upgrade

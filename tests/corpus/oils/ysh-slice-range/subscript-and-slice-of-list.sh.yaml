@@ -2,7 +2,7 @@ disabled: true
 name: subscript and slice of List
 dialect: bash
 source: oils:spec/ysh-slice-range#subscript-and-slice-of-list
-stdout: |-
+stdout: |
   (Int)   2
   (List)   [2,3]
   implicit

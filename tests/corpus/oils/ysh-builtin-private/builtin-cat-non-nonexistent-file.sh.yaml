@@ -2,7 +2,7 @@ disabled: true
 name: builtin cat non nonexistent file
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-cat-non-nonexistent-file
-stdout: |-
+stdout: |
   FOO
   FOO
   status=1

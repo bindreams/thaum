@@ -1,7 +1,7 @@
 name: 'Unset and scope (bug #653)'
 dialect: bash
 source: oils:spec/builtin-vars#unset-and-scope-bug-653
-stdout: |-
+stdout: |
   level2=yy
   level2=xx
   level1=xx

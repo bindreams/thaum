@@ -1,7 +1,7 @@
 name: '[bash_unset] dynamic-unset for nested tempenvs'
 dialect: bash
 source: oils:spec/ble-unset#bashunset-dynamic-unset-for-nested-tempenvs
-stdout: |-
+stdout: |
   # value-unset, mksh-unset
   [global,tempenv1,tempenv2,tempenv3] v: tempenv3
   [global,tempenv1,tempenv2,tempenv3] v: (unset) (unlocal 1)

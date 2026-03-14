@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/builtin-trap#trap-1-is-equivalent-to-sighup-hup-is-equivalent-to-sighup
 status: 0
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

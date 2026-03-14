@@ -2,7 +2,7 @@ disabled: true
 name: Range
 dialect: bash
 source: oils:spec/ysh-printing#range
-stdout: |-
+stdout: |
   (Range 1 ..< 100)
   (Dict)  {k: (Range 1 ..< 100)}
 

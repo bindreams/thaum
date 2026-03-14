@@ -1,7 +1,7 @@
 name: \[\] are non-printing
 dialect: bash
 source: oils:spec/prompt#are-non-printing
-stdout: |-
+stdout: |
   foo$
 ---
 PS1='\[foo\]\$'

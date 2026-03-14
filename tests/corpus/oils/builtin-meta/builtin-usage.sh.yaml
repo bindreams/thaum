@@ -1,7 +1,7 @@
 name: builtin usage
 dialect: bash
 source: oils:spec/builtin-meta#builtin-usage
-stdout: |-
+stdout: |
   status=0
   status=0
   status=1

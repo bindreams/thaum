@@ -1,7 +1,7 @@
 name: Integer constant validation
 dialect: bash
 source: oils:spec/arith#integer-constant-validation
-stdout: |-
+stdout: |
   status=1
   status=1
   status=1

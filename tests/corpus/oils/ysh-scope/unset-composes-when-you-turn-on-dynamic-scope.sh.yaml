@@ -2,7 +2,7 @@ disabled: true
 name: unset composes when you turn on dynamic scope
 dialect: bash
 source: oils:spec/ysh-scope#unset-composes-when-you-turn-on-dynamic-scope
-stdout: |-
+stdout: |
   x=X y=Y
   x= y=
 ---

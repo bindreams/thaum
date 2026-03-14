@@ -1,7 +1,7 @@
 name: "mapfile (delimiter): -d '' (null-separated)"
 dialect: bash
 source: oils:spec/builtin-bash#mapfile-delimiter--d-null-separated
-stdout: |-
+stdout: |
   n=3
   [1]
   [3]

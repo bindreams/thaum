@@ -2,7 +2,7 @@ disabled: true
 name: Procs defined inside compound statements
 dialect: bash
 source: oils:spec/ysh-proc#procs-defined-inside-compound-statements
-stdout: |-
+stdout: |
   loop
   brace
 ---

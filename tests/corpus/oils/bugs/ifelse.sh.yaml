@@ -1,7 +1,7 @@
 name: if/else
 dialect: bash
 source: oils:spec/bugs#ifelse
-stdout: |-
+stdout: |
   ELSE
 ---
 if false; then

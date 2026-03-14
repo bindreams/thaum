@@ -2,7 +2,7 @@ disabled: true
 name: decode integer larger than 2^32
 dialect: bash
 source: oils:spec/ysh-json#decode-integer-larger-than-232
-stdout: |-
+stdout: |
   8589934592
   (Int)   8589934592
 ---

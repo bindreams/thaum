@@ -2,7 +2,7 @@ disabled: true
 name: List insert() negative
 dialect: bash
 source: oils:spec/ysh-list#list-insert-negative
-stdout: |-
+stdout: |
   pass
 ---
 shopt -s ysh:all

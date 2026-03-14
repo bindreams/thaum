@@ -2,7 +2,7 @@ disabled: true
 name: x if b else y
 dialect: bash
 source: oils:spec/ysh-expr-bool#x-if-b-else-y
-stdout: |-
+stdout: |
   43
   41
 ---

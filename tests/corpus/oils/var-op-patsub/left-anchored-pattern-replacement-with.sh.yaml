@@ -1,7 +1,7 @@
 name: 'Left Anchored Pattern replacement with #'
 dialect: bash
 source: oils:spec/var-op-patsub#left-anchored-pattern-replacement-with
-stdout: |-
+stdout: |
   xx_yy_xx xx_xx_xx
 ---
 s=xx_xx_xx

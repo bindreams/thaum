@@ -1,7 +1,7 @@
 name: extglob inside arg word
 dialect: bash
 source: oils:spec/extglob-match#extglob-inside-arg-word
-stdout: |-
+stdout: |
   rhs
   rhs arg
   nope

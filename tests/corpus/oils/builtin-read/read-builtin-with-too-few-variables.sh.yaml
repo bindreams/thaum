@@ -2,7 +2,7 @@ name: read builtin with too few variables
 dialect: bash
 source: oils:spec/builtin-read#read-builtin-with-too-few-variables
 status: 0
-stdout: |-
+stdout: |
   /A/B//
 ---
 set -o errexit

@@ -2,7 +2,7 @@ disabled: true
 name: Simple Block Closure
 dialect: bash
 source: oils:spec/ysh-closures#simple-block-closure
-stdout: |-
+stdout: |
   43
 ---
 shopt --set ysh:upgrade

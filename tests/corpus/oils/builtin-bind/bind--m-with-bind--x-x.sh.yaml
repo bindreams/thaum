@@ -1,7 +1,7 @@
 name: bind -m with bind -x/-X
 dialect: bash
 source: oils:spec/builtin-bind#bind--m-with-bind--x-x
-stdout: |-
+stdout: |
   status=1
   emacs
   status=0

@@ -1,7 +1,7 @@
 name: If
 dialect: posix
 source: oils:spec/if#if
-stdout: |-
+stdout: |
   if
 ---
 if true; then

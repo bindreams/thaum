@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace(Eggex, *, count)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-count
-stdout: |-
+stdout: |
   1-2-3-
   1-2-3-
   1-2-3-

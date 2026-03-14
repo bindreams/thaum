@@ -1,7 +1,7 @@
 name: export -n undefined is ignored
 dialect: bash
 source: oils:spec/builtin-vars#export--n-undefined-is-ignored
-stdout: |-
+stdout: |
   status=0
 ---
 set -o errexit

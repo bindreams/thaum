@@ -2,7 +2,7 @@ disabled: true
 name: forkwait
 dialect: bash
 source: oils:spec/ysh-builtin-process#forkwait
-stdout: |-
+stdout: |
   hi
   status=42
   ok

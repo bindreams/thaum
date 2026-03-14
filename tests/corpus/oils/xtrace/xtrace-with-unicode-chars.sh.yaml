@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#xtrace-with-unicode-chars
 stdout: |
   [μ] [μ]
-stderr: |-
+stderr: |
   + echo '[μ]' '[μ]'
 ---
 case $SH in dash) exit ;; esac

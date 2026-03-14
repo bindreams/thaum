@@ -1,7 +1,7 @@
 name: '[bash_unset] local-unset / dynamic-unset for tempenv'
 dialect: bash
 source: oils:spec/ble-features#bashunset-local-unset-dynamic-unset-for-tempenv
-stdout: |-
+stdout: |
   # always-cell-unset, bash-unset
   #   local-unset   = cell-unset
   #   dynamic-unset = cell-unset

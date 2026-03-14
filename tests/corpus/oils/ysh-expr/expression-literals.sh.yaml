@@ -2,7 +2,7 @@ disabled: true
 name: expression literals
 dialect: bash
 source: oils:spec/ysh-expr#expression-literals
-stdout: |-
+stdout: |
   type=Expr
   3
   false

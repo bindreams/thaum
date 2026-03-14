@@ -1,7 +1,7 @@
 name: cd BAD/..
 dialect: bash
 source: oils:spec/builtin-cd#cd-bad
-stdout: |-
+stdout: |
   status=1
 ---
 

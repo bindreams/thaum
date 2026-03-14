@@ -2,7 +2,7 @@ disabled: true
 name: 'builtin rm: usage, removing files'
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-rm-usage-removing-files
-stdout: |-
+stdout: |
   ok
   ok
   status=1

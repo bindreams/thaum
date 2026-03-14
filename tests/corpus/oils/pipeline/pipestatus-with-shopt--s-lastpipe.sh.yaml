@@ -1,7 +1,7 @@
 name: PIPESTATUS with shopt -s lastpipe
 dialect: bash
 source: oils:spec/pipeline#pipestatus-with-shopt--s-lastpipe
-stdout: |-
+stdout: |
   1 2 3
 ---
 shopt -s lastpipe

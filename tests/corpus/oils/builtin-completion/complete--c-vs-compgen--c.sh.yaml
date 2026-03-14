@@ -1,7 +1,7 @@
 name: complete -C vs. compgen -C
 dialect: bash
 source: oils:spec/builtin-completion#complete--c-vs-compgen--c
-stdout: |-
+stdout: |
   foo
   bar
   compgen=0

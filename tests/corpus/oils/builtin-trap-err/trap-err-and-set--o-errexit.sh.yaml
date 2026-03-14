@@ -2,7 +2,7 @@ name: trap ERR and set -o errexit
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-set--o-errexit
 status: 1
-stdout: |-
+stdout: |
   line=3
   a
   b

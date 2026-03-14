@@ -1,7 +1,7 @@
 name: 'comparison: :- operator with single quoted arg'
 dialect: bash
 source: oils:spec/var-sub-quote#comparison---operator-with-single-quoted-arg
-stdout: |-
+stdout: |
   a
   'a'
 ---

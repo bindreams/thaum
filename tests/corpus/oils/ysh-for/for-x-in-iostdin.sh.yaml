@@ -2,7 +2,7 @@ disabled: true
 name: for x in (io.stdin) {
 dialect: bash
 source: oils:spec/ysh-for#for-x-in-iostdin
-stdout: |-
+stdout: |
   -1-
   -2-
   -3-

@@ -2,7 +2,7 @@ disabled: true
 name: pp asdl_
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-asdl
-stdout: |-
+stdout: |
   (value.Str s:42)
   (value.Dict d:{foo (value.Str s:42)})
   (value.Stdin)

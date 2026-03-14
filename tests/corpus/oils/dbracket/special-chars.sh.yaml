@@ -1,7 +1,7 @@
 name: special chars
 dialect: bash
 source: oils:spec/dbracket#special-chars
-stdout: |-
+stdout: |
   caret 0
   bang 0
 ---

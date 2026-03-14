@@ -1,7 +1,7 @@
 name: sh -c with multiple -- args
 dialect: bash
 source: oils:spec/sh-usage#sh--c-with-multiple----args
-stdout: |-
+stdout: |
   status=127
   status=127
   z failed

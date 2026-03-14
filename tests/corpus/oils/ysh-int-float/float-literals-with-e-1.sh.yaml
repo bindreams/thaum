@@ -2,7 +2,7 @@ disabled: true
 name: Float Literals with e-1
 dialect: bash
 source: oils:spec/ysh-int-float#float-literals-with-e-1
-stdout: |-
+stdout: |
   ok
 ---
 

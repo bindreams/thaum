@@ -2,7 +2,7 @@ disabled: true
 name: toJson() toJson8()
 dialect: bash
 source: oils:spec/ysh-json#tojson-tojson8
-stdout: |-
+stdout: |
   [42,1.5,null,true,"hi","�"]
   [42,1.5,null,true,"hi",b'\yf0']
   [3,4]

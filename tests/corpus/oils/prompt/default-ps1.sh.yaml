@@ -1,7 +1,7 @@
 name: default PS1
 dialect: bash
 source: oils:spec/prompt#default-ps1
-stdout: |-
+stdout: |
   _\s-\v\$ _
 ---
 #flags='--norc --noprofile'

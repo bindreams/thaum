@@ -3,7 +3,7 @@ name: multiline array and command sub (only here docs disallowed)
 dialect: bash
 source: 
   oils:spec/ysh-expr#multiline-array-and-command-sub-only-here-docs-disallowed
-stdout: |-
+stdout: |
   array=3
   comsub=6
 ---

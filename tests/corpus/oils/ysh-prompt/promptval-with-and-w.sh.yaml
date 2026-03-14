@@ -2,7 +2,7 @@ disabled: true
 name: promptVal() with $ and w
 dialect: bash
 source: oils:spec/ysh-prompt#promptval-with-and-w
-stdout: |-
+stdout: |
   x=$
   pass
 ---

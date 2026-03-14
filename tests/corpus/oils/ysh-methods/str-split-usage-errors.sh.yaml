@@ -2,7 +2,7 @@ disabled: true
 name: Str => split(), usage errors
 dialect: bash
 source: oils:spec/ysh-methods#str-split-usage-errors
-stdout: |-
+stdout: |
   status=3
   status=3
   status=3

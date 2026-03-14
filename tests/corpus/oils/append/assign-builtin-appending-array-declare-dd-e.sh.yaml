@@ -1,7 +1,7 @@
 name: 'assign builtin appending array: declare d+=(d e)'
 dialect: bash
 source: oils:spec/append#assign-builtin-appending-array-declare-dd-e
-stdout: |-
+stdout: |
   d e
   d e c l
   r e

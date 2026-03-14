@@ -1,7 +1,7 @@
 name: Here redirect with explicit descriptor
 dialect: bash
 source: oils:spec/here-doc#here-redirect-with-explicit-descriptor
-stdout: |-
+stdout: |
   one
 ---
 # A space between 0 and <<EOF causes it to pass '0' as an arg to cat.

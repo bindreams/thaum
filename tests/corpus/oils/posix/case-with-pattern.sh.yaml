@@ -1,7 +1,7 @@
 name: Case with | pattern
 dialect: bash
 source: oils:spec/posix#case-with-pattern
-stdout: |-
+stdout: |
   A
 ---
 foo=a

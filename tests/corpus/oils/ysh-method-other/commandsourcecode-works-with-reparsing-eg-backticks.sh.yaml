@@ -3,7 +3,7 @@ name: Command.sourceCode() works with reparsing, e.g. backticks
 dialect: bash
 source: 
   oils:spec/ysh-method-other#commandsourcecode-works-with-reparsing-eg-backticks
-stdout: |-
+stdout: |
   (Str)   "   \n  echo \"greeting `echo backticks`\"\n"
   (Str)   "   \n  array_lhs[i++]=y\n"
   (Str)   "   \n  e foo\n"

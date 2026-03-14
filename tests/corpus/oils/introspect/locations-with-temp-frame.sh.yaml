@@ -1,7 +1,7 @@
 name: Locations with temp frame
 dialect: bash
 source: oils:spec/introspect#locations-with-temp-frame
-stdout: |-
+stdout: |
   F
   G
   STACK:spec/testdata/bash-source-pushtemp.sh:g:3

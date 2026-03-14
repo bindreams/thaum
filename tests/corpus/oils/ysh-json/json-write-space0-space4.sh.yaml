@@ -2,7 +2,7 @@ disabled: true
 name: json write space=0, space=4
 dialect: bash
 source: oils:spec/ysh-json#json-write-space0-space4
-stdout: |-
+stdout: |
   {"name":"bob","age":30}
   {
       "name": "bob",

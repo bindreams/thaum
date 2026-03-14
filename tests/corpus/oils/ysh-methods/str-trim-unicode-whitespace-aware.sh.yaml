@@ -3,7 +3,7 @@ name: Str => trim(), unicode whitespace aware
 dialect: bash
 source: oils:spec/ysh-methods#str-trim-unicode-whitespace-aware
 status: 0
-stdout: |-
+stdout: |
   YSH
 ---
 

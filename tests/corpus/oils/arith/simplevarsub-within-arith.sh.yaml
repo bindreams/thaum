@@ -1,7 +1,7 @@
 name: SimpleVarSub within arith
 dialect: bash
 source: oils:spec/arith#simplevarsub-within-arith
-stdout: |-
+stdout: |
   42
 ---
 j=0

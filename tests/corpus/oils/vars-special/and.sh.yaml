@@ -1,7 +1,7 @@
 name: $_ and ${_}
 dialect: bash
 source: oils:spec/vars-special#and
-stdout: |-
+stdout: |
   42 value 42var
   foobar
 ---

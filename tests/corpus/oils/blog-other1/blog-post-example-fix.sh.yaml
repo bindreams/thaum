@@ -1,7 +1,7 @@
 name: Blog Post Example Fix
 dialect: bash
 source: oils:spec/blog-other1#blog-post-example-fix
-stdout: |-
+stdout: |
   /foo
   /bar
   /baz

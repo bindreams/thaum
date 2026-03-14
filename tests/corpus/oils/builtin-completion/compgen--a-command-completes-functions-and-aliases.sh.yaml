@@ -2,7 +2,7 @@ name: compgen -A command completes functions and aliases
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--a-command-completes-functions-and-aliases
-stdout: |-
+stdout: |
   our_alias
   our_func
   our_func2

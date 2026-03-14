@@ -6,7 +6,7 @@ stdout: |
   yy
   xx
   zz
-stderr: |-
+stderr: |
   | command 12345: tac - /dev/fd/3
   ; process 12345: status 0
   . builtin set '+x'

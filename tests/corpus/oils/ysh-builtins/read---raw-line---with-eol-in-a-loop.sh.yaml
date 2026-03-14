@@ -2,7 +2,7 @@ disabled: true
 name: read --raw-line --with-eol in a loop
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line---with-eol-in-a-loop
-stdout: |-
+stdout: |
   (Str)   "\n"
   (Str)   "a\n"
   (Str)   "b\n"

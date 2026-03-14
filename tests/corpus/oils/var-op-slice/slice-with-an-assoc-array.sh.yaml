@@ -2,7 +2,7 @@ name: Slice with an assoc array
 dialect: bash
 source: oils:spec/var-op-slice#slice-with-an-assoc-array
 status: 0
-stdout: |-
+stdout: |
   assigned
   ab
 ---

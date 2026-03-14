@@ -1,7 +1,7 @@
 name: 'Unrecoverable: divide by zero in redirect word'
 dialect: bash
 source: oils:spec/fatal-errors#unrecoverable-divide-by-zero-in-redirect-word
-stdout: |-
+stdout: |
   outside=1
 ---
 

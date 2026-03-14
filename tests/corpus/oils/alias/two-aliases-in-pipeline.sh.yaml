@@ -1,7 +1,7 @@
 name: Two aliases in pipeline
 dialect: bash
 source: oils:spec/alias#two-aliases-in-pipeline
-stdout: |-
+stdout: |
   3
 ---
 shopt -s expand_aliases

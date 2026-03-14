@@ -1,7 +1,7 @@
 name: $_ with pipeline and subshell
 dialect: bash
 source: oils:spec/vars-special#with-pipeline-and-subshell
-stdout: |-
+stdout: |
   last=
   pipeline=last=
   subshell=pipeline=last=

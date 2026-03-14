@@ -1,7 +1,7 @@
 name: $''
 dialect: bash
 source: oils:spec/quote#unnamed
-stdout: |-
+stdout: |
   foo
 ---
 echo $'foo'

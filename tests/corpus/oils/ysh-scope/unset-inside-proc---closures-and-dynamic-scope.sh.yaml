@@ -2,7 +2,7 @@ disabled: true
 name: unset inside proc - closures and dynamic scope
 dialect: bash
 source: oils:spec/ysh-scope#unset-inside-proc---closures-and-dynamic-scope
-stdout: |-
+stdout: |
   shellfunc x=
   unset-proc x=
   unset-proc-dynamic-scope x=

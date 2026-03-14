@@ -1,7 +1,7 @@
 name: Command Sub in local sets exit code
 dialect: bash
 source: oils:spec/command-sub#command-sub-in-local-sets-exit-code
-stdout: |-
+stdout: |
   x
   0
   0

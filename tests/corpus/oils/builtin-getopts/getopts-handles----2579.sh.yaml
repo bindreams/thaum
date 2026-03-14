@@ -1,7 +1,7 @@
 name: "getopts handles '--' #2579"
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-handles----2579
-stdout: |-
+stdout: |
   a
   name=?
   3

@@ -3,7 +3,7 @@ name: case syntax, one line
 dialect: bash
 source: oils:spec/ysh-case#case-syntax-one-line
 status: 0
-stdout: |-
+stdout: |
   C++
   header.h
 ---

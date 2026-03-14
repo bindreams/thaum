@@ -3,7 +3,7 @@ name: Max code point is disallowed at parse time
 dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#max-code-point-is-disallowed-at-parse-time
-stdout: |-
+stdout: |
   (Bool)   false
   (Bool)   true
 

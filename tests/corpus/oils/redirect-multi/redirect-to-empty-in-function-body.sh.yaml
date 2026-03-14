@@ -1,7 +1,7 @@
 name: Redirect to $empty (in function body)
 dialect: bash
 source: oils:spec/redirect-multi#redirect-to-empty-in-function-body
-stdout: |-
+stdout: |
   status=1
 ---
 empty=''

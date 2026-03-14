@@ -3,7 +3,7 @@ name: ysh:upgrade behavior
 dialect: bash
 source: oils:spec/ysh-options-assign#yshupgrade-behavior
 status: 2
-stdout: |-
+stdout: |
   status=0
   x=1
 ---

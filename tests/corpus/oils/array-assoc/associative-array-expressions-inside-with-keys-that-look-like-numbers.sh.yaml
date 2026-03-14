@@ -3,7 +3,7 @@ name: Associative array expressions inside (( )) with keys that look like
 dialect: bash
 source: 
   oils:spec/array-assoc#associative-array-expressions-inside-with-keys-that-look-like-numbers
-stdout: |-
+stdout: |
   42
   42
 ---

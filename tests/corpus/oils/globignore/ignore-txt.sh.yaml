@@ -1,7 +1,7 @@
 name: Ignore *.txt
 dialect: bash
 source: oils:spec/globignore#ignore-txt
-stdout: |-
+stdout: |
   one.md foo/two.md foo/two.txt
 ---
 touch one.md one.txt

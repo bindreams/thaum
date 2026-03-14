@@ -2,7 +2,7 @@ name: "'local x' and then array assignment"
 dialect: bash
 source: oils:spec/assign#local-x-and-then-array-assignment
 status: 0
-stdout: |-
+stdout: |
   foo
 ---
 f() {

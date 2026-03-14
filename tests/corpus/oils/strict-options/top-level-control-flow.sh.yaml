@@ -2,7 +2,7 @@ name: top level control flow
 dialect: bash
 source: oils:spec/strict-options#top-level-control-flow
 status: 0
-stdout: |-
+stdout: |
   SUBSHELL
   BREAK
   CONTINUE

@@ -1,7 +1,7 @@
 name: $'' with newlines
 dialect: bash
 source: oils:spec/quote#with-newlines
-stdout: |-
+stdout: |
   col1
   col2
   col3

@@ -1,7 +1,7 @@
 name: typeset s${dyn}+=
 dialect: bash
 source: oils:spec/append#typeset-sdyn
-stdout: |-
+stdout: |
   sx=foo
   tx=foo
   tx=foofoo

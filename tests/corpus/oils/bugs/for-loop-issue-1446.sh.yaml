@@ -1,7 +1,7 @@
 name: 'for loop (issue #1446)'
 dialect: bash
 source: oils:spec/bugs#for-loop-issue-1446
-stdout: |-
+stdout: |
   0
   1
 ---

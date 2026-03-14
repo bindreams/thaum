@@ -2,7 +2,7 @@ name: nounset
 dialect: bash
 source: oils:spec/sh-options#nounset
 status: 1
-stdout: |-
+stdout: |
   []
 ---
 echo "[$unset]"

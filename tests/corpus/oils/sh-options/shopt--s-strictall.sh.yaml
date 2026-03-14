@@ -1,7 +1,7 @@
 name: shopt -s strict:all
 dialect: bash
 source: oils:spec/sh-options#shopt--s-strictall
-stdout: |-
+stdout: |
   shopt -u strict_arg_parse
   shopt -u strict_argv
   -

@@ -3,7 +3,7 @@ name: 'proc eval block: fatal error'
 dialect: bash
 source: oils:spec/ysh-control-flow#proc-eval-block-fatal-error
 status: 1
-stdout: |-
+stdout: |
   one
 ---
 shopt -s ysh:all

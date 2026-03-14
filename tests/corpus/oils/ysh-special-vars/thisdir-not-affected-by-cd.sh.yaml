@@ -2,7 +2,7 @@ disabled: true
 name: _this_dir not affected by 'cd'
 dialect: bash
 source: oils:spec/ysh-special-vars#thisdir-not-affected-by-cd
-stdout: |-
+stdout: |
   hi from this_dir.ysh
   $_this_dir = REPLACED/oils/spec/testdata/module
 ---

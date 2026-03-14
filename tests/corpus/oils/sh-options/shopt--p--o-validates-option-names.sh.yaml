@@ -1,7 +1,7 @@
 name: shopt -p -o validates option names
 dialect: bash
 source: oils:spec/sh-options#shopt--p--o-validates-option-names
-stdout: |-
+stdout: |
   set +o errexit
   status=2
 ---

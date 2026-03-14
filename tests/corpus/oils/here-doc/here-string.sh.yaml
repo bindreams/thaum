@@ -1,7 +1,7 @@
 name: Here string
 dialect: bash
 source: oils:spec/here-doc#here-string
-stdout: |-
+stdout: |
   hi
 ---
 cat <<< 'hi'

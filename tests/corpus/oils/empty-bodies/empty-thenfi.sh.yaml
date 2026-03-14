@@ -1,7 +1,7 @@
 name: Empty then/fi
 dialect: bash
 source: oils:spec/empty-bodies#empty-thenfi
-stdout: |-
+stdout: |
   empty
 ---
 if foo; then

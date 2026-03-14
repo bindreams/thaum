@@ -2,7 +2,7 @@ disabled: true
 name: Handle _error.code
 dialect: bash
 source: oils:spec/ysh-builtin-error#handle-errorcode
-stdout: |-
+stdout: |
   PASS
   CASE PASS
 ---

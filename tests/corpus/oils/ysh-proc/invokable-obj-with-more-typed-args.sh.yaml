@@ -2,7 +2,7 @@ disabled: true
 name: invokable Obj with more typed args
 dialect: bash
 source: oils:spec/ysh-proc#invokable-obj-with-more-typed-args
-stdout: |-
+stdout: |
   sum = 1
   (Dict)   {"x":0,"y":1}
   (List)   ["a","b",42,43]

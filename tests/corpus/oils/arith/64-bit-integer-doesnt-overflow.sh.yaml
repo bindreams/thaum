@@ -1,7 +1,7 @@
 name: 64-bit integer doesn't overflow
 dialect: bash
 source: oils:spec/arith#64-bit-integer-doesnt-overflow
-stdout: |-
+stdout: |
   2147483648
   4294967296
   6442450944

@@ -1,7 +1,7 @@
 name: BashAssoc ${a[@]@Q}
 dialect: bash
 source: oils:spec/array-assoc#bashassoc-aq
-stdout: |-
+stdout: |
   [$'\'\'' '"' '()<>&|' '[]*?']
   [$'\'\'' '"' '()<>&|' '[]*?']
 ---

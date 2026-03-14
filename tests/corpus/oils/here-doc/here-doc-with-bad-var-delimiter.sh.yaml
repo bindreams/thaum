@@ -1,7 +1,7 @@
 name: Here doc with bad var delimiter
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-bad-var-delimiter
-stdout: |-
+stdout: |
   here
 ---
 # Most shells accept this, but OSH is stricter.

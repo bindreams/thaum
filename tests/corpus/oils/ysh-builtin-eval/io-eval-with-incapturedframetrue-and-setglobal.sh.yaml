@@ -3,7 +3,7 @@ name: io->eval with in_captured_frame=true and setglobal
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#io-eval-with-incapturedframetrue-and-setglobal
-stdout: |-
+stdout: |
   block arg x = main
   mutated = ZZ
   (Str)   "ZZ"

@@ -1,7 +1,7 @@
 name: a[x]=foo:~ has tilde expansion
 dialect: bash
 source: oils:spec/tilde#axfoo-has-tilde-expansion
-stdout: |-
+stdout: |
   foo:/home/bar
   foo:/home/bar
 ---

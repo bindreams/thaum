@@ -1,7 +1,7 @@
 name: ': 3>&3 (OSH regression)'
 dialect: bash
 source: oils:spec/redirect#33-osh-regression
-stdout: |-
+stdout: |
   hello
 ---
 

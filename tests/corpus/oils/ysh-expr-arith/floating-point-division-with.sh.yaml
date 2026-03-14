@@ -2,7 +2,7 @@ disabled: true
 name: Floating Point Division with /
 dialect: bash
 source: oils:spec/ysh-expr-arith#floating-point-division-with
-stdout: |-
+stdout: |
   20.0
 ---
 

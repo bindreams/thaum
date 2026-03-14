@@ -2,7 +2,7 @@ disabled: true
 name: builtin sleep behaves like external sleep
 dialect: bash
 source: oils:spec/ysh-builtin-private#builtin-sleep-behaves-like-external-sleep
-stdout: |-
+stdout: |
   ok
   ok
   ok

@@ -2,7 +2,7 @@ disabled: true
 name: vm.getDebugStack()
 dialect: bash
 source: oils:spec/ysh-introspect#vmgetdebugstack
-stdout: |-
+stdout: |
   1
   2
 ---

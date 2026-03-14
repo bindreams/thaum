@@ -1,7 +1,7 @@
 name: set -o lists options
 dialect: bash
 source: oils:spec/builtin-set#set--o-lists-options
-stdout: |-
+stdout: |
   noexec
 ---
 # NOTE: osh doesn't use the same format yet.

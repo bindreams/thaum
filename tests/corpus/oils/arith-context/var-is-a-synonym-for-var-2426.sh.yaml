@@ -1,7 +1,7 @@
 name: $[$var is a synonym for $(($var (#2426)
 dialect: bash
 source: oils:spec/arith-context#var-is-a-synonym-for-var-2426
-stdout: |-
+stdout: |
   3
 ---
 var=1

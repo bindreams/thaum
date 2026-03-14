@@ -1,7 +1,7 @@
 name: simple repetition with *(foo) and +(Foo)
 dialect: bash
 source: oils:spec/extglob-match#simple-repetition-with-foo-and-foo
-stdout: |-
+stdout: |
   TRUE
   TRUE
 ---

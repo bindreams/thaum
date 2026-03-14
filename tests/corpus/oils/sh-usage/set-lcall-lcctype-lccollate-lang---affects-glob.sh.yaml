@@ -1,7 +1,7 @@
 name: Set LC_ALL LC_CTYPE LC_COLLATE LANG - affects glob ?
 dialect: bash
 source: oils:spec/sh-usage#set-lcall-lcctype-lccollate-lang---affects-glob
-stdout: |-
+stdout: |
   LC_ALL _x_
   LC_ALL _x_ _μ_
 

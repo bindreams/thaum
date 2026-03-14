@@ -2,7 +2,7 @@ disabled: true
 name: Match newline with [\n]
 dialect: bash
 source: oils:spec/ysh-regex-bytes-chars#match-newline-with-n
-stdout: |-
+stdout: |
   (Str)   "[\n]"
   (Bool)   false
   (Bool)   true

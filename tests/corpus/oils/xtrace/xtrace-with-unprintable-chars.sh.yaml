@@ -1,7 +1,7 @@
 name: xtrace with unprintable chars
 dialect: bash
 source: oils:spec/xtrace#xtrace-with-unprintable-chars
-stdout: |-
+stdout: |
   STDOUT
      a 003   b 004   c  \0   d  \n
     61  03  62  04  63  00  64  0a

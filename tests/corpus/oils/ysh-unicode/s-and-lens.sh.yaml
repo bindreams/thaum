@@ -2,7 +2,7 @@ disabled: true
 name: ${#s} and len(s)
 dialect: bash
 source: oils:spec/ysh-unicode#s-and-lens
-stdout: |-
+stdout: |
   farmer scalars = 4
   facepalm scalars = 5
   farmer len = 15

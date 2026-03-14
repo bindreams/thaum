@@ -2,7 +2,7 @@ name: 'symbolic syntax error: start with -'
 dialect: bash
 source: oils:spec/builtin-umask#symbolic-syntax-error-start-with
 status: 0
-stdout: |-
+stdout: |
   error
   124
   error

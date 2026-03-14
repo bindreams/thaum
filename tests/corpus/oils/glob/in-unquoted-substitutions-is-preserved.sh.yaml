@@ -1,7 +1,7 @@
 name: \ in unquoted substitutions is preserved
 dialect: bash
 source: oils:spec/glob#in-unquoted-substitutions-is-preserved
-stdout: |-
+stdout: |
   \*\*.txt
   \*\*.txt
 ---

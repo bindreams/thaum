@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace(Eggex, Expr), scopes
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-expr-scopes
-stdout: |-
+stdout: |
   Hello 123 (surprise!)
   Hello 123
   Hello 123, 456

@@ -1,7 +1,7 @@
 name: getopts empty
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-empty
-stdout: |-
+stdout: |
   status=1 opt=? OPTARG=
 ---
 set -- 

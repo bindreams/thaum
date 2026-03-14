@@ -1,7 +1,7 @@
 name: 'unset -v assoc (related to issue #661)'
 dialect: bash
 source: oils:spec/builtin-vars#unset--v-assoc-related-to-issue-661
-stdout: |-
+stdout: |
   1
   keys=1],a[1
   vals=foo

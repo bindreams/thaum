@@ -1,7 +1,7 @@
 name: printf eE fF gG
 dialect: bash
 source: oils:spec/builtin-printf#printf-ee-ff-gg
-stdout: |-
+stdout: |
   [3.140000e+00]
   [3.140000E+00]
   [3.140000]

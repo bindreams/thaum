@@ -1,7 +1,7 @@
 name: $_ with assignments, arrays, etc.
 dialect: bash
 source: oils:spec/vars-special#with-assignments-arrays-etc
-stdout: |-
+stdout: |
   colon [foo]
   bare assign []
   declare [s=bar]

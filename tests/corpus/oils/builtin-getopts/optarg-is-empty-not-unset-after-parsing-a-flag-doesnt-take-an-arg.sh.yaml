@@ -2,7 +2,7 @@ name: OPTARG is empty (not unset) after parsing a flag doesn't take an arg
 dialect: bash
 source: 
   oils:spec/builtin-getopts#optarg-is-empty-not-unset-after-parsing-a-flag-doesnt-take-an-arg
-stdout: |-
+stdout: |
   name=a
   OPTARG=
 ---

@@ -3,7 +3,7 @@ name: 'cd builtin: break in block'
 dialect: bash
 source: oils:spec/ysh-control-flow#cd-builtin-break-in-block
 status: 1
-stdout: |-
+stdout: |
   one
   1
 ---

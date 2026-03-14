@@ -1,7 +1,7 @@
 name: $'' allowed within VarSub arguments
 dialect: bash
 source: oils:spec/var-sub-quote#allowed-within-varsub-arguments
-stdout: |-
+stdout: |
   a
   a
 ---

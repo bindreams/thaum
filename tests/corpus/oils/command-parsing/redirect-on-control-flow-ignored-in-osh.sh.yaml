@@ -2,7 +2,7 @@ name: Redirect on control flow (ignored in OSH)
 dialect: bash
 source: oils:spec/command-parsing#redirect-on-control-flow-ignored-in-osh
 status: 0
-stdout: |-
+stdout: |
   REDIRECTED
 ---
 rm -f _tmp/r.txt

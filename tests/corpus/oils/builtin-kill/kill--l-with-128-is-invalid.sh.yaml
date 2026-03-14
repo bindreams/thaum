@@ -1,7 +1,7 @@
 name: kill -l with 128 is invalid
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-with-128-is-invalid
-stdout: |-
+stdout: |
   invalid
   ## N-I mksh STDOUT:
   128

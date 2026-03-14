@@ -1,7 +1,7 @@
 name: '`set` output format - ifupdown-ng'
 dialect: bash
 source: oils:spec/known-differences#set-output-format---ifupdown-ng
-stdout: |-
+stdout: |
   FOO=bar
 ---
 export FOO=bar

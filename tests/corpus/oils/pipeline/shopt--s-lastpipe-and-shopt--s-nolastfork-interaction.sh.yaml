@@ -1,7 +1,7 @@
 name: shopt -s lastpipe and shopt -s no_last_fork interaction
 dialect: bash
 source: oils:spec/pipeline#shopt--s-lastpipe-and-shopt--s-nolastfork-interaction
-stdout: |-
+stdout: |
   0
   status=1
   0

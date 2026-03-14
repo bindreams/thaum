@@ -1,7 +1,7 @@
 name: test builtin - Unexpected trailing word '--' (#2409)
 dialect: bash
 source: oils:spec/bool-parse#test-builtin---unexpected-trailing-word----2409
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

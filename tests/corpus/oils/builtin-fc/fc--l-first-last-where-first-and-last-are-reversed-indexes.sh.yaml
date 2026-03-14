@@ -2,7 +2,7 @@ name: fc -l [first] [last] where first and last are reversed indexes
 dialect: bash
 source: 
   oils:spec/builtin-fc#fc--l-first-last-where-first-and-last-are-reversed-indexes
-stdout: |-
+stdout: |
   3	 echo 2
   2	 echo 1
   ^D

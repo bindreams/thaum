@@ -2,7 +2,7 @@ disabled: true
 name: Append object onto Array
 dialect: bash
 source: oils:spec/ysh-user-feedback#append-object-onto-array
-stdout: |-
+stdout: |
   [
     {
       "1": "Test 1"

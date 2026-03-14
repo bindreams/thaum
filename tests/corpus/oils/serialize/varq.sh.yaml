@@ -1,7 +1,7 @@
 name: ${var@Q}
 dialect: bash
 source: oils:spec/serialize#varq
-stdout: |-
+stdout: |
   $'one\ntwo μ'
   $'one\ntwo μ'
 ---

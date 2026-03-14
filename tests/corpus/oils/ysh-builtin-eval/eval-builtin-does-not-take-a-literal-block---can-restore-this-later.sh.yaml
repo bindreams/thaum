@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#eval-builtin-does-not-take-a-literal-block---can-restore-this-later
 status: 2
-stdout: |-
+stdout: |
   obj
   command literal
 ---

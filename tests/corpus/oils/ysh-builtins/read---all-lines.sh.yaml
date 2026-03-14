@@ -2,7 +2,7 @@ disabled: true
 name: read --all-lines
 dialect: bash
 source: oils:spec/ysh-builtins#read---all-lines
-stdout: |-
+stdout: |
   1 2 3
 ---
 seq 3 | read --all-lines :nums

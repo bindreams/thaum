@@ -2,7 +2,7 @@ disabled: true
 name: '... with pipeline'
 dialect: bash
 source: oils:spec/ysh-multiline#with-pipeline
-stdout: |-
+stdout: |
   2
 ---
 ... { echo one; echo two; }

@@ -2,7 +2,7 @@ disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by
 name: alias for left brace
 dialect: bash
 source: oils:spec/alias#alias-for-left-brace
-stdout: |-
+stdout: |
   one
   two
 ---

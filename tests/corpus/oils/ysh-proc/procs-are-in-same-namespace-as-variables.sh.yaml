@@ -2,7 +2,7 @@ disabled: true
 name: procs are in same namespace as variables
 dialect: bash
 source: oils:spec/ysh-proc#procs-are-in-same-namespace-as-variables
-stdout: |-
+stdout: |
   myproc is a Proc
 ---
 shopt --set parse_proc parse_ysh_expr_sub

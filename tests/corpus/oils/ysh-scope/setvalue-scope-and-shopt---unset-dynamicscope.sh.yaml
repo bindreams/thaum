@@ -2,7 +2,7 @@ disabled: true
 name: SetValue scope and shopt --unset dynamic_scope
 dialect: bash
 source: oils:spec/ysh-scope#setvalue-scope-and-shopt---unset-dynamicscope
-stdout: |-
+stdout: |
   x=stack
   ---
   f x=f

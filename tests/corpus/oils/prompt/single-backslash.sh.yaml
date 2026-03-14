@@ -1,7 +1,7 @@
 name: Single backslash
 dialect: bash
 source: oils:spec/prompt#single-backslash
-stdout: |-
+stdout: |
   \
 ---
 PS1='\'

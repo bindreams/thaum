@@ -1,7 +1,7 @@
 name: no match
 dialect: bash
 source: oils:spec/extglob-files#no-match
-stdout: |-
+stdout: |
   @(__nope__)
   @(__nope__*|__nope__?|*|?|[:alpha:]||)
 ---

@@ -1,7 +1,7 @@
 name: Pipeline in eval
 dialect: bash
 source: oils:spec/pipeline#pipeline-in-eval
-stdout: |-
+stdout: |
   1
 ---
 ls /dev/null | eval 'cat | cat' | wc -l

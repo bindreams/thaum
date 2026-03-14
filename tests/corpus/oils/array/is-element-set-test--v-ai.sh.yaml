@@ -1,7 +1,7 @@
 name: Is element set?  test -v a[i]
 dialect: bash
 source: oils:spec/array#is-element-set-test--v-ai
-stdout: |-
+stdout: |
   set=0
   empty=0
   unset=1

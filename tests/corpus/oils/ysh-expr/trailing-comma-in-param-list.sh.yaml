@@ -2,7 +2,7 @@ disabled: true
 name: Trailing Comma in Param list
 dialect: bash
 source: oils:spec/ysh-expr#trailing-comma-in-param-list
-stdout: |-
+stdout: |
   7 7
 ---
 shopt --set ysh:upgrade  # needed for math.ysh

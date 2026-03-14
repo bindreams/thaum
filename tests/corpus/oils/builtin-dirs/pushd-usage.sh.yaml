@@ -1,7 +1,7 @@
 name: pushd usage
 dialect: bash
 source: oils:spec/builtin-dirs#pushd-usage
-stdout: |-
+stdout: |
   status=2
   status=0
   status=0

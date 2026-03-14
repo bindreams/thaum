@@ -1,7 +1,7 @@
 name: compgen -k shows Oils keywords too
 dialect: bash
 source: oils:spec/builtin-completion#compgen--k-shows-oils-keywords-too
-stdout: |-
+stdout: |
   =
   call
   const

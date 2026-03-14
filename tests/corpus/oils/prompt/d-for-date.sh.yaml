@@ -1,7 +1,7 @@
 name: \d for date
 dialect: bash
 source: oils:spec/prompt#d-for-date
-stdout: |-
+stdout: |
   matched=0
 ---
 PS1='foo \d bar'

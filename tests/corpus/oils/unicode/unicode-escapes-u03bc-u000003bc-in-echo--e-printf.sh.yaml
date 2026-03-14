@@ -1,7 +1,7 @@
 name: Unicode escapes \u03bc \U000003bc in $'', echo -e, printf
 dialect: bash
 source: oils:spec/unicode#unicode-escapes-u03bc-u000003bc-in-echo--e-printf
-stdout: |-
+stdout: |
   μ μ
   μ μ
   μ μ

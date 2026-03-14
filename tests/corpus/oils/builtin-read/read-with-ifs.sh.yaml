@@ -1,7 +1,7 @@
 name: read with IFS=''
 dialect: bash
 source: oils:spec/builtin-read#read-with-ifs
-stdout: |-
+stdout: |
   [  a b c d|]
 ---
 IFS=''

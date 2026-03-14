@@ -2,7 +2,7 @@ disabled: true
 name: module-with-hyphens
 dialect: bash
 source: oils:spec/ysh-builtin-module#module-with-hyphens
-stdout: |-
+stdout: |
   [for-xtrace]
   counter = 5
   counter = 6

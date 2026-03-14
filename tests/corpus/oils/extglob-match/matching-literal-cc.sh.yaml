@@ -1,7 +1,7 @@
 name: Matching literal '@(cc)'
 dialect: bash
 source: oils:spec/extglob-match#matching-literal-cc
-stdout: |-
+stdout: |
   status=0
   status=1
   status=0

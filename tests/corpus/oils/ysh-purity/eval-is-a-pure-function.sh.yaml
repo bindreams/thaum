@@ -2,7 +2,7 @@ disabled: true
 name: eval() is a pure function
 dialect: bash
 source: oils:spec/ysh-purity#eval-is-a-pure-function
-stdout: |-
+stdout: |
   (Dict)   {"a":1,"b":2}
   impure code=5
   3

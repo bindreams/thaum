@@ -2,7 +2,7 @@ disabled: true
 name: subscript and slice :| 1 2 3 4 |
 dialect: bash
 source: oils:spec/ysh-slice-range#subscript-and-slice-1-2-3-4
-stdout: |-
+stdout: |
   (Str)   "2"
   (List)   ["2","3"]
   implicit

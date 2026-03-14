@@ -2,7 +2,7 @@ name: continue
 dialect: bash
 source: oils:spec/loop#continue
 status: 0
-stdout: |-
+stdout: |
   a
   a
   b

@@ -1,7 +1,7 @@
 name: Backslash escapes inside double quoted string
 dialect: bash
 source: oils:spec/quote#backslash-escapes-inside-double-quoted-string
-stdout: |-
+stdout: |
   $ \ \ \p \q
 ---
 echo "\$ \\ \\ \p \q"

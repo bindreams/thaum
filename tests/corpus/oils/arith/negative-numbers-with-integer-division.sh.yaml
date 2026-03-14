@@ -1,7 +1,7 @@
 name: Negative numbers with integer division /
 dialect: bash
 source: oils:spec/arith#negative-numbers-with-integer-division
-stdout: |-
+stdout: |
   3
   -3
   -3

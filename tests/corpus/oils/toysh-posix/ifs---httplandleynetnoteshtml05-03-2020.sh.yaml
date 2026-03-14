@@ -1,7 +1,7 @@
 name: IFS - http://landley.net/notes.html#05-03-2020
 dialect: bash
 source: oils:spec/toysh-posix#ifs---httplandleynetnoteshtml05-03-2020
-stdout: |-
+stdout: |
   =one=
   =abc=
   =d f=

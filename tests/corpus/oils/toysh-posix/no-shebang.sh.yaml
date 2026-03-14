@@ -1,7 +1,7 @@
 name: no shebang
 dialect: bash
 source: oils:spec/toysh-posix#no-shebang
-stdout: |-
+stdout: |
   hello
   hello
   hello 123

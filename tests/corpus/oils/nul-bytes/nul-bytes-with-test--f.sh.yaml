@@ -1,7 +1,7 @@
 name: NUL bytes with test -f
 dialect: bash
 source: oils:spec/nul-bytes#nul-bytes-with-test--f
-stdout: |-
+stdout: |
   status=1
   status=0
   status=0

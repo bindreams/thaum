@@ -1,7 +1,7 @@
 name: elif
 dialect: bash
 source: oils:spec/if#elif
-stdout: |-
+stdout: |
   elif
 ---
 if (( 0 )); then

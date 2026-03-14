@@ -2,7 +2,7 @@ disabled: true
 name: "''' in Expression Mode"
 dialect: bash
 source: oils:spec/ysh-string#in-expression-mode
-stdout: |-
+stdout: |
   [two = $two '
   three = $three ''
    \u{61}

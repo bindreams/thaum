@@ -1,7 +1,7 @@
 name: 'Regression: "${v:-AxBxC}"x should not be split'
 dialect: bash
 source: oils:spec/word-split#regression-v-axbxcx-should-not-be-split
-stdout: |-
+stdout: |
   AxBxC
   AxBxCx
   A B C

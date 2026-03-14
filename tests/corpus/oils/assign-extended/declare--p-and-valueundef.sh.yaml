@@ -1,7 +1,7 @@
 name: declare -p and value.Undef
 dialect: bash
 source: oils:spec/assign-extended#declare--p-and-valueundef
-stdout: |-
+stdout: |
   declare -- x
   declare -- x
 ---

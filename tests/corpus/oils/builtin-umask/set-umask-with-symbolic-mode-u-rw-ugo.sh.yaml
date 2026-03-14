@@ -2,7 +2,7 @@ name: 'set umask with symbolic mode: u-rw  ...  u=,g+,o-  ...'
 dialect: bash
 source: oils:spec/builtin-umask#set-umask-with-symbolic-mode-u-rw-ugo
 status: 0
-stdout: |-
+stdout: |
   status0=0
   600
   status1=0

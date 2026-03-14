@@ -3,7 +3,7 @@ name: Wrong Types with ~==
 dialect: bash
 source: oils:spec/ysh-expr-compare#wrong-types-with
 status: 1
-stdout: |-
+stdout: |
   one
 ---
 shopt -s ysh:all

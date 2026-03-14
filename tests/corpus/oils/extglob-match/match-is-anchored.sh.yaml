@@ -1,7 +1,7 @@
 name: match is anchored
 dialect: bash
 source: oils:spec/extglob-match#match-is-anchored
-stdout: |-
+stdout: |
   FALSE
   FALSE
   TRUE

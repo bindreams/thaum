@@ -3,7 +3,7 @@ name: no_xtrace_osh UNSET, and xtrace_rich set
 dialect: bash
 source: oils:spec/ysh-xtrace#noxtraceosh-unset-and-xtracerich-set
 stdout: "\n"
-stderr: |-
+stderr: |
   | command 12345: env 'false'
   ; process 12345: status 1
   . builtin set '+x'

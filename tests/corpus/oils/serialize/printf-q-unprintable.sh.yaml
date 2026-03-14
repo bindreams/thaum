@@ -1,7 +1,7 @@
 name: printf %q unprintable
 dialect: bash
 source: oils:spec/serialize#printf-q-unprintable
-stdout: |-
+stdout: |
   $'\377'
 ---
 case $SH in ash) return ;; esac  # yash and ash don't implement this

@@ -3,7 +3,7 @@ name: shopt usage error
 dialect: bash
 source: oils:spec/ysh-builtin-shopt#shopt-usage-error
 status: 2
-stdout: |-
+stdout: |
   one
 ---
 shopt --set oil:all

@@ -1,7 +1,7 @@
 name: typeset -f with function keyword (ksh style)
 dialect: bash
 source: oils:spec/print-source-code#typeset--f-with-function-keyword-ksh-style
-stdout: |-
+stdout: |
   serialized
 ---
 : prefix; function myfunc {

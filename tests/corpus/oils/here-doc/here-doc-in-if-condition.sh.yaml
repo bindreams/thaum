@@ -1,7 +1,7 @@
 name: Here Doc in if condition
 dialect: bash
 source: oils:spec/here-doc#here-doc-in-if-condition
-stdout: |-
+stdout: |
   here doc in IF CONDITION
   THEN executed
 ---

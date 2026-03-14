@@ -1,7 +1,7 @@
 name: '[[ glob matching, [[ has no glob expansion'
 dialect: bash
 source: oils:spec/dbracket#glob-matching-has-no-glob-expansion
-stdout: |-
+stdout: |
   true
   false
 ---

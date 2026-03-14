@@ -1,7 +1,7 @@
 name: 'Bug: Nix idiom with closing ) next to pattern'
 dialect: bash
 source: oils:spec/regex#bug-nix-idiom-with-closing-next-to-pattern
-stdout: |-
+stdout: |
   one
   two
 ---

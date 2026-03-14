@@ -2,7 +2,7 @@ disabled: true
 name: push-registers
 dialect: bash
 source: oils:spec/ysh-builtins#push-registers
-stdout: |-
+stdout: |
   status=43
   bar bar
   status=42

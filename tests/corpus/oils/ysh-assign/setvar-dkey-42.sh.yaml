@@ -2,7 +2,7 @@ disabled: true
 name: setvar d.key = 42
 dialect: bash
 source: oils:spec/ysh-assign#setvar-dkey-42
-stdout: |-
+stdout: |
   f3=43
   f2=42
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: OILS_VERSION, not OIL_VERSION
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#oilsversion-not-oilversion
-stdout: |-
+stdout: |
   OIL
 ---
 

@@ -1,7 +1,7 @@
 name: Register invalid trap, remove invalid trap
 dialect: bash
 source: oils:spec/builtin-trap#register-invalid-trap-remove-invalid-trap
-stdout: |-
+stdout: |
   ok
   ok
 ---

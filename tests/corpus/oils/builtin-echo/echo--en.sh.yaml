@@ -1,7 +1,7 @@
 name: echo -en
 dialect: bash
 source: oils:spec/builtin-echo#echo--en
-stdout: |-
+stdout: |
   abc
   def
 ---

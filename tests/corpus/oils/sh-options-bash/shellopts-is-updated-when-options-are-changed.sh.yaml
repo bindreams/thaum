@@ -1,7 +1,7 @@
 name: SHELLOPTS is updated when options are changed
 dialect: bash
 source: oils:spec/sh-options-bash#shellopts-is-updated-when-options-are-changed
-stdout: |-
+stdout: |
   1
   0
   1

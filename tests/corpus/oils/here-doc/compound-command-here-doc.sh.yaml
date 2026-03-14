@@ -1,7 +1,7 @@
 name: Compound command here doc
 dialect: bash
 source: oils:spec/here-doc#compound-command-here-doc
-stdout: |-
+stdout: |
   X 1
   X 2
   X 3

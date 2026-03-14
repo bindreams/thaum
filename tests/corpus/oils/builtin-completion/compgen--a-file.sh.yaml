@@ -1,7 +1,7 @@
 name: compgen -A file
 dialect: bash
 source: oils:spec/builtin-completion#compgen--a-file
-stdout: |-
+stdout: |
   oils-version.txt
   opy
   osh

@@ -4,7 +4,7 @@ source: oils:spec/serialize#xtrace
 stdout: |
   one
   two
-stderr: |-
+stderr: |
   + echo $'one\ntwo'
 ---
 zz=$'one\ntwo'

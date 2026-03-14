@@ -1,7 +1,7 @@
 name: More levels of double quotes in backticks
 dialect: bash
 source: oils:spec/command-sub#more-levels-of-double-quotes-in-backticks
-stdout: |-
+stdout: |
   \foo\ -
   \foo\ -
   \"foo\" -

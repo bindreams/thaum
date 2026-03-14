@@ -2,7 +2,7 @@ name: ${mystr[@]} and ${mystr[*]} disallowed with strict_array
 dialect: bash
 source: oils:spec/array#mystr-and-mystr-disallowed-with-strictarray
 status: 0
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

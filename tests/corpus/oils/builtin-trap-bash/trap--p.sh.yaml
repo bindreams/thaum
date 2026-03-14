@@ -1,7 +1,7 @@
 name: trap -p
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap--p
-stdout: |-
+stdout: |
   shown
   exit
 ---

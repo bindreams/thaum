@@ -1,7 +1,7 @@
 name: osh --eval
 dialect: bash
 source: oils:spec/sh-usage#osh---eval
-stdout: |-
+stdout: |
   one x y z
   status=0 flag -c x y z
 

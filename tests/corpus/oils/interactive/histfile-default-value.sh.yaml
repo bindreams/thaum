@@ -1,7 +1,7 @@
 name: HISTFILE default value
 dialect: bash
 source: oils:spec/interactive#histfile-default-value
-stdout: |-
+stdout: |
   status=0
 ---
 

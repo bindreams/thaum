@@ -2,7 +2,7 @@ disabled: true
 name: getVar() gets global or local vars
 dialect: bash
 source: oils:spec/ysh-func-builtin#getvar-gets-global-or-local-vars
-stdout: |-
+stdout: |
   g=global
   mylocal=43
   mylocal=43

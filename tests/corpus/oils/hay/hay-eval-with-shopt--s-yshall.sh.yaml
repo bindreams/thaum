@@ -2,7 +2,7 @@ disabled: true
 name: hay eval with shopt -s ysh:all
 dialect: bash
 source: oils:spec/hay#hay-eval-with-shopt--s-yshall
-stdout: |-
+stdout: |
   foo bar
 ---
 shopt --set parse_brace parse_equals parse_proc

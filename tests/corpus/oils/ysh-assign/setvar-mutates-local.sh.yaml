@@ -2,7 +2,7 @@ disabled: true
 name: setvar mutates local
 dialect: bash
 source: oils:spec/ysh-assign#setvar-mutates-local
-stdout: |-
+stdout: |
   x=global
   x=local
   x=mutated

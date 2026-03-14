@@ -2,7 +2,7 @@ disabled: true
 name: Multiple spreads
 dialect: bash
 source: oils:spec/ysh-func#multiple-spreads
-stdout: |-
+stdout: |
   (List)   [1,2,3,1,2,3]
   (Dict)   {"m":"spam","n":"no","p":5,"q":6}
 ---

@@ -2,7 +2,7 @@ name: Empty init
 dialect: bash
 source: oils:spec/for-expr#empty-init
 status: 0
-stdout: |-
+stdout: |
   1
   2
   3

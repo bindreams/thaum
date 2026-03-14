@@ -3,7 +3,7 @@ name: error builtin adds named args as properties on _error Dict
 dialect: bash
 source: 
   oils:spec/ysh-builtin-error#error-builtin-adds-named-args-as-properties-on-error-dict
-stdout: |-
+stdout: |
   (Dict)   {"code":99,"message":"bad"}
   (Dict)   {"myData":{"spam":"eggs"},"code":99,"message":"bad"}
   (Dict)   {"message":"bad","code":99}

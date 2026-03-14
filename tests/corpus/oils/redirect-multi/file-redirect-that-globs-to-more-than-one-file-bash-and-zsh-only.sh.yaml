@@ -2,7 +2,7 @@ name: File redirect that globs to more than one file (bash and zsh only)
 dialect: bash
 source: 
   oils:spec/redirect-multi#file-redirect-that-globs-to-more-than-one-file-bash-and-zsh-only
-stdout: |-
+stdout: |
   status=1
   ==> foo-bar <==
 

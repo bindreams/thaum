@@ -2,7 +2,7 @@ name: kill -l 10 TERM translates between names and numbers
 dialect: bash
 source: 
   oils:spec/builtin-kill#kill--l-10-term-translates-between-names-and-numbers
-stdout: |-
+stdout: |
   USR1
   SEGV
   USR2

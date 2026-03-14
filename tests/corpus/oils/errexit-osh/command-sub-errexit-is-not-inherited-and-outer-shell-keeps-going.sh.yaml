@@ -2,7 +2,7 @@ name: 'command sub: errexit is NOT inherited and outer shell keeps going'
 dialect: bash
 source: 
   oils:spec/errexit-osh#command-sub-errexit-is-not-inherited-and-outer-shell-keeps-going
-stdout: |-
+stdout: |
   one two
   parent status=0
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: Simple Cycles
 dialect: bash
 source: oils:spec/ysh-printing#simple-cycles
-stdout: |-
+stdout: |
   (List)  ['one', 'two', [...]]
   (Dict)  {dead_end: null, live_end: {...}}
 ---

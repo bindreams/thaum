@@ -1,7 +1,7 @@
 name: hash with args
 dialect: bash
 source: oils:spec/command#hash-with-args
-stdout: |-
+stdout: |
   status=0
   /whoami
   status=1

@@ -2,7 +2,7 @@ disabled: true
 name: sigpipe_status_ok
 dialect: bash
 source: oils:spec/ysh-options#sigpipestatusok
-stdout: |-
+stdout: |
   y
   141 0
   141 141

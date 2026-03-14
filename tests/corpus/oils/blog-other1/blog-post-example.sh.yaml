@@ -1,7 +1,7 @@
 name: Blog Post Example
 dialect: bash
 source: oils:spec/blog-other1#blog-post-example
-stdout: |-
+stdout: |
   /foo:/bar:/baz
 ---
 paths=`tr '\n' ':' | sed -e 's/:$//'`<<EOPATHS

@@ -2,7 +2,7 @@ disabled: true
 name: String
 dialect: bash
 source: oils:spec/ysh-printing#string
-stdout: |-
+stdout: |
   (Str)   'double quoted'
   (Str)   'single quoted'
 ---

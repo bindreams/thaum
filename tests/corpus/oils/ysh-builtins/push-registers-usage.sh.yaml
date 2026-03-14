@@ -2,7 +2,7 @@ disabled: true
 name: push-registers usage
 dialect: bash
 source: oils:spec/ysh-builtins#push-registers-usage
-stdout: |-
+stdout: |
   status=2
   status=2
   hi

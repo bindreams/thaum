@@ -2,7 +2,7 @@ name: Return statement
 dialect: bash
 source: oils:spec/sh-func#return-statement
 status: 42
-stdout: |-
+stdout: |
   one
 ---
 f() {

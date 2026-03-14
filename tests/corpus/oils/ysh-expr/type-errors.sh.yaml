@@ -2,7 +2,7 @@ disabled: true
 name: Type Errors
 dialect: bash
 source: oils:spec/ysh-expr#type-errors
-stdout: |-
+stdout: |
   3
   3
   3

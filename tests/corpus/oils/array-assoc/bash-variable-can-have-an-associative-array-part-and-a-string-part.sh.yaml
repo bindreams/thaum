@@ -2,7 +2,7 @@ name: bash variable can have an associative array part and a string part
 dialect: bash
 source: 
   oils:spec/array-assoc#bash-variable-can-have-an-associative-array-part-and-a-string-part
-stdout: |-
+stdout: |
   1 2
   1 2 zero
   1 2 string

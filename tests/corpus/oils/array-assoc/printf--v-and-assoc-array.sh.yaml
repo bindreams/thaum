@@ -1,7 +1,7 @@
 name: printf -v and assoc array
 dialect: bash
 source: oils:spec/array-assoc#printf--v-and-assoc-array
-stdout: |-
+stdout: |
   values: val
   values: /val2/
   values: /val3/

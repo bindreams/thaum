@@ -1,7 +1,7 @@
 name: shift is fatal at top level?
 dialect: bash
 source: oils:spec/toysh-posix#shift-is-fatal-at-top-level
-stdout: |-
+stdout: |
   hello
 ---
 # http://landley.net/notes.html#08-04-2020

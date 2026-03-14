@@ -1,7 +1,7 @@
 name: Here doc with var sub, command sub, arith sub
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-var-sub-command-sub-arith-sub
-stdout: |-
+stdout: |
   var: v
   command: hi
   arith: 3

@@ -1,7 +1,7 @@
 name: matching every byte against itself
 dialect: bash
 source: oils:spec/case#matching-every-byte-against-itself
-stdout: |-
+stdout: |
   sum=255
 ---
 

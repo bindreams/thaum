@@ -2,7 +2,7 @@ disabled: true
 name: read --raw-line --j8
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line---j8
-stdout: |-
+stdout: |
   foo
 ---
 

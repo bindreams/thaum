@@ -1,7 +1,7 @@
 name: 'trap EXIT, sleep, SIGINT: non-interactively'
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-sleep-sigint-non-interactively
-stdout: |-
+stdout: |
   on exit
   status=0
 ---

@@ -1,7 +1,7 @@
 name: Constants in bases 2 to 64
 dialect: bash
 source: oils:spec/arith#constants-in-bases-2-to-64
-stdout: |-
+stdout: |
   10-35, 36-61, 62, 63
 ---
 # This is a truly bizarre syntax.  Oh it comes from zsh... which allows 36.

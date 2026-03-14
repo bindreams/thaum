@@ -3,7 +3,7 @@ name: '# operator with single quoted arg (dash/ash and bash/mksh disagree, repor
 dialect: bash
 source: 
   oils:spec/var-sub-quote#operator-with-single-quoted-arg-dashash-and-bashmksh-disagree-reported-by-crestwave
-stdout: |-
+stdout: |
   --
   --
   -'a'-

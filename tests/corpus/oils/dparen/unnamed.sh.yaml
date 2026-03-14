@@ -1,7 +1,7 @@
 name: (( ))
 dialect: bash
 source: oils:spec/dparen#unnamed
-stdout: |-
+stdout: |
   1 3
 ---
 # What is the difference with this and let?  One difference: spaces are allowed.

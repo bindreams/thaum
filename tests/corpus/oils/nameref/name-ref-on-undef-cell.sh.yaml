@@ -2,7 +2,7 @@ name: name ref on Undef cell
 dialect: bash
 source: oils:spec/nameref#name-ref-on-undef-cell
 status: 1
-stdout: |-
+stdout: |
   ref=
   nounset
 ---

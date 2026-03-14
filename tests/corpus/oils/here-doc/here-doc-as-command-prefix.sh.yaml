@@ -1,7 +1,7 @@
 name: Here doc as command prefix
 dialect: bash
 source: oils:spec/here-doc#here-doc-as-command-prefix
-stdout: |-
+stdout: |
   3
   2
   1

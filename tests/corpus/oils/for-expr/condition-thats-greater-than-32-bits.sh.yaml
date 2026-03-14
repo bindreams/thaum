@@ -1,7 +1,7 @@
 name: Condition that's greater than 32 bits
 dialect: bash
 source: oils:spec/for-expr#condition-thats-greater-than-32-bits
-stdout: |-
+stdout: |
   4294967296
   4294967297
   4294967298

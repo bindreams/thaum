@@ -2,7 +2,7 @@ disabled: true
 name: Slices with Multiple Dimensions (for TSV8?)
 dialect: bash
 source: oils:spec/ysh-slice-range#slices-with-multiple-dimensions-for-tsv8
-stdout: |-
+stdout: |
   (Str)   'TODO: Table Slicing'
   (Str)   'TODO: Table Slicing'
 ---

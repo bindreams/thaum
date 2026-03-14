@@ -2,7 +2,7 @@ name: typeset -f prints function source code - nested functions
 dialect: bash
 source: 
   oils:spec/print-source-code#typeset--f-prints-function-source-code---nested-functions
-stdout: |-
+stdout: |
   outer
   inner
 ---

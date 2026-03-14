@@ -2,7 +2,7 @@ name: 'Print shell strings with weird chars: set and printf %q and ${x@Q}'
 dialect: bash
 source: 
   oils:spec/builtin-misc#print-shell-strings-with-weird-chars-set-and-printf-q-and-xq
-stdout: |-
+stdout: |
   foo=$'a\nb\u0001c\'d'
   pf  $'a\nb\u0001c\'d'
   @Q  $'a\nb\u0001c\'d'

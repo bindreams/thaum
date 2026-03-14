@@ -2,7 +2,7 @@ name: trap EXIT with explicit exit
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-with-explicit-exit
 status: 42
-stdout: |-
+stdout: |
   IN TRAP
   FOO
 ---

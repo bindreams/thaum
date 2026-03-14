@@ -3,7 +3,7 @@ name: Temp bindings can use locals in the same frame,(don't introduce new frame)
 dialect: bash
 source: 
   oils:spec/ysh-env#temp-bindings-can-use-locals-in-the-same-framedont-introduce-new-frame
-stdout: |-
+stdout: |
   shfunc x=zzz FOO=
   shfunc x=zzz FOO=zzz
 

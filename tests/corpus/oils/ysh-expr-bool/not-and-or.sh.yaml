@@ -2,7 +2,7 @@ disabled: true
 name: not, and, or
 dialect: bash
 source: oils:spec/ysh-expr-bool#not-and-or
-stdout: |-
+stdout: |
   false
   false
   true

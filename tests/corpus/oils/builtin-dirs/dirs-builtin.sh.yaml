@@ -2,7 +2,7 @@ name: dirs builtin
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-builtin
 status: 0
-stdout: |-
+stdout: |
   /
 ---
 cd /

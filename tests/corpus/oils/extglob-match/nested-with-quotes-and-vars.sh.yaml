@@ -1,7 +1,7 @@
 name: nested @() with quotes and vars
 dialect: bash
 source: oils:spec/extglob-match#nested-with-quotes-and-vars
-stdout: |-
+stdout: |
   TRUE
 ---
 shopt -s extglob

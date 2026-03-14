@@ -1,7 +1,7 @@
 name: Substitute one unicode character (UTF-8)
 dialect: bash
 source: oils:spec/var-op-patsub#substitute-one-unicode-character-utf-8
-stdout: |-
+stdout: |
   foo and foo
   foo and _μ_
   _μ_ and foo

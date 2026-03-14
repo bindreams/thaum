@@ -1,7 +1,7 @@
 name: '[k1]=v1 looking like brace expansions (BashArray)'
 dialect: bash
 source: oils:spec/array-literal#k1v1-looking-like-brace-expansions-basharray
-stdout: |-
+stdout: |
   -{a,b}-
 ---
 a=([k2]=-{a,b}-)

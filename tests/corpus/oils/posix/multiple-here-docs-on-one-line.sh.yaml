@@ -1,7 +1,7 @@
 name: Multiple here docs on one line
 dialect: bash
 source: oils:spec/posix#multiple-here-docs-on-one-line
-stdout: |-
+stdout: |
   one
   two
 ---

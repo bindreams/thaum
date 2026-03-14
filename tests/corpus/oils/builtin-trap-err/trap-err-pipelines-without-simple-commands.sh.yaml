@@ -1,7 +1,7 @@
 name: trap ERR pipelines without simple commands
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-pipelines-without-simple-commands
-stdout: |-
+stdout: |
   assign
   dparen
   dbracket

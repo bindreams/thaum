@@ -2,7 +2,7 @@ disabled: true
 name: read --raw-line
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line
-stdout: |-
+stdout: |
   reply=hi
   len=2
   pass

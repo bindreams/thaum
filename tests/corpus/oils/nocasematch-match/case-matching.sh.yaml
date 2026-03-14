@@ -1,7 +1,7 @@
 name: case matching
 dialect: bash
 source: oils:spec/nocasematch-match#case-matching
-stdout: |-
+stdout: |
   0
   0
   0

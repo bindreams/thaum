@@ -1,7 +1,7 @@
 name: External programs don't have _OVM in environment
 dialect: bash
 source: oils:spec/command#external-programs-dont-have-ovm-in-environment
-stdout: |-
+stdout: |
   status=1
 ---
 # bug fix for leakage

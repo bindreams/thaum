@@ -1,7 +1,7 @@
 name: setting $PWD doesn't affect the value of 'pwd' builtin
 dialect: bash
 source: oils:spec/builtin-cd#setting-pwd-doesnt-affect-the-value-of-pwd-builtin
-stdout: |-
+stdout: |
   before foo
   /tmp/oil-spec-test/pwd
   after foo

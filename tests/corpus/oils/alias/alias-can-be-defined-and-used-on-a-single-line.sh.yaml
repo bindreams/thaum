@@ -1,7 +1,7 @@
 name: Alias can be defined and used on a single line
 dialect: bash
 source: oils:spec/alias#alias-can-be-defined-and-used-on-a-single-line
-stdout: |-
+stdout: |
   hello other line
 ---
 shopt -s expand_aliases

@@ -2,7 +2,7 @@ disabled: true
 name: More test --true --false
 dialect: bash
 source: oils:spec/ysh-builtins#more-test---true---false
-stdout: |-
+stdout: |
   dict=1
   dict=0
 

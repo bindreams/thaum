@@ -2,7 +2,7 @@ disabled: true
 name: elif bug
 dialect: bash
 source: oils:spec/ysh-user-feedback#elif-bug
-stdout: |-
+stdout: |
   A
 ---
 if (true) {

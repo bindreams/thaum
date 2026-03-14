@@ -1,7 +1,7 @@
 name: var and func - http://landley.net/notes.html#19-03-2020
 dialect: bash
 source: oils:spec/toysh-posix#var-and-func---httplandleynetnoteshtml19-03-2020
-stdout: |-
+stdout: |
   42
   hello
 ---

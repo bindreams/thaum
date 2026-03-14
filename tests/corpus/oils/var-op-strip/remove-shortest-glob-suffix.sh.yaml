@@ -1,7 +1,7 @@
 name: Remove shortest glob suffix
 dialect: bash
 source: oils:spec/var-op-strip#remove-shortest-glob-suffix
-stdout: |-
+stdout: |
   aabbc
 ---
 v=aabbccdd

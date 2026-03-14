@@ -2,7 +2,7 @@ name: compgen doesn't respect -X for user-defined functions
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen-doesnt-respect--x-for-user-defined-functions
-stdout: |-
+stdout: |
   one
   three
   --

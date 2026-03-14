@@ -1,7 +1,7 @@
 name: continue at top level is NOT an error
 dialect: bash
 source: oils:spec/strict-options#continue-at-top-level-is-not-an-error
-stdout: |-
+stdout: |
   status=0
 ---
 # NOTE: bash and mksh both print warnings, but don't exit with an error.

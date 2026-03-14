@@ -2,7 +2,7 @@ name: '! turns zero into 1'
 dialect: bash
 source: oils:spec/pipeline#turns-zero-into-1
 status: 0
-stdout: |-
+stdout: |
   1
 ---
 ! $SH -c 'exit 0'; echo $?

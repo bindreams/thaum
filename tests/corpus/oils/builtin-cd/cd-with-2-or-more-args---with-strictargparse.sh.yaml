@@ -1,7 +1,7 @@
 name: cd with 2 or more args - with strict_arg_parse
 dialect: bash
 source: oils:spec/builtin-cd#cd-with-2-or-more-args---with-strictargparse
-stdout: |-
+stdout: |
   status=0
   status=0
   failed with multiple args

@@ -3,7 +3,7 @@ name: Userland max
 dialect: bash
 source: oils:spec/ysh-func#userland-max
 status: 10
-stdout: |-
+stdout: |
   (Int)   6
   (Int)   7
 ---

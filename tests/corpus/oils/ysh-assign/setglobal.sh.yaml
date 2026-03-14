@@ -2,7 +2,7 @@ disabled: true
 name: setglobal
 dialect: bash
 source: oils:spec/ysh-assign#setglobal
-stdout: |-
+stdout: |
   x=global
   x=local
   x=mutated

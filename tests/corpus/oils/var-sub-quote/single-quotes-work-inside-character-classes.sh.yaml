@@ -1,7 +1,7 @@
 name: single quotes work inside character classes
 dialect: bash
 source: oils:spec/var-sub-quote#single-quotes-work-inside-character-classes
-stdout: |-
+stdout: |
   a---b
 ---
 x='a[[[---]]]b'

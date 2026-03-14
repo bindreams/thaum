@@ -1,7 +1,7 @@
 name: Postincrement
 dialect: bash
 source: oils:spec/arith#postincrement
-stdout: |-
+stdout: |
   4
   5
 ---

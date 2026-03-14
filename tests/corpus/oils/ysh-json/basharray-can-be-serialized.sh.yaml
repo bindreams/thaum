@@ -2,7 +2,7 @@ disabled: true
 name: BashArray can be serialized
 dialect: bash
 source: oils:spec/ysh-json#basharray-can-be-serialized
-stdout: |-
+stdout: |
   {
     "type": "BashArray",
     "data": {}

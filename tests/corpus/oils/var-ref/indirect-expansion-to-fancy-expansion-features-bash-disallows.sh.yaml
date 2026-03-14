@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/var-ref#indirect-expansion-to-fancy-expansion-features-bash-disallows
 status: 0
-stdout: |-
+stdout: |
   done
 ---
 

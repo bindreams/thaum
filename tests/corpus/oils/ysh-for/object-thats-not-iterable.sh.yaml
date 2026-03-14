@@ -3,7 +3,7 @@ name: Object that's not iterable
 dialect: bash
 source: oils:spec/ysh-for#object-thats-not-iterable
 status: 3
-stdout: |-
+stdout: |
   hi
 ---
 

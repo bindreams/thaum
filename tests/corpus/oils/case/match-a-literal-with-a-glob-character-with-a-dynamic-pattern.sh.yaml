@@ -2,7 +2,7 @@ name: Match a literal with a glob character with a dynamic pattern
 dialect: bash
 source: 
   oils:spec/case#match-a-literal-with-a-glob-character-with-a-dynamic-pattern
-stdout: |-
+stdout: |
   match
 ---
 x='b.py'

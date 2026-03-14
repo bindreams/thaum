@@ -2,7 +2,7 @@ name: let with ()
 dialect: bash
 source: oils:spec/let#let-with
 status: 0
-stdout: |-
+stdout: |
   1 3 9
 ---
 let x=( 1 )

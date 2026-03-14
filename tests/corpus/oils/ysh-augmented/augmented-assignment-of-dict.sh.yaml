@@ -2,7 +2,7 @@ disabled: true
 name: Augmented assignment of Dict
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-of-dict
-stdout: |-
+stdout: |
   43.5
   45.0
   48.0

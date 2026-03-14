@@ -1,7 +1,7 @@
 name: bind -r of bind -x commands
 dialect: bash
 source: oils:spec/builtin-bind#bind--r-of-bind--x-commands
-stdout: |-
+stdout: |
   status=1
   \C-o\C-s\C-h
   status=0

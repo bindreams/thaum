@@ -3,7 +3,7 @@ name: set -u with undefined var in interactive shell does NOT exit the
 dialect: bash
 source: 
   oils:spec/builtin-set#set--u-with-undefined-var-in-interactive-shell-does-not-exit-the-interpreter
-stdout: |-
+stdout: |
   before
   OK
   before

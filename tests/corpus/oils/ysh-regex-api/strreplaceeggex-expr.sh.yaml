@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace(Eggex, Expr)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-expr
-stdout: |-
+stdout: |
   Hello Bob
   Hello Bob (extracted from 'name: Bob')
 ---

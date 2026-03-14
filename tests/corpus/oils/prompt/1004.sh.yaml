@@ -1,7 +1,7 @@
 name: \1004
 dialect: bash
 source: oils:spec/prompt#1004
-stdout: |-
+stdout: |
   @4$
 ---
 PS1='\1004$'

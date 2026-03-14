@@ -1,7 +1,7 @@
 name: compopt with invalid syntax
 dialect: bash
 source: oils:spec/builtin-completion#compopt-with-invalid-syntax
-stdout: |-
+stdout: |
   status=2
 ---
 compopt -o invalid

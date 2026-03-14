@@ -2,7 +2,7 @@ disabled: true
 name: _start() and _end()
 dialect: bash
 source: oils:spec/ysh-regex-api#start-and-end
-stdout: |-
+stdout: |
   start=3 end=6
   ---
   start=0 end=3

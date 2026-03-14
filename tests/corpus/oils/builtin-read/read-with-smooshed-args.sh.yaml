@@ -1,7 +1,7 @@
 name: read with smooshed args
 dialect: bash
 source: oils:spec/builtin-read#read-with-smooshed-args
-stdout: |-
+stdout: |
   var=h
 ---
 echo hi | { read -rn1 var; echo var=$var; }

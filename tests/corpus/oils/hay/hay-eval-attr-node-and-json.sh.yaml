@@ -2,7 +2,7 @@ disabled: true
 name: hay eval Attr node, and JSON
 dialect: bash
 source: oils:spec/hay#hay-eval-attr-node-and-json
-stdout: |-
+stdout: |
   diff 0
 ---
 shopt --set parse_brace parse_equals

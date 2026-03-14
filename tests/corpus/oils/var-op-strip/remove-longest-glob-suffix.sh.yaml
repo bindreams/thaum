@@ -1,7 +1,7 @@
 name: Remove longest glob suffix
 dialect: bash
 source: oils:spec/var-op-strip#remove-longest-glob-suffix
-stdout: |-
+stdout: |
   aabb
 ---
 v=aabbccdd

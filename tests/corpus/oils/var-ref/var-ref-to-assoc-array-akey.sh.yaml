@@ -1,7 +1,7 @@
 name: var ref TO assoc array a[key]
 dialect: bash
 source: oils:spec/var-ref#var-ref-to-assoc-array-akey
-stdout: |-
+stdout: |
   ref=
   ref_SUB=bean
   ref_SUB_QUOTED=bean

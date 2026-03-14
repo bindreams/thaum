@@ -2,7 +2,7 @@ name: umask a is valid who
 dialect: bash
 source: oils:spec/builtin-umask#umask-a-is-valid-who
 status: 0
-stdout: |-
+stdout: |
   000
   120
   564

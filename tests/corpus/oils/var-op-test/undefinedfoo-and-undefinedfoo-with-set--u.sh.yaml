@@ -1,7 +1,7 @@
 name: '"${undefined[@]+foo}" and "${undefined[@]:+foo}", with set -u'
 dialect: bash
 source: oils:spec/var-op-test#undefinedfoo-and-undefinedfoo-with-set--u
-stdout: |-
+stdout: |
   plus //
   plus colon //
 ---

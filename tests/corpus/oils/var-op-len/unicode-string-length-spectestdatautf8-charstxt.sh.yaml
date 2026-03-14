@@ -1,7 +1,7 @@
 name: Unicode string length (spec/testdata/utf8-chars.txt)
 dialect: bash
 source: oils:spec/var-op-len#unicode-string-length-spectestdatautf8-charstxt
-stdout: |-
+stdout: |
   7
 ---
 v=$(cat $REPO_ROOT/spec/testdata/utf8-chars.txt)

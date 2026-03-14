@@ -2,7 +2,7 @@ name: Prefix env on assignment
 dialect: bash
 source: oils:spec/command-parsing#prefix-env-on-assignment
 status: 0
-stdout: |-
+stdout: |
   env var
 ---
 f() {

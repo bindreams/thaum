@@ -2,7 +2,7 @@ disabled: true
 name: circular list - TODO 2023-06 REGRESS
 dialect: bash
 source: oils:spec/ysh-assign#circular-list---todo-2023-06-regress
-stdout: |-
+stdout: |
   (List)   [1, 2, 3]
   (List)   [[...], 2, 3]
 ---

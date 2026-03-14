@@ -1,7 +1,7 @@
 name: Brace Expansion
 dialect: bash
 source: oils:spec/toysh#brace-expansion
-stdout: |-
+stdout: |
   /home/foo/pwd /root/pwd
   {~,~root}/pwd
   ~/pwd ~root/pwd

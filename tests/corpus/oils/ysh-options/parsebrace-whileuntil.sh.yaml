@@ -2,7 +2,7 @@ disabled: true
 name: 'parse_brace: while/until'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-whileuntil
-stdout: |-
+stdout: |
   one
   two
   sh syntax

@@ -1,7 +1,7 @@
 name: 'set -o errtrace: trap ERR runs in subprograms'
 dialect: bash
 source: oils:spec/builtin-trap-err#set--o-errtrace-trap-err-runs-in-subprograms
-stdout: |-
+stdout: |
   line=6
   subshell
   line=10

@@ -1,7 +1,7 @@
 name: '[[ compound expressions'
 dialect: bash
 source: oils:spec/dbracket#compound-expressions
-stdout: |-
+stdout: |
   true
 ---
 # Notes on whitespace:

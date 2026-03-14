@@ -1,7 +1,7 @@
 name: + matches 1 or more
 dialect: bash
 source: oils:spec/extglob-match#matches-1-or-more
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

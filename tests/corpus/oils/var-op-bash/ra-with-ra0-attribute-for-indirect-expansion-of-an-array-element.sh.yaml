@@ -3,7 +3,7 @@ name: ${!r@a} with r='a[0]' (attribute for indirect expansion of an array
 dialect: bash
 source: 
   oils:spec/var-op-bash#ra-with-ra0-attribute-for-indirect-expansion-of-an-array-element
-stdout: |-
+stdout: |
   a
   a
   A

@@ -1,7 +1,7 @@
 name: Alias name with punctuation
 dialect: bash
 source: oils:spec/alias#alias-name-with-punctuation
-stdout: |-
+stdout: |
   X
 ---
 # NOTE: / is not OK in bash, but OK in other shells.  Must less restrictive

@@ -1,7 +1,7 @@
 name: Remove multiple handlers with trap -
 dialect: bash
 source: oils:spec/builtin-trap#remove-multiple-handlers-with-trap
-stdout: |-
+stdout: |
   ---
   ok
 ---

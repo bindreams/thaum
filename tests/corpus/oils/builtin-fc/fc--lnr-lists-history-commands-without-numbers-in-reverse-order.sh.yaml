@@ -2,7 +2,7 @@ name: fc -lnr lists history commands without numbers in reverse order
 dialect: bash
 source: 
   oils:spec/builtin-fc#fc--lnr-lists-history-commands-without-numbers-in-reverse-order
-stdout: |-
+stdout: |
   	 echo 3
   	 echo 2
   	 echo 1

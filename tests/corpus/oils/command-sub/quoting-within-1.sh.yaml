@@ -1,7 +1,7 @@
 name: Quoting $ within ``
 dialect: bash
 source: oils:spec/command-sub#quoting-within
-stdout: |-
+stdout: |
   1 $
   2 $
   3 $

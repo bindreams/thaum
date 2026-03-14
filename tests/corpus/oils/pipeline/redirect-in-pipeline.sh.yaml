@@ -1,7 +1,7 @@
 name: Redirect in Pipeline
 dialect: bash
 source: oils:spec/pipeline#redirect-in-pipeline
-stdout: |-
+stdout: |
   0
 ---
 echo hi 1>&2 | wc -l

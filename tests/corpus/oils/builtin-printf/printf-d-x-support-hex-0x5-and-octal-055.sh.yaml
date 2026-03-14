@@ -1,7 +1,7 @@
 name: printf %d %X support hex 0x5 and octal 055
 dialect: bash
 source: oils:spec/builtin-printf#printf-d-x-support-hex-0x5-and-octal-055
-stdout: |-
+stdout: |
   hex
   85
   55

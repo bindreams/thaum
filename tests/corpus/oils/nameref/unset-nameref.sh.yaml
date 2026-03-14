@@ -1,7 +1,7 @@
 name: unset nameref
 dialect: bash
 source: oils:spec/nameref#unset-nameref
-stdout: |-
+stdout: |
   ref=X
   ref=
   x=

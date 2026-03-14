@@ -1,7 +1,7 @@
 name: no-ops not shown by shopt -p
 dialect: bash
 source: oils:spec/sh-options#no-ops-not-shown-by-shopt--p
-stdout: |-
+stdout: |
   --
 ---
 

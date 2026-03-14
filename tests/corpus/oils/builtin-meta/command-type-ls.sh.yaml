@@ -1,7 +1,7 @@
 name: $(command type ls)
 dialect: bash
 source: oils:spec/builtin-meta#command-type-ls
-stdout: |-
+stdout: |
   FUNCTION
   status=0
 ---

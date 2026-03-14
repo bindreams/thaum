@@ -2,7 +2,7 @@ name: User array compared to "$@" (broken unless shopt -s strict_array)
 dialect: bash
 source: 
   oils:spec/dbracket#user-array-compared-to-broken-unless-shopt--s-strictarray
-stdout: |-
+stdout: |
   true
   false
 ---

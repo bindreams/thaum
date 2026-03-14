@@ -1,7 +1,7 @@
 name: More && ||
 dialect: bash
 source: oils:spec/errexit#more
-stdout: |-
+stdout: |
   group
   status=1
 

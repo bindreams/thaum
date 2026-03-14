@@ -2,7 +2,7 @@ disabled: true
 name: Double Quoted
 dialect: bash
 source: oils:spec/ysh-string#double-quoted
-stdout: |-
+stdout: |
   Hello World
   Hello World
 ---

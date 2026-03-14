@@ -1,7 +1,7 @@
 name: newline inside single-quoted string
 dialect: bash
 source: oils:spec/quote#newline-inside-single-quoted-string
-stdout: |-
+stdout: |
   newline
   inside single-quoted string
 ---

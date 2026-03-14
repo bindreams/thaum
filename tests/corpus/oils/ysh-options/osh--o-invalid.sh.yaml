@@ -2,7 +2,7 @@ disabled: true
 name: osh -O invalid
 dialect: bash
 source: oils:spec/ysh-options#osh--o-invalid
-stdout: |-
+stdout: |
   hi
   status=0
   status=2

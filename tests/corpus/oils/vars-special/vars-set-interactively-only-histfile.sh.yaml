@@ -1,7 +1,7 @@
 name: 'Vars set interactively only: $HISTFILE'
 dialect: bash
 source: oils:spec/vars-special#vars-set-interactively-only-histfile
-stdout: |-
+stdout: |
   histfile=
   histfile=yes
 ---

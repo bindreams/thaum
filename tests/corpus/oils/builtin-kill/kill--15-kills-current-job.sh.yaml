@@ -1,7 +1,7 @@
 name: kill -15 %% kills current job
 dialect: bash
 source: oils:spec/builtin-kill#kill--15-kills-current-job
-stdout: |-
+stdout: |
   kill=0
   wait=143
   wait=127

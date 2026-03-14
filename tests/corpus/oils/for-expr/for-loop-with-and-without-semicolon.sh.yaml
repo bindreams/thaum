@@ -2,7 +2,7 @@ name: For loop with and without semicolon
 dialect: bash
 source: oils:spec/for-expr#for-loop-with-and-without-semicolon
 status: 0
-stdout: |-
+stdout: |
   1
   2
   3

@@ -1,7 +1,7 @@
 name: pattern $f(x)  -- regression
 dialect: bash
 source: oils:spec/regex#pattern-fx----regression
-stdout: |-
+stdout: |
   status=0
   status=1
 ---

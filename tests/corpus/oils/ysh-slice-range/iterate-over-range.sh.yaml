@@ -2,7 +2,7 @@ disabled: true
 name: Iterate over range
 dialect: bash
 source: oils:spec/ysh-slice-range#iterate-over-range
-stdout: |-
+stdout: |
   1
   2
   3

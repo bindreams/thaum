@@ -1,7 +1,7 @@
 name: wait for N parallel jobs
 dialect: bash
 source: oils:spec/background#wait-for-n-parallel-jobs
-stdout: |-
+stdout: |
   status=0
 ---
 

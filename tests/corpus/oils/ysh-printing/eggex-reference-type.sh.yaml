@@ -2,7 +2,7 @@ disabled: true
 name: Eggex (reference type)
 dialect: bash
 source: oils:spec/ysh-printing#eggex-reference-type
-stdout: |-
+stdout: |
   <Eggex 0x--->
   (Dict)  {k: <Eggex 0x--->}
 

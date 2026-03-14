@@ -1,7 +1,7 @@
 name: Issue 2269 - Do NUL bytes match ? in ${a#?}
 dialect: bash
 source: oils:spec/nul-bytes#issue-2269---do-nul-bytes-match-in-a
-stdout: |-
+stdout: |
   escaped that'"'"'s it!
   that's it!
   ---

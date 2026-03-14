@@ -1,7 +1,7 @@
 name: dirs does not take arguments
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-does-not-take-arguments
-stdout: |-
+stdout: |
   failed
   failed
 ---

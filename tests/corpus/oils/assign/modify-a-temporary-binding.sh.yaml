@@ -1,7 +1,7 @@
 name: Modify a temporary binding
 dialect: bash
 source: oils:spec/assign#modify-a-temporary-binding
-stdout: |-
+stdout: |
   x before = 5
   x after  = 6
 ---

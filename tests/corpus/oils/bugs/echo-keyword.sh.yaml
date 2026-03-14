@@ -1,7 +1,7 @@
 name: echo keyword
 dialect: bash
 source: oils:spec/bugs#echo-keyword
-stdout: |-
+stdout: |
   done
 ---
 echo done

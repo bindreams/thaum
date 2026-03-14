@@ -1,7 +1,7 @@
 name: Break after ) is OK.
 dialect: bash
 source: oils:spec/func-parsing#break-after-is-ok
-stdout: |-
+stdout: |
   hi
   in-func
 ---

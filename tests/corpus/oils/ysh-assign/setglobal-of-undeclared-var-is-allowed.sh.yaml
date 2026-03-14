@@ -2,7 +2,7 @@ disabled: true
 name: setglobal of undeclared var is allowed
 dialect: bash
 source: oils:spec/ysh-assign#setglobal-of-undeclared-var-is-allowed
-stdout: |-
+stdout: |
   x=XX
   x=xx
 ---

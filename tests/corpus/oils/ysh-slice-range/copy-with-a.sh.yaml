@@ -2,7 +2,7 @@ disabled: true
 name: Copy with a[:]
 dialect: bash
 source: oils:spec/ysh-slice-range#copy-with-a
-stdout: |-
+stdout: |
   (List)   [1,2,3]
 ---
 var a = [1,2,3]

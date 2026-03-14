@@ -2,7 +2,7 @@ name: printf floating point (not required, but they all implement it)
 dialect: bash
 source: 
   oils:spec/builtin-printf#printf-floating-point-not-required-but-they-all-implement-it
-stdout: |-
+stdout: |
   [3.141590]
   [3.14]
   [    3.14]

@@ -2,7 +2,7 @@ disabled: true
 name: evalInFrame() and evalToDict()
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#evalinframe-and-evaltodict
-stdout: |-
+stdout: |
   hi
   hi
   (Dict)   {}

@@ -1,7 +1,7 @@
 name: Making command out of command sub should work
 dialect: bash
 source: oils:spec/command-sub#making-command-out-of-command-sub-should-work
-stdout: |-
+stdout: |
   split builtin
 ---
 # Works in bash and dash!

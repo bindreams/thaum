@@ -2,7 +2,7 @@ disabled: true
 name: read --num-bytes
 dialect: bash
 source: oils:spec/ysh-builtins#read---num-bytes
-stdout: |-
+stdout: |
   reply=[  a ]
   reply=[  a b]
   x=[  a ]

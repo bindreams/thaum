@@ -1,7 +1,7 @@
 name: printf %6q (width)
 dialect: bash
 source: oils:spec/builtin-printf#printf-6q-width
-stdout: |-
+stdout: |
   [ 'a b']
   ['a b']
 ---

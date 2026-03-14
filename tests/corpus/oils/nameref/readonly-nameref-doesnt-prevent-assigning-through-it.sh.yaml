@@ -1,7 +1,7 @@
 name: readonly nameref doesn't prevent assigning through it
 dialect: bash
 source: oils:spec/nameref#readonly-nameref-doesnt-prevent-assigning-through-it
-stdout: |-
+stdout: |
   ref=XX
   ref=XXXX
   x=X

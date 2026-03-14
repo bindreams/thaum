@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/builtin-dirs#dirs--v-to-print-numbered-stack-one-entry-per-line
 status: 0
-stdout: |-
+stdout: |
   --
    0  /tmp
    1  /

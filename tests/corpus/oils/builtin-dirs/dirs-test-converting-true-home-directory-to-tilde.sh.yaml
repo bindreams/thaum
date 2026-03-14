@@ -2,7 +2,7 @@ name: dirs test converting true home directory to tilde
 dialect: bash
 source: oils:spec/builtin-dirs#dirs-test-converting-true-home-directory-to-tilde
 status: 0
-stdout: |-
+stdout: |
   ~/oil_test/tmp /
 ---
 cd /

@@ -1,7 +1,7 @@
 name: Pipeline group quirk
 dialect: bash
 source: oils:spec/builtin-trap-err#pipeline-group-quirk
-stdout: |-
+stdout: |
   group2
   ok
 ---

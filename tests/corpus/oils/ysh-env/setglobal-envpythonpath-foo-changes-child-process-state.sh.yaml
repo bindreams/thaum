@@ -3,7 +3,7 @@ name: setglobal ENV.PYTHONPATH = 'foo' changes child process state
 dialect: bash
 source: 
   oils:spec/ysh-env#setglobal-envpythonpath-foo-changes-child-process-state
-stdout: |-
+stdout: |
   pythonpath=foo
 ---
 shopt -s ysh:upgrade

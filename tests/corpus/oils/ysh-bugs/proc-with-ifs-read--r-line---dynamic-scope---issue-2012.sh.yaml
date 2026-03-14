@@ -3,7 +3,7 @@ name: 'proc with IFS= read -r line - dynamic scope - issue #2012'
 dialect: bash
 source: 
   oils:spec/ysh-bugs#proc-with-ifs-read--r-line---dynamic-scope---issue-2012
-stdout: |-
+stdout: |
   zz
   yy
 ---

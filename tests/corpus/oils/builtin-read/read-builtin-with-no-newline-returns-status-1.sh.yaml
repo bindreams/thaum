@@ -2,7 +2,7 @@ name: read builtin with no newline returns status 1
 dialect: bash
 source: oils:spec/builtin-read#read-builtin-with-no-newline-returns-status-1
 status: 0
-stdout: |-
+stdout: |
   status=1
   ZZZ
 ---

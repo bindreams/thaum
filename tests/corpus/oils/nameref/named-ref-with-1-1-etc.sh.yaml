@@ -1,7 +1,7 @@
 name: named ref with 1 $1 etc.
 dialect: bash
 source: oils:spec/nameref#named-ref-with-1-1-etc
-stdout: |-
+stdout: |
   ref=1
   ref=1
   ref2=$1

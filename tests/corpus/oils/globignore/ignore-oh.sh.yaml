@@ -1,7 +1,7 @@
 name: Ignore *.o:*.h
 dialect: bash
 source: oils:spec/globignore#ignore-oh
-stdout: |-
+stdout: |
   hello hello.c
 ---
 touch {hello.c,hello.h,hello.o,hello}

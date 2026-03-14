@@ -1,7 +1,7 @@
 name: glob after var expansion
 dialect: bash
 source: oils:spec/glob#glob-after-var-expansion
-stdout: |-
+stdout: |
   _tmp/a.A _tmp/aa.A _tmp/b.B
 ---
 touch _tmp/a.A _tmp/aa.A _tmp/b.B

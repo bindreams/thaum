@@ -1,7 +1,7 @@
 name: op-test for ${a[@]} and ${a[*]}
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-a-and-a
-stdout: |-
+stdout: |
   a[@]: 'no-colon' 'with-colon'
   a[*]: 'no-colon' 'with-colon'
   a[@]: '' 'with-colon'

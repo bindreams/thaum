@@ -1,7 +1,7 @@
 name: 'Allowed: [[ = ]] and [[ == ]]'
 dialect: bash
 source: oils:spec/bool-parse#allowed-and
-stdout: |-
+stdout: |
   status=0
   status=0
 ---

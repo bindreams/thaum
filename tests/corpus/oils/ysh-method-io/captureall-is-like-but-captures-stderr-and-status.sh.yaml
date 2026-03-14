@@ -3,7 +3,7 @@ name: captureAll() is like $() but captures stderr and status
 dialect: bash
 source: 
   oils:spec/ysh-method-io#captureall-is-like-but-captures-stderr-and-status
-stdout: |-
+stdout: |
   (Dict)   {"stdout":"stdout\ncaptured\n\u0000","stderr":"stderr\ncaptured\n","status":42}
 ---
 

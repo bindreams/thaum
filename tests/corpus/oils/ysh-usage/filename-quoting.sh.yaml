@@ -2,7 +2,7 @@ disabled: true
 name: Filename quoting
 dialect: bash
 source: oils:spec/ysh-usage#filename-quoting
-stdout: |-
+stdout: |
   no-quoting:1
   "with spaces.sh":1
   b'bad \yff':1

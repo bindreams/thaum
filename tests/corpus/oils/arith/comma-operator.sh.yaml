@@ -2,7 +2,7 @@ name: comma operator
 dialect: bash
 source: oils:spec/arith#comma-operator
 status: 0
-stdout: |-
+stdout: |
   42
   last=6
 ---

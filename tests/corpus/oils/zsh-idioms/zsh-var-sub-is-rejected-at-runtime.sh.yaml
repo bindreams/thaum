@@ -1,7 +1,7 @@
 name: zsh var sub is rejected at runtime
 dialect: bash
 source: oils:spec/zsh-idioms#zsh-var-sub-is-rejected-at-runtime
-stdout: |-
+stdout: |
   status=1
   status=1
   status=1

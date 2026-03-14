@@ -1,7 +1,7 @@
 name: Background process and then a singleton pipeline
 dialect: bash
 source: oils:spec/background#background-process-and-then-a-singleton-pipeline
-stdout: |-
+stdout: |
   begin
   end
   status=42

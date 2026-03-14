@@ -7,7 +7,7 @@ source:
 # we expect the bash-like output where all assignments fail silently.
 # TODO: add a ShellOption (typeset_unset_readonly_bug) for oils-compatible behavior.
 status: 0
-stdout: |-
+stdout: |
   r=r1
   r=r1
   r=r1

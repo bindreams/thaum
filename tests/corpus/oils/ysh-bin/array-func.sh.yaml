@@ -2,7 +2,7 @@ disabled: true
 name: Array func
 dialect: bash
 source: oils:spec/ysh-bin#array-func
-stdout: |-
+stdout: |
   foo
   bar
 ---

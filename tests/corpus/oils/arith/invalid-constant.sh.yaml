@@ -2,7 +2,7 @@ name: Invalid constant
 dialect: bash
 source: oils:spec/arith#invalid-constant
 status: 1
-stdout: |-
+stdout: |
   0
   status=0
   status=1

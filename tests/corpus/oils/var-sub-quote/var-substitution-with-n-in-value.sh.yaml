@@ -1,7 +1,7 @@
 name: Var substitution with \n in value
 dialect: bash
 source: oils:spec/var-sub-quote#var-substitution-with-n-in-value
-stdout: |-
+stdout: |
   a\nb
   c\nd
   e\nf

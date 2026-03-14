@@ -1,7 +1,7 @@
 name: Redirect after here doc
 dialect: bash
 source: oils:spec/here-doc#redirect-after-here-doc
-stderr: |-
+stderr: |
   out
 ---
 cat <<EOF 1>&2

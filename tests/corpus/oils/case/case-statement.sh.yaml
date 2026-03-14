@@ -1,7 +1,7 @@
 name: Case statement
 dialect: bash
 source: oils:spec/case#case-statement
-stdout: |-
+stdout: |
   A
   loop
   loop

@@ -1,7 +1,7 @@
 name: op-test for ${!array} with array="a[@]" or array="a[*]"
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-array-with-arraya-or-arraya
-stdout: |-
+stdout: |
   ref=a[@]: 'no-colon' 'with-colon'
   ref=a[*]: 'no-colon' 'with-colon'
   ref=a[@]: '' 'with-colon'

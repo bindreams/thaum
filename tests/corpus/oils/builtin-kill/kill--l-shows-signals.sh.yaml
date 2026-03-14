@@ -1,7 +1,7 @@
 name: kill -l shows signals
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-shows-signals
-stdout: |-
+stdout: |
   0
   ## N-I dash STDOUT:
 ---

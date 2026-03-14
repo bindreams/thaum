@@ -2,7 +2,7 @@ disabled: true
 name: JSON \/ escapes supported
 dialect: bash
 source: oils:spec/ysh-json#json-escapes-supported
-stdout: |-
+stdout: |
   /
   reply=/
   reply=/

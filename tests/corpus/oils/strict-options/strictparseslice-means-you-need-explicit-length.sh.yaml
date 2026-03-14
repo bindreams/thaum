@@ -2,7 +2,7 @@ disabled: true
 name: strict_parse_slice means you need explicit  length
 dialect: bash
 source: oils:spec/strict-options#strictparseslice-means-you-need-explicit-length
-stdout: |-
+stdout: |
   //
   status=0
   status=2

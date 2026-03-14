@@ -1,7 +1,7 @@
 name: type -P does not find directories (regression)
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-does-not-find-directories-regression
-stdout: |-
+stdout: |
   status=1
   /usr/bin/cat
   status=0

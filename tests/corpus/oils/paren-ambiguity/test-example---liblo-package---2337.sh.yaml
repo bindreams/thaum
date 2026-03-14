@@ -1,7 +1,7 @@
 name: '((test example - liblo package - #2337'
 dialect: bash
 source: oils:spec/paren-ambiguity#test-example---liblo-package---2337
-stdout: |-
+stdout: |
   bye
 ---
 

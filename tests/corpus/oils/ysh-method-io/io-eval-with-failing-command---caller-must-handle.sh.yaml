@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-method-io#io-eval-with-failing-command---caller-must-handle
 status: 1
-stdout: |-
+stdout: |
   one
   (Dict)   {"code":1}
   one

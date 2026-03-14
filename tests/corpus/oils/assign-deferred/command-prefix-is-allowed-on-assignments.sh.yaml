@@ -1,7 +1,7 @@
 name: "'command' prefix is allowed on assignments"
 dialect: bash
 source: oils:spec/assign-deferred#command-prefix-is-allowed-on-assignments
-stdout: |-
+stdout: |
   r1=R1
   r2=R2
 ---

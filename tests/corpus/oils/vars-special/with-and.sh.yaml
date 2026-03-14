@@ -1,7 +1,7 @@
 name: $_ with && and ||
 dialect: bash
 source: oils:spec/vars-special#with-and
-stdout: |-
+stdout: |
   hi
   last=hi
   and=last=hi

@@ -3,7 +3,7 @@ name: User can handle errors - fromJson() fromJson8()
 dialect: bash
 source: oils:spec/ysh-json#user-can-handle-errors---fromjson-fromjson8
 status: 4
-stdout: |-
+stdout: |
   status=4
   decode error Expected Id.J8_RBracket
   status=4

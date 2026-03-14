@@ -1,7 +1,7 @@
 name: bash atoms [[ (( - redir failure checked
 dialect: bash
 source: oils:spec/errexit#bash-atoms---redir-failure-checked
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

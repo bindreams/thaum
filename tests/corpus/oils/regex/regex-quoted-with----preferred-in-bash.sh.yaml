@@ -1,7 +1,7 @@
 name: Regex quoted with \ -- preferred in bash
 dialect: bash
 source: oils:spec/regex#regex-quoted-with----preferred-in-bash
-stdout: |-
+stdout: |
   true
 ---
 [[ 'a b' =~ ^(a\ b)$ ]] && echo true

@@ -1,7 +1,7 @@
 name: ${@:0:1}
 dialect: bash
 source: oils:spec/var-op-slice#01
-stdout: |-
+stdout: |
   SHELL
 ---
 set a b c

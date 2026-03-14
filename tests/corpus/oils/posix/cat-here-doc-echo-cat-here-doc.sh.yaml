@@ -1,7 +1,7 @@
 name: cat here doc; echo; cat here doc
 dialect: bash
 source: oils:spec/posix#cat-here-doc-echo-cat-here-doc
-stdout: |-
+stdout: |
   one
   two
   three

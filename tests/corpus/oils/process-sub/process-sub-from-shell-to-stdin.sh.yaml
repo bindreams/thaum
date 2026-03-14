@@ -1,7 +1,7 @@
 name: Process sub from shell to stdin
 dialect: bash
 source: oils:spec/process-sub#process-sub-from-shell-to-stdin
-stdout: |-
+stdout: |
   3
   2
   1

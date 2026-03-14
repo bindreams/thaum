@@ -1,7 +1,7 @@
 name: break in condition of nested loop
 dialect: bash
 source: oils:spec/loop#break-in-condition-of-nested-loop
-stdout: |-
+stdout: |
   i=1
   i=2
   i=3

@@ -1,7 +1,7 @@
 name: shopt -s failglob in loop context
 dialect: bash
 source: oils:spec/glob-bash#shopt--s-failglob-in-loop-context
-stdout: |-
+stdout: |
   *.ZZ
   status=0
   status=1

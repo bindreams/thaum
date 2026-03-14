@@ -1,7 +1,7 @@
 name: "'umask -S' prints symbolic umask"
 dialect: bash
 source: oils:spec/builtin-umask#umask--s-prints-symbolic-umask
-stdout: |-
+stdout: |
   u=rwx,g=rx,o=rx
   status=0
 ---

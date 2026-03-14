@@ -2,7 +2,7 @@ disabled: true
 name: failed builtin  usage
 dialect: bash
 source: oils:spec/ysh-builtin-error#failed-builtin-usage
-stdout: |-
+stdout: |
   ok
   status=2
   ok

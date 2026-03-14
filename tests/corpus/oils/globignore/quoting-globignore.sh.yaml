@@ -1,7 +1,7 @@
 name: Quoting GLOBIGNORE
 dialect: bash
 source: oils:spec/globignore#quoting-globignore
-stdout: |-
+stdout: |
   *
   *
   *

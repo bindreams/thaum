@@ -1,7 +1,7 @@
 name: assoc array and - and +
 dialect: bash
 source: oils:spec/var-op-test#assoc-array-and---and
-stdout: |-
+stdout: |
   empty=minus
   empty=
   assoc=v

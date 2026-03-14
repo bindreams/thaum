@@ -1,7 +1,7 @@
 name: pattern starting with . does not return . and ..
 dialect: bash
 source: oils:spec/glob#pattern-starting-with-does-not-return-and
-stdout: |-
+stdout: |
   hi .*
 ---
 

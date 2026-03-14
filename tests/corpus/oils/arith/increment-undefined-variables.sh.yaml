@@ -1,7 +1,7 @@
 name: Increment undefined variables
 dialect: bash
 source: oils:spec/arith#increment-undefined-variables
-stdout: |-
+stdout: |
   [1][1]
 ---
 shopt -u strict_arith || true

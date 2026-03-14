@@ -1,7 +1,7 @@
 name: bind -v -V accepted
 dialect: bash
 source: oils:spec/builtin-bind#bind--v--v-accepted
-stdout: |-
+stdout: |
   set blink-matching-paren off
 
   blink-matching-paren is set to 'off'

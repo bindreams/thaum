@@ -2,7 +2,7 @@ disabled: true
 name: 'parse_paren: while statement'
 dialect: bash
 source: oils:spec/ysh-options#parseparen-while-statement
-stdout: |-
+stdout: |
   1
   2
   done ksh

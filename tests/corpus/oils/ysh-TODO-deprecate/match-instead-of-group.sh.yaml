@@ -2,7 +2,7 @@ disabled: true
 name: _match() instead of _group()
 dialect: bash
 source: oils:spec/ysh-TODO-deprecate#match-instead-of-group
-stdout: |-
+stdout: |
   42
   42
 ---

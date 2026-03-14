@@ -3,7 +3,7 @@ name: proc and shell function
 dialect: bash
 source: oils:spec/ysh-xtrace#proc-and-shell-function
 stdout: ''
-stderr: |-
+stderr: |
   > proc shfunc 1
     . builtin ':' 1
   < proc shfunc

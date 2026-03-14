@@ -2,7 +2,7 @@ disabled: true
 name: obj=>method() - remove?
 dialect: bash
 source: oils:spec/ysh-expr#objmethod---remove
-stdout: |-
+stdout: |
   HI
 ---
 var s = 'hi'

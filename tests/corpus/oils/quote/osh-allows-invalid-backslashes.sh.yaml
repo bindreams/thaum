@@ -1,7 +1,7 @@
 name: OSH allows invalid backslashes
 dialect: bash
 source: oils:spec/quote#osh-allows-invalid-backslashes
-stdout: |-
+stdout: |
   \uZ \u{03bc \z
 ---
 case $SH in dash|mksh) exit ;; esac

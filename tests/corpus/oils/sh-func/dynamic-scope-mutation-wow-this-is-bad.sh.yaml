@@ -1,7 +1,7 @@
 name: Dynamic Scope Mutation (wow this is bad)
 dialect: bash
 source: oils:spec/sh-func#dynamic-scope-mutation-wow-this-is-bad
-stdout: |-
+stdout: |
   g_var=g_var
   g_var=f_mutation
   g_var=

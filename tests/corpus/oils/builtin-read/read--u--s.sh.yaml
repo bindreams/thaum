@@ -1,7 +1,7 @@
 name: read -u -s
 dialect: bash
 source: oils:spec/builtin-read#read--u--s
-stdout: |-
+stdout: |
   reply=hi
 ---
 case $SH in dash|mksh) exit ;; esac

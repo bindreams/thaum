@@ -2,7 +2,7 @@ disabled: true
 name: Capture with Type Conversion Func
 dialect: bash
 source: oils:spec/ysh-regex-api#capture-with-type-conversion-func
-stdout: |-
+stdout: |
   Int Float
   Int Float
 ---

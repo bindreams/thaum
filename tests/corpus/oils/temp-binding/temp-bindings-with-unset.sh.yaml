@@ -1,7 +1,7 @@
 name: Temp bindings with unset
 dialect: bash
 source: oils:spec/temp-binding#temp-bindings-with-unset
-stdout: |-
+stdout: |
   x=
   ---
   x=

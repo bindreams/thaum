@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/builtin-eval-source#eval-ysh-block-with-break-continue-return-error
 status: 1
-stdout: |-
+stdout: |
   --- break
   1
   end func

@@ -2,7 +2,7 @@ disabled: true
 name: Division operators are left associative
 dialect: bash
 source: oils:spec/ysh-expr-arith#division-operators-are-left-associative
-stdout: |-
+stdout: |
   a=1.25 b=1.25
   a=1 b=1
   a=2 b=2

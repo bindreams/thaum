@@ -2,7 +2,7 @@ disabled: true
 name: floatsEqual()
 dialect: bash
 source: oils:spec/ysh-expr-compare#floatsequal
-stdout: |-
+stdout: |
   (Bool)   true
   (Bool)   false
 ---

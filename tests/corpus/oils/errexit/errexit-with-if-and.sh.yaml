@@ -2,7 +2,7 @@ name: errexit with if and { }
 dialect: bash
 source: oils:spec/errexit#errexit-with-if-and
 status: 0
-stdout: |-
+stdout: |
   one
   two
   three

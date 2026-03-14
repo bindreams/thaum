@@ -3,7 +3,7 @@ name: parseCommand then io->eval(to_dict=true) - in global scope
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#parsecommand-then-io-evaltodicttrue---in-global-scope
-stdout: |-
+stdout: |
   <Command>
   hi
   (Dict)   {"x":42,"y":"global"}

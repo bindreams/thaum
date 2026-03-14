@@ -3,7 +3,7 @@ name: leftMatch() combined with REG_NEWLINE - interaction with ^
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#leftmatch-combined-with-regnewline---interaction-with
-stdout: |-
+stdout: |
   (List)   [0,"o"]
   (List)   [1,"n"]
   (List)   [2,"e"]

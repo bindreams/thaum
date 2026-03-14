@@ -1,7 +1,7 @@
 name: type -p and -P builtin -> file
 dialect: bash
 source: oils:spec/builtin-type-bash#type--p-and--p-builtin---file
-stdout: |-
+stdout: |
   /tmp/mv
   /tmp/tar
   /tmp/grep

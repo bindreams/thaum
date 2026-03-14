@@ -2,7 +2,7 @@ disabled: true
 name: int() more
 dialect: bash
 source: oils:spec/ysh-convert#int-more
-stdout: |-
+stdout: |
   (Int)   3
   (Int)   -35
   (Int)   56

@@ -2,7 +2,7 @@ disabled: true
 name: Process subs, subshells not allowed with eval()
 dialect: bash
 source: oils:spec/ysh-purity#process-subs-subshells-not-allowed-with-eval
-stdout: |-
+stdout: |
   1
   2
   code=5 message=Process subs aren't allowed in pure mode (OILS-ERR-204)

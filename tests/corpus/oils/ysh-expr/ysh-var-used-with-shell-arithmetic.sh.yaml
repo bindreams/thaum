@@ -2,7 +2,7 @@ disabled: true
 name: YSH var used with shell arithmetic
 dialect: bash
 source: oils:spec/ysh-expr#ysh-var-used-with-shell-arithmetic
-stdout: |-
+stdout: |
   lt=1
   gt=0
   lt=1

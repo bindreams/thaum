@@ -2,7 +2,7 @@ name: trap ERR and pipelines - PIPESTATUS difference
 dialect: bash
 source: 
   oils:spec/builtin-trap-err#trap-err-and-pipelines---pipestatus-difference
-stdout: |-
+stdout: |
   A
   err [] status=1 [1]
   B

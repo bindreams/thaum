@@ -1,7 +1,7 @@
 name: remove pwd dir
 dialect: bash
 source: oils:spec/builtin-cd#remove-pwd-dir
-stdout: |-
+stdout: |
   /tmp/oil-spec-test/pwd
   status=0
   /tmp/oil-spec-test/pwd

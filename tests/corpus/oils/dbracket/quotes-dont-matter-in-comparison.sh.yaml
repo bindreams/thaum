@@ -1,7 +1,7 @@
 name: Quotes don't matter in comparison
 dialect: bash
 source: oils:spec/dbracket#quotes-dont-matter-in-comparison
-stdout: |-
+stdout: |
   true
   true
 ---

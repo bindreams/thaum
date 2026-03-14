@@ -1,7 +1,7 @@
 name: '* matches 0 or more'
 dialect: bash
 source: oils:spec/extglob-match#matches-0-or-more
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

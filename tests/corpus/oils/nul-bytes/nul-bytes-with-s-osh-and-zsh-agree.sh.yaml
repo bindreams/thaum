@@ -1,7 +1,7 @@
 name: NUL bytes with ${#s} (OSH and zsh agree)
 dialect: bash
 source: oils:spec/nul-bytes#nul-bytes-with-s-osh-and-zsh-agree
-stdout: |-
+stdout: |
   empty=0
   nul=0
 ---

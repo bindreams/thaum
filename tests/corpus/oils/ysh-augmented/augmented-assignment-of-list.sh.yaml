@@ -2,7 +2,7 @@ disabled: true
 name: Augmented assignment of List
 dialect: bash
 source: oils:spec/ysh-augmented#augmented-assignment-of-list
-stdout: |-
+stdout: |
   31 42
   31 21
   31 10.5

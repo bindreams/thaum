@@ -1,7 +1,7 @@
 name: ${A[@]#prefix}
 dialect: bash
 source: oils:spec/array-assoc#aprefix
-stdout: |-
+stdout: |
   hree
   one
   wo

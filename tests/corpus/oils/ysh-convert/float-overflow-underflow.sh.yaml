@@ -2,7 +2,7 @@ disabled: true
 name: float() overflow / underflow
 dialect: bash
 source: oils:spec/ysh-convert#float-overflow-underflow
-stdout: |-
+stdout: |
   1.2
   3.4
   inf

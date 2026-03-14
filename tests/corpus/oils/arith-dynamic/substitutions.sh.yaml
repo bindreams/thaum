@@ -1,7 +1,7 @@
 name: Substitutions
 dialect: bash
 source: oils:spec/arith-dynamic#substitutions
-stdout: |-
+stdout: |
   7
   7
 ---

@@ -1,7 +1,7 @@
 name: '[[ -v assoc[key] ]] syntax errors'
 dialect: bash
 source: oils:spec/array-assoc#v-assockey-syntax-errors
-stdout: |-
+stdout: |
   empty=0
   k=0
   typo=1

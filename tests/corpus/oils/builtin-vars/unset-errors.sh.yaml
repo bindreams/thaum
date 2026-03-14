@@ -1,7 +1,7 @@
 name: Unset errors
 dialect: bash
 source: oils:spec/builtin-vars#unset-errors
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

@@ -2,7 +2,7 @@ disabled: true
 name: 'parse_brace: brace group in if condition'
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-brace-group-in-if-condition
-stdout: |-
+stdout: |
   one
   two
   three

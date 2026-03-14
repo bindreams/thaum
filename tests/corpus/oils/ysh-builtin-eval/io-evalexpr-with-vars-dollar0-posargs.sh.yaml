@@ -2,7 +2,7 @@ disabled: true
 name: io->evalExpr() with vars, dollar0, pos_args
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-evalexpr-with-vars-dollar0-posargs
-stdout: |-
+stdout: |
   z a b hello
   2
   4

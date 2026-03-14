@@ -1,7 +1,7 @@
 name: '%06s is no-op'
 dialect: bash
 source: oils:spec/builtin-printf#06s-is-no-op
-stdout: |-
+stdout: |
   (    42)
   (   -42)
   (    42)

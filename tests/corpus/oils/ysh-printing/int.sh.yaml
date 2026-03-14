@@ -2,7 +2,7 @@ disabled: true
 name: Int
 dialect: bash
 source: oils:spec/ysh-printing#int
-stdout: |-
+stdout: |
   (Int)   -123
 ---
 =  -123

@@ -1,7 +1,7 @@
 name: $ is optional
 dialect: bash
 source: oils:spec/arith#is-optional
-stdout: |-
+stdout: |
   2
 ---
 i=1

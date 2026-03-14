@@ -2,7 +2,7 @@ name: declare -a arr does not remove existing arrays (OSH regression)
 dialect: bash
 source: 
   oils:spec/assign#declare--a-arr-does-not-remove-existing-arrays-osh-regression
-stdout: |-
+stdout: |
   arr:3
 ---
 case $SH in dash) exit 99 ;; esac # dash does not support arrays

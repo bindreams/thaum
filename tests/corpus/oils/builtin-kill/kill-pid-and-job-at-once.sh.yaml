@@ -1,7 +1,7 @@
 name: kill pid and job at once
 dialect: bash
 source: oils:spec/builtin-kill#kill-pid-and-job-at-once
-stdout: |-
+stdout: |
   0
   ## BUG dash STDOUT:
   1

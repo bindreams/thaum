@@ -2,7 +2,7 @@ disabled: true
 name: Group ()
 dialect: bash
 source: oils:spec/ysh-regex#group
-stdout: |-
+stdout: |
   (^[[:space:]]|[[:digit:]][[:digit:]])
   yes
   yes

@@ -1,7 +1,7 @@
 name: Brace Expansion within Array
 dialect: bash
 source: oils:spec/array#brace-expansion-within-array
-stdout: |-
+stdout: |
   -a -b c- d-
 ---
 a=(-{a,b} {c,d}-)

@@ -1,7 +1,7 @@
 name: 'mapfile (truncate delim): -t'
 dialect: bash
 source: oils:spec/builtin-bash#mapfile-truncate-delim--t
-stdout: |-
+stdout: |
   n=3
   [1]
   [3]

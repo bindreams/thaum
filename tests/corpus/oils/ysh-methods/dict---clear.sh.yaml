@@ -3,7 +3,7 @@ name: Dict -> clear()
 dialect: bash
 source: oils:spec/ysh-methods#dict---clear
 status: 0
-stdout: |-
+stdout: |
   (Dict)   {}
   (Dict)   {}
 ---

@@ -2,7 +2,7 @@ name: builtin command echo hi
 dialect: bash
 source: oils:spec/builtin-meta#builtin-command-echo-hi
 status: 0
-stdout: |-
+stdout: |
   hi
 ---
 builtin command echo hi

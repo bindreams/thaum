@@ -2,7 +2,7 @@ disabled: true
 name: Bitwise logical
 dialect: bash
 source: oils:spec/ysh-expr-arith#bitwise-logical
-stdout: |-
+stdout: |
   1
   7
   6

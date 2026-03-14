@@ -2,7 +2,7 @@ disabled: true
 name: can unset procs without -f
 dialect: bash
 source: oils:spec/ysh-proc#can-unset-procs-without--f
-stdout: |-
+stdout: |
   bar
   status=0
   <Proc>

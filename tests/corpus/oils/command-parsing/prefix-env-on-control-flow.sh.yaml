@@ -2,7 +2,7 @@ name: Prefix env on control flow
 dialect: bash
 source: oils:spec/command-parsing#prefix-env-on-control-flow
 status: 0
-stdout: |-
+stdout: |
   a
 ---
 for x in a b c; do

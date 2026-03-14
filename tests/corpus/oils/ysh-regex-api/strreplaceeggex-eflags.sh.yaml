@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace(Eggex, *), eflags
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplaceeggex-eflags
-stdout: |-
+stdout: |
   [1]-[2]-[3]
   [4]-[5]
   [1]-2-3

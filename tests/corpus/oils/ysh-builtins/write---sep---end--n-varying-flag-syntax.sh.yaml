@@ -2,7 +2,7 @@ disabled: true
 name: write --sep, --end, -n, varying flag syntax
 dialect: bash
 source: oils:spec/ysh-builtins#write---sep---end--n-varying-flag-syntax
-stdout: |-
+stdout: |
   a b
   c d
   .

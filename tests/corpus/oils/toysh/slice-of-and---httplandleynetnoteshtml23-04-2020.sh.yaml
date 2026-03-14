@@ -1,7 +1,7 @@
 name: slice of @ and @ - http://landley.net/notes.html#23-04-2020
 dialect: bash
 source: oils:spec/toysh#slice-of-and---httplandleynetnoteshtml23-04-2020
-stdout: |-
+stdout: |
   =ef=
   =gh=
   =ij=

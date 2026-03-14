@@ -1,7 +1,7 @@
 name: length ${#a[@]}
 dialect: bash
 source: oils:spec/array-assoc#length-a
-stdout: |-
+stdout: |
   3
 ---
 declare -A a

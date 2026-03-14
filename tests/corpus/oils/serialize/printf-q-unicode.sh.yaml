@@ -1,7 +1,7 @@
 name: printf %q unicode
 dialect: bash
 source: oils:spec/serialize#printf-q-unicode
-stdout: |-
+stdout: |
   μ
 ---
 case $SH in ash) return ;; esac  # yash and ash don't implement this

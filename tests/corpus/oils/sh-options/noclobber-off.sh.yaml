@@ -1,7 +1,7 @@
 name: noclobber off
 dialect: bash
 source: oils:spec/sh-options#noclobber-off
-stdout: |-
+stdout: |
   status=0
   status=0
   status=0

@@ -1,7 +1,7 @@
 name: undef[0]
 dialect: bash
 source: oils:spec/arith#undef0
-stdout: |-
+stdout: |
   ARITH 0
   status=0
 

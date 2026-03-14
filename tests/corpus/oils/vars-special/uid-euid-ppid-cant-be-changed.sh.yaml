@@ -1,7 +1,7 @@
 name: UID EUID PPID can't be changed
 dialect: bash
 source: oils:spec/vars-special#uid-euid-ppid-cant-be-changed
-stdout: |-
+stdout: |
   status=1
 ---
 

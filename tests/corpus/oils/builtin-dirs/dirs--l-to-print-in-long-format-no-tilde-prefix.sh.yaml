@@ -2,7 +2,7 @@ name: dirs -l to print in long format, no tilde prefix
 dialect: bash
 source: oils:spec/builtin-dirs#dirs--l-to-print-in-long-format-no-tilde-prefix
 status: 0
-stdout: |-
+stdout: |
   ~/oil_test /
   /tmp/oil_test /
 ---

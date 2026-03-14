@@ -1,7 +1,7 @@
 name: trap 0 is equivalent to trap EXIT
 dialect: bash
 source: oils:spec/builtin-trap#trap-0-is-equivalent-to-trap-exit
-stdout: |-
+stdout: |
   trap -- 'echo EXIT' EXIT
   trap -- 'echo INT' SIGINT
   ---

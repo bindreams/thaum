@@ -1,7 +1,7 @@
 name: read -u 3 -d b -N 6
 dialect: bash
 source: oils:spec/builtin-read#read--u-3--d-b--n-6
-stdout: |-
+stdout: |
   reply=abab
   reply=ab
 ---

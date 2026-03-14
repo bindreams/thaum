@@ -3,7 +3,7 @@ name: trap ERR - proc subshell failure
 dialect: bash
 source: oils:spec/ysh-introspect#trap-err---proc-subshell-failure
 status: 42
-stdout: |-
+stdout: |
   [ stdin ]:16
       f
       ^

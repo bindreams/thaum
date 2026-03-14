@@ -2,7 +2,7 @@ disabled: true
 name: echo $[f(x)] for various types
 dialect: bash
 source: oils:spec/ysh-word-eval#echo-fx-for-various-types
-stdout: |-
+stdout: |
   bool true
   int 2
   float 3.14

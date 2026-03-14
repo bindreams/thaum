@@ -1,7 +1,7 @@
 name: '[[ $x == !($str) ]]'
 dialect: bash
 source: oils:spec/extglob-match#x-str
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

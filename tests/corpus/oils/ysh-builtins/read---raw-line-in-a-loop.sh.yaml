@@ -2,7 +2,7 @@ disabled: true
 name: read --raw-line in a loop
 dialect: bash
 source: oils:spec/ysh-builtins#read---raw-line-in-a-loop
-stdout: |-
+stdout: |
   (Str)   ""
   (Str)   "a"
   (Str)   "b"

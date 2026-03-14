@@ -1,7 +1,7 @@
 name: Two here docs -- first is ignored; second ones wins!
 dialect: bash
 source: oils:spec/here-doc#two-here-docs----first-is-ignored-second-ones-wins
-stdout: |-
+stdout: |
   there
 ---
 <<EOF1 cat <<EOF2

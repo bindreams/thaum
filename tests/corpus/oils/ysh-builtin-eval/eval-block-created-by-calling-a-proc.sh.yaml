@@ -2,7 +2,7 @@ disabled: true
 name: Eval block created by calling a proc
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-block-created-by-calling-a-proc
-stdout: |-
+stdout: |
   0
   1
 ---

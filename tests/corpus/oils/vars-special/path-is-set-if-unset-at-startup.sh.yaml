@@ -1,7 +1,7 @@
 name: $PATH is set if unset at startup
 dialect: bash
 source: oils:spec/vars-special#path-is-set-if-unset-at-startup
-stdout: |-
+stdout: |
   yes
   yes
 ---

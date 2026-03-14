@@ -2,7 +2,7 @@ disabled: true
 name: json round trip (regression)
 dialect: bash
 source: oils:spec/ysh-json#json-round-trip-regression
-stdout: |-
+stdout: |
   (Dict)   {"short":"-v","long":"--verbose","type":null,"default":"","help":"Enable verbose logging"}
 ---
 

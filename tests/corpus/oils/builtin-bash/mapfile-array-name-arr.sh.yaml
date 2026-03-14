@@ -1,7 +1,7 @@
 name: 'mapfile (array name): arr'
 dialect: bash
 source: oils:spec/builtin-bash#mapfile-array-name-arr
-stdout: |-
+stdout: |
   n=3
   [1
   ]

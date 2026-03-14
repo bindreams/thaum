@@ -2,7 +2,7 @@ disabled: true
 name: List->reverse() from iterator
 dialect: bash
 source: oils:spec/ysh-methods#list-reverse-from-iterator
-stdout: |-
+stdout: |
   2
   1
   0

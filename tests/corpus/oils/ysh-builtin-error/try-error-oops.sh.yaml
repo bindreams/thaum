@@ -2,7 +2,7 @@ disabled: true
 name: try { error oops }
 dialect: bash
 source: oils:spec/ysh-builtin-error#try-error-oops
-stdout: |-
+stdout: |
   status=10
 ---
 

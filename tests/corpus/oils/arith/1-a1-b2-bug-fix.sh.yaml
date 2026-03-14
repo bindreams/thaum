@@ -1,7 +1,7 @@
 name: '1 ? a=1 : b=2 ( bug fix)'
 dialect: bash
 source: oils:spec/arith#1-a1-b2-bug-fix
-stdout: |-
+stdout: |
   1
   a=1
 ---

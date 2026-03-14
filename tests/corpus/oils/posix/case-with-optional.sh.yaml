@@ -1,7 +1,7 @@
 name: Case with optional (
 dialect: bash
 source: oils:spec/posix#case-with-optional
-stdout: |-
+stdout: |
   A
 ---
 foo=a

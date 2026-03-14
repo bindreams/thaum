@@ -1,7 +1,7 @@
 name: shopt -u globskipdots shows . and ..
 dialect: bash
 source: oils:spec/glob#shopt--u-globskipdots-shows-and
-stdout: |-
+stdout: |
   hi . ..
 ---
 case $SH in dash|ash|mksh) exit ;; esac

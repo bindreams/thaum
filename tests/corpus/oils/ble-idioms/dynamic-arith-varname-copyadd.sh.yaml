@@ -1,7 +1,7 @@
 name: 'dynamic arith varname: copy/add'
 dialect: bash
 source: oils:spec/ble-idioms#dynamic-arith-varname-copyadd
-stdout: |-
+stdout: |
   c_x=3 c_y=4
   c_x=7 c_y=24
 ---

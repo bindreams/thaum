@@ -1,7 +1,7 @@
 name: declare builtin doesn't allow spaces
 dialect: bash
 source: oils:spec/array-assign#declare-builtin-doesnt-allow-spaces
-stdout: |-
+stdout: |
   declare -a a=([0]="1" [1]="X")
   declare -a a=([0]="1" [1]="X" [2]="3")
 ---

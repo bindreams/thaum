@@ -1,7 +1,7 @@
 name: Non-executable on $PATH
 dialect: bash
 source: oils:spec/command#non-executable-on-path
-stdout: |-
+stdout: |
   two
   status=0
 ---

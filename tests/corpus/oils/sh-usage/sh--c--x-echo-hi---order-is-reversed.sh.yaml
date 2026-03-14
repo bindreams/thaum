@@ -4,7 +4,7 @@ source: oils:spec/sh-usage#sh--c--x-echo-hi---order-is-reversed
 stdout: |
   hi
   status=127
-stderr: |-
+stderr: |
   + echo hi
 ---
 case $SH in zsh) exit ;; esac  # different -x format

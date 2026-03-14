@@ -1,7 +1,7 @@
 name: Variable references
 dialect: bash
 source: oils:spec/arith-dynamic#variable-references
-stdout: |-
+stdout: |
   7
   status=0
   9

@@ -1,7 +1,7 @@
 name: assoc array ${arr["k"]=x}
 dialect: bash
 source: oils:spec/var-op-test#assoc-array-arrkx
-stdout: |-
+stdout: |
   0
   1
 ---

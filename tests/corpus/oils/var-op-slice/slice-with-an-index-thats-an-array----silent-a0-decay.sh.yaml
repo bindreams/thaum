@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/var-op-slice#slice-with-an-index-thats-an-array----silent-a0-decay
 status: 0
-stdout: |-
+stdout: |
   assigned
   de
 ---

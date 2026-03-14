@@ -3,7 +3,7 @@ name: Eggex flags to treat newlines as special are respected
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#eggex-flags-to-treat-newlines-as-special-are-respected
-stdout: |-
+stdout: |
   yes
   yes
   yes

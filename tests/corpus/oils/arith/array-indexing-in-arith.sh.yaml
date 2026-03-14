@@ -1,7 +1,7 @@
 name: Array indexing in arith
 dialect: bash
 source: oils:spec/arith#array-indexing-in-arith
-stdout: |-
+stdout: |
   11
 ---
 # zsh does 1-based indexing!

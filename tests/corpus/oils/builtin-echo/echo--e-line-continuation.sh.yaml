@@ -1,7 +1,7 @@
 name: echo -e line continuation
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-line-continuation
-stdout: |-
+stdout: |
   foo\
   bar
 ---

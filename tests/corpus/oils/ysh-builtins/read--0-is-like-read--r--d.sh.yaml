@@ -2,7 +2,7 @@ disabled: true
 name: read -0 is like read -r -d ''
 dialect: bash
 source: oils:spec/ysh-builtins#read--0-is-like-read--r--d
-stdout: |-
+stdout: |
   [./a\b\c\d]
   [./a\b\c\d]
 ---

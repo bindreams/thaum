@@ -1,7 +1,7 @@
 name: lookup with ${a[0]} -- "0" is a string
 dialect: bash
 source: oils:spec/array-assoc#lookup-with-a0----0-is-a-string
-stdout: |-
+stdout: |
   0 a 1 b 2 c
 ---
 declare -A a

@@ -2,7 +2,7 @@ name: '"declare -a arr" and "readonly -a a" creates an empty array (OSH)'
 dialect: bash
 source: 
   oils:spec/assign#declare--a-arr-and-readonly--a-a-creates-an-empty-array-osh
-stdout: |-
+stdout: |
   declare -a arr1=()
   declare -ra arr2=()
   declare -A dict1=()

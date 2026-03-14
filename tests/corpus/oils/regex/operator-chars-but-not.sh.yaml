@@ -1,7 +1,7 @@
 name: Operator chars ; & but not |
 dialect: bash
 source: oils:spec/regex#operator-chars-but-not
-stdout: |-
+stdout: |
   semi=2
   semi paren
   semi paren=0

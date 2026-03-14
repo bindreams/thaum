@@ -1,7 +1,7 @@
 name: compgen -o default completes files and dirs
 dialect: bash
 source: oils:spec/builtin-completion#compgen--o-default-completes-files-and-dirs
-stdout: |-
+stdout: |
   spec/temp-binding.test.sh
   spec/testdata
   spec/tilde.test.sh

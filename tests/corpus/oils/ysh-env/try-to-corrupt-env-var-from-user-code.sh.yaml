@@ -2,7 +2,7 @@ disabled: true
 name: try to corrupt ENV var from user code
 dialect: bash
 source: oils:spec/ysh-env#try-to-corrupt-env-var-from-user-code
-stdout: |-
+stdout: |
   (Str)   'aa'
 ---
 shopt --set ysh:all

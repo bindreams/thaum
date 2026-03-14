@@ -2,7 +2,7 @@ disabled: true
 name: Regex with [ (bug regression)
 dialect: bash
 source: oils:spec/ysh-regex-api#regex-with-bug-regression
-stdout: |-
+stdout: |
   sq
   char class
 ---

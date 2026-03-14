@@ -1,7 +1,7 @@
 name: Confusing unquoted slash matches bash (and ash)
 dialect: bash
 source: oils:spec/var-op-patsub#confusing-unquoted-slash-matches-bash-and-ash
-stdout: |-
+stdout: |
   c_c
   c_c
 ---

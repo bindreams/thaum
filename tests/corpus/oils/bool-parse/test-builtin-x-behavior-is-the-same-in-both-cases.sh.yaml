@@ -1,7 +1,7 @@
 name: 'test builtin: ( x ) behavior is the same in both cases'
 dialect: bash
 source: oils:spec/bool-parse#test-builtin-x-behavior-is-the-same-in-both-cases
-stdout: |-
+stdout: |
   status=0
   status=0
 ---

@@ -3,7 +3,7 @@ name: Dict -> inc() with floats
 dialect: bash
 source: oils:spec/ysh-methods#dict---inc-with-floats
 status: 3
-stdout: |-
+stdout: |
   (Dict)   {"a":4.5}
   (Dict)   {"a":8.0}
   (Dict)   {"a":8.0,"b":3.5}

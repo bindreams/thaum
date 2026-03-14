@@ -1,7 +1,7 @@
 name: sh -c -- 'echo hi' does not run anything (#2637)
 dialect: bash
 source: oils:spec/sh-usage#sh--c----echo-hi-does-not-run-anything-2637
-stdout: |-
+stdout: |
   z failed
 
   three failed

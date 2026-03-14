@@ -1,7 +1,7 @@
 name: declare -p var (exit status)
 dialect: bash
 source: oils:spec/assign-extended#declare--p-var-exit-status
-stdout: |-
+stdout: |
   1
   1
   0

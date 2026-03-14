@@ -2,7 +2,7 @@ disabled: true
 name: Nested bare assignment
 dialect: bash
 source: oils:spec/hay#nested-bare-assignment
-stdout: |-
+stdout: |
   {
     "source": null,
     "children": [

@@ -1,7 +1,7 @@
 name: PatSub of negated unescaped [[] and []]
 dialect: bash
 source: oils:spec/glob#patsub-of-negated-unescaped-and
-stdout: |-
+stdout: |
   [<<<<
   >>>>]
   [<<<<

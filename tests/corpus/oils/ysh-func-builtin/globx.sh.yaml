@@ -2,7 +2,7 @@ disabled: true
 name: '@[glob(x)]'
 dialect: bash
 source: oils:spec/ysh-func-builtin#globx
-stdout: |-
+stdout: |
   A
   B
   ___

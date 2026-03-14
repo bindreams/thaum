@@ -1,7 +1,7 @@
 name: subshell while running a script (regression)
 dialect: bash
 source: oils:spec/bugs#subshell-while-running-a-script-regression
-stdout: |-
+stdout: |
   start
   end
 ---

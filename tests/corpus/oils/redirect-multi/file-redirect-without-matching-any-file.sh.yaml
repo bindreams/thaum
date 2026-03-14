@@ -1,7 +1,7 @@
 name: File redirect without matching any file
 dialect: bash
 source: oils:spec/redirect-multi#file-redirect-without-matching-any-file
-stdout: |-
+stdout: |
   status=0
   zz-*-xx
 ---

@@ -1,7 +1,7 @@
 name: unalias without args is a usage error
 dialect: bash
 source: oils:spec/alias#unalias-without-args-is-a-usage-error
-stdout: |-
+stdout: |
   usage-error
 ---
 unalias

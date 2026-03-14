@@ -1,7 +1,7 @@
 name: traps are cleared in subshell (started with &)
 dialect: bash
 source: oils:spec/builtin-trap#traps-are-cleared-in-subshell-started-with
-stdout: |-
+stdout: |
   SIGURG
   begin child
   end child

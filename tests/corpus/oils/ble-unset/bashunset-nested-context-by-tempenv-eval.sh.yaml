@@ -1,7 +1,7 @@
 name: '[bash_unset] nested context by tempenv-eval'
 dialect: bash
 source: oils:spec/ble-unset#bashunset-nested-context-by-tempenv-eval
-stdout: |-
+stdout: |
   # localvar-nest no
   [global,tempenv1,local1] v: local1
   [global,tempenv1,local1,tempenv2,(eval)] v: tempenv2

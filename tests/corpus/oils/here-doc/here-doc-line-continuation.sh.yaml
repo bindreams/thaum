@@ -1,7 +1,7 @@
 name: Here doc line continuation
 dialect: bash
 source: oils:spec/here-doc#here-doc-line-continuation
-stdout: |-
+stdout: |
   one
   two
 ---

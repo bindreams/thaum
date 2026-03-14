@@ -2,7 +2,7 @@ disabled: true
 name: dict() converts from BashAssoc to Dict
 dialect: bash
 source: oils:spec/ysh-convert#dict-converts-from-bashassoc-to-dict
-stdout: |-
+stdout: |
   "BashAssoc"
   {
     "a": "1",

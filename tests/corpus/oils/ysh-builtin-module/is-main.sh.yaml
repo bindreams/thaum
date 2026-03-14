@@ -2,7 +2,7 @@ disabled: true
 name: is-main
 dialect: bash
 source: oils:spec/ysh-builtin-module#is-main
-stdout: |-
+stdout: |
   lib.ysh is not the main module
   hi from main.ysh
   hi from lib.ysh

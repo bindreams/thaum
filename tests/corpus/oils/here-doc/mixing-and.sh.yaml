@@ -1,7 +1,7 @@
 name: Mixing << and <<-
 dialect: bash
 source: oils:spec/here-doc#mixing-and
-stdout: |-
+stdout: |
   one
   --
   two

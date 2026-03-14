@@ -1,7 +1,7 @@
 name: Case with empty condition
 dialect: bash
 source: oils:spec/case#case-with-empty-condition
-stdout: |-
+stdout: |
   match
 ---
 case $empty in

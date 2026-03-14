@@ -1,7 +1,7 @@
 name: set -o noglob
 dialect: bash
 source: oils:spec/glob#set--o-noglob
-stdout: |-
+stdout: |
   _tmp/spec-tmp/a.zz _tmp/spec-tmp/b.zz
   _tmp/spec-tmp/*.zz
 ---

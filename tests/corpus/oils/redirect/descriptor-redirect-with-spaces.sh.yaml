@@ -1,7 +1,7 @@
 name: Descriptor redirect with spaces
 dialect: bash
 source: oils:spec/redirect#descriptor-redirect-with-spaces
-stderr: |-
+stderr: |
   one
   two 1
   three

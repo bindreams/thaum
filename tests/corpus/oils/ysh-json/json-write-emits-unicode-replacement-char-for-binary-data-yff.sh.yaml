@@ -3,7 +3,7 @@ name: json write emits Unicode replacement char for binary data \yff
 dialect: bash
 source: 
   oils:spec/ysh-json#json-write-emits-unicode-replacement-char-for-binary-data-yff
-stdout: |-
+stdout: |
   [
     3,
     "foo",

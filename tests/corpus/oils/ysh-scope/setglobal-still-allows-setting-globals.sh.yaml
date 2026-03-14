@@ -2,7 +2,7 @@ disabled: true
 name: setglobal still allows setting globals
 dialect: bash
 source: oils:spec/ysh-scope#setglobal-still-allows-setting-globals
-stdout: |-
+stdout: |
   g=p new_global=p
 ---
 shopt --set parse_proc

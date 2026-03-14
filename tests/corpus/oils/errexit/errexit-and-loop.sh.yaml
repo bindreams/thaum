@@ -2,7 +2,7 @@ name: errexit and loop
 dialect: bash
 source: oils:spec/errexit#errexit-and-loop
 status: 1
-stdout: |-
+stdout: |
   hi 2
 ---
 set -o errexit

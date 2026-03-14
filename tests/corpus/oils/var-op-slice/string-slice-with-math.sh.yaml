@@ -1,7 +1,7 @@
 name: String slice with math
 dialect: bash
 source: oils:spec/var-op-slice#string-slice-with-math
-stdout: |-
+stdout: |
   def
 ---
 # I think this is the $(()) language inside?

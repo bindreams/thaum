@@ -1,7 +1,7 @@
 name: assignment with dynamic var name
 dialect: bash
 source: oils:spec/arith#assignment-with-dynamic-var-name
-stdout: |-
+stdout: |
   42
   xbar=42
 ---

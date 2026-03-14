@@ -2,7 +2,7 @@ disabled: true
 name: use usage with --pick etc.
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-usage-with---pick-etc
-stdout: |-
+stdout: |
   bad-flag=2
   all-provided=2
   all-for-testing=2

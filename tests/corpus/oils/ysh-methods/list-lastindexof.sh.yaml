@@ -2,7 +2,7 @@ disabled: true
 name: List => lastIndexOf()
 dialect: bash
 source: oils:spec/ysh-methods#list-lastindexof
-stdout: |-
+stdout: |
   4
   3
   2

@@ -1,7 +1,7 @@
 name: read -d -n - respects delimiter and splits
 dialect: bash
 source: oils:spec/builtin-read#read--d--n---respects-delimiter-and-splits
-stdout: |-
+stdout: |
   delim c
   [  a]
   [  a ]

@@ -2,7 +2,7 @@ disabled: true
 name: "'... for' is allowed, but NOT recommended"
 dialect: bash
 source: oils:spec/ysh-multiline#for-is-allowed-but-not-recommended
-stdout: |-
+stdout: |
   foo
   bar
   foo

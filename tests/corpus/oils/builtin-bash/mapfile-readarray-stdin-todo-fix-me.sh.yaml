@@ -1,7 +1,7 @@
 name: 'mapfile / readarray stdin  TODO: Fix me.'
 dialect: bash
 source: oils:spec/builtin-bash#mapfile-readarray-stdin-todo-fix-me
-stdout: |-
+stdout: |
   2
   3
 ---

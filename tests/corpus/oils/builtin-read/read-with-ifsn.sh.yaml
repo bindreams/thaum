@@ -1,7 +1,7 @@
 name: read with IFS=$'\n'
 dialect: bash
 source: oils:spec/builtin-read#read-with-ifsn
-stdout: |-
+stdout: |
   [  a b c]
 ---
 # The leading spaces are stripped if they appear in IFS.

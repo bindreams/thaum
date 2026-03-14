@@ -1,7 +1,7 @@
 name: test -v a[i] with arith expressions
 dialect: bash
 source: oils:spec/array#test--v-ai-with-arith-expressions
-stdout: |-
+stdout: |
   status=0
   status=1
 

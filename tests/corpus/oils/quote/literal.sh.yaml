@@ -1,7 +1,7 @@
 name: Literal $
 dialect: bash
 source: oils:spec/quote#literal
-stdout: |-
+stdout: |
   $
 ---
 echo $

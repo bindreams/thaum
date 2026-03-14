@@ -1,7 +1,7 @@
 name: shopt -p exit code (regression)
 dialect: bash
 source: oils:spec/sh-options#shopt--p-exit-code-regression
-stdout: |-
+stdout: |
   status=0
 ---
 case $SH in dash|mksh) exit ;; esac

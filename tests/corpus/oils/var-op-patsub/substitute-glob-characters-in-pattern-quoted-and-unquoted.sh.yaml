@@ -2,7 +2,7 @@ name: Substitute glob characters in pattern, quoted and unquoted
 dialect: bash
 source: 
   oils:spec/var-op-patsub#substitute-glob-characters-in-pattern-quoted-and-unquoted
-stdout: |-
+stdout: |
   a-b
   -
 ---

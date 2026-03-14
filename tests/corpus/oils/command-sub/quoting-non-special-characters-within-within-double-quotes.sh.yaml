@@ -2,7 +2,7 @@ name: Quoting non-special characters within `` within double quotes
 dialect: bash
 source: 
   oils:spec/command-sub#quoting-non-special-characters-within-within-double-quotes
-stdout: |-
+stdout: |
   [1 z]
   [2 z]
   [3 \z]

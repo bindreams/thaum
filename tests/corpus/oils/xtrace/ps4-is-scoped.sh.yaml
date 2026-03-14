@@ -1,7 +1,7 @@
 name: PS4 is scoped
 dialect: bash
 source: oils:spec/xtrace#ps4-is-scoped
-stderr: |-
+stderr: |
   + echo one
   + f
   + local 'PS4=- '

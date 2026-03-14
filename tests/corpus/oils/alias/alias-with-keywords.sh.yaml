@@ -1,7 +1,7 @@
 name: alias with keywords
 dialect: bash
 source: oils:spec/alias#alias-with-keywords
-stdout: |-
+stdout: |
   done
 ---
 # from issue #299

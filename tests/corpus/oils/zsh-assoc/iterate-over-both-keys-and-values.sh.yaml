@@ -2,7 +2,7 @@ disabled: {reason: "zsh syntax not in scope"}
 name: iterate over both keys and values
 dialect: bash
 source: oils:spec/zsh-assoc#iterate-over-both-keys-and-values
-stdout: |-
+stdout: |
   k1: v1
   k2: v2
   k3: v3

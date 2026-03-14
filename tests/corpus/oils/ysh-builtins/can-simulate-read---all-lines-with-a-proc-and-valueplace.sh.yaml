@@ -3,7 +3,7 @@ name: Can simulate read --all-lines with a proc and value.Place
 dialect: bash
 source: 
   oils:spec/ysh-builtins#can-simulate-read---all-lines-with-a-proc-and-valueplace
-stdout: |-
+stdout: |
   [
     "1",
     "2",

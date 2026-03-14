@@ -1,7 +1,7 @@
 name: declare
 dialect: bash
 source: oils:spec/assign-extended#declare
-stdout: |-
+stdout: |
   [declare]
   test_var1=111
   test_var2=222

@@ -1,7 +1,7 @@
 name: kill -n 9 specifies the signal number
 dialect: bash
 source: oils:spec/builtin-kill#kill--n-9-specifies-the-signal-number
-stdout: |-
+stdout: |
   kill=0
   wait=137
 ---

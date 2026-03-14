@@ -1,7 +1,7 @@
 name: kill -l 0 INT lists both signals
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-0-int-lists-both-signals
-stdout: |-
+stdout: |
   EXIT
   2
   ## N-I dash status: 2

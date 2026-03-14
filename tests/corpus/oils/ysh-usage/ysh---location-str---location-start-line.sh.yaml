@@ -2,7 +2,7 @@ disabled: true
 name: ysh --location-str --location-start-line
 dialect: bash
 source: oils:spec/ysh-usage#ysh---location-str---location-start-line
-stdout: |-
+stdout: |
   -- foo.hay:42: Unexpected
   line 10
   -- [ stdin ]:11: Unexpected

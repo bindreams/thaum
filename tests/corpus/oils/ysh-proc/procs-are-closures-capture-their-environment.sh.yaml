@@ -2,7 +2,7 @@ disabled: true
 name: Procs are closures (capture their environment)
 dialect: bash
 source: oils:spec/ysh-proc#procs-are-closures-capture-their-environment
-stdout: |-
+stdout: |
   x = 43
 ---
 shopt --set ysh:upgrade

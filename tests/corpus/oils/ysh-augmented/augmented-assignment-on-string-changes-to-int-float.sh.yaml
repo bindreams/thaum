@@ -3,7 +3,7 @@ name: Augmented assignment on string changes to Int Float
 dialect: bash
 source: 
   oils:spec/ysh-augmented#augmented-assignment-on-string-changes-to-int-float
-stdout: |-
+stdout: |
   (Str)   "42"
   (Int)   46
   (Int)   55

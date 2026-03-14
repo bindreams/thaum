@@ -1,7 +1,7 @@
 name: shopt -s failglob in array literal context
 dialect: bash
 source: oils:spec/glob-bash#shopt--s-failglob-in-array-literal-context
-stdout: |-
+stdout: |
   *.ZZ
   status=1
 ---

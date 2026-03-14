@@ -3,7 +3,7 @@ name: Mutate List entries, a[42] a['42'] allowed
 dialect: bash
 source: oils:spec/ysh-list#mutate-list-entries-a42-a42-allowed
 status: 3
-stdout: |-
+stdout: |
   (List)   ["2",1,"4"]
   (List)   ["2",1,9]
   (List)   ["2",1,99]

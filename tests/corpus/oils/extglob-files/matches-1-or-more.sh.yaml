@@ -1,7 +1,7 @@
 name: +() matches 1 or more
 dialect: bash
 source: oils:spec/extglob-files#matches-1-or-more
-stdout: |-
+stdout: |
   eg2/_One eg2/_OneOne eg2/_OneTwo eg2/_TwoTwo
 ---
 shopt -s extglob

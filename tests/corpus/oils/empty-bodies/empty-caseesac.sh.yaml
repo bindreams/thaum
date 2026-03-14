@@ -1,7 +1,7 @@
 name: Empty case/esac
 dialect: bash
 source: oils:spec/empty-bodies#empty-caseesac
-stdout: |-
+stdout: |
   empty
 ---
 case foo in

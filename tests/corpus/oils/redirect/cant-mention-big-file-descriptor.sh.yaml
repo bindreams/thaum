@@ -1,7 +1,7 @@
 name: can't mention big file descriptor
 dialect: bash
 source: oils:spec/redirect#cant-mention-big-file-descriptor
-stdout: |-
+stdout: |
   hi
   hi 99
   hi 100

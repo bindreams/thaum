@@ -1,7 +1,7 @@
 name: $- with interactive shell
 dialect: bash
 source: oils:spec/sh-options#with-interactive-shell
-stdout: |-
+stdout: |
   FALSE
   TRUE
 ---

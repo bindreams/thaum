@@ -1,7 +1,7 @@
 name: get length
 dialect: bash
 source: oils:spec/zsh-assoc#get-length
-stdout: |-
+stdout: |
   3 2
 ---
 typeset -A assoc

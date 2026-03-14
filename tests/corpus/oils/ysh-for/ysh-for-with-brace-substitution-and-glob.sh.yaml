@@ -2,7 +2,7 @@ disabled: true
 name: YSH for with brace substitution and glob
 dialect: bash
 source: oils:spec/ysh-for#ysh-for-with-brace-substitution-and-glob
-stdout: |-
+stdout: |
   0 bar.py
   1 foo.py
   2 README.md

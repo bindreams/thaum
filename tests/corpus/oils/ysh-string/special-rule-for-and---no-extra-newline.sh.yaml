@@ -2,7 +2,7 @@ disabled: true
 name: Special rule for <<< ''' and <<< """ - no extra newline
 dialect: bash
 source: oils:spec/ysh-string#special-rule-for-and---no-extra-newline
-stdout: |-
+stdout: |
   (Str)   "unquoted\n"
   (Str)   "single with newline\n"
   (Str)   "double with newline\n"

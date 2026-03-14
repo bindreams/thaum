@@ -1,7 +1,7 @@
 name: '!= on strings'
 dialect: bash
 source: oils:spec/dbracket#on-strings
-stdout: |-
+stdout: |
   true
   false
 ---

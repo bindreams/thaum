@@ -1,7 +1,7 @@
 name: '`< $file` behaves like $(< file)'
 dialect: bash
 source: oils:spec/redirect-command#file-behaves-like-file
-stdout: |-
+stdout: |
   [7
   8]
 ---

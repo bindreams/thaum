@@ -1,7 +1,7 @@
 name: trap EXIT clears the EXIT trap
 dialect: bash
 source: oils:spec/builtin-trap#trap-exit-clears-the-exit-trap
-stdout: |-
+stdout: |
   trap -- 'echo EXIT' EXIT
   trap -- 'echo INT' SIGINT
   ---

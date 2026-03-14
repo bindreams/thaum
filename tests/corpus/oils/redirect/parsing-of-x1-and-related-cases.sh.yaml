@@ -1,7 +1,7 @@
 name: Parsing of x=1> and related cases
 dialect: bash
 source: oils:spec/redirect#parsing-of-x1-and-related-cases
-stdout: |-
+stdout: |
   x=1
   x=1
   x=

@@ -1,7 +1,7 @@
 name: Empty expression (( ))  $(( ))
 dialect: bash
 source: oils:spec/arith-context#empty-expression
-stdout: |-
+stdout: |
   status=1
   0
 ---

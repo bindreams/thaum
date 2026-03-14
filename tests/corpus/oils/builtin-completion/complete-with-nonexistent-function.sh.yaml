@@ -1,7 +1,7 @@
 name: complete with nonexistent function
 dialect: bash
 source: oils:spec/builtin-completion#complete-with-nonexistent-function
-stdout: |-
+stdout: |
   status=2
 ---
 complete -F invalidZZ -D

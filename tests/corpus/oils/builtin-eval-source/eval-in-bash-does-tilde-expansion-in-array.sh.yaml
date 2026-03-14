@@ -1,7 +1,7 @@
 name: Eval in bash does tilde expansion in array
 dialect: bash
 source: oils:spec/builtin-eval-source#eval-in-bash-does-tilde-expansion-in-array
-stdout: |-
+stdout: |
   FALSE
   FALSE
   TRUE

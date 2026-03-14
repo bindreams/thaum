@@ -2,7 +2,7 @@ disabled: true
 name: I/O error in for x in (stdin) {
 dialect: bash
 source: oils:spec/ysh-for#io-error-in-for-x-in-stdin
-stdout: |-
+stdout: |
   pass
 ---
 

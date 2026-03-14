@@ -3,7 +3,7 @@ name: Assoc array can't be spliced directly
 dialect: bash
 source: oils:spec/ysh-word-eval#assoc-array-cant-be-spliced-directly
 status: 3
-stdout: |-
+stdout: |
   bar
   eggs
 ---

@@ -2,7 +2,7 @@ name: shopt -s strict:all || true while errexit is on
 dialect: bash
 source: oils:spec/errexit#shopt--s-strictall-true-while-errexit-is-on
 status: 1
-stdout: |-
+stdout: |
   one
 ---
 set -o errexit

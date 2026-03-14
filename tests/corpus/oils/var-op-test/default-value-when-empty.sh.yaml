@@ -1,7 +1,7 @@
 name: Default value when empty
 dialect: bash
 source: oils:spec/var-op-test#default-value-when-empty
-stdout: |-
+stdout: |
   is empty
 ---
 empty=''

@@ -1,7 +1,7 @@
 name: Here doc with quote expansion in terminator
 dialect: bash
 source: oils:spec/here-doc#here-doc-with-quote-expansion-in-terminator
-stdout: |-
+stdout: |
   one
   two
 ---

@@ -1,7 +1,7 @@
 name: trap ERR and || conditional
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err-and-conditional
-stdout: |-
+stdout: |
   line=3
   ok
   ok

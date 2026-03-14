@@ -2,7 +2,7 @@ disabled: true
 name: $[f(x)]
 dialect: bash
 source: oils:spec/ysh-expr-sub#fx
-stdout: |-
+stdout: |
   3
 ---
 var a = %(a b c)

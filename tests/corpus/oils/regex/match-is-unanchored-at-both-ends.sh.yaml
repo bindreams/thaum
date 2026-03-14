@@ -1,7 +1,7 @@
 name: Match is unanchored at both ends
 dialect: bash
 source: oils:spec/regex#match-is-unanchored-at-both-ends
-stdout: |-
+stdout: |
   true
 ---
 [[ 'bar' =~ a ]] && echo true

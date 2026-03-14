@@ -1,7 +1,7 @@
 name: Nested pipelines
 dialect: bash
 source: oils:spec/pipeline#nested-pipelines
-stdout: |-
+stdout: |
   1
   2
   3

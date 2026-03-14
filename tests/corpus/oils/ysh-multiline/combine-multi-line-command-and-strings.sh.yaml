@@ -2,7 +2,7 @@ disabled: true
 name: Combine multi-line command and strings
 dialect: bash
 source: oils:spec/ysh-multiline#combine-multi-line-command-and-strings
-stdout: |-
+stdout: |
   FOUR
   THREE
   TWO

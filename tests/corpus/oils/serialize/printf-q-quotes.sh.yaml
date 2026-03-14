@@ -1,7 +1,7 @@
 name: printf %q quotes
 dialect: bash
 source: oils:spec/serialize#printf-q-quotes
-stdout: |-
+stdout: |
   \'\"
   roundtrip-ok
 ---

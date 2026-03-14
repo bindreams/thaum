@@ -3,7 +3,7 @@ name: error builtin sets _error.message, which can be used by programs
 dialect: bash
 source: 
   oils:spec/ysh-builtin-error#error-builtin-sets-errormessage-which-can-be-used-by-programs
-stdout: |-
+stdout: |
   status=3
   message=divide by zero: 42 / 0
   status=3

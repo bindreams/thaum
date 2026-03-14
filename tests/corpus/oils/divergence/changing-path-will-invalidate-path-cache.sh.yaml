@@ -1,7 +1,7 @@
 name: Changing PATH will invalidate PATH cache
 dialect: bash
 source: oils:spec/divergence#changing-path-will-invalidate-path-cache
-stdout: |-
+stdout: |
   hi
   status=0
   hey

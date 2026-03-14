@@ -2,7 +2,7 @@ name: matching the byte 0xff against empty string - DISABLED - CI only bug?
 dialect: bash
 source: 
   oils:spec/case#matching-the-byte-0xff-against-empty-string---disabled---ci-only-bug
-stdout: |-
+stdout: |
   b
   b
 ---

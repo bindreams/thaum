@@ -1,7 +1,7 @@
 name: 'dynamic arith varname: read'
 dialect: bash
 source: oils:spec/ble-idioms#dynamic-arith-varname-read
-stdout: |-
+stdout: |
   x=12 y=34
 ---
 

@@ -3,7 +3,7 @@ name: $[expr_sub] in expression mode
 dialect: bash
 source: oils:spec/ysh-expr-sub#exprsub-in-expression-mode
 status: 3
-stdout: |-
+stdout: |
   (Str)   "42"
   (Str)   "3"
   (Str)   "3"

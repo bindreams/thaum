@@ -2,7 +2,7 @@ name: declare -f exit code indicates function existence
 dialect: bash
 source: 
   oils:spec/assign-extended#declare--f-exit-code-indicates-function-existence
-stdout: |-
+stdout: |
   1
   1
   0

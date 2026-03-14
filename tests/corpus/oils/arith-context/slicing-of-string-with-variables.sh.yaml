@@ -1,7 +1,7 @@
 name: Slicing of string with variables
 dialect: bash
 source: oils:spec/arith-context#slicing-of-string-with-variables
-stdout: |-
+stdout: |
   abcd abcd b
 ---
 s='abcd'

@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/sh-func#scope-of-global-variable-when-sourced-in-function-shell-functions-arent-closures
 status: 1
-stdout: |-
+stdout: |
   g = global
 ---
 set -u

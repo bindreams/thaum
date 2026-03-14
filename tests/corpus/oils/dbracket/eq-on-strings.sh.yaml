@@ -1,7 +1,7 @@
 name: -eq on strings
 dialect: bash
 source: oils:spec/dbracket#eq-on-strings
-stdout: |-
+stdout: |
   true
   true
 ---

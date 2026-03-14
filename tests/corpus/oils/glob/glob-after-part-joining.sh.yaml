@@ -1,7 +1,7 @@
 name: Glob after part joining
 dialect: bash
 source: oils:spec/glob#glob-after-part-joining
-stdout: |-
+stdout: |
   _tmp/*.yy _tmp/bar.yyy _tmp/foo.yyy
 ---
 touch _tmp/foo.yyy _tmp/bar.yyy

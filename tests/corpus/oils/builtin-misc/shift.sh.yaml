@@ -2,7 +2,7 @@ name: shift
 dialect: bash
 source: oils:spec/builtin-misc#shift
 status: 0
-stdout: |-
+stdout: |
   2 3 4
   4
 ---

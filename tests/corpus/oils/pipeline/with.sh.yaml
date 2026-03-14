@@ -2,7 +2,7 @@ name: '! with ||'
 dialect: bash
 source: oils:spec/pipeline#with
 status: 0
-stdout: |-
+stdout: |
   hi
   FAILED
 ---

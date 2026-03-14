@@ -1,7 +1,7 @@
 name: cd permits double bare dash
 dialect: bash
 source: oils:spec/builtin-cd#cd-permits-double-bare-dash
-stdout: |-
+stdout: |
   /
 ---
 cd -- /

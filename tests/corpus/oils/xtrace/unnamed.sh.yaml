@@ -2,7 +2,7 @@ name: '[[ ]]'
 dialect: bash
 source: oils:spec/xtrace#unnamed
 stdout: ''
-stderr: |-
+stderr: |
   + dir=/
   + [[ -d $dir ]]
   + (( a = 42 ))

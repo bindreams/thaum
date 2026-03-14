@@ -1,7 +1,7 @@
 name: < file in pipeline and subshell doesn't work
 dialect: bash
 source: oils:spec/redirect-command#file-in-pipeline-and-subshell-doesnt-work
-stdout: |-
+stdout: |
   end
 ---
 echo FOO > file2

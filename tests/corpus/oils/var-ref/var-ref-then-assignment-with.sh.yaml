@@ -1,7 +1,7 @@
 name: Var ref, then assignment with ${ := }
 dialect: bash
 source: oils:spec/var-ref#var-ref-then-assignment-with
-stdout: |-
+stdout: |
   foo
   foo
 ---

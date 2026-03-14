@@ -1,7 +1,7 @@
 name: 'recursive arith: short circuit ?:'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-short-circuit
-stdout: |-
+stdout: |
   123:123
   321:321
 ---

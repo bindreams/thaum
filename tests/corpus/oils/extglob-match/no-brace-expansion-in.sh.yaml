@@ -1,7 +1,7 @@
 name: No brace expansion in ==
 dialect: bash
 source: oils:spec/extglob-match#no-brace-expansion-in
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

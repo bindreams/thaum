@@ -2,7 +2,7 @@ name: redirect after declare -p
 dialect: bash
 source: oils:spec/assign#redirect-after-declare--p
 stdout: ''
-stderr: |-
+stderr: |
   typeset foo=bar
 ---
 case $SH in *dash) exit 99 ;; esac  # stderr unpredictable

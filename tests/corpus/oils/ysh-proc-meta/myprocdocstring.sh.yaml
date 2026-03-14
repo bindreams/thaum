@@ -2,7 +2,7 @@ disabled: true
 name: myproc.docString()
 dialect: bash
 source: oils:spec/ysh-proc-meta#myprocdocstring
-stdout: |-
+stdout: |
   (Str)   "YSH-style proc"
   (Null)   null
   (Str)   "doc ' comment with \" quotes"

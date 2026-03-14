@@ -2,7 +2,7 @@ disabled: true
 name: expression literals, lazy evaluation
 dialect: bash
 source: oils:spec/ysh-expr#expression-literals-lazy-evaluation
-stdout: |-
+stdout: |
   result=1
 ---
 shopt --set parse_ysh_expr_sub

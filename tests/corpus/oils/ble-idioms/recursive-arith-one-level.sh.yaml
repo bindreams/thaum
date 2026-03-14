@@ -1,7 +1,7 @@
 name: 'recursive arith: one level'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-one-level
-stdout: |-
+stdout: |
   123
 ---
 a='b=123'

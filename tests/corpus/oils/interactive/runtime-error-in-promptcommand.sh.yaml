@@ -1,7 +1,7 @@
 name: runtime error in PROMPT_COMMAND
 dialect: bash
 source: oils:spec/interactive#runtime-error-in-promptcommand
-stdout: |-
+stdout: |
   one
   two
   ^D

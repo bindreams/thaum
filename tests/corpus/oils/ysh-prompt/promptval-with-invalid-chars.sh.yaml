@@ -3,7 +3,7 @@ name: promptVal() with invalid chars
 dialect: bash
 source: oils:spec/ysh-prompt#promptval-with-invalid-chars
 status: 3
-stdout: |-
+stdout: |
   x=<Error: \D{} not in promptVal()> 
   x=<Error: \/ is invalid or unimplemented in $PS1> 
 ---

@@ -1,7 +1,7 @@
 name: PIPESTATUS is set on simple commands
 dialect: bash
 source: oils:spec/pipeline#pipestatus-is-set-on-simple-commands
-stdout: |-
+stdout: |
   pipestatus 1
   pipestatus 55 44
   pipestatus 0

@@ -2,7 +2,7 @@ disabled: true
 name: io->eval with argv bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#io-eval-with-argv-bindings
-stdout: |-
+stdout: |
   foo bar baz
   (List)   ["foo","bar","baz"]
 ---

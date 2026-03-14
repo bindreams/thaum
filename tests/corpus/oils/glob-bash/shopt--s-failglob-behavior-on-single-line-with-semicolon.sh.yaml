@@ -2,7 +2,7 @@ name: shopt -s failglob behavior on single line with semicolon
 dialect: bash
 source: 
   oils:spec/glob-bash#shopt--s-failglob-behavior-on-single-line-with-semicolon
-stdout: |-
+stdout: |
   status=1
 ---
 # bash behaves differently when commands are separated by a semicolon than when

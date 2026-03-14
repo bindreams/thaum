@@ -1,7 +1,7 @@
 name: pattern a=(1)
 dialect: bash
 source: oils:spec/regex#pattern-a1
-stdout: |-
+stdout: |
   status=0
   status=1
 ---

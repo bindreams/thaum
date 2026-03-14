@@ -1,7 +1,7 @@
 name: compgen -W '' cmd is not a usage error
 dialect: bash
 source: oils:spec/builtin-completion#compgen--w-cmd-is-not-a-usage-error
-stdout: |-
+stdout: |
   status=1
 ---
 # Bug fix due to '' being falsey in Python

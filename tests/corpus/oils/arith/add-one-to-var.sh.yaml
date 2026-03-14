@@ -1,7 +1,7 @@
 name: Add one to var
 dialect: bash
 source: oils:spec/arith#add-one-to-var
-stdout: |-
+stdout: |
   2
 ---
 i=1

@@ -3,7 +3,7 @@ name: 'Executor: External Commands not allowed'
 dialect: bash
 source: oils:spec/ysh-purity#executor-external-commands-not-allowed
 status: 127
-stdout: |-
+stdout: |
   1
   2
   3

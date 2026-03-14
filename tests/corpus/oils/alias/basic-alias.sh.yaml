@@ -1,7 +1,7 @@
 name: Basic alias
 dialect: bash
 source: oils:spec/alias#basic-alias
-stdout: |-
+stdout: |
   hello world
   hi
   expected failure

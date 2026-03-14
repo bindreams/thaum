@@ -1,7 +1,7 @@
 name: popd usage error
 dialect: bash
 source: oils:spec/builtin-dirs#popd-usage-error
-stdout: |-
+stdout: |
   status=2
   status=0
   status=2

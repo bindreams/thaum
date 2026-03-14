@@ -1,7 +1,7 @@
 name: Loop split across alias and arg works
 dialect: bash
 source: oils:spec/alias#loop-split-across-alias-and-arg-works
-stdout: |-
+stdout: |
   1
   2
   3

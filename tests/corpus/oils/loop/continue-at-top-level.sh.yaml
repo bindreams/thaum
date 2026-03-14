@@ -2,7 +2,7 @@ name: continue at top level
 dialect: bash
 source: oils:spec/loop#continue-at-top-level
 status: 0
-stdout: |-
+stdout: |
   one
   two
 ---

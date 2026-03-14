@@ -1,7 +1,7 @@
 name: Start background pipeline, wait $pid
 dialect: bash
 source: oils:spec/background#start-background-pipeline-wait-pid
-stdout: |-
+stdout: |
   status=0
   status=99
   --

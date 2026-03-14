@@ -2,7 +2,7 @@ disabled: true
 name: read --all-lines --with-eol
 dialect: bash
 source: oils:spec/ysh-builtins#read---all-lines---with-eol
-stdout: |-
+stdout: |
   1
   2
   3

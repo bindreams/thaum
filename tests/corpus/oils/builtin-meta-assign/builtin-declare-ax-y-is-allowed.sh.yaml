@@ -1,7 +1,7 @@
 name: builtin declare a=(x y) is allowed
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declare-ax-y-is-allowed
-stdout: |-
+stdout: |
   declare -a a=(x y)
   declare -a a=(x y)
   declare -a a=(x y)

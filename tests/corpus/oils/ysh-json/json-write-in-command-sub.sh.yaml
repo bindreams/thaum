@@ -2,7 +2,7 @@ disabled: true
 name: json write in command sub
 dialect: bash
 source: oils:spec/ysh-json#json-write-in-command-sub
-stdout: |-
+stdout: |
   {
     "name": "bob",
     "age": 30

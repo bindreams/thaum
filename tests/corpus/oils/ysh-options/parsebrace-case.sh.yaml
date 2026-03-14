@@ -2,7 +2,7 @@ disabled: true
 name: parse_brace case
 dialect: bash
 source: oils:spec/ysh-options#parsebrace-case
-stdout: |-
+stdout: |
   python
   shell
   python

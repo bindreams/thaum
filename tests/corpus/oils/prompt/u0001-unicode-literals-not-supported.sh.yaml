@@ -1,7 +1,7 @@
 name: \u0001 unicode literals not supported
 dialect: bash
 source: oils:spec/prompt#u0001-unicode-literals-not-supported
-stdout: |-
+stdout: |
   status=0
 ---
 PS1='[\u0001]'

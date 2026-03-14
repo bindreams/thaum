@@ -1,7 +1,7 @@
 name: declare in an if statement
 dialect: bash
 source: oils:spec/assign#declare-in-an-if-statement
-stdout: |-
+stdout: |
   bar
   eggs
 ---

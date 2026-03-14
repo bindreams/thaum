@@ -1,7 +1,7 @@
 name: Array index on LHS with indices
 dialect: bash
 source: oils:spec/arith-context#array-index-on-lhs-with-indices
-stdout: |-
+stdout: |
   1 2 X
 ---
 a=(1 2 3)

@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/builtin-special#special-builtins-cant-be-redefined-as-shell-functions-set--o-posix
 status: 0
-stdout: |-
+stdout: |
   hi
   hi
 ---

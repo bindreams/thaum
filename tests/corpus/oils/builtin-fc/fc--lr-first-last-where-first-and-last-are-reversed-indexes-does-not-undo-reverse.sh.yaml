@@ -3,7 +3,7 @@ name: fc -lr [first] [last] where first and last are reversed indexes does not
 dialect: bash
 source: 
   oils:spec/builtin-fc#fc--lr-first-last-where-first-and-last-are-reversed-indexes-does-not-undo-reverse
-stdout: |-
+stdout: |
   3	 echo 2
   2	 echo 1
   ^D

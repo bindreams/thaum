@@ -1,7 +1,7 @@
 name: tilde expansion with =~ (confusing)
 dialect: bash
 source: oils:spec/dbracket#tilde-expansion-with-confusing
-stdout: |-
+stdout: |
   regex=0
   regex=0
   regex=1

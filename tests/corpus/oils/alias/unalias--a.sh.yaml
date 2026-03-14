@@ -1,7 +1,7 @@
 name: unalias -a
 dialect: bash
 source: oils:spec/alias#unalias--a
-stdout: |-
+stdout: |
   2
   status=0
 ---

@@ -1,7 +1,7 @@
 name: Preincrement
 dialect: bash
 source: oils:spec/arith#preincrement
-stdout: |-
+stdout: |
   5
   5
 ---

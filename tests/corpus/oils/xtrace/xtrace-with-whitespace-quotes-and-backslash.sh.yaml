@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#xtrace-with-whitespace-quotes-and-backslash
 stdout: |
   1 2 ' " \
-stderr: |-
+stderr: |
   + echo '1 2' $'\'' '"' $'\\'
 ---
 set -o xtrace

@@ -2,7 +2,7 @@ disabled: true
 name: Bool
 dialect: bash
 source: oils:spec/ysh-printing#bool
-stdout: |-
+stdout: |
   (Bool)  true
   (Bool)  false
 ---

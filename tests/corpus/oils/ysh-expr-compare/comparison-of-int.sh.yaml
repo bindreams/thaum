@@ -2,7 +2,7 @@ disabled: true
 name: Comparison of Int
 dialect: bash
 source: oils:spec/ysh-expr-compare#comparison-of-int
-stdout: |-
+stdout: |
   <
   <=
   >

@@ -2,7 +2,7 @@ name: trap ERR doesn't run in subprograms - subshell, command sub, async
 dialect: bash
 source: 
   oils:spec/builtin-trap-err#trap-err-doesnt-run-in-subprograms---subshell-command-sub-async
-stdout: |-
+stdout: |
   subshell
   async
   line=11

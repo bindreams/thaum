@@ -2,7 +2,7 @@ name: umask with too many arguments (i.e. extra spaces)
 dialect: bash
 source: oils:spec/builtin-umask#umask-with-too-many-arguments-ie-extra-spaces
 status: 0
-stdout: |-
+stdout: |
   ok
   111
 ---

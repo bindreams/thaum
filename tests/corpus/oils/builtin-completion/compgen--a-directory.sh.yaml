@@ -1,7 +1,7 @@
 name: compgen -A directory
 dialect: bash
 source: oils:spec/builtin-completion#compgen--a-directory
-stdout: |-
+stdout: |
   client
   core
   cpp

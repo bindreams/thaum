@@ -9,7 +9,7 @@ stdout: |
   a z
   b y
   b z
-stderr: |-
+stderr: |
   . builtin echo 1
   . builtin echo 2
   + break 1

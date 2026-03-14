@@ -1,7 +1,7 @@
 name: Failed redirect in assignment, vs. export
 dialect: bash
 source: oils:spec/toysh-posix#failed-redirect-in-assignment-vs-export
-stdout: |-
+stdout: |
   abc=
   abc=
 ---

@@ -1,7 +1,7 @@
 name: $? split over multiple lines
 dialect: bash
 source: oils:spec/quote#split-over-multiple-lines
-stdout: |-
+stdout: |
   $?
 ---
 # Same with $$, etc.  OSH won't do this because $? is a single token.

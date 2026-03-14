@@ -2,7 +2,7 @@ disabled: true
 name: Basic help message
 dialect: bash
 source: oils:spec/ysh-stdlib-args#basic-help-message
-stdout: |-
+stdout: |
   usage: program-name [-h] [-v] src dst
 
   Reference Implementation

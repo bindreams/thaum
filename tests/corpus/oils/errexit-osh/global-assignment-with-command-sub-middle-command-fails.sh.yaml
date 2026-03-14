@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/errexit-osh#global-assignment-with-command-sub-middle-command-fails
 status: 0
-stdout: |-
+stdout: |
   one
   two
 ---

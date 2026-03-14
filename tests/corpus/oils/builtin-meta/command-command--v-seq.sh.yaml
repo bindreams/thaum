@@ -1,7 +1,7 @@
 name: command command -v seq
 dialect: bash
 source: oils:spec/builtin-meta#command-command--v-seq
-stdout: |-
+stdout: |
   seq
 ---
 seq() {

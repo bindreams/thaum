@@ -1,7 +1,7 @@
 name: Parsing $(( ))
 dialect: bash
 source: oils:spec/toysh-posix#parsing
-stdout: |-
+stdout: |
   fail
 ---
 # http://landley.net/notes.html#15-03-2020

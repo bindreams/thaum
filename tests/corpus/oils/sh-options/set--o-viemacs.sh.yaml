@@ -1,7 +1,7 @@
 name: set -o vi/emacs
 dialect: bash
 source: oils:spec/sh-options#set--o-viemacs
-stdout: |-
+stdout: |
   0
   0
 ---

@@ -2,7 +2,7 @@ name: complete with no args and complete -p both print completion spec
 dialect: bash
 source: 
   oils:spec/builtin-completion#complete-with-no-args-and-complete--p-both-print-completion-spec
-stdout: |-
+stdout: |
   complete -W 'foo bar' mycommand
   complete -W 'foo bar' mycommand
   complete -F myfunc other

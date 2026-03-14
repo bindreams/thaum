@@ -2,7 +2,7 @@ name: func subshell OverflowError https://github.com/oilshell/oil/issues/996
 dialect: bash
 source: 
   oils:spec/exit-status#func-subshell-overflowerror-httpsgithubcomoilshelloilissues996
-stdout: |-
+stdout: |
   status=255
   status=1
   expected a small integer

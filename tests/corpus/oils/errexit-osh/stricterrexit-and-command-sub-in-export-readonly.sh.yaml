@@ -1,7 +1,7 @@
 name: strict_errexit and command sub in export / readonly
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-and-command-sub-in-export-readonly
-stdout: |-
+stdout: |
   a
   status=1
   a

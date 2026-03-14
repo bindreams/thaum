@@ -1,7 +1,7 @@
 name: '! matches none'
 dialect: bash
 source: oils:spec/extglob-match#matches-none
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

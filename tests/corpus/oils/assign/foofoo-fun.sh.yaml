@@ -1,7 +1,7 @@
 name: FOO=foo fun
 dialect: bash
 source: oils:spec/assign#foofoo-fun
-stdout: |-
+stdout: |
   [foo]
 ---
 fun() {

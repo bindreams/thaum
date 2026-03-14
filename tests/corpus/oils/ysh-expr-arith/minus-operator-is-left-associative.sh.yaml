@@ -2,7 +2,7 @@ disabled: true
 name: Minus operator is left associative
 dialect: bash
 source: oils:spec/ysh-expr-arith#minus-operator-is-left-associative
-stdout: |-
+stdout: |
   a=0 b=0
   a=0 b=0
 ---

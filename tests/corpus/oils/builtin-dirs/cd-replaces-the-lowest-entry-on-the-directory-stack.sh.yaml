@@ -2,7 +2,7 @@ name: cd replaces the lowest entry on the directory stack!
 dialect: bash
 source: 
   oils:spec/builtin-dirs#cd-replaces-the-lowest-entry-on-the-directory-stack
-stdout: |-
+stdout: |
   pushd=0
   /tmp /tmp/oils-spec/builtin-dirs
   cd=0

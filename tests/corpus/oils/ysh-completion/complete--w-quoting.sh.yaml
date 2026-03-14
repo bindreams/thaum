@@ -2,7 +2,7 @@ disabled: true
 name: complete -W quoting
 dialect: bash
 source: oils:spec/ysh-completion#complete--w-quoting
-stdout: |-
+stdout: |
   "q2-argv can\\'t "
   "q2-argv checkout "
   "q2-argv cherry "

@@ -2,7 +2,7 @@ disabled: true
 name: circular dict - TODO 2023-06 REGRESS
 dialect: bash
 source: oils:spec/ysh-assign#circular-dict---todo-2023-06-regress
-stdout: |-
+stdout: |
   (OrderedDict)   <'name': 'foo'>
   (OrderedDict)   <'name': 123>
   (OrderedDict)   <'name': 'mystr'>

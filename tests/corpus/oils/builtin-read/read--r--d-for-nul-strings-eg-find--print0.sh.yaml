@@ -1,7 +1,7 @@
 name: read -r -d '' for NUL strings, e.g. find -print0
 dialect: bash
 source: oils:spec/builtin-read#read--r--d-for-nul-strings-eg-find--print0
-stdout: |-
+stdout: |
   [./a\b\c\d]
 ---
 

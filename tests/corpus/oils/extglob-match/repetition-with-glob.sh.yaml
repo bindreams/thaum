@@ -1,7 +1,7 @@
 name: repetition with glob
 dialect: bash
 source: oils:spec/extglob-match#repetition-with-glob
-stdout: |-
+stdout: |
   TRUE
   FALSE
 ---

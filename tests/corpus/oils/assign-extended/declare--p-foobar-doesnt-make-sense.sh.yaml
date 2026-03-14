@@ -1,7 +1,7 @@
 name: declare -p foo=bar doesn't make sense
 dialect: bash
 source: oils:spec/assign-extended#declare--p-foobar-doesnt-make-sense
-stdout: |-
+stdout: |
   status=1
   status=1
   declare -- a=b

@@ -3,7 +3,7 @@ name: Str => startsWith(Str) and endsWith(Str), eggex
 dialect: bash
 source: oils:spec/ysh-methods#str-startswithstr-and-endswithstr-eggex
 status: 0
-stdout: |-
+stdout: |
   false false
   true true
   true true

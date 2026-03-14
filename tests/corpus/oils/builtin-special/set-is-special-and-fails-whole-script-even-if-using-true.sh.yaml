@@ -2,7 +2,7 @@ name: set is special and fails whole script, even if using || true
 dialect: bash
 source: 
   oils:spec/builtin-special#set-is-special-and-fails-whole-script-even-if-using-true
-stdout: |-
+stdout: |
   ok
   non-zero status
 ---

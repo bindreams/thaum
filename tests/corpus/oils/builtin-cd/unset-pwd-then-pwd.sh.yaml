@@ -1,7 +1,7 @@
 name: unset PWD; then pwd
 dialect: bash
 source: oils:spec/builtin-cd#unset-pwd-then-pwd
-stdout: |-
+stdout: |
   PWD=
   /tmp/oil-spec-test/pwd
   PWD=

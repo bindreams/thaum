@@ -2,7 +2,7 @@ disabled: true
 name: Str->search() only matches %start ^ when pos == 0
 dialect: bash
 source: oils:spec/ysh-regex-api#str-search-only-matches-start-when-pos-0
-stdout: |-
+stdout: |
   pat=^([[:digit:]]+)-
   12-
   pat=([[:digit:]]+)-

@@ -1,7 +1,7 @@
 name: write big file with ulimit
 dialect: bash
 source: oils:spec/builtin-process#write-big-file-with-ulimit
-stdout: |-
+stdout: |
   outer=153
 ---
 

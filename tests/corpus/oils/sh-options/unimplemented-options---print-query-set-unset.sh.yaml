@@ -1,7 +1,7 @@
 name: Unimplemented options - print, query, set, unset
 dialect: bash
 source: oils:spec/sh-options#unimplemented-options---print-query-set-unset
-stdout: |-
+stdout: |
   q=2
   p=2
   noflag=2

@@ -1,7 +1,7 @@
 name: Evaluation of argv[0] in pipeline occurs in child
 dialect: bash
 source: oils:spec/pipeline#evaluation-of-argv0-in-pipeline-occurs-in-child
-stdout: |-
+stdout: |
   1
   cmd=
 ---

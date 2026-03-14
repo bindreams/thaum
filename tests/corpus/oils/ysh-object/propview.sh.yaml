@@ -3,7 +3,7 @@ name: propView()
 dialect: bash
 source: oils:spec/ysh-object#propview
 status: 3
-stdout: |-
+stdout: |
   (Dict)   {"x":3,"y":4}
   (Dict)   {"x":99,"y":4}
 ---

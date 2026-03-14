@@ -1,7 +1,7 @@
 name: Unicode in IFS
 dialect: bash
 source: oils:spec/word-split#unicode-in-ifs
-stdout: |-
+stdout: |
   <>
   <x>
 ---

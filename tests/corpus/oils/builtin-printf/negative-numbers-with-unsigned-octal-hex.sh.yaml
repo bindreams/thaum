@@ -1,7 +1,7 @@
 name: negative numbers with unsigned / octal / hex
 dialect: bash
 source: oils:spec/builtin-printf#negative-numbers-with-unsigned-octal-hex
-stdout: |-
+stdout: |
   [18446744073709551574]
   status=0
   [1777777777777777777726]

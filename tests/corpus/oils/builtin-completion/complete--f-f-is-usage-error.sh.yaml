@@ -1,7 +1,7 @@
 name: complete -F f is usage error
 dialect: bash
 source: oils:spec/builtin-completion#complete--f-f-is-usage-error
-stdout: |-
+stdout: |
   status=0
   status=2
 ---

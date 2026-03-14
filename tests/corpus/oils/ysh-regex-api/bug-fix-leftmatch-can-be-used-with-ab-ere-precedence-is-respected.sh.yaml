@@ -3,7 +3,7 @@ name: 'Bug fix: leftMatch() can be used with a|b (ERE precedence is respected)'
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#bug-fix-leftmatch-can-be-used-with-ab-ere-precedence-is-respected
-stdout: |-
+stdout: |
   (List)   ["2","2",null]
   (List)   ["t",null,"t"]
 

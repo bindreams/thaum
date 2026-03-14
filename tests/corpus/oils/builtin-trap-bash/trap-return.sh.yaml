@@ -2,7 +2,7 @@ name: trap RETURN
 dialect: bash
 source: oils:spec/builtin-trap-bash#trap-return
 status: 42
-stdout: |-
+stdout: |
   --
   f
   --

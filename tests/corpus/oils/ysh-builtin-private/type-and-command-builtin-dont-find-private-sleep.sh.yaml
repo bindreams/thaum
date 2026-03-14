@@ -3,7 +3,7 @@ name: type and command builtin don't find private sleep
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#type-and-command-builtin-dont-find-private-sleep
-stdout: |-
+stdout: |
   file
   sleep is sleep
 

@@ -2,7 +2,7 @@ disabled: true
 name: Long Python Example
 dialect: bash
 source: oils:spec/ysh-regex-api#long-python-example
-stdout: |-
+stdout: |
   Y
   N
   Y decimal

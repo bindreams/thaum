@@ -2,7 +2,7 @@ disabled: true
 name: dict with expression keys
 dialect: bash
 source: oils:spec/ysh-dict#dict-with-expression-keys
-stdout: |-
+stdout: |
   len=1
   hello
   len=1

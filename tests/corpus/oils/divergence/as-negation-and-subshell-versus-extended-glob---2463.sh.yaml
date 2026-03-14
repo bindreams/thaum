@@ -2,7 +2,7 @@ name: '!( as negation and subshell versus extended glob - #2463'
 dialect: bash
 source: 
   oils:spec/divergence#as-negation-and-subshell-versus-extended-glob---2463
-stdout: |-
+stdout: |
   one
   two
 ---

@@ -1,7 +1,7 @@
 name: Truncating 'exit' status
 dialect: bash
 source: oils:spec/exit-status#truncating-exit-status
-stdout: |-
+stdout: |
   status=255
   status=0
   status=1

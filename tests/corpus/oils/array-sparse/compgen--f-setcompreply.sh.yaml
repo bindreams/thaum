@@ -1,7 +1,7 @@
 name: compgen -F _set_COMPREPLY
 dialect: bash
 source: oils:spec/array-sparse#compgen--f-setcompreply
-stdout: |-
+stdout: |
   0
   1
   3

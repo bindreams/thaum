@@ -1,7 +1,7 @@
 name: Mixing quoted and unquoted parts
 dialect: bash
 source: oils:spec/regex#mixing-quoted-and-unquoted-parts
-stdout: |-
+stdout: |
   true
   true
 ---

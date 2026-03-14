@@ -2,7 +2,7 @@ disabled: true
 name: object identity
 dialect: bash
 source: oils:spec/ysh-expr-compare#object-identity
-stdout: |-
+stdout: |
   (Bool)   true
   (Bool)   true
 

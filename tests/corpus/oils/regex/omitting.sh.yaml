@@ -1,7 +1,7 @@
 name: Omitting ( )
 dialect: bash
 source: oils:spec/regex#omitting
-stdout: |-
+stdout: |
   true
 ---
 [[ '^a b$' == ^a\ b$ ]] && echo true

@@ -2,7 +2,7 @@ name: \s for shell, \v for major.minor version, and \V for full version
 dialect: bash
 source: 
   oils:spec/prompt#s-for-shell-v-for-majorminor-version-and-v-for-full-version
-stdout: |-
+stdout: |
   match=0
   match=0
   match=0

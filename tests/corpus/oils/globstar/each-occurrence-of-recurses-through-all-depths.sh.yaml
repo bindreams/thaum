@@ -1,7 +1,7 @@
 name: each occurrence of ** recurses through all depths
 dialect: bash
 source: oils:spec/globstar#each-occurrence-of-recurses-through-all-depths
-stdout: |-
+stdout: |
   c/leaf.md
   c/subdir/leaf.md
   leaf.md

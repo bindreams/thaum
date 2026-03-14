@@ -1,7 +1,7 @@
 name: HISTFILE must point to a file
 dialect: bash
 source: oils:spec/builtin-history#histfile-must-point-to-a-file
-stdout: |-
+stdout: |
   status=1
   ^D
 ---

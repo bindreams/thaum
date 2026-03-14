@@ -1,7 +1,7 @@
 name: 'compgen with action and suffix: helptopic'
 dialect: bash
 source: oils:spec/builtin-completion#compgen-with-action-and-suffix-helptopic
-stdout: |-
+stdout: |
   false___
 ---
 compgen -A helptopic -S ___ fal

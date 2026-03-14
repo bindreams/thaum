@@ -1,7 +1,7 @@
 name: Arith lexer mode
 dialect: bash
 source: oils:spec/for-expr#arith-lexer-mode
-stdout: |-
+stdout: |
   3
   4
   3

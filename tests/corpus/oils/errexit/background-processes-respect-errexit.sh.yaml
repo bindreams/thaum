@@ -2,7 +2,7 @@ name: background processes respect errexit
 dialect: bash
 source: oils:spec/errexit#background-processes-respect-errexit
 status: 1
-stdout: |-
+stdout: |
   one
 ---
 set -o errexit

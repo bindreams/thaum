@@ -1,7 +1,7 @@
 name: literal strings inside (( ))
 dialect: bash
 source: oils:spec/dparen#literal-strings-inside
-stdout: |-
+stdout: |
   42 0
 ---
 declare -A A

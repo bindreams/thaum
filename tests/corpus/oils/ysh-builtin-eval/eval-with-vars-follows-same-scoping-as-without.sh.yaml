@@ -3,7 +3,7 @@ name: eval with vars follows same scoping as without
 dialect: bash
 source: 
   oils:spec/ysh-builtin-eval#eval-with-vars-follows-same-scoping-as-without
-stdout: |-
+stdout: |
   baz
   baz
   foo

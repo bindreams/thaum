@@ -2,7 +2,7 @@ disabled: true
 name: '""" and $""" in Command Mode'
 dialect: bash
 source: oils:spec/ysh-string#and-in-command-mode
-stdout: |-
+stdout: |
   --
   one "
   two = 2 ""

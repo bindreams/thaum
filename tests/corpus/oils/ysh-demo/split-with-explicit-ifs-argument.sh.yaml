@@ -2,7 +2,7 @@ disabled: true
 name: split with explicit IFS argument
 dialect: bash
 source: oils:spec/ysh-demo#split-with-explicit-ifs-argument
-stdout: |-
+stdout: |
   1 one
   --
   2 two

@@ -2,7 +2,7 @@ name: true is not special; prefix assignments don't persist, it can be redefined
 dialect: bash
 source: 
   oils:spec/builtin-special#true-is-not-special-prefix-assignments-dont-persist-it-can-be-redefined
-stdout: |-
+stdout: |
   foo=
   true func
   foo=

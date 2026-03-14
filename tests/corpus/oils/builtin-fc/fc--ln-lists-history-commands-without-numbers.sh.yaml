@@ -1,7 +1,7 @@
 name: fc -ln lists history commands without numbers
 dialect: bash
 source: oils:spec/builtin-fc#fc--ln-lists-history-commands-without-numbers
-stdout: |-
+stdout: |
   	 history -r
   	 echo 1
   	 echo 2

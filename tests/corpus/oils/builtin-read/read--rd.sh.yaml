@@ -1,7 +1,7 @@
 name: read -rd
 dialect: bash
 source: oils:spec/builtin-read#read--rd
-stdout: |-
+stdout: |
   foo
   bar
 ---

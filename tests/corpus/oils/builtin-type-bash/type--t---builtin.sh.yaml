@@ -1,7 +1,7 @@
 name: type -t -> builtin
 dialect: bash
 source: oils:spec/builtin-type-bash#type--t---builtin
-stdout: |-
+stdout: |
   builtin
   builtin
   builtin

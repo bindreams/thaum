@@ -2,7 +2,7 @@ disabled: true
 name: with runtime REFLECTION via __invoke__ - no parsing
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-runtime-reflection-via-invoke---no-parsing
-stdout: |-
+stdout: |
   prefix a
   prefix b
 ---

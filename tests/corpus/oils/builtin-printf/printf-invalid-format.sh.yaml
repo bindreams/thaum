@@ -1,7 +1,7 @@
 name: printf invalid format
 dialect: bash
 source: oils:spec/builtin-printf#printf-invalid-format
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-regex-bytes-chars#high-bytes-0x80-0xff-usually-cant-be-matched---eggex-is-utf-8
 status: 1
-stdout: |-
+stdout: |
   (Bool)   true
   (Bool)   false
 ---

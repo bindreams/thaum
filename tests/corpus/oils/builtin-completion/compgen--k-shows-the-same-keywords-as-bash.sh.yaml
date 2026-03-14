@@ -1,7 +1,7 @@
 name: compgen -k shows the same keywords as bash
 dialect: bash
 source: oils:spec/builtin-completion#compgen--k-shows-the-same-keywords-as-bash
-stdout: |-
+stdout: |
   !
   [[
   ]]

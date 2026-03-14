@@ -2,7 +2,7 @@ disabled: true
 name: Recursive functions with LRU Cache
 dialect: bash
 source: oils:spec/ysh-func#recursive-functions-with-lru-cache
-stdout: |-
+stdout: |
   hit: 1
   hit: 2
   hit: 3

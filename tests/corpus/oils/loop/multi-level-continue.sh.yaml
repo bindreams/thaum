@@ -1,7 +1,7 @@
 name: multi-level continue
 dialect: bash
 source: oils:spec/loop#multi-level-continue
-stdout: |-
+stdout: |
   1 a
   1 c
   2 a

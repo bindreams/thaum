@@ -1,7 +1,7 @@
 name: traps are not active inside subshells $() ()  trap | cat
 dialect: bash
 source: oils:spec/builtin-trap#traps-are-not-active-inside-subshells-trap-cat
-stdout: |-
+stdout: |
   1 traps.txt
   ( )
   $(trap)

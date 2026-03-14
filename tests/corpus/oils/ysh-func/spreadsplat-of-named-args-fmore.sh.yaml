@@ -2,7 +2,7 @@ disabled: true
 name: 'Spread/splat of named args: f(...more)'
 dialect: bash
 source: oils:spec/ysh-func#spreadsplat-of-named-args-fmore
-stdout: |-
+stdout: |
   9 10
   3 4
 ---

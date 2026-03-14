@@ -1,7 +1,7 @@
 name: Sourcing inside function grows the debug stack
 dialect: bash
 source: oils:spec/introspect#sourcing-inside-function-grows-the-debug-stack
-stdout: |-
+stdout: |
   F
   G
   STACK:spec/testdata/bash-source-pushtemp.sh:g:3

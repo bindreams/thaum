@@ -1,7 +1,7 @@
 name: strict_errexit and ! && || if while until
 dialect: bash
 source: oils:spec/errexit-osh#stricterrexit-and-if-while-until
-stdout: |-
+stdout: |
   bang=1
   --
   or=1

@@ -1,7 +1,7 @@
 name: type -t control flow
 dialect: bash
 source: oils:spec/builtin-type-bash#type--t-control-flow
-stdout: |-
+stdout: |
   builtin
   builtin
   builtin

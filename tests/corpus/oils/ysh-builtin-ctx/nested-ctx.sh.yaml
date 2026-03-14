@@ -2,7 +2,7 @@ disabled: true
 name: nested ctx
 dialect: bash
 source: oils:spec/ysh-builtin-ctx#nested-ctx
-stdout: |-
+stdout: |
   {
     "from": "a"
   }

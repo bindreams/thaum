@@ -2,7 +2,7 @@ disabled: true
 name: json write of Dict in cycle
 dialect: bash
 source: oils:spec/ysh-json#json-write-of-dict-in-cycle
-stdout: |-
+stdout: |
   (Dict)   {"k":{...}}
   status=1
 ---

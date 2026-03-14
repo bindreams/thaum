@@ -3,7 +3,7 @@ name: Blank line in multiline command is syntax error
 dialect: bash
 source: oils:spec/ysh-multiline#blank-line-in-multiline-command-is-syntax-error
 status: 2
-stdout: |-
+stdout: |
   comment is OK
 ---
 ... echo comment

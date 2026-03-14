@@ -1,7 +1,7 @@
 name: (YSH) $[a1 === a2]
 dialect: bash
 source: oils:spec/array-sparse#ysh-a1-a2
-stdout: |-
+stdout: |
   true
   true
   false

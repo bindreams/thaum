@@ -1,7 +1,7 @@
 name: $_ is not reset with (( and [[
 dialect: bash
 source: oils:spec/vars-special#is-not-reset-with-and
-stdout: |-
+stdout: |
   simple
   (( simple
   [[ (( simple

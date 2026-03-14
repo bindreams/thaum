@@ -1,7 +1,7 @@
 name: Unset array member
 dialect: bash
 source: oils:spec/builtin-vars#unset-array-member
-stdout: |-
+stdout: |
   status=0
   x z len=2
 ---

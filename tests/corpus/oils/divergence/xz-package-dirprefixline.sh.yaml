@@ -1,7 +1,7 @@
 name: 'xz package: dirprefix="${line##*([}"'
 dialect: bash
 source: oils:spec/divergence#xz-package-dirprefixline
-stdout: |-
+stdout: |
   --
   -foo-
 ---

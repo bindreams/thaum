@@ -1,7 +1,7 @@
 name: 'trap INT, sleep, SIGINT: non-interactively'
 dialect: bash
 source: oils:spec/builtin-trap#trap-int-sleep-sigint-non-interactively
-stdout: |-
+stdout: |
   status=0
 ---
 

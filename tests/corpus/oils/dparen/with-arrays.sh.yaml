@@ -1,7 +1,7 @@
 name: (( )) with arrays
 dialect: bash
 source: oils:spec/dparen#with-arrays
-stdout: |-
+stdout: |
   15
 ---
 a=(4 5 6)

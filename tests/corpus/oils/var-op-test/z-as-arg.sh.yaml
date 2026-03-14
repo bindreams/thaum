@@ -1,7 +1,7 @@
 name: '"\z" as arg'
 dialect: bash
 source: oils:spec/var-op-test#z-as-arg
-stdout: |-
+stdout: |
   $
   \(
   \z

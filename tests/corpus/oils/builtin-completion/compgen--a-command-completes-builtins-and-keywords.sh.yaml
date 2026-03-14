@@ -2,7 +2,7 @@ name: compgen -A command completes builtins and keywords
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--a-command-completes-builtins-and-keywords
-stdout: |-
+stdout: |
   eval
   status=0
   while

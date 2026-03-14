@@ -2,7 +2,7 @@ name: errexit with &&
 dialect: bash
 source: oils:spec/errexit#errexit-with
 status: 1
-stdout: |-
+stdout: |
   ok
 ---
 set -o errexit

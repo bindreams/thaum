@@ -2,7 +2,7 @@ disabled: true
 name: Float Division
 dialect: bash
 source: oils:spec/ysh-expr-arith#float-division
-stdout: |-
+stdout: |
   (Float)   2.5
   (Float)   -2.5
   (Float)   -2.5

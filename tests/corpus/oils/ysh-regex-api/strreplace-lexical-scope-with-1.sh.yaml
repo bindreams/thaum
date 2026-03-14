@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace() lexical scope with ^[]
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplace-lexical-scope-with
-stdout: |-
+stdout: |
   <Expr>
   replace   my[x st t x]r
   myreplace my[x st t x]r

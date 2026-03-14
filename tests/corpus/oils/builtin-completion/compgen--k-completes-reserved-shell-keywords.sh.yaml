@@ -2,7 +2,7 @@ name: compgen -k completes reserved shell keywords
 dialect: bash
 source: 
   oils:spec/builtin-completion#compgen--k-completes-reserved-shell-keywords
-stdout: |-
+stdout: |
   do
   done
   status=0

@@ -1,7 +1,7 @@
 name: HISTFILE is written in interactive shell
 dialect: bash
 source: oils:spec/interactive#histfile-is-written-in-interactive-shell
-stdout: |-
+stdout: |
   hist1
   hist2
   ^D

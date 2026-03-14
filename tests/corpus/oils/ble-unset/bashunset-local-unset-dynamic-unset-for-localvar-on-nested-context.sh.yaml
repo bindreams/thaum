@@ -2,7 +2,7 @@ name: '[bash_unset] local-unset / dynamic-unset for localvar on nested-context'
 dialect: bash
 source: 
   oils:spec/ble-unset#bashunset-local-unset-dynamic-unset-for-localvar-on-nested-context
-stdout: |-
+stdout: |
   # always-cell-unset (remove all localvar/tempenv)
   [global,tempenv1,local1,tempenv2,(eval),local2,(unset)] v: tempenv1
   [global,tempenv1,local1,tempenv2,(eval),local2,(unlocal)] v: tempenv1

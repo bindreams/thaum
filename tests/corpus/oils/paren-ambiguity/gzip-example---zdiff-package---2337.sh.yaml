@@ -1,7 +1,7 @@
 name: '((gzip example - zdiff package - #2337'
 dialect: bash
 source: oils:spec/paren-ambiguity#gzip-example---zdiff-package---2337
-stdout: |-
+stdout: |
   bye
 ---
 

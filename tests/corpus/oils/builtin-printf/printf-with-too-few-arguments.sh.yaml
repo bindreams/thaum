@@ -1,7 +1,7 @@
 name: printf with too few arguments
 dialect: bash
 source: oils:spec/builtin-printf#printf-with-too-few-arguments
-stdout: |-
+stdout: |
   -a b-x y--
 ---
 printf -- '-%s-%s-%s-\n' 'a b' 'x y'

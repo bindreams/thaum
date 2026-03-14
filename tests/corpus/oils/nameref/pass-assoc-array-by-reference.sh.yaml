@@ -1,7 +1,7 @@
 name: pass assoc array by reference
 dialect: bash
 source: oils:spec/nameref#pass-assoc-array-by-reference
-stdout: |-
+stdout: |
   jam
 ---
 show_value() {

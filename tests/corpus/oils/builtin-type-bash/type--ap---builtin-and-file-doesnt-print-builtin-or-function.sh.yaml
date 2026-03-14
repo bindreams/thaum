@@ -2,7 +2,7 @@ name: type -ap -> builtin and file; doesn't print builtin or function
 dialect: bash
 source: 
   oils:spec/builtin-type-bash#type--ap---builtin-and-file-doesnt-print-builtin-or-function
-stdout: |-
+stdout: |
   /bin/pwd
   _tmp/pwd
   ---

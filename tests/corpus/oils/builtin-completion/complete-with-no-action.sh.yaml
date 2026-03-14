@@ -1,7 +1,7 @@
 name: complete with no action
 dialect: bash
 source: oils:spec/builtin-completion#complete-with-no-action
-stdout: |-
+stdout: |
   status=2
 ---
 complete foo

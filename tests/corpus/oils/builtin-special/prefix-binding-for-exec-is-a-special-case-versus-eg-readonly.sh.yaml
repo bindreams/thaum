@@ -2,7 +2,7 @@ name: Prefix binding for exec is a special case (versus e.g. readonly)
 dialect: bash
 source: 
   oils:spec/builtin-special#prefix-binding-for-exec-is-a-special-case-versus-eg-readonly
-stdout: |-
+stdout: |
   pre1= x= pre2=pre2
 ---
 

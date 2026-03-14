@@ -1,7 +1,7 @@
 name: $PWD is not only set, but exported
 dialect: bash
 source: oils:spec/vars-special#pwd-is-not-only-set-but-exported
-stdout: |-
+stdout: |
   status=0
 ---
 env | grep -q PWD

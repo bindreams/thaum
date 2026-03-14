@@ -2,7 +2,7 @@ disabled: true
 name: Stateful proc with counter
 dialect: bash
 source: oils:spec/ysh-proc#stateful-proc-with-counter
-stdout: |-
+stdout: |
   counter = 1
   counter = 3
   counter = 6

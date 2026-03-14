@@ -1,7 +1,7 @@
 name: define and use alias on a single line
 dialect: bash
 source: oils:spec/alias#define-and-use-alias-on-a-single-line
-stdout: |-
+stdout: |
   two
   three
 ---

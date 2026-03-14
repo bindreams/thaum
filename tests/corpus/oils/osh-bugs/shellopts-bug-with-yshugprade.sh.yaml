@@ -1,7 +1,7 @@
 name: SHELLOPTS bug with ysh:ugprade
 dialect: bash
 source: oils:spec/osh-bugs#shellopts-bug-with-yshugprade
-stdout: |-
+stdout: |
   1
   a
   b

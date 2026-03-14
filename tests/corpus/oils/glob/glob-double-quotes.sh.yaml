@@ -1,7 +1,7 @@
 name: glob double quotes
 dialect: bash
 source: oils:spec/glob#glob-double-quotes
-stdout: |-
+stdout: |
   _tmp/"quoted.py"
 ---
 # note: mksh doesn't support [[:punct:]] ?

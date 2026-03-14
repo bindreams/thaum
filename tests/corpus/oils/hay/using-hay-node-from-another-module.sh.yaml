@@ -2,7 +2,7 @@ disabled: true
 name: Using Hay node from another module
 dialect: bash
 source: oils:spec/hay#using-hay-node-from-another-module
-stdout: |-
+stdout: |
   {
     "version": "3.3"
   }

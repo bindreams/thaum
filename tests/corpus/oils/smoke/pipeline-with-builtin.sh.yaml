@@ -1,7 +1,7 @@
 name: pipeline with builtin
 dialect: bash
 source: oils:spec/smoke#pipeline-with-builtin
-stdout: |-
+stdout: |
   1
 ---
 echo hi | wc -l

@@ -1,7 +1,7 @@
 name: printf %q
 dialect: bash
 source: oils:spec/builtin-printf#printf-q
-stdout: |-
+stdout: |
   ['a b']
 ---
 x='a b'

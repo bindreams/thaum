@@ -1,7 +1,7 @@
 name: Remove const prefix
 dialect: bash
 source: oils:spec/var-op-strip#remove-const-prefix
-stdout: |-
+stdout: |
   bcd cd
 ---
 v=abcd

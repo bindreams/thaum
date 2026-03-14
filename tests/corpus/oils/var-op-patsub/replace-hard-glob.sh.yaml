@@ -1,7 +1,7 @@
 name: Replace hard glob
 dialect: bash
 source: oils:spec/var-op-patsub#replace-hard-glob
-stdout: |-
+stdout: |
   aa__cc
 ---
 s='aa*bb+cc'

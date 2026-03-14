@@ -2,7 +2,7 @@ name: builtin,command break,continue,return,exit
 dialect: bash
 source: oils:spec/loop#builtincommand-breakcontinuereturnexit
 status: 5
-stdout: |-
+stdout: |
   - break
   1
   - continue

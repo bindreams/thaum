@@ -1,7 +1,7 @@
 name: $% is not a parse error
 dialect: bash
 source: oils:spec/parse-errors#is-not-a-parse-error
-stdout: |-
+stdout: |
   $%
 ---
 echo $%

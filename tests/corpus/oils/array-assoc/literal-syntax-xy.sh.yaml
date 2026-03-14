@@ -1,7 +1,7 @@
 name: Literal syntax ([x]=y)
 dialect: bash
 source: oils:spec/array-assoc#literal-syntax-xy
-stdout: |-
+stdout: |
   b
   bar
   c

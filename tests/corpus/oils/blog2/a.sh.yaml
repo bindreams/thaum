@@ -1,7 +1,7 @@
 name: -a
 dialect: bash
 source: oils:spec/blog2#a
-stdout: |-
+stdout: |
   status=0
 ---
 [ -a ]

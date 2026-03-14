@@ -2,7 +2,7 @@ disabled: true
 name: mixing assignment builtins and YSH assignment
 dialect: bash
 source: oils:spec/ysh-assign#mixing-assignment-builtins-and-ysh-assignment
-stdout: |-
+stdout: |
   x=2
   status=0
   status=1

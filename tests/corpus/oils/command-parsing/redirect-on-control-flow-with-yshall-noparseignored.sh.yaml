@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/command-parsing#redirect-on-control-flow-with-yshall-noparseignored
 status: 0
-stdout: |-
+stdout: |
   REDIRECTED
 ---
 shopt -s ysh:all

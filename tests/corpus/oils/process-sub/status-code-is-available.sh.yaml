@@ -1,7 +1,7 @@
 name: status code is available
 dialect: bash
 source: oils:spec/process-sub#status-code-is-available
-stdout: |-
+stdout: |
   1
   2
   1

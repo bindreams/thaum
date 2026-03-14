@@ -2,7 +2,7 @@ disabled: true
 name: BashArray, new representation for bash array
 dialect: bash
 source: oils:spec/ysh-printing#basharray-new-representation-for-bash-array
-stdout: |-
+stdout: |
   (BashArray)
   (BashArray [0]='hello' [5]='5')
 

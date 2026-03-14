@@ -1,7 +1,7 @@
 name: 'bash and mksh: V in (( a[K] = V )) gets coerced to integer'
 dialect: bash
 source: oils:spec/dparen#bash-and-mksh-v-in-ak-v-gets-coerced-to-integer
-stdout: |-
+stdout: |
   a["key"]=0
   keys = 0
   values = 0

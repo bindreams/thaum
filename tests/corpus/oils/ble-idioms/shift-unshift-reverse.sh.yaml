@@ -1,7 +1,7 @@
 name: shift unshift reverse
 dialect: bash
 source: oils:spec/ble-idioms#shift-unshift-reverse
-stdout: |-
+stdout: |
   1 2 3 4 5 6
   2 3 4 5 6
   4 5 6

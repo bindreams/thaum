@@ -1,7 +1,7 @@
 name: getopts three invocations
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-three-invocations
-stdout: |-
+stdout: |
   status=0 opt=h
   status=0 opt=c
   status=1 opt=?

@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace() at top level
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplace-at-top-level
-stdout: |-
+stdout: |
   <Expr>
   replace   my[x st t x]r
   myreplace my[x st t x]r

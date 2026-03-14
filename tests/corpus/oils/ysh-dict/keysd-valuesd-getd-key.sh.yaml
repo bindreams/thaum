@@ -2,7 +2,7 @@ disabled: true
 name: keys(d), values(d), get(d, key)
 dialect: bash
 source: oils:spec/ysh-dict#keysd-valuesd-getd-key
-stdout: |-
+stdout: |
   (List)   ["a","b"]
   (List)   [42,99]
   (Int)   42

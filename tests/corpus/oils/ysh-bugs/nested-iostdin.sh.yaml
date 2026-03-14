@@ -2,7 +2,7 @@ disabled: true
 name: Nested io.stdin
 dialect: bash
 source: oils:spec/ysh-bugs#nested-iostdin
-stdout: |-
+stdout: |
   x=a
   x=b
   x=a

@@ -1,7 +1,7 @@
 name: command -V nonexistent
 dialect: bash
 source: oils:spec/builtin-meta#command--v-nonexistent
-stdout: |-
+stdout: |
   status=1
   nonexistent: not found
 ---

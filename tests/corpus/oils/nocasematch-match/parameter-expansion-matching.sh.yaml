@@ -1,7 +1,7 @@
 name: parameter expansion matching
 dialect: bash
 source: oils:spec/nocasematch-match#parameter-expansion-matching
-stdout: |-
+stdout: |
   a a
   A A
 ---

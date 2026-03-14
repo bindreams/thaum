@@ -2,7 +2,7 @@ disabled: true
 name: dict() does shallow copy
 dialect: bash
 source: oils:spec/ysh-convert#dict-does-shallow-copy
-stdout: |-
+stdout: |
   true
   false
   true

@@ -1,7 +1,7 @@
 name: "'echo' and printf fail on writing to full disk"
 dialect: bash
 source: oils:spec/bugs#echo-and-printf-fail-on-writing-to-full-disk
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

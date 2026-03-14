@@ -1,7 +1,7 @@
 name: exit 1 when trap code string is invalid
 dialect: bash
 source: oils:spec/builtin-trap#exit-1-when-trap-code-string-is-invalid
-stdout: |-
+stdout: |
   status=1
 ---
 # All shells spew warnings to stderr, but don't actually exit!  Bad!

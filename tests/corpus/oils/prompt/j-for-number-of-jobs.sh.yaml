@@ -1,7 +1,7 @@
 name: \j for number of jobs
 dialect: bash
 source: oils:spec/prompt#j-for-number-of-jobs
-stdout: |-
+stdout: |
   matched=0
   matched=0
   sleep 5

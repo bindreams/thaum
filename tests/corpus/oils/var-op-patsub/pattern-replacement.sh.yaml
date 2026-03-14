@@ -1,7 +1,7 @@
 name: Pattern replacement
 dialect: bash
 source: oils:spec/var-op-patsub#pattern-replacement
-stdout: |-
+stdout: |
   abXX
 ---
 v=abcde

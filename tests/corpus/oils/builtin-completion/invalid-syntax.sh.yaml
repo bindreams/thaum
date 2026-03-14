@@ -1,7 +1,7 @@
 name: Invalid syntax
 dialect: bash
 source: oils:spec/builtin-completion#invalid-syntax
-stdout: |-
+stdout: |
   status=2
 ---
 compgen -A foo

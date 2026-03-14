@@ -1,7 +1,7 @@
 name: redirect if
 dialect: bash
 source: oils:spec/redirect-command#redirect-if
-stdout: |-
+stdout: |
   if-body
 ---
 if true; then

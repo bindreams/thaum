@@ -3,7 +3,7 @@ name: use foo.ysh creates a value.Obj, and it's cached on later invocations
 dialect: bash
 source: 
   oils:spec/ysh-builtin-module#use-fooysh-creates-a-valueobj-and-its-cached-on-later-invocations
-stdout: |-
+stdout: |
   caller_no_leak = null
   (List)   ["util",("MY_INTEGER":42,"log":<Proc>,"die":<Proc>,"setvar_noleak":"util.ysh","setglobal_noleak":"util.ysh","invokableObj":("x":3,"y":4) --> ("__invoke__":<Proc>)) --> ("__invoke__":<BuiltinProc>)]
   (List)   ["repeated",("MY_INTEGER":42,"log":<Proc>,"die":<Proc>,"setvar_noleak":"util.ysh","setglobal_noleak":"util.ysh","invokableObj":("x":3,"y":4) --> ("__invoke__":<Proc>)) --> ("__invoke__":<BuiltinProc>)]

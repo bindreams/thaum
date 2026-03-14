@@ -2,7 +2,7 @@ disabled: true
 name: "'call' to ignore return value"
 dialect: bash
 source: oils:spec/ysh-keywords#call-to-ignore-return-value
-stdout: |-
+stdout: |
   a
   b
   c

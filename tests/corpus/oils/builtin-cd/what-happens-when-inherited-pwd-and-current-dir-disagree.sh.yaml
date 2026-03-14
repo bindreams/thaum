@@ -2,7 +2,7 @@ name: What happens when inherited $PWD and current dir disagree?
 dialect: bash
 source: 
   oils:spec/builtin-cd#what-happens-when-inherited-pwd-and-current-dir-disagree
-stdout: |-
+stdout: |
   Python PWD = '/tmp/osh-spec-cd'
   PWD = /tmp/osh-spec-cd/cpan/Encode
   /tmp/osh-spec-cd/cpan/Encode

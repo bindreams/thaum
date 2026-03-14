@@ -1,7 +1,7 @@
 name: Changing resource limit is denied
 dialect: bash
 source: oils:spec/builtin-process#changing-resource-limit-is-denied
-stdout: |-
+stdout: |
   both=0
   soft=0
   soft=0

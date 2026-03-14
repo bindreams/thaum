@@ -1,7 +1,7 @@
 name: '#2640 Hanging when reading from character devices'
 dialect: bash
 source: oils:spec/bugs#2640-hanging-when-reading-from-character-devices
-stdout: |-
+stdout: |
   00000
   00000
   00000

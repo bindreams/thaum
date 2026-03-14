@@ -1,7 +1,7 @@
 name: kill -l 0 returns EXIT
 dialect: bash
 source: oils:spec/builtin-kill#kill--l-0-returns-exit
-stdout: |-
+stdout: |
   EXIT
   ## N-I dash status: 2
   ## N-I dash STDOUT:

@@ -2,7 +2,7 @@ disabled: true
 name: List pop()
 dialect: bash
 source: oils:spec/ysh-list#list-pop
-stdout: |-
+stdout: |
   pass
 ---
 shopt -s ysh:all

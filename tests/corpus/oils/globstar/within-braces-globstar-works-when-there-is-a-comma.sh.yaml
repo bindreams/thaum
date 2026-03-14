@@ -1,7 +1,7 @@
 name: within braces, globstar works when there is a comma
 dialect: bash
 source: oils:spec/globstar#within-braces-globstar-works-when-there-is-a-comma
-stdout: |-
+stdout: |
   c/subdir/leaf.md
 ---
 shopt -s globstar

@@ -3,7 +3,7 @@ name: Bound methods, receiver value/reference semantics
 dialect: bash
 source: oils:spec/ysh-methods#bound-methods-receiver-valuereference-semantics
 status: 0
-stdout: |-
+stdout: |
   (List)   ["foo"]
   (List)   ["foo","baz"]
   (Bool)   true

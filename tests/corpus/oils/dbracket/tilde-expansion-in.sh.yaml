@@ -1,7 +1,7 @@
 name: tilde expansion in [[
 dialect: bash
 source: oils:spec/dbracket#tilde-expansion-in
-stdout: |-
+stdout: |
   status=0
   status=0
   status=1

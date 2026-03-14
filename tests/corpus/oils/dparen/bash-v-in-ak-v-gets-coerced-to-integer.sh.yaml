@@ -1,7 +1,7 @@
 name: 'bash: V in (( A["K"] = V )) gets coerced to integer'
 dialect: bash
 source: oils:spec/dparen#bash-v-in-ak-v-gets-coerced-to-integer
-stdout: |-
+stdout: |
   A["key"]=
   keys = K
   values = 0

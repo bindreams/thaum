@@ -2,7 +2,7 @@ name: bind -l should report readline functions
 dialect: bash
 source: oils:spec/builtin-bind#bind--l-should-report-readline-functions
 status: 0
-stdout: |-
+stdout: |
   accept-line
 ---
 

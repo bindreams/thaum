@@ -2,7 +2,7 @@ name: first and second word are the same alias, with trailing space
 dialect: bash
 source: 
   oils:spec/alias#first-and-second-word-are-the-same-alias-with-trailing-space
-stdout: |-
+stdout: |
   x echo x
 ---
 shopt -s expand_aliases  # bash requires this

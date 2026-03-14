@@ -1,7 +1,7 @@
 name: op-test for ${a} and ${a[0]}
 dialect: bash
 source: oils:spec/var-op-test#op-test-for-a-and-a0
-stdout: |-
+stdout: |
   a   : 'no-colon' 'with-colon'
   a[0]: 'no-colon' 'with-colon'
   a   : '' 'with-colon'

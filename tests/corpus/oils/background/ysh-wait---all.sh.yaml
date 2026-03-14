@@ -1,7 +1,7 @@
 name: YSH wait --all
 dialect: bash
 source: oils:spec/background#ysh-wait---all
-stdout: |-
+stdout: |
   wait 0
   wait --all 1
 ---

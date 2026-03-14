@@ -1,7 +1,7 @@
 name: PROMPT_COMMAND can see $?, like bash
 dialect: bash
 source: oils:spec/interactive#promptcommand-can-see-like-bash
-stdout: |-
+stdout: |
   last_status=0
   last_status=42
   last_status=43

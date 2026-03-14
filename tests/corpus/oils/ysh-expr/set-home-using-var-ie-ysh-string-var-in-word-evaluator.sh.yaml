@@ -3,7 +3,7 @@ name: Set $HOME using 'var' (i.e. YSH string var in word evaluator)
 dialect: bash
 source: 
   oils:spec/ysh-expr#set-home-using-var-ie-ysh-string-var-in-word-evaluator
-stdout: |-
+stdout: |
   foo
   foo
 ---

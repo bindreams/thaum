@@ -1,7 +1,7 @@
 name: set -u -- x y z
 dialect: bash
 source: oils:spec/builtin-set#set--u----x-y-z
-stdout: |-
+stdout: |
   x y z
 ---
 set a b c

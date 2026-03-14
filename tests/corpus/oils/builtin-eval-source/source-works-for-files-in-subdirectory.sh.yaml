@@ -1,7 +1,7 @@
 name: source works for files in subdirectory
 dialect: bash
 source: oils:spec/builtin-eval-source#source-works-for-files-in-subdirectory
-stdout: |-
+stdout: |
   path
 ---
 mkdir -p dir

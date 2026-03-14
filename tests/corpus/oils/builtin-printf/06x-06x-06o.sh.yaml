@@ -1,7 +1,7 @@
 name: '%06x %06X %06o'
 dialect: bash
 source: oils:spec/builtin-printf#06x-06x-06o
-stdout: |-
+stdout: |
   [00002a]
   [00002A]
   [000052]

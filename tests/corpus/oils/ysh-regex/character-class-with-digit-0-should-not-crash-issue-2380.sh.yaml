@@ -3,7 +3,7 @@ name: 'character class with digit [\\0] should not crash (issue #2380)'
 dialect: bash
 source: 
   oils:spec/ysh-regex#character-class-with-digit-0-should-not-crash-issue-2380
-stdout: |-
+stdout: |
   pattern: [0\\]
   (Bool)   true
   (Bool)   false

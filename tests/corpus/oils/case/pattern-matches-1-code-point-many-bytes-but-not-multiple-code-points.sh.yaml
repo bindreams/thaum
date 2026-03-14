@@ -2,7 +2,7 @@ name: Pattern ? matches 1 code point (many bytes), but not multiple code points
 dialect: bash
 source: 
   oils:spec/case#pattern-matches-1-code-point-many-bytes-but-not-multiple-code-points
-stdout: |-
+stdout: |
   yes
   yes
   no

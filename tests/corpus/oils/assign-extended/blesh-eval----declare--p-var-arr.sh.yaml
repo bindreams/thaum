@@ -1,7 +1,7 @@
 name: 'ble.sh: eval -- "$(declare -p var arr)"'
 dialect: bash
 source: oils:spec/assign-extended#blesh-eval----declare--p-var-arr
-stdout: |-
+stdout: |
   sum=21
   arr[0]=a2
   arr[1]=a5

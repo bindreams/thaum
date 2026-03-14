@@ -1,7 +1,7 @@
 name: $PWD is set
 dialect: bash
 source: oils:spec/vars-special#pwd-is-set
-stdout: |-
+stdout: |
   status=0
 ---
 # Just test that it has a slash for now.

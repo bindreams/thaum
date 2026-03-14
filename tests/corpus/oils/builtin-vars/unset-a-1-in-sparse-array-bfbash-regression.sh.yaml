@@ -1,7 +1,7 @@
 name: unset a[-1] in sparse array (bf.bash regression)
 dialect: bash
 source: oils:spec/builtin-vars#unset-a-1-in-sparse-array-bfbash-regression
-stdout: |-
+stdout: |
   len=3 a=0 2 3
   last=3 second=2 third=
   ---

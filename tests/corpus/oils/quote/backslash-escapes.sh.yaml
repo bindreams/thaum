@@ -1,7 +1,7 @@
 name: Backslash escapes
 dialect: bash
 source: oils:spec/quote#backslash-escapes
-stdout: |-
+stdout: |
   $ | a b c d \
 ---
 echo \$ \| \a \b \c \d \\

@@ -2,7 +2,7 @@ disabled: true
 name: Chained Comparisons
 dialect: bash
 source: oils:spec/ysh-expr-compare#chained-comparisons
-stdout: |-
+stdout: |
   123
   123
   no

@@ -1,7 +1,7 @@
 name: Append string to undefined variable
 dialect: bash
 source: oils:spec/append#append-string-to-undefined-variable
-stdout: |-
+stdout: |
   s=foo
   t=foo
   t=foofoo

@@ -1,7 +1,7 @@
 name: array decays to string when comparing with [[ a = b ]]
 dialect: bash
 source: oils:spec/array-compat#array-decays-to-string-when-comparing-with-a-b
-stdout: |-
+stdout: |
   2 7
   EQUAL
 ---

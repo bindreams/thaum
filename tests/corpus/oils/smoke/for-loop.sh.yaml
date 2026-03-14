@@ -2,7 +2,7 @@ name: for loop
 dialect: bash
 source: oils:spec/smoke#for-loop
 status: 0
-stdout: |-
+stdout: |
   a
   b
   c

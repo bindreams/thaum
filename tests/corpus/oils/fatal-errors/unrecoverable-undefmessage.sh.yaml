@@ -1,7 +1,7 @@
 name: 'Unrecoverable: ${undef?message}'
 dialect: bash
 source: oils:spec/fatal-errors#unrecoverable-undefmessage
-stdout: |-
+stdout: |
   outside=1
   outside=1
 ---

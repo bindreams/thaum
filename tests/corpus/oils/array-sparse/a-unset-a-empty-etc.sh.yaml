@@ -1,7 +1,7 @@
 name: ${a[@]-unset}, ${a[@]:-empty}, etc.
 dialect: bash
 source: oils:spec/array-sparse#a-unset-a-empty-etc
-stdout: |-
+stdout: |
   a1 unset: [unset]
   a1 empty: [empty]
   a2 unset: []

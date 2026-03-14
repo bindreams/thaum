@@ -2,7 +2,7 @@ disabled: true
 name: 'Data after internal NUL (issue #2026)'
 dialect: bash
 source: oils:spec/ysh-json#data-after-internal-nul-issue-2026
-stdout: |-
+stdout: |
   status=4
   status=4
   status=1

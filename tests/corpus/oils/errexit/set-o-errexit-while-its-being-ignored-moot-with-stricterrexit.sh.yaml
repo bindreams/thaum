@@ -2,7 +2,7 @@ name: set +o errexit while it's being ignored (moot with strict_errexit)
 dialect: bash
 source: 
   oils:spec/errexit#set-o-errexit-while-its-being-ignored-moot-with-stricterrexit
-stdout: |-
+stdout: |
   1
   2
   3

@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/ysh-methods#str-trim-with-an-eggex-pattern-trims-bytes-not-runes
 status: 0
-stdout: |-
+stdout: |
   "", "", ""
   "", "", ""
   b'\yce', b'\yce', b'\yce'

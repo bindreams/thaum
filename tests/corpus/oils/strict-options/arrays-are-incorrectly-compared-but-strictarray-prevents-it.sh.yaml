@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/strict-options#arrays-are-incorrectly-compared-but-strictarray-prevents-it
 status: 1
-stdout: |-
+stdout: |
   2
   4
   EQUAL

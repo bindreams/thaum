@@ -1,7 +1,7 @@
 name: Negative numbers with bit shift
 dialect: bash
 source: oils:spec/arith#negative-numbers-with-bit-shift
-stdout: |-
+stdout: |
   10
   5
   ---

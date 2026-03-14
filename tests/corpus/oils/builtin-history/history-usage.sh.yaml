@@ -1,7 +1,7 @@
 name: history usage
 dialect: bash
 source: oils:spec/builtin-history#history-usage
-stdout: |-
+stdout: |
   status=2
   status=2
 ---

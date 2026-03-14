@@ -1,7 +1,7 @@
 name: printf %q newline
 dialect: bash
 source: oils:spec/serialize#printf-q-newline
-stdout: |-
+stdout: |
   $'one\ntwo'
   roundtrip-ok
 ---

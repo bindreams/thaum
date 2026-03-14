@@ -1,7 +1,7 @@
 name: command sub with command_sub_errexit only
 dialect: bash
 source: oils:spec/errexit-osh#command-sub-with-commandsuberrexit-only
-stdout: |-
+stdout: |
   zero
   one two
   parent status=0

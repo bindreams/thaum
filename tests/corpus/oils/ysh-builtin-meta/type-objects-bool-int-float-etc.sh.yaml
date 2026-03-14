@@ -2,7 +2,7 @@ disabled: true
 name: Type objects Bool, Int, Float, etc.
 dialect: bash
 source: oils:spec/ysh-builtin-meta#type-objects-bool-int-float-etc
-stdout: |-
+stdout: |
   (Obj)   ("name":"Bool") --> ("__index__":<BuiltinFunc>)
   (Obj)   ("name":"Int") --> ("__index__":<BuiltinFunc>)
   (Obj)   ("name":"Float") --> ("__index__":<BuiltinFunc>)

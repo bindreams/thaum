@@ -2,7 +2,7 @@ disabled: true
 name: 'Expression for loop with index: List'
 dialect: bash
 source: oils:spec/ysh-for#expression-for-loop-with-index-list
-stdout: |-
+stdout: |
   0 spam
   1 eggs
 ---

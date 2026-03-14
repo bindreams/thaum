@@ -1,7 +1,7 @@
 name: 'mapfile (store position): -O start'
 dialect: bash
 source: oils:spec/builtin-bash#mapfile-store-position--o-start
-stdout: |-
+stdout: |
   n=5
   [x]
   [y]

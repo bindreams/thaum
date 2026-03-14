@@ -2,7 +2,7 @@ disabled: true
 name: Multiple func calls
 dialect: bash
 source: oils:spec/ysh-func#multiple-func-calls
-stdout: |-
+stdout: |
   2
   3
   2

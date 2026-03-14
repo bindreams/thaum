@@ -1,7 +1,7 @@
 name: Augmented assignment
 dialect: bash
 source: oils:spec/arith#augmented-assignment
-stdout: |-
+stdout: |
   5
   5
 ---

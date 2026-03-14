@@ -1,7 +1,7 @@
 name: getopts sees unknown arg
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-sees-unknown-arg
-stdout: |-
+stdout: |
   status=0 opt=? OPTARG=
 ---
 set -- -Z

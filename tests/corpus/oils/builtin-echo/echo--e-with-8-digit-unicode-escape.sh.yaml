@@ -1,7 +1,7 @@
 name: echo -e with 8 digit unicode escape
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-with-8-digit-unicode-escape
-stdout: |-
+stdout: |
   abcdef
 ---
 flags='-e'

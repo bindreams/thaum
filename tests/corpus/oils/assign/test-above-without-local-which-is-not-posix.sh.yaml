@@ -1,7 +1,7 @@
 name: Test above without 'local' (which is not POSIX)
 dialect: bash
 source: oils:spec/assign#test-above-without-local-which-is-not-posix
-stdout: |-
+stdout: |
   x=temp-binding
   x=mutated-temp
   x=global

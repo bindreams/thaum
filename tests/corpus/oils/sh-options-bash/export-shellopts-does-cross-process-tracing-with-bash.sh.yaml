@@ -2,7 +2,7 @@ name: export SHELLOPTS does cross-process tracing with bash
 dialect: bash
 source: 
   oils:spec/sh-options-bash#export-shellopts-does-cross-process-tracing-with-bash
-stdout: |-
+stdout: |
   + echo 1
   1
   sh -c 'echo 2'

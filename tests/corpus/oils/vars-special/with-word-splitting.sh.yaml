@@ -1,7 +1,7 @@
 name: $_ with word splitting
 dialect: bash
 source: oils:spec/vars-special#with-word-splitting
-stdout: |-
+stdout: |
   spaces
 ---
 case $SH in dash|mksh) exit ;; esac

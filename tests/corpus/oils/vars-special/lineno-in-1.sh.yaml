@@ -1,7 +1,7 @@
 name: $LINENO in ((
 dialect: bash
 source: oils:spec/vars-special#lineno-in
-stdout: |-
+stdout: |
   one
   2
 ---

@@ -3,7 +3,7 @@ name: read-lines can be built on top of read --all and Str.lines()
 dialect: bash
 source: 
   oils:spec/ysh-methods#read-lines-can-be-built-on-top-of-read---all-and-strlines
-stdout: |-
+stdout: |
   (List)   ["4","5","6","7"]
 ---
 

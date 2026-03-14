@@ -2,7 +2,7 @@ name: '$(( closed with )) after multiple lines is parse error - #2337'
 dialect: bash
 source: 
   oils:spec/paren-ambiguity#closed-with-after-multiple-lines-is-parse-error---2337
-stdout: |-
+stdout: |
   ok
 ---
 

@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#xtrace-with-paths
 stdout: |
   my-dir/my_file.cc
-stderr: |-
+stderr: |
   + echo my-dir/my_file.cc
 ---
 set -o xtrace

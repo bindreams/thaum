@@ -1,7 +1,7 @@
 name: type -a -> file
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a---file
-stdout: |-
+stdout: |
   date is /bin/date
   date is _tmp/date
 ---

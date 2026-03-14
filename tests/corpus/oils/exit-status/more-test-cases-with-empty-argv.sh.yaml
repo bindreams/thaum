@@ -1,7 +1,7 @@
 name: More test cases with empty argv
 dialect: bash
 source: oils:spec/exit-status#more-test-cases-with-empty-argv
-stdout: |-
+stdout: |
   status=0
   status=42
   status=43

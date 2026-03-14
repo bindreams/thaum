@@ -1,7 +1,7 @@
 name: set -o verbose prints unevaluated code
 dialect: bash
 source: oils:spec/xtrace#set--o-verbose-prints-unevaluated-code
-stdout: |-
+stdout: |
   foo
   bar
   ## STDERR:

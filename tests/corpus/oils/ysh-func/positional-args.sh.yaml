@@ -2,7 +2,7 @@ disabled: true
 name: Positional args
 dialect: bash
 source: oils:spec/ysh-func#positional-args
-stdout: |-
+stdout: |
   pos 1 2
   rest 3 4
 ---

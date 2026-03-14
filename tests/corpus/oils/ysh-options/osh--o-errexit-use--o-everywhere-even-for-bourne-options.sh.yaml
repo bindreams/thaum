@@ -3,7 +3,7 @@ name: 'osh -O errexit: use -O everywhere, even for Bourne options'
 dialect: bash
 source: 
   oils:spec/ysh-options#osh--o-errexit-use--o-everywhere-even-for-bourne-options
-stdout: |-
+stdout: |
   set -o errexit
 ---
 $SH -O errexit -c 'shopt -p -o errexit'

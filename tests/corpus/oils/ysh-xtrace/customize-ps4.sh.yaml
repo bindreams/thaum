@@ -6,7 +6,7 @@ stdout: |
   1
   2
   3
-stderr: |-
+stderr: |
   5 . builtin echo 1
   5 . builtin echo 2
   6 . builtin echo 3

@@ -1,7 +1,7 @@
 name: While Loop ends pipeline
 dialect: bash
 source: oils:spec/pipeline#while-loop-ends-pipeline
-stdout: |-
+stdout: |
   .1
   .2
   .3

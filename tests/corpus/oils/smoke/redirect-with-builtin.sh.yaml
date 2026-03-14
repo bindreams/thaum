@@ -1,7 +1,7 @@
 name: Redirect with builtin
 dialect: bash
 source: oils:spec/smoke#redirect-with-builtin
-stdout: |-
+stdout: |
   hi
 ---
 echo hi > hi.txt

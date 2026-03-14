@@ -1,7 +1,7 @@
 name: fc -lr lists history commands in reverse order
 dialect: bash
 source: oils:spec/builtin-fc#fc--lr-lists-history-commands-in-reverse-order
-stdout: |-
+stdout: |
   4	 echo 3
   3	 echo 2
   2	 echo 1

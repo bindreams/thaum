@@ -1,7 +1,7 @@
 name: extended glob of single unicode char
 dialect: bash
 source: oils:spec/extglob-match#extended-glob-of-single-unicode-char
-stdout: |-
+stdout: |
   0
   0
 ---

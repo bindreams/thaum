@@ -2,7 +2,7 @@ disabled: true
 name: shvar builtin syntax
 dialect: bash
 source: oils:spec/ysh-scope#shvar-builtin-syntax
-stdout: |-
+stdout: |
   status=2
   status=2
   status=2

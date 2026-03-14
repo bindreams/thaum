@@ -1,7 +1,7 @@
 name: echo -e with embedded newline
 dialect: bash
 source: oils:spec/builtin-echo#echo--e-with-embedded-newline
-stdout: |-
+stdout: |
   foo
   bar
 ---

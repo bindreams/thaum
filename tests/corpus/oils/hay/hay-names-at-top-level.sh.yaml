@@ -2,7 +2,7 @@ disabled: true
 name: hay names at top level
 dialect: bash
 source: oils:spec/hay#hay-names-at-top-level
-stdout: |-
+stdout: |
   status=0
   1 one
   status=0

@@ -3,7 +3,7 @@ name: User can handle errors - toJson() toJson8()
 dialect: bash
 source: oils:spec/ysh-json#user-can-handle-errors---tojson-tojson8
 status: 4
-stdout: |-
+stdout: |
   status=4
   encode error Can't encode List (object id) in object cycle
   status=4

@@ -1,7 +1,7 @@
 name: git-completion snippet
 dialect: bash
 source: oils:spec/zsh-idioms#git-completion-snippet
-stdout: |-
+stdout: |
   status=0
 ---
 

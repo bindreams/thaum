@@ -2,7 +2,7 @@ disabled: true
 name: null / true / false
 dialect: bash
 source: oils:spec/ysh-expr#null-true-false
-stdout: |-
+stdout: |
   no
   yes
   no

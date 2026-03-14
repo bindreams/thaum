@@ -2,7 +2,7 @@ disabled: true
 name: Closed ranges
 dialect: bash
 source: oils:spec/ysh-slice-range#closed-ranges
-stdout: |-
+stdout: |
   1
   2
   (Range 1 ..< 3)

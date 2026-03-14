@@ -3,7 +3,7 @@ name: Encoding bytes that don't hit UTF8_REJECT immediately (bug fix)
 dialect: bash
 source: 
   oils:spec/ysh-json#encoding-bytes-that-dont-hit-utf8reject-immediately-bug-fix
-stdout: |-
+stdout: |
   b'\yce'
   declare -- x=$'\xce'
 

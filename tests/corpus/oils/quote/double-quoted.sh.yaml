@@ -1,7 +1,7 @@
 name: Double-quoted
 dialect: bash
 source: oils:spec/quote#double-quoted
-stdout: |-
+stdout: |
   double   quoted
 ---
 echo "double   quoted"

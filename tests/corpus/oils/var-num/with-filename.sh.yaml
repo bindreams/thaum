@@ -1,7 +1,7 @@
 name: $@ with filename
 dialect: bash
 source: oils:spec/var-num#with-filename
-stdout: |-
+stdout: |
   a b c
 ---
 s=dollar0

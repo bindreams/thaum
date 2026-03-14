@@ -2,7 +2,7 @@ disabled: true
 name: 'cd builtin: return in block'
 dialect: bash
 source: oils:spec/ysh-control-flow#cd-builtin-return-in-block
-stdout: |-
+stdout: |
   one
 ---
 shopt -s ysh:all

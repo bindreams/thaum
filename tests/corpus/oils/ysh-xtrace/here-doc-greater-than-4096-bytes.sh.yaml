@@ -5,7 +5,7 @@ source: oils:spec/ysh-xtrace#here-doc-greater-than-4096-bytes
 stdout: |
   2002 big-here.sh
   2000
-stderr: |-
+stderr: |
   | here doc 12345
   | command 12345: wc -l
   ; process 12345: status 0

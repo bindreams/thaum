@@ -1,7 +1,7 @@
 name: command -v with multiple names
 dialect: bash
 source: oils:spec/builtin-meta#command--v-with-multiple-names
-stdout: |-
+stdout: |
   echo
   myfunc
   for

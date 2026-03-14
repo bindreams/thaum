@@ -2,7 +2,7 @@ disabled: true
 name: BashAssoc, short
 dialect: bash
 source: oils:spec/ysh-printing#bashassoc-short
-stdout: |-
+stdout: |
   (BashAssoc)
   (BashAssoc ['k']=$'foo \u0001μ')
 

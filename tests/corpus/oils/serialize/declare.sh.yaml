@@ -1,7 +1,7 @@
 name: declare
 dialect: bash
 source: oils:spec/serialize#declare
-stdout: |-
+stdout: |
   zz=$'one\ntwo'
   declare -- zz=$'one\ntwo'
 ---

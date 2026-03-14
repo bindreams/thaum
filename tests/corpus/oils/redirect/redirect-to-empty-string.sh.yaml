@@ -2,7 +2,7 @@ name: Redirect to empty string
 dialect: bash
 source: oils:spec/redirect#redirect-to-empty-string
 status: 1
-stdout: |-
+stdout: |
   result=1
 ---
 f=''

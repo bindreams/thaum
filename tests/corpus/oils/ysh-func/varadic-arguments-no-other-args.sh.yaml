@@ -2,7 +2,7 @@ disabled: true
 name: Varadic arguments, no other args
 dialect: bash
 source: oils:spec/ysh-func#varadic-arguments-no-other-args
-stdout: |-
+stdout: |
   (List)   []
   (List)   [1]
   (List)   [1,2]

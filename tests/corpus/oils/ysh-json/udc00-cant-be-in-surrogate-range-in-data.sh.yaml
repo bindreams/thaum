@@ -2,7 +2,7 @@ disabled: true
 name: \u{dc00} can't be in surrogate range in data
 dialect: bash
 source: oils:spec/ysh-json#udc00-cant-be-in-surrogate-range-in-data
-stdout: |-
+stdout: |
   status=0
   status=1
   status=1

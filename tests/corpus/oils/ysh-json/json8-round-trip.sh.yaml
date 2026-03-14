@@ -2,7 +2,7 @@ disabled: true
 name: json8 round trip
 dialect: bash
 source: oils:spec/ysh-json#json8-round-trip
-stdout: |-
+stdout: |
   [42,1.5,null,true,"hi",b'\yff\yfe\b\n""']
   [
     42,

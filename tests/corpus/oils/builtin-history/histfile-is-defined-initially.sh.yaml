@@ -1,7 +1,7 @@
 name: HISTFILE is defined initially
 dialect: bash
 source: oils:spec/builtin-history#histfile-is-defined-initially
-stdout: |-
+stdout: |
   exists
   ^D
 ---

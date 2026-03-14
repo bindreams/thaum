@@ -2,7 +2,7 @@ name: history builtin usage
 dialect: bash
 source: oils:spec/builtin-misc#history-builtin-usage
 status: 0
-stdout: |-
+stdout: |
   status=0
   status=0
   status=2

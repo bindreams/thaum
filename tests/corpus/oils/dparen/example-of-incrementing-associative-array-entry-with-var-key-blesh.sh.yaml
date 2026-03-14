@@ -2,7 +2,7 @@ name: Example of incrementing associative array entry with var key (ble.sh)
 dialect: bash
 source: 
   oils:spec/dparen#example-of-incrementing-associative-array-entry-with-var-key-blesh
-stdout: |-
+stdout: |
   foo=44
 ---
 declare -A A=(['foo']=42)

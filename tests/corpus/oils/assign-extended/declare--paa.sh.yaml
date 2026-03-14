@@ -1,7 +1,7 @@
 name: declare -paA
 dialect: bash
 source: oils:spec/assign-extended#declare--paa
-stdout: |-
+stdout: |
   [declare -pa]
   declare -a test_var6=()
   [declare -pA]

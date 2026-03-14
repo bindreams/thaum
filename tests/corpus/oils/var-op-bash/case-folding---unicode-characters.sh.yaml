@@ -1,7 +1,7 @@
 name: Case folding - Unicode characters
 dialect: bash
 source: oils:spec/var-op-bash#case-folding---unicode-characters
-stdout: |-
+stdout: |
   u ÀÈ
   U ÀÈ
   l àÈ

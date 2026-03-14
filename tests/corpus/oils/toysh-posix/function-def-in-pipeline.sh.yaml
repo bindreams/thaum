@@ -1,7 +1,7 @@
 name: Function def in pipeline
 dialect: bash
 source: oils:spec/toysh-posix#function-def-in-pipeline
-stdout: |-
+stdout: |
   ha
 ---
 # http://landley.net/notes.html#26-05-2020

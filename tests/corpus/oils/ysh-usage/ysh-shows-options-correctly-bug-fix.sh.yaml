@@ -2,7 +2,7 @@ disabled: true
 name: YSH shows options correctly (bug fix)
 dialect: bash
 source: oils:spec/ysh-usage#ysh-shows-options-correctly-bug-fix
-stdout: |-
+stdout: |
   set -o errexit
   set -o pipefail
 ---

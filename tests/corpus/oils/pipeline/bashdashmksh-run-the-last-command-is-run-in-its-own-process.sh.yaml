@@ -2,7 +2,7 @@ name: bash/dash/mksh run the last command is run in its own process
 dialect: bash
 source: 
   oils:spec/pipeline#bashdashmksh-run-the-last-command-is-run-in-its-own-process
-stdout: |-
+stdout: |
   line=hi
 ---
 echo hi | read line

@@ -1,7 +1,7 @@
 name: No tab escapes within single quotes
 dialect: bash
 source: oils:spec/quote#no-tab-escapes-within-single-quotes
-stdout: |-
+stdout: |
   a\tb
 ---
 # dash and mksh allow this, which is a BUG.

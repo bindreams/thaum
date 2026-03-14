@@ -1,7 +1,7 @@
 name: bind -q
 dialect: bash
 source: oils:spec/builtin-bind#bind--q
-stdout: |-
+stdout: |
   status=1
   vi-subst is not bound to any keys.
   status=1

@@ -2,7 +2,7 @@ disabled: true
 name: Ternary op behaves like if statement
 dialect: bash
 source: oils:spec/ysh-expr-compare#ternary-op-behaves-like-if-statement
-stdout: |-
+stdout: |
   y=42
   x=42
 ---

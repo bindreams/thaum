@@ -2,7 +2,7 @@ name: error in trap ERR (recursive)
 dialect: bash
 source: oils:spec/builtin-trap-err#error-in-trap-err-recursive
 status: 1
-stdout: |-
+stdout: |
   A
   err status 1
   err 2

@@ -1,7 +1,7 @@
 name: 'Empty IFS bug #2141 (from pnut)'
 dialect: bash
 source: oils:spec/word-split#empty-ifs-bug-2141-from-pnut
-stdout: |-
+stdout: |
   12 + 30 = 42
   12 + 30 = 42
   12 + 30 = 42

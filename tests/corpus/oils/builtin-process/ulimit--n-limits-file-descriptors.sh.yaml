@@ -1,7 +1,7 @@
 name: ulimit -n limits file descriptors
 dialect: bash
 source: oils:spec/builtin-process#ulimit--n-limits-file-descriptors
-stdout: |-
+stdout: |
   status=0
   status=1
 ---

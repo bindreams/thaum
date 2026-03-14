@@ -1,7 +1,7 @@
 name: Empty command sub $() (command::NoOp)
 dialect: bash
 source: oils:spec/command-sub#empty-command-sub-commandnoop
-stdout: |-
+stdout: |
   -- ..
 ---
 

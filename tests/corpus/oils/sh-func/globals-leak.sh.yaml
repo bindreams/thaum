@@ -1,7 +1,7 @@
 name: Globals leak
 dialect: bash
 source: oils:spec/sh-func#globals-leak
-stdout: |-
+stdout: |
   f_var
 ---
 f() {

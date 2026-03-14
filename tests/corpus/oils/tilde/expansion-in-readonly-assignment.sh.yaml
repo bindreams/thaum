@@ -1,7 +1,7 @@
 name: ~ expansion in readonly assignment
 dialect: bash
 source: oils:spec/tilde#expansion-in-readonly-assignment
-stdout: |-
+stdout: |
   /home/bob/src
 ---
 # dash fails here!

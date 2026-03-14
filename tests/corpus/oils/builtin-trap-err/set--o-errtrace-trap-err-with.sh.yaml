@@ -1,7 +1,7 @@
 name: 'set -o errtrace: trap ERR with &'
 dialect: bash
 source: oils:spec/builtin-trap-err#set--o-errtrace-trap-err-with
-stdout: |-
+stdout: |
   line=8
   async
 ---

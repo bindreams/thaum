@@ -2,7 +2,7 @@ name: Extended glob as argument to ${undef:-} (dynamic globbing)
 dialect: bash
 source: 
   oils:spec/extglob-files#extended-glob-as-argument-to-undef--dynamic-globbing
-stdout: |-
+stdout: |
   bar.py foo.py spam.py
   bar.py foo.py
 ---

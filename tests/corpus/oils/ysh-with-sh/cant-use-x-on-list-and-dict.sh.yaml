@@ -3,7 +3,7 @@ name: Can't use $x on List and Dict
 dialect: bash
 source: oils:spec/ysh-with-sh#cant-use-x-on-list-and-dict
 status: 3
-stdout: |-
+stdout: |
   array abc
   array abc
 ---

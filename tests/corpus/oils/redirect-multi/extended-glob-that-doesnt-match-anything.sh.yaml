@@ -1,7 +1,7 @@
 name: Extended glob that doesn't match anything
 dialect: bash
 source: oils:spec/redirect-multi#extended-glob-that-doesnt-match-anything
-stdout: |-
+stdout: |
   status=0
   bad_@(*.cc|*.h)
   status=1

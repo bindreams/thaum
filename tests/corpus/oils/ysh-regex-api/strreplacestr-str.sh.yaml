@@ -2,7 +2,7 @@ disabled: true
 name: Str.replace(Str, Str)
 dialect: bash
 source: oils:spec/ysh-regex-api#strreplacestr-str
-stdout: |-
+stdout: |
   AbcA
   aBca
   abca

@@ -1,7 +1,7 @@
 name: 'mutate through nameref: ref[0]='
 dialect: bash
 source: oils:spec/nameref#mutate-through-nameref-ref0
-stdout: |-
+stdout: |
   xx Y Z
 ---
 

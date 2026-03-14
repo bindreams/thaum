@@ -1,7 +1,7 @@
 name: \555 is beyond max octal byte of \377 and wrapped to m
 dialect: bash
 source: oils:spec/prompt#555-is-beyond-max-octal-byte-of-377-and-wrapped-to-m
-stdout: |-
+stdout: |
   m$
 ---
 PS1='\555$'

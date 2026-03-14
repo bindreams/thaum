@@ -1,7 +1,7 @@
 name: Multiple digit constants with base N
 dialect: bash
 source: oils:spec/arith#multiple-digit-constants-with-base-n
-stdout: |-
+stdout: |
   123, 27
 ---
 echo $((10#0123)), $((16#1b))

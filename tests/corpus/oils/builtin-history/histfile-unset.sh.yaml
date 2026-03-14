@@ -1,7 +1,7 @@
 name: HISTFILE unset
 dialect: bash
 source: oils:spec/builtin-history#histfile-unset
-stdout: |-
+stdout: |
   status=1
   ^D
 ---

@@ -2,7 +2,7 @@ disabled: true
 name: $[len(x)] inside strings
 dialect: bash
 source: oils:spec/ysh-expr#lenx-inside-strings
-stdout: |-
+stdout: |
   -3-
 ---
 var s = "abc"

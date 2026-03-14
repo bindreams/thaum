@@ -1,7 +1,7 @@
 name: String length
 dialect: bash
 source: oils:spec/var-op-len#string-length
-stdout: |-
+stdout: |
   3
 ---
 v=foo

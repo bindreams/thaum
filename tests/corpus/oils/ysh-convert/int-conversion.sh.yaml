@@ -2,7 +2,7 @@ disabled: true
 name: int() conversion
 dialect: bash
 source: oils:spec/ysh-convert#int-conversion
-stdout: |-
+stdout: |
   1234
   1234
   1

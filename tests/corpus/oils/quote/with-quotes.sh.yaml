@@ -1,7 +1,7 @@
 name: $'' with quotes
 dialect: bash
 source: oils:spec/quote#with-quotes
-stdout: |-
+stdout: |
   single ' double "
 ---
 echo $'single \' double \"'

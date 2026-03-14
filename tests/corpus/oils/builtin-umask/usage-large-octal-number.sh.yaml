@@ -2,7 +2,7 @@ name: 'usage: large octal number'
 dialect: bash
 source: oils:spec/builtin-umask#usage-large-octal-number
 status: 0
-stdout: |-
+stdout: |
   status=0
   0567
 ---

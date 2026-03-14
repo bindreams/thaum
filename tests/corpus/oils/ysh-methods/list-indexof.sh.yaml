@@ -2,7 +2,7 @@ disabled: true
 name: List => indexOf()
 dialect: bash
 source: oils:spec/ysh-methods#list-indexof
-stdout: |-
+stdout: |
   -1
   0
   1

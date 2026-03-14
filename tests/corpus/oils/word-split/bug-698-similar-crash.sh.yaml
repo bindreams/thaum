@@ -1,7 +1,7 @@
 name: 'Bug #698, similar crash'
 dialect: bash
 source: oils:spec/word-split#bug-698-similar-crash
-stdout: |-
+stdout: |
   \
 ---
 var='\'

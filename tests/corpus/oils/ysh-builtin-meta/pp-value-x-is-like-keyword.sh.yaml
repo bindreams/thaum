@@ -2,7 +2,7 @@ disabled: true
 name: pp value (x) is like = keyword
 dialect: bash
 source: oils:spec/ysh-builtin-meta#pp-value-x-is-like-keyword
-stdout: |-
+stdout: |
   (Str)   'foo'
   (Str)   b'isn\'t this sq'
   (Str)   '"dq $myvar"'

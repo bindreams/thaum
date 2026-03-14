@@ -2,7 +2,7 @@ disabled: true
 name: '@splice'
 dialect: bash
 source: oils:spec/ysh-regex#splice
-stdout: |-
+stdout: |
   [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
   yes
   no

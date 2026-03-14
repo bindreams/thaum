@@ -1,7 +1,7 @@
 name: Alias is respected inside eval
 dialect: bash
 source: oils:spec/alias#alias-is-respected-inside-eval
-stdout: |-
+stdout: |
   hello inside
   hello outside
 ---

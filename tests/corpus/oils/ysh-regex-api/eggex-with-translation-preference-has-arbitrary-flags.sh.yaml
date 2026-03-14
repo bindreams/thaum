@@ -3,7 +3,7 @@ name: Eggex with translation preference has arbitrary flags
 dialect: bash
 source: 
   oils:spec/ysh-regex-api#eggex-with-translation-preference-has-arbitrary-flags
-stdout: |-
+stdout: |
   yes
 ---
 shopt -s ysh:upgrade

@@ -2,7 +2,7 @@ disabled: true
 name: '!== operator'
 dialect: bash
 source: oils:spec/ysh-user-feedback#operator
-stdout: |-
+stdout: |
   not equal
 ---
 var a = 'bar'

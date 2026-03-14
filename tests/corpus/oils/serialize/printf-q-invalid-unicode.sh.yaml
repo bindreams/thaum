@@ -1,7 +1,7 @@
 name: printf %q invalid unicode
 dialect: bash
 source: oils:spec/serialize#printf-q-invalid-unicode
-stdout: |-
+stdout: |
   $'\xce'
   $'\xceμ'
   $'μ\xce'

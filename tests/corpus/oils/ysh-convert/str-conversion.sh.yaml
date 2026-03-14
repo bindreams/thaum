@@ -3,7 +3,7 @@ name: str() conversion
 dialect: bash
 source: oils:spec/ysh-convert#str-conversion
 status: 3
-stdout: |-
+stdout: |
   1234
   1.234
   foo

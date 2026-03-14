@@ -2,7 +2,7 @@ disabled: true
 name: bad assertion when pretty printing
 dialect: bash
 source: oils:spec/ysh-bugs#bad-assertion-when-pretty-printing
-stdout: |-
+stdout: |
   status=0
 ---
 

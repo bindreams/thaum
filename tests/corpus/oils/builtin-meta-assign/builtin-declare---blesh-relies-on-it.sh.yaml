@@ -1,7 +1,7 @@
 name: \builtin declare - ble.sh relies on it
 dialect: bash
 source: oils:spec/builtin-meta-assign#builtin-declare---blesh-relies-on-it
-stdout: |-
+stdout: |
   a b
   a b
   a b

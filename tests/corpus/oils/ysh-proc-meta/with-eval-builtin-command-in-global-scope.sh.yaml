@@ -2,7 +2,7 @@ disabled: true
 name: with eval builtin command, in global scope
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-eval-builtin-command-in-global-scope
-stdout: |-
+stdout: |
   prefix a
   prefix b
 ---

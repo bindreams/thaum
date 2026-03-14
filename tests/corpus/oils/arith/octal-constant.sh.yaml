@@ -1,7 +1,7 @@
 name: Octal constant
 dialect: bash
 source: oils:spec/arith#octal-constant
-stdout: |-
+stdout: |
   9
 ---
 echo $(( 011 ))

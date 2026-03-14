@@ -2,7 +2,7 @@ name: read without args uses $REPLY, no splitting occurs (without -n)
 dialect: bash
 source: 
   oils:spec/builtin-read#read-without-args-uses-reply-no-splitting-occurs-without--n
-stdout: |-
+stdout: |
   [  a b  ]
   [a b]
   [  a b    line2]

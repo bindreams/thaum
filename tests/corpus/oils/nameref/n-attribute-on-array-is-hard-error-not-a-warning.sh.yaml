@@ -2,7 +2,7 @@ name: -n attribute on array is hard error, not a warning
 dialect: bash
 source: oils:spec/nameref#n-attribute-on-array-is-hard-error-not-a-warning
 status: 1
-stdout: |-
+stdout: |
   hi
 ---
 x=X

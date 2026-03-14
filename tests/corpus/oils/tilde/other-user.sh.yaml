@@ -1,7 +1,7 @@
 name: other user
 dialect: bash
 source: oils:spec/tilde#other-user
-stdout: |-
+stdout: |
   ~nonexistent
 ---
 echo ~nonexistent

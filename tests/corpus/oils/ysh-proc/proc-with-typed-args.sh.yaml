@@ -2,7 +2,7 @@ disabled: true
 name: proc with typed args
 dialect: bash
 source: oils:spec/ysh-proc#proc-with-typed-args
-stdout: |-
+stdout: |
   (Str)   "WORD"
   (List)   [1,2,3]
   (Dict)   {"name":"bob"}

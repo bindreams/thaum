@@ -1,7 +1,7 @@
 name: Sparse array with big index
 dialect: bash
 source: oils:spec/ble-idioms#sparse-array-with-big-index
-stdout: |-
+stdout: |
   len=1
 ---
 

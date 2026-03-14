@@ -1,7 +1,7 @@
 name: Increment and decrement array elements
 dialect: bash
 source: oils:spec/arith#increment-and-decrement-array-elements
-stdout: |-
+stdout: |
   6 7 6 7 - 1 1 -1 -1
 ---
 shopt -u strict_arith || true

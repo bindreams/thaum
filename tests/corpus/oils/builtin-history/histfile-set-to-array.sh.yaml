@@ -1,7 +1,7 @@
 name: HISTFILE set to array
 dialect: bash
 source: oils:spec/builtin-history#histfile-set-to-array
-stdout: |-
+stdout: |
   status=1
   ^D
 ---

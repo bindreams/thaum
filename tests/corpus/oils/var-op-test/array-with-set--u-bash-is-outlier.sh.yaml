@@ -2,7 +2,7 @@ name: '"${array[@]} with set -u (bash is outlier)'
 dialect: bash
 source: oils:spec/var-op-test#array-with-set--u-bash-is-outlier
 status: 1
-stdout: |-
+stdout: |
   empty //
 ---
 case $SH in dash) exit ;; esac

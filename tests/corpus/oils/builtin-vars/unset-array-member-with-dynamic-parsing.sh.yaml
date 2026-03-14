@@ -1,7 +1,7 @@
 name: Unset array member with dynamic parsing
 dialect: bash
 source: oils:spec/builtin-vars#unset-array-member-with-dynamic-parsing
-stdout: |-
+stdout: |
   status=0
   x z len=2
 ---

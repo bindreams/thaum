@@ -1,7 +1,7 @@
 name: Dynamic octal constant
 dialect: bash
 source: oils:spec/arith#dynamic-octal-constant
-stdout: |-
+stdout: |
   9
 ---
 zero=0

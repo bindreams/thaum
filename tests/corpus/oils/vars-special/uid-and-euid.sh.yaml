@@ -1,7 +1,7 @@
 name: $UID and $EUID
 dialect: bash
 source: oils:spec/vars-special#uid-and-euid
-stdout: |-
+stdout: |
   status=0
 ---
 # These are both bash-specific.

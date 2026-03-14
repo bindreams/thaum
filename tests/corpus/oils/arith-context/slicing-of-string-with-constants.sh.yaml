@@ -1,7 +1,7 @@
 name: Slicing of string with constants
 dialect: bash
 source: oils:spec/arith-context#slicing-of-string-with-constants
-stdout: |-
+stdout: |
   abcd abcd b
 ---
 s='abcd'

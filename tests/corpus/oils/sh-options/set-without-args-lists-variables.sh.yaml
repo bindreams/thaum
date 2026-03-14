@@ -2,7 +2,7 @@ name: set without args lists variables
 dialect: bash
 source: oils:spec/sh-options#set-without-args-lists-variables
 status: 0
-stdout: |-
+stdout: |
   __GLOBAL=mutated
   __OTHERLOCAL=L
   __mylocal=L

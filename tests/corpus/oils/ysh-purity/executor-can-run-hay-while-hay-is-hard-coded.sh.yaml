@@ -2,7 +2,7 @@ disabled: true
 name: 'Executor: can run Hay (while Hay is hard-coded)'
 dialect: bash
 source: oils:spec/ysh-purity#executor-can-run-hay-while-hay-is-hard-coded
-stdout: |-
+stdout: |
   {
     "version": "1.1"
   }

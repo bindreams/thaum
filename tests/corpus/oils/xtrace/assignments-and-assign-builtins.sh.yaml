@@ -3,7 +3,7 @@ dialect: bash
 source: oils:spec/xtrace#assignments-and-assign-builtins
 stdout: |
   2
-stderr: |-
+stderr: |
   + x=1
   + x=2
   + echo 2

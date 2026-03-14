@@ -1,7 +1,7 @@
 name: Storing backslashes and then echoing them
 dialect: bash
 source: oils:spec/quote#storing-backslashes-and-then-echoing-them
-stdout: |-
+stdout: |
   \ \\
   \ \\
 ---

@@ -1,7 +1,7 @@
 name: Last case without ;;
 dialect: bash
 source: oils:spec/posix#last-case-without
-stdout: |-
+stdout: |
   A
 ---
 foo=a

@@ -1,7 +1,7 @@
 name: type -ap -> file; abbreviated
 dialect: bash
 source: oils:spec/builtin-type-bash#type--ap---file-abbreviated
-stdout: |-
+stdout: |
   /bin/date
   _tmp/date
 ---

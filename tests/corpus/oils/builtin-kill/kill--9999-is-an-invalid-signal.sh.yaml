@@ -1,7 +1,7 @@
 name: kill -9999 is an invalid signal
 dialect: bash
 source: oils:spec/builtin-kill#kill--9999-is-an-invalid-signal
-stdout: |-
+stdout: |
   kill=1
   wait=0
   ## N-I dash STDOUT:

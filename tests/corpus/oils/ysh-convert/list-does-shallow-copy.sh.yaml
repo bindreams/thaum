@@ -2,7 +2,7 @@ disabled: true
 name: list() does shallow copy
 dialect: bash
 source: oils:spec/ysh-convert#list-does-shallow-copy
-stdout: |-
+stdout: |
   2
   2
   3

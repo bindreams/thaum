@@ -3,7 +3,7 @@ dialect: bash
 source: 
   oils:spec/redirect-multi#non-file-redirects-dont-respect-glob-args-we-differe-from-bash
 status: 0
-stdout: |-
+stdout: |
   stdout
 ---
 

@@ -1,7 +1,7 @@
 name: '@P with array'
 dialect: bash
 source: oils:spec/prompt#p-with-array
-stdout: |-
+stdout: |
   a b c
   status=0
   a b c

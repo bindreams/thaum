@@ -1,7 +1,7 @@
 name: printf %d with + prefix (positive sign)
 dialect: bash
 source: oils:spec/builtin-printf#printf-d-with-prefix-positive-sign
-stdout: |-
+stdout: |
   decimal
   42
   octal

@@ -1,7 +1,7 @@
 name: glob with char class expression
 dialect: bash
 source: oils:spec/glob#glob-with-char-class-expression
-stdout: |-
+stdout: |
   _tmp/e.E _tmp/foo.-
 ---
 # note: mksh doesn't support [[:punct:]] ?

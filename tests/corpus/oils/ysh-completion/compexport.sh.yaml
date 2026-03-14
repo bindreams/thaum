@@ -2,7 +2,7 @@ disabled: true
 name: compexport
 dialect: bash
 source: oils:spec/ysh-completion#compexport
-stdout: |-
+stdout: |
   "haynode "
   "hay "
 ---

@@ -3,7 +3,7 @@ name: Control flow must be static in YSH (strict_control_flow)
 dialect: bash
 source: 
   oils:spec/strict-options#control-flow-must-be-static-in-ysh-strictcontrolflow
-stdout: |-
+stdout: |
   a
   ---
   a

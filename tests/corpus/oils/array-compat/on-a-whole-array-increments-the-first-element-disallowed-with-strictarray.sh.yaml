@@ -3,7 +3,7 @@ name: ++ on a whole array increments the first element (disallowed with
 dialect: bash
 source: 
   oils:spec/array-compat#on-a-whole-array-increments-the-first-element-disallowed-with-strictarray
-stdout: |-
+stdout: |
   2 10
 ---
 shopt -s strict_array

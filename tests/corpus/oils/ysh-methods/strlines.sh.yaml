@@ -2,7 +2,7 @@ disabled: true
 name: Str.lines()
 dialect: bash
 source: oils:spec/ysh-methods#strlines
-stdout: |-
+stdout: |
   (List)   []
   (List)   [""]
   (List)   ["",""]

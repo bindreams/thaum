@@ -1,7 +1,7 @@
 name: a[i]=v with BigInt
 dialect: bash
 source: oils:spec/array-sparse#aiv-with-bigint
-stdout: |-
+stdout: |
   3
   4
   5

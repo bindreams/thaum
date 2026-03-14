@@ -1,7 +1,7 @@
 name: setting key to itself (from bash-bug mailing list)
 dialect: bash
 source: oils:spec/array-assoc#setting-key-to-itself-from-bash-bug-mailing-list
-stdout: |-
+stdout: |
   value1
   value1 value2
 ---

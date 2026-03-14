@@ -1,7 +1,7 @@
 name: Var substitution with newlines (#2492)
 dialect: bash
 source: oils:spec/var-sub-quote#var-substitution-with-newlines-2492
-stdout: |-
+stdout: |
   a b
   a
   b

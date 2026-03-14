@@ -3,7 +3,7 @@ name: singleton pipeline
 dialect: bash
 source: oils:spec/ysh-xtrace#singleton-pipeline
 stdout: ''
-stderr: |-
+stderr: |
   . builtin ':' begin
   . builtin 'false'
   . builtin ':' end

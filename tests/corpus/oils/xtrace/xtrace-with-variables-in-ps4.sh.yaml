@@ -4,7 +4,7 @@ source: oils:spec/xtrace#xtrace-with-variables-in-ps4
 stdout: |
   one
   two
-stderr: |-
+stderr: |
   +:x=1
   +1:echo one
   +1:x=2

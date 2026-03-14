@@ -1,7 +1,7 @@
 name: Quoted literal in glob pattern
 dialect: bash
 source: oils:spec/case#quoted-literal-in-glob-pattern
-stdout: |-
+stdout: |
   match
 ---
 x='[ab].py'

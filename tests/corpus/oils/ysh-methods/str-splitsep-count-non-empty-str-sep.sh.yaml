@@ -2,7 +2,7 @@ disabled: true
 name: Str => split(sep, count), non-empty str sep
 dialect: bash
 source: oils:spec/ysh-methods#str-splitsep-count-non-empty-str-sep
-stdout: |-
+stdout: |
   (List)   ["a","b","c"]
   (List)   ["a","b","c"]
   (List)   ["","a"]

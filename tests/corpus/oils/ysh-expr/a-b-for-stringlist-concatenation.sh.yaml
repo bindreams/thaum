@@ -2,7 +2,7 @@ disabled: true
 name: a ++ b for string/list concatenation
 dialect: bash
 source: oils:spec/ysh-expr#a-b-for-stringlist-concatenation
-stdout: |-
+stdout: |
   string abcde
   list len=3
   ---

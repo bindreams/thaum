@@ -2,7 +2,7 @@ name: read builtin splits value across multiple vars
 dialect: bash
 source: oils:spec/builtin-read#read-builtin-splits-value-across-multiple-vars
 status: 0
-stdout: |-
+stdout: |
   [A/B/C D E]
 ---
 # NOTE: there are TABS below

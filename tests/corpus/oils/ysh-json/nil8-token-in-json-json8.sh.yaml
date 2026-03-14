@@ -2,7 +2,7 @@ disabled: true
 name: NIL8 token in JSON / JSON8
 dialect: bash
 source: oils:spec/ysh-json#nil8-token-in-json-json8
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

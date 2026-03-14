@@ -2,7 +2,7 @@ disabled: true
 name: Named Capture Decays Without Name
 dialect: bash
 source: oils:spec/ysh-regex-api#named-capture-decays-without-name
-stdout: |-
+stdout: |
   ([[:digit:]]+)
   yes
 ---

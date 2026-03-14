@@ -2,7 +2,7 @@ disabled: true
 name: Functions share a namespace with variables
 dialect: bash
 source: oils:spec/ysh-func#functions-share-a-namespace-with-variables
-stdout: |-
+stdout: |
   g(2) -> 4
 ---
 func f(x) {

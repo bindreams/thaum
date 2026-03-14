@@ -2,7 +2,7 @@ disabled: true
 name: list() from range
 dialect: bash
 source: oils:spec/ysh-convert#list-from-range
-stdout: |-
+stdout: |
   0
   1
   2

@@ -1,7 +1,7 @@
 name: PS4 with runtime error
 dialect: bash
 source: oils:spec/xtrace#ps4-with-runtime-error
-stdout: |-
+stdout: |
   one
   status=0
 ---

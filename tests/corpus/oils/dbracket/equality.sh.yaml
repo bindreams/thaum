@@ -1,7 +1,7 @@
 name: equality
 dialect: bash
 source: oils:spec/dbracket#equality
-stdout: |-
+stdout: |
   true
   false
 ---

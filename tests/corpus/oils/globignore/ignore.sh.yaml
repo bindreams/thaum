@@ -1,7 +1,7 @@
 name: Ignore *
 dialect: bash
 source: oils:spec/globignore#ignore
-stdout: |-
+stdout: |
   *
 ---
 # This pattern appears in public repositories

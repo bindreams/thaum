@@ -1,7 +1,7 @@
 name: More 64-bit ops
 dialect: bash
 source: oils:spec/arith#more-64-bit-ops
-stdout: |-
+stdout: |
   eq=1
   eq=0
   greater=0

@@ -3,7 +3,7 @@ name: builtin rm always fails on directories (regardless of -f)
 dialect: bash
 source: 
   oils:spec/ysh-builtin-private#builtin-rm-always-fails-on-directories-regardless-of--f
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

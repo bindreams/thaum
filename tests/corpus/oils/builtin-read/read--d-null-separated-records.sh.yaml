@@ -1,7 +1,7 @@
 name: read -d '' (null-separated records)
 dialect: bash
 source: oils:spec/builtin-read#read--d-null-separated-records
-stdout: |-
+stdout: |
   v1=a,b,c
   v1=d v2=e,f
   v1=g v2=h v3=i

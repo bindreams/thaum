@@ -1,7 +1,7 @@
 name: $HOME is NOT set
 dialect: bash
 source: oils:spec/vars-special#home-is-not-set
-stdout: |-
+stdout: |
   status=0
   status=1
   status=1

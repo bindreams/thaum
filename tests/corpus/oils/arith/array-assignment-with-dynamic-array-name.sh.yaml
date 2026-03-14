@@ -1,7 +1,7 @@
 name: array assignment with dynamic array name
 dialect: bash
 source: oils:spec/arith#array-assignment-with-dynamic-array-name
-stdout: |-
+stdout: |
   42
   xbar[5]=42
 ---

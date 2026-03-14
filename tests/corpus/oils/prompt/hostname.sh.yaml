@@ -1,7 +1,7 @@
 name: hostname
 dialect: bash
 source: oils:spec/prompt#hostname
-stdout: |-
+stdout: |
   status=0
   status=0
 ---

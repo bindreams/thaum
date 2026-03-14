@@ -2,7 +2,7 @@ disabled: true
 name: eval lines with var bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-lines-with-var-bindings
-stdout: |-
+stdout: |
   a b | a mylocal
   c d | c mylocal
 

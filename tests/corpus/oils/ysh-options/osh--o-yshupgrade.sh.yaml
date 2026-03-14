@@ -2,7 +2,7 @@ disabled: true
 name: osh -O ysh:upgrade
 dialect: bash
 source: oils:spec/ysh-options#osh--o-yshupgrade
-stdout: |-
+stdout: |
   one
   two
   three

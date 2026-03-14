@@ -1,7 +1,7 @@
 name: Bitwise ops
 dialect: bash
 source: oils:spec/arith#bitwise-ops
-stdout: |-
+stdout: |
   3
   0
   3

@@ -1,7 +1,7 @@
 name: unary array assignment with dynamic var name
 dialect: bash
 source: oils:spec/arith#unary-array-assignment-with-dynamic-var-name
-stdout: |-
+stdout: |
   42
   xbar[5]=43
 ---

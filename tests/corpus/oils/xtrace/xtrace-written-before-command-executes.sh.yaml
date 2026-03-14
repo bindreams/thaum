@@ -2,7 +2,7 @@ name: xtrace written before command executes
 dialect: bash
 source: oils:spec/xtrace#xtrace-written-before-command-executes
 stdout: ''
-stderr: |-
+stderr: |
   + echo one
   one
   + echo two

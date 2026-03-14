@@ -2,7 +2,7 @@ name: $- with -c
 dialect: bash
 source: oils:spec/sh-options#with--c
 status: 0
-stdout: |-
+stdout: |
   u
 ---
 # dash's behavior seems most sensible here?

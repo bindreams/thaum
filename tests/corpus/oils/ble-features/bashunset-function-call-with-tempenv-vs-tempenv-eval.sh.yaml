@@ -2,7 +2,7 @@ name: '[bash_unset] function call with tempenv vs tempenv-eval'
 dialect: bash
 source: 
   oils:spec/ble-features#bashunset-function-call-with-tempenv-vs-tempenv-eval
-stdout: |-
+stdout: |
   # bash-unset (bash-5.1)
   [global] v: global
   [global,local] v: (unset)

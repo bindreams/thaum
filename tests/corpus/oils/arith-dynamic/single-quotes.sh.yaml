@@ -1,7 +1,7 @@
 name: Single quotes
 dialect: bash
 source: oils:spec/arith-dynamic#single-quotes
-stdout: |-
+stdout: |
   status=1
   status=1
 ---

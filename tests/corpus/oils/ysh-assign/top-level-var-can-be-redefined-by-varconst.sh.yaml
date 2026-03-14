@@ -3,7 +3,7 @@ name: 'top level: var can be redefined by var/const'
 dialect: bash
 source: oils:spec/ysh-assign#top-level-var-can-be-redefined-by-varconst
 status: 1
-stdout: |-
+stdout: |
   x=global
   x=local
   x=g2

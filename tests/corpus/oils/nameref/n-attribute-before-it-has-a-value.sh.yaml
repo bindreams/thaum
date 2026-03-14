@@ -1,7 +1,7 @@
 name: -n attribute before it has a value
 dialect: bash
 source: oils:spec/nameref#n-attribute-before-it-has-a-value
-stdout: |-
+stdout: |
   ref=
   ref=XX
 ---

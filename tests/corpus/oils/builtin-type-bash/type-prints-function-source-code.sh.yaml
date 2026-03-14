@@ -1,7 +1,7 @@
 name: type prints function source code
 dialect: bash
 source: oils:spec/builtin-type-bash#type-prints-function-source-code
-stdout: |-
+stdout: |
   f is a function
   f () 
   { 

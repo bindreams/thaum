@@ -1,7 +1,7 @@
 name: When GLOBIGNORE is set, no_dash_glob isn't respected
 dialect: bash
 source: oils:spec/globignore#when-globignore-is-set-nodashglob-isnt-respected
-stdout: |-
+stdout: |
   _tmp foo.txt
   -foo.txt _tmp
 ---

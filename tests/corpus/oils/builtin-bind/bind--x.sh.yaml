@@ -1,7 +1,7 @@
 name: bind -X
 dialect: bash
 source: oils:spec/builtin-bind#bind--x
-stdout: |-
+stdout: |
   status=1
   \C-o\C-s\C-h
   echo foo

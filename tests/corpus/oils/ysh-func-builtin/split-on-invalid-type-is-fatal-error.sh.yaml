@@ -3,7 +3,7 @@ name: split() on invalid type is fatal error
 dialect: bash
 source: oils:spec/ysh-func-builtin#split-on-invalid-type-is-fatal-error
 status: 3
-stdout: |-
+stdout: |
   --all
   --long
 ---

@@ -1,7 +1,7 @@
 name: (( )) result
 dialect: bash
 source: oils:spec/dparen#result
-stdout: |-
+stdout: |
   True
   False
 ---

@@ -3,7 +3,7 @@ name: Separation of -> attr and () calling
 dialect: bash
 source: oils:spec/ysh-methods#separation-of---attr-and-calling
 status: 0
-stdout: |-
+stdout: |
   (Bool)   true
 ---
 const check = "abc" => startsWith

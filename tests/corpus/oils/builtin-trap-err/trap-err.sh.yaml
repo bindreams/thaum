@@ -2,7 +2,7 @@ name: trap ERR
 dialect: bash
 source: oils:spec/builtin-trap-err#trap-err
 status: 99
-stdout: |-
+stdout: |
   A
   err [x y] 1
   B

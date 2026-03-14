@@ -1,7 +1,7 @@
 name: kill HUP pid gives the correct error
 dialect: bash
 source: oils:spec/builtin-kill#kill-hup-pid-gives-the-correct-error
-stdout: |-
+stdout: |
   1
   ## OK osh STDOUT:
   2

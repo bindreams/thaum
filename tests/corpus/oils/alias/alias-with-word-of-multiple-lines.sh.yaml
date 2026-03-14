@@ -1,7 +1,7 @@
 name: alias with word of multiple lines
 dialect: bash
 source: oils:spec/alias#alias-with-word-of-multiple-lines
-stdout: |-
+stdout: |
   status=2
 ---
 shopt -s expand_aliases

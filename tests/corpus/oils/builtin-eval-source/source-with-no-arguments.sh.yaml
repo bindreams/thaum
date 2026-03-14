@@ -1,7 +1,7 @@
 name: Source with no arguments
 dialect: bash
 source: oils:spec/builtin-eval-source#source-with-no-arguments
-stdout: |-
+stdout: |
   status=2
 ---
 source

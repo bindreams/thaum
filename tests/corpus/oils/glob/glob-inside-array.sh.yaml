@@ -1,7 +1,7 @@
 name: glob inside array
 dialect: bash
 source: oils:spec/glob#glob-inside-array
-stdout: |-
+stdout: |
   _tmp/a.A _tmp/aa.A _tmp/b.B
 ---
 touch _tmp/a.A _tmp/aa.A _tmp/b.B

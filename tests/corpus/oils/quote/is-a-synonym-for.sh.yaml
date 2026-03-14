@@ -1,7 +1,7 @@
 name: $"" is a synonym for ""
 dialect: bash
 source: oils:spec/quote#is-a-synonym-for
-stdout: |-
+stdout: |
   foo
   foo x
 ---

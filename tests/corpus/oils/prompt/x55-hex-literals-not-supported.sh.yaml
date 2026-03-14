@@ -1,7 +1,7 @@
 name: \x55 hex literals not supported
 dialect: bash
 source: oils:spec/prompt#x55-hex-literals-not-supported
-stdout: |-
+stdout: |
   [\x55]
 ---
 PS1='[\x55]'

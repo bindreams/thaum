@@ -1,7 +1,7 @@
 name: \D{} for locale specific strftime
 dialect: bash
 source: oils:spec/prompt#d-for-locale-specific-strftime
-stdout: |-
+stdout: |
   matched=0
 ---
 

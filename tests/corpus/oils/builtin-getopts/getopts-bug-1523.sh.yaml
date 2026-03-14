@@ -2,7 +2,7 @@ name: 'getopts bug #1523'
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-bug-1523
 status: 1
-stdout: |-
+stdout: |
   opt:a
   opt:b
   opt:c arg:def

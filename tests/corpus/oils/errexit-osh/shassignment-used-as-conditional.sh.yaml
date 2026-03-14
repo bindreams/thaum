@@ -2,7 +2,7 @@ name: ShAssignment used as conditional
 dialect: bash
 source: oils:spec/errexit-osh#shassignment-used-as-conditional
 status: 1
-stdout: |-
+stdout: |
   yes
   yes
 ---

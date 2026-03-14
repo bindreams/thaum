@@ -2,7 +2,7 @@ name: Open descriptor with exec
 dialect: bash
 source: oils:spec/redirect#open-descriptor-with-exec
 status: 0
-stdout: |-
+stdout: |
   hi
 ---
 # What is the point of this?  ./configure scripts and debootstrap use it.

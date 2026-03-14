@@ -1,7 +1,7 @@
 name: Getopts parses the function's arguments
 dialect: bash
 source: oils:spec/builtin-getopts#getopts-parses-the-functions-arguments
-stdout: |-
+stdout: |
   h=0 c=bar opt=? optind=3 argv=-h -c foo x y z
 ---
 FLAG_h=0

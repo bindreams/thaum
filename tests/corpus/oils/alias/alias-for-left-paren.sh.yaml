@@ -2,7 +2,7 @@ disabled: {reason: "funkiness level 5: partial-syntax aliases are unsupported by
 name: alias for left paren
 dialect: bash
 source: oils:spec/alias#alias-for-left-paren
-stdout: |-
+stdout: |
   one
   two
 ---

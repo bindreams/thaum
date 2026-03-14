@@ -1,7 +1,7 @@
 name: Process sub input
 dialect: bash
 source: oils:spec/process-sub#process-sub-input
-stdout: |-
+stdout: |
   1
   2
   2

@@ -1,7 +1,7 @@
 name: . in function name
 dialect: bash
 source: oils:spec/func-parsing#in-function-name
-stdout: |-
+stdout: |
   func-name.ext
 ---
 # bash accepts; dash doesn't

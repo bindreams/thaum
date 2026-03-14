@@ -1,7 +1,7 @@
 name: test "declare -p sp"
 dialect: bash
 source: oils:spec/array-sparse#test-declare--p-sp
-stdout: |-
+stdout: |
   declare -a a0=()
   declare -a a1=(1)
   declare -a a2=(1 2)

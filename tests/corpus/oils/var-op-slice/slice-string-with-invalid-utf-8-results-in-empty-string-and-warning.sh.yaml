@@ -5,7 +5,7 @@ source:
 status: 0
 stdout: |
   --
-stderr: |-
+stderr: |
   [??? no location ???] warning: UTF-8 decode: Bad encoding at offset 0 in string of 6 bytes
 ---
 s=$(echo -e "\xFF")bcdef

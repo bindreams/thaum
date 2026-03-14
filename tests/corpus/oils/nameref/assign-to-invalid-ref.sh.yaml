@@ -1,7 +1,7 @@
 name: assign to invalid ref
 dialect: bash
 source: oils:spec/nameref#assign-to-invalid-ref
-stdout: |-
+stdout: |
   ref=1
   ref=1
   ref=foo

@@ -2,7 +2,7 @@ disabled: true
 name: eval lines with argv bindings
 dialect: bash
 source: oils:spec/ysh-builtin-eval#eval-lines-with-argv-bindings
-stdout: |-
+stdout: |
   b a
   d c
   b a mylocal

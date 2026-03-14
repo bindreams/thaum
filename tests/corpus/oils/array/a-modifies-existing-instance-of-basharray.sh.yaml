@@ -1,7 +1,7 @@
 name: a+=() modifies existing instance of BashArray
 dialect: bash
 source: oils:spec/array#a-modifies-existing-instance-of-basharray
-stdout: |-
+stdout: |
   a=(1 2 3 4 5)
   b=(1 2 3 4 5)
 ---

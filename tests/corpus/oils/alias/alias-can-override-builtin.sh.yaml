@@ -1,7 +1,7 @@
 name: alias can override builtin
 dialect: bash
 source: oils:spec/alias#alias-can-override-builtin
-stdout: |-
+stdout: |
   foo bar
 ---
 shopt -s expand_aliases

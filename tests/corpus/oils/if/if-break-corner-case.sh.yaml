@@ -1,7 +1,7 @@
 name: if break corner case
 dialect: bash
 source: oils:spec/if#if-break-corner-case
-stdout: |-
+stdout: |
   hi
 ---
 

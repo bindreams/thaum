@@ -1,7 +1,7 @@
 name: 'recursive arith: recursion'
 dialect: bash
 source: oils:spec/ble-idioms#recursive-arith-recursion
-stdout: |-
+stdout: |
   5050
 ---
 loop='i<=100&&(s+=i,i++,loop)' s=0 i=0

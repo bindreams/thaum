@@ -2,7 +2,7 @@ disabled: true
 name: Complex Cycles
 dialect: bash
 source: oils:spec/ysh-printing#complex-cycles
-stdout: |-
+stdout: |
   (Dict)
   {
       nothing: null,

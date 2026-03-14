@@ -2,7 +2,7 @@ disabled: true
 name: Int constants bigger than 64 bits
 dialect: bash
 source: oils:spec/ysh-expr-arith#int-constants-bigger-than-64-bits
-stdout: |-
+stdout: |
   (Int)   1111
   dec=0
   dec=2

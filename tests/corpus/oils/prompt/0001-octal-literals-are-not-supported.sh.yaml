@@ -1,7 +1,7 @@
 name: \0001 octal literals are not supported
 dialect: bash
 source: oils:spec/prompt#0001-octal-literals-are-not-supported
-stdout: |-
+stdout: |
   [%5]
 ---
 PS1='[\0455]'

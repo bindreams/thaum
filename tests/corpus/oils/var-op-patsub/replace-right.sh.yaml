@@ -1,7 +1,7 @@
 name: Replace right ]
 dialect: bash
 source: oils:spec/var-op-patsub#replace-right
-stdout: |-
+stdout: |
   --_--
   --_--
 ---

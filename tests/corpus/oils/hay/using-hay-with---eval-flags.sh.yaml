@@ -2,7 +2,7 @@ disabled: true
 name: Using Hay with --eval flags
 dialect: bash
 source: oils:spec/hay#using-hay-with---eval-flags
-stdout: |-
+stdout: |
   {
     "type": "Package",
     "args": [

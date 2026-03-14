@@ -1,7 +1,7 @@
 name: declare -p arr
 dialect: bash
 source: oils:spec/assign-extended#declare--p-arr
-stdout: |-
+stdout: |
   declare -a test_arr1=()
   declare -a test_arr2=()
   declare -A test_arr3=()

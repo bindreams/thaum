@@ -1,7 +1,7 @@
 name: '((pkg-config example - postfix package - #2337'
 dialect: bash
 source: oils:spec/paren-ambiguity#pkg-config-example---postfix-package---2337
-stdout: |-
+stdout: |
   bye
 ---
 

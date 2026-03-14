@@ -1,7 +1,7 @@
 name: extglob in variable
 dialect: bash
 source: oils:spec/extglob-match#extglob-in-variable
-stdout: |-
+stdout: |
   TRUE
   TRUE
   FALSE

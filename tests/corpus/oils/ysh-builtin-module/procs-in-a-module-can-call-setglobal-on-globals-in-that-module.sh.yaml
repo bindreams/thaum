@@ -3,7 +3,7 @@ name: procs in a module can call setglobal on globals in that module
 dialect: bash
 source: 
   oils:spec/ysh-builtin-module#procs-in-a-module-can-call-setglobal-on-globals-in-that-module
-stdout: |-
+stdout: |
   g1 = g1
   g1 = proc mutated
 

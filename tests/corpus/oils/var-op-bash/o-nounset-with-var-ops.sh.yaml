@@ -1,7 +1,7 @@
 name: -o nounset with var ops
 dialect: bash
 source: oils:spec/var-op-bash#o-nounset-with-var-ops
-stdout: |-
+stdout: |
   stat: 1
   stat: 1
   stat: 1

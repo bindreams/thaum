@@ -1,7 +1,7 @@
 name: exec builtin accepts --
 dialect: bash
 source: oils:spec/builtin-process#exec-builtin-accepts
-stdout: |-
+stdout: |
   hi
 ---
 exec -- echo hi

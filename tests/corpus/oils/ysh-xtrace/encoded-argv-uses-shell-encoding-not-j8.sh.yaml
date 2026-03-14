@@ -5,7 +5,7 @@ source: oils:spec/ysh-xtrace#encoded-argv-uses-shell-encoding-not-j8
 stdout: |
   one two
    μ
-stderr: |-
+stderr: |
   . builtin echo $'one two\n' 'μ'
 ---
 

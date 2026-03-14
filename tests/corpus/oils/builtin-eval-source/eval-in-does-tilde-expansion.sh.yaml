@@ -1,7 +1,7 @@
 name: Eval in does tilde expansion
 dialect: bash
 source: oils:spec/builtin-eval-source#eval-in-does-tilde-expansion
-stdout: |-
+stdout: |
   FALSE
   FALSE
   TRUE

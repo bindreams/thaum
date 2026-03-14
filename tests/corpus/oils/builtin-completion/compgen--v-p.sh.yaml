@@ -1,7 +1,7 @@
 name: compgen -v P
 dialect: bash
 source: oils:spec/builtin-completion#compgen--v-p
-stdout: |-
+stdout: |
   PATH
   PWD
 ---

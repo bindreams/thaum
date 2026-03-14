@@ -1,7 +1,7 @@
 name: typeset -p
 dialect: bash
 source: oils:spec/assign-extended#typeset--p
-stdout: |-
+stdout: |
   1
   1
   0

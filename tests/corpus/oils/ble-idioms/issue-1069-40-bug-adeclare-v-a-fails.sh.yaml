@@ -1,7 +1,7 @@
 name: 'Issue #1069 [40] BUG: a=(declare v); "${a[@]}" fails'
 dialect: bash
 source: oils:spec/ble-idioms#issue-1069-40-bug-adeclare-v-a-fails
-stdout: |-
+stdout: |
   v=1
 ---
 case $SH in ash|dash)  exit 99 ;; esac

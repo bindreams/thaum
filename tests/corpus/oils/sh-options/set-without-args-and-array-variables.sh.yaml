@@ -1,7 +1,7 @@
 name: set without args and array variables
 dialect: bash
 source: oils:spec/sh-options#set-without-args-and-array-variables
-stdout: |-
+stdout: |
   __array=(1 2 '3 4')
 ---
 declare -a __array

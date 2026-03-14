@@ -2,7 +2,7 @@ name: Turning extglob on changes the meaning of [[ !(str) ]] in bash
 dialect: bash
 source: 
   oils:spec/extglob-match#turning-extglob-on-changes-the-meaning-of-str-in-bash
-stdout: |-
+stdout: |
   TRUE
   FALSE
   TRUE

@@ -2,7 +2,7 @@ name: 'Issue #1069 [49] BUG: \return 0 does not work (other variations)'
 dialect: bash
 source: 
   oils:spec/ble-idioms#issue-1069-49-bug-return-0-does-not-work-other-variations
-stdout: |-
+stdout: |
   status=3
   status=3
   status=3

@@ -1,7 +1,7 @@
 name: unset a[-1] (bf.bash regression)
 dialect: bash
 source: oils:spec/builtin-vars#unset-a-1-bfbash-regression
-stdout: |-
+stdout: |
   len=2
   last=2
   last=2

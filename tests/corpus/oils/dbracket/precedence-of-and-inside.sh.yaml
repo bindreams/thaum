@@ -1,7 +1,7 @@
 name: precedence of && and || inside [[
 dialect: bash
 source: oils:spec/dbracket#precedence-of-and-inside
-stdout: |-
+stdout: |
   true
 ---
 [[ True || '' && '' ]] && echo true

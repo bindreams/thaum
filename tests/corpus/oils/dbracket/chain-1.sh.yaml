@@ -1,7 +1,7 @@
 name: '|| chain'
 dialect: bash
 source: oils:spec/dbracket#chain
-stdout: |-
+stdout: |
   true
 ---
 [[ '' || '' || t ]] && echo true

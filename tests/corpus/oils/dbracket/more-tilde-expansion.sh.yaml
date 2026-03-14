@@ -1,7 +1,7 @@
 name: more tilde expansion
 dialect: bash
 source: oils:spec/dbracket#more-tilde-expansion
-stdout: |-
+stdout: |
   status=0
   status=1
   unary=1

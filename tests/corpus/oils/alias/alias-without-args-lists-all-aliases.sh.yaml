@@ -1,7 +1,7 @@
 name: alias without args lists all aliases
 dialect: bash
 source: oils:spec/alias#alias-without-args-lists-all-aliases
-stdout: |-
+stdout: |
   alias ex='exit'
   alias ll='ls -l'
   status=0

@@ -3,7 +3,7 @@ name: Multiple ysh --eval values
 dialect: bash
 source: oils:spec/ysh-usage#multiple-ysh---eval-values
 status: 1
-stdout: |-
+stdout: |
   1
   2
   flag -c

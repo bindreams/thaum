@@ -2,7 +2,7 @@ disabled: true
 name: $[d.key]
 dialect: bash
 source: oils:spec/ysh-expr-sub#dkey
-stdout: |-
+stdout: |
   42
 ---
 var d = {}

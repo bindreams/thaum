@@ -1,7 +1,7 @@
 name: Survey of getcwd() syscall
 dialect: bash
 source: oils:spec/builtin-cd#survey-of-getcwd-syscall
-stdout: |-
+stdout: |
   1 err.txt
 ---
 

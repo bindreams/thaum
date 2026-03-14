@@ -1,7 +1,7 @@
 name: '[[ glob matching with escapes'
 dialect: bash
 source: oils:spec/dbracket#glob-matching-with-escapes
-stdout: |-
+stdout: |
   true
 ---
 [[ 'foo.*' == *."*" ]] && echo true

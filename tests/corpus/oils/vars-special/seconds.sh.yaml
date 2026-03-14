@@ -2,7 +2,7 @@ name: $SECONDS
 dialect: bash
 source: oils:spec/vars-special#seconds
 status: 0
-stdout: |-
+stdout: |
   ok
 ---
 

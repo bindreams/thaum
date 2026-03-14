@@ -1,7 +1,7 @@
 name: Two compound commands with two here docs
 dialect: bash
 source: oils:spec/here-doc#two-compound-commands-with-two-here-docs
-stdout: |-
+stdout: |
   X 1
   X 2
   ==

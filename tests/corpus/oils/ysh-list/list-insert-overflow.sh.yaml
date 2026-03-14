@@ -2,7 +2,7 @@ disabled: true
 name: List insert() overflow
 dialect: bash
 source: oils:spec/ysh-list#list-insert-overflow
-stdout: |-
+stdout: |
   pass
 ---
 shopt -s ysh:all

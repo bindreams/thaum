@@ -2,7 +2,7 @@ disabled: true
 name: 'Bug: rooting of pgen2::PNode'
 dialect: bash
 source: oils:spec/ysh-bugs#bug-rooting-of-pgen2pnode
-stdout: |-
+stdout: |
   42
 ---
 

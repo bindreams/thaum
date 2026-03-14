@@ -3,7 +3,7 @@ name: Dict -> get()
 dialect: bash
 source: oils:spec/ysh-methods#dict---get
 status: 0
-stdout: |-
+stdout: |
   (Str)   "Hitchhiker's Guide"
   (Int)   1979
   (Str)   ""

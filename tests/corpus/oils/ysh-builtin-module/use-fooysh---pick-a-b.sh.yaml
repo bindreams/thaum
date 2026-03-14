@@ -2,7 +2,7 @@ disabled: true
 name: use foo.ysh --pick a b
 dialect: bash
 source: oils:spec/ysh-builtin-module#use-fooysh---pick-a-b
-stdout: |-
+stdout: |
   (Int)   3
   (Int)   2
 ---

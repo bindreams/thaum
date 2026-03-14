@@ -1,7 +1,7 @@
 name: '[[ -v assoc[key] ]]'
 dialect: bash
 source: oils:spec/array-assoc#v-assockey
-stdout: |-
+stdout: |
   no quotes
   empty=0
   k=0

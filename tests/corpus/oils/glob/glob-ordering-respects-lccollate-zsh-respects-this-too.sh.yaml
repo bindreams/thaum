@@ -1,7 +1,7 @@
 name: Glob ordering respects LC_COLLATE (zsh respects this too)
 dialect: bash
 source: oils:spec/glob#glob-ordering-respects-lccollate-zsh-respects-this-too
-stdout: |-
+stdout: |
   hello hello-test.sh hello.py hello_preamble.sh
   hello hello_preamble.sh hello.py hello-test.sh
   hello hello_preamble.sh hello.py hello-test.sh

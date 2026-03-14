@@ -4,7 +4,7 @@ dialect: bash
 source: 
   oils:spec/exit-status#if-subshell-false----exit-code-is-propagated-in-a-weird-way-strictargv-prevents
 status: 0
-stdout: |-
+stdout: |
   FALSE
 ---
 if `false`; then echo TRUE; else echo FALSE; fi

@@ -1,7 +1,7 @@
 name: ': escaped'
 dialect: bash
 source: oils:spec/glob#escaped
-stdout: |-
+stdout: |
   _tmp/foo.- _tmp/*.[[:punct:]]
 ---
 

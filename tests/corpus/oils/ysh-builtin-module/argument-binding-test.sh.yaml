@@ -2,7 +2,7 @@ disabled: true
 name: argument binding test
 dialect: bash
 source: oils:spec/ysh-builtin-module#argument-binding-test
-stdout: |-
+stdout: |
   (List)   ["w1","w2"]
   (List)   ["w3","w4"]
 

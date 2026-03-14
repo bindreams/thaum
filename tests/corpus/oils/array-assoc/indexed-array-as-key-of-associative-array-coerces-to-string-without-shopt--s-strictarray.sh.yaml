@@ -4,7 +4,7 @@ name: Indexed array as key of associative array coerces to string (without shopt
 dialect: bash
 source: 
   oils:spec/array-assoc#indexed-array-as-key-of-associative-array-coerces-to-string-without-shopt--s-strictarray
-stdout: |-
+stdout: |
   foo
   1 2 3
   42

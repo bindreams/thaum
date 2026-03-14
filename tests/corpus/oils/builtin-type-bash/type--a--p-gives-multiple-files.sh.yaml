@@ -1,7 +1,7 @@
 name: type -a -P gives multiple files
 dialect: bash
 source: oils:spec/builtin-type-bash#type--a--p-gives-multiple-files
-stdout: |-
+stdout: |
   _tmp/pwd
   /bin/pwd
 ---

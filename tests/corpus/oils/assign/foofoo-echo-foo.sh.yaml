@@ -1,7 +1,7 @@
 name: FOO=foo echo [foo]
 dialect: bash
 source: oils:spec/assign#foofoo-echo-foo
-stdout: |-
+stdout: |
   []
 ---
 FOO=foo echo "[$foo]"

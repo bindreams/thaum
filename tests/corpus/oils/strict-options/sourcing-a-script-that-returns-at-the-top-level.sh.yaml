@@ -1,7 +1,7 @@
 name: Sourcing a script that returns at the top level
 dialect: bash
 source: oils:spec/strict-options#sourcing-a-script-that-returns-at-the-top-level
-stdout: |-
+stdout: |
   one
   return-helper.sh
   42

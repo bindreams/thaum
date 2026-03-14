@@ -1,7 +1,7 @@
 name: fc -l lists history commands
 dialect: bash
 source: oils:spec/builtin-fc#fc--l-lists-history-commands
-stdout: |-
+stdout: |
   1	 history -r
   2	 echo 1
   3	 echo 2

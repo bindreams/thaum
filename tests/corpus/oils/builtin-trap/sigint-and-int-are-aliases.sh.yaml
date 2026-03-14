@@ -1,7 +1,7 @@
 name: SIGINT and INT are aliases
 dialect: bash
 source: oils:spec/builtin-trap#sigint-and-int-are-aliases
-stdout: |-
+stdout: |
   0
   0
 ---

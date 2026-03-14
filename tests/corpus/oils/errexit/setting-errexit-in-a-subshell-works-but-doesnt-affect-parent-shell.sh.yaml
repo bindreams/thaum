@@ -2,7 +2,7 @@ name: setting errexit in a subshell works but doesn't affect parent shell
 dialect: bash
 source: 
   oils:spec/errexit#setting-errexit-in-a-subshell-works-but-doesnt-affect-parent-shell
-stdout: |-
+stdout: |
   1
   2
   3

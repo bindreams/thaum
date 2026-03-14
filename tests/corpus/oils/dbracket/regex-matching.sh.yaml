@@ -1,7 +1,7 @@
 name: '[[ regex matching'
 dialect: bash
 source: oils:spec/dbracket#regex-matching
-stdout: |-
+stdout: |
   true
   false
 ---

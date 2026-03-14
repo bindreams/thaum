@@ -2,7 +2,7 @@ name: declare -F with shopt -s extdebug prints more info
 dialect: bash
 source: 
   oils:spec/assign-extended#declare--f-with-shopt--s-extdebug-prints-more-info
-stdout: |-
+stdout: |
   declare -f add
   declare -f g
 

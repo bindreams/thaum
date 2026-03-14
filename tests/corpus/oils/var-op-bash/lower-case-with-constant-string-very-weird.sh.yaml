@@ -1,7 +1,7 @@
 name: Lower Case with constant string (VERY WEIRD)
 dialect: bash
 source: oils:spec/var-op-bash#lower-case-with-constant-string-very-weird
-stdout: |-
+stdout: |
   aAA ABC DEF
   aaa aBC DEF
 ---

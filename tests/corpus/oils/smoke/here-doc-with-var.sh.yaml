@@ -1,7 +1,7 @@
 name: here doc with var
 dialect: bash
 source: oils:spec/smoke#here-doc-with-var
-stdout: |-
+stdout: |
   "two
   one
 ---

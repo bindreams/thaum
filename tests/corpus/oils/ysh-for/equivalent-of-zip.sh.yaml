@@ -2,7 +2,7 @@ disabled: true
 name: Equivalent of zip()
 dialect: bash
 source: oils:spec/ysh-for#equivalent-of-zip
-stdout: |-
+stdout: |
   0 a d
   1 b e
   2 c f

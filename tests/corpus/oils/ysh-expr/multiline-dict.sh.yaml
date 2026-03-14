@@ -2,7 +2,7 @@ disabled: true
 name: multiline dict
 dialect: bash
 source: oils:spec/ysh-expr#multiline-dict
-stdout: |-
+stdout: |
   mydict=2
 ---
 

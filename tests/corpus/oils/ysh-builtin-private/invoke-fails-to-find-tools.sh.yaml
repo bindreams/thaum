@@ -2,7 +2,7 @@ disabled: true
 name: invoke fails to find tools
 dialect: bash
 source: oils:spec/ysh-builtin-private#invoke-fails-to-find-tools
-stdout: |-
+stdout: |
   status=127
   status=127
   status=127

@@ -1,7 +1,7 @@
 name: declare -p
 dialect: bash
 source: oils:spec/assign-extended#declare--p
-stdout: |-
+stdout: |
   [declare]
   declare -- test_var1=111
   declare -r test_var2=222

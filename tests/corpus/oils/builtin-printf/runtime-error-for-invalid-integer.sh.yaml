@@ -1,7 +1,7 @@
 name: Runtime error for invalid integer
 dialect: bash
 source: oils:spec/builtin-printf#runtime-error-for-invalid-integer
-stdout: |-
+stdout: |
   3
   status=1
   0

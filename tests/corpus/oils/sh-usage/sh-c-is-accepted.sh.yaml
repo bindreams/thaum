@@ -2,7 +2,7 @@ name: sh +c is accepted
 dialect: bash
 source: oils:spec/sh-usage#sh-c-is-accepted
 status: 0
-stdout: |-
+stdout: |
   hi
 ---
 $SH +c 'echo hi'

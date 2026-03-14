@@ -1,7 +1,7 @@
 name: '[[ glob matching with unquoted var'
 dialect: bash
 source: oils:spec/dbracket#glob-matching-with-unquoted-var
-stdout: |-
+stdout: |
   true
   false
 ---

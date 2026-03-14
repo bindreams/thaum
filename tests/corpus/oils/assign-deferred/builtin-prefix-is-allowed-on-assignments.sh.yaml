@@ -1,7 +1,7 @@
 name: "'builtin' prefix is allowed on assignments"
 dialect: bash
 source: oils:spec/assign-deferred#builtin-prefix-is-allowed-on-assignments
-stdout: |-
+stdout: |
   e=E
 ---
 builtin export e='E'

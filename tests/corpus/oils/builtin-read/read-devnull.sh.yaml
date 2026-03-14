@@ -1,7 +1,7 @@
 name: read /dev/null
 dialect: bash
 source: oils:spec/builtin-read#read-devnull
-stdout: |-
+stdout: |
   1
 ---
 read -n 1 </dev/null

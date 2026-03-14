@@ -1,7 +1,7 @@
 name: Extended glob in ${x//pat/replace}
 dialect: bash
 source: oils:spec/extglob-match#extended-glob-in-xpatreplace
-stdout: |-
+stdout: |
   foZ
 ---
 # not supported in OSH due to GlobToERE() strategy for positional info

@@ -1,7 +1,7 @@
 name: for word + redirect order
 dialect: bash
 source: oils:spec/redir-order#for-word-redirect-order
-stdout: |-
+stdout: |
   world
 ---
 

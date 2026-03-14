@@ -1,7 +1,7 @@
 name: declare -l -u
 dialect: bash
 source: oils:spec/type-compat#declare--l--u
-stdout: |-
+stdout: |
   foo
   FOO
 ---

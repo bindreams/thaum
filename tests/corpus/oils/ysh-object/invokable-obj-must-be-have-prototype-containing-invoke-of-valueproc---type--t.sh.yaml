@@ -4,7 +4,7 @@ name: invokable Obj must be have prototype containing __invoke__ of value.Proc -
 dialect: bash
 source: 
   oils:spec/ysh-object#invokable-obj-must-be-have-prototype-containing-invoke-of-valueproc---type--t
-stdout: |-
+stdout: |
   (List)   ["a",{"x":5,"y":6}]
 
   proc

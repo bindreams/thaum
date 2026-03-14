@@ -1,7 +1,7 @@
 name: ': 3>&3-'
 dialect: bash
 source: oils:spec/redirect#33
-stdout: |-
+stdout: |
   hello
 ---
 : 3>&3-

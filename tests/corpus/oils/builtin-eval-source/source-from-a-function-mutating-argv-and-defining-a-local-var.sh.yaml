@@ -2,7 +2,7 @@ name: Source from a function, mutating argv and defining a local var
 dialect: bash
 source: 
   oils:spec/builtin-eval-source#source-from-a-function-mutating-argv-and-defining-a-local-var
-stdout: |-
+stdout: |
   source-argv: args to func
   source-argv: args to src
   to func

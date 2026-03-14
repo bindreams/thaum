@@ -2,7 +2,7 @@ disabled: true
 name: 'with parseCommand() then io->eval(cmd, vars={out_dict: {}})'
 dialect: bash
 source: oils:spec/ysh-proc-meta#with-parsecommand-then-io-evalcmd-varsoutdict
-stdout: |-
+stdout: |
   prefix a
   prefix b
 ---

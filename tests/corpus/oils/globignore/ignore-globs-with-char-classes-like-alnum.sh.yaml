@@ -1,7 +1,7 @@
 name: Ignore globs with char classes like [[:alnum:]]
 dialect: bash
 source: oils:spec/globignore#ignore-globs-with-char-classes-like-alnum
-stdout: |-
+stdout: |
   .env _testing.py
   20231114.log has space.docx pyproject.toml
   .env 20231114.log _testing.py pyproject.toml

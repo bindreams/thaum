@@ -1,7 +1,7 @@
 name: Newline in the middle of expression
 dialect: bash
 source: oils:spec/arith#newline-in-the-middle-of-expression
-stdout: |-
+stdout: |
   3
 ---
 echo $((1

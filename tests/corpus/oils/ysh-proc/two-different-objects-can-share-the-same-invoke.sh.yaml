@@ -2,7 +2,7 @@ disabled: true
 name: two different objects can share the same __invoke__
 dialect: bash
 source: oils:spec/ysh-proc#two-different-objects-can-share-the-same-invoke
-stdout: |-
+stdout: |
   sum = 9
   sum = 53
 ---

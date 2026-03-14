@@ -1,7 +1,7 @@
 name: wait -n with arguments - arguments are respected
 dialect: bash
 source: oils:spec/background#wait--n-with-arguments---arguments-are-respected
-stdout: |-
+stdout: |
   x
   status=0
   status=127

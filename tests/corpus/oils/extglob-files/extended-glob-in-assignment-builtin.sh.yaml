@@ -1,7 +1,7 @@
 name: Extended glob in assignment builtin
 dialect: bash
 source: oils:spec/extglob-files#extended-glob-in-assignment-builtin
-stdout: |-
+stdout: |
   status=2
 ---
 

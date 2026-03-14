@@ -2,7 +2,7 @@ name: Add integer to indexed array (a[0] decay)
 dialect: bash
 source: oils:spec/arith#add-integer-to-indexed-array-a0-decay
 status: 0
-stdout: |-
+stdout: |
   6
 ---
 declare -a array=(1 2 3)

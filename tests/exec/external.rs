@@ -95,6 +95,14 @@ fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(out, "hello\n");
 }
 
+/// Pipeline with a nonexistent command should report exit code 127 and print an error.
+#[skuld::test]
+fn pipeline_command_not_found_status(#[fixture(test_tools)] tools: &Path) {
+    let (_, err, status) = exec_with_tools("echo hello | nonexistent_cmd", tools);
+    assert_eq!(status, 127);
+    assert!(err.contains("command not found"));
+}
+
 // PATH resolution (genuinely external commands) -----------------------------------------------------------------------
 
 /// `env` is NOT a builtin — this exercises real PATH resolution + process spawning.

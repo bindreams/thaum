@@ -127,7 +127,7 @@ fn spawn_pipeline_stage(
                     // next stage sees EOF.
                     {
                         let mut writer = write_end;
-                        let _ = writer.write_all(&stdout_buf);
+                        writer.write_all(&stdout_buf).map_err(ExecError::Io)?;
                     }
                     let mut pipes = std::collections::HashMap::new();
                     pipes.insert(1, read_end);
@@ -202,7 +202,11 @@ fn spawn_pipeline_stage(
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                     let _ = writeln!(io.stderr, "{cmd_name}: command not found");
-                    Ok(None)
+                    Ok(Some(ChildEx::completed(127, std::collections::HashMap::new())))
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                    let _ = writeln!(io.stderr, "{cmd_name}: permission denied");
+                    Ok(Some(ChildEx::completed(126, std::collections::HashMap::new())))
                 }
                 Err(e) => Err(ExecError::Io(e)),
             }

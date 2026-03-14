@@ -1,5 +1,6 @@
 use super::*;
 use crate::ast::Expression;
+use std::io::{Read, Write};
 
 skuld::default_labels!(exec);
 
@@ -71,4 +72,16 @@ fn flatten_three_stage() {
     };
     let stages = flatten_pipeline(&pipe_abc);
     assert_eq!(stages.len(), 3);
+}
+
+/// Verify that `os_pipe()` creates a working pipe: data written to the write end
+/// is readable from the read end, and closing the write end signals EOF.
+#[skuld::test]
+fn os_pipe_write_read() {
+    let (mut read_end, mut write_end) = os_pipe().unwrap();
+    write_end.write_all(b"hello\n").unwrap();
+    drop(write_end);
+    let mut buf = String::new();
+    read_end.read_to_string(&mut buf).unwrap();
+    assert_eq!(buf, "hello\n");
 }

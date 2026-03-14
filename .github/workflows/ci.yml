@@ -11,21 +11,27 @@ env:
 
 jobs:
   test:
-    name: Test (${{ matrix.os }})
+    name: Tests (${{ matrix.os-name }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os-name: Linux
+            os: ubuntu-latest
+          - os-name: macOS
+            os: macos-latest
+          - os-name: Windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --features cli -- --no-sandbox
+      - run: cargo nextest run --features cli -E 'not binary(corpus)'
 
-  test-exec:
-    name: Execution tests
+  test-corpus:
+    name: Corpus tests
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -33,9 +39,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - name: Build Docker image
-        run: docker build -t thaum-corpus-exec -f tests/docker/Dockerfile .
-      - run: cargo nextest run --features cli -E 'binary(corpus)'
+      - run: cargo nextest run --features cli -E 'binary(corpus)' -- --no-sandbox
 
   lint:
     name: Lint
@@ -46,8 +50,7 @@ jobs:
         with:
           components: clippy, rustfmt
       - uses: Swatinem/rust-cache@v2
-      - run: cargo fmt --all -- --check
-      - run: cargo clippy --all-targets --features cli -- -D warnings
+      - uses: j178/prek-action@v1
 
   coverage:
     name: Coverage

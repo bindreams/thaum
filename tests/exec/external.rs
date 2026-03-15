@@ -121,39 +121,9 @@ fn external_env_found_via_path(#[fixture(test_tools)] tools: &Path) {
     assert!(!r.stdout().is_empty(), "env should produce output, got empty");
 }
 
-// Non-capturing I/O (live mode) ---------------------------------------------------------------------------------------
-
-/// When the IoContext is non-capturing, external commands should inherit parent
-/// handles directly. Their output bypasses the IoContext buffer entirely.
+/// External command output is relayed through IoContext to the caller's buffers.
 #[skuld::test]
-fn external_non_capturing_inherits_handles(#[fixture(test_tools)] tools: &Path) {
-    use thaum::exec::CapturedIo;
-
-    let program = thaum::parse("env").unwrap();
-    let mut executor = crate::test_executor_with_tools(tools);
-    // Export a variable so `env` produces output.
-    let _ = executor.env_mut().set_var("THAUM_TEST_VAR", "1");
-    executor.env_mut().export_var("THAUM_TEST_VAR");
-
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.capturing = false;
-
-    let status = executor.execute(&program, &mut ctx).unwrap();
-    assert_eq!(status, 0);
-    // In non-capturing mode, external commands inherit parent handles.
-    // The CapturedIo buffer should be empty because output went to
-    // the real process stdout, not through IoContext.
-    assert_eq!(
-        captured.stdout_string(),
-        "",
-        "non-capturing IoContext should not receive external command output"
-    );
-}
-
-/// Regression guard: capturing mode continues to capture external command output.
-#[skuld::test]
-fn external_capturing_captures_output(#[fixture(test_tools)] tools: &Path) {
+fn external_output_relayed_through_io_context(#[fixture(test_tools)] tools: &Path) {
     use thaum::exec::CapturedIo;
 
     let program = thaum::parse("env").unwrap();
@@ -166,7 +136,7 @@ fn external_capturing_captures_output(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(status, 0);
     assert!(
         captured.stdout_string().contains("THAUM_TEST_VAR=1"),
-        "capturing IoContext should receive external command output, got: {:?}",
+        "IoContext should receive external command output, got: {:?}",
         captured.stdout_string()
     );
 }

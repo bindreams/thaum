@@ -3,10 +3,8 @@
 //!
 //! Stdout and stderr are always piped and relayed through `IoContext`, so the
 //! caller controls where output goes (real process handles in production,
-//! in-memory buffers in tests).
-//!
-//! TODO: Always piping means child processes never see a TTY on stdout/stderr.
-//! For interactive/REPL mode, a PTY forwarding mechanism will be needed.
+//! in-memory buffers in tests). When the parent stream is a terminal, a PTY
+//! is used instead of a plain pipe so that `isatty()` returns true in the child.
 
 use crate::exec::child_io;
 use crate::exec::command_ex::{CommandEx, Fd};
@@ -81,20 +79,21 @@ impl Executor {
         }
 
         // Pipe stdout/stderr through IoContext so the caller controls where
-        // output goes. `entry().or_insert` respects explicit redirects above.
-        child_cmd.fds.entry(1).or_insert(Fd::Pipe);
-        child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+        // output goes. Use a PTY when the parent stream is a terminal so the
+        // child sees isatty() == true. `entry().or_insert` respects explicit
+        // redirects above.
+        child_cmd
+            .fds
+            .entry(1)
+            .or_insert(if io.tty_stdout { Fd::Pty } else { Fd::Pipe });
+        child_cmd
+            .fds
+            .entry(2)
+            .or_insert(if io.tty_stderr { Fd::Pty } else { Fd::Pipe });
 
         match child_cmd.spawn() {
             Ok(mut child) => {
-                let (stdout_buf, stderr_buf) = child_io::drain_child_pipes(&mut child)?;
-                let status = child.wait().map_err(ExecError::Io)?;
-                if !stdout_buf.is_empty() {
-                    io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
-                }
-                if !stderr_buf.is_empty() {
-                    io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
-                }
+                let status = child_io::drain_and_relay(&mut child, io)?;
                 Ok(status)
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {

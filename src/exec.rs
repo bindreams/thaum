@@ -355,6 +355,9 @@ impl Executor {
         let mut fd0 = self.fd_table.get(&0).and_then(|f| f.try_clone().ok());
         let mut fd1 = self.fd_table.get(&1).and_then(|f| f.try_clone().ok());
         let mut fd2 = self.fd_table.get(&2).and_then(|f| f.try_clone().ok());
+        // Persistent redirect overrides TTY — child should see a file.
+        let out_tty = if fd1.is_some() { false } else { io.tty_stdout };
+        let err_tty = if fd2.is_some() { false } else { io.tty_stderr };
         let mut persistent_io = IoContext::new(
             match fd0.as_mut() {
                 Some(f) => f as &mut dyn std::io::Read,
@@ -368,6 +371,8 @@ impl Executor {
                 Some(f) => f as &mut dyn std::io::Write,
                 None => io.stderr,
             },
+            out_tty,
+            err_tty,
         );
 
         match self.execute_expression_inner(expr, &mut persistent_io) {

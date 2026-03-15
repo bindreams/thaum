@@ -101,6 +101,7 @@ pub fn test_tools() -> Result<TestTools, String> {
         ("pwd", "test-pwd"),
         ("touch", "test-touch"),
         ("argv", "test-argv"),
+        ("isatty", "test-isatty"),
     ];
 
     for &(name, bin_name) in tools {

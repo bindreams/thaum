@@ -17,7 +17,7 @@ use windows::Win32::System::Threading::{
     CreateProcessW, CREATE_UNICODE_ENVIRONMENT, PROCESS_INFORMATION, STARTF_USESTDHANDLES, STARTUPINFOW,
 };
 
-use super::{ChildEx, ChildInner, CommandEx, Fd};
+use super::{ChildEx, ChildInner, CommandEx, Fd, SendHandle, SendHpcon};
 
 /// CRT fd flags used in the lpReserved2 buffer.
 const FOPEN: u8 = 0x01;
@@ -57,8 +57,18 @@ fn resolve_path_if_needed(cmd: &mut CommandEx) {
 }
 
 /// Spawn a child process using `CreateProcessW` with full fd table support.
+///
+/// If any fd is `Fd::Pty`, delegates to `spawn_with_conpty` for terminal
+/// emulation. Mixed cases (only stdout or only stderr needing a PTY) are
+/// handled by ConPTY with explicit `hStd*` overrides for the non-PTY fd.
 pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
     resolve_path_if_needed(&mut cmd);
+
+    let any_pty = cmd.fds.values().any(|fd| matches!(fd, Fd::Pty));
+    if any_pty {
+        return spawn_with_conpty(cmd);
+    }
+
     let mut pipes: HashMap<i32, File> = HashMap::new();
     let mut handle_table: HashMap<i32, (HANDLE, u8)> = HashMap::new();
 
@@ -87,6 +97,7 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
                 make_inheritable(handle)?;
                 handle_table.insert(fd_num, (handle, FOPEN));
             }
+            Fd::Pty => unreachable!("Pty fds are handled by spawn_with_conpty"),
         }
     }
 
@@ -119,7 +130,8 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
     // Build lpReserved2 for FDs 3+ (CRT fd table).
     let reserved2 = build_lpreserved2(&handle_table);
     if !reserved2.is_empty() {
-        si.cbReserved2 = reserved2.len() as u16;
+        si.cbReserved2 =
+            u16::try_from(reserved2.len()).expect("lpReserved2 buffer exceeds u16::MAX — fd number too large");
         // SAFETY: reserved2 lives until CreateProcessW returns.
         si.lpReserved2 = reserved2.as_ptr() as *mut u8;
     }
@@ -185,8 +197,10 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
     let _ = unsafe { CloseHandle(pi.hThread) };
 
     Ok(ChildEx {
-        inner: ChildInner::Handle(pi.hProcess),
+        inner: ChildInner::Handle(SendHandle(pi.hProcess)),
         pipes,
+        _conpty_input: None,
+        conpty_output_fd: None,
     })
 }
 
@@ -250,8 +264,24 @@ fn build_env_block(env: &HashMap<OsString, OsString>) -> Vec<u16> {
             entry
         })
         .collect();
-    // Environment block must be sorted (case-insensitive) per Windows convention.
-    entries.sort();
+    // Environment block must be sorted case-insensitively per Windows convention.
+    entries.sort_by(|a, b| {
+        a.iter()
+            .map(|&c| {
+                if (b'a' as u16..=b'z' as u16).contains(&c) {
+                    c - 32
+                } else {
+                    c
+                }
+            })
+            .cmp(b.iter().map(|&c| {
+                if (b'a' as u16..=b'z' as u16).contains(&c) {
+                    c - 32
+                } else {
+                    c
+                }
+            }))
+    });
 
     let mut block: Vec<u16> = Vec::new();
     for entry in entries {
@@ -273,4 +303,302 @@ fn create_pipe() -> io::Result<(HANDLE, HANDLE)> {
 fn make_inheritable(handle: HANDLE) -> io::Result<()> {
     use windows::Win32::Foundation::{SetHandleInformation, HANDLE_FLAG_INHERIT};
     unsafe { SetHandleInformation(handle, HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT) }.map_err(io::Error::other)
+}
+
+// ConPTY spawn ========================================================================================================
+
+/// Spawn a child process using ConPTY (Windows Pseudo Console) for terminal
+/// emulation. The child sees a real console, so `isatty()` returns true for
+/// fds handled by the ConPTY.
+///
+/// Supports three modes:
+/// - **Both stdout and stderr are Pty**: ConPTY handles both. Output is merged
+///   into a single stream (stored as fd 1). This is invisible to the user since
+///   both streams go to the same terminal.
+/// - **Only stdout is Pty**: ConPTY output is stored as fd 1. stderr gets an
+///   explicit pipe via `hStdError`, keeping streams separate.
+/// - **Only stderr is Pty**: ConPTY output is stored as fd 2. stdout gets an
+///   explicit pipe via `hStdOutput`, keeping streams separate.
+///
+/// Non-Pty fds (File, Pipe, InputPipe) are passed via lpReserved2 as usual.
+fn spawn_with_conpty(cmd: CommandEx) -> io::Result<ChildEx> {
+    use windows::Win32::System::Console::{ClosePseudoConsole, CreatePseudoConsole, HPCON};
+    use windows::Win32::System::Threading::{
+        CreateProcessW, DeleteProcThreadAttributeList, InitializeProcThreadAttributeList, UpdateProcThreadAttribute,
+        CREATE_UNICODE_ENVIRONMENT, EXTENDED_STARTUPINFO_PRESENT, LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_INFORMATION,
+        STARTUPINFOEXW,
+    };
+
+    // Get terminal size from the parent console (default 80x24 if unavailable).
+    let size = get_console_size();
+
+    // Create input/output pipes for the ConPTY.
+    let (pty_input_read, pty_input_write) = create_pipe()?;
+    let (pty_output_read, pty_output_write) = create_pipe()?;
+
+    // Create the pseudo console.
+    let hpc = unsafe { CreatePseudoConsole(size, pty_input_read, pty_output_write, 0) }
+        .map_err(|e| io::Error::other(format!("CreatePseudoConsole failed: {e}")))?;
+
+    // Close pipe ends that ConPTY now owns copies of.
+    let _ = unsafe { CloseHandle(pty_input_read) };
+    let _ = unsafe { CloseHandle(pty_output_write) };
+    // Keep pty_input_write alive — closing it while the child runs makes ConPTY
+    // generate a close event (STATUS_CONTROL_C_EXIT). Convert to a File so it
+    // drops with the ChildEx pipes map. Use fd -1 as a sentinel (not a real fd).
+    let pty_input_file = unsafe { File::from_raw_handle(pty_input_write.0 as _) };
+
+    /// RAII guard that calls `DeleteProcThreadAttributeList` on drop.
+    struct AttrListGuard(LPPROC_THREAD_ATTRIBUTE_LIST);
+    impl Drop for AttrListGuard {
+        fn drop(&mut self) {
+            unsafe { DeleteProcThreadAttributeList(self.0) };
+        }
+    }
+
+    // Build the attribute list. Allocate for 2 attributes: PSEUDOCONSOLE is
+    // always present; HANDLE_LIST is added later if non-Pty fds need inheritance.
+    let mut attr_size: usize = 0;
+    let _ = unsafe { InitializeProcThreadAttributeList(None, 2, Some(0), &mut attr_size) };
+    let mut attr_buf = vec![0u8; attr_size];
+    let attr_list = LPPROC_THREAD_ATTRIBUTE_LIST(attr_buf.as_mut_ptr() as _);
+    unsafe { InitializeProcThreadAttributeList(Some(attr_list), 2, Some(0), &mut attr_size) }
+        .map_err(|e| io::Error::other(format!("InitializeProcThreadAttributeList: {e}")))?;
+    let _attr_guard = AttrListGuard(attr_list);
+
+    // PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE = 0x00020016
+    const PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE: usize = 0x00020016;
+    unsafe {
+        UpdateProcThreadAttribute(
+            attr_list,
+            0,
+            PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+            Some(hpc.0 as *const std::ffi::c_void),
+            std::mem::size_of::<HPCON>(),
+            None,
+            None,
+        )
+    }
+    .map_err(|e| io::Error::other(format!("UpdateProcThreadAttribute: {e}")))?;
+
+    // Determine which of stdout/stderr are handled by ConPTY vs pipes.
+    let stdout_pty = matches!(cmd.fds.get(&1), Some(Fd::Pty));
+    debug_assert!(
+        stdout_pty || matches!(cmd.fds.get(&2), Some(Fd::Pty)),
+        "spawn_with_conpty called but neither stdout nor stderr is Pty"
+    );
+
+    // For non-Pty fds that were requested as Pipe or other types, create
+    // regular pipes. Also, for stdout/stderr that are NOT Pty, we need an
+    // explicit pipe so we can set hStdOutput/hStdError to override ConPTY.
+    let mut pipes: HashMap<i32, File> = HashMap::new();
+    let mut handle_table: HashMap<i32, (HANDLE, u8)> = HashMap::new();
+
+    for (&fd_num, fd_spec) in &cmd.fds {
+        match fd_spec {
+            Fd::Pty => {} // Handled by ConPTY
+            Fd::Pipe => {
+                let (read_handle, write_handle) = create_pipe()?;
+                let read_file = unsafe { File::from_raw_handle(read_handle.0 as _) };
+                make_inheritable(write_handle)?;
+                handle_table.insert(fd_num, (write_handle, FOPEN | FPIPE));
+                pipes.insert(fd_num, read_file);
+            }
+            Fd::InputPipe => {
+                let (read_handle, write_handle) = create_pipe()?;
+                let write_file = unsafe { File::from_raw_handle(write_handle.0 as _) };
+                make_inheritable(read_handle)?;
+                handle_table.insert(fd_num, (read_handle, FOPEN | FPIPE));
+                pipes.insert(fd_num, write_file);
+            }
+            Fd::File(file) => {
+                let raw = file.try_clone()?.into_raw_handle();
+                let handle = HANDLE(raw as _);
+                make_inheritable(handle)?;
+                handle_table.insert(fd_num, (handle, FOPEN));
+            }
+        }
+    }
+
+    // Collect non-Pty handles that need to be inherited by the child.
+    // With ConPTY, bInheritHandles is normally false (ConPTY provides console
+    // handles directly). But when non-Pty fds exist (e.g. piped stdin from a
+    // pipeline, or fds 3+ from redirections), we need bInheritHandles=true with
+    // PROC_THREAD_ATTRIBUTE_HANDLE_LIST to whitelist exactly those handles.
+    let inherit_handles: Vec<HANDLE> = handle_table.values().map(|(h, _)| *h).collect();
+    let has_inheritable = !inherit_handles.is_empty();
+
+    if has_inheritable {
+        const PROC_THREAD_ATTRIBUTE_HANDLE_LIST: usize = 0x00020002;
+        unsafe {
+            UpdateProcThreadAttribute(
+                attr_list,
+                0,
+                PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                Some(inherit_handles.as_ptr() as *const std::ffi::c_void),
+                inherit_handles.len() * std::mem::size_of::<HANDLE>(),
+                None,
+                None,
+            )
+        }
+        .map_err(|e| io::Error::other(format!("UpdateProcThreadAttribute(HANDLE_LIST): {e}")))?;
+    }
+
+    // Build STARTUPINFOEXW.
+    let mut si_ex: STARTUPINFOEXW = unsafe { std::mem::zeroed() };
+    si_ex.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
+    si_ex.lpAttributeList = attr_list;
+
+    // STARTF_USESTDHANDLES lets us selectively override individual std handles.
+    // Handles left as null default to the ConPTY console. Handles set to an
+    // explicit pipe bypass ConPTY for that fd, keeping streams separate.
+    // See: https://github.com/microsoft/terminal/issues/4380#issuecomment-580865346
+    si_ex.StartupInfo.dwFlags |= STARTF_USESTDHANDLES;
+    if let Some(&(h, _)) = handle_table.get(&0) {
+        si_ex.StartupInfo.hStdInput = h;
+    }
+    if let Some(&(h, _)) = handle_table.get(&1) {
+        si_ex.StartupInfo.hStdOutput = h;
+    }
+    if let Some(&(h, _)) = handle_table.get(&2) {
+        si_ex.StartupInfo.hStdError = h;
+    }
+
+    // lpReserved2 for FDs 3+.
+    let reserved2 = build_lpreserved2(&handle_table);
+    if !reserved2.is_empty() {
+        si_ex.StartupInfo.cbReserved2 =
+            u16::try_from(reserved2.len()).expect("lpReserved2 buffer exceeds u16::MAX — fd number too large");
+        si_ex.StartupInfo.lpReserved2 = reserved2.as_ptr() as *mut u8;
+    }
+
+    // Build command line, environment, path, cwd.
+    let cmdline = cmd.commandline();
+    let mut cmdline_wide: Vec<u16> = cmdline.encode_wide().chain(std::iter::once(0)).collect();
+    let env_block = build_env_block(&cmd.env);
+    let path_wide: Vec<u16> = cmd.path.encode_wide().chain(std::iter::once(0)).collect();
+    let cwd_wide: Option<Vec<u16>> = cmd
+        .cwd
+        .as_ref()
+        .map(|p| p.as_os_str().encode_wide().chain(std::iter::once(0)).collect());
+
+    let mut pi: PROCESS_INFORMATION = unsafe { std::mem::zeroed() };
+    let cwd_pcwstr = match &cwd_wide {
+        Some(w) => windows::core::PCWSTR(w.as_ptr()),
+        None => windows::core::PCWSTR::null(),
+    };
+
+    let result = unsafe {
+        CreateProcessW(
+            windows::core::PCWSTR(path_wide.as_ptr()),
+            Some(windows::core::PWSTR(cmdline_wide.as_mut_ptr())),
+            None,
+            None,
+            has_inheritable, // Only inherit when HANDLE_LIST whitelists specific handles.
+            CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT,
+            Some(env_block.as_ptr() as _),
+            cwd_pcwstr,
+            &si_ex.StartupInfo,
+            &mut pi,
+        )
+    };
+
+    // Cleanup: close child-side handles for non-Pty fds.
+    for &(handle, _) in handle_table.values() {
+        let _ = unsafe { CloseHandle(handle) };
+    }
+
+    result.map_err(|e| {
+        // ConPTY must be closed on error too.
+        unsafe { ClosePseudoConsole(hpc) };
+        let win32_code = (e.code().0 as u32) & 0xFFFF;
+        let kind = match win32_code {
+            2 => io::ErrorKind::NotFound,
+            3 => io::ErrorKind::NotFound,
+            5 => io::ErrorKind::PermissionDenied,
+            _ => io::ErrorKind::Other,
+        };
+        io::Error::new(kind, e)
+    })?;
+
+    let _ = unsafe { CloseHandle(pi.hThread) };
+
+    // ConPTY output pipe carries console output. Store it under the fd that
+    // is handled by ConPTY. When both are Pty, fd 1 gets the merged stream.
+    // When only one is Pty, it gets the ConPTY output; the other has its own pipe.
+    let pty_output_file = unsafe { File::from_raw_handle(pty_output_read.0 as _) };
+    if stdout_pty {
+        pipes.insert(1, pty_output_file);
+    } else {
+        pipes.insert(2, pty_output_file);
+    }
+
+    // Record which fd carries ConPTY output for clean_conpty_output routing.
+    let conpty_fd = if stdout_pty { 1 } else { 2 };
+
+    // Keep ConPTY alive until the child exits — closing it earlier tears down
+    // the console session and can crash the child during initialization.
+    Ok(ChildEx {
+        inner: ChildInner::HandleWithPty(SendHandle(pi.hProcess), SendHpcon(hpc)),
+        pipes,
+        _conpty_input: Some(pty_input_file),
+        conpty_output_fd: Some(conpty_fd),
+    })
+}
+
+/// Get the current console window size, defaulting to 80x24.
+fn get_console_size() -> windows::Win32::System::Console::COORD {
+    use windows::Win32::System::Console::{
+        GetConsoleScreenBufferInfo, GetStdHandle, CONSOLE_SCREEN_BUFFER_INFO, COORD, STD_OUTPUT_HANDLE,
+    };
+    let mut info: CONSOLE_SCREEN_BUFFER_INFO = unsafe { std::mem::zeroed() };
+    let handle = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE);
+    if unsafe { GetConsoleScreenBufferInfo(handle, &mut info) }.is_ok() {
+        COORD {
+            X: info.srWindow.Right - info.srWindow.Left + 1,
+            Y: info.srWindow.Bottom - info.srWindow.Top + 1,
+        }
+    } else {
+        COORD { X: 80, Y: 24 }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    skuld::default_labels!(exec);
+
+    /// Environment block sorting must be case-insensitive per Windows convention.
+    #[skuld::test]
+    fn env_block_sort_is_case_insensitive() {
+        let mut env = HashMap::new();
+        // "path" sorts after "PATH" in byte order but should be adjacent case-insensitively.
+        env.insert(OsString::from("Zebra"), OsString::from("z"));
+        env.insert(OsString::from("alpha"), OsString::from("a"));
+        env.insert(OsString::from("PATH"), OsString::from("p1"));
+        env.insert(OsString::from("path"), OsString::from("p2"));
+        env.insert(OsString::from("Beta"), OsString::from("b"));
+
+        let block = build_env_block(&env);
+        // Decode the block back into entries.
+        let entries: Vec<String> = block
+            .split(|&c| c == 0)
+            .filter(|s| !s.is_empty())
+            .map(String::from_utf16_lossy)
+            .collect();
+
+        // Extract just the var names for order checking.
+        let names: Vec<&str> = entries.iter().map(|e| e.split('=').next().unwrap()).collect();
+        // Case-insensitive sort: alpha, Beta, PATH, path, Zebra (or path before PATH — both valid).
+        for i in 1..names.len() {
+            assert!(
+                names[i - 1].to_ascii_uppercase() <= names[i].to_ascii_uppercase(),
+                "env block not case-insensitively sorted: {:?} should come before {:?} (full order: {:?})",
+                names[i - 1],
+                names[i],
+                names
+            );
+        }
+    }
 }

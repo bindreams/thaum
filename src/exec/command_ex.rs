@@ -21,6 +21,10 @@ pub(crate) enum Fd {
     /// Input pipe: child gets the read-end, parent gets the write-end
     /// via `ChildEx::take_pipe(fd)`. Used for feeding stdin to a child.
     InputPipe,
+    /// PTY output: child gets the slave end (which reports as a terminal),
+    /// parent gets the master end via `ChildEx::take_pipe(fd)`. Used when
+    /// the parent stream is a TTY so the child sees `isatty() == true`.
+    Pty,
     /// Redirect to/from this file.
     File(File),
 }
@@ -66,7 +70,6 @@ impl CommandEx {
     /// - **Unix:** POSIX shell quoting (single-quote each arg, escape `'`).
     /// - **Windows:** MSVC CRT quoting (double-quote, escape `\` before `"`).
     ///   Includes a `debug_assert` round-trip via `CommandLineToArgvW`.
-    #[allow(dead_code)] // Will be used by Windows CreateProcessW; tested via unit tests.
     pub fn commandline(&self) -> OsString {
         #[cfg(unix)]
         {
@@ -104,7 +107,33 @@ pub(crate) struct ChildEx {
     inner: ChildInner,
     /// Read-ends of pipes created for `Fd::Pipe` entries, keyed by fd number.
     pub pipes: HashMap<i32, File>,
+    /// ConPTY input pipe write-end. Kept alive until the child exits; closing
+    /// it earlier causes ConPTY to generate STATUS_CONTROL_C_EXIT.
+    #[cfg(windows)]
+    _conpty_input: Option<File>,
+    /// Which fd carries ConPTY output (1 or 2). `None` for non-ConPTY children.
+    /// Used by `child_io` to know which buffer to run `clean_conpty_output` on.
+    #[cfg(windows)]
+    conpty_output_fd: Option<i32>,
 }
+
+/// Windows process handle, safe to send across threads.
+///
+/// Process handles have no thread affinity — any thread can wait on or query them.
+#[cfg(windows)]
+struct SendHandle(windows::Win32::Foundation::HANDLE);
+
+#[cfg(windows)]
+// SAFETY: Windows HANDLE is a pointer-sized integer with no thread affinity.
+unsafe impl Send for SendHandle {}
+
+/// Windows pseudo console handle, safe to send across threads.
+#[cfg(windows)]
+struct SendHpcon(windows::Win32::System::Console::HPCON);
+
+#[cfg(windows)]
+// SAFETY: HPCON is an opaque handle with no thread affinity.
+unsafe impl Send for SendHpcon {}
 
 #[allow(dead_code)] // Variants only constructed on their respective platform.
 enum ChildInner {
@@ -113,7 +142,11 @@ enum ChildInner {
     #[cfg(unix)]
     Pid(nix::libc::pid_t),
     #[cfg(windows)]
-    Handle(windows::Win32::Foundation::HANDLE),
+    Handle(SendHandle),
+    /// Process spawned with a ConPTY console. The HPCON must stay alive until
+    /// the child exits; closing it earlier tears down the console session.
+    #[cfg(windows)]
+    HandleWithPty(SendHandle, SendHpcon),
 }
 
 impl ChildEx {
@@ -125,60 +158,150 @@ impl ChildEx {
         ChildEx {
             inner: ChildInner::Completed(exit_code),
             pipes,
+            #[cfg(windows)]
+            _conpty_input: None,
+            #[cfg(windows)]
+            conpty_output_fd: None,
         }
     }
 
     /// Wait for the child to exit and return its exit code.
     pub fn wait(&mut self) -> io::Result<i32> {
-        match &mut self.inner {
-            ChildInner::Completed(code) => Ok(*code),
-            #[cfg(unix)]
-            ChildInner::Pid(pid) => {
-                let mut status: nix::libc::c_int = 0;
-                loop {
-                    let ret = unsafe { nix::libc::waitpid(*pid, &mut status, 0) };
-                    if ret == -1 {
-                        let err = io::Error::last_os_error();
-                        if err.kind() == io::ErrorKind::Interrupted {
-                            continue;
-                        }
-                        return Err(err);
-                    }
-                    break;
-                }
-                if nix::libc::WIFEXITED(status) {
-                    Ok(nix::libc::WEXITSTATUS(status))
-                } else if nix::libc::WIFSIGNALED(status) {
-                    Ok(128 + nix::libc::WTERMSIG(status))
-                } else {
-                    Ok(128)
-                }
-            }
-            #[cfg(windows)]
-            ChildInner::Handle(handle) => {
-                use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject, INFINITE};
-                let wait_result = unsafe { WaitForSingleObject(*handle, INFINITE) };
-                // WAIT_EVENT(0) is WAIT_OBJECT_0 — the object was signaled.
-                if wait_result.0 != 0 {
-                    let err = io::Error::last_os_error();
-                    let _ = unsafe { windows::Win32::Foundation::CloseHandle(*handle) };
-                    return Err(err);
-                }
-                let mut code: u32 = 0;
-                unsafe { GetExitCodeProcess(*handle, &mut code) }.map_err(|e| io::Error::other(e.to_string()))?;
-                debug_assert!(
-                    unsafe { windows::Win32::Foundation::CloseHandle(*handle) }.is_ok(),
-                    "CloseHandle failed — possible double-close"
-                );
-                Ok(code as i32)
-            }
-        }
+        wait_inner(&mut self.inner)
     }
 
     /// Take the read-end of a pipe for the given fd number.
     pub fn take_pipe(&mut self, fd: i32) -> Option<File> {
         self.pipes.remove(&fd)
     }
+
+    /// Take pipes and return a wait closure, splitting the borrow.
+    ///
+    /// Returns `(stdout_pipe, stderr_pipe, wait_fn)`. The wait closure captures
+    /// only `self.inner`, so callers can drain pipes concurrently without
+    /// borrowing all of `self`.
+    pub(super) fn take_pipes_and_waiter(
+        &mut self,
+    ) -> (Option<File>, Option<File>, impl FnOnce() -> io::Result<i32> + '_) {
+        let stdout = self.pipes.remove(&1);
+        let stderr = self.pipes.remove(&2);
+        let inner = &mut self.inner;
+        (stdout, stderr, move || wait_inner(inner))
+    }
+
+    /// Mark this child as already completed with the given exit code.
+    ///
+    /// Used after `drain_and_wait_conpty` has already called `wait()` and closed
+    /// all handles. Subsequent `wait()` calls return the cached code.
+    pub fn mark_completed(&mut self, status: i32) {
+        self.inner = ChildInner::Completed(status);
+    }
+
+    /// Whether this child was spawned with a ConPTY (Windows only).
+    ///
+    /// ConPTY output pipes don't EOF until the ConPTY is closed; callers must
+    /// wait for the process, then close the ConPTY, then drain the pipes.
+    pub fn has_conpty(&self) -> bool {
+        #[cfg(windows)]
+        if matches!(self.inner, ChildInner::HandleWithPty(..)) {
+            return true;
+        }
+        false
+    }
+
+    /// Which fd carries ConPTY output (1 or 2), or `None` for non-ConPTY children.
+    ///
+    /// When both stdout and stderr are PTY, ConPTY merges them into a single
+    /// stream on fd 1. When only one is PTY, that fd gets the ConPTY output.
+    pub fn conpty_output_fd(&self) -> Option<i32> {
+        #[cfg(windows)]
+        {
+            self.conpty_output_fd
+        }
+        #[cfg(not(windows))]
+        {
+            None
+        }
+    }
+}
+
+/// Wait for a child process described by `ChildInner`. Factored out of
+/// `ChildEx::wait()` so callers can split borrows (e.g. `drain_and_wait_conpty`
+/// can pass `&mut child.inner` to a thread without borrowing all of `child`).
+fn wait_inner(inner: &mut ChildInner) -> io::Result<i32> {
+    if let ChildInner::Completed(code) = inner {
+        return Ok(*code);
+    }
+    // Take ownership so handle newtypes are moved out by value, not copied.
+    // This prevents double-close if a Drop impl is ever added to the newtypes.
+    let owned = std::mem::replace(inner, ChildInner::Completed(1));
+    let result = match owned {
+        ChildInner::Completed(_) => unreachable!("checked above"),
+        #[cfg(unix)]
+        ChildInner::Pid(pid) => {
+            let mut status: nix::libc::c_int = 0;
+            loop {
+                let ret = unsafe { nix::libc::waitpid(pid, &mut status, 0) };
+                if ret == -1 {
+                    let err = io::Error::last_os_error();
+                    if err.kind() == io::ErrorKind::Interrupted {
+                        continue;
+                    }
+                    return Err(err);
+                }
+                break;
+            }
+            if nix::libc::WIFEXITED(status) {
+                Ok(nix::libc::WEXITSTATUS(status))
+            } else if nix::libc::WIFSIGNALED(status) {
+                Ok(128 + nix::libc::WTERMSIG(status))
+            } else {
+                Ok(128)
+            }
+        }
+        #[cfg(windows)]
+        ChildInner::Handle(h) => wait_for_handle(h.0, None),
+        #[cfg(windows)]
+        ChildInner::HandleWithPty(h, hpc) => wait_for_handle(h.0, Some(hpc.0)),
+    };
+    // Transition to Completed so a second wait() returns the cached code
+    // instead of operating on already-closed handles.
+    *inner = ChildInner::Completed(match &result {
+        Ok(c) => *c,
+        Err(_) => 1,
+    });
+    result
+}
+
+/// Wait for a Windows process handle to exit, optionally closing a ConPTY after.
+#[cfg(windows)]
+fn wait_for_handle(
+    handle: windows::Win32::Foundation::HANDLE,
+    hpc: Option<windows::Win32::System::Console::HPCON>,
+) -> io::Result<i32> {
+    use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject, INFINITE};
+
+    let wait_result = unsafe { WaitForSingleObject(handle, INFINITE) };
+    if wait_result.0 != 0 {
+        let err = io::Error::last_os_error();
+        let _ = unsafe { windows::Win32::Foundation::CloseHandle(handle) };
+        if let Some(hpc) = hpc {
+            unsafe { windows::Win32::System::Console::ClosePseudoConsole(hpc) };
+        }
+        return Err(err);
+    }
+    let mut code: u32 = 0;
+    let gep_result = unsafe { GetExitCodeProcess(handle, &mut code) };
+    // Always clean up handles, even if GetExitCodeProcess failed.
+    debug_assert!(
+        unsafe { windows::Win32::Foundation::CloseHandle(handle) }.is_ok(),
+        "CloseHandle failed — possible double-close"
+    );
+    if let Some(hpc) = hpc {
+        unsafe { windows::Win32::System::Console::ClosePseudoConsole(hpc) };
+    }
+    gep_result.map_err(|e| io::Error::other(e.to_string()))?;
+    Ok(code as i32)
 }
 
 // Process replacement =================================================================================================
@@ -207,7 +330,7 @@ impl CommandEx {
                         unsafe { nix::libc::close(raw) };
                     }
                 }
-                Fd::Pipe | Fd::InputPipe => {} // Not meaningful for exec replacement.
+                Fd::Pipe | Fd::InputPipe | Fd::Pty => {} // Not meaningful for exec replacement.
             }
         }
 
@@ -490,6 +613,14 @@ impl SpawnFileActions {
         Ok(())
     }
 
+    fn add_close(&mut self, fd: i32) -> io::Result<()> {
+        let res = unsafe { libc::posix_spawn_file_actions_addclose(&mut self.inner, fd) };
+        if res != 0 {
+            return Err(io::Error::from_raw_os_error(res));
+        }
+        Ok(())
+    }
+
     fn as_ptr(&self) -> *const libc::posix_spawn_file_actions_t {
         &self.inner
     }
@@ -540,6 +671,25 @@ impl Drop for SpawnAttr {
 
 // spawn_impl ==========================================================================================================
 
+/// Get the parent terminal's window size for PTY propagation.
+/// Returns a sensible default (80x24) if the query fails.
+#[cfg(unix)]
+fn get_terminal_size() -> libc::winsize {
+    // Try stdout (fd 1), then stderr (fd 2).
+    for fd in [1, 2] {
+        let mut ws: libc::winsize = unsafe { std::mem::zeroed() };
+        if unsafe { libc::ioctl(fd, libc::TIOCGWINSZ, &mut ws) } == 0 && ws.ws_col > 0 && ws.ws_row > 0 {
+            return ws;
+        }
+    }
+    libc::winsize {
+        ws_row: 24,
+        ws_col: 80,
+        ws_xpixel: 0,
+        ws_ypixel: 0,
+    }
+}
+
 #[cfg(unix)]
 fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     use std::ffi::CString;
@@ -575,6 +725,37 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
                 let parent_file = File::from(write_end);
                 set_cloexec(&parent_file);
                 pipes.insert(fd_num, parent_file);
+            }
+            Fd::Pty => {
+                let winsize = get_terminal_size();
+                let pty = nix::pty::openpty(&winsize, None).map_err(io::Error::other)?;
+                // Disable ONLCR so the PTY doesn't convert \n → \r\n.
+                // The parent relays output through IoContext; the receiving
+                // terminal (if any) handles line endings itself.
+                {
+                    use nix::sys::termios::{self, OutputFlags, SetArg};
+                    let mut attrs = termios::tcgetattr(&pty.slave).map_err(io::Error::other)?;
+                    attrs.output_flags.remove(OutputFlags::ONLCR);
+                    termios::tcsetattr(&pty.slave, SetArg::TCSANOW, &attrs).map_err(io::Error::other)?;
+                }
+                let slave_raw = pty.slave.into_raw_fd();
+                raw_fds_to_close.push(slave_raw);
+                file_actions.add_dup2(slave_raw, fd_num).inspect_err(|_| {
+                    close_raw_fds(&raw_fds_to_close);
+                })?;
+                // Close the original slave fd in the child after dup2. Without
+                // this, the child holds an extra reference to the PTY slave,
+                // preventing EOF detection on the master.
+                // Skip if slave_raw == fd_num: dup2 is a no-op (POSIX) and
+                // closing would destroy the target fd.
+                if slave_raw != fd_num {
+                    file_actions.add_close(slave_raw).inspect_err(|_| {
+                        close_raw_fds(&raw_fds_to_close);
+                    })?;
+                }
+                let master_file = File::from(pty.master);
+                set_cloexec(&master_file);
+                pipes.insert(fd_num, master_file);
             }
             Fd::File(file) => {
                 let raw_fd = file.try_clone()?.into_raw_fd();

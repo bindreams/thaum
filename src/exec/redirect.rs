@@ -137,7 +137,17 @@ impl ActiveRedirects {
     /// Build an IoContext that uses redirect file handles for FDs 0-2 where
     /// present, falling back to the original `io` streams.
     pub fn apply_to_io<'a>(&'a mut self, io: &'a mut IoContext<'_>) -> IoContext<'a> {
-        let IoContext { stdin, stdout, stderr } = io;
+        let IoContext {
+            stdin,
+            stdout,
+            stderr,
+            tty_stdout,
+            tty_stderr,
+        } = io;
+        // Compute tty flags before borrowing self mutably. Redirected fds are
+        // no longer terminals — child should see a file, not a TTY.
+        let out_tty = if self.stdout.is_some() { false } else { *tty_stdout };
+        let err_tty = if self.stderr.is_some() { false } else { *tty_stderr };
         IoContext::new(
             match self.stdin.as_mut() {
                 Some(f) => f as &mut dyn Read,
@@ -151,6 +161,8 @@ impl ActiveRedirects {
                 Some(f) => f as &mut dyn Write,
                 None => *stderr,
             },
+            out_tty,
+            err_tty,
         )
     }
 }

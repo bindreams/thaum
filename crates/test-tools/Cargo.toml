@@ -50,3 +50,8 @@ test = false
 name = "test-argv"
 path = "src/tools/argv.rs"
 test = false
+
+[[bin]]
+name = "test-isatty"
+path = "src/tools/isatty.rs"
+test = false

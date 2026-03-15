@@ -178,22 +178,23 @@ fn spawn_pipeline_stage(
                 child_cmd.fds.insert(1, Fd::Pipe);
             } else {
                 // Last pipeline stage: pipe stdout through IoContext.
-                child_cmd.fds.entry(1).or_insert(Fd::Pipe);
+                child_cmd
+                    .fds
+                    .entry(1)
+                    .or_insert(if io.tty_stdout { Fd::Pty } else { Fd::Pipe });
             }
             // Always pipe stderr through IoContext.
-            child_cmd.fds.entry(2).or_insert(Fd::Pipe);
+            child_cmd
+                .fds
+                .entry(2)
+                .or_insert(if io.tty_stderr { Fd::Pty } else { Fd::Pipe });
 
             match child_cmd.spawn() {
                 Ok(mut child) => {
                     if !pipe_stdout {
                         // Last stage: drain pipes and relay output through io.
-                        let (stdout_buf, stderr_buf) = crate::exec::child_io::drain_child_pipes(&mut child)?;
-                        if !stdout_buf.is_empty() {
-                            io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
-                        }
-                        if !stderr_buf.is_empty() {
-                            io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
-                        }
+                        // Don't wait here — the pipeline orchestrator waits later.
+                        crate::exec::child_io::drain_to_io(&mut child, io)?;
                     }
                     Ok(Some(child))
                 }

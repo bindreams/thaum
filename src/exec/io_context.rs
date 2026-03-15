@@ -3,6 +3,8 @@
 
 use std::io::{self, Cursor, Read, Write};
 
+use crate::exec::platform::is_fd_terminal;
+
 /// I/O context for shell execution.
 ///
 /// Holds references to stdin/stdout/stderr streams. External commands always
@@ -12,12 +14,29 @@ pub struct IoContext<'io> {
     pub stdin: &'io mut dyn Read,
     pub stdout: &'io mut dyn Write,
     pub stderr: &'io mut dyn Write,
+    /// True when the parent's stdout is a TTY. External commands will get a
+    /// PTY slave on fd 1 so `isatty(1)` returns true in the child.
+    pub tty_stdout: bool,
+    /// True when the parent's stderr is a TTY (same idea for fd 2).
+    pub tty_stderr: bool,
 }
 
 impl<'io> IoContext<'io> {
     /// Create an I/O context from arbitrary Read/Write implementations.
-    pub fn new(stdin: &'io mut dyn Read, stdout: &'io mut dyn Write, stderr: &'io mut dyn Write) -> Self {
-        IoContext { stdin, stdout, stderr }
+    pub fn new(
+        stdin: &'io mut dyn Read,
+        stdout: &'io mut dyn Write,
+        stderr: &'io mut dyn Write,
+        tty_stdout: bool,
+        tty_stderr: bool,
+    ) -> Self {
+        IoContext {
+            stdin,
+            stdout,
+            stderr,
+            tty_stdout,
+            tty_stderr,
+        }
     }
 }
 
@@ -39,11 +58,16 @@ impl ProcessIo {
     }
 
     /// Borrow the process streams as an `IoContext` for executor use.
+    ///
+    /// Sets `tty_stdout`/`tty_stderr` based on whether the real process
+    /// stdout/stderr are connected to a terminal.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
             stdout: &mut self.stdout,
             stderr: &mut self.stderr,
+            tty_stdout: is_fd_terminal(1),
+            tty_stderr: is_fd_terminal(2),
         }
     }
 }
@@ -87,11 +111,15 @@ impl CapturedIo {
     }
 
     /// Borrow the capture buffers as an `IoContext` for executor use.
+    ///
+    /// TTY flags are always false — test buffers are not terminals.
     pub fn context(&mut self) -> IoContext<'_> {
         IoContext {
             stdin: &mut self.stdin,
             stdout: &mut self.stdout,
             stderr: &mut self.stderr,
+            tty_stdout: false,
+            tty_stderr: false,
         }
     }
 

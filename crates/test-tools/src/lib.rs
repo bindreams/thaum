@@ -100,6 +100,7 @@ pub fn test_tools() -> Result<TestTools, String> {
         ("env", "test-env"),
         ("pwd", "test-pwd"),
         ("touch", "test-touch"),
+        ("argv", "test-argv"),
     ];
 
     for &(name, bin_name) in tools {

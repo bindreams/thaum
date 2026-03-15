@@ -8,32 +8,32 @@ use crate::*;
 
 #[skuld::test]
 fn external_echo_captured(#[fixture(test_tools)] tools: &Path) {
-    let (out, _err, status) = exec_with_tools("echo hello", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "hello\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("echo hello", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "hello\n");
 }
 
 #[skuld::test]
 fn external_echo_with_args(#[fixture(test_tools)] tools: &Path) {
-    let (out, _, status) = exec_with_tools("echo a b c", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "a b c\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("echo a b c", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "a b c\n");
 }
 
 #[skuld::test]
 fn external_stderr_captured(#[fixture(test_tools)] tools: &Path) {
-    let (out, err, status) = exec_with_tools("sh -c 'echo err >&2'", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "");
-    assert_eq!(err, "err\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("sh -c 'echo err >&2'", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "");
+    assert_eq!(r.stderr(), "err\n");
 }
 
 #[skuld::test]
 fn external_both_streams_captured(#[fixture(test_tools)] tools: &Path) {
-    let (out, err, status) = exec_with_tools("sh -c 'echo out; echo err >&2'", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "out\n");
-    assert_eq!(err, "err\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("sh -c 'echo out; echo err >&2'", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "out\n");
+    assert_eq!(r.stderr(), "err\n");
 }
 
 #[skuld::test]
@@ -42,8 +42,10 @@ fn external_large_stderr_no_deadlock(#[fixture(test_tools)] tools: &Path) {
     // The pipe buffer is typically 64KB on Linux; if reads are sequential, this deadlocks.
     let script =
         "sh -c 'i=0; while [ $i -lt 2000 ]; do echo stdout_line_$i; echo stderr_line_$i >&2; i=$((i+1)); done'";
-    let (out, err, status) = exec_with_tools(script, tools);
-    assert_eq!(status, 0);
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!(script, env = &[("PATH", &*tools_dir)]);
+    let out = r.stdout();
+    let err = r.stderr();
     // Verify we got output on both streams (exact count depends on buffering).
     assert!(
         out.lines().count() >= 1000,
@@ -59,16 +61,19 @@ fn external_large_stderr_no_deadlock(#[fixture(test_tools)] tools: &Path) {
 
 #[skuld::test]
 fn external_exit_status(#[fixture(test_tools)] tools: &Path) {
-    let (_, _, status) = exec_with_tools("true", tools);
-    assert_eq!(status, 0);
-    let (_, _, status) = exec_with_tools("false", tools);
-    assert_eq!(status, 1);
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("true", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.status(), 0);
+    let r = exec!("false", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.status(), 1);
 }
 
 #[skuld::test]
 fn external_not_found(#[fixture(test_tools)] tools: &Path) {
-    let (_, err, status) = exec_with_tools("nonexistent_command_xyz_123", tools);
-    assert_eq!(status, 127);
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("nonexistent_command_xyz_123", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.status(), 127);
+    let err = r.stderr();
     assert!(
         err.contains("command not found"),
         "stderr should mention 'command not found', got: {err}"
@@ -80,9 +85,9 @@ fn external_with_redirect_bypasses_pipe(#[fixture(test_tools)] tools: &Path, #[f
     let file = dir.join("stdout.txt");
     let f = file.to_string_lossy().replace('\\', "/");
     let script = format!("echo hello > {f}");
-    let (out, _, status) = exec_with_tools(&script, tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "", "stdout should be empty when redirected to file");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!(&*script, env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "", "stdout should be empty when redirected to file");
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
@@ -90,17 +95,18 @@ fn external_with_redirect_bypasses_pipe(#[fixture(test_tools)] tools: &Path, #[f
 
 #[skuld::test]
 fn external_cat_in_pipeline(#[fixture(test_tools)] tools: &Path) {
-    let (out, _, status) = exec_with_tools("echo hello | cat", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "hello\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("echo hello | cat", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "hello\n");
 }
 
 /// Pipeline with a nonexistent command should report exit code 127 and print an error.
 #[skuld::test]
 fn pipeline_command_not_found_status(#[fixture(test_tools)] tools: &Path) {
-    let (_, err, status) = exec_with_tools("echo hello | nonexistent_cmd", tools);
-    assert_eq!(status, 127);
-    assert!(err.contains("command not found"));
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("echo hello | nonexistent_cmd", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.status(), 127);
+    assert!(r.stderr().contains("command not found"));
 }
 
 // PATH resolution (genuinely external commands) -----------------------------------------------------------------------
@@ -109,10 +115,10 @@ fn pipeline_command_not_found_status(#[fixture(test_tools)] tools: &Path) {
 /// On Windows, this validates that resolve_command finds `env.exe` via PATH.
 #[skuld::test]
 fn external_env_found_via_path(#[fixture(test_tools)] tools: &Path) {
-    let (out, _, status) = exec_with_tools("env", tools);
-    assert_eq!(status, 0);
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("env", env = &[("PATH", &*tools_dir)]);
     // env prints exported vars; the test executor exports `_`, so at minimum we get `_=env`.
-    assert!(!out.is_empty(), "env should produce output, got empty");
+    assert!(!r.stdout().is_empty(), "env should produce output, got empty");
 }
 
 // Non-capturing I/O (live mode) ---------------------------------------------------------------------------------------
@@ -169,13 +175,14 @@ fn external_capturing_captures_output(#[fixture(test_tools)] tools: &Path) {
 
 #[skuld::test]
 fn sh_dash_c_basic(#[fixture(test_tools)] tools: &Path) {
-    let (out, _, status) = exec_with_tools("sh -c 'echo hello from sh'", tools);
-    assert_eq!(status, 0);
-    assert_eq!(out, "hello from sh\n");
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("sh -c 'echo hello from sh'", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.stdout(), "hello from sh\n");
 }
 
 #[skuld::test]
 fn sh_dash_c_exit_status(#[fixture(test_tools)] tools: &Path) {
-    let (_, _, status) = exec_with_tools("sh -c 'exit 42'", tools);
-    assert_eq!(status, 42);
+    let tools_dir = tools.to_string_lossy();
+    let r = exec!("sh -c 'exit 42'", env = &[("PATH", &*tools_dir)]);
+    assert_eq!(r.status(), 42);
 }

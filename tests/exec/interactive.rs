@@ -8,23 +8,21 @@ use thaum::Dialect;
 
 #[skuld::test]
 fn dollar_dash_includes_i_when_interactive() {
-    let program = thaum::parse("echo $-").unwrap();
-    let mut exec = Executor::new();
-    exec.env_mut().set_interactive(true);
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&program, &mut io.context());
-    let output = io.stdout_string();
-    assert!(output.contains('i'), "expected $- to contain 'i', got: {output:?}");
+    let mut sh = shell!(interactive);
+    let r = sh.exec("echo $-");
+    assert!(
+        r.stdout().contains('i'),
+        "expected $- to contain 'i', got: {:?}",
+        r.stdout()
+    );
+    sh.join();
 }
 
 #[skuld::test]
 fn dollar_dash_excludes_i_when_not_interactive() {
-    let program = thaum::parse("echo $-").unwrap();
-    let mut exec = Executor::new();
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&program, &mut io.context());
-    let output = io.stdout_string();
-    assert!(!output.contains('i'), "expected $- NOT to contain 'i', got: {output:?}");
+    let r = exec!("echo $-");
+    let out = r.stdout();
+    assert!(!out.contains('i'), "expected $- NOT to contain 'i', got: {out:?}");
 }
 
 #[skuld::test]
@@ -39,19 +37,11 @@ fn expand_aliases_on_by_default_when_interactive() {
 
 #[skuld::test]
 fn state_persists_across_lines() {
-    let mut exec = crate::test_executor();
-    exec.env_mut().set_interactive(true);
-    let mut io = CapturedIo::new();
-
-    // Line 1: set a variable
-    let prog1 = thaum::parse("X=hello").unwrap();
-    let _ = exec.execute(&prog1, &mut io.context());
-
-    // Line 2: use the variable
-    let prog2 = thaum::parse("echo $X").unwrap();
-    let _ = exec.execute(&prog2, &mut io.context());
-
-    assert_eq!(io.stdout_string().trim(), "hello");
+    let mut sh = shell!(interactive);
+    sh.exec("X=hello");
+    let r = sh.exec("echo $X");
+    assert_eq!(r.stdout().trim(), "hello");
+    sh.join();
 }
 
 #[skuld::test]
@@ -72,31 +62,22 @@ fn syntax_error_does_not_poison_executor() {
 
 #[skuld::test]
 fn function_defined_in_one_line_callable_in_next() {
-    let mut exec = crate::test_executor();
-    exec.env_mut().set_interactive(true);
-
-    let prog1 = thaum::parse("greet() { echo hi; }").unwrap();
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&prog1, &mut io.context());
-
-    let prog2 = thaum::parse("greet").unwrap();
-    let _ = exec.execute(&prog2, &mut io.context());
-    assert_eq!(io.stdout_string().trim(), "hi");
+    let mut sh = shell!(interactive);
+    sh.exec("greet() { echo hi; }");
+    let r = sh.exec("greet");
+    assert_eq!(r.stdout().trim(), "hi");
+    sh.join();
 }
 
 #[skuld::test]
 fn alias_defined_in_one_line_usable_in_next() {
-    let mut exec = crate::test_bash_executor();
-    exec.env_mut().set_interactive(true);
-
-    let prog1 = thaum::parse_with("alias ll='echo listing'", Dialect::Bash).unwrap();
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&prog1, &mut io.context());
-
-    // Alias expansion requires re-parsing with the alias table
+    let mut sh = shell!(dialect = Dialect::Bash, interactive);
+    sh.exec("alias ll='echo listing'");
+    // Alias expansion requires re-parsing with the alias table.
     // In the real REPL, aliases are snapshot'd before each line parse.
     // For this test we verify the alias was stored.
-    assert!(exec.env().get_alias("ll").is_some());
+    assert!(sh.env().get_alias("ll").is_some());
+    sh.join();
 }
 
 // PS1/PS2 defaults ====================================================================================================
@@ -143,15 +124,13 @@ fn interactive_defaults_ps4() {
 
 #[skuld::test]
 fn prompt_command_sets_variable() {
-    let mut exec = crate::test_bash_executor();
-    exec.env_mut().set_interactive(true);
-    let _ = exec.env_mut().set_var("PROMPT_COMMAND", "MARKER=prompted");
+    let mut sh = shell!(dialect = Dialect::Bash, interactive);
+    let _ = sh.env_mut().set_var("PROMPT_COMMAND", "MARKER=prompted");
 
     // Simulate what the REPL does: parse and execute PROMPT_COMMAND
-    let cmd = exec.env().get_var("PROMPT_COMMAND").unwrap().to_string();
-    let prog = thaum::parse(&cmd).unwrap();
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&prog, &mut io.context());
+    let cmd = sh.env().get_var("PROMPT_COMMAND").unwrap().to_string();
+    sh.exec(&cmd);
 
-    assert_eq!(exec.env().get_var("MARKER").unwrap(), "prompted");
+    assert_eq!(sh.env().get_var("MARKER").unwrap(), "prompted");
+    sh.join();
 }

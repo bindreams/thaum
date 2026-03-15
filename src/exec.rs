@@ -90,6 +90,10 @@ pub struct Executor {
     /// defined on line N, `lineno_base` is set to N-1 so `execute_lines`
     /// produces correct source line numbers (i + 1 + base).
     lineno_base: usize,
+    /// Whether `exec cmd` is allowed to replace the process image. Default
+    /// `true`. Set to `false` in test helpers to prevent a bare `exec` from
+    /// killing the test process.
+    allow_process_replacement: bool,
 }
 
 impl Executor {
@@ -107,6 +111,7 @@ impl Executor {
             lineno_base: 0,
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
+            allow_process_replacement: true,
         }
     }
 
@@ -128,6 +133,7 @@ impl Executor {
             lineno_base: 0,
             errexit_suppressed: false,
             options,
+            allow_process_replacement: true,
         }
     }
 
@@ -142,6 +148,7 @@ impl Executor {
             lineno_base: 0,
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
+            allow_process_replacement: true,
         }
     }
 
@@ -161,12 +168,18 @@ impl Executor {
             lineno_base: 0,
             errexit_suppressed: false,
             options,
+            allow_process_replacement: true,
         }
     }
 
     /// Set the path to the thaum binary for subshell spawning.
     pub fn set_exe_path(&mut self, path: std::path::PathBuf) {
         self.exe_path = Some(path);
+    }
+
+    /// Set whether `exec cmd` is allowed to replace the process image.
+    pub fn set_allow_process_replacement(&mut self, allow: bool) {
+        self.allow_process_replacement = allow;
     }
 
     /// Get a mutable reference to the environment.

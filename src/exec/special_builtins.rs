@@ -177,6 +177,21 @@ impl Executor {
         }
 
         #[cfg(unix)]
+        if !self.allow_process_replacement {
+            // Subprocess fallback: spawn and wait instead of replacing the process.
+            match cmd.spawn() {
+                Ok(mut child) => {
+                    let code = child.wait().map_err(ExecError::Io)?;
+                    return Err(ExecError::ExitRequested(code));
+                }
+                Err(e) => {
+                    let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+                    return Err(ExecError::ExitRequested(127));
+                }
+            }
+        }
+
+        #[cfg(unix)]
         {
             // Replace the process image. Only returns on error.
             let e = cmd.exec_replace();

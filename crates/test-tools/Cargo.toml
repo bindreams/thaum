@@ -45,3 +45,8 @@ test = false
 name = "test-touch"
 path = "src/tools/touch.rs"
 test = false
+
+[[bin]]
+name = "test-argv"
+path = "src/tools/argv.rs"
+test = false

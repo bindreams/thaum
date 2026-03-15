@@ -22,6 +22,9 @@ mod compound;
 pub mod environment;
 /// Execution errors and control-flow signals (`exit`, `break`, `return`).
 pub mod error;
+#[cfg(test)]
+#[path = "exec/error_tests.rs"]
+mod error_tests;
 /// POSIX word expansion: tilde, parameter, quote removal.
 pub mod expand;
 mod external;
@@ -368,7 +371,15 @@ impl Executor {
             io.capturing,
         );
 
-        self.execute_expression_inner(expr, &mut persistent_io)
+        match self.execute_expression_inner(expr, &mut persistent_io) {
+            Ok(s) => Ok(s),
+            Err(e) if e.is_control_flow() => Err(e),
+            Err(e) => {
+                let status = e.exit_status();
+                let _ = writeln!(persistent_io.stderr, "thaum: {e}");
+                Ok(status)
+            }
+        }
     }
 
     fn execute_expression_inner(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {

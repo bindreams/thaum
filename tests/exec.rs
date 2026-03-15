@@ -279,7 +279,7 @@ impl Shell {
         let status = match self.executor.execute(&program, &mut captured.context()) {
             Ok(s) => s,
             Err(ExecError::ExitRequested(code)) => code,
-            Err(e) => panic!("exec failed for {script:?}: {e}"),
+            Err(e) => panic!("unexpected error leaked past executor for {script:?}: {e}"),
         };
         self.last_status = status;
         let stderr = captured.stderr_string();
@@ -402,7 +402,7 @@ fn run_in_process(script: &str, dialect: Dialect, extra_env: &[(&str, &str)]) ->
     let status = match executor.execute(&program, &mut captured.context()) {
         Ok(s) => s,
         Err(ExecError::ExitRequested(code)) => code,
-        Err(e) => panic!("exec failed for {script:?}: {e}"),
+        Err(e) => panic!("unexpected error leaked past executor for {script:?}: {e}"),
     };
     ExecOutput::new(captured.stdout_string(), captured.stderr_string(), status)
 }

@@ -48,3 +48,24 @@ pub enum ExecError {
     #[error("return requested: {0}")]
     ReturnRequested(i32),
 }
+
+impl ExecError {
+    /// Whether this is a control-flow signal that must propagate to its boundary
+    /// (loop for break/continue, function for return, top-level for exit).
+    pub fn is_control_flow(&self) -> bool {
+        matches!(
+            self,
+            Self::ExitRequested(_) | Self::BreakRequested(_) | Self::ContinueRequested(_) | Self::ReturnRequested(_)
+        )
+    }
+
+    /// The exit status a real shell would set for this error.
+    pub fn exit_status(&self) -> i32 {
+        match self {
+            Self::CommandNotFound(_) => 127,
+            Self::Io(e) if e.kind() == io::ErrorKind::PermissionDenied => 126,
+            Self::ExitRequested(code) | Self::ReturnRequested(code) => *code,
+            _ => 1,
+        }
+    }
+}

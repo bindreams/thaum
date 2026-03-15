@@ -24,9 +24,9 @@ fn append_value_semantics() {
 
 // Integer append ======================================================================================================
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn append_integer_add() {
-    let r = exec!("declare -i x=5; x+=3; echo $x");
+    let r = exec!("declare -i x=5; x+=3; echo $x", dialect = Dialect::Bash);
     assert_eq!(r.stdout(), "8\n");
 }
 
@@ -58,9 +58,9 @@ fn append_assoc_element() {
 
 // Builtin integration =================================================================================================
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn declare_append() {
-    let r = exec!("s=abc; declare s+=d; echo $s");
+    let r = exec!("s=abc; declare s+=d; echo $s", dialect = Dialect::Bash);
     assert_eq!(r.stdout(), "abcd\n");
 }
 
@@ -70,8 +70,8 @@ fn export_append() {
     assert_eq!(r.stdout(), "abcd\n");
 }
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn local_append() {
-    let r = exec!("f() { local s=ab; local s+=cd; echo $s; }; f");
+    let r = exec!("f() { local s=ab; local s+=cd; echo $s; }; f", dialect = Dialect::Bash);
     assert_eq!(r.stdout(), "abcd\n");
 }

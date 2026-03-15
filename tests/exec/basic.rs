@@ -5,6 +5,67 @@ use thaum::Dialect;
 
 use crate::*;
 
+// Runtime error handling ==============================================================================================
+
+#[skuld::test]
+fn runtime_error_sets_status_and_continues() {
+    let mut sh = shell!(dialect = Dialect::Bash);
+    sh.exec("readonly X=1");
+    let r = sh.exec("X=2; echo after");
+    assert_eq!(r.status(), 0, "echo after succeeds, so final status is 0");
+    assert_eq!(r.stdout(), "after\n", "execution should continue after runtime error");
+    assert!(
+        r.stderr().contains("readonly variable"),
+        "error should appear on stderr"
+    );
+    let r = sh.join();
+    assert!(
+        r.stderr().contains("readonly variable"),
+        "accumulated stderr should contain error"
+    );
+    r.status(); // acknowledge the final status
+}
+
+#[skuld::test]
+fn readonly_violation_exit_status_1() {
+    let mut sh = shell!(dialect = Dialect::Bash);
+    sh.exec("readonly X=1");
+    let r = sh.exec("X=2");
+    assert_eq!(r.status(), 1, "readonly violation should set $?=1");
+    assert!(r.stderr().contains("readonly variable"), "stderr: {:?}", r.stderr());
+    let r = sh.join();
+    assert_eq!(r.status(), 1);
+    assert!(r.stderr().contains("readonly variable"));
+}
+
+#[skuld::test]
+fn command_not_found_exit_status_127() {
+    let r = exec!("nonexistent_command_xyz_123");
+    assert_eq!(r.status(), 127);
+    assert!(r.stderr().contains("command not found"), "stderr: {:?}", r.stderr());
+}
+
+#[skuld::test]
+fn unbound_variable_exit_status_1() {
+    let r = exec!("set -u; echo $UNBOUND_VAR_XYZ");
+    assert_eq!(r.status(), 1);
+    assert!(r.stderr().contains("unbound variable"), "stderr: {:?}", r.stderr());
+}
+
+#[skuld::test]
+fn division_by_zero_exit_status_1() {
+    let r = exec!("echo $((1/0))", dialect = Dialect::Bash);
+    assert_eq!(r.status(), 1);
+    assert!(r.stderr().contains("division by zero"), "stderr: {:?}", r.stderr());
+}
+
+#[skuld::test]
+fn runtime_error_prints_to_stderr() {
+    let r = exec!("nonexistent_command_xyz_123");
+    assert_eq!(r.status(), 127);
+    assert!(r.stderr().contains("command not found"), "stderr: {:?}", r.stderr());
+}
+
 // Basic command execution ---------------------------------------------------------------------------------------------
 
 #[skuld::test]
@@ -133,10 +194,11 @@ fn if_true_branch() {
     sh.join();
 }
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test(ignore = "bare assignment returns stale $? — if-false else-branch inherits condition status")]
 fn if_false_branch() {
     let mut sh = shell!();
-    sh.exec("if false; then X=yes; else X=no; fi");
+    let r = sh.exec("if false; then X=yes; else X=no; fi");
+    assert_eq!(r.status(), 0, "if-else should return status of else body");
     assert_eq!(sh.env().get_var("X"), Some("no"));
     sh.join();
 }
@@ -245,9 +307,11 @@ fn unset_builtin() {
 
 // External command (basic smoke test) — moved to exec/external.rs -----------------------------------------------------
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn external_command_not_found() {
-    assert_eq!(exec!("nonexistent_command_xyz_123").status(), 127);
+    let r = exec!("nonexistent_command_xyz_123");
+    assert_eq!(r.status(), 127);
+    assert!(r.stderr().contains("command not found"));
 }
 
 // Test builtin --------------------------------------------------------------------------------------------------------
@@ -300,10 +364,14 @@ fn test_builtin_file_operators() {
     assert_eq!(exec!("[ -f / ]").status(), 1); // / is directory, not regular file
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn test_builtin_syntax_error_exit_2() {
-    assert_eq!(exec!("[ '(' foo ]").status(), 2);
-    assert_eq!(exec!("[").status(), 2);
+    let r = exec!("[ '(' foo ]");
+    assert_eq!(r.status(), 2);
+    assert!(!r.stderr().is_empty());
+    let r = exec!("[");
+    assert_eq!(r.status(), 2);
+    assert!(!r.stderr().is_empty());
 }
 
 // Break/continue ------------------------------------------------------------------------------------------------------
@@ -380,14 +448,15 @@ fn command_substitution_in_argument() {
     sh.join();
 }
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn command_substitution_exit_status() {
     // $? should reflect the command substitution's exit status
-    // (though the assignment itself succeeds with status 0)
     let mut sh = shell!();
-    sh.exec("X=$(false)");
+    let r = sh.exec("X=$(false)");
+    assert_eq!(r.status(), 1, "bare assignment should return cmd sub exit status");
     assert_eq!(sh.env().get_var("X"), Some(""));
-    sh.join();
+    let r = sh.join();
+    assert_eq!(r.status(), 1);
 }
 
 #[skuld::test]

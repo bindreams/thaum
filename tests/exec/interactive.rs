@@ -134,3 +134,42 @@ fn prompt_command_sets_variable() {
     assert_eq!(sh.env().get_var("MARKER").unwrap(), "prompted");
     sh.join();
 }
+
+// Runtime errors in interactive mode ==================================================================================
+
+#[skuld::test]
+fn interactive_readonly_sets_status_1() {
+    let mut sh = shell!(interactive, dialect = Dialect::Bash);
+    sh.exec("readonly X=1");
+    let r = sh.exec("X=2");
+    assert_eq!(r.status(), 1, "interactive readonly violation should set $?=1");
+    assert!(r.stderr().contains("readonly variable"));
+    let r = sh.join();
+    assert_eq!(r.status(), 1);
+    r.stderr(); // acknowledge accumulated stderr
+}
+
+#[skuld::test]
+fn interactive_command_not_found_sets_127() {
+    let mut sh = shell!(interactive);
+    let r = sh.exec("nonexistent_xyz_cmd");
+    assert_eq!(r.status(), 127, "interactive command not found should set $?=127");
+    assert!(r.stderr().contains("command not found"));
+    let r = sh.join();
+    assert_eq!(r.status(), 127);
+    r.stderr();
+}
+
+#[skuld::test]
+fn interactive_error_continues_execution() {
+    let mut sh = shell!(interactive, dialect = Dialect::Bash);
+    sh.exec("readonly V=1");
+    let r = sh.exec("V=2");
+    assert_eq!(r.status(), 1);
+    r.stderr();
+    let r = sh.exec("echo still_alive");
+    assert_eq!(r.stdout().trim(), "still_alive");
+    let r = sh.join();
+    r.status();
+    r.stderr();
+}

@@ -431,9 +431,11 @@ fn set_x_off() {
 
 // set -u (nounset) ----------------------------------------------------------------------------------------------------
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn set_u_unset_var() {
-    assert_ne!(exec!("set -u; echo $nonexistent_xyz").status(), 0);
+    let r = exec!("set -u; echo $nonexistent_xyz");
+    assert_ne!(r.status(), 0);
+    assert!(r.stderr().contains("unbound variable"));
 }
 
 #[skuld::test]

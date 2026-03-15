@@ -17,8 +17,6 @@ use thaum::exec::{ExecError, Executor, ProcessIo};
 use thaum::interactive::is_incomplete;
 use thaum::{Dialect, ShellOptions};
 
-use super::error_fmt;
-
 /// Rustyline helper: validates incomplete input and provides file-path completion.
 struct ShellHelper {
     options: ShellOptions,
@@ -136,13 +134,12 @@ pub fn run(dialect: Dialect, login: bool) {
                                 }
                                 process::exit(code);
                             }
-                            Err(ExecError::CommandNotFound(name)) => {
-                                eprintln!("{name}: command not found");
-                                executor.env_mut().set_last_exit_status(127);
-                            }
                             Err(e) => {
-                                error_fmt::print_exec_error(&e);
-                                executor.env_mut().set_last_exit_status(2);
+                                // Runtime errors are handled internally by the executor.
+                                // Only control-flow signals (break/continue/return outside
+                                // their scope) should reach here.
+                                eprintln!("thaum: unexpected: {e}");
+                                executor.env_mut().set_last_exit_status(1);
                             }
                         }
                         command_number += 1;

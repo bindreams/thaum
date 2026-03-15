@@ -219,9 +219,11 @@ fn declare_assoc_array_inline() {
     assert_eq!(r.stdout(), "1 2\n");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn declare_readonly() {
-    assert_ne!(exec!("declare -r x=42; x=99", dialect = Dialect::Bash).status(), 0);
+    let r = exec!("declare -r x=42; x=99", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0);
+    assert!(r.stderr().contains("readonly variable"));
 }
 
 #[skuld::test]

@@ -469,13 +469,9 @@ fn exec_script(
     match executor.execute(&program, &mut process_io.context()) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
-        Err(ExecError::CommandNotFound(name)) => {
-            eprintln!("{name}: command not found");
-            process::exit(127);
-        }
         Err(e) => {
-            error_fmt::print_exec_error(&e);
-            process::exit(2);
+            eprintln!("thaum: unexpected: {e}");
+            process::exit(1);
         }
     }
 }
@@ -523,13 +519,9 @@ fn do_exec_ast(cli: &CliArgs) {
     match executor.execute_lines(&payload.body, &mut process_io.context()) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
-        Err(ExecError::CommandNotFound(name)) => {
-            eprintln!("{name}: command not found");
-            process::exit(127);
-        }
         Err(e) => {
-            error_fmt::print_exec_error(&e);
-            process::exit(2);
+            eprintln!("thaum: unexpected: {e}");
+            process::exit(1);
         }
     }
 }

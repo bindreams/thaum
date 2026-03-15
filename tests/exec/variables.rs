@@ -29,11 +29,12 @@ fn dollar_dash_reflects_nounset() {
     assert!(r.stdout().trim().contains('u'), "$- should contain 'u' after set -u");
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn dollar_dash_reflects_xtrace() {
     // xtrace output goes to stderr, not stdout; just check the flag is present
     let r = exec!("set -x; echo $-");
     assert!(r.stdout().trim().contains('x'), "$- should contain 'x' after set -x");
+    assert!(!r.stderr().is_empty(), "xtrace should produce stderr output");
 }
 
 #[skuld::test]
@@ -264,23 +265,18 @@ fn ppid_is_set() {
     assert!(val > 0, "PPID should be positive");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn ppid_is_readonly() {
-    // PPID should reject assignment.
-    assert_ne!(
-        exec!("PPID=42 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "PPID assignment should fail"
-    );
+    let r = exec!("PPID=42", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "PPID assignment should fail");
+    assert!(!r.stderr().is_empty());
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn ppid_cannot_be_unset() {
-    assert_ne!(
-        exec!("unset PPID 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "unset PPID should fail"
-    );
+    let r = exec!("unset PPID", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "unset PPID should fail");
+    assert!(!r.stderr().is_empty());
 }
 
 // getopts =============================================================================================================
@@ -435,13 +431,11 @@ fn bash_versinfo_is_array() {
     assert!(major >= 1, "major version should be >= 1");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn bash_versinfo_is_readonly() {
-    assert_ne!(
-        exec!("BASH_VERSINFO=(1 2 3) 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "BASH_VERSINFO should be readonly"
-    );
+    let r = exec!("BASH_VERSINFO=(1 2 3)", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "BASH_VERSINFO should be readonly");
+    assert!(!r.stderr().is_empty());
 }
 
 #[skuld::test]
@@ -452,13 +446,11 @@ fn uid_is_set() {
     assert!(val <= 65534, "UID out of range: {val}");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn uid_is_readonly() {
-    assert_ne!(
-        exec!("UID=42 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "UID should be readonly"
-    );
+    let r = exec!("UID=42", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "UID should be readonly");
+    assert!(!r.stderr().is_empty());
 }
 
 #[skuld::test]
@@ -468,13 +460,11 @@ fn euid_is_set() {
     assert!(val <= 65534, "EUID out of range: {val}");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn euid_is_readonly() {
-    assert_ne!(
-        exec!("EUID=42 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "EUID should be readonly"
-    );
+    let r = exec!("EUID=42", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "EUID should be readonly");
+    assert!(!r.stderr().is_empty());
 }
 
 #[skuld::test]
@@ -569,22 +559,18 @@ fn shellopts_contains_errexit_after_set_e() {
     assert!(r.stdout().contains("errexit"), "SHELLOPTS should contain 'errexit'");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn shellopts_is_readonly() {
-    assert_ne!(
-        exec!("SHELLOPTS=x 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "SHELLOPTS should be readonly"
-    );
+    let r = exec!("SHELLOPTS=x", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "SHELLOPTS should be readonly");
+    assert!(!r.stderr().is_empty());
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn shellopts_cannot_be_unset() {
-    assert_ne!(
-        exec!("unset SHELLOPTS 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "unset SHELLOPTS should fail"
-    );
+    let r = exec!("unset SHELLOPTS", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "unset SHELLOPTS should fail");
+    assert!(!r.stderr().is_empty());
 }
 
 // BASHOPTS ============================================================================================================
@@ -597,22 +583,18 @@ fn bashopts_is_set() {
     let _ = r.stdout().trim();
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn bashopts_is_readonly() {
-    assert_ne!(
-        exec!("BASHOPTS=x 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "BASHOPTS should be readonly"
-    );
+    let r = exec!("BASHOPTS=x", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "BASHOPTS should be readonly");
+    assert!(!r.stderr().is_empty());
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn bashopts_cannot_be_unset() {
-    assert_ne!(
-        exec!("unset BASHOPTS 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "unset BASHOPTS should fail"
-    );
+    let r = exec!("unset BASHOPTS", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "unset BASHOPTS should fail");
+    assert!(!r.stderr().is_empty());
 }
 
 // FUNCNAME ============================================================================================================
@@ -648,24 +630,20 @@ fn funcname_empty_outside_function() {
 
 // BASH_SOURCE =========================================================================================================
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn bash_source_cannot_be_unset() {
-    assert_ne!(
-        exec!("unset BASH_SOURCE 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "unset BASH_SOURCE should fail"
-    );
+    let r = exec!("unset BASH_SOURCE", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "unset BASH_SOURCE should fail");
+    assert!(!r.stderr().is_empty());
 }
 
 // BASH_LINENO =========================================================================================================
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn bash_lineno_cannot_be_unset() {
-    assert_ne!(
-        exec!("unset BASH_LINENO 2>/dev/null", dialect = Dialect::Bash).status(),
-        0,
-        "unset BASH_LINENO should fail"
-    );
+    let r = exec!("unset BASH_LINENO", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0, "unset BASH_LINENO should fail");
+    assert!(!r.stderr().is_empty());
 }
 
 #[skuld::test]
@@ -817,7 +795,7 @@ fn popd_empty_stack_fails() {
     );
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn pushd_no_args_swaps_top_two() {
     let real_tmp = std::fs::canonicalize("/tmp").unwrap().to_string_lossy().to_string();
     let r = exec!(
@@ -825,6 +803,7 @@ fn pushd_no_args_swaps_top_two() {
         dialect = Dialect::Bash
     );
     assert_eq!(r.stdout().trim(), real_tmp, "pushd with no args should swap top two");
+    r.stderr(); // acknowledge pushd output on stderr
 }
 
 #[skuld::test]

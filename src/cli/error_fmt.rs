@@ -1,7 +1,6 @@
 //! Human-readable error formatting with source context and caret highlighting.
 
 use colored::Colorize;
-use thaum::exec::ExecError;
 
 use thaum::format::SourceMapper;
 
@@ -74,8 +73,4 @@ pub(super) fn print_error(error: &thaum::ParseError, source: &str, filename: &st
             eprintln!("{} | {}{}", " ".repeat(gutter_width), padding, carets);
         }
     }
-}
-
-pub(super) fn print_exec_error(error: &ExecError) {
-    print_error_header(&error.to_string());
 }

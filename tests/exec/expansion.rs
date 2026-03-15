@@ -1,6 +1,5 @@
 use std::path::Path;
 
-use thaum::exec::ExecError;
 use thaum::Dialect;
 
 use crate::*;
@@ -42,11 +41,9 @@ fn arith_expansion_with_assignment_side_effect() {
 
 #[skuld::test]
 fn arith_expansion_division_by_zero() {
-    let program = thaum::parse("X=$((1/0))").unwrap();
-    let mut executor = thaum::exec::Executor::new();
-    let mut captured = thaum::exec::CapturedIo::new();
-    let err = executor.execute(&program, &mut captured.context()).unwrap_err();
-    assert!(matches!(err, ExecError::DivisionByZero));
+    let r = exec!("X=$((1/0))");
+    assert_eq!(r.status(), 1, "division by zero should set $?=1");
+    assert!(r.stderr().contains("division by zero"), "stderr: {:?}", r.stderr());
 }
 
 #[skuld::test]
@@ -161,28 +158,38 @@ fn readonly_set_and_read() {
     assert_eq!(r.stdout(), "42\n");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn readonly_prevents_assignment() {
-    assert_ne!(exec!("readonly X=42; X=99").status(), 0);
+    let r = exec!("readonly X=42; X=99");
+    assert_ne!(r.status(), 0);
+    assert!(r.stderr().contains("readonly variable"));
 }
 
 // local builtin -------------------------------------------------------------------------------------------------------
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn local_scopes_variable_in_function() {
-    let r = exec!("f() { local X=inner; echo $X; }; X=outer; f; echo $X");
+    let r = exec!(
+        "f() { local X=inner; echo $X; }; X=outer; f; echo $X",
+        dialect = Dialect::Bash
+    );
     assert_eq!(r.stdout(), "inner\nouter\n");
 }
 
-#[skuld::test(ignore = "old test_executor used Bash mode; needs dialect fix or ExecError refactor")]
+#[skuld::test]
 fn local_unset_var_removed_on_exit() {
-    let r = exec!("f() { local Y=temp; echo $Y; }; f; echo \"${Y:-gone}\"");
+    let r = exec!(
+        "f() { local Y=temp; echo $Y; }; f; echo \"${Y:-gone}\"",
+        dialect = Dialect::Bash
+    );
     assert_eq!(r.stdout(), "temp\ngone\n");
 }
 
-#[skuld::test(ignore = "ExecError propagates instead of setting $? — needs executor refactor")]
+#[skuld::test]
 fn local_outside_function_fails() {
-    assert_ne!(exec!("local X=1").status(), 0);
+    let r = exec!("local X=1", dialect = Dialect::Bash);
+    assert_ne!(r.status(), 0);
+    assert!(!r.stderr().is_empty());
 }
 
 // eval builtin --------------------------------------------------------------------------------------------------------
@@ -285,20 +292,24 @@ fn exec_command(#[fixture(test_tools)] tools: &Path) {
     assert_eq!(r.stdout(), "hello\n");
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn exec_not_found() {
     // exec with nonexistent command -- the subshell exits 127.
     let r = exec!("(exec /nonexistent/command/xyz 2>/dev/null); echo $?");
     assert!(r.stdout().trim() != "0");
+    r.stderr(); // subshell error may propagate
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test]
 fn exec_rejects_unknown_flags() {
     // Bash: `exec -z` → "exec: -z: invalid option", exit 2.
     let r = exec!("(exec -z 2>/dev/null); echo $?");
     assert_eq!(r.stdout().trim(), "2", "exec with unknown flag should exit 2");
+    r.stderr();
     // Also verify that unknown flag is rejected even with a command following.
-    assert_eq!(exec!("(exec -z true 2>/dev/null)").status(), 2);
+    let r = exec!("(exec -z true 2>/dev/null)");
+    assert_eq!(r.status(), 2);
+    r.stderr();
 }
 
 // exec redirect-only mode ---------------------------------------------------------------------------------------------
@@ -399,7 +410,7 @@ fn exec_fd3_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path) {
     assert_eq!(std::fs::read_to_string(&file).unwrap(), "hello\n");
 }
 
-#[skuld::test(ignore = "unchecked stderr from expected errors — needs stderr assertions")]
+#[skuld::test(ignore = "subshell crashes on Windows when writing to closed FD")]
 fn exec_closed_fd_not_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path) {
     // After exec 3>&-, a subsequent subshell must NOT see FD 3.
     // This validates that fd_table is explicitly constructed per-spawn

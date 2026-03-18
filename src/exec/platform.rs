@@ -189,6 +189,34 @@ pub fn is_fd_terminal(fd: i32) -> bool {
     }
 }
 
+/// Check whether a `File` handle refers to a terminal.
+///
+/// On Unix, extracts the raw fd via `AsRawFd` and calls `isatty()`.
+/// On Windows, extracts the raw handle via `AsRawHandle` and checks
+/// with `GetConsoleMode` + MSYS/Cygwin PTY heuristics (via `IsTerminal`).
+pub fn is_file_terminal(file: &std::fs::File) -> bool {
+    #[cfg(unix)]
+    {
+        use std::os::fd::AsRawFd;
+        nix::unistd::isatty(file.as_raw_fd()).unwrap_or(false)
+    }
+    #[cfg(windows)]
+    {
+        use std::io::IsTerminal;
+        use std::os::windows::io::AsRawHandle;
+        use std::os::windows::io::BorrowedHandle;
+
+        let handle = file.as_raw_handle();
+        // SAFETY: the File is alive so the handle is valid for the duration of this call.
+        unsafe { BorrowedHandle::borrow_raw(handle) }.is_terminal()
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = file;
+        false
+    }
+}
+
 /// Get the parent process ID on Windows via the toolhelp snapshot API.
 #[cfg(windows)]
 pub fn get_parent_pid() -> Option<u32> {

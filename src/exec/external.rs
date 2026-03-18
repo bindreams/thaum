@@ -1,10 +1,15 @@
 //! External (non-builtin) command execution via fork/exec. Sets up redirections,
 //! exported environment variables, and extra FD mappings before spawning.
 //!
-//! Stdout and stderr are always piped and relayed through `IoContext`, so the
-//! caller controls where output goes (real process handles in production,
-//! in-memory buffers in tests). When the parent stream is a terminal, a PTY
-//! is used instead of a plain pipe so that `isatty()` returns true in the child.
+//! For unredirected stdout/stderr, the spawning strategy depends on the IoContext
+//! and `Executor::terminal_inherit`:
+//! - `terminal_inherit` + tty fd: the child inherits the parent's terminal directly
+//!   (no interposing pipe or PTY), so interactive programs work correctly.
+//! - tty fd without `terminal_inherit`: a PTY is used so `isatty()` returns true
+//!   in the child while output is still captured and relayed through IoContext.
+//! - non-tty fd: a plain pipe is used; output is relayed through IoContext.
+
+use std::io::Write;
 
 use crate::exec::child_io;
 use crate::exec::command_ex::{CommandEx, Fd};
@@ -18,7 +23,7 @@ impl Executor {
     ///
     /// Redirections are pre-resolved in `active`. Stdout and stderr are piped
     /// when not explicitly redirected, and the captured output is relayed
-    /// through `io` so that `CapturedIo` (tests) and `ProcessIo` (live) both
+    /// through `io` so that `CapturedIo` (tests) and `IoContext::from_process()` (live) both
     /// receive the child's output.
     pub(super) fn execute_external(
         &mut self,
@@ -26,7 +31,7 @@ impl Executor {
         args: &[String],
         assignments: &[crate::ast::Assignment],
         active: &mut ActiveRedirects,
-        io: &mut IoContext<'_>,
+        io: &mut IoContext,
     ) -> Result<i32, ExecError> {
         let mut argv: Vec<std::ffi::OsString> = Vec::with_capacity(1 + args.len());
         argv.push(name.into());
@@ -48,11 +53,13 @@ impl Executor {
         }
         child_cmd.env = env;
 
-        // Persistent fd_table first (includes FDs 0-2 from `exec` redirects).
-        for (&fd, file) in &self.fd_table {
-            child_cmd
-                .fds
-                .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        // IoContext FDs (3+) — includes persistent fds from `exec` redirects.
+        for (&fd, file) in io.fds() {
+            if fd >= 3 {
+                child_cmd
+                    .fds
+                    .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+            }
         }
 
         // Per-command redirects override persistent ones: FDs 0-2 from
@@ -78,18 +85,21 @@ impl Executor {
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
         }
 
-        // Pipe stdout/stderr through IoContext so the caller controls where
-        // output goes. Use a PTY when the parent stream is a terminal so the
-        // child sees isatty() == true. `entry().or_insert` respects explicit
-        // redirects above.
-        child_cmd
-            .fds
-            .entry(1)
-            .or_insert(if io.tty_stdout { Fd::Pty } else { Fd::Pipe });
-        child_cmd
-            .fds
-            .entry(2)
-            .or_insert(if io.tty_stderr { Fd::Pty } else { Fd::Pipe });
+        // Set up stdout/stderr for the child. For unredirected fds:
+        // - terminal_inherit + tty: skip insertion → child inherits parent's
+        //   terminal directly (avoids ConPTY stdin freeze for interactive cmds).
+        // - no terminal_inherit + tty: use Fd::Pty so child sees isatty()==true.
+        // - no tty: use Fd::Pipe for capture.
+        // `entry().or_insert` respects explicit redirects above.
+        for &fd in &[1, 2] {
+            if let std::collections::hash_map::Entry::Vacant(e) = child_cmd.fds.entry(fd) {
+                if self.terminal_inherit && io.is_tty(fd) {
+                    // Child inherits parent's terminal fd directly.
+                } else {
+                    e.insert(if io.is_tty(fd) { Fd::Pty } else { Fd::Pipe });
+                }
+            }
+        }
 
         match child_cmd.spawn() {
             Ok(mut child) => {
@@ -97,11 +107,15 @@ impl Executor {
                 Ok(status)
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                let _ = writeln!(io.stderr, "{name}: command not found");
+                if let Some(stderr) = io.fd_mut(2) {
+                    let _ = writeln!(stderr, "{name}: command not found");
+                }
                 Ok(127)
             }
             Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                let _ = writeln!(io.stderr, "{name}: permission denied");
+                if let Some(stderr) = io.fd_mut(2) {
+                    let _ = writeln!(stderr, "{name}: permission denied");
+                }
                 Ok(126)
             }
             Err(e) => Err(ExecError::Io(e)),

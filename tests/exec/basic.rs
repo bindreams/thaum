@@ -471,10 +471,11 @@ fn consecutive_reads_from_stdin() {
     // Regression: BufReader over-read consumed both lines on the first call.
     let program = thaum::parse("read A; read B; echo $A $B").unwrap();
     let mut executor = test_executor();
-    let mut captured = CapturedIo::with_stdin(b"first\nsecond\n");
-    let status = executor.execute(&program, &mut captured.context()).unwrap();
+    let (mut io, capture) = CapturedIo::with_stdin(b"first\nsecond\n");
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    assert_eq!(captured.stdout_string(), "first second\n");
+    let output = capture.finish(io);
+    assert_eq!(output.stdout_string(), "first second\n");
 }
 
 #[skuld::test]
@@ -607,8 +608,8 @@ fn posix_rejects_declare() {
     let mut exec = thaum::exec::Executor::with_options(options);
     exec.set_exe_path(thaum_exe());
     let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
-    let mut io = CapturedIo::new();
-    let result = exec.execute(&prog, &mut io.context());
+    let (mut io, _capture) = CapturedIo::new();
+    let result = exec.execute(&prog, &mut io);
     // declare should fail (command not found) in POSIX mode
     match result {
         Ok(status) => assert_ne!(status, 0),
@@ -624,8 +625,8 @@ fn posix_rejects_shopt() {
     let mut exec = thaum::exec::Executor::with_options(options);
     exec.set_exe_path(thaum_exe());
     let _ = exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
-    let mut io = CapturedIo::new();
-    let result = exec.execute(&prog, &mut io.context());
+    let (mut io, _capture) = CapturedIo::new();
+    let result = exec.execute(&prog, &mut io);
     match result {
         Ok(status) => assert_ne!(status, 0),
         Err(thaum::exec::ExecError::CommandNotFound(_)) => {}
@@ -648,4 +649,39 @@ fn posix_allows_test_builtin() {
 fn bash_allows_declare() {
     let r = exec!("declare x=hello; echo $x", dialect = Dialect::Bash);
     assert_eq!(r.stdout(), "hello\n");
+}
+
+// Closed fd safety ====================================================================================================
+
+#[skuld::test]
+fn builtin_with_closed_stdin_does_not_panic() {
+    let r = exec!("echo hello 0<&-");
+    assert_eq!(r.stdout(), "hello\n");
+}
+
+#[skuld::test]
+fn builtin_pipeline_with_closed_stdin_does_not_panic() {
+    let r = exec!("true 0<&- | echo ok");
+    assert_eq!(r.stdout(), "ok\n");
+}
+
+#[skuld::test]
+fn close_stdout_does_not_crash() {
+    // `1>&-` closes stdout; echo should silently drop output.
+    let r = exec!("echo hello 1>&-");
+    assert_eq!(r.stdout(), "");
+}
+
+#[skuld::test]
+fn close_stdin_read_returns_eof() {
+    // read from /dev/null returns EOF immediately → nonzero exit.
+    let r = exec!("read X 0<&-; echo $?");
+    assert_eq!(r.stdout(), "1\n");
+}
+
+#[skuld::test]
+fn exec_close_stdout_persistent() {
+    // exec redirect-only mode: close stdout persistently, echo still runs.
+    let r = exec!("exec 1>&-; echo hello");
+    assert_eq!(r.stdout(), "");
 }

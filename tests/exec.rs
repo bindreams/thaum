@@ -275,16 +275,17 @@ impl Shell {
         let program =
             thaum::parse_with(script, self.dialect).unwrap_or_else(|e| panic!("parse failed for {script:?}: {e}"));
 
-        let mut captured = CapturedIo::new();
-        let status = match self.executor.execute(&program, &mut captured.context()) {
+        let (mut io, capture) = CapturedIo::new();
+        let status = match self.executor.execute(&program, &mut io) {
             Ok(s) => s,
             Err(ExecError::ExitRequested(code)) => code,
             Err(e) => panic!("unexpected error leaked past executor for {script:?}: {e}"),
         };
         self.last_status = status;
-        let stderr = captured.stderr_string();
+        let output = capture.finish(io);
+        let stderr = output.stderr_string();
         self.accumulated_stderr.push_str(&stderr);
-        ExecOutput::new(captured.stdout_string(), stderr, status)
+        ExecOutput::new(output.stdout_string(), stderr, status)
     }
 
     /// Write data to a file descriptor's buffer (stdin = 0).
@@ -398,13 +399,14 @@ fn run_in_process(script: &str, dialect: Dialect, extra_env: &[(&str, &str)]) ->
     executor.set_exe_path(thaum_exe());
     executor.set_allow_process_replacement(false);
 
-    let mut captured = CapturedIo::new();
-    let status = match executor.execute(&program, &mut captured.context()) {
+    let (mut io, capture) = CapturedIo::new();
+    let status = match executor.execute(&program, &mut io) {
         Ok(s) => s,
         Err(ExecError::ExitRequested(code)) => code,
         Err(e) => panic!("unexpected error leaked past executor for {script:?}: {e}"),
     };
-    ExecOutput::new(captured.stdout_string(), captured.stderr_string(), status)
+    let output = capture.finish(io);
+    ExecOutput::new(output.stdout_string(), output.stderr_string(), status)
 }
 
 fn run_subprocess(script: &str, dialect: Dialect, extra_env: &[(&str, &str)]) -> ExecOutput {

@@ -205,16 +205,17 @@ fn run_exec_native(spec: &ShYaml, input: &str, dialect: thaum::Dialect) -> Resul
         .env_mut()
         .set_var("PATH", &std::env::var("PATH").unwrap_or_default());
 
-    let mut io = CapturedIo::new();
-    let exit_code = match exec.execute(&program, &mut io.context()) {
+    let (mut io, capture) = CapturedIo::new();
+    let exit_code = match exec.execute(&program, &mut io) {
         Ok(status) => status,
         Err(ExecError::ExitRequested(code)) => code,
         Err(_) => 127,
     };
+    let captured_output = capture.finish(io);
 
     let result = common::docker::ExecResult {
-        stdout: io.stdout_string(),
-        stderr: io.stderr_string(),
+        stdout: captured_output.stdout_string(),
+        stderr: captured_output.stderr_string(),
         exit_code,
     };
 
@@ -373,11 +374,12 @@ fn run_test(spec: &ShYaml) -> Result<(), Failed> {
             let posix_options = thaum::Dialect::Posix.options();
             let mut posix_exec = thaum::exec::Executor::with_options(posix_options);
             let _ = posix_exec.env_mut().set_var("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
-            let mut posix_io = thaum::exec::CapturedIo::new();
-            let posix_result = posix_exec.execute(&posix_program, &mut posix_io.context());
+            let (mut posix_io, posix_capture) = thaum::exec::CapturedIo::new();
+            let posix_result = posix_exec.execute(&posix_program, &mut posix_io);
+            let posix_output = posix_capture.finish(posix_io);
             if let Ok(status) = posix_result {
                 let stdout_matches = match &spec.stdout {
-                    Some(matcher) => matcher.check(&posix_io.stdout_string(), "stdout").is_ok(),
+                    Some(matcher) => matcher.check(&posix_output.stdout_string(), "stdout").is_ok(),
                     None => true,
                 };
                 let status_matches = match spec.status {

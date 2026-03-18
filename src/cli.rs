@@ -13,7 +13,7 @@ use std::{fs, process};
 use clap::Parser;
 use thaum::format::{SourceMapper, YamlWriter};
 
-use thaum::exec::{ExecError, Executor, ProcessIo};
+use thaum::exec::{ExecError, Executor, IoContext};
 
 // Clap argument definitions ===========================================================================================
 
@@ -465,8 +465,8 @@ fn exec_script(
     executor.env_mut().set_program_name(filename.to_string());
     executor.env_mut().set_positional_params(script_args.to_vec());
 
-    let mut process_io = ProcessIo::new();
-    match executor.execute(&program, &mut process_io.context()) {
+    let mut io = IoContext::from_process();
+    match executor.execute(&program, &mut io) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(e) => {
@@ -508,15 +508,16 @@ fn do_exec_ast(cli: &CliArgs) {
     let env = Environment::from_serialized(payload.env);
     let mut executor = Executor::with_env_and_options(env, payload.options);
 
-    // Reconstruct fd_table from FDs inherited via CommandEx (posix_spawn).
+    let mut io = IoContext::from_process();
+
+    // Reconstruct inherited FDs from CommandEx (posix_spawn).
     for fd in payload.inherited_fds {
-        if let Some(file) = thaum::exec::redirect::dup_process_fd(fd) {
-            executor.fd_table_mut().insert(fd, file);
+        if let Some(file) = thaum::exec::buffered_file::dup_process_fd(fd) {
+            io.set_fd(fd, file);
         }
     }
 
-    let mut process_io = ProcessIo::new();
-    match executor.execute_lines(&payload.body, &mut process_io.context()) {
+    match executor.execute_lines(&payload.body, &mut io) {
         Ok(status) => process::exit(status),
         Err(ExecError::ExitRequested(code)) => process::exit(code),
         Err(e) => {

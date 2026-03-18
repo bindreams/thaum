@@ -15,7 +15,7 @@ use crate::exec::Executor;
 ///
 /// The `_io` parameter is currently unused but reserved for future use
 /// (e.g., command substitution inside test expressions that needs IO).
-pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, _io: &mut IoContext<'_>) -> Result<bool, ExecError> {
+pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, _io: &mut IoContext) -> Result<bool, ExecError> {
     match expr {
         BashTestExpr::And { left, right } => {
             if !evaluate(left, executor, _io)? {

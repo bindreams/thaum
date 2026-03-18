@@ -34,11 +34,7 @@ fn collect_pipeline_stages<'a>(expr: &'a Expression, stages: &mut Vec<&'a Expres
 /// Execute a pipeline of commands connected by pipes.
 ///
 /// Returns the exit status of the last command in the pipeline.
-pub fn execute_pipeline(
-    executor: &mut Executor,
-    stages: &[&Expression],
-    io: &mut IoContext<'_>,
-) -> Result<i32, ExecError> {
+pub fn execute_pipeline(executor: &mut Executor, stages: &[&Expression], io: &mut IoContext) -> Result<i32, ExecError> {
     debug_assert!(!stages.is_empty());
 
     if stages.len() == 1 {
@@ -86,7 +82,7 @@ fn spawn_pipeline_stage(
     expr: &Expression,
     stdin: Option<std::fs::File>,
     pipe_stdout: bool,
-    io: &mut IoContext<'_>,
+    io: &mut IoContext,
 ) -> Result<Option<ChildEx>, ExecError> {
     match expr {
         Expression::Command(cmd) => {
@@ -112,14 +108,25 @@ fn spawn_pipeline_stage(
                 let mut stdout_buf: Vec<u8> = Vec::new();
                 let mut stderr_buf: Vec<u8> = Vec::new();
 
-                let _status = crate::exec::builtins::run_builtin(
-                    cmd_name,
-                    cmd_args,
-                    executor.env_mut(),
-                    io.stdin,
-                    &mut stdout_buf,
-                    &mut stderr_buf,
-                );
+                let _status = if let Some(stdin) = io.fd_mut(0) {
+                    crate::exec::builtins::run_builtin(
+                        cmd_name,
+                        cmd_args,
+                        executor.env_mut(),
+                        stdin,
+                        &mut stdout_buf,
+                        &mut stderr_buf,
+                    )
+                } else {
+                    crate::exec::builtins::run_builtin(
+                        cmd_name,
+                        cmd_args,
+                        executor.env_mut(),
+                        &mut std::io::empty(),
+                        &mut stdout_buf,
+                        &mut stderr_buf,
+                    )
+                };
 
                 if pipe_stdout && !stdout_buf.is_empty() {
                     let (read_end, write_end) = os_pipe()?;
@@ -134,10 +141,14 @@ fn spawn_pipeline_stage(
                     return Ok(Some(ChildEx::completed(_status.unwrap_or(1), pipes)));
                 } else {
                     if !stdout_buf.is_empty() {
-                        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                        if let Some(stdout) = io.fd_mut(1) {
+                            stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                        }
                     }
                     if !stderr_buf.is_empty() {
-                        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                        if let Some(stderr) = io.fd_mut(2) {
+                            stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                        }
                     }
                     return Ok(None);
                 }
@@ -164,10 +175,12 @@ fn spawn_pipeline_stage(
                 child_cmd.env.insert(assignment.name.clone().into(), value.into());
             }
 
-            for (&fd, file) in executor.fd_table().iter() {
-                child_cmd
-                    .fds
-                    .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+            for (&fd, file) in io.fds() {
+                if fd >= 3 {
+                    child_cmd
+                        .fds
+                        .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+                }
             }
 
             if let Some(prev_out) = stdin {
@@ -181,13 +194,13 @@ fn spawn_pipeline_stage(
                 child_cmd
                     .fds
                     .entry(1)
-                    .or_insert(if io.tty_stdout { Fd::Pty } else { Fd::Pipe });
+                    .or_insert(if io.is_tty(1) { Fd::Pty } else { Fd::Pipe });
             }
             // Always pipe stderr through IoContext.
             child_cmd
                 .fds
                 .entry(2)
-                .or_insert(if io.tty_stderr { Fd::Pty } else { Fd::Pipe });
+                .or_insert(if io.is_tty(2) { Fd::Pty } else { Fd::Pipe });
 
             match child_cmd.spawn() {
                 Ok(mut child) => {
@@ -199,11 +212,15 @@ fn spawn_pipeline_stage(
                     Ok(Some(child))
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    let _ = writeln!(io.stderr, "{cmd_name}: command not found");
+                    if let Some(stderr) = io.fd_mut(2) {
+                        let _ = writeln!(stderr, "{cmd_name}: command not found");
+                    }
                     Ok(Some(ChildEx::completed(127, std::collections::HashMap::new())))
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                    let _ = writeln!(io.stderr, "{cmd_name}: permission denied");
+                    if let Some(stderr) = io.fd_mut(2) {
+                        let _ = writeln!(stderr, "{cmd_name}: permission denied");
+                    }
                     Ok(Some(ChildEx::completed(126, std::collections::HashMap::new())))
                 }
                 Err(e) => Err(ExecError::Io(e)),

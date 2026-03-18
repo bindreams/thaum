@@ -55,9 +55,10 @@ fn syntax_error_does_not_poison_executor() {
 
     // Line 2: valid command still works
     let prog = thaum::parse("echo ok").unwrap();
-    let mut io = CapturedIo::new();
-    let _ = exec.execute(&prog, &mut io.context());
-    assert_eq!(io.stdout_string().trim(), "ok");
+    let (mut io, capture) = CapturedIo::new();
+    let _ = exec.execute(&prog, &mut io);
+    let output = capture.finish(io);
+    assert_eq!(output.stdout_string().trim(), "ok");
 }
 
 #[skuld::test]

@@ -13,18 +13,20 @@ impl Executor {
         &mut self,
         body: &CompoundCommand,
         redirects: &[Redirect],
-        io: &mut IoContext<'_>,
+        io: &mut IoContext,
     ) -> Result<i32, ExecError> {
         if redirects.is_empty() {
             return self.execute_compound_body(body, io);
         }
-        let mut active = self.resolve_redirects(redirects)?;
-        let mut redirected_io = active.apply_to_io(io);
-        self.execute_compound_body(body, &mut redirected_io)
+        let mut active = self.resolve_redirects(redirects, io)?;
+        let saved = active.apply(io);
+        let result = self.execute_compound_body(body, io);
+        saved.restore(io);
+        result
     }
 
     /// Execute the body of a compound command (dispatch by variant).
-    fn execute_compound_body(&mut self, body: &CompoundCommand, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    fn execute_compound_body(&mut self, body: &CompoundCommand, io: &mut IoContext) -> Result<i32, ExecError> {
         match body {
             CompoundCommand::BraceGroup { body, .. } => self.execute_lines(body, io),
 

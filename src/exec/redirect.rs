@@ -3,102 +3,12 @@
 
 use std::collections::{HashMap, HashSet};
 use std::fs::{File, OpenOptions};
-use std::io::{self, Read, Write};
+use std::io::{self, Write};
 
 use crate::ast::{Redirect, RedirectKind};
+use crate::exec::buffered_file::{dup_process_fd, BufferedFile};
 use crate::exec::error::ExecError;
 use crate::exec::expand;
-
-// BufferedFile ========================================================================================================
-
-/// File handle with a read-ahead buffer.
-///
-/// Wraps `std::fs::File` with transparent 8 KB buffering for `Read`. External
-/// command FD setup calls [`try_clone()`](BufferedFile::try_clone) on the inner
-/// File, bypassing the buffer — the OS fd position is shared via `dup()`.
-pub(super) struct BufferedFile {
-    file: File,
-    buf: Vec<u8>,
-    pos: usize,
-    /// When true, reads bypass the buffer and go directly to the OS.
-    /// Used for cloned FDs (`<&N`/`>&N`) where the OS fd position is
-    /// shared between multiple consumers.
-    passthrough: bool,
-}
-
-impl BufferedFile {
-    pub fn new(file: File) -> Self {
-        BufferedFile {
-            file,
-            buf: Vec::new(),
-            pos: 0,
-            passthrough: false,
-        }
-    }
-
-    /// Create without read buffering. For cloned FDs where the OS fd
-    /// position is shared — buffering would over-read and desync.
-    pub fn passthrough(file: File) -> Self {
-        BufferedFile {
-            file,
-            buf: Vec::new(),
-            pos: 0,
-            passthrough: true,
-        }
-    }
-
-    /// Clone the underlying OS file descriptor (for child process inheritance).
-    pub fn try_clone(&self) -> io::Result<File> {
-        self.file.try_clone()
-    }
-
-    /// Consume this wrapper and return the inner `File`.
-    pub fn into_inner(self) -> File {
-        self.file
-    }
-}
-
-impl Read for BufferedFile {
-    fn read(&mut self, dest: &mut [u8]) -> io::Result<usize> {
-        if self.passthrough {
-            return self.file.read(dest);
-        }
-        // Serve from buffer if available.
-        if self.pos < self.buf.len() {
-            let available = &self.buf[self.pos..];
-            let n = dest.len().min(available.len());
-            dest[..n].copy_from_slice(&available[..n]);
-            self.pos += n;
-            return Ok(n);
-        }
-        // For large reads, bypass the buffer entirely.
-        if dest.len() >= 8192 {
-            return self.file.read(dest);
-        }
-        // Refill buffer from file.
-        self.buf.resize(8192, 0);
-        self.pos = 0;
-        let n = self.file.read(&mut self.buf)?;
-        if n == 0 {
-            self.buf.clear();
-            return Ok(0);
-        }
-        self.buf.truncate(n);
-        let to_copy = dest.len().min(n);
-        dest[..to_copy].copy_from_slice(&self.buf[..to_copy]);
-        self.pos = to_copy;
-        Ok(to_copy)
-    }
-}
-
-impl Write for BufferedFile {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        self.file.write(buf)
-    }
-    fn flush(&mut self) -> io::Result<()> {
-        self.file.flush()
-    }
-}
 use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
 
@@ -113,7 +23,7 @@ pub(super) struct ActiveRedirects {
     pub stderr: Option<BufferedFile>,
     pub extra_fds: HashMap<i32, BufferedFile>,
     /// FDs explicitly closed via `N>&-` / `N<&-`. Used by `exec` redirect-only
-    /// mode to remove persistent FDs from the fd_table.
+    /// mode to remove persistent FDs from the IoContext.
     pub closed_fds: HashSet<i32>,
 }
 
@@ -134,36 +44,75 @@ impl ActiveRedirects {
         self.stdin.is_some() || self.stdout.is_some() || self.stderr.is_some() || !self.extra_fds.is_empty()
     }
 
-    /// Build an IoContext that uses redirect file handles for FDs 0-2 where
-    /// present, falling back to the original `io` streams.
-    pub fn apply_to_io<'a>(&'a mut self, io: &'a mut IoContext<'_>) -> IoContext<'a> {
-        let IoContext {
-            stdin,
-            stdout,
-            stderr,
-            tty_stdout,
-            tty_stderr,
-        } = io;
-        // Compute tty flags before borrowing self mutably. Redirected fds are
-        // no longer terminals — child should see a file, not a TTY.
-        let out_tty = if self.stdout.is_some() { false } else { *tty_stdout };
-        let err_tty = if self.stderr.is_some() { false } else { *tty_stderr };
-        IoContext::new(
-            match self.stdin.as_mut() {
-                Some(f) => f as &mut dyn Read,
-                None => *stdin,
-            },
-            match self.stdout.as_mut() {
-                Some(f) => f as &mut dyn Write,
-                None => *stdout,
-            },
-            match self.stderr.as_mut() {
-                Some(f) => f as &mut dyn Write,
-                None => *stderr,
-            },
-            out_tty,
-            err_tty,
-        )
+    /// Apply redirects to IoContext via save/restore. Returns saved fds for
+    /// restoration when the command completes.
+    ///
+    /// `into_inner()` on BufferedFile is safe here: the buffer is always empty
+    /// because BufferedFile was just created by `resolve_redirects` (no reads yet).
+    pub fn apply(&mut self, io: &mut IoContext) -> SavedFds {
+        let mut saved = SavedFds::new();
+        if let Some(f) = self.stdin.take() {
+            saved.push(0, io.save_and_set(0, f.into_inner()));
+        }
+        if let Some(f) = self.stdout.take() {
+            saved.push(1, io.save_and_set(1, f.into_inner()));
+        }
+        if let Some(f) = self.stderr.take() {
+            saved.push(2, io.save_and_set(2, f.into_inner()));
+        }
+        for (fd, file) in self.extra_fds.drain() {
+            saved.push(fd, io.save_and_set(fd, file.into_inner()));
+        }
+        for &fd in &self.closed_fds {
+            if fd <= 2 {
+                // Replace fds 0-2 with /dev/null instead of removing, so
+                // downstream code always finds a valid handle for these fds.
+                let null = crate::exec::io_context::open_null_device();
+                saved.push(fd, io.save_and_set(fd, null));
+            } else {
+                saved.push(fd, io.remove_fd(fd));
+            }
+        }
+        // Clear tty overrides for all touched fds so that redirected fds
+        // don't falsely report as terminals.
+        for &(fd, _) in &saved.fds {
+            if io.has_tty_override(fd) {
+                saved.saved_tty_overrides.insert(fd);
+                io.clear_tty_override(fd);
+            }
+        }
+        saved
+    }
+}
+
+/// Saved fd entries for restore-on-completion. Restores in reverse order
+/// to correctly unwind chained dup redirects (e.g. `exec 3>&1 1>/dev/null`).
+pub(super) struct SavedFds {
+    fds: Vec<(i32, Option<File>)>,
+    saved_tty_overrides: HashSet<i32>,
+}
+
+impl SavedFds {
+    fn new() -> Self {
+        SavedFds {
+            fds: Vec::new(),
+            saved_tty_overrides: HashSet::new(),
+        }
+    }
+
+    fn push(&mut self, fd: i32, saved: Option<File>) {
+        self.fds.push((fd, saved));
+    }
+
+    /// Restore all saved fds back to the IoContext, in reverse order.
+    /// Also restores tty overrides that were cleared during apply.
+    pub fn restore(self, io: &mut IoContext) {
+        for (fd, saved) in self.fds.into_iter().rev() {
+            io.restore(fd, saved);
+        }
+        for fd in self.saved_tty_overrides {
+            io.set_tty_override(fd);
+        }
     }
 }
 
@@ -171,9 +120,12 @@ impl Executor {
     /// Process a command's redirect list into an `ActiveRedirects`.
     ///
     /// Redirects are processed left-to-right. `>&N` resolves against FDs
-    /// already opened in this redirect list, then against the persistent
-    /// fd_table.
-    pub(super) fn resolve_redirects(&mut self, redirects: &[Redirect]) -> Result<ActiveRedirects, ExecError> {
+    /// already opened in this redirect list, then against the IoContext.
+    pub(super) fn resolve_redirects(
+        &mut self,
+        redirects: &[Redirect],
+        io: &IoContext,
+    ) -> Result<ActiveRedirects, ExecError> {
         let mut active = ActiveRedirects::new();
 
         for redirect in redirects {
@@ -220,7 +172,7 @@ impl Executor {
                         // Close the FD: use sink for 0-2, remove for 3+.
                         close_write_fd(&mut active, dest_fd);
                     } else if let Ok(src_fd) = target.parse::<i32>() {
-                        let cloned = clone_fd_for_write(&active, &self.fd_table, src_fd)?;
+                        let cloned = clone_fd_for_write(&active, io, src_fd)?;
                         // Cloned FDs share OS position — don't buffer reads.
                         assign_write_fd(&mut active, dest_fd, cloned)?;
                     } else {
@@ -233,7 +185,7 @@ impl Executor {
                     if target == "-" {
                         close_read_fd(&mut active, dest_fd);
                     } else if let Ok(src_fd) = target.parse::<i32>() {
-                        let cloned = clone_fd_for_read(&active, &self.fd_table, src_fd)?;
+                        let cloned = clone_fd_for_read(&active, io, src_fd)?;
                         // Cloned FDs share OS position — don't buffer reads.
                         assign_read_bf(&mut active, dest_fd, BufferedFile::passthrough(cloned))?;
                     } else {
@@ -316,10 +268,8 @@ fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<
 fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
     active.closed_fds.insert(fd);
     match fd {
-        // For FDs 0-2, we can't truly close them — use /dev/null equivalent.
-        // The null device file is opened lazily when needed via apply_to_io.
-        // For now, just mark them as "will be null" by leaving as None.
-        // The caller handles the default fallback.
+        // For FDs 0-2, mark as closed. apply() will replace them with
+        // /dev/null instead of removing them from the IoContext.
         1 => active.stdout = None,
         2 => active.stderr = None,
         n => {
@@ -339,9 +289,9 @@ fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
     }
 }
 
-/// Clone a file descriptor from the active redirects or persistent fd_table
+/// Clone a file descriptor from the active redirects or IoContext
 /// for use as a write target.
-fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, src_fd: i32) -> Result<File, ExecError> {
+fn clone_fd_for_write(active: &ActiveRedirects, io: &IoContext, src_fd: i32) -> Result<File, ExecError> {
     // Check active redirects first (FDs opened earlier in this redirect list).
     if let Some(file) = active.stdout.as_ref().filter(|_| src_fd == 1) {
         return file.try_clone().map_err(ExecError::Io);
@@ -355,11 +305,12 @@ fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, s
     if let Some(file) = active.extra_fds.get(&src_fd) {
         return file.try_clone().map_err(ExecError::Io);
     }
-    // Check persistent fd_table.
-    if let Some(file) = fd_table.get(&src_fd) {
-        return file.try_clone().map_err(ExecError::Io);
+    // Check IoContext (contains both persistent fds and original process fds).
+    if let Ok(file) = io.try_clone_fd(src_fd) {
+        return Ok(file);
     }
-    // For FDs 0-2, fall back to duplicating the process's own file descriptors.
+    // Fall back to duplicating the process's own file descriptors (for fds
+    // not in IoContext, e.g. inherited from parent).
     if let Some(file) = dup_process_fd(src_fd) {
         return Ok(file);
     }
@@ -367,111 +318,9 @@ fn clone_fd_for_write(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, s
 }
 
 /// Clone a file descriptor for use as a read source.
-fn clone_fd_for_read(active: &ActiveRedirects, fd_table: &HashMap<i32, File>, src_fd: i32) -> Result<File, ExecError> {
+fn clone_fd_for_read(active: &ActiveRedirects, io: &IoContext, src_fd: i32) -> Result<File, ExecError> {
     // Same resolution order as clone_fd_for_write.
-    clone_fd_for_write(active, fd_table, src_fd)
-}
-
-/// Duplicate a process-level file descriptor.
-///
-/// On Unix, attempts `dup(fd)` for any non-negative FD. Returns `None` if
-/// the FD doesn't exist (EBADF). This handles both standard streams (0-2)
-/// and FDs inherited from parent processes (e.g., subshells inheriting
-/// FDs opened by `exec 3>file`).
-///
-/// On Windows, FDs 0-2 use `GetStdHandle` + `DuplicateHandle`; FDs 3+ use
-/// `_get_osfhandle` to convert CRT FD numbers to OS handles.
-pub fn dup_process_fd(fd: i32) -> Option<File> {
-    #[cfg(unix)]
-    {
-        use std::os::fd::FromRawFd;
-        if fd < 0 {
-            return None;
-        }
-        // SAFETY: dup() is safe for any non-negative fd; returns -1 on invalid fd.
-        let new_fd = unsafe { nix::libc::dup(fd) };
-        if new_fd < 0 {
-            return None;
-        }
-        // SAFETY: new_fd is a valid open file descriptor (dup succeeded).
-        Some(unsafe { File::from_raw_fd(new_fd) })
-    }
-    #[cfg(windows)]
-    {
-        match fd {
-            0 => dup_std_handle(windows::Win32::System::Console::STD_INPUT_HANDLE),
-            1 => dup_std_handle(windows::Win32::System::Console::STD_OUTPUT_HANDLE),
-            2 => dup_std_handle(windows::Win32::System::Console::STD_ERROR_HANDLE),
-            _ => dup_crt_fd(fd),
-        }
-    }
-    #[cfg(not(any(unix, windows)))]
-    {
-        None
-    }
-}
-
-#[cfg(windows)]
-fn dup_std_handle(which: windows::Win32::System::Console::STD_HANDLE) -> Option<File> {
-    use std::os::windows::io::FromRawHandle;
-    use windows::Win32::Foundation::{DuplicateHandle, DUPLICATE_SAME_ACCESS, HANDLE};
-    use windows::Win32::System::Console::GetStdHandle;
-    use windows::Win32::System::Threading::GetCurrentProcess;
-
-    let handle = unsafe { GetStdHandle(which).ok()? };
-    let process = unsafe { GetCurrentProcess() };
-    let mut dup_handle = HANDLE::default();
-    unsafe {
-        DuplicateHandle(
-            process,
-            handle,
-            process,
-            &mut dup_handle,
-            0,
-            false,
-            DUPLICATE_SAME_ACCESS,
-        )
-        .ok()?;
-    }
-    Some(unsafe { File::from_raw_handle(dup_handle.0 as _) })
-}
-
-/// Duplicate a CRT file descriptor (3+) on Windows.
-///
-/// Uses `_get_osfhandle` to get the OS handle, then `DuplicateHandle`.
-/// Returns `None` if the CRT FD is invalid.
-#[cfg(windows)]
-fn dup_crt_fd(fd: i32) -> Option<File> {
-    use std::os::windows::io::FromRawHandle;
-    use windows::Win32::Foundation::{DuplicateHandle, DUPLICATE_SAME_ACCESS, HANDLE};
-    use windows::Win32::System::Threading::GetCurrentProcess;
-
-    extern "C" {
-        fn _get_osfhandle(fd: i32) -> isize;
-    }
-
-    let os_handle = unsafe { _get_osfhandle(fd) };
-    // _get_osfhandle returns -1 (INVALID_HANDLE_VALUE) on error.
-    if os_handle == -1 {
-        return None;
-    }
-
-    let handle = HANDLE(os_handle as _);
-    let process = unsafe { GetCurrentProcess() };
-    let mut dup_handle = HANDLE::default();
-    unsafe {
-        DuplicateHandle(
-            process,
-            handle,
-            process,
-            &mut dup_handle,
-            0,
-            false,
-            DUPLICATE_SAME_ACCESS,
-        )
-        .ok()?;
-    }
-    Some(unsafe { File::from_raw_handle(dup_handle.0 as _) })
+    clone_fd_for_write(active, io, src_fd)
 }
 
 /// Create a temporary file for heredoc/herestring content.

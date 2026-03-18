@@ -6,7 +6,7 @@
 //! `drain_child_pipes()` which reads both pipes concurrently via a scoped
 //! thread, avoiding the circular wait.
 
-use std::io::Read;
+use std::io::{Read, Write};
 
 use crate::exec::command_ex::ChildEx;
 use crate::exec::error::ExecError;
@@ -204,7 +204,7 @@ pub(super) fn drain_and_wait_conpty(child: &mut ChildEx) -> Result<(i32, Vec<u8>
 /// For ConPTY children, drain and wait run concurrently (pipes don't EOF until
 /// the pseudo console is closed). For regular children, drains pipes first,
 /// then waits.
-pub(super) fn drain_and_relay(child: &mut ChildEx, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+pub(super) fn drain_and_relay(child: &mut ChildEx, io: &mut IoContext) -> Result<i32, ExecError> {
     // Read conpty_output_fd before drain_and_wait_conpty, which calls
     // mark_completed and changes the inner variant to Completed.
     let conpty_fd = child.conpty_output_fd();
@@ -222,10 +222,14 @@ pub(super) fn drain_and_relay(child: &mut ChildEx, io: &mut IoContext<'_>) -> Re
         _ => {}
     }
     if !stdout_buf.is_empty() {
-        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        if let Some(stdout) = io.fd_mut(1) {
+            stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        }
     }
     if !stderr_buf.is_empty() {
-        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        if let Some(stderr) = io.fd_mut(2) {
+            stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        }
     }
     Ok(status)
 }
@@ -235,7 +239,7 @@ pub(super) fn drain_and_relay(child: &mut ChildEx, io: &mut IoContext<'_>) -> Re
 /// For pipeline stages where the orchestrator handles the wait separately.
 /// ConPTY children are an exception: they require a concurrent wait to trigger
 /// EOF on their output pipes, so this function waits and marks them completed.
-pub(super) fn drain_to_io(child: &mut ChildEx, io: &mut IoContext<'_>) -> Result<(), ExecError> {
+pub(super) fn drain_to_io(child: &mut ChildEx, io: &mut IoContext) -> Result<(), ExecError> {
     let conpty_fd = child.conpty_output_fd();
     let (mut stdout_buf, mut stderr_buf) = if child.has_conpty() {
         let (_status, out, err) = drain_and_wait_conpty(child)?;
@@ -249,10 +253,14 @@ pub(super) fn drain_to_io(child: &mut ChildEx, io: &mut IoContext<'_>) -> Result
         _ => {}
     }
     if !stdout_buf.is_empty() {
-        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        if let Some(stdout) = io.fd_mut(1) {
+            stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        }
     }
     if !stderr_buf.is_empty() {
-        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        if let Some(stderr) = io.fd_mut(2) {
+            stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        }
     }
     Ok(())
 }

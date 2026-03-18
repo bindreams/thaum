@@ -38,3 +38,21 @@ fn is_fd_terminal_false_for_negative_fd() {
 fn is_fd_terminal_false_for_max_fd() {
     assert!(!super::is_fd_terminal(i32::MAX));
 }
+
+// is_file_terminal ====================================================================================================
+
+#[cfg(unix)]
+#[skuld::test]
+fn is_file_terminal_true_for_pty() {
+    let pty = nix::pty::openpty(None, None).unwrap();
+    let file = unsafe { std::fs::File::from_raw_fd(pty.slave.as_raw_fd()) };
+    assert!(super::is_file_terminal(&file));
+    // Prevent double-close: forget the File, let OwnedFd drop it.
+    std::mem::forget(file);
+}
+
+#[skuld::test]
+fn is_file_terminal_false_for_regular_file() {
+    let file = tempfile::tempfile().unwrap();
+    assert!(!super::is_file_terminal(&file));
+}

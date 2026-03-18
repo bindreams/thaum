@@ -79,11 +79,12 @@ src/
     pipeline.rs        — pipeline execution
     external.rs        — external process spawning
     command_ex.rs      — cross-platform Command wrapper (FD mapping)
-    redirect.rs        — I/O redirection handling
+    redirect.rs        — redirect resolution: opens files, builds ActiveRedirects, save/restore into IoContext
     subshell.rs        — subshell payload types (serialized state)
     numeric.rs         — shared shell-style numeric parsing (hex, octal, char)
     pattern.rs         — shell glob pattern matching
-    io_context.rs      — I/O context abstraction (stdin/stdout/stderr)
+    io_context.rs      — uniform HashMap<i32, File> fd table; IoContext::from_process() (dup process fds), CapturedIo (pipe + drain threads)
+    buffered_file.rs   — File with optional read-ahead buffer; dup_process_fd helper
     error.rs           — ExecError type definitions
 
   cli/

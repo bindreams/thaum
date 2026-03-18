@@ -13,7 +13,7 @@ use rustyline::validate::{ValidationContext, ValidationResult, Validator};
 use rustyline::{Context, Editor, Helper};
 
 use thaum::exec::prompt::{self, PromptContext};
-use thaum::exec::{ExecError, Executor, ProcessIo};
+use thaum::exec::{ExecError, Executor, IoContext};
 use thaum::interactive::is_incomplete;
 use thaum::{Dialect, ShellOptions};
 
@@ -78,10 +78,11 @@ pub fn run(dialect: Dialect, login: bool) {
     executor.env_mut().set_interactive(true);
     executor.env_mut().set_interactive_defaults(&options);
     executor.env_mut().inherit_from_process();
+    executor.set_terminal_inherit(true);
 
-    let mut process_io = ProcessIo::new();
+    let mut io = IoContext::from_process();
 
-    source_startup_files(&mut executor, &mut process_io, &options, login);
+    source_startup_files(&mut executor, &mut io, &options, login);
 
     // Load history from HISTFILE
     let histfile = resolve_histfile(&executor);
@@ -96,7 +97,7 @@ pub fn run(dialect: Dialect, login: bool) {
     loop {
         // Execute PROMPT_COMMAND before displaying the prompt (Bash feature).
         if options.bash_prompt_escapes {
-            execute_prompt_command(&mut executor, &mut process_io);
+            execute_prompt_command(&mut executor, &mut io);
         }
 
         let ps1_template = executor.env().get_var("PS1").unwrap_or("$ ").to_string();
@@ -126,7 +127,7 @@ pub fn run(dialect: Dialect, login: bool) {
 
                 match thaum::parse_with(&line, dialect) {
                     Ok(program) => {
-                        match executor.execute(&program, &mut process_io.context()) {
+                        match executor.execute(&program, &mut io) {
                             Ok(_) => {}
                             Err(ExecError::ExitRequested(code)) => {
                                 if let Some(ref path) = histfile {
@@ -258,7 +259,7 @@ fn resolve_histfile(executor: &Executor) -> Option<String> {
 /// - **POSIX mode:** Source `$ENV` if set and readable.
 /// - **Bash login shell:** `/etc/profile` → first of `~/.bash_profile`, `~/.bash_login`, `~/.profile`.
 /// - **Bash non-login interactive:** `~/.bashrc`.
-fn source_startup_files(executor: &mut Executor, io: &mut ProcessIo, options: &ShellOptions, login: bool) {
+fn source_startup_files(executor: &mut Executor, io: &mut IoContext, options: &ShellOptions, login: bool) {
     if options.bash_prompt_escapes {
         // Bash mode
         if login {
@@ -287,13 +288,13 @@ fn source_startup_files(executor: &mut Executor, io: &mut ProcessIo, options: &S
 }
 
 /// Source a file if it exists. Returns `true` if the file was found and sourced.
-fn source_file_if_exists(executor: &mut Executor, io: &mut ProcessIo, options: &ShellOptions, path: &str) -> bool {
+fn source_file_if_exists(executor: &mut Executor, io: &mut IoContext, options: &ShellOptions, path: &str) -> bool {
     let Ok(source) = std::fs::read_to_string(path) else {
         return false;
     };
     match thaum::parse_with_options(&source, options.clone()) {
         Ok(program) => {
-            let _ = executor.execute(&program, &mut io.context());
+            let _ = executor.execute(&program, io);
         }
         Err(e) => {
             eprintln!("thaum: {path}: {e}");
@@ -303,7 +304,7 @@ fn source_file_if_exists(executor: &mut Executor, io: &mut ProcessIo, options: &
 }
 
 /// Execute the PROMPT_COMMAND variable if set.
-fn execute_prompt_command(executor: &mut Executor, process_io: &mut ProcessIo) {
+fn execute_prompt_command(executor: &mut Executor, io: &mut IoContext) {
     let cmd = match executor.env().get_var("PROMPT_COMMAND") {
         Some(s) => s.to_string(),
         None => return,
@@ -315,7 +316,7 @@ fn execute_prompt_command(executor: &mut Executor, process_io: &mut ProcessIo) {
 
     // Parse and execute PROMPT_COMMAND. Errors are silently ignored.
     if let Ok(program) = thaum::parse(&cmd) {
-        let _ = executor.execute(&program, &mut process_io.context());
+        let _ = executor.execute(&program, io);
     }
 }
 

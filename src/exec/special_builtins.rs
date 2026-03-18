@@ -4,6 +4,8 @@
 //! so they are intercepted in `execute_command` before the normal builtin
 //! dispatch path.
 
+use std::io::Write;
+
 use crate::exec::command_ex::{CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
@@ -15,7 +17,7 @@ impl Executor {
     ///
     /// Variables, functions, and state changes persist in the current shell
     /// (unlike a subshell).
-    pub(super) fn builtin_eval(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub(super) fn builtin_eval(&mut self, args: &[String], io: &mut IoContext) -> Result<i32, ExecError> {
         let text = args.join(" ");
         if text.is_empty() {
             return Ok(0);
@@ -30,9 +32,11 @@ impl Executor {
     ///
     /// If extra arguments are supplied after the filename, they temporarily
     /// replace the positional parameters for the duration of the sourced file.
-    pub(super) fn builtin_source(&mut self, args: &[String], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub(super) fn builtin_source(&mut self, args: &[String], io: &mut IoContext) -> Result<i32, ExecError> {
         if args.is_empty() {
-            let _ = writeln!(io.stderr, "source: filename argument required");
+            if let Some(stderr) = io.fd_mut(2) {
+                let _ = writeln!(stderr, "source: filename argument required");
+            }
             return Ok(2);
         }
         let filename = &args[0];
@@ -99,8 +103,8 @@ impl Executor {
     /// `exec` builtin: replace the current shell with the given command.
     ///
     /// With no arguments, redirect-only mode is handled by the caller
-    /// (`execute_command`) which adopts the redirects into the persistent
-    /// `fd_table` before reaching this function.
+    /// (`execute_command`) which adopts the redirects into the IoContext
+    /// before reaching this function.
     ///
     /// On Unix, replaces the process image via `execvp`. On other platforms,
     /// spawns the child and exits via `ExitRequested`.
@@ -108,7 +112,7 @@ impl Executor {
         &mut self,
         args: &[String],
         active: &mut ActiveRedirects,
-        io: &mut IoContext<'_>,
+        io: &mut IoContext,
     ) -> Result<i32, ExecError> {
         if args.is_empty() {
             // Redirect-only mode is handled before this function is called.
@@ -129,7 +133,9 @@ impl Executor {
                 cmd_start = i;
                 continue;
             } else if args[i].starts_with('-') {
-                let _ = writeln!(io.stderr, "exec: {}: invalid option", args[i]);
+                if let Some(stderr) = io.fd_mut(2) {
+                    let _ = writeln!(stderr, "exec: {}: invalid option", args[i]);
+                }
                 return Ok(2);
             } else {
                 cmd_start = i;
@@ -159,9 +165,11 @@ impl Executor {
             .map(|(k, v)| (k.into(), v.into()))
             .collect();
 
-        // Build FD table: persistent fd_table first, per-command redirects override.
-        for (&fd, file) in &self.fd_table {
-            cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        // Build FD table: IoContext fds 3+ first, per-command redirects override.
+        for (&fd, file) in io.fds() {
+            if fd >= 3 {
+                cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+            }
         }
         if let Some(ref file) = active.stdin {
             cmd.fds.insert(0, Fd::File(file.try_clone().map_err(ExecError::Io)?));
@@ -185,7 +193,9 @@ impl Executor {
                     return Err(ExecError::ExitRequested(code));
                 }
                 Err(e) => {
-                    let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+                    if let Some(stderr) = io.fd_mut(2) {
+                        let _ = writeln!(stderr, "exec: {}: {}", cmd_name, e);
+                    }
                     return Err(ExecError::ExitRequested(127));
                 }
             }
@@ -195,7 +205,9 @@ impl Executor {
         {
             // Replace the process image. Only returns on error.
             let e = cmd.exec_replace();
-            let _ = writeln!(io.stderr, "exec: {cmd_name}: {e}");
+            if let Some(stderr) = io.fd_mut(2) {
+                let _ = writeln!(stderr, "exec: {cmd_name}: {e}");
+            }
             Err(ExecError::ExitRequested(127))
         }
 
@@ -220,7 +232,9 @@ impl Executor {
                     Err(ExecError::ExitRequested(code))
                 }
                 Err(e) => {
-                    let _ = writeln!(io.stderr, "exec: {}: {}", cmd_name, e);
+                    if let Some(stderr) = io.fd_mut(2) {
+                        let _ = writeln!(stderr, "exec: {}: {}", cmd_name, e);
+                    }
                     Err(ExecError::ExitRequested(127))
                 }
             }

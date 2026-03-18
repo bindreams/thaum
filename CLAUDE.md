@@ -115,12 +115,13 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `gettext.rs` — GNU gettext catalog lookup for `$"..."` locale translation
   - `compound.rs` — compound command execution (if/while/for/case)
   - `pipeline.rs` — pipeline execution
-  - `external.rs` + `command_ex.rs` — external process spawning
-  - `redirect.rs` — I/O redirection
+  - `external.rs` + `command_ex.rs` — external process spawning; `terminal_inherit` enables direct terminal inheritance for interactive programs
+  - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`
   - `subshell.rs` — subshell payload types
   - `numeric.rs` — shared shell-style numeric parsing
   - `pattern.rs` — shell glob pattern matching
-  - `io_context.rs` — I/O context abstraction
+  - `io_context.rs` — uniform `HashMap<i32, File>` fd table; `IoContext::from_process()` dups process fds, `CapturedIo` uses OS pipes with eager drain threads
+  - `buffered_file.rs` — `BufferedFile` (read-ahead wrapper around `File`) and `dup_process_fd`
   - `error.rs` — ExecError types
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
 - `tests/parse.rs` + `tests/parse/` — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)

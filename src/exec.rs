@@ -13,6 +13,8 @@ pub(crate) mod brace_expansion;
 #[cfg(test)]
 #[path = "exec/brace_expansion_tests.rs"]
 mod brace_expansion_tests;
+/// File handle with optional read-ahead buffering + process fd duplication.
+pub mod buffered_file;
 /// Shell builtins that only need `Environment` (not the full `Executor`).
 pub mod builtins;
 mod child_io;
@@ -55,7 +57,7 @@ mod test_builtin_tests;
 
 pub use environment::Environment;
 pub use error::ExecError;
-pub use io_context::{CapturedIo, IoContext, ProcessIo};
+pub use io_context::{CapturedIo, CapturedOutput, IoContext};
 #[cfg(test)]
 use pattern::shell_pattern_match;
 
@@ -70,9 +72,6 @@ use crate::ast::{Command, ExecutionMode, Expression, Line, Program, Statement};
 /// functions, CWD, exit status) in an `Environment`.
 pub struct Executor {
     env: Environment,
-    /// Persistent extra file descriptors (3+), typically set by `exec N>file`.
-    /// FDs 0-2 are handled by IoContext; this table holds FDs 3 and above.
-    fd_table: HashMap<i32, std::fs::File>,
     /// Alias table snapshot taken at the start of each line.  Alias expansion
     /// uses this snapshot so that `alias`/`unalias` within a line don't affect
     /// expansion of later commands on the same line (matching bash semantics).
@@ -97,6 +96,10 @@ pub struct Executor {
     /// `true`. Set to `false` in test helpers to prevent a bare `exec` from
     /// killing the test process.
     allow_process_replacement: bool,
+    /// When true, external commands inherit unredirected fds directly from the
+    /// parent process instead of piping through IoContext. Enables interactive
+    /// programs (cmd, pwsh) to access the real terminal.
+    terminal_inherit: bool,
 }
 
 impl Executor {
@@ -107,7 +110,7 @@ impl Executor {
         env.inherit_from_process();
         Executor {
             env,
-            fd_table: HashMap::new(),
+
             alias_snapshot: HashMap::new(),
             exe_path: None,
             source_stack: Vec::new(),
@@ -115,6 +118,7 @@ impl Executor {
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
             allow_process_replacement: true,
+            terminal_inherit: false,
         }
     }
 
@@ -129,7 +133,7 @@ impl Executor {
         }
         Executor {
             env,
-            fd_table: HashMap::new(),
+
             alias_snapshot: HashMap::new(),
             exe_path: None,
             source_stack: Vec::new(),
@@ -137,6 +141,7 @@ impl Executor {
             errexit_suppressed: false,
             options,
             allow_process_replacement: true,
+            terminal_inherit: false,
         }
     }
 
@@ -144,7 +149,7 @@ impl Executor {
     pub fn with_env(env: Environment) -> Self {
         Executor {
             env,
-            fd_table: HashMap::new(),
+
             alias_snapshot: HashMap::new(),
             exe_path: None,
             source_stack: Vec::new(),
@@ -152,6 +157,7 @@ impl Executor {
             errexit_suppressed: false,
             options: crate::Dialect::Bash.options(),
             allow_process_replacement: true,
+            terminal_inherit: false,
         }
     }
 
@@ -164,7 +170,7 @@ impl Executor {
         }
         Executor {
             env,
-            fd_table: HashMap::new(),
+
             alias_snapshot: HashMap::new(),
             exe_path: None,
             source_stack: Vec::new(),
@@ -172,6 +178,7 @@ impl Executor {
             errexit_suppressed: false,
             options,
             allow_process_replacement: true,
+            terminal_inherit: false,
         }
     }
 
@@ -183,6 +190,16 @@ impl Executor {
     /// Set whether `exec cmd` is allowed to replace the process image.
     pub fn set_allow_process_replacement(&mut self, allow: bool) {
         self.allow_process_replacement = allow;
+    }
+
+    /// Set whether external commands inherit unredirected fds from the parent.
+    ///
+    /// When enabled, if IoContext reports a fd as a terminal and no explicit
+    /// redirect overrides it, the child inherits the parent's fd directly
+    /// instead of piping through IoContext. This allows interactive programs
+    /// to access the real terminal (avoiding ConPTY stdin freeze on Windows).
+    pub fn set_terminal_inherit(&mut self, inherit: bool) {
+        self.terminal_inherit = inherit;
     }
 
     /// Get a mutable reference to the environment.
@@ -200,48 +217,38 @@ impl Executor {
         &self.options
     }
 
-    /// Get a reference to the persistent FD table.
-    pub fn fd_table(&self) -> &HashMap<i32, std::fs::File> {
-        &self.fd_table
-    }
-
-    /// Mutable access to the persistent FD table. Used by `exec-ast` child
-    /// processes to reconstruct inherited FDs.
-    pub fn fd_table_mut(&mut self) -> &mut HashMap<i32, std::fs::File> {
-        &mut self.fd_table
-    }
-
     /// Current source filename (top of the source stack, or empty for stdin/-c).
     fn current_source(&self) -> String {
         self.source_stack.last().cloned().unwrap_or_default()
     }
 
-    /// Adopt redirects from `exec` redirect-only mode into persistent state.
+    /// Adopt redirects from `exec` redirect-only mode into persistent IoContext state.
     ///
-    /// FDs 0-2 and 3+ are all stored in `fd_table`. Persistent FDs 0-2 are
-    /// injected into `ActiveRedirects` at the start of `execute_command`;
-    /// FDs 3+ are inherited by child processes via `execute_external` and
-    /// pipeline stages. Explicitly closed FDs are removed.
-    fn adopt_redirects(&mut self, active: redirect::ActiveRedirects) {
+    /// All fds (0-2 and 3+) go into `io`. Explicitly closed fds are removed.
+    fn adopt_redirects(&mut self, active: redirect::ActiveRedirects, io: &mut IoContext) {
         for fd in &active.closed_fds {
-            self.fd_table.remove(fd);
+            if *fd <= 2 {
+                io.set_fd(*fd, io_context::open_null_device());
+            } else {
+                io.remove_fd(*fd);
+            }
         }
         if let Some(f) = active.stdin {
-            self.fd_table.insert(0, f.into_inner());
+            io.set_fd(0, f.into_inner());
         }
         if let Some(f) = active.stdout {
-            self.fd_table.insert(1, f.into_inner());
+            io.set_fd(1, f.into_inner());
         }
         if let Some(f) = active.stderr {
-            self.fd_table.insert(2, f.into_inner());
+            io.set_fd(2, f.into_inner());
         }
         for (fd, file) in active.extra_fds {
-            self.fd_table.insert(fd, file.into_inner());
+            io.set_fd(fd, file.into_inner());
         }
     }
 
     /// Execute a parsed program. Returns the exit status of the last command.
-    pub fn execute(&mut self, program: &Program, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub fn execute(&mut self, program: &Program, io: &mut IoContext) -> Result<i32, ExecError> {
         self.execute_lines(&program.lines, io)
     }
 
@@ -249,7 +256,7 @@ impl Executor {
     ///
     /// Takes an alias table snapshot before each line so that alias
     /// definitions within a line only take effect for subsequent lines.
-    pub fn execute_lines(&mut self, lines: &[crate::ast::Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub fn execute_lines(&mut self, lines: &[crate::ast::Line], io: &mut IoContext) -> Result<i32, ExecError> {
         let mut status = 0;
         for (i, line) in lines.iter().enumerate() {
             self.env.set_lineno(i + 1 + self.lineno_base);
@@ -265,10 +272,10 @@ impl Executor {
     /// pipes it to the child's stdin, and captures stdout/stderr.  The child
     /// is a real separate process, so `$BASHPID` and signal isolation work
     /// correctly on all platforms.
-    pub(crate) fn execute_subshell(&mut self, body: &[Line], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub(crate) fn execute_subshell(&mut self, body: &[Line], io: &mut IoContext) -> Result<i32, ExecError> {
         use command_ex::{CommandEx, Fd};
 
-        let inherited_fds: Vec<i32> = self.fd_table.keys().filter(|&&fd| fd >= 3).copied().collect();
+        let inherited_fds: Vec<i32> = io.fds().keys().filter(|&&fd| fd >= 3).copied().collect();
 
         let payload = subshell::SubshellPayload {
             env: self.env.serialize(),
@@ -291,10 +298,10 @@ impl Executor {
         // Inherit the full process environment so the child has system vars.
         cmd.env = std::env::vars_os().collect();
 
-        // Pass fd_table FDs (3+) to the child atomically.
+        // Pass IoContext FDs (3+) to the child atomically.
         for &fd in &inherited_fds {
-            if let Some(file) = self.fd_table.get(&fd) {
-                cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+            if let Ok(file) = io.try_clone_fd(fd) {
+                cmd.fds.insert(fd, Fd::File(file));
             }
         }
 
@@ -310,14 +317,18 @@ impl Executor {
         let (stdout_buf, stderr_buf) = child_io::drain_child_pipes(&mut child)?;
         let status = child.wait().map_err(ExecError::Io)?;
 
-        io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
-        io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        if let Some(stdout) = io.fd_mut(1) {
+            stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+        }
+        if let Some(stderr) = io.fd_mut(2) {
+            stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+        }
 
         Ok(status)
     }
 
     /// Execute a list of statements, returning the last exit status.
-    pub fn execute_statements(&mut self, stmts: &[Statement], io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    pub fn execute_statements(&mut self, stmts: &[Statement], io: &mut IoContext) -> Result<i32, ExecError> {
         let mut status = 0;
         for stmt in stmts {
             status = self.execute_statement(stmt, io)?;
@@ -326,7 +337,7 @@ impl Executor {
     }
 
     /// Execute a single statement.
-    fn execute_statement(&mut self, stmt: &Statement, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    fn execute_statement(&mut self, stmt: &Statement, io: &mut IoContext) -> Result<i32, ExecError> {
         match stmt.mode {
             ExecutionMode::Background => Err(ExecError::UnsupportedFeature("background execution (&)".to_string())),
             ExecutionMode::Sequential | ExecutionMode::Terminated => {
@@ -349,44 +360,25 @@ impl Executor {
     }
 
     /// Execute an expression, returning its exit status.
-    pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
-        // Apply persistent FDs 0-2 from fd_table (set by `exec` redirects).
-        // Clone into locals so the overridden IoContext borrows them.
-        let mut fd0 = self.fd_table.get(&0).and_then(|f| f.try_clone().ok());
-        let mut fd1 = self.fd_table.get(&1).and_then(|f| f.try_clone().ok());
-        let mut fd2 = self.fd_table.get(&2).and_then(|f| f.try_clone().ok());
-        // Persistent redirect overrides TTY — child should see a file.
-        let out_tty = if fd1.is_some() { false } else { io.tty_stdout };
-        let err_tty = if fd2.is_some() { false } else { io.tty_stderr };
-        let mut persistent_io = IoContext::new(
-            match fd0.as_mut() {
-                Some(f) => f as &mut dyn std::io::Read,
-                None => io.stdin,
-            },
-            match fd1.as_mut() {
-                Some(f) => f as &mut dyn std::io::Write,
-                None => io.stdout,
-            },
-            match fd2.as_mut() {
-                Some(f) => f as &mut dyn std::io::Write,
-                None => io.stderr,
-            },
-            out_tty,
-            err_tty,
-        );
-
-        match self.execute_expression_inner(expr, &mut persistent_io) {
+    ///
+    /// Runtime errors (non-control-flow) are printed to stderr and converted
+    /// to an exit status. Persistent fds from `exec` redirects are already
+    /// in `io` — no wrapping needed.
+    pub fn execute_expression(&mut self, expr: &Expression, io: &mut IoContext) -> Result<i32, ExecError> {
+        match self.execute_expression_inner(expr, io) {
             Ok(s) => Ok(s),
             Err(e) if e.is_control_flow() => Err(e),
             Err(e) => {
                 let status = e.exit_status();
-                let _ = writeln!(persistent_io.stderr, "thaum: {e}");
+                if let Some(stderr) = io.fd_mut(2) {
+                    let _ = writeln!(stderr, "thaum: {e}");
+                }
                 Ok(status)
             }
         }
     }
 
-    fn execute_expression_inner(&mut self, expr: &Expression, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    fn execute_expression_inner(&mut self, expr: &Expression, io: &mut IoContext) -> Result<i32, ExecError> {
         match expr {
             Expression::Command(cmd) => {
                 // Try alias expansion before normal execution
@@ -621,7 +613,7 @@ impl Executor {
     fn try_alias_expansion(
         &mut self,
         cmd: &Command,
-        io: &mut IoContext<'_>,
+        io: &mut IoContext,
         already_expanded: &HashSet<String>,
     ) -> Result<Option<i32>, ExecError> {
         if !self.env.expand_aliases_enabled() || cmd.arguments.is_empty() {
@@ -720,7 +712,7 @@ impl Executor {
     fn execute_expression_with_alias_guard(
         &mut self,
         expr: &Expression,
-        io: &mut IoContext<'_>,
+        io: &mut IoContext,
         already_expanded: &HashSet<String>,
     ) -> Result<i32, ExecError> {
         match expr {
@@ -738,7 +730,7 @@ impl Executor {
     }
 
     /// Execute a simple command.
-    fn execute_command(&mut self, cmd: &Command, io: &mut IoContext<'_>) -> Result<i32, ExecError> {
+    fn execute_command(&mut self, cmd: &Command, io: &mut IoContext) -> Result<i32, ExecError> {
         // Expand arguments
         let mut expanded_args: Vec<String> = Vec::new();
         for arg in &cmd.arguments {
@@ -750,12 +742,14 @@ impl Executor {
         // Files are opened here (side effect: `> file` creates/truncates even
         // without a command). Redirect handles are dropped when `active` goes
         // out of scope.
-        let mut active = self.resolve_redirects(&cmd.redirects)?;
+        let mut active = self.resolve_redirects(&cmd.redirects, io)?;
 
         // Xtrace: print expanded command to stderr before dispatch.
         if self.env.xtrace_enabled() && !expanded_args.is_empty() {
             let ps4 = self.env.get_var("PS4").unwrap_or("+ ").to_string();
-            let _ = writeln!(io.stderr, "{}{}", ps4, expanded_args.join(" "));
+            if let Some(stderr) = io.fd_mut(2) {
+                let _ = writeln!(stderr, "{}{}", ps4, expanded_args.join(" "));
+            }
         }
 
         // If no command name, just process assignments
@@ -778,29 +772,31 @@ impl Executor {
         // Check for special builtins (need Executor access, not just Environment).
         match cmd_name.as_str() {
             "eval" => {
-                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
-                let mut cmd_io = active.apply_to_io(io);
-                let result = self.builtin_eval(cmd_args, &mut cmd_io);
-                self.restore_prefix_assignments(saved);
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+                let saved_fds = active.apply(io);
+                let result = self.builtin_eval(cmd_args, io);
+                saved_fds.restore(io);
+                self.restore_prefix_assignments(saved_env);
                 return result;
             }
             "source" | "." => {
-                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
-                let mut cmd_io = active.apply_to_io(io);
-                let result = self.builtin_source(cmd_args, &mut cmd_io);
-                self.restore_prefix_assignments(saved);
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+                let saved_fds = active.apply(io);
+                let result = self.builtin_source(cmd_args, io);
+                saved_fds.restore(io);
+                self.restore_prefix_assignments(saved_env);
                 return result;
             }
             "exec" => {
-                let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
                 if cmd_args.is_empty() {
-                    // Redirect-only mode: adopt redirects permanently.
-                    self.adopt_redirects(active);
-                    self.restore_prefix_assignments(saved);
+                    // Redirect-only mode: adopt redirects permanently into IoContext.
+                    self.adopt_redirects(active, io);
+                    self.restore_prefix_assignments(saved_env);
                     return Ok(0);
                 }
                 let result = self.builtin_exec(cmd_args, &mut active, io);
-                self.restore_prefix_assignments(saved);
+                self.restore_prefix_assignments(saved_env);
                 return result;
             }
             _ => {}
@@ -808,7 +804,7 @@ impl Executor {
 
         // Check for functions first
         if let Some(func) = self.env.get_function(cmd_name).cloned() {
-            let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+            let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
             let call_info = environment::CallInfo {
                 function_name: cmd_name.to_string(),
                 source_file: func.def_source.clone(),
@@ -821,13 +817,14 @@ impl Executor {
             let saved_base = self.lineno_base;
             self.lineno_base = func.def_lineno.saturating_sub(1);
 
-            let mut cmd_io = active.apply_to_io(io);
-            let result = self.execute_compound(&func.body, &func.redirects, &mut cmd_io);
+            let saved_fds = active.apply(io);
+            let result = self.execute_compound(&func.body, &func.redirects, io);
+            saved_fds.restore(io);
 
             self.lineno_base = saved_base;
 
             self.env.pop_scope();
-            self.restore_prefix_assignments(saved);
+            self.restore_prefix_assignments(saved_env);
 
             return match result {
                 Ok(status) => Ok(status),
@@ -851,9 +848,9 @@ impl Executor {
         };
 
         if is_active_builtin {
-            let saved = self.apply_prefix_assignments(&cmd.assignments)?;
+            let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+            let saved_fds = active.apply(io);
 
-            let cmd_io = active.apply_to_io(io);
             let mut stdout_buf: Vec<u8> = Vec::new();
             let mut stderr_buf: Vec<u8> = Vec::new();
 
@@ -867,14 +864,25 @@ impl Executor {
             }
             let all_args: Vec<String> = cmd_args.iter().cloned().chain(extra_args).collect();
 
-            let result = builtins::run_builtin(
-                cmd_name,
-                &all_args,
-                &mut self.env,
-                cmd_io.stdin,
-                &mut stdout_buf,
-                &mut stderr_buf,
-            );
+            let result = if let Some(stdin) = io.fd_mut(0) {
+                builtins::run_builtin(
+                    cmd_name,
+                    &all_args,
+                    &mut self.env,
+                    stdin,
+                    &mut stdout_buf,
+                    &mut stderr_buf,
+                )
+            } else {
+                builtins::run_builtin(
+                    cmd_name,
+                    &all_args,
+                    &mut self.env,
+                    &mut std::io::empty(),
+                    &mut stdout_buf,
+                    &mut stderr_buf,
+                )
+            };
 
             // Execute array assignments AFTER the builtin runs, so declare -A
             // has created the associative array before we set subscripted elements.
@@ -886,13 +894,18 @@ impl Executor {
 
             // Write captured output to the (possibly redirected) io context
             if !stdout_buf.is_empty() {
-                cmd_io.stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                if let Some(stdout) = io.fd_mut(1) {
+                    stdout.write_all(&stdout_buf).map_err(ExecError::Io)?;
+                }
             }
             if !stderr_buf.is_empty() {
-                cmd_io.stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                if let Some(stderr) = io.fd_mut(2) {
+                    stderr.write_all(&stderr_buf).map_err(ExecError::Io)?;
+                }
             }
 
-            self.restore_prefix_assignments(saved);
+            saved_fds.restore(io);
+            self.restore_prefix_assignments(saved_env);
 
             return result;
         }
@@ -1112,8 +1125,8 @@ impl Default for Executor {
 pub fn run(input: &str) -> Result<i32, ExecError> {
     let program = crate::parse(input).map_err(|e| ExecError::BadSubstitution(format!("parse error: {e}")))?;
     let mut executor = Executor::new();
-    let mut process_io = ProcessIo::new();
-    match executor.execute(&program, &mut process_io.context()) {
+    let mut io = IoContext::from_process();
+    match executor.execute(&program, &mut io) {
         Ok(status) => Ok(status),
         Err(ExecError::ExitRequested(code)) => Ok(code),
         Err(e) => Err(e),

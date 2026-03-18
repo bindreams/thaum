@@ -109,7 +109,7 @@ fn pipeline_command_not_found_status(#[fixture(test_tools)] tools: &Path) {
     assert!(r.stderr().contains("command not found"));
 }
 
-/// When both tty flags are true, the last pipeline stage uses ConPTY on Windows.
+/// When both tty overrides are set, the last pipeline stage uses ConPTY on Windows.
 /// This exercises the drain_and_wait_conpty + subsequent wait() path, which
 /// previously triggered undefined behavior (double-wait on closed handles).
 #[skuld::test]
@@ -121,14 +121,14 @@ fn pipeline_last_stage_conpty_no_double_wait(#[fixture(test_tools)] tools: &Path
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     // On Windows with ConPTY, the child should see stdout as a TTY.
     // On Unix with Pty, same. The key assertion is no crash/UB from double-wait.
     assert!(!out.is_empty(), "pipeline should produce output from isatty, got empty");
@@ -144,14 +144,14 @@ fn pipeline_stdin_reaches_conpty_child(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("hello"),
         "piped stdin should reach ConPTY child, got: {out:?}"
@@ -172,18 +172,18 @@ fn external_conpty_with_fd_redirect(#[fixture(test_tools)] tools: &Path, #[fixtu
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
+    drop(capture.finish(io));
     assert!(file.exists(), "fd 3 redirect should create the file");
 }
 
 /// Mid-pipeline stages should see stdout as a pipe, not a PTY, even when the
-/// shell's tty_stdout is true. Only the last stage gets the PTY.
+/// shell's tty flags are overridden. Only the last stage gets the PTY.
 #[skuld::test]
 fn pipeline_mid_stage_stdout_is_pipe(#[fixture(test_tools)] tools: &Path) {
     use thaum::exec::CapturedIo;
@@ -193,14 +193,14 @@ fn pipeline_mid_stage_stdout_is_pipe(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("stdout:no"),
         "mid-pipeline stage stdout should be a pipe, not a PTY, got: {out:?}"
@@ -229,19 +229,20 @@ fn external_output_relayed_through_io_context(#[fixture(test_tools)] tools: &Pat
     let _ = executor.env_mut().set_var("THAUM_TEST_VAR", "1");
     executor.env_mut().export_var("THAUM_TEST_VAR");
 
-    let mut captured = CapturedIo::new();
-    let status = executor.execute(&program, &mut captured.context()).unwrap();
+    let (mut io, capture) = CapturedIo::new();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
+    let output = capture.finish(io);
     assert!(
-        captured.stdout_string().contains("THAUM_TEST_VAR=1"),
+        output.stdout_string().contains("THAUM_TEST_VAR=1"),
         "IoContext should receive external command output, got: {:?}",
-        captured.stdout_string()
+        output.stdout_string()
     );
 }
 
 // PTY forwarding ------------------------------------------------------------------------------------------------------
 
-/// When both tty_stdout and tty_stderr are true, the child should see a terminal
+/// When both tty overrides are set, the child should see a terminal
 /// on fd 1 (via ConPTY on Windows, PTY on Unix).
 #[skuld::test]
 fn external_pty_stdout_reports_tty(#[fixture(test_tools)] tools: &Path) {
@@ -251,17 +252,17 @@ fn external_pty_stdout_reports_tty(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("stdout:yes"),
-        "child should see stdout as TTY when tty_stdout=true, got: {out:?}"
+        "child should see stdout as TTY when tty override is set, got: {out:?}"
     );
     assert!(
         !out.contains('\r'),
@@ -269,7 +270,7 @@ fn external_pty_stdout_reports_tty(#[fixture(test_tools)] tools: &Path) {
     );
 }
 
-/// When only stdout requests a TTY but stderr does not, the child should still
+/// When only stdout has tty override but stderr does not, the child should still
 /// see stdout as a terminal. POSIX semantics: isatty() is independent per fd.
 #[skuld::test]
 fn external_mixed_tty_stdout_only(#[fixture(test_tools)] tools: &Path) {
@@ -279,21 +280,20 @@ fn external_mixed_tty_stdout_only(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = false;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("stdout:yes"),
         "stdout should be TTY even when stderr is not, got: {out:?}"
     );
     assert!(
         out.contains("stderr:no"),
-        "stderr should be pipe when tty_stderr=false, got: {out:?}"
+        "stderr should be pipe when no tty override, got: {out:?}"
     );
     assert!(
         !out.contains('\r'),
@@ -301,7 +301,7 @@ fn external_mixed_tty_stdout_only(#[fixture(test_tools)] tools: &Path) {
     );
 }
 
-/// When only stderr requests a TTY but stdout does not, the child should still
+/// When only stderr has tty override but stdout does not, the child should still
 /// see stderr as a terminal. Symmetric case of mixed_tty_stdout_only.
 #[skuld::test]
 fn external_mixed_tty_stderr_only(#[fixture(test_tools)] tools: &Path) {
@@ -311,17 +311,16 @@ fn external_mixed_tty_stderr_only(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = false;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("stdout:no"),
-        "stdout should be pipe when tty_stdout=false, got: {out:?}"
+        "stdout should be pipe when no tty override, got: {out:?}"
     );
     assert!(
         out.contains("stderr:yes"),
@@ -343,14 +342,14 @@ fn external_pty_output_no_crlf(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
-    ctx.tty_stderr = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("hello"),
         "PTY echo should produce output containing 'hello', got: {out:?}"
@@ -361,7 +360,7 @@ fn external_pty_output_no_crlf(#[fixture(test_tools)] tools: &Path) {
     );
 }
 
-/// When tty_stdout is false (default for CapturedIo), the child should see a pipe.
+/// When no tty overrides are set (default for CapturedIo), the child should see a pipe.
 #[skuld::test]
 fn external_pipe_stdout_reports_no_tty(#[fixture(test_tools)] tools: &Path) {
     use thaum::exec::CapturedIo;
@@ -370,18 +369,19 @@ fn external_pipe_stdout_reports_no_tty(#[fixture(test_tools)] tools: &Path) {
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let status = executor.execute(&program, &mut captured.context()).unwrap();
+    let (mut io, capture) = CapturedIo::new();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
-    let out = captured.stdout_string();
+    let output = capture.finish(io);
+    let out = output.stdout_string();
     assert!(
         out.contains("stdout:no"),
-        "child should see stdout as pipe when tty_stdout=false, got: {out:?}"
+        "child should see stdout as pipe when no tty override, got: {out:?}"
     );
 }
 
-/// When stdout is redirected to a file, the tty flag is cleared even if the parent's
-/// stdout is a terminal. The child should see a pipe, not a TTY.
+/// When stdout is redirected to a file, the tty override is not applied to the
+/// redirect target. The child should see a pipe, not a TTY.
 #[skuld::test]
 fn external_redirect_clears_tty(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
     use thaum::exec::CapturedIo;
@@ -393,17 +393,104 @@ fn external_redirect_clears_tty(#[fixture(test_tools)] tools: &Path, #[fixture(t
     let mut executor = crate::test_executor_with_tools(tools);
     executor.env_mut().export_var("PATH");
 
-    let mut captured = CapturedIo::new();
-    let mut ctx = captured.context();
-    ctx.tty_stdout = true;
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
 
-    let status = executor.execute(&program, &mut ctx).unwrap();
+    let status = executor.execute(&program, &mut io).unwrap();
     assert_eq!(status, 0);
+    drop(capture.finish(io));
 
-    let output = std::fs::read_to_string(&file).unwrap();
+    let file_output = std::fs::read_to_string(&file).unwrap();
     assert!(
-        output.contains("stdout:no"),
-        "redirected stdout should NOT be a TTY, got: {output:?}"
+        file_output.contains("stdout:no"),
+        "redirected stdout should NOT be a TTY, got: {file_output:?}"
+    );
+}
+
+// Terminal inherit ----------------------------------------------------------------------------------------------------
+
+/// When terminal_inherit is enabled and IoContext reports tty, the child inherits
+/// the parent's fds directly — output bypasses IoContext capture.
+#[skuld::test]
+fn external_inherit_bypasses_capture(#[fixture(test_tools)] tools: &Path) {
+    use thaum::exec::CapturedIo;
+
+    // `isatty` is an external command (not a builtin) that writes to stdout.
+    let program = thaum::parse("isatty").unwrap();
+    let mut executor = crate::test_executor_with_tools(tools);
+    executor.env_mut().export_var("PATH");
+    executor.set_terminal_inherit(true);
+
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
+
+    let status = executor.execute(&program, &mut io).unwrap();
+    assert_eq!(status, 0);
+    let output = capture.finish(io);
+    // With terminal_inherit, unredirected fds are inherited from the parent.
+    // Since CapturedIo uses pipes (not a real terminal), the child writes to
+    // the real process stdout — NOT captured. Captured stdout should be empty.
+    assert_eq!(
+        output.stdout_string(),
+        "",
+        "terminal_inherit should bypass capture, got: {:?}",
+        output.stdout_string()
+    );
+}
+
+/// With terminal_inherit, a redirected fd goes to file while the non-redirected
+/// fd is inherited from the parent.
+#[skuld::test]
+fn external_inherit_partial_redirect(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
+    use thaum::exec::CapturedIo;
+
+    // `isatty` is external — its stdout is redirected to a file.
+    let file = dir.join("out.txt");
+    let f = file.to_string_lossy().replace('\\', "/");
+    let script = format!("isatty > {f}");
+    let program = thaum::parse(&script).unwrap();
+    let mut executor = crate::test_executor_with_tools(tools);
+    executor.env_mut().export_var("PATH");
+    executor.set_terminal_inherit(true);
+
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
+
+    let status = executor.execute(&program, &mut io).unwrap();
+    assert_eq!(status, 0);
+    drop(capture.finish(io));
+
+    // Stdout was explicitly redirected to file — should contain isatty output.
+    let file_output = std::fs::read_to_string(&file).unwrap();
+    assert!(
+        file_output.contains("stdout:"),
+        "redirected stdout should contain isatty output, got: {file_output:?}"
+    );
+}
+
+/// Default terminal_inherit=false with tty override still uses PTY (existing behavior).
+#[skuld::test]
+fn external_no_inherit_tty_uses_pty(#[fixture(test_tools)] tools: &Path) {
+    use thaum::exec::CapturedIo;
+
+    let program = thaum::parse("isatty").unwrap();
+    let mut executor = crate::test_executor_with_tools(tools);
+    executor.env_mut().export_var("PATH");
+    // terminal_inherit defaults to false — PTY path should be used.
+
+    let (mut io, capture) = CapturedIo::new();
+    io.set_tty_override(1);
+    io.set_tty_override(2);
+
+    let status = executor.execute(&program, &mut io).unwrap();
+    assert_eq!(status, 0);
+    let output = capture.finish(io);
+    let out = output.stdout_string();
+    assert!(
+        out.contains("stdout:yes"),
+        "without terminal_inherit, tty override should use PTY, got: {out:?}"
     );
 }
 

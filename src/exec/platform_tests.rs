@@ -1,5 +1,5 @@
 #[cfg(unix)]
-use std::os::fd::AsRawFd;
+use std::os::fd::{AsRawFd, FromRawFd};
 
 skuld::default_labels!(exec);
 

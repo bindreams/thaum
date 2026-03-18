@@ -70,6 +70,7 @@ impl CommandEx {
     /// - **Unix:** POSIX shell quoting (single-quote each arg, escape `'`).
     /// - **Windows:** MSVC CRT quoting (double-quote, escape `\` before `"`).
     ///   Includes a `debug_assert` round-trip via `CommandLineToArgvW`.
+    #[cfg(any(test, windows))]
     pub fn commandline(&self) -> OsString {
         #[cfg(unix)]
         {

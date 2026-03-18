@@ -197,8 +197,7 @@ pub fn is_fd_terminal(fd: i32) -> bool {
 pub fn is_file_terminal(file: &std::fs::File) -> bool {
     #[cfg(unix)]
     {
-        use std::os::fd::AsRawFd;
-        nix::unistd::isatty(file.as_raw_fd()).unwrap_or(false)
+        nix::unistd::isatty(file).unwrap_or(false)
     }
     #[cfg(windows)]
     {

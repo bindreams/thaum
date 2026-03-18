@@ -8,7 +8,7 @@ use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum_testkit::sh_yaml::{Disabled, ParseErrorSpec, ShYaml};
 use yaml_rust2::Yaml;
 
-/// Whether --no-sandbox was passed on the command line.
+/// Whether THAUM_GAUNTLET_NO_SANDBOX=1 is set in the environment.
 static NO_SANDBOX: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 // YAML subset matching (using yaml_rust2::Yaml) -----------------------------------------------------------------------
@@ -236,7 +236,7 @@ fn run_exec_native(spec: &ShYaml, input: &str, dialect: thaum::Dialect) -> Resul
 
 // Docker proxy execution ==============================================================================================
 
-/// Execute a gauntlet test inside Docker by running the gauntlet binary with --no-sandbox.
+/// Execute a gauntlet test inside Docker by running the gauntlet binary with no-sandbox mode.
 ///
 /// Invokes the compiled gauntlet binary inside the container with `--format json`
 /// and `--exact` to run a single test. Parses the libtest JSON output to
@@ -245,9 +245,10 @@ fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker
     let output = Command::new("docker")
         .args([
             "exec",
+            "-e",
+            "THAUM_GAUNTLET_NO_SANDBOX=1",
             container_id,
             "/usr/local/bin/gauntlet-test",
-            "--no-sandbox",
             "--format",
             "json",
             "--exact",
@@ -334,7 +335,7 @@ fn run_test(spec: &ShYaml) -> Result<(), Failed> {
                 .map_err(|msg| format!("AST mismatch: {msg}\n\nActual verbose YAML:\n{actual_yaml_str}"))?;
         }
 
-        // 3. Execution assertions (optional, --no-sandbox native mode only)
+        // 3. Execution assertions (optional, no-sandbox native mode only)
         if spec.status.is_some() || spec.stdout.is_some() || spec.stderr.is_some() {
             let result = run_exec_native(spec, input, dialect)?;
             if let Some(expected_status) = spec.status {
@@ -431,7 +432,7 @@ fn collect_files_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 fn main() {
-    let no_sandbox = std::env::args().any(|a| a == "--no-sandbox");
+    let no_sandbox = std::env::var("THAUM_GAUNTLET_NO_SANDBOX").is_ok_and(|v| v == "1");
     NO_SANDBOX.store(no_sandbox, std::sync::atomic::Ordering::Relaxed);
 
     // Check if gauntlet execution is available. For Docker mode, this only runs
@@ -451,7 +452,6 @@ fn main() {
     let files = discover_gauntlet_files(&gauntlet_dir);
 
     let mut runner = skuld::TestRunner::new();
-    runner.strip_args(&["--no-sandbox"]);
 
     for path in files {
         let rel = path
@@ -485,7 +485,7 @@ fn main() {
             vec!["gauntlet", "lex", "parse"]
         };
 
-        // Disable exec tests when Docker is unavailable (unless --no-sandbox).
+        // Disable exec tests when Docker is unavailable (unless no-sandbox mode).
         let ignored = disabled || (has_exec && !exec_available);
 
         if has_exec && !no_sandbox && !disabled {
@@ -498,7 +498,7 @@ fn main() {
                 }
             });
         } else {
-            // Native mode (--no-sandbox) or parse-only tests: run locally.
+            // Native mode (no-sandbox) or parse-only tests: run locally.
             runner.add(display_name, &labels, ignored, move || {
                 if let Err(e) = run_test(&parsed) {
                     panic!("{}", e.message().unwrap_or("test failed"));

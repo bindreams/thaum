@@ -39,7 +39,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --features cli -E 'binary(gauntlet)' -- --no-sandbox
+      - run: cargo nextest run --features cli -E 'binary(gauntlet)'
+        env:
+          THAUM_GAUNTLET_NO_SANDBOX: "1"
 
   lint:
     name: Lint

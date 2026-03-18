@@ -7,7 +7,7 @@
 //!
 //! The gauntlet test binary is compiled into the Docker image alongside thaum.
 //! Exec tests delegate to the binary inside Docker via `docker exec` with
-//! `--no-sandbox --format json --exact`.
+//! `THAUM_GAUNTLET_NO_SANDBOX=1 --format json --exact`.
 
 use std::path::Path;
 use std::process::{Command, Stdio};

@@ -2,10 +2,10 @@
 # /// script
 # dependencies = ["ruamel.yaml"]
 # ///
-"""Import Oils spec tests into thaum corpus format.
+"""Import Oils spec tests into thaum gauntlet format.
 
 Clones the Oils repository at a pinned revision, parses spec/*.test.sh files,
-and converts each test case into a .sh.yaml corpus file.
+and converts each test case into a .sh.yaml gauntlet file.
 
 Usage:
     uv run scripts/import-oils.py
@@ -32,7 +32,7 @@ DEFAULT_REV = "master"
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "tests" / "corpus" / "oils"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "tests" / "gauntlet" / "oils"
 
 
 # ---------------------------------------------------------------------------
@@ -275,7 +275,7 @@ def import_spec_files(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Import Oils spec tests into thaum corpus format")
+    parser = argparse.ArgumentParser(description="Import Oils spec tests into thaum gauntlet format")
     parser.add_argument("--rev", default=DEFAULT_REV, help=f"Oils revision to clone (default: {DEFAULT_REV})")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Output directory")
     parser.add_argument("--spec-files", help="Comma-separated list of spec files to import (e.g. 'arith.test.sh,loop.test.sh')")

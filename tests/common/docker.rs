@@ -1,11 +1,11 @@
-//! Docker sandbox for corpus execution tests.
+//! Docker sandbox for gauntlet execution tests.
 //!
 //! Provides two process-scoped fixtures:
 //!
-//! - **`corpus_image`**: builds the Docker image (untagged), removes on drop.
-//! - **`corpus_sandbox`**: starts a container from the image, kills on drop.
+//! - **`gauntlet_image`**: builds the Docker image (untagged), removes on drop.
+//! - **`gauntlet_sandbox`**: starts a container from the image, kills on drop.
 //!
-//! The corpus test binary is compiled into the Docker image alongside thaum.
+//! The gauntlet test binary is compiled into the Docker image alongside thaum.
 //! Exec tests delegate to the binary inside Docker via `docker exec` with
 //! `--no-sandbox --format json --exact`.
 
@@ -22,39 +22,39 @@ fn docker_available() -> Result<(), String> {
     }
 }
 
-// Corpus image fixture (process-scoped) ===============================================================================
+// Gauntlet image fixture (process-scoped) =============================================================================
 
 /// A Docker image built from `tests/docker/Dockerfile`. Untagged — identified
 /// by raw image ID. Removed on drop (build cache stays).
-pub struct CorpusImage {
+pub struct GauntletImage {
     pub id: String,
 }
 
-impl Drop for CorpusImage {
+impl Drop for GauntletImage {
     fn drop(&mut self) {
         thaum_testkit::docker::remove_image(&self.id);
-        eprintln!("corpus: removed Docker image {}", &self.id[..12.min(self.id.len())]);
+        eprintln!("gauntlet: removed Docker image {}", &self.id[..12.min(self.id.len())]);
     }
 }
 
 #[skuld::fixture(scope = process, requires = [docker_available])]
-fn corpus_image() -> Result<CorpusImage, String> {
+fn gauntlet_image() -> Result<GauntletImage, String> {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
-    eprintln!("corpus: building Docker image...");
+    eprintln!("gauntlet: building Docker image...");
     let id = thaum_testkit::docker::build_image(&dockerfile, manifest_dir, None)?;
-    eprintln!("corpus: built Docker image {}", &id[..12.min(id.len())]);
-    Ok(CorpusImage { id })
+    eprintln!("gauntlet: built Docker image {}", &id[..12.min(id.len())]);
+    Ok(GauntletImage { id })
 }
 
-// Corpus sandbox fixture (process-scoped) =============================================================================
+// Gauntlet sandbox fixture (process-scoped) ===========================================================================
 
-/// A running Docker container for corpus test execution. Killed on drop.
-pub struct CorpusSandbox {
+/// A running Docker container for gauntlet test execution. Killed on drop.
+pub struct GauntletSandbox {
     pub container_id: String,
 }
 
-impl Drop for CorpusSandbox {
+impl Drop for GauntletSandbox {
     fn drop(&mut self) {
         let _ = Command::new("docker")
             .args(["rm", "-f", &self.container_id])
@@ -62,14 +62,14 @@ impl Drop for CorpusSandbox {
             .stderr(Stdio::null())
             .status();
         eprintln!(
-            "corpus: removed sandbox container {}",
+            "gauntlet: removed sandbox container {}",
             &self.container_id[..12.min(self.container_id.len())]
         );
     }
 }
 
 #[skuld::fixture(scope = process, requires = [docker_available])]
-fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox, String> {
+fn gauntlet_sandbox(#[fixture] gauntlet_image: &GauntletImage) -> Result<GauntletSandbox, String> {
     let output = Command::new("docker")
         .args([
             "run",
@@ -78,7 +78,7 @@ fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox
             "--tmpfs=/tmp:size=64m,exec",
             "--entrypoint",
             "sleep",
-            &corpus_image.id,
+            &gauntlet_image.id,
             "infinity",
         ])
         .stdout(Stdio::piped())
@@ -93,15 +93,15 @@ fn corpus_sandbox(#[fixture] corpus_image: &CorpusImage) -> Result<CorpusSandbox
 
     let container_id = String::from_utf8_lossy(&output.stdout).trim().to_string();
     eprintln!(
-        "corpus: started sandbox container {}",
+        "gauntlet: started sandbox container {}",
         &container_id[..12.min(container_id.len())]
     );
-    Ok(CorpusSandbox { container_id })
+    Ok(GauntletSandbox { container_id })
 }
 
 // ExecResult ==========================================================================================================
 
-/// Result from running a test script (used by `run_exec_native` in corpus.rs).
+/// Result from running a test script (used by `run_exec_native` in gauntlet.rs).
 #[derive(Debug)]
 pub struct ExecResult {
     pub stdout: String,

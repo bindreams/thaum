@@ -58,7 +58,7 @@ Optional arguments:
 - `labels = [docker, slow]` — prepended as `[docker][slow]` for nextest filtering
 - `ignore` or `ignore = "reason"` — statically ignore the test
 
-For dynamic test generation (e.g. corpus tests from data files), use `skuld::TestRunner::add()`.
+For dynamic test generation (e.g. gauntlet tests from data files), use `skuld::TestRunner::add()`.
 
 ## Pre-commit checklist
 

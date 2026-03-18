@@ -1,7 +1,7 @@
 //! Infrastructure tests — verify that test/bench machinery works correctly.
 //!
 //! Tests here catch infrastructure problems (Docker, callgrind, binary
-//! availability) independently of functional test suites like corpus or parse.
+//! availability) independently of functional test suites like gauntlet or parse.
 
 #[path = "common/mod.rs"]
 mod common;

@@ -236,9 +236,9 @@ fn run_exec_native(spec: &ShYaml, input: &str, dialect: thaum::Dialect) -> Resul
 
 // Docker proxy execution ==============================================================================================
 
-/// Execute a corpus test inside Docker by running the corpus binary with --no-sandbox.
+/// Execute a gauntlet test inside Docker by running the gauntlet binary with --no-sandbox.
 ///
-/// Invokes the compiled corpus binary inside the container with `--format json`
+/// Invokes the compiled gauntlet binary inside the container with `--format json`
 /// and `--exact` to run a single test. Parses the libtest JSON output to
 /// determine pass/fail.
 fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker::ExecResult, Failed> {
@@ -246,7 +246,7 @@ fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker
         .args([
             "exec",
             container_id,
-            "/usr/local/bin/corpus-test",
+            "/usr/local/bin/gauntlet-test",
             "--no-sandbox",
             "--format",
             "json",
@@ -299,7 +299,7 @@ fn run_exec_docker(container_id: &str, test_name: &str) -> Result<common::docker
     }
 
     // No test result event found — the binary likely failed to start.
-    Err(format!("corpus binary produced no test result\nstdout: {stdout_str}\nstderr: {stderr_str}").into())
+    Err(format!("gauntlet binary produced no test result\nstdout: {stdout_str}\nstderr: {stderr_str}").into())
 }
 
 // Test execution ======================================================================================================
@@ -401,7 +401,7 @@ fn run_test(spec: &ShYaml) -> Result<(), Failed> {
 
 // Test discovery and harness ------------------------------------------------------------------------------------------
 
-fn discover_corpus_files(dir: &Path) -> Vec<PathBuf> {
+fn discover_gauntlet_files(dir: &Path) -> Vec<PathBuf> {
     let mut files = Vec::new();
     if !dir.exists() {
         return files;
@@ -434,28 +434,28 @@ fn main() {
     let no_sandbox = std::env::args().any(|a| a == "--no-sandbox");
     NO_SANDBOX.store(no_sandbox, std::sync::atomic::Ordering::Relaxed);
 
-    // Check if corpus execution is available. For Docker mode, this only runs
+    // Check if gauntlet execution is available. For Docker mode, this only runs
     // `docker info` (fast, idempotent).
     let exec_available = no_sandbox
-        || skuld::collect_fixture_requires(&["corpus_sandbox"])
+        || skuld::collect_fixture_requires(&["gauntlet_sandbox"])
             .iter()
             .all(|check| check().is_ok());
 
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).
     if exec_available && !no_sandbox {
-        skuld::warm_up("corpus_sandbox");
+        skuld::warm_up("gauntlet_sandbox");
     }
 
-    let corpus_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/corpus");
-    let files = discover_corpus_files(&corpus_dir);
+    let gauntlet_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/gauntlet");
+    let files = discover_gauntlet_files(&gauntlet_dir);
 
     let mut runner = skuld::TestRunner::new();
     runner.strip_args(&["--no-sandbox"]);
 
     for path in files {
         let rel = path
-            .strip_prefix(&corpus_dir)
+            .strip_prefix(&gauntlet_dir)
             .unwrap_or(&path)
             .to_string_lossy()
             .replace(".sh.yaml", "")
@@ -480,19 +480,19 @@ fn main() {
 
         let has_exec = parsed.status.is_some() || parsed.stdout.is_some() || parsed.stderr.is_some();
         let labels: Vec<&str> = if has_exec {
-            vec!["corpus", "lex", "parse", "exec"]
+            vec!["gauntlet", "lex", "parse", "exec"]
         } else {
-            vec!["corpus", "lex", "parse"]
+            vec!["gauntlet", "lex", "parse"]
         };
 
         // Disable exec tests when Docker is unavailable (unless --no-sandbox).
         let ignored = disabled || (has_exec && !exec_available);
 
         if has_exec && !no_sandbox && !disabled {
-            // Docker mode: delegate the entire test to the corpus binary inside Docker.
+            // Docker mode: delegate the entire test to the gauntlet binary inside Docker.
             let display_name_for_docker = display_name.clone();
             runner.add(display_name, &labels, ignored, move || {
-                let sandbox: &common::docker::CorpusSandbox = skuld::fixture("corpus_sandbox");
+                let sandbox: &common::docker::GauntletSandbox = skuld::fixture("gauntlet_sandbox");
                 if let Err(e) = run_exec_docker(&sandbox.container_id, &display_name_for_docker) {
                     panic!("{}", e.message().unwrap_or("test failed"));
                 }
@@ -507,7 +507,7 @@ fn main() {
         }
     }
 
-    // Process fixtures (corpus_image, corpus_sandbox) are cleaned up
+    // Process fixtures (gauntlet_image, gauntlet_sandbox) are cleaned up
     // automatically inside run_tests() — image removed, container killed.
     runner.run_tests().exit();
 }

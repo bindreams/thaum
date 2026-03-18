@@ -28,10 +28,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --features cli -E 'not binary(corpus)'
+      - run: cargo nextest run --features cli -E 'not binary(gauntlet)'
 
-  test-corpus:
-    name: Corpus tests
+  test-gauntlet:
+    name: Gauntlet tests
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -39,7 +39,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --features cli -E 'binary(corpus)' -- --no-sandbox
+      - run: cargo nextest run --features cli -E 'binary(gauntlet)' -- --no-sandbox
 
   lint:
     name: Lint

@@ -1,7 +1,7 @@
 //! Docker infrastructure smoke tests.
 //!
 //! Verify that Docker images build and containers work, independently of
-//! whether corpus or bench tests are enabled. Catches Dockerfile breakage
+//! whether gauntlet or bench tests are enabled. Catches Dockerfile breakage
 //! early.
 
 use std::path::Path;
@@ -28,8 +28,8 @@ impl Drop for DockerImage {
     }
 }
 
-#[skuld::fixture(scope = process, name = "infra_corpus_image", requires = [preconditions::docker])]
-fn corpus_image() -> Result<DockerImage, String> {
+#[skuld::fixture(scope = process, name = "infra_gauntlet_image", requires = [preconditions::docker])]
+fn gauntlet_image() -> Result<DockerImage, String> {
     let dockerfile = project_root().join("tests/docker/Dockerfile");
     thaum_testkit::docker::build_image(&dockerfile, project_root(), None).map(|id| DockerImage { id })
 }
@@ -94,8 +94,8 @@ fn kill_container(container_id: &str) {
 // Tests ---------------------------------------------------------------------------------------------------------------
 
 #[skuld::test]
-fn corpus_image_builds(#[fixture(infra_corpus_image)] image: &DockerImage) {
-    assert!(!image.id.is_empty(), "corpus image should have an ID");
+fn gauntlet_image_builds(#[fixture(infra_gauntlet_image)] image: &DockerImage) {
+    assert!(!image.id.is_empty(), "gauntlet image should have an ID");
 }
 
 #[skuld::test]
@@ -104,7 +104,7 @@ fn bench_image_builds(#[fixture(infra_bench_image)] image: &DockerImage) {
 }
 
 #[skuld::test]
-fn corpus_container_lifecycle(#[fixture(infra_corpus_image)] image: &DockerImage) {
+fn gauntlet_container_lifecycle(#[fixture(infra_gauntlet_image)] image: &DockerImage) {
     let container_id = start_container(&image.id);
     let (stdout, code) = exec_in(&container_id, &["echo", "ok"]);
     kill_container(&container_id);
@@ -114,7 +114,7 @@ fn corpus_container_lifecycle(#[fixture(infra_corpus_image)] image: &DockerImage
 }
 
 #[skuld::test]
-fn corpus_thaum_available(#[fixture(infra_corpus_image)] image: &DockerImage) {
+fn gauntlet_thaum_available(#[fixture(infra_gauntlet_image)] image: &DockerImage) {
     let container_id = start_container(&image.id);
     let (stdout, code) = exec_in(&container_id, &["thaum", "--version"]);
     kill_container(&container_id);

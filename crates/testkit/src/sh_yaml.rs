@@ -3,7 +3,7 @@
 //! The `.sh.yaml` format has a YAML header (metadata, assertions, environment)
 //! separated from the shell script body by a `---` line. This module provides
 //! [`ShYaml`] — a single struct that captures all header fields — and loading
-//! functions used by both corpus tests and benchmarks.
+//! functions used by both gauntlet tests and benchmarks.
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -12,10 +12,10 @@ use serde::Deserialize;
 
 // ShYaml struct =======================================================================================================
 
-/// Parsed `.sh.yaml` file — shared across corpus tests and benchmarks.
+/// Parsed `.sh.yaml` file — shared across gauntlet tests and benchmarks.
 ///
 /// Consumers use only the fields they need:
-/// - Corpus tests: all fields (validation, execution, output matching)
+/// - Gauntlet tests: all fields (validation, execution, output matching)
 /// - Benchmarks: `dialect`, `body`, `setup`, `environment`
 #[derive(Deserialize)]
 pub struct ShYaml {

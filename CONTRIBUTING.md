@@ -21,7 +21,7 @@ with the `skuld` custom harness. A bare `#[test]` compiles but silently never ru
 #[skuld::test(labels = [slow])]                     // label for filtering
 ```
 
-For dynamic tests (e.g. corpus YAML files), use `skuld::TestRunner::add()`.
+For dynamic tests (e.g. gauntlet YAML files), use `skuld::TestRunner::add()`.
 
 ### Benchmarks
 
@@ -100,7 +100,7 @@ tests/
   parse.rs + parse/ — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
   exec.rs + exec/   — execution tests (basic, expansion, arrays, printf, bash)
   cli.rs + cli/     — CLI output format regression tests (requires --features cli)
-  corpus.rs         — oils corpus test runner (custom harness)
+  gauntlet.rs       — gauntlet test runner (custom harness)
 crates/testkit/ — test infrastructure (separate workspace crate, not part of public API)
   src/sh_yaml.rs   — .sh.yaml test format parser
   src/docker.rs    — Docker helpers (image build, availability check)

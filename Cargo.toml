@@ -75,7 +75,7 @@ name = "exec"
 harness = false
 
 [[test]]
-name = "corpus"
+name = "gauntlet"
 harness = false
 
 [[test]]

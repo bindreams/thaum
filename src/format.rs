@@ -1,7 +1,7 @@
 //! AST formatting: YAML output and canonical shell source.
 //!
 //! Provides the YAML emitter, value model, and AST writer used by both the CLI
-//! and the corpus test runner, plus a source writer for `declare -f` output.
+//! and the gauntlet test runner, plus a source writer for `declare -f` output.
 
 /// Byte-offset to line/column mapper for source-location display.
 pub mod source_map;

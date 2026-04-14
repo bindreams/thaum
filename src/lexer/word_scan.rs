@@ -6,7 +6,7 @@ use crate::error::LexError;
 use crate::span::Span;
 use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};
 
-use super::{LastScanned, Lexer};
+use super::{heredoc, LastScanned, Lexer};
 
 impl Lexer {
     /// Scan one fragment token. Called when the cursor is at a non-blank,
@@ -153,15 +153,20 @@ impl Lexer {
                             if self.peek_char() == Some('(') {
                                 self.advance_char();
                                 content.push('(');
-                                self.read_balanced_into(&mut content, '(', ')', 2, quote_start)?;
+                                // $((..)) — arith, no heredocs (<< is left-shift).
+                                self.read_balanced_into(&mut content, '(', ')', 2, quote_start, false)?;
                             } else {
-                                self.read_balanced_into(&mut content, '(', ')', 1, quote_start)?;
+                                // $(..) — cmdsub, heredocs allowed.
+                                self.read_balanced_into(&mut content, '(', ')', 1, quote_start, true)?;
                             }
                         }
                         Some('{') => {
                             self.advance_char();
                             content.push('{');
-                            self.read_balanced_into(&mut content, '{', '}', 1, quote_start)?;
+                            // ${..} — brace param. Heredocs disabled at this
+                            // level (brace-arg `<<` is literal); nested $(..)
+                            // re-enables heredoc detection via recursive descent.
+                            self.read_balanced_into(&mut content, '{', '}', 1, quote_start, false)?;
                         }
                         _ => {}
                     }
@@ -214,16 +219,16 @@ impl Lexer {
             Some('(') => {
                 self.advance_char(); // consume (
                 if self.peek_char() == Some('(') {
-                    // Arithmetic expansion: $((expr))
+                    // Arithmetic expansion: $((expr)) — `<<` is left-shift.
                     self.advance_char(); // consume second (
-                    let content = self.read_balanced_content('(', ')', 2, dollar_pos)?;
+                    let content = self.read_balanced_content('(', ')', 2, dollar_pos, false)?;
                     Ok(SpannedToken {
                         token: Token::ArithSub(content),
                         span: Span::new(start, self.cursor_pos().0),
                     })
                 } else {
-                    // Command substitution: $(cmd)
-                    let content = self.read_balanced_content('(', ')', 1, dollar_pos)?;
+                    // Command substitution: $(cmd) — heredocs allowed.
+                    let content = self.read_balanced_content('(', ')', 1, dollar_pos, true)?;
                     Ok(SpannedToken {
                         token: Token::CommandSub(content),
                         span: Span::new(start, self.cursor_pos().0),
@@ -232,7 +237,9 @@ impl Lexer {
             }
             Some('{') => {
                 self.advance_char(); // consume {
-                let content = self.read_balanced_content('{', '}', 1, dollar_pos)?;
+                                     // ${..} — heredocs disabled at brace-arg level (literal text);
+                                     // nested $(..) re-enables via recursive descent.
+                let content = self.read_balanced_content('{', '}', 1, dollar_pos, false)?;
                 Ok(SpannedToken {
                     token: Token::BraceParam(content),
                     span: Span::new(start, self.cursor_pos().0),
@@ -591,7 +598,8 @@ impl Lexer {
     fn scan_process_sub(&mut self, start: usize, direction: char) -> Result<SpannedToken, LexError> {
         self.advance_char(); // consume < or >
         self.advance_char(); // consume (
-        let content = self.read_balanced_content('(', ')', 1, start)?;
+                             // <(cmd) / >(cmd) — shell command context, heredocs allowed.
+        let content = self.read_balanced_content('(', ')', 1, start, true)?;
         Ok(SpannedToken {
             token: Token::BashProcessSub { direction, content },
             span: Span::new(start, self.cursor_pos().0),
@@ -684,9 +692,26 @@ impl Lexer {
         })
     }
 
-    /// Read characters into `word` until matching close delimiter is found.
-    /// Handles nested open/close pairs and quoting within the balanced content.
-    /// Returns an error if EOF is reached without finding the closing delimiter.
+    /// Read characters into `word` until the matching close delimiter is found.
+    /// Handles nested open/close pairs, case/esac pattern delimiters, and
+    /// quoting within the balanced content.
+    ///
+    /// `enable_heredocs` controls whether bare `<<`/`<<-` at this scope level
+    /// is recognized as a heredoc operator:
+    /// - `true` for shell-command contexts (`$(...)`, `<(...)`, `>(...)`): `<<`
+    ///   queues a heredoc and the body is inlined verbatim into `word` at the
+    ///   next `\n`.
+    /// - `false` for non-command contexts (`$((..))`, `${..}`): `<<` is
+    ///   literal (left-shift inside arith, literal text inside brace-arg).
+    ///
+    /// Regardless of `enable_heredocs`, nested `$(..)` and `<(..)`/`>(..)`
+    /// constructs are detected and scanned recursively with heredoc detection
+    /// re-enabled inside their bodies; nested `$((..))` and `${..}` are
+    /// recursively scanned with heredoc detection disabled. This ensures
+    /// `${var:-$(cat <<EOF ...)}` works (inner cmdsub gets heredoc handling)
+    /// while `${var:-<<foo}` is preserved as literal text.
+    ///
+    /// Returns `UnterminatedExpansion` on EOF without matching close.
     pub(super) fn read_balanced_into(
         &mut self,
         word: &mut String,
@@ -694,11 +719,17 @@ impl Lexer {
         close: char,
         mut depth: i32,
         start: usize,
+        enable_heredocs: bool,
     ) -> Result<(), LexError> {
+        debug_assert_ne!(open, close, "read_balanced_into: open and close must differ");
+
         // Track case/esac nesting so that ) in case patterns inside $()
         // doesn't prematurely close the command substitution.
         let mut case_depth: i32 = 0;
         let mut current_word = String::new();
+
+        // Queued heredocs from the current logical line; drained on the next '\n'.
+        let mut local_heredocs: Vec<(String, bool)> = Vec::new();
 
         // Check if a completed word is `case` or `esac` and update depth.
         let check_keyword = |w: &mut String, case_depth: &mut i32| {
@@ -712,10 +743,117 @@ impl Lexer {
 
         while let Some(ch) = self.advance_char() {
             word.push(ch);
+
+            // Heredoc operator detection — only at shell-command scope level.
+            // Nested arith and brace-arg scopes are handled by recursive
+            // descent below, so we don't need an arith_nest counter here.
+            if enable_heredocs && ch == '<' && self.peek_char() == Some('<') {
+                check_keyword(&mut current_word, &mut case_depth);
+                let second = self.advance_char().unwrap();
+                debug_assert_eq!(second, '<');
+                word.push(second);
+                // `<<<` is a here-string (Bash) or invalid (POSIX). In either
+                // case it is NOT a heredoc operator — consume the third `<`
+                // and continue without queueing.
+                if self.peek_char() == Some('<') {
+                    let third = self.advance_char().unwrap();
+                    word.push(third);
+                    continue;
+                }
+                // `<<-` strip-tabs variant.
+                let mut strip_tabs = false;
+                if self.peek_char() == Some('-') {
+                    let dash = self.advance_char().unwrap();
+                    word.push(dash);
+                    strip_tabs = true;
+                }
+                // Skip blanks (space/tab) between the operator and the delimiter.
+                while matches!(self.peek_char(), Some(' ') | Some('\t')) {
+                    let blank = self.advance_char().unwrap();
+                    word.push(blank);
+                }
+                // Read the delimiter word using the existing helper.
+                let delim_start = self.cursor_pos().0;
+                let tok = self.scan_heredoc_delimiter(delim_start)?;
+                match tok.token {
+                    Token::Literal(raw) if !raw.is_empty() => {
+                        word.push_str(&raw);
+                        let (delimiter, _quoted) = heredoc::strip_heredoc_quotes(&raw);
+                        // Empty-after-strip delimiters (`<<""`, `<<''`) are
+                        // valid in bash — body is delimited by an empty line.
+                        local_heredocs.push((delimiter, strip_tabs));
+                    }
+                    Token::Literal(_) | Token::Eof => {
+                        return Err(LexError::MissingHereDocDelimiter {
+                            span: Span::new(delim_start, self.cursor_pos().0),
+                        });
+                    }
+                    _ => unreachable!("scan_heredoc_delimiter returned non-Literal/Eof"),
+                }
+                continue;
+            }
+
+            // Newline flushes queued heredoc bodies verbatim.
+            if ch == '\n' {
+                if !local_heredocs.is_empty() {
+                    let pending = std::mem::take(&mut local_heredocs);
+                    for (delim, strip) in pending {
+                        self.read_heredoc_body_raw(word, &delim, strip)?;
+                    }
+                }
+                check_keyword(&mut current_word, &mut case_depth);
+                continue;
+            }
+
+            // `$`-prefixed nested constructs: $(..), $((..)), ${..}.
+            // Recursively descend so each scope gets its own heredoc-detection
+            // policy. This is what makes `${var:-$(cat <<EOF...)}` work while
+            // `${var:-<<foo}` stays literal.
+            if ch == '$' {
+                match self.peek_char() {
+                    Some('(') => {
+                        let paren = self.advance_char().unwrap();
+                        word.push(paren);
+                        if self.peek_char() == Some('(') {
+                            // $((..)) — arith, no heredocs.
+                            let second_paren = self.advance_char().unwrap();
+                            word.push(second_paren);
+                            self.read_balanced_into(word, '(', ')', 2, start, false)?;
+                        } else {
+                            // $(..) — cmdsub, heredocs allowed.
+                            self.read_balanced_into(word, '(', ')', 1, start, true)?;
+                        }
+                    }
+                    Some('{') => {
+                        // ${..} — brace-arg, heredocs disabled (literal text
+                        // at this level; nested $(..) will re-enable).
+                        let brace = self.advance_char().unwrap();
+                        word.push(brace);
+                        self.read_balanced_into(word, '{', '}', 1, start, false)?;
+                    }
+                    _ => { /* plain `$` — default handling */ }
+                }
+                check_keyword(&mut current_word, &mut case_depth);
+                continue;
+            }
+
+            // `<(..)` / `>(..)` process substitution inside shell-command
+            // context (bash feature; POSIX mode produces literal bytes but
+            // we still need to scan past the body).
+            if (ch == '<' || ch == '>') && self.peek_char() == Some('(') && enable_heredocs {
+                let paren = self.advance_char().unwrap();
+                word.push(paren);
+                self.read_balanced_into(word, '(', ')', 1, start, true)?;
+                check_keyword(&mut current_word, &mut case_depth);
+                continue;
+            }
+
             if ch == open {
                 check_keyword(&mut current_word, &mut case_depth);
                 depth += 1;
-            } else if ch == close {
+                continue;
+            }
+            if ch == close {
                 check_keyword(&mut current_word, &mut case_depth);
                 depth -= 1;
                 if depth == 0 && (case_depth == 0 || close != ')') {
@@ -723,14 +861,16 @@ impl Lexer {
                 }
                 // Inside a case construct, ) at the outermost $() level is a
                 // pattern delimiter, not the command substitution closer.
-                // Only applies to () balancing, not {} or other delimiters.
                 if depth == 0 {
                     depth = 1;
                 }
-            } else if ch.is_ascii_alphanumeric() || ch == '_' {
+                continue;
+            }
+            if ch.is_ascii_alphanumeric() || ch == '_' {
                 current_word.push(ch);
-                continue; // don't hit the keyword check below
-            } else if ch == '\'' {
+                continue;
+            }
+            if ch == '\'' {
                 check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
@@ -746,7 +886,9 @@ impl Lexer {
                         }
                     }
                 }
-            } else if ch == '"' {
+                continue;
+            }
+            if ch == '"' {
                 check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
@@ -768,12 +910,16 @@ impl Lexer {
                         }
                     }
                 }
-            } else if ch == '\\' {
+                continue;
+            }
+            if ch == '\\' {
                 check_keyword(&mut current_word, &mut case_depth);
                 if let Some(c) = self.advance_char() {
                     word.push(c);
                 }
-            } else if ch == '`' {
+                continue;
+            }
+            if ch == '`' {
                 check_keyword(&mut current_word, &mut case_depth);
                 loop {
                     match self.advance_char() {
@@ -795,10 +941,10 @@ impl Lexer {
                         }
                     }
                 }
-            } else {
-                // Any other character (whitespace, operators, etc.) is a word boundary.
-                check_keyword(&mut current_word, &mut case_depth);
+                continue;
             }
+            // Default: any other character is a word boundary.
+            check_keyword(&mut current_word, &mut case_depth);
         }
         // Reached EOF without finding matching close delimiter
         let kind = match (open, close) {
@@ -820,9 +966,10 @@ impl Lexer {
         close: char,
         initial_depth: i32,
         start: usize,
+        enable_heredocs: bool,
     ) -> Result<String, LexError> {
         let mut content = String::new();
-        self.read_balanced_into(&mut content, open, close, initial_depth, start)?;
+        self.read_balanced_into(&mut content, open, close, initial_depth, start, enable_heredocs)?;
         // Strip the closing delimiter(s) that belong to the opening sequence
         let strip_bytes = initial_depth as usize * close.len_utf8();
         content.truncate(content.len() - strip_bytes);

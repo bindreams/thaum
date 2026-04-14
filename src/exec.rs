@@ -510,6 +510,48 @@ impl Executor {
                         parts: resolved,
                     });
                 }
+                Fragment::Parameter(crate::ast::ParameterExpansion::Complex {
+                    name,
+                    indirect,
+                    operator,
+                    argument: Some(arg),
+                }) => {
+                    // Recurse into the brace-arg so any cmdsub or arith inside
+                    // (e.g. `${var:-$(cmd)}`, `${var#$((1<<2))}`) is resolved
+                    // before parameter expansion runs.
+                    //
+                    // CAREFUL: conditional operators (`:-`, `:=`, `:?`, `:+`)
+                    // evaluate their argument lazily — bash does NOT execute
+                    // the cmdsub when the alternate branch isn't taken. We
+                    // replicate that by inspecting the variable's current
+                    // value and skipping resolution when the argument won't
+                    // be used. Trim operators (`#`, `##`, `%`, `%%`) always
+                    // evaluate the pattern, so we always resolve.
+                    use crate::ast::ParamOp;
+                    let needs_resolution = match operator {
+                        Some(ParamOp::Default) | Some(ParamOp::DefaultAssign) | Some(ParamOp::Error) => {
+                            // Argument used iff value is unset or empty.
+                            self.env.get_var(name).is_none_or(|v| v.is_empty())
+                        }
+                        Some(ParamOp::Alternative) => {
+                            // Argument used iff value is set AND non-empty.
+                            self.env.get_var(name).is_some_and(|v| !v.is_empty())
+                        }
+                        // Trim operators and all others: always resolve.
+                        _ => true,
+                    };
+                    let resolved_arg = if needs_resolution {
+                        Box::new(self.resolve_cmd_subs_in_word(arg)?)
+                    } else {
+                        arg.clone()
+                    };
+                    result.push(Fragment::Parameter(crate::ast::ParameterExpansion::Complex {
+                        name: name.clone(),
+                        indirect: *indirect,
+                        operator: *operator,
+                        argument: Some(resolved_arg),
+                    }));
+                }
                 // All other fragments pass through unchanged
                 other => result.push(other.clone()),
             }

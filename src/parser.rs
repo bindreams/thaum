@@ -8,7 +8,7 @@ mod bash;
 mod commands;
 mod compound;
 mod expressions;
-mod helpers;
+pub(crate) mod helpers;
 mod test_expr;
 mod word_collect;
 

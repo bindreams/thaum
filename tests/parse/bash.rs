@@ -863,3 +863,46 @@ fn posix_brace_is_literal() {
         }
     }
 }
+
+// Heredoc inside command substitution / process substitution ==========================================================
+
+#[skuld::test]
+fn heredoc_strip_tabs_in_cmdsub_bash() {
+    // <<- heredoc inside $(...) with metachars in body, parsed in Bash dialect.
+    let input = "echo $(cat <<-EOF\n\tit's ) a \"body\"\n\tEOF\n)";
+    let _ = parse_with(input, Dialect::Bash).unwrap();
+}
+
+#[skuld::test]
+fn heredoc_in_process_sub_input() {
+    // `<(..)` uses the same raw-extraction path as `$(..)` via scan_process_sub.
+    let input = "diff <(cat <<EOF\nit's one\nEOF\n) <(cat <<EOF\nit's two\nEOF\n)";
+    let _ = parse_with(input, Dialect::Bash).unwrap();
+}
+
+#[skuld::test]
+fn heredoc_in_process_sub_output() {
+    let input = "cmd >(tee <<EOF > /tmp/out\nit's output\nEOF\n)";
+    let _ = parse_with(input, Dialect::Bash).unwrap();
+}
+
+#[skuld::test]
+fn bash_only_syntax_inside_cmdsub_with_bash_dialect() {
+    // Pre-existing bug: parse_command_substitution always used POSIX mode,
+    // so Bash-only constructs inside $(..) silently failed even when the
+    // outer parse was Bash. After the fix, the inner parse uses the outer dialect.
+    let prog = parse_with("echo $(cat <<< \"here-string\")", Dialect::Bash).unwrap();
+    let cmd = match &prog.lines[0][0].expression {
+        Expression::Command(c) => c,
+        _ => panic!(),
+    };
+    let w = match &cmd.arguments[1] {
+        Argument::Word(w) => w,
+        _ => panic!(),
+    };
+    let stmts = match &w.parts[0] {
+        Fragment::CommandSubstitution(s) => s,
+        _ => panic!(),
+    };
+    assert!(!stmts.is_empty(), "inner re-parse silently dropped Bash syntax");
+}

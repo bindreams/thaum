@@ -619,7 +619,13 @@ fn expand_dq_token_fragment(
             expand_parameter(&ParameterExpansion::Simple(name.clone()), env, out)?;
         }
         Token::BraceParam(raw) => {
-            let expansion = crate::word::parse_brace_param_content(raw, true, true, true);
+            // Match the gettext lexer's options at line 578 (only locale_translation).
+            let opts = crate::dialect::ShellOptions {
+                locale_translation: true,
+                ..Default::default()
+            };
+            let expansion = crate::word::parse_brace_param_content(raw, &opts)
+                .map_err(|e| ExecError::BadSubstitution(format!("gettext brace-param: {e}")))?;
             expand_parameter(&expansion, env, out)?;
         }
         Token::CommandSub(_) | Token::BacktickSub(_) => {

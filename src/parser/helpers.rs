@@ -67,7 +67,7 @@ pub fn expr_span(expr: &Expression) -> Span {
 
 /// De-escape a raw literal string: remove backslash escaping.
 /// `\\c` -> `c`, other characters pass through unchanged.
-pub(super) fn de_escape_literal(s: &str) -> String {
+pub(crate) fn de_escape_literal(s: &str) -> String {
     let mut result = String::with_capacity(s.len());
     let mut chars = s.chars();
     while let Some(c) = chars.next() {

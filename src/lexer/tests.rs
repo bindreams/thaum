@@ -604,3 +604,86 @@ fn speculate_tokens_stay_in_buffer() {
     // Body was read during the first speculative pass and is in the queue
     assert_eq!(s.take_heredoc_body().unwrap(), "hello\n");
 }
+
+// read_heredoc_body_raw ===============================================================================================
+
+#[skuld::test]
+fn read_heredoc_body_raw_basic() {
+    let mut lexer = Lexer::from_str("body line 1\nbody line 2\nEOF\nafter", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap();
+    assert_eq!(out, "body line 1\nbody line 2\nEOF\n");
+    // Cursor is positioned after the consumed delimiter line, at "after".
+    assert_eq!(lexer.peek_char(), Some('a'));
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_eof_terminated_delimiter_line() {
+    // Input ends with the delimiter line and NO trailing newline. Mirrors
+    // `read_single_heredoc`'s permissive behavior.
+    let mut lexer = Lexer::from_str("body\nEOF", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap();
+    assert_eq!(out, "body\nEOF");
+    assert!(lexer.is_at_eof());
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_unterminated() {
+    // No delimiter line at all → UnterminatedHereDoc.
+    let mut lexer = Lexer::from_str("body1\nbody2\n", ShellOptions::default());
+    let mut out = String::new();
+    let err = lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap_err();
+    match err {
+        LexError::UnterminatedHereDoc { delimiter, .. } => assert_eq!(delimiter, "EOF"),
+        other => panic!("expected UnterminatedHereDoc, got {other:?}"),
+    }
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_preserves_tabs_when_strip_tabs_set() {
+    // Even with strip_tabs=true, the body is preserved verbatim — the inner
+    // re-parse applies stripping. strip_tabs only affects DELIMITER comparison.
+    let mut lexer = Lexer::from_str("\tbody\n\tEOF\n", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", true).unwrap();
+    assert_eq!(out, "\tbody\n\tEOF\n");
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_does_not_touch_lexer_state() {
+    let mut lexer = Lexer::from_str("body\nEOF\n", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap();
+    assert!(lexer.pending_heredocs.is_empty());
+    assert!(!lexer.expecting_heredoc_delimiter);
+    assert!(lexer.completed_bodies.is_empty());
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_delimiter_substring_in_body() {
+    // A line containing "EOF" but not equal to it must not terminate.
+    let mut lexer = Lexer::from_str("prefix EOF suffix\nEOF\n", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap();
+    assert_eq!(out, "prefix EOF suffix\nEOF\n");
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_strip_tabs_only_compares_after_strip() {
+    // strip_tabs=true: leading tabs on the delimiter line don't prevent match.
+    let mut lexer = Lexer::from_str("\tbody\n\tEOF\n", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", true).unwrap();
+    // Body is preserved verbatim including the leading tab on each line.
+    assert_eq!(out, "\tbody\n\tEOF\n");
+}
+
+#[skuld::test]
+fn read_heredoc_body_raw_does_not_interpret_line_continuation() {
+    // `\<newline>` in a heredoc body is two literal characters.
+    let mut lexer = Lexer::from_str("a\\\nb\nEOF\n", ShellOptions::default());
+    let mut out = String::new();
+    lexer.read_heredoc_body_raw(&mut out, "EOF", false).unwrap();
+    assert_eq!(out, "a\\\nb\nEOF\n");
+}

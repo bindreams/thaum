@@ -6,9 +6,9 @@
 
 use crate::ast::*;
 use crate::error::ParseError;
-use crate::lexer::Lexer;
 use crate::span::Span;
-use crate::token::{ExtGlobTokenKind, GlobKind, SpannedToken, Token};
+use crate::token::{SpannedToken, Token};
+use crate::word::{merge_adjacent_literals, token_to_fragment};
 
 use super::helpers::de_escape_literal;
 use super::Parser;
@@ -58,7 +58,7 @@ impl Parser {
                 } else {
                     ProcessDirection::Out
                 };
-                let stmts = crate::word::parse_command_substitution(&content);
+                let stmts = crate::word::parse_command_substitution(&content, self.options.clone())?;
                 return Ok(Some(Argument::Atom(Atom::BashProcessSubstitution {
                     direction: dir,
                     body: stmts,
@@ -101,106 +101,15 @@ impl Parser {
         })
     }
 
-    /// Convert a single fragment token to a Fragment AST node.
+    /// Convert a single fragment token to a Fragment AST node. Thin wrapper
+    /// over `crate::word::token_to_fragment` which is the canonical free-function
+    /// implementation (also used by the executor's gettext re-lex path).
     pub(super) fn token_to_fragment(&mut self, st: SpannedToken) -> Result<Fragment, ParseError> {
-        match st.token {
-            Token::Literal(s) => Ok(Fragment::Literal(de_escape_literal(&s))),
-            Token::SingleQuoted(s) => Ok(Fragment::SingleQuoted(s)),
-            Token::DoubleQuoted(raw) => {
-                let inner = self.lex_double_quoted_content(&raw)?;
-                Ok(Fragment::DoubleQuoted(inner))
-            }
-            Token::SimpleParam(name) => Ok(Fragment::Parameter(ParameterExpansion::Simple(name))),
-            Token::BraceParam(raw) => {
-                let expansion = crate::word::parse_brace_param_content(
-                    &raw,
-                    self.options.case_modification,
-                    self.options.parameter_transform,
-                    self.options.parameter_transform_51,
-                );
-                Ok(Fragment::Parameter(expansion))
-            }
-            Token::CommandSub(raw) => {
-                let stmts = crate::word::parse_command_substitution(&raw);
-                Ok(Fragment::CommandSubstitution(stmts))
-            }
-            Token::BacktickSub(raw) => {
-                let stmts = crate::word::parse_command_substitution(&raw);
-                Ok(Fragment::CommandSubstitution(stmts))
-            }
-            Token::ArithSub(raw) => {
-                #[allow(clippy::unnecessary_lazy_evaluations)]
-                let arith =
-                    crate::parser::arith_expr::parse_arith_expr(&raw).unwrap_or_else(|_| ArithExpr::Variable(raw));
-                Ok(Fragment::ArithmeticExpansion(arith))
-            }
-            Token::Glob(kind) => {
-                let gc = match kind {
-                    GlobKind::Star => GlobChar::Star,
-                    GlobKind::Question => GlobChar::Question,
-                    GlobKind::BracketOpen => GlobChar::BracketOpen,
-                };
-                Ok(Fragment::Glob(gc))
-            }
-            Token::TildePrefix(user) => Ok(Fragment::TildePrefix(user)),
-            Token::BashAnsiCQuoted(content) => Ok(Fragment::BashAnsiCQuoted(content)),
-            Token::BashLocaleQuoted(raw) => {
-                let inner = self.lex_double_quoted_content(&raw)?;
-                Ok(Fragment::BashLocaleQuoted { raw, parts: inner })
-            }
-            Token::BashExtGlob { kind, pattern } => {
-                let ast_kind = match kind {
-                    ExtGlobTokenKind::ZeroOrOne => ExtGlobKind::ZeroOrOne,
-                    ExtGlobTokenKind::ZeroOrMore => ExtGlobKind::ZeroOrMore,
-                    ExtGlobTokenKind::OneOrMore => ExtGlobKind::OneOrMore,
-                    ExtGlobTokenKind::ExactlyOne => ExtGlobKind::ExactlyOne,
-                    ExtGlobTokenKind::Not => ExtGlobKind::Not,
-                };
-                Ok(Fragment::BashExtGlob {
-                    kind: ast_kind,
-                    pattern,
-                })
-            }
-            Token::BashProcessSub { content, .. } => {
-                let stmts = crate::word::parse_command_substitution(&content);
-                Ok(Fragment::CommandSubstitution(stmts))
-            }
-            _ => unreachable!("token_to_fragment called with non-fragment token: {:?}", st.token),
-        }
-    }
-
-    /// Lex the inner content of a double-quoted string into fragments.
-    fn lex_double_quoted_content(&mut self, raw: &str) -> Result<Vec<Fragment>, ParseError> {
-        let mut inner_lexer = Lexer::new_double_quote_mode(raw, self.options.clone());
-        let mut fragments = Vec::new();
-        loop {
-            let tok = inner_lexer.next_token()?;
-            if tok.token == Token::Eof {
-                break;
-            }
-            let frag = self.token_to_fragment(tok)?;
-            fragments.push(frag);
-        }
-        Ok(fragments)
+        token_to_fragment(st, &self.options)
     }
 }
 
 // Private helpers =====================================================================================================
-
-/// Merge adjacent Literal fragments for cleaner ASTs.
-fn merge_adjacent_literals(fragments: Vec<Fragment>) -> Vec<Fragment> {
-    let mut result: Vec<Fragment> = Vec::with_capacity(fragments.len());
-    for frag in fragments {
-        if let Fragment::Literal(s) = &frag {
-            if let Some(Fragment::Literal(prev)) = result.last_mut() {
-                prev.push_str(s);
-                continue;
-            }
-        }
-        result.push(frag);
-    }
-    result
-}
 
 /// Detect brace expansions, both within single Literal fragments and
 /// spanning across non-literal fragments (e.g., `{$a,b}`).

@@ -14,6 +14,66 @@ pub(super) struct PendingHereDoc {
 }
 
 impl Lexer {
+    /// Read a heredoc body verbatim into `out`, including the delimiter line
+    /// and its trailing newline, without touching any of the lexer's
+    /// heredoc-pipeline state (`pending_heredocs`, `expecting_heredoc_delimiter`,
+    /// `completed_bodies`, `last_scanned`, `buffer`).
+    ///
+    /// Used by `read_balanced_into` to inline heredoc bodies into the raw
+    /// content of `$(...)` / `<(...)` / `>(...)` / `${...}` so the subsequent
+    /// full re-parse can recognize the heredoc again. Unlike
+    /// `read_single_heredoc`, this function preserves the delimiter line and
+    /// does NOT strip tabs from the body — the re-parse applies `<<-`
+    /// stripping itself.
+    ///
+    /// On EOF without finding the delimiter line, returns `UnterminatedHereDoc`.
+    /// An EOF-terminated last line that matches the delimiter is accepted
+    /// (mirrors `read_single_heredoc`).
+    pub(super) fn read_heredoc_body_raw(
+        &mut self,
+        out: &mut String,
+        delimiter: &str,
+        strip_tabs: bool,
+    ) -> Result<(), LexError> {
+        let body_start = self.cursor_pos().0;
+        let initial_out_len = out.len();
+
+        loop {
+            let line_start = out.len();
+            let mut hit_eof = false;
+            loop {
+                match self.advance_char() {
+                    Some('\n') => {
+                        out.push('\n');
+                        break;
+                    }
+                    Some(c) => out.push(c),
+                    None => {
+                        hit_eof = true;
+                        break;
+                    }
+                }
+            }
+            // Compute the line slice without the trailing '\n' (if present).
+            let line = out[line_start..].strip_suffix('\n').unwrap_or(&out[line_start..]);
+            let check = if strip_tabs {
+                line.trim_start_matches('\t')
+            } else {
+                line
+            };
+            if check == delimiter {
+                debug_assert!(out.len() >= initial_out_len);
+                return Ok(());
+            }
+            if hit_eof {
+                return Err(LexError::UnterminatedHereDoc {
+                    delimiter: delimiter.to_string(),
+                    span: Span::new(body_start, self.cursor_pos().0),
+                });
+            }
+        }
+    }
+
     /// Read a single here-document body until the delimiter line is found.
     pub(super) fn read_single_heredoc(&mut self, delimiter: &str, strip_tabs: bool) -> Result<String, LexError> {
         let start = self.cursor_pos().0;

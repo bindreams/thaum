@@ -19,6 +19,9 @@ pub enum LexError {
     #[error("unterminated here-document (delimiter: '{delimiter}')")]
     UnterminatedHereDoc { delimiter: String, span: Span },
 
+    #[error("missing here-document delimiter after `<<`")]
+    MissingHereDocDelimiter { span: Span },
+
     #[error("unterminated backquote")]
     UnterminatedBackquote { span: Span },
 
@@ -37,6 +40,7 @@ impl LexError {
             | LexError::UnterminatedSingleQuote { span }
             | LexError::UnterminatedDoubleQuote { span }
             | LexError::UnterminatedHereDoc { span, .. }
+            | LexError::MissingHereDocDelimiter { span }
             | LexError::UnterminatedBackquote { span }
             | LexError::UnterminatedExpansion { span, .. } => Some(*span),
             LexError::Io(_) => None,

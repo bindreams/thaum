@@ -910,3 +910,72 @@ fn declare_p_plain_var() {
         r.stdout()
     );
 }
+
+// Brace-parameter expansion with structural arguments =================================================================
+// Regressions for the heredoc-in-cmdsub fix and the brace-arg structural refactor.
+
+#[skuld::test]
+fn brace_param_default_runs_cmdsub_when_unset() {
+    let r = exec!("unset var; echo ${var:-$(echo defaulted)}");
+    assert_eq!(r.stdout(), "defaulted\n");
+}
+
+#[skuld::test]
+fn brace_param_default_uses_value_when_set() {
+    let r = exec!("var=actual; echo ${var:-$(echo defaulted)}");
+    assert_eq!(r.stdout(), "actual\n");
+}
+
+#[skuld::test]
+fn brace_param_default_skips_cmdsub_side_effect_when_set() {
+    // CRITICAL (Bug D regression): ${var:-$(cmd)} must NOT run the cmdsub
+    // when var is set. The runtime pre-resolution must respect bash's lazy
+    // evaluation contract.
+    let r = exec!(
+        "var=set\n\
+         f() { echo SIDE_EFFECT_RAN; echo default; }\n\
+         echo \"${var:-$(f)}\""
+    );
+    assert_eq!(r.stdout(), "set\n");
+    assert!(
+        !r.stdout().contains("SIDE_EFFECT_RAN"),
+        "cmdsub side effect should not have run: {}",
+        r.stdout()
+    );
+}
+
+#[skuld::test]
+fn brace_param_alternative_skips_cmdsub_when_unset() {
+    // ${var:+$(cmd)} must NOT run the cmdsub when var is unset.
+    let r = exec!(
+        "unset var\n\
+         f() { echo SIDE_EFFECT_RAN; echo alt; }\n\
+         echo \"${var:+$(f)}\""
+    );
+    assert_eq!(r.stdout(), "\n");
+    assert!(
+        !r.stdout().contains("SIDE_EFFECT_RAN"),
+        "cmdsub side effect should not have run: {}",
+        r.stdout()
+    );
+}
+
+#[skuld::test]
+fn brace_param_alternative_runs_cmdsub_when_set() {
+    let r = exec!("var=anything; echo ${var:+$(echo alt)}");
+    assert_eq!(r.stdout(), "alt\n");
+}
+
+#[skuld::test]
+fn brace_param_default_with_arith() {
+    let r = exec!("unset var; echo ${var:-$((1 << 5))}");
+    assert_eq!(r.stdout(), "32\n");
+}
+
+#[skuld::test]
+fn brace_param_trim_pattern_with_cmdsub_runs_eagerly() {
+    // Trim operators (#, ##, %, %%) always evaluate the pattern, so the
+    // cmdsub should always run regardless of var state.
+    let r = exec!("var=prefix-rest; echo ${var#$(echo prefix)-}");
+    assert_eq!(r.stdout(), "rest\n");
+}

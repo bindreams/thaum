@@ -18,7 +18,19 @@ with the `skuld` custom harness. A bare `#[test]` compiles but silently never ru
 ```rust
 #[skuld::test]                                     // simple test
 #[skuld::test(requires = [preconditions::docker])]  // runtime precondition
-#[skuld::test(labels = [slow])]                     // label for filtering
+#[skuld::test(labels = [INTERACTIVE])]              // label for filtering
+```
+
+Labels are `Label` constants defined via `skuld::new_label!`. Thaum's shared
+label set lives in [src/test_labels.rs](/src/test_labels.rs) (main-lib unit
+tests) and [tests/common/labels.rs](/tests/common/labels.rs) (integration
+tests). New labels get added there, not inline.
+
+Filter tests at runtime with the `SKULD_LABELS` env var (boolean expression
+over label names, supporting `&` / `|` / `!` / parens):
+
+```sh
+SKULD_LABELS="lex & !exec" cargo nextest run
 ```
 
 For dynamic tests (e.g. gauntlet YAML files), use `skuld::TestRunner::add()`.

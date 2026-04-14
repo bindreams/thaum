@@ -9,6 +9,8 @@ use std::time::Duration;
 
 use thaum_expect::PtySession;
 
+use crate::common::labels::INTERACTIVE;
+
 fn spawn_thaum_interactive() -> PtySession {
     let bin = env!("CARGO_BIN_EXE_thaum");
     let mut cmd = std::process::Command::new(bin);
@@ -22,7 +24,7 @@ fn spawn_thaum_interactive() -> PtySession {
     session
 }
 
-#[skuld::test(labels = [interactive])]
+#[skuld::test(labels = [INTERACTIVE])]
 fn repl_echo_hello() {
     let mut session = spawn_thaum_interactive();
     session.expect("$").expect("expected initial prompt");
@@ -31,7 +33,7 @@ fn repl_echo_hello() {
     session.send_line("exit").expect("send exit failed");
 }
 
-#[skuld::test(labels = [interactive])]
+#[skuld::test(labels = [INTERACTIVE])]
 fn repl_variable_persists_across_lines() {
     let mut session = spawn_thaum_interactive();
     session.expect("$").expect("expected initial prompt");
@@ -42,7 +44,7 @@ fn repl_variable_persists_across_lines() {
     session.send_line("exit").expect("send exit failed");
 }
 
-#[skuld::test(labels = [interactive])]
+#[skuld::test(labels = [INTERACTIVE])]
 fn repl_syntax_error_continues() {
     let mut session = spawn_thaum_interactive();
     session.expect("$").expect("expected initial prompt");
@@ -54,7 +56,7 @@ fn repl_syntax_error_continues() {
     session.send_line("exit").expect("send exit failed");
 }
 
-#[skuld::test(labels = [interactive])]
+#[skuld::test(labels = [INTERACTIVE])]
 fn repl_piped_stdin_no_interactive() {
     // When stdin is piped (not a TTY), interactive mode should NOT activate.
     let bin = env!("CARGO_BIN_EXE_thaum");

@@ -1,9 +1,17 @@
 //! Precondition functions for infrastructure tests.
 
 use std::path::PathBuf;
+use std::process::{Command, Stdio};
 
 pub fn valgrind() -> Result<(), String> {
-    skuld::probe_executable("valgrind")
+    Command::new("valgrind")
+        .arg("--version")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .is_ok_and(|s| s.success())
+        .then_some(())
+        .ok_or_else(|| "valgrind not installed".into())
 }
 
 pub fn thaum_binary_path() -> PathBuf {
@@ -11,7 +19,12 @@ pub fn thaum_binary_path() -> PathBuf {
 }
 
 pub fn thaum() -> Result<(), String> {
-    skuld::probe_path(thaum_binary_path())
+    let path = thaum_binary_path();
+    if path.exists() {
+        Ok(())
+    } else {
+        Err(format!("thaum binary not found at {}", path.display()))
+    }
 }
 
 pub fn docker() -> Result<(), String> {

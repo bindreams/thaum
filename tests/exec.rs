@@ -11,11 +11,13 @@ use std::cell::Cell;
 use thaum::exec::{CapturedIo, Environment, ExecError, Executor};
 use thaum::Dialect;
 
+use common::labels::{EXEC, LEX, PARSE};
+
 fn main() {
     skuld::run_all();
 }
 
-skuld::default_labels!(lex, parse, exec);
+skuld::default_labels!(LEX, PARSE, EXEC);
 
 const DEFAULT_PATH: &str = "/usr/bin:/bin:/usr/sbin:/sbin";
 

@@ -2,9 +2,10 @@
 //! redirections, word expansion, and Bash extensions.
 
 use super::*;
+use crate::test_labels::{LEX, PARSE};
 use pretty_assertions::assert_eq;
 
-skuld::default_labels!(lex, parse);
+skuld::default_labels!(LEX, PARSE);
 
 fn parse_ok(input: &str) -> Program {
     parse(input).unwrap_or_else(|e| panic!("parse failed for {input:?}: {e}"))

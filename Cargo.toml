@@ -54,7 +54,7 @@ windows = { version = "0.62", features = [
 pretty_assertions = "1"
 yaml-rust2 = "0.8"
 libtest-mimic = "0.8"
-skuld = { git = "https://github.com/bindreams/skuld" }
+skuld = "0.1"
 clap = { version = "4", features = ["derive"] }
 tempfile = "3.26.0"
 thaum-testkit = { path = "crates/testkit" }

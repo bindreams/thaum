@@ -3,8 +3,9 @@
 use std::io::{Read, Seek, Write};
 
 use super::BufferedFile;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 /// Create a BufferedFile backed by a tempfile with the given data.
 fn bf_with_data(data: &[u8], passthrough: bool) -> BufferedFile {

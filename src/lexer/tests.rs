@@ -2,9 +2,10 @@
 //! heredocs, quoting, spans, and the buffered peek/advance/speculate API.
 
 use super::*;
+use crate::test_labels::LEX;
 use crate::token::GlobKind;
 
-skuld::default_labels!(lex);
+skuld::default_labels!(LEX);
 
 /// Helper: lex all tokens from input, including Whitespace tokens.
 fn lex_all(input: &str) -> Result<Vec<Token>, LexError> {

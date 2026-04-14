@@ -268,8 +268,9 @@ pub(super) fn drain_to_io(child: &mut ChildEx, io: &mut IoContext) -> Result<(),
 #[cfg(test)]
 mod tests {
     use super::clean_conpty_output;
+    use crate::test_labels::EXEC;
 
-    skuld::default_labels!(exec);
+    skuld::default_labels!(EXEC);
 
     #[skuld::test]
     fn clean_replaces_crlf_with_lf() {

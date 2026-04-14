@@ -55,10 +55,22 @@ Optional arguments:
 
 - `requires = [f1, f2]` — runtime preconditions (`fn() -> Result<(), String>`)
 - `name = "display name"` — custom name in test output
-- `labels = [docker, slow]` — prepended as `[docker][slow]` for nextest filtering
+- `labels = [LABEL1, LABEL2]` — label constants for `SKULD_LABELS` filtering.
+  Labels are defined via `skuld::new_label!(pub LABEL1, "label1")` and
+  referenced as paths. Thaum's label set lives in
+  [src/test_labels.rs](/src/test_labels.rs) for main-lib unit tests and
+  [tests/common/labels.rs](/tests/common/labels.rs) for integration tests.
 - `ignore` or `ignore = "reason"` — statically ignore the test
 
 For dynamic test generation (e.g. gauntlet tests from data files), use `skuld::TestRunner::add()`.
+
+Filter tests at runtime with `SKULD_LABELS`, a boolean expression over label
+names (`&` AND, `|` OR, `!` NOT, parens):
+
+```sh
+SKULD_LABELS="lex & !exec" cargo nextest run        # only non-exec lex tests
+SKULD_LABELS="docker | interactive" cargo nextest run  # docker OR interactive
+```
 
 ## Pre-commit checklist
 

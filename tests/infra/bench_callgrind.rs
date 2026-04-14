@@ -5,8 +5,9 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 use super::preconditions;
+use crate::common::labels::BENCH;
 
-skuld::default_labels!(bench);
+skuld::default_labels!(BENCH);
 
 fn scripts_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/scripts")

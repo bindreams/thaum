@@ -8,8 +8,9 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use super::preconditions;
+use crate::common::labels::{DOCKER, INFRA};
 
-skuld::default_labels!(infra, docker);
+skuld::default_labels!(INFRA, DOCKER);
 
 fn project_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR"))

@@ -15,7 +15,7 @@ ptyprocess = "0.5"
 conpty = "0.7"
 
 [dev-dependencies]
-skuld = { git = "https://github.com/bindreams/skuld" }
+skuld = "0.1"
 
 [lib]
 harness = false

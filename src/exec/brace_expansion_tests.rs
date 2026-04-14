@@ -1,8 +1,9 @@
 use crate::ast::{BraceExpansionKind, Fragment};
+use crate::test_labels::EXEC;
 
 use super::brace_expansion::expand_braces;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 /// Helper: extract literal strings from expansion results.
 fn to_strings(result: &[Vec<Fragment>]) -> Vec<String> {

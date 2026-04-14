@@ -18,8 +18,10 @@ mod redirects;
 #[path = "parse/word_expansion.rs"]
 mod word_expansion;
 
+use common::labels::{LEX, PARSE};
+
 fn main() {
     skuld::run_all();
 }
 
-skuld::default_labels!(lex, parse);
+skuld::default_labels!(LEX, PARSE);

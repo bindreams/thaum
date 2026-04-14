@@ -1,8 +1,9 @@
 use super::*;
 use crate::ast::{Fragment, GlobChar, ParamOp, ParameterExpansion, Word};
 use crate::span::Span;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 fn dummy_span() -> Span {
     Span::new(0, 0)

@@ -1,8 +1,9 @@
 use std::io::{Read, Write};
 
 use super::{CapturedIo, IoContext};
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 // IoContext::from_process =============================================================================================
 

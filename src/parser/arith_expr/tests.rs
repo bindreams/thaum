@@ -2,8 +2,9 @@
 //! precedence, associativity, assignment, ternary, comma expressions.
 
 use super::*;
+use crate::test_labels::PARSE;
 
-skuld::default_labels!(parse);
+skuld::default_labels!(PARSE);
 
 fn parse_ok(input: &str) -> ArithExpr {
     parse_arith_expr(input).unwrap_or_else(|e| panic!("parse_arith_expr failed for {input:?}: {e}"))

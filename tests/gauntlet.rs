@@ -3,6 +3,7 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+use common::labels::{EXEC, GAUNTLET, LEX, PARSE};
 use libtest_mimic::Failed;
 use thaum::exec::{CapturedIo, ExecError, Executor};
 use thaum_testkit::sh_yaml::{Disabled, ParseErrorSpec, ShYaml};
@@ -440,7 +441,7 @@ fn main() {
     let exec_available = no_sandbox
         || skuld::collect_fixture_requires(&["gauntlet_sandbox"])
             .iter()
-            .all(|check| check().is_ok());
+            .all(|req| req.eval().is_ok());
 
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).
@@ -479,10 +480,10 @@ fn main() {
         };
 
         let has_exec = parsed.status.is_some() || parsed.stdout.is_some() || parsed.stderr.is_some();
-        let labels: Vec<&str> = if has_exec {
-            vec!["gauntlet", "lex", "parse", "exec"]
+        let labels: &[skuld::Label] = if has_exec {
+            &[GAUNTLET, LEX, PARSE, EXEC]
         } else {
-            vec!["gauntlet", "lex", "parse"]
+            &[GAUNTLET, LEX, PARSE]
         };
 
         // Disable exec tests when Docker is unavailable (unless no-sandbox mode).
@@ -491,7 +492,7 @@ fn main() {
         if has_exec && !no_sandbox && !disabled {
             // Docker mode: delegate the entire test to the gauntlet binary inside Docker.
             let display_name_for_docker = display_name.clone();
-            runner.add(display_name, &labels, ignored, move || {
+            runner.add(display_name, labels, ignored, move || {
                 let sandbox: &common::docker::GauntletSandbox = skuld::fixture("gauntlet_sandbox");
                 if let Err(e) = run_exec_docker(&sandbox.container_id, &display_name_for_docker) {
                     panic!("{}", e.message().unwrap_or("test failed"));
@@ -499,7 +500,7 @@ fn main() {
             });
         } else {
             // Native mode (no-sandbox) or parse-only tests: run locally.
-            runner.add(display_name, &labels, ignored, move || {
+            runner.add(display_name, labels, ignored, move || {
                 if let Err(e) = run_test(&parsed) {
                     panic!("{}", e.message().unwrap_or("test failed"));
                 }

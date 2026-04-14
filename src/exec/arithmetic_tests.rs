@@ -1,8 +1,9 @@
 use super::*;
 use crate::ast::{ArithAssignOp, ArithBinaryOp, ArithExpr, ArithUnaryOp};
 use crate::exec::environment::Environment;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 // Helpers -------------------------------------------------------------------------------------------------------------
 

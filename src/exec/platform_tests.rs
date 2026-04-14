@@ -1,7 +1,9 @@
 #[cfg(unix)]
 use std::os::fd::{AsRawFd, FromRawFd};
 
-skuld::default_labels!(exec);
+use crate::test_labels::EXEC;
+
+skuld::default_labels!(EXEC);
 
 #[cfg(unix)]
 #[skuld::test]

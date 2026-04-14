@@ -1,7 +1,8 @@
 use super::*;
 use crate::exec::environment::Environment;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 fn fixture_dir() -> String {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR"))

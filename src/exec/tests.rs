@@ -2,10 +2,11 @@
 //! control flow, and compound command execution.
 
 use super::*;
+use crate::test_labels::EXEC;
 use icu::locale::Locale;
 use pattern::{trim_largest_prefix, trim_largest_suffix, trim_smallest_prefix, trim_smallest_suffix};
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 fn c() -> Locale {
     locale::parse_posix_locale("C")

@@ -1,8 +1,9 @@
 use super::*;
 use crate::ast::Expression;
+use crate::test_labels::EXEC;
 use std::io::{Read, Write};
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 #[skuld::test]
 fn flatten_single() {

@@ -1,6 +1,7 @@
+use crate::common::labels::EXEC;
 use crate::*;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 // Simple list expansion ===============================================================================================
 

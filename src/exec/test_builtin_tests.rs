@@ -1,7 +1,8 @@
 use super::builtins::run_builtin;
 use super::Environment;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 /// Helper: run `test` builtin with given args, return exit status.
 fn test_status(args: &[&str]) -> i32 {

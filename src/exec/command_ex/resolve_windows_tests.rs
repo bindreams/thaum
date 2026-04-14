@@ -1,13 +1,14 @@
 //! Unit tests for Windows command path resolution.
 
-skuld::default_labels!(exec);
-
 use std::ffi::OsStr;
 use std::path::Path;
 
 use skuld::temp_dir;
 
 use super::resolve_windows::resolve_command;
+use crate::test_labels::EXEC;
+
+skuld::default_labels!(EXEC);
 
 /// Create a dummy file (empty) at the given path.
 fn touch(path: &Path) {

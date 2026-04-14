@@ -1,6 +1,7 @@
 use super::*;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 #[skuld::test]
 fn test_empty() {

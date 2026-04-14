@@ -566,8 +566,9 @@ fn get_console_size() -> windows::Win32::System::Console::COORD {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_labels::EXEC;
 
-    skuld::default_labels!(exec);
+    skuld::default_labels!(EXEC);
 
     /// Environment block sorting must be case-insensitive per Windows convention.
     #[skuld::test]

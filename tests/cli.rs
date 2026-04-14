@@ -8,8 +8,10 @@ mod interactive;
 #[path = "cli/output.rs"]
 mod output;
 
+use common::labels::{CLI, LEX, PARSE};
+
 fn main() {
     skuld::run_all();
 }
 
-skuld::default_labels!(lex, parse, cli);
+skuld::default_labels!(LEX, PARSE, CLI);

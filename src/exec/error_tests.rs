@@ -1,8 +1,9 @@
 //! Unit tests for `ExecError` classification methods.
 
 use super::error::ExecError;
+use crate::test_labels::EXEC;
 
-skuld::default_labels!(exec);
+skuld::default_labels!(EXEC);
 
 #[skuld::test]
 fn control_flow_classification() {

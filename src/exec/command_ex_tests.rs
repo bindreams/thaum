@@ -1,4 +1,6 @@
-skuld::default_labels!(exec);
+use crate::test_labels::EXEC;
+
+skuld::default_labels!(EXEC);
 
 #[cfg(unix)]
 mod posix_quoting {

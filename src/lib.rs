@@ -51,6 +51,9 @@ pub fn parse_with_options(input: &str, options: ShellOptions) -> Result<Program,
 }
 
 #[cfg(test)]
+mod test_labels;
+
+#[cfg(test)]
 fn main() {
     skuld::run_all();
 }

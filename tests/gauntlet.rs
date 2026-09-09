@@ -443,9 +443,14 @@ fn main() {
             .iter()
             .all(|req| req.eval().is_ok());
 
+    // Enumerating tests must have no side effects: `cargo nextest list` runs
+    // every test binary with `--list`, so warming up here would make listing
+    // build a Docker image (issue #20).
+    let listing = std::env::args().any(|a| a == "--list");
+
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).
-    if exec_available && !no_sandbox {
+    if exec_available && !no_sandbox && !listing {
         skuld::warm_up("gauntlet_sandbox");
     }
 

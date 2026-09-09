@@ -2,7 +2,9 @@
 slow-timeout = { period = "30s", terminate-after = 2 }
 
 # Docker image builds can take minutes on first run (cached afterwards).
-# Gauntlet exec tests also trigger Docker builds via the gauntlet_sandbox fixture.
+# Gauntlet exec tests trigger a build via the gauntlet_sandbox fixture, and
+# every test in the infra binary builds an image directly, so both binaries
+# need the long timeout rather than just the tests whose names say "docker".
 [[profile.default.overrides]]
-filter = "test(~docker) | binary_id(~gauntlet)"
+filter = "test(~docker) | binary_id(~gauntlet) | binary_id(~infra)"
 slow-timeout = { period = "120s", terminate-after = 2 }

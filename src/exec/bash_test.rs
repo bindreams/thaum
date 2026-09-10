@@ -13,37 +13,37 @@ use crate::exec::Executor;
 
 /// Evaluate a `[[ ]]` conditional expression. Returns true/false.
 ///
-/// The `_io` parameter is currently unused but reserved for future use
+/// The `io` parameter is currently unused but reserved for future use
 /// (e.g., command substitution inside test expressions that needs IO).
-pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, _io: &mut IoContext) -> Result<bool, ExecError> {
+pub fn evaluate(expr: &BashTestExpr, executor: &mut Executor, io: &mut IoContext) -> Result<bool, ExecError> {
     match expr {
         BashTestExpr::And { left, right } => {
-            if !evaluate(left, executor, _io)? {
+            if !evaluate(left, executor, io)? {
                 Ok(false)
             } else {
-                evaluate(right, executor, _io)
+                evaluate(right, executor, io)
             }
         }
         BashTestExpr::Or { left, right } => {
-            if evaluate(left, executor, _io)? {
+            if evaluate(left, executor, io)? {
                 Ok(true)
             } else {
-                evaluate(right, executor, _io)
+                evaluate(right, executor, io)
             }
         }
-        BashTestExpr::Not(inner) => Ok(!evaluate(inner, executor, _io)?),
-        BashTestExpr::Group(inner) => evaluate(inner, executor, _io),
+        BashTestExpr::Not(inner) => Ok(!evaluate(inner, executor, io)?),
+        BashTestExpr::Group(inner) => evaluate(inner, executor, io),
         BashTestExpr::Word(w) => {
-            let s = executor.expand_word(w)?;
+            let s = executor.expand_word(w, io)?;
             Ok(!s.is_empty())
         }
         BashTestExpr::Unary { op, arg } => {
-            let s = executor.expand_word(arg)?;
+            let s = executor.expand_word(arg, io)?;
             Ok(evaluate_unary(*op, &s, executor.env()))
         }
         BashTestExpr::Binary { left, op, right } => {
-            let l = executor.expand_word(left)?;
-            let r = executor.expand_word(right)?;
+            let l = executor.expand_word(left, io)?;
+            let r = executor.expand_word(right, io)?;
             evaluate_binary(&l, *op, &r, executor.env_mut())
         }
     }

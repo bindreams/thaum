@@ -48,7 +48,7 @@ impl Executor {
             .map(|(k, v)| (k.into(), v.into()))
             .collect();
         for assignment in assignments {
-            let value = self.expand_scalar_assignment(assignment)?;
+            let value = self.expand_scalar_assignment(assignment, io)?;
             env.insert(assignment.name.clone().into(), value.into());
         }
         child_cmd.env = env;

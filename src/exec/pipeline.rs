@@ -95,7 +95,7 @@ fn spawn_pipeline_stage(
 
             if expanded_args.is_empty() {
                 for assignment in &cmd.assignments {
-                    executor.execute_assignment(assignment)?;
+                    executor.execute_assignment(assignment, io)?;
                 }
                 return Ok(None);
             }
@@ -171,7 +171,7 @@ fn spawn_pipeline_stage(
             child_cmd.env = env;
 
             for assignment in &cmd.assignments {
-                let value = executor.expand_scalar_assignment(assignment)?;
+                let value = executor.expand_scalar_assignment(assignment, io)?;
                 child_cmd.env.insert(assignment.name.clone().into(), value.into());
             }
 

@@ -8,6 +8,16 @@ mod posix_quoting {
     use std::path::Path;
 
     use skuld::temp_dir;
+    use thaum_test_tools::test_tools;
+
+    /// Absolute path to a `test_tools` binary, as an `OsString` for `argv[0]`.
+    ///
+    /// The spawn layer performs no `PATH` search, so every argv[0] here must
+    /// already name a concrete file. The fixture's `sh` is the thaum binary,
+    /// which impersonates a POSIX shell when argv[0]'s stem is `sh`.
+    fn tool(tools: &Path, name: &str) -> OsString {
+        tools.join(name).into_os_string()
+    }
 
     fn roundtrip(args: &[&str]) {
         let argv: Vec<OsString> = args.iter().map(OsString::from).collect();
@@ -67,10 +77,10 @@ mod posix_quoting {
     }
 
     #[skuld::test]
-    fn input_pipe_cat() {
+    fn input_pipe_cat(#[fixture(test_tools)] tools: &Path) {
         use std::io::{Read, Write};
         // Test InputPipe: write to stdin, capture stdout.
-        let mut cmd = super::super::CommandEx::new(vec![OsString::from("cat")]);
+        let mut cmd = super::super::CommandEx::new(vec![tool(tools, "cat")]);
         cmd.fds.insert(0, super::super::Fd::InputPipe);
         cmd.fds.insert(1, super::super::Fd::Pipe);
         let mut child = cmd.spawn().expect("spawn failed");
@@ -94,10 +104,10 @@ mod posix_quoting {
     /// Without CLOEXEC on parent-side pipe ends, the child inherits both
     /// parent ends and never sees EOF — causing a deadlock.
     #[skuld::test]
-    fn multi_pipe_stdout_stderr() {
+    fn multi_pipe_stdout_stderr(#[fixture(test_tools)] tools: &Path) {
         use std::io::Read;
         let mut cmd = super::super::CommandEx::new(vec![
-            OsString::from("sh"),
+            tool(tools, "sh"),
             OsString::from("-c"),
             OsString::from("echo out; echo err >&2"),
         ]);
@@ -124,10 +134,10 @@ mod posix_quoting {
     /// The child reads stdin and echoes it to stdout. Without CLOEXEC,
     /// the child inherits the parent's write-end of stdin, preventing EOF.
     #[skuld::test]
-    fn stdin_pipe_with_stdout_pipe() {
+    fn stdin_pipe_with_stdout_pipe(#[fixture(test_tools)] tools: &Path) {
         use std::io::{Read, Write};
         let mut cmd = super::super::CommandEx::new(vec![
-            OsString::from("sh"),
+            tool(tools, "sh"),
             OsString::from("-c"),
             OsString::from("read line; echo got:$line"),
         ]);
@@ -149,8 +159,8 @@ mod posix_quoting {
     }
 
     #[skuld::test]
-    fn spawn_echo() {
-        let argv = vec![OsString::from("echo"), OsString::from("hello")];
+    fn spawn_echo(#[fixture(test_tools)] tools: &Path) {
+        let argv = vec![tool(tools, "echo"), OsString::from("hello")];
         let mut cmd = super::super::CommandEx::new(argv);
         cmd.fds.insert(1, super::super::Fd::Pipe);
         let mut child = cmd.spawn().expect("spawn failed");
@@ -163,9 +173,9 @@ mod posix_quoting {
     }
 
     #[skuld::test]
-    fn spawn_with_env() {
+    fn spawn_with_env(#[fixture(test_tools)] tools: &Path) {
         let mut cmd = super::super::CommandEx::new(vec![
-            OsString::from("sh"),
+            tool(tools, "sh"),
             OsString::from("-c"),
             OsString::from("echo $MY_TEST_VAR"),
         ]);
@@ -181,12 +191,12 @@ mod posix_quoting {
     }
 
     #[skuld::test]
-    fn spawn_fd3_inheritance(#[fixture(temp_dir)] dir: &Path) {
+    fn spawn_fd3_inheritance(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
         let file_path = dir.join("fd3.txt");
         let file = std::fs::File::create(&file_path).unwrap();
 
         let mut cmd = super::super::CommandEx::new(vec![
-            OsString::from("sh"),
+            tool(tools, "sh"),
             OsString::from("-c"),
             OsString::from("echo hello >&3"),
         ]);
@@ -199,11 +209,11 @@ mod posix_quoting {
 
     /// Verify that `CommandEx.cwd` sets the child's working directory.
     #[skuld::test]
-    fn spawn_with_cwd(#[fixture(temp_dir)] dir: &Path) {
+    fn spawn_with_cwd(#[fixture(test_tools)] tools: &Path, #[fixture(temp_dir)] dir: &Path) {
         use std::io::Read;
-        // "pwd" prints the working directory. Use /bin/pwd to avoid shell
-        // builtins — we're testing the spawn layer, not the shell.
-        let mut cmd = super::super::CommandEx::new(vec![OsString::from("pwd")]);
+        // The fixture's `pwd` prints the working directory. This exercises the
+        // spawn layer, so it must be a real process rather than a shell builtin.
+        let mut cmd = super::super::CommandEx::new(vec![tool(tools, "pwd")]);
         cmd.cwd = Some(dir.to_path_buf());
         cmd.fds.insert(1, super::super::Fd::Pipe);
         let mut child = cmd.spawn().expect("spawn failed");
@@ -226,14 +236,15 @@ mod posix_quoting {
     /// causing concurrent threads to interfere. With addchdir_np (or the
     /// mutex fallback), each child gets its own CWD atomically.
     #[skuld::test]
-    fn spawn_concurrent_cwd_no_race() {
+    fn spawn_concurrent_cwd_no_race(#[fixture(test_tools)] tools: &Path) {
         use std::io::Read;
         let handles: Vec<_> = (0..20)
             .map(|_| {
                 let dir = tempfile::tempdir().unwrap();
                 let dir_path = dir.path().canonicalize().unwrap();
+                let pwd = tool(tools, "pwd");
                 std::thread::spawn(move || {
-                    let mut cmd = super::super::CommandEx::new(vec![OsString::from("pwd")]);
+                    let mut cmd = super::super::CommandEx::new(vec![pwd]);
                     cmd.cwd = Some(dir.path().to_path_buf());
                     cmd.fds.insert(1, super::super::Fd::Pipe);
                     let mut child = cmd.spawn().expect("spawn failed");

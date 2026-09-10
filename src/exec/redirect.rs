@@ -67,12 +67,14 @@ impl ActiveRedirects {
             let was_closed = io.is_closed(fd);
             if fd <= 2 {
                 // Replace fds 0-2 with /dev/null instead of removing, so
-                // downstream code always finds a valid handle for these fds.
-                // The shell's own writes to a closed 0-2 therefore succeed
-                // where bash reports EBADF — tracked separately as issue #41;
-                // the child half is handled at the spawn sites.
+                // downstream code always finds a valid handle for these fds,
+                // then mark the number closed so children are still denied it.
+                // The shell's own writes therefore succeed where bash reports
+                // EBADF — that half is issue #41.
                 let null = crate::exec::io_context::open_null_device();
-                saved.push(fd, was_closed, io.save_and_set(fd, null));
+                let prev = io.save_and_set(fd, null);
+                io.set_closed_marker(fd, true);
+                saved.push(fd, was_closed, prev);
             } else {
                 let prev = io.remove_fd(fd);
                 io.close_fd(fd);
@@ -244,8 +246,8 @@ impl Executor {
                     let resolved = self.resolve_path(&path);
                     let file = File::create(&resolved).map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
-                    active.stdout = Some(BufferedFile::new(file));
-                    active.stderr = Some(BufferedFile::new(clone));
+                    assign_write_fd(&mut active, 1, file)?;
+                    assign_write_fd(&mut active, 2, clone)?;
                 }
                 RedirectKind::BashAppendAll(word) => {
                     // &>> file — append both stdout and stderr to file
@@ -257,8 +259,8 @@ impl Executor {
                         .open(&resolved)
                         .map_err(|e| ExecError::BadRedirect(format!("{path}: {e}")))?;
                     let clone = file.try_clone().map_err(ExecError::Io)?;
-                    active.stdout = Some(BufferedFile::new(file));
-                    active.stderr = Some(BufferedFile::new(clone));
+                    assign_write_fd(&mut active, 1, file)?;
+                    assign_write_fd(&mut active, 2, clone)?;
                 }
             }
         }
@@ -271,7 +273,10 @@ impl Executor {
 /// close N". A bare `-` is the plain close form and is handled by the caller.
 fn parse_move_target(target: &str) -> Option<i32> {
     let digits = target.strip_suffix('-')?;
-    if digits.is_empty() {
+    // Digits only. `str::parse` would accept a leading `-`, so `3>&-3-` would
+    // yield -3 and carry a negative descriptor into the closed set and on into
+    // `dup2`. bash rejects the word instead.
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
         return None;
     }
     digits.parse::<i32>().ok()
@@ -310,25 +315,31 @@ fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<
     Ok(())
 }
 
-/// Close a write FD by assigning a sink.
+/// Close a write FD (`N>&-`).
 fn close_write_fd(active: &mut ActiveRedirects, fd: i32) {
-    active.closed_fds.insert(fd);
-    match fd {
-        // For FDs 0-2, mark as closed. apply() will replace them with
-        // /dev/null instead of removing them from the IoContext.
-        1 => active.stdout = None,
-        2 => active.stderr = None,
-        n => {
-            active.extra_fds.remove(&n);
-        }
-    }
+    clear_fd_slot(active, fd);
 }
 
-/// Close a read FD.
+/// Close a read FD (`N<&-`).
 fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
+    clear_fd_slot(active, fd);
+}
+
+/// Drop whatever this redirect list has assigned to `fd` and mark it closed.
+///
+/// The slot is chosen by descriptor *number*, not by the direction of the
+/// closing operator: `0>&-` and `0<&-` both close descriptor 0. Keying off the
+/// operator instead left `0>&-` routing to `extra_fds` while stdin stayed
+/// assigned, so `exec 0<src 0>&-; read x` still read the file (bash: EBADF).
+///
+/// For FDs 0-2 the slot is only cleared here; `apply()` and `adopt_redirects`
+/// substitute /dev/null so downstream code always finds a valid handle.
+fn clear_fd_slot(active: &mut ActiveRedirects, fd: i32) {
     active.closed_fds.insert(fd);
     match fd {
         0 => active.stdin = None,
+        1 => active.stdout = None,
+        2 => active.stderr = None,
         n => {
             active.extra_fds.remove(&n);
         }

@@ -213,24 +213,37 @@ fn exec_dashdash_ends_option_parsing() {
 }
 
 #[skuld::test]
-fn exec_invalid_option_still_applies_redirections(#[fixture(temp_dir)] dir: &Path) {
-    // bash -c 'exec -q 3>&1; echo after >&3; echo rc=$?' 3>probe
-    //   -> stderr "exec: -q: invalid option" plus usage, "after" on stdout,
-    //      "rc=0" (the rc of `echo`, not of `exec`), probe empty.
-    // bash makes an `exec` redirection permanent even when the builtin then
-    // rejects an option, which is also the fail-safe direction: the write goes
-    // where the script asked rather than to the host.
-    let probe = HostFd::new(dir.join("invalid-option.txt"));
+fn exec_invalid_option_does_not_apply_redirections(#[fixture(temp_dir)] dir: &Path) {
+    // `exec` makes its redirections permanent only when it *succeeds*. A
+    // rejected option undoes them:
+    //   bash -c 'exec -q 3>q; echo AFTER >&3; echo rc=$?'
+    //     -> "exec: -q: invalid option" plus usage on stderr,
+    //        "3: Bad file descriptor", rc=1, and q is empty.
+    // The file is still created by the redirection itself; only the descriptor
+    // is dropped. An earlier revision of this test asserted the opposite,
+    // having misread `probe=[after]` — probe holding the text is precisely the
+    // evidence that fd 3 was *not* redirected.
+    let q = dir.join("invalid-option.txt");
+    let probe = HostFd::new(dir.join("invalid-option-probe.txt"));
 
-    let script = format!("exec -q {fd}>&1; echo after >&{fd}; echo rc=$?", fd = probe.fd);
+    let script = format!(
+        "exec -q {fd}>{q}; echo AFTER >&{fd}; echo rc=$?",
+        fd = probe.fd,
+        q = shell_path(&q)
+    );
     let r = exec!(&script);
-    assert_eq!(r.stdout(), "after\nrc=0\n");
     assert!(
         r.stderr().contains("invalid option"),
         "expected an invalid-option diagnostic, got: {}",
         r.stderr()
     );
-    assert_eq!(probe.contents(), "");
+    assert_eq!(
+        std::fs::read_to_string(&q).unwrap(),
+        "",
+        "a rejected option must not leave the redirection in place"
+    );
+    r.stdout();
+    r.status();
 }
 
 // `>&-` must actually close, for the shell (#17) ======================================================================
@@ -430,22 +443,67 @@ fn closed_input_fd_not_inherited(#[fixture(temp_dir)] dir: &Path, #[fixture(test
 
 #[skuld::test]
 fn close_of_unopened_fd_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
-    // Closing a number the shell never opened must not make the next spawn
-    // fail. On macOS a bare `posix_spawn_file_actions_addclose` against a
-    // descriptor that is not open fails the whole spawn with EBADF, so this
-    // pins the dup2-then-close construction. bash agrees the close is a no-op:
+    // Closing a number the shell never opened is a no-op in bash:
     //   bash -c 'exec 21>&-; echo ok'  ->  "ok"
-    // The command must be an *external* one, since the risk is in the spawn.
+    // It must not break the *spawn* that follows, so the command has to be an
+    // external one.
+    //
+    // Swept rather than pinned to one number. The first version of this test
+    // hardcoded 21 and passed while fd 12 failed: which numbers collide depends
+    // on where /dev/null and the capture pipes happen to land, so a single
+    // number tests almost nothing.
     let marker = dir.join("spawn-marker.txt");
     std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
 
-    let script = format!("exec 21>&-; {ct} {t}", ct = tool(tools, "cat"), t = shell_path(&marker));
-    let r = exec!(&script);
-    assert_eq!(
-        r.stdout(),
-        "ok\n",
-        "a close of an unopened number must not break the next spawn"
-    );
+    for fd in 3..=24 {
+        let script = format!("exec {fd}>&-; {cat} {t}", t = shell_path(&marker));
+        let r = exec!(&script);
+        assert_eq!(r.stdout(), "ok\n", "closing fd {fd} broke the following spawn");
+    }
+}
+
+#[skuld::test]
+fn closing_several_fds_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // Two or more closes in one command is the shape that exposed the
+    // file-action collision: the shared /dev/null source could itself sit on a
+    // number that another entry closed, and `posix_spawn` then failed the whole
+    // spawn with EBADF. `bash -c 'exec 6>&- 7>&-; echo ok'` prints "ok".
+    //
+    // Repeated because the failure was nondeterministic — `cmd.fds` is a
+    // HashMap and its iteration order varies per process, so a single
+    // invocation missed it most of the time.
+    let marker = dir.join("multi-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+    let script = format!("exec 5>&- 6>&- 7>&- 8>&-; {cat} {t}", t = shell_path(&marker));
+
+    for attempt in 0..25 {
+        let r = exec!(&script);
+        assert_eq!(r.stdout(), "ok\n", "multi-close broke the spawn on attempt {attempt}");
+    }
+}
+
+#[skuld::test]
+fn closing_several_fds_does_not_break_pipeline_or_subshell(
+    #[fixture(temp_dir)] dir: &Path,
+    #[fixture(test_tools)] tools: &Path,
+) {
+    // The same collision reached the pipeline and subshell spawn paths.
+    let marker = dir.join("multi-ps-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+
+    for attempt in 0..15 {
+        let r = exec!(&format!(
+            "exec 5>&- 6>&- 7>&-; {cat} {t} | {cat}",
+            t = shell_path(&marker)
+        ));
+        assert_eq!(r.stdout(), "ok\n", "pipeline broke on attempt {attempt}");
+
+        let r = exec!(&format!("exec 5>&- 6>&- 7>&-; ({cat} {t})", t = shell_path(&marker)));
+        assert_eq!(r.stdout(), "ok\n", "subshell broke on attempt {attempt}");
+    }
 }
 
 // Closed standard descriptors are closed in the child too (#41's child half) ==========================================
@@ -466,6 +524,103 @@ fn closed_stdout_not_inherited_by_child(#[fixture(test_tools)] tools: &Path) {
     let r = exec!(&script);
     assert_eq!(r.stdout(), "done\n", "a closed stdout must not reach the host");
     r.stderr();
+}
+
+// Command substitution is a spawn site too (#16's actual incident shape) ==============================================
+
+#[skuld::test]
+fn cmdsub_child_does_not_reach_host_fd(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // The shape that corrupted the corpus harness's database, verbatim:
+    //   bash -c 'exec 3>tgt; x=$(sh -c "echo REDIR >&3")' 3>probe
+    //     -> tgt holds "REDIR", probe empty.
+    // `execute_command_substitution` built its child's fd table from nothing but
+    // a stdout pipe, so the shell's `exec 3>tgt` was invisible to it and the
+    // write went to the host's descriptor instead.
+    let probe = HostFd::new(dir.join("cmdsub-probe.txt"));
+    let target = dir.join("cmdsub-target.txt");
+
+    let script = format!(
+        "exec {fd}>{t}; x=$({wf} {fd} REDIR)",
+        fd = probe.fd,
+        t = shell_path(&target),
+        wf = tool(tools, "writefd")
+    );
+    exec!(&script);
+    assert_eq!(std::fs::read_to_string(&target).unwrap(), "REDIR\n");
+    assert_eq!(probe.contents(), "", "the host's descriptor must not receive the write");
+}
+
+#[skuld::test]
+fn closed_fd_not_inherited_by_cmdsub(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; x=$(sh -c "echo LEAK >&3")' 3>probe -> probe empty.
+    let probe = HostFd::new(dir.join("cmdsub-closed.txt"));
+
+    let script = format!(
+        "exec {fd}>&-; x=$({wf} {fd} LEAK); echo \"x=[$x]\"",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    r.stdout();
+    r.stderr();
+    assert_eq!(
+        probe.contents(),
+        "",
+        "command substitution must not inherit a closed descriptor"
+    );
+}
+
+// Closing by number, not by the direction of the operator =============================================================
+
+#[skuld::test]
+fn close_clears_the_slot_for_its_number_not_its_direction(#[fixture(temp_dir)] dir: &Path) {
+    // `0>&-` closes descriptor 0 even though `>` reads as an output operator:
+    //   bash -c 'exec 0<src 0>&-; read x; echo "rc=$? x=[$x]"'
+    //     -> "read: 0: read error: Bad file descriptor", rc=1, x empty.
+    // Routing by operator direction left stdin assigned, so the read succeeded.
+    let src = dir.join("close-direction.txt");
+    std::fs::write(&src, "DATA\n").unwrap();
+
+    let script = format!("exec 0<{s} 0>&-; read x; echo \"rc=$? x=[$x]\"", s = shell_path(&src));
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1 x=[]\n", "0>&- must close descriptor 0");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdin_not_inherited_by_child(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // `exec 0<&-` must reach children as a genuine close:
+    //   printf X | bash -c 'exec 0<&-; cat'  ->  "cat: stdin: Bad file descriptor"
+    // `adopt_redirects` substituted /dev/null for fds 0-2 without recording the
+    // close, so `io.closed_fds()` was empty for them and the child inherited the
+    // host's stdin.
+    let src = dir.join("closed-stdin.txt");
+    std::fs::write(&src, "HOSTDATA\n").unwrap();
+    let cat = tool(tools, "cat");
+
+    let script = format!("exec 0<{s}; exec 0<&-; {cat}", s = shell_path(&src));
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "", "a closed stdin must not reach the child");
+    r.stderr();
+    r.status();
+}
+
+// Malformed move targets ==============================================================================================
+
+#[skuld::test]
+fn move_target_rejects_non_digits() {
+    // `exec 3>&-3-` must not parse as a move from descriptor -3. bash rejects
+    // the word outright ("exec: 3-: not found"); thaum reports a bad redirect.
+    // Either way the command fails and the script continues — what must not
+    // happen is a negative descriptor reaching the closed set and then `dup2`.
+    let r = exec!("exec 3>&-3-; echo alive");
+    assert_eq!(
+        r.stdout(),
+        "alive\n",
+        "a malformed move target must not abort the script"
+    );
+    r.stderr();
+    r.status();
 }
 
 // Numeric-move redirections `N>&M-` / `N<&M-` (#17's audit) ===========================================================

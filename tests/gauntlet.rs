@@ -445,8 +445,10 @@ fn main() {
 
     // Enumerating tests must have no side effects: `cargo nextest list` runs
     // every test binary with `--list`, so warming up here would make listing
-    // build a Docker image (issue #20).
-    let listing = std::env::args().any(|a| a == "--list");
+    // build a Docker image (issue #20). Parse with libtest-mimic rather than
+    // scanning argv, which also covers `--help`: `from_args` prints help and
+    // exits before returning, so the warm-up below is never reached.
+    let listing = libtest_mimic::Arguments::from_args().list;
 
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).

@@ -14,11 +14,12 @@ use crate::common::labels::{DOCKER, INFRA};
 
 skuld::default_labels!(INFRA);
 
-/// Binaries whose tests may build a Docker image.
+/// Binaries containing tests that may build a Docker image.
 ///
-/// `infra` builds both the gauntlet and bench images; `gauntlet` triggers a
-/// build through the `gauntlet_sandbox` fixture. Both therefore need the long
-/// slow-timeout, and neither belongs in a required CI job.
+/// Four of `infra`'s six tests build the gauntlet or bench image directly; the
+/// other two are callgrind benchmarks that build nothing. `gauntlet` triggers a
+/// build through the `gauntlet_sandbox` fixture. The timeout override and the
+/// CI exclusion are both whole-binary, so this list is of binaries, not tests.
 const DOCKER_BUILDING_BINARIES: &[&str] = &["thaum::infra", "thaum::gauntlet"];
 
 fn nextest_available() -> Result<(), String> {
@@ -214,6 +215,13 @@ fn slow_timeout_override_covers_every_docker_building_binary() {
 fn gating_job_selects_no_docker_building_binary() {
     let filter = workflow_filter("test");
     let selected = binaries_selected_by(&filter);
+    // Positive control: an assertion of absence passes trivially against an
+    // empty set, so confirm the filter selected something first.
+    assert!(
+        !selected.is_empty(),
+        "the gating CI job's filter `{filter}` selected no tests at all, so asserting what it \
+         does not select proves nothing"
+    );
     for binary in DOCKER_BUILDING_BINARIES {
         assert!(
             !selected.contains(*binary),
@@ -271,19 +279,67 @@ fn filter_parsing_survives_forced_colour() {
 /// `cargo nextest list`'s output: nextest discards a test binary's stderr when
 /// listing succeeds, so a guard phrased against the outer command's output can
 /// never fail and reports success forever.
+///
+/// Three things this guard needs to avoid passing vacuously:
+///
+/// - `THAUM_GAUNTLET_NO_SANDBOX` is removed from the child's environment.
+///   With it set the child short-circuits before the warm-up and emits no
+///   marker, so an inherited value would make the guard pass against unfixed
+///   code — and `CONTRIBUTING.md` teaches that variable two lines above the
+///   command a developer would run.
+/// - The child's exit status is checked. A child dying before it reaches the
+///   fixture also produces stderr without the marker.
+/// - A positive control confirms the child got far enough to list tests, so
+///   "no marker" means "did not warm up" rather than "did not run".
+///
+/// Note it is skipped where Docker is absent, which is correct — without a
+/// daemon the fixture's precondition fails and no warm-up is attempted — but it
+/// does mean issue #20 has no regression cover on the macOS CI runner.
 #[skuld::test(requires = [nextest_available, docker_available], labels = [DOCKER])]
-fn listing_does_not_warm_up_the_docker_fixture() {
+fn listing_tests_builds_no_image() {
     let binary = test_binary_path("thaum::gauntlet");
     let output = Command::new(&binary)
         .arg("--list")
+        .env_remove("THAUM_GAUNTLET_NO_SANDBOX")
         .current_dir(project_root())
         .output()
         .unwrap_or_else(|e| panic!("running {} --list: {e}", binary.display()));
     let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    assert!(
+        output.status.success(),
+        "`{} --list` exited {:?} — a child that dies early produces no marker and would make \
+         this guard pass for the wrong reason.\nstderr:\n{stderr}",
+        binary.display(),
+        output.status.code()
+    );
+    assert!(
+        stdout.lines().filter(|l| !l.trim().is_empty()).count() > 100,
+        "`{} --list` listed almost nothing, so the absence of a build marker proves nothing.\n\
+         stdout:\n{stdout}",
+        binary.display()
+    );
     assert!(
         !stderr.contains("building Docker image"),
         "`{} --list` warmed up the Docker fixture — enumerating tests must have no side effects \
          (issue #20).\nstderr:\n{stderr}",
         binary.display()
+    );
+}
+
+/// `CONTRIBUTING.md` documents the Docker-free filter by copying it.
+///
+/// Nothing otherwise keeps that copy in step with `ci.yml`, and a developer
+/// following stale instructions gets Docker builds they were told they had
+/// opted out of.
+#[skuld::test]
+fn contributing_documents_the_gating_filter_verbatim() {
+    let filter = workflow_filter("test");
+    let doc = read("CONTRIBUTING.md");
+    assert!(
+        doc.contains(&filter),
+        "CONTRIBUTING.md does not contain the gating job's filter `{filter}` verbatim, so the \
+         documented way to skip Docker work has drifted from what CI runs"
     );
 }

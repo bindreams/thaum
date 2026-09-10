@@ -128,11 +128,13 @@ impl Executor {
                 cmd_start = i;
                 continue;
             } else if args[i].starts_with('-') {
-                // bash makes the redirections permanent even when it then
-                // rejects the option, so adopt before reporting. That is also
-                // the fail-safe direction: the write goes where the script
-                // asked rather than to whatever the host has at that number.
-                self.adopt_redirects(active, io);
+                // The redirections are *not* adopted. `exec` only makes them
+                // permanent when it succeeds, so a rejected option undoes them:
+                //   bash -c 'exec -q 3>q; echo AFTER >&3; echo rc=$?'
+                //     -> "exec: -q: invalid option", rc=1, and q is empty —
+                //        the file is created by the redirection but fd 3 is
+                //        closed again before the next command runs.
+                // Dropping `active` here reproduces that.
                 if let Some(stderr) = io.fd_mut(2) {
                     let _ = writeln!(stderr, "exec: {}: invalid option", args[i]);
                 }

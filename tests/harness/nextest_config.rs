@@ -180,11 +180,28 @@ fn test_binary_path(binary_id: &str) -> PathBuf {
 
 // Filter guards -------------------------------------------------------------------------------------------------------
 
+/// Every Docker-building binary that has listable tests is covered by the override.
+///
+/// Compared against the *unfiltered* listing rather than a fixed expectation:
+/// skuld omits tests whose `requires` preconditions fail, so on a machine
+/// without Docker every test in `thaum::infra` is unavailable and the binary
+/// does not appear at all. Asserting it is present would then fail for a reason
+/// that has nothing to do with the timeout policy — which is what happened on
+/// the macOS CI runner.
 #[skuld::test(requires = [nextest_available])]
 fn slow_timeout_override_covers_every_docker_building_binary() {
     let filter = slow_timeout_override_filter();
     let selected = binaries_selected_by(&filter);
+    let present = binaries_selected_by("all()");
+    assert!(
+        present.contains("thaum::gauntlet"),
+        "no Docker-building binary has listable tests here, so this guard checked nothing.\n\
+         Present: {present:?}"
+    );
     for binary in DOCKER_BUILDING_BINARIES {
+        if !present.contains(*binary) {
+            continue;
+        }
         assert!(
             selected.contains(*binary),
             "`{binary}` can build a Docker image but is not covered by the slow-timeout override \

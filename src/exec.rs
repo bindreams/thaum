@@ -230,7 +230,7 @@ impl Executor {
             if *fd <= 2 {
                 io.set_fd(*fd, io_context::open_null_device());
             } else {
-                io.remove_fd(*fd);
+                io.close_fd(*fd);
             }
         }
         if let Some(f) = active.stdin {
@@ -303,6 +303,13 @@ impl Executor {
             if let Ok(file) = io.try_clone_fd(fd) {
                 cmd.fds.insert(fd, Fd::File(file));
             }
+        }
+
+        // Closed descriptors are closed in the subshell process too, so its own
+        // `dup_process_fd` fallback fails naturally and nothing needs to travel
+        // in the payload.
+        for &fd in io.closed_fds() {
+            cmd.fds.insert(fd, Fd::Close);
         }
 
         let mut child = cmd.spawn().map_err(ExecError::Io)?;
@@ -830,14 +837,11 @@ impl Executor {
                 return result;
             }
             "exec" => {
+                // Redirect-only mode is decided inside `builtin_exec`, after
+                // option parsing — `exec --` and `exec -a name` reach it with a
+                // non-empty argument list but no command word.
                 let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
-                if cmd_args.is_empty() {
-                    // Redirect-only mode: adopt redirects permanently into IoContext.
-                    self.adopt_redirects(active, io);
-                    self.restore_prefix_assignments(saved_env);
-                    return Ok(0);
-                }
-                let result = self.builtin_exec(cmd_args, &mut active, io);
+                let result = self.builtin_exec(cmd_args, active, io);
                 self.restore_prefix_assignments(saved_env);
                 return result;
             }

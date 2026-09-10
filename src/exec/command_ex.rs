@@ -2,8 +2,12 @@
 //!
 //! `CommandEx` is a plain data struct describing a child process to spawn.
 //! `ChildEx` is the spawned process handle. `Fd` describes what to do with
-//! each file descriptor. Platform-specific spawn logic uses `posix_spawnp`
+//! each file descriptor. Platform-specific spawn logic uses `posix_spawn`
 //! on Unix and `CreateProcessW` on Windows.
+//!
+//! Neither searches `PATH`: `path` must already name a file. Lookup belongs to
+//! the shell, which resolves against its own `$PATH` in `exec::command_lookup`
+//! before building a `CommandEx`.
 
 use std::collections::HashMap;
 use std::ffi::{OsStr, OsString};
@@ -34,7 +38,8 @@ pub(crate) enum Fd {
 /// Description of a child process to spawn. All fields are public; callers
 /// build the struct, then consume it with `spawn(self)`.
 pub(crate) struct CommandEx {
-    /// Executable path for OS lookup (PATH search on both platforms).
+    /// Path to the executable. No `PATH` search is performed — a bare name
+    /// reaching `spawn` is a caller bug.
     pub path: OsString,
     /// Full argv including [0]. Normally `argv[0] == path`.
     /// `exec -a name cmd` sets `argv[0] = "name"` while `path = "cmd"`.
@@ -96,6 +101,15 @@ impl CommandEx {
     }
 
     /// Spawn the child process. Consumes self.
+    ///
+    /// `path` must already name a file: the spawn layer searches no `PATH`.
+    #[contracts::debug_requires(
+        {
+            let p = self.path.to_string_lossy();
+            p.contains('/') || (cfg!(windows) && p.contains('\\'))
+        },
+        "path must be resolved before spawning — see exec::command_lookup"
+    )]
     pub fn spawn(self) -> io::Result<ChildEx> {
         spawn_impl(self)
     }
@@ -308,10 +322,10 @@ fn wait_for_handle(
 // Process replacement =================================================================================================
 
 impl CommandEx {
-    /// Replace the current process image with this command (Unix `execvp`).
+    /// Replace the current process image with this command (Unix `execve`).
     ///
     /// Applies FD redirections via `dup2`, changes CWD, sets environment,
-    /// then calls `execvp`. On success, this function never returns.
+    /// then calls `execve`. On success, this function never returns.
     /// On failure, returns the OS error.
     #[cfg(unix)]
     pub fn exec_replace(self) -> io::Error {
@@ -360,28 +374,9 @@ impl CommandEx {
             .collect::<Result<_, _>>()
             .unwrap_or_default();
 
-        let path_c = match CString::new(self.path.as_bytes()) {
+        let resolved = match CString::new(self.path.as_bytes()) {
             Ok(c) => c,
             Err(e) => return io::Error::new(io::ErrorKind::InvalidInput, e),
-        };
-
-        // Resolve the executable path via PATH if it's a bare name.
-        let resolved = if self.path.to_string_lossy().contains('/') {
-            path_c
-        } else {
-            // Search PATH manually for execve (which doesn't do PATH lookup).
-            let path_var = std::env::var("PATH").unwrap_or_default();
-            let mut found = None;
-            for dir in path_var.split(':') {
-                let candidate = format!("{}/{}", dir, self.path.to_string_lossy());
-                if let Ok(c) = CString::new(candidate.as_bytes()) {
-                    if std::path::Path::new(&candidate).is_file() {
-                        found = Some(c);
-                        break;
-                    }
-                }
-            }
-            found.unwrap_or(path_c)
         };
 
         // execve replaces the process image. Only returns on error.
@@ -826,7 +821,7 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
 
     let mut pid: libc::pid_t = 0;
     let res = unsafe {
-        libc::posix_spawnp(
+        libc::posix_spawn(
             &mut pid,
             path_c.as_ptr(),
             file_actions.as_ptr(),

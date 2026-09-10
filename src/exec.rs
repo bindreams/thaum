@@ -19,6 +19,8 @@ pub mod buffered_file;
 pub mod builtins;
 mod child_io;
 pub(crate) mod command_ex;
+/// Resolving a command name to an executable using the shell's `$PATH`.
+pub(crate) mod command_lookup;
 mod compound;
 /// Shell state: variables, functions, aliases, positional parameters, CWD, `$?`.
 pub mod environment;
@@ -620,6 +622,21 @@ impl Executor {
                             .map(|(k, v): (String, String)| (std::ffi::OsString::from(k), std::ffi::OsString::from(v)))
                             .collect();
                         child_cmd.fds.insert(1, command_ex::Fd::Pipe);
+
+                        // Command substitution has no IoContext — this site
+                        // does not capture the child's stderr either, so a
+                        // failed lookup sets the status without a diagnostic.
+                        match self.lookup_command(cmd_name, &child_cmd.env) {
+                            Ok(path) => child_cmd.path = path.into_os_string(),
+                            Err(command_lookup::LookupError::NotFound) => {
+                                self.env.set_last_exit_status(127);
+                                continue;
+                            }
+                            Err(command_lookup::LookupError::NotExecutable(_)) => {
+                                self.env.set_last_exit_status(126);
+                                continue;
+                            }
+                        }
 
                         match child_cmd.spawn() {
                             Ok(mut child) => {

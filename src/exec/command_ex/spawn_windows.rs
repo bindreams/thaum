@@ -5,7 +5,7 @@
 //! inherit arbitrary file descriptors, not just stdin/stdout/stderr.
 
 use std::collections::HashMap;
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsString;
 use std::fs::File;
 use std::io;
 use std::os::windows::ffi::OsStrExt;
@@ -23,47 +23,12 @@ use super::{ChildEx, ChildInner, CommandEx, Fd, SendHandle, SendHpcon};
 const FOPEN: u8 = 0x01;
 const FPIPE: u8 = 0x08;
 
-/// Resolve `cmd.path` via PATH + PATHEXT if it's a bare command name.
-///
-/// Equivalent of Unix `posix_spawnp`'s PATH search. `CreateProcessW` does not
-/// search PATH when `lpApplicationName` is non-NULL, so we must do it ourselves.
-fn resolve_path_if_needed(cmd: &mut CommandEx) {
-    let name = cmd.path.to_string_lossy();
-    if name.contains('/') || name.contains('\\') {
-        return;
-    }
-
-    // Use PATH from cmd.env (child's environment) first, falling back to the
-    // process environment. This matches posix_spawnp on Unix, which searches
-    // the calling process's PATH rather than the child's envp.
-    let env_path = cmd
-        .env
-        .get(OsStr::new("PATH"))
-        .and_then(|v| v.to_str())
-        .map(String::from);
-    let proc_path;
-    let path_var = match &env_path {
-        Some(p) => p.as_str(),
-        None => {
-            proc_path = std::env::var("PATH").unwrap_or_default();
-            proc_path.as_str()
-        }
-    };
-
-    let pathext = cmd.env.get(OsStr::new("PATHEXT")).and_then(|v| v.to_str());
-    if let Some(resolved) = super::resolve_windows::resolve_command(cmd.path.as_ref(), path_var, pathext) {
-        cmd.path = resolved.into_os_string();
-    }
-}
-
 /// Spawn a child process using `CreateProcessW` with full fd table support.
 ///
 /// If any fd is `Fd::Pty`, delegates to `spawn_with_conpty` for terminal
 /// emulation. Mixed cases (only stdout or only stderr needing a PTY) are
 /// handled by ConPTY with explicit `hStd*` overrides for the non-PTY fd.
-pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
-    resolve_path_if_needed(&mut cmd);
-
+pub(super) fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let any_pty = cmd.fds.values().any(|fd| matches!(fd, Fd::Pty));
     if any_pty {
         return spawn_with_conpty(cmd);

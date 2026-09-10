@@ -13,6 +13,7 @@ use std::io::Write;
 
 use crate::exec::child_io;
 use crate::exec::command_ex::{CommandEx, Fd};
+use crate::exec::command_lookup;
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::redirect::ActiveRedirects;
@@ -52,6 +53,13 @@ impl Executor {
             env.insert(assignment.name.clone().into(), value.into());
         }
         child_cmd.env = env;
+
+        // Resolve the command against the shell's PATH before spawning: the
+        // spawn layer searches nothing.
+        match self.lookup_command(name, &child_cmd.env) {
+            Ok(path) => child_cmd.path = path.into_os_string(),
+            Err(e) => return Ok(command_lookup::report(&e, name, io)),
+        }
 
         // IoContext FDs (3+) — includes persistent fds from `exec` redirects.
         for (&fd, file) in io.fds() {
@@ -114,7 +122,7 @@ impl Executor {
             }
             Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
                 if let Some(stderr) = io.fd_mut(2) {
-                    let _ = writeln!(stderr, "{name}: permission denied");
+                    let _ = writeln!(stderr, "{name}: Permission denied");
                 }
                 Ok(126)
             }

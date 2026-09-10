@@ -165,12 +165,23 @@ embedder intact.
 reports EBADF for the entire spawn (macOS). The dup2 makes the number open unconditionally, with no
 check-then-act against the process-global fd table.
 
-**Parent-side source descriptors are relocated above every target before any file action is
-added** (`relocate_above`, `F_DUPFD_CLOEXEC`). The child's actions dup2 *from* parent-side numbers
-and close *at* numbers in `cmd.fds`; if those sets overlap, an action destroys another's input and
+**Parent-side source descriptors are kept clear of every target before any file action is added**
+(`relocate_clear_of`, `F_DUPFD_CLOEXEC`). The child's actions dup2 *from* parent-side numbers and
+dup2/close *at* numbers in `cmd.fds`; if those sets overlap, an action destroys another's input and
 the spawn fails with EBADF. `cmd.fds` is a `HashMap`, so which entries collide depends on iteration
 order *and* on the host's fd table — the failure is nondeterministic and moves with the embedder.
 Actions are then emitted in a fixed order: every dup2, then every close.
+
+**A close never displaces a descriptor the runtime owns.** `CommandEx::reserve` claims the
+subshell's AST transport and the capture pipes; `CommandEx::close_fd_in_child` is the only way a
+script's `N>&-` reaches a child, and it refuses reserved numbers. Inserting `Fd::Close` directly
+would silently take the transport away — `exec 0<&-` did exactly that, and every subshell failed
+with "invalid JSON payload" while pointing the user at their data.
+
+A descriptor number the platform's spawn API refuses to name cannot be open in the child either, so
+that close is dropped rather than failing the spawn — bash prints `ok` for `exec 2000000>&-`. macOS
+rejects numbers from 10240 upward, a bound reachable through neither `sysconf(_SC_OPEN_MAX)`
+(1048576) nor `getdtablesize()` (245760), so the API is asked rather than guessed.
 
 On Windows, fds 3+ reach the child only through `build_lpreserved2`, where an absent entry already
 reads as closed. Descriptors 0-2 are **not** closed in the child on Windows: `close_in_child` gates

@@ -102,23 +102,18 @@ impl Executor {
 
     /// `exec` builtin: replace the current shell with the given command.
     ///
-    /// With no arguments, redirect-only mode is handled by the caller
-    /// (`execute_command`) which adopts the redirects into the IoContext
-    /// before reaching this function.
+    /// If no command word survives option parsing — a bare `exec`, `exec --`,
+    /// `exec -a name`, or a rejected option — this is redirect-only mode and
+    /// the redirections are adopted permanently into the `IoContext`.
     ///
     /// On Unix, replaces the process image via `execvp`. On other platforms,
     /// spawns the child and exits via `ExitRequested`.
     pub(super) fn builtin_exec(
         &mut self,
         args: &[String],
-        active: &mut ActiveRedirects,
+        active: ActiveRedirects,
         io: &mut IoContext,
     ) -> Result<i32, ExecError> {
-        if args.is_empty() {
-            // Redirect-only mode is handled before this function is called.
-            return Ok(0);
-        }
-
         // Parse flags.
         let mut argv0_override: Option<&str> = None;
         let mut cmd_start = 0;
@@ -133,6 +128,13 @@ impl Executor {
                 cmd_start = i;
                 continue;
             } else if args[i].starts_with('-') {
+                // The redirections are *not* adopted. `exec` only makes them
+                // permanent when it succeeds, so a rejected option undoes them:
+                //   bash -c 'exec -q 3>q; echo AFTER >&3; echo rc=$?'
+                //     -> "exec: -q: invalid option", rc=1, and q is empty —
+                //        the file is created by the redirection but fd 3 is
+                //        closed again before the next command runs.
+                // Dropping `active` here reproduces that.
                 if let Some(stderr) = io.fd_mut(2) {
                     let _ = writeln!(stderr, "exec: {}: invalid option", args[i]);
                 }
@@ -144,7 +146,12 @@ impl Executor {
         }
 
         if cmd_start >= args.len() {
-            return Ok(0); // No command after flags.
+            // No command word survived option parsing, so this is redirect-only
+            // mode — `exec --`, `exec -a name`, or a bare `exec`. Dropping the
+            // redirections here is what let `exec -- 3>&1` leave the host's
+            // descriptor 3 live and receive the script's write (#16).
+            self.adopt_redirects(active, io);
+            return Ok(0);
         }
 
         let cmd_name = &args[cmd_start];
@@ -182,6 +189,12 @@ impl Executor {
         }
         for (&fd, file) in &active.extra_fds {
             cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        for &fd in io.closed_fds() {
+            cmd.close_fd_in_child(fd);
+        }
+        for &fd in &active.closed_fds {
+            cmd.close_fd_in_child(fd);
         }
 
         #[cfg(unix)]

@@ -27,6 +27,10 @@ pub(crate) enum Fd {
     Pty,
     /// Redirect to/from this file.
     File(File),
+    /// Not open in the child. Used for descriptors the script closed with
+    /// `N>&-`: omitting them would silently hand the child whatever the *host*
+    /// process has at that number.
+    Close,
 }
 
 // CommandEx ===========================================================================================================
@@ -47,6 +51,10 @@ pub(crate) struct CommandEx {
     /// File descriptor table. Keys are fd numbers (0 = stdin, 1 = stdout, …).
     /// Fds not present here inherit from the parent process.
     pub fds: HashMap<i32, Fd>,
+    /// Descriptors the runtime owns for its own plumbing — a subshell's AST
+    /// transport, a capture pipe. [`close_fd_in_child`](CommandEx::close_fd_in_child)
+    /// refuses to displace these. Set via [`reserve`](CommandEx::reserve).
+    reserved: std::collections::HashSet<i32>,
 }
 
 impl CommandEx {
@@ -61,7 +69,40 @@ impl CommandEx {
             env: std::env::vars_os().collect(),
             cwd: None,
             fds: HashMap::new(),
+            reserved: std::collections::HashSet::new(),
         }
+    }
+
+    /// Claim `fd` for the runtime's own plumbing.
+    ///
+    /// Reserved descriptors are exempt from [`close_fd_in_child`](CommandEx::close_fd_in_child):
+    /// a script closing a descriptor must not be able to take away the channel
+    /// the runtime is using to talk to its own child. `exec 0<&-` did exactly
+    /// that to the subshell transport, and every subshell stopped running.
+    pub fn reserve(&mut self, fd: i32, spec: Fd) {
+        self.fds.insert(fd, spec);
+        self.reserved.insert(fd);
+    }
+
+    /// Ask for `fd` to be closed in the child.
+    ///
+    /// The single place that decides whether a script's `N>&-` reaches a child.
+    /// Three reasons it may not:
+    ///
+    /// * the runtime reserved the descriptor (see [`reserve`](CommandEx::reserve));
+    /// * it is a standard descriptor on Windows, where the close path is
+    ///   unexercised, so that platform keeps its previous behaviour (issue #46).
+    ///
+    /// A number too large for the platform's spawn API to name is handled at
+    /// emission time, in `spawn_impl`, where the API reports it.
+    pub fn close_fd_in_child(&mut self, fd: i32) {
+        if self.reserved.contains(&fd) {
+            return;
+        }
+        if fd <= 2 && !cfg!(unix) {
+            return;
+        }
+        self.fds.insert(fd, Fd::Close);
     }
 
     /// Join `self.argv` into a single command-line string using platform
@@ -330,6 +371,11 @@ impl CommandEx {
                         // SAFETY: raw is valid and no longer needed (dup2 made a copy).
                         unsafe { nix::libc::close(raw) };
                     }
+                }
+                Fd::Close => {
+                    // SAFETY: close() is safe for any fd number; EBADF (the fd
+                    // was not open) is the expected no-op case and is ignored.
+                    unsafe { nix::libc::close(fd_num) };
                 }
                 Fd::Pipe | Fd::InputPipe | Fd::Pty => {} // Not meaningful for exec replacement.
             }
@@ -691,6 +737,58 @@ fn get_terminal_size() -> libc::winsize {
     }
 }
 
+/// Move a parent-side source descriptor clear of every descriptor the child's
+/// fd table targets, closing the original.
+///
+/// The child's file actions dup2 *from* these numbers and dup2/close *at* the
+/// numbers in `cmd.fds`. The two sets must be disjoint: if a source sits on a
+/// number the child also closes — or that another dup2 overwrites — the action
+/// list destroys its own input and `posix_spawn` fails the whole spawn with
+/// EBADF. Which numbers collide depends on the host process's fd table and on
+/// `HashMap` iteration order, so the failure is nondeterministic and moves with
+/// whatever the embedder happens to have open.
+///
+/// Each colliding duplicate is parked so the next `F_DUPFD_CLOEXEC` cannot
+/// return the same number; the loop therefore consumes one distinct target per
+/// iteration and ends within `targets.len()` steps. `F_DUPFD_CLOEXEC` keeps the
+/// duplicate close-on-exec, so it serves the file actions — which run before
+/// exec — and then disappears rather than leaking into the child.
+#[cfg(unix)]
+fn relocate_clear_of(
+    raw: std::os::fd::RawFd,
+    targets: &std::collections::HashSet<i32>,
+    raw_fds_to_close: &[std::os::fd::RawFd],
+) -> io::Result<std::os::fd::RawFd> {
+    if !targets.contains(&raw) {
+        return Ok(raw);
+    }
+    let mut parked: Vec<std::os::fd::RawFd> = Vec::new();
+    let mut cur = raw;
+    let outcome = loop {
+        // SAFETY: `cur` is an owned, open descriptor.
+        let next = unsafe { libc::fcntl(cur, libc::F_DUPFD_CLOEXEC, 3) };
+        if next < 0 {
+            break Err(io::Error::last_os_error());
+        }
+        parked.push(cur);
+        if !targets.contains(&next) {
+            break Ok(next);
+        }
+        cur = next;
+    };
+    for fd in parked {
+        // SAFETY: each parked fd is owned here and superseded by its duplicate.
+        unsafe { libc::close(fd) };
+    }
+    match outcome {
+        Ok(fd) => Ok(fd),
+        Err(e) => {
+            close_raw_fds(raw_fds_to_close);
+            Err(e)
+        }
+    }
+}
+
 #[cfg(unix)]
 fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     use std::ffi::CString;
@@ -702,27 +800,39 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let mut pipes: HashMap<i32, File> = HashMap::new();
     // Raw FDs that must be closed in the parent after spawn (or on error).
     let mut raw_fds_to_close: Vec<std::os::fd::RawFd> = Vec::new();
+    // Lazily-opened /dev/null, shared by all `Fd::Close` entries.
+    let mut devnull_fd: Option<std::os::fd::RawFd> = None;
+
+    // Every descriptor number the child's fd table targets. Parent-side source
+    // fds are kept clear of this set — see `relocate_clear_of`.
+    let targets: std::collections::HashSet<i32> = cmd.fds.keys().copied().collect();
+
+    // Collected actions, applied after the loop in a fixed order: every dup2
+    // first, then every close. `cmd.fds` is a HashMap, so the iteration order
+    // varies per process; without this the resulting spawn would be
+    // order-dependent and therefore nondeterministic.
+    let mut dup2_actions: Vec<(std::os::fd::RawFd, i32)> = Vec::new();
+    let mut close_actions: Vec<i32> = Vec::new();
+    // Targets that exist only to be closed. If the platform's spawn API cannot
+    // name the number, the close is vacuous rather than fatal — see below.
+    let mut close_only: std::collections::HashSet<i32> = std::collections::HashSet::new();
 
     for (&fd_num, fd_spec) in &cmd.fds {
         match fd_spec {
             Fd::Pipe => {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
-                let write_raw = write_end.into_raw_fd();
+                let write_raw = relocate_clear_of(write_end.into_raw_fd(), &targets, &raw_fds_to_close)?;
                 raw_fds_to_close.push(write_raw);
-                file_actions.add_dup2(write_raw, fd_num).inspect_err(|_| {
-                    close_raw_fds(&raw_fds_to_close);
-                })?;
+                dup2_actions.push((write_raw, fd_num));
                 let parent_file = File::from(read_end);
                 set_cloexec(&parent_file);
                 pipes.insert(fd_num, parent_file);
             }
             Fd::InputPipe => {
                 let (read_end, write_end) = nix::unistd::pipe().map_err(io::Error::other)?;
-                let read_raw = read_end.into_raw_fd();
+                let read_raw = relocate_clear_of(read_end.into_raw_fd(), &targets, &raw_fds_to_close)?;
                 raw_fds_to_close.push(read_raw);
-                file_actions.add_dup2(read_raw, fd_num).inspect_err(|_| {
-                    close_raw_fds(&raw_fds_to_close);
-                })?;
+                dup2_actions.push((read_raw, fd_num));
                 let parent_file = File::from(write_end);
                 set_cloexec(&parent_file);
                 pipes.insert(fd_num, parent_file);
@@ -739,32 +849,91 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
                     attrs.output_flags.remove(OutputFlags::ONLCR);
                     termios::tcsetattr(&pty.slave, SetArg::TCSANOW, &attrs).map_err(io::Error::other)?;
                 }
-                let slave_raw = pty.slave.into_raw_fd();
+                // Kept clear of every target, so the "close the slave in the
+                // child" action below can never destroy a target fd.
+                let slave_raw = relocate_clear_of(pty.slave.into_raw_fd(), &targets, &raw_fds_to_close)?;
                 raw_fds_to_close.push(slave_raw);
-                file_actions.add_dup2(slave_raw, fd_num).inspect_err(|_| {
-                    close_raw_fds(&raw_fds_to_close);
-                })?;
+                dup2_actions.push((slave_raw, fd_num));
                 // Close the original slave fd in the child after dup2. Without
                 // this, the child holds an extra reference to the PTY slave,
                 // preventing EOF detection on the master.
-                // Skip if slave_raw == fd_num: dup2 is a no-op (POSIX) and
-                // closing would destroy the target fd.
-                if slave_raw != fd_num {
-                    file_actions.add_close(slave_raw).inspect_err(|_| {
-                        close_raw_fds(&raw_fds_to_close);
-                    })?;
-                }
+                close_actions.push(slave_raw);
                 let master_file = File::from(pty.master);
                 set_cloexec(&master_file);
                 pipes.insert(fd_num, master_file);
             }
             Fd::File(file) => {
-                let raw_fd = file.try_clone()?.into_raw_fd();
+                let raw_fd = relocate_clear_of(file.try_clone()?.into_raw_fd(), &targets, &raw_fds_to_close)?;
                 raw_fds_to_close.push(raw_fd);
-                file_actions.add_dup2(raw_fd, fd_num).inspect_err(|_| {
-                    close_raw_fds(&raw_fds_to_close);
-                })?;
+                dup2_actions.push((raw_fd, fd_num));
             }
+            Fd::Close => {
+                // A bare `addclose` is not usable here: if `fd_num` is not open
+                // in this process, the child's close(2) fails and posix_spawn
+                // reports EBADF for the whole spawn (verified on macOS 15).
+                // Checking first would be a check-then-act on a process-global
+                // table, so instead dup /dev/null onto the number — which makes
+                // it open unconditionally — and close that.
+                let devnull_raw = match devnull_fd {
+                    Some(raw) => raw,
+                    None => {
+                        let file = File::options()
+                            .read(true)
+                            .write(true)
+                            .open("/dev/null")
+                            .inspect_err(|_| {
+                                close_raw_fds(&raw_fds_to_close);
+                            })?;
+                        let raw = relocate_clear_of(file.into_raw_fd(), &targets, &raw_fds_to_close)?;
+                        raw_fds_to_close.push(raw);
+                        devnull_fd = Some(raw);
+                        raw
+                    }
+                };
+                dup2_actions.push((devnull_raw, fd_num));
+                close_actions.push(fd_num);
+                close_only.insert(fd_num);
+            }
+        }
+    }
+
+    // Deterministic order: all dup2s, then all closes. Safe because no source
+    // is a member of `targets`, so no close in the second pass can invalidate a
+    // source used in the first.
+    dup2_actions.sort_unstable();
+    close_actions.sort_unstable();
+
+    // A descriptor number the spawn API refuses to name cannot be open in the
+    // child either, so closing it is a no-op — which is what bash does:
+    // `exec 2000000>&-; echo ok` prints "ok". macOS rejects such numbers from
+    // `posix_spawn_file_actions_adddup2` with EBADF from 10240 upward, and that
+    // bound is not reachable through `sysconf(_SC_OPEN_MAX)` (1048576) or
+    // `getdtablesize()` (245760) — so rather than guess it, let the API say so
+    // and drop the vacuous action. Anything that is not merely a close still
+    // propagates: a real redirect to an unusable descriptor is an error.
+    let vacuous = |fd: i32, e: &io::Error| close_only.contains(&fd) && e.raw_os_error() == Some(libc::EBADF);
+
+    let mut dropped: std::collections::HashSet<i32> = std::collections::HashSet::new();
+    for (src, dst) in dup2_actions {
+        if let Err(e) = file_actions.add_dup2(src, dst) {
+            if vacuous(dst, &e) {
+                dropped.insert(dst);
+                continue;
+            }
+            close_raw_fds(&raw_fds_to_close);
+            return Err(e);
+        }
+    }
+    for fd in close_actions {
+        if dropped.contains(&fd) {
+            continue;
+        }
+        if let Err(e) = file_actions.add_close(fd) {
+            if vacuous(fd, &e) {
+                continue;
+            }
+            close_raw_fds(&raw_fds_to_close);
+            return Err(e);
         }
     }
 

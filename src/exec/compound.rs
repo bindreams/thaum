@@ -120,7 +120,7 @@ impl Executor {
                 let word_list = if let Some(words) = words {
                     let mut list = Vec::new();
                     for word in words {
-                        let fields = self.expand_word_to_fields(word)?;
+                        let fields = self.expand_word_to_fields(word, io)?;
                         list.extend(fields);
                     }
                     list
@@ -149,14 +149,14 @@ impl Executor {
             }
 
             CompoundCommand::CaseClause { word, arms, .. } => {
-                let expanded = self.expand_word(word)?;
+                let expanded = self.expand_word(word, io)?;
                 let mut status = 0;
 
                 for arm in arms {
                     let mut matched = false;
                     let locale = super::locale::ctype_locale(&self.env);
                     for pattern in &arm.patterns {
-                        let pat = self.expand_word(pattern)?;
+                        let pat = self.expand_word(pattern, io)?;
                         if super::pattern::shell_pattern_match(&expanded, &pat, &locale) {
                             matched = true;
                             break;

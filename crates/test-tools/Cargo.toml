@@ -55,3 +55,8 @@ test = false
 name = "test-isatty"
 path = "src/tools/isatty.rs"
 test = false
+
+[[bin]]
+name = "test-writefd"
+path = "src/tools/writefd.rs"
+test = false

@@ -48,7 +48,7 @@ impl Executor {
             .map(|(k, v)| (k.into(), v.into()))
             .collect();
         for assignment in assignments {
-            let value = self.expand_scalar_assignment(assignment)?;
+            let value = self.expand_scalar_assignment(assignment, io)?;
             env.insert(assignment.name.clone().into(), value.into());
         }
         child_cmd.env = env;
@@ -60,6 +60,14 @@ impl Executor {
                     .fds
                     .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
             }
+        }
+
+        // Descriptors the script closed must be closed in the child too.
+        // Leaving them out of the table is not enough: posix_spawn inherits
+        // every fd it is not told about, so the child would get whatever the
+        // *host* process has at that number.
+        for &fd in io.closed_fds() {
+            child_cmd.close_fd_in_child(fd);
         }
 
         // Per-command redirects override persistent ones: FDs 0-2 from
@@ -83,6 +91,14 @@ impl Executor {
             child_cmd
                 .fds
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        // Per-command closes, e.g. `cmd 3>&-`. Applied after the per-command
+        // opens so that within one redirect list the last word wins, and after
+        // the persistent set so a per-command reopen can override it.
+        // Standard descriptors are included: `cmd 1>&-` must leave the child
+        // without a stdout rather than with a pipe to the host's (issue #41).
+        for &fd in &active.closed_fds {
+            child_cmd.close_fd_in_child(fd);
         }
 
         // Set up stdout/stderr for the child. For unredirected fds:

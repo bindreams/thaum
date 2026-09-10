@@ -375,6 +375,8 @@ mod bash;
 mod basic;
 #[path = "exec/brace_expansion.rs"]
 mod brace_expansion;
+#[path = "exec/descriptors.rs"]
+mod descriptors;
 #[path = "exec/expansion.rs"]
 mod expansion;
 #[path = "exec/external.rs"]

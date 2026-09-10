@@ -224,13 +224,22 @@ impl Executor {
 
     /// Adopt redirects from `exec` redirect-only mode into persistent IoContext state.
     ///
-    /// All fds (0-2 and 3+) go into `io`. Explicitly closed fds are removed.
+    /// Opened fds (0-2 and 3+) go into `io`. Closed fds are *marked* closed, not
+    /// removed: 3+ lose their handle, while 0-2 keep a `/dev/null` handle so the
+    /// shell's own writers still find one. Either way the marker is what stops a
+    /// later `>&N` resolving the number and what denies it to children.
     fn adopt_redirects(&mut self, active: redirect::ActiveRedirects, io: &mut IoContext) {
         for fd in &active.closed_fds {
             if *fd <= 2 {
+                // Substitute /dev/null so the shell's own writers always find a
+                // handle, but still record the close: children must be denied
+                // the descriptor, or `exec 0<&-; cat` reads the *host's* stdin.
+                // (The shell's own reads/writes still hit /dev/null rather than
+                // reporting EBADF — that half is issue #41.)
                 io.set_fd(*fd, io_context::open_null_device());
+                io.set_closed_marker(*fd, true);
             } else {
-                io.remove_fd(*fd);
+                io.close_fd(*fd);
             }
         }
         if let Some(f) = active.stdin {
@@ -291,9 +300,13 @@ impl Executor {
         };
 
         let mut cmd = CommandEx::new(vec![exe.into(), "exec-ast".into()]);
-        cmd.fds.insert(0, Fd::InputPipe); // parent writes JSON payload
-        cmd.fds.insert(1, Fd::Pipe); // parent reads stdout
-        cmd.fds.insert(2, Fd::Pipe); // parent reads stderr
+        // Reserved, not merely inserted: these carry the AST payload and the
+        // child's captured output. A script's `exec 0<&-` must not be able to
+        // take the transport away — that made every subshell fail with
+        // "invalid JSON payload" while pointing the user at their data.
+        cmd.reserve(0, Fd::InputPipe); // parent writes JSON payload
+        cmd.reserve(1, Fd::Pipe); // parent reads stdout
+        cmd.reserve(2, Fd::Pipe); // parent reads stderr
         cmd.cwd = Some(self.env.cwd().to_path_buf());
         // Inherit the full process environment so the child has system vars.
         cmd.env = std::env::vars_os().collect();
@@ -303,6 +316,13 @@ impl Executor {
             if let Ok(file) = io.try_clone_fd(fd) {
                 cmd.fds.insert(fd, Fd::File(file));
             }
+        }
+
+        // Closed descriptors are closed in the subshell process too, so its own
+        // `dup_process_fd` fallback fails naturally and nothing needs to travel
+        // in the payload.
+        for &fd in io.closed_fds() {
+            cmd.close_fd_in_child(fd);
         }
 
         let mut child = cmd.spawn().map_err(ExecError::Io)?;
@@ -444,16 +464,16 @@ impl Executor {
     }
 
     /// Expand a word, resolving command substitutions first.
-    fn expand_word(&mut self, word: &crate::ast::Word) -> Result<String, ExecError> {
-        let resolved = self.resolve_cmd_subs_in_word(word)?;
+    fn expand_word(&mut self, word: &crate::ast::Word, io: &IoContext) -> Result<String, ExecError> {
+        let resolved = self.resolve_cmd_subs_in_word(word, io)?;
         expand::expand_word(&resolved, &mut self.env)
     }
 
     /// Expand an argument, resolving command substitutions first.
-    fn expand_argument(&mut self, arg: &crate::ast::Argument) -> Result<Vec<String>, ExecError> {
+    fn expand_argument(&mut self, arg: &crate::ast::Argument, io: &IoContext) -> Result<Vec<String>, ExecError> {
         match arg {
             crate::ast::Argument::Word(word) => {
-                let resolved = self.resolve_cmd_subs_in_word(word)?;
+                let resolved = self.resolve_cmd_subs_in_word(word, io)?;
                 expand::expand_word_to_fields(&resolved, &mut self.env)
             }
             crate::ast::Argument::Atom(atom) => match atom {
@@ -465,15 +485,19 @@ impl Executor {
     }
 
     /// Expand a word into fields, resolving command substitutions first.
-    fn expand_word_to_fields(&mut self, word: &crate::ast::Word) -> Result<Vec<String>, ExecError> {
-        let resolved = self.resolve_cmd_subs_in_word(word)?;
+    fn expand_word_to_fields(&mut self, word: &crate::ast::Word, io: &IoContext) -> Result<Vec<String>, ExecError> {
+        let resolved = self.resolve_cmd_subs_in_word(word, io)?;
         expand::expand_word_to_fields(&resolved, &mut self.env)
     }
 
     /// Pre-process a Word, executing command substitutions and replacing
     /// them with Literal fragments containing the captured output.
-    fn resolve_cmd_subs_in_word(&mut self, word: &crate::ast::Word) -> Result<crate::ast::Word, ExecError> {
-        let new_parts = self.resolve_cmd_subs_in_fragments(&word.parts)?;
+    fn resolve_cmd_subs_in_word(
+        &mut self,
+        word: &crate::ast::Word,
+        io: &IoContext,
+    ) -> Result<crate::ast::Word, ExecError> {
+        let new_parts = self.resolve_cmd_subs_in_fragments(&word.parts, io)?;
         Ok(crate::ast::Word {
             parts: new_parts,
             span: word.span,
@@ -484,13 +508,14 @@ impl Executor {
     fn resolve_cmd_subs_in_fragments(
         &mut self,
         fragments: &[crate::ast::Fragment],
+        io: &IoContext,
     ) -> Result<Vec<crate::ast::Fragment>, ExecError> {
         use crate::ast::Fragment;
         let mut result = Vec::with_capacity(fragments.len());
         for fragment in fragments {
             match fragment {
                 Fragment::CommandSubstitution(stmts) => {
-                    let output = self.execute_command_substitution(stmts)?;
+                    let output = self.execute_command_substitution(stmts, io)?;
                     // Strip trailing newlines (POSIX behavior)
                     let trimmed = output.trim_end_matches('\n').to_string();
                     result.push(Fragment::Literal(trimmed));
@@ -500,11 +525,11 @@ impl Executor {
                     result.push(Fragment::Literal(value.to_string()));
                 }
                 Fragment::DoubleQuoted(parts) => {
-                    let resolved = self.resolve_cmd_subs_in_fragments(parts)?;
+                    let resolved = self.resolve_cmd_subs_in_fragments(parts, io)?;
                     result.push(Fragment::DoubleQuoted(resolved));
                 }
                 Fragment::BashLocaleQuoted { raw, parts } => {
-                    let resolved = self.resolve_cmd_subs_in_fragments(parts)?;
+                    let resolved = self.resolve_cmd_subs_in_fragments(parts, io)?;
                     result.push(Fragment::BashLocaleQuoted {
                         raw: raw.clone(),
                         parts: resolved,
@@ -541,7 +566,7 @@ impl Executor {
                         _ => true,
                     };
                     let resolved_arg = if needs_resolution {
-                        Box::new(self.resolve_cmd_subs_in_word(arg)?)
+                        Box::new(self.resolve_cmd_subs_in_word(arg, io)?)
                     } else {
                         arg.clone()
                     };
@@ -565,7 +590,7 @@ impl Executor {
     /// the output buffer. For external commands, uses piped stdout.
     /// Creates its own internal IoContext with a capture buffer for stdout
     /// and io::sink() for stderr (discarding stderr from command substitutions).
-    fn execute_command_substitution(&mut self, stmts: &[Statement]) -> Result<String, ExecError> {
+    fn execute_command_substitution(&mut self, stmts: &[Statement], io: &IoContext) -> Result<String, ExecError> {
         let mut captured = Vec::new();
 
         for stmt in stmts {
@@ -579,7 +604,7 @@ impl Executor {
 
                     if args.is_empty() {
                         for assignment in &cmd.assignments {
-                            self.execute_assignment(assignment)?;
+                            self.execute_assignment(assignment, io)?;
                         }
                         continue;
                     }
@@ -619,7 +644,24 @@ impl Executor {
                             .into_iter()
                             .map(|(k, v): (String, String)| (std::ffi::OsString::from(k), std::ffi::OsString::from(v)))
                             .collect();
-                        child_cmd.fds.insert(1, command_ex::Fd::Pipe);
+                        child_cmd.reserve(1, command_ex::Fd::Pipe);
+                        // Command substitution is a fifth spawn site and needs
+                        // the same descriptor state as the others: the shell's
+                        // fds 3+, and a real close for anything the script
+                        // closed. Without this `x=$(sh -c "echo >&3")` bypassed
+                        // `exec 3>file` entirely and wrote to the *host's*
+                        // descriptor 3 — the shape that corrupted the corpus
+                        // harness's database.
+                        for (&fd, file) in io.fds() {
+                            if fd >= 3 {
+                                child_cmd
+                                    .fds
+                                    .insert(fd, command_ex::Fd::File(file.try_clone().map_err(ExecError::Io)?));
+                            }
+                        }
+                        for &fd in io.closed_fds() {
+                            child_cmd.close_fd_in_child(fd);
+                        }
 
                         match child_cmd.spawn() {
                             Ok(mut child) => {
@@ -707,7 +749,7 @@ impl Executor {
             match arg.try_to_static_string() {
                 Some(s) => remaining_source.push_str(&s),
                 None => {
-                    let fields = self.expand_argument(arg)?;
+                    let fields = self.expand_argument(arg, io)?;
                     remaining_source.push_str(&fields.join(" "));
                 }
             }
@@ -776,7 +818,7 @@ impl Executor {
         // Expand arguments
         let mut expanded_args: Vec<String> = Vec::new();
         for arg in &cmd.arguments {
-            let fields = self.expand_argument(arg)?;
+            let fields = self.expand_argument(arg, io)?;
             expanded_args.extend(fields);
         }
 
@@ -797,7 +839,7 @@ impl Executor {
         // If no command name, just process assignments
         if expanded_args.is_empty() {
             for assignment in &cmd.assignments {
-                self.execute_assignment(assignment)?;
+                self.execute_assignment(assignment, io)?;
             }
             // POSIX: bare assignments return the exit status of the last
             // command substitution executed during value expansion.
@@ -814,7 +856,7 @@ impl Executor {
         // Check for special builtins (need Executor access, not just Environment).
         match cmd_name.as_str() {
             "eval" => {
-                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments, io)?;
                 let saved_fds = active.apply(io);
                 let result = self.builtin_eval(cmd_args, io);
                 saved_fds.restore(io);
@@ -822,7 +864,7 @@ impl Executor {
                 return result;
             }
             "source" | "." => {
-                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments, io)?;
                 let saved_fds = active.apply(io);
                 let result = self.builtin_source(cmd_args, io);
                 saved_fds.restore(io);
@@ -830,14 +872,11 @@ impl Executor {
                 return result;
             }
             "exec" => {
-                let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
-                if cmd_args.is_empty() {
-                    // Redirect-only mode: adopt redirects permanently into IoContext.
-                    self.adopt_redirects(active, io);
-                    self.restore_prefix_assignments(saved_env);
-                    return Ok(0);
-                }
-                let result = self.builtin_exec(cmd_args, &mut active, io);
+                // Redirect-only mode is decided inside `builtin_exec`, after
+                // option parsing — `exec --` and `exec -a name` reach it with a
+                // non-empty argument list but no command word.
+                let saved_env = self.apply_prefix_assignments(&cmd.assignments, io)?;
+                let result = self.builtin_exec(cmd_args, active, io);
                 self.restore_prefix_assignments(saved_env);
                 return result;
             }
@@ -846,7 +885,7 @@ impl Executor {
 
         // Check for functions first
         if let Some(func) = self.env.get_function(cmd_name).cloned() {
-            let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+            let saved_env = self.apply_prefix_assignments(&cmd.assignments, io)?;
             let call_info = environment::CallInfo {
                 function_name: cmd_name.to_string(),
                 source_file: func.def_source.clone(),
@@ -890,7 +929,7 @@ impl Executor {
         };
 
         if is_active_builtin {
-            let saved_env = self.apply_prefix_assignments(&cmd.assignments)?;
+            let saved_env = self.apply_prefix_assignments(&cmd.assignments, io)?;
             let saved_fds = active.apply(io);
 
             let mut stdout_buf: Vec<u8> = Vec::new();
@@ -930,7 +969,7 @@ impl Executor {
             // has created the associative array before we set subscripted elements.
             for assignment in &cmd.assignments {
                 if matches!(assignment.value, crate::ast::AssignmentValue::BashArray(_)) {
-                    self.execute_assignment(assignment)?;
+                    self.execute_assignment(assignment, io)?;
                 }
             }
 
@@ -958,10 +997,14 @@ impl Executor {
     }
 
     /// Execute a full assignment (scalar, indexed, or array), with append support.
-    pub(crate) fn execute_assignment(&mut self, assignment: &crate::ast::Assignment) -> Result<(), ExecError> {
+    pub(crate) fn execute_assignment(
+        &mut self,
+        assignment: &crate::ast::Assignment,
+        io: &IoContext,
+    ) -> Result<(), ExecError> {
         if let Some(ref subscript) = assignment.index {
             // Indexed or associative assignment: name[subscript]=value or name[subscript]+=value
-            let value = self.expand_word(assignment.value.as_scalar())?;
+            let value = self.expand_word(assignment.value.as_scalar(), io)?;
             if self.env.is_assoc_array(&assignment.name) {
                 if assignment.append {
                     let old = self
@@ -991,7 +1034,7 @@ impl Executor {
         } else {
             match &assignment.value {
                 crate::ast::AssignmentValue::Scalar(word) => {
-                    let value = self.expand_word(word)?;
+                    let value = self.expand_word(word, io)?;
                     if assignment.append {
                         if self.env.has_integer_attr(&assignment.name) {
                             let old_str = self.env.get_var(&assignment.name).unwrap_or("0").to_string();
@@ -1014,9 +1057,9 @@ impl Executor {
                 }
                 crate::ast::AssignmentValue::BashArray(elems) => {
                     if assignment.append {
-                        self.execute_array_append(&assignment.name, elems)?;
+                        self.execute_array_append(&assignment.name, elems, io)?;
                     } else {
-                        self.execute_array_assign(&assignment.name, elems)?;
+                        self.execute_array_assign(&assignment.name, elems, io)?;
                     }
                 }
             }
@@ -1033,19 +1076,24 @@ impl Executor {
     }
 
     /// Replace an array variable with new elements (non-append).
-    fn execute_array_assign(&mut self, name: &str, elems: &[crate::ast::ArrayElement]) -> Result<(), ExecError> {
+    fn execute_array_assign(
+        &mut self,
+        name: &str,
+        elems: &[crate::ast::ArrayElement],
+        io: &IoContext,
+    ) -> Result<(), ExecError> {
         let mut plain_elements = Vec::new();
         for elem in elems {
             match elem {
                 crate::ast::ArrayElement::Plain(word) => {
-                    plain_elements.push(self.expand_word(word)?);
+                    plain_elements.push(self.expand_word(word, io)?);
                 }
                 crate::ast::ArrayElement::Subscripted { index, value } => {
                     // Flush any accumulated plain elements first
                     if !plain_elements.is_empty() {
                         self.env.set_array(name, std::mem::take(&mut plain_elements))?;
                     }
-                    let val = self.expand_word(value)?;
+                    let val = self.expand_word(value, io)?;
                     if self.env.is_assoc_array(name) {
                         self.env.set_assoc_element(name, index, &val)?;
                     } else {
@@ -1062,17 +1110,22 @@ impl Executor {
     }
 
     /// Append elements to an existing array (or create one).
-    fn execute_array_append(&mut self, name: &str, elems: &[crate::ast::ArrayElement]) -> Result<(), ExecError> {
+    fn execute_array_append(
+        &mut self,
+        name: &str,
+        elems: &[crate::ast::ArrayElement],
+        io: &IoContext,
+    ) -> Result<(), ExecError> {
         let mut next_idx = self.env.get_array_next_index(name);
         for elem in elems {
             match elem {
                 crate::ast::ArrayElement::Plain(word) => {
-                    let val = self.expand_word(word)?;
+                    let val = self.expand_word(word, io)?;
                     self.env.set_array_element(name, next_idx, &val)?;
                     next_idx += 1;
                 }
                 crate::ast::ArrayElement::Subscripted { index, value } => {
-                    let val = self.expand_word(value)?;
+                    let val = self.expand_word(value, io)?;
                     if self.env.is_assoc_array(name) {
                         self.env.set_assoc_element(name, index, &val)?;
                     } else {
@@ -1104,8 +1157,9 @@ impl Executor {
     pub(crate) fn expand_scalar_assignment(
         &mut self,
         assignment: &crate::ast::Assignment,
+        io: &IoContext,
     ) -> Result<String, ExecError> {
-        self.expand_word(assignment.value.as_scalar())
+        self.expand_word(assignment.value.as_scalar(), io)
     }
 
     /// Apply prefix assignments temporarily, returning saved values.
@@ -1116,6 +1170,7 @@ impl Executor {
     fn apply_prefix_assignments(
         &mut self,
         assignments: &[crate::ast::Assignment],
+        io: &IoContext,
     ) -> Result<Vec<(String, Option<String>, bool)>, ExecError> {
         let mut saved = Vec::new();
         for assignment in assignments {
@@ -1125,7 +1180,7 @@ impl Executor {
             }
             let old_val = self.env.get_var(&assignment.name).map(|s| s.to_string());
             let old_exported = self.env.is_exported(&assignment.name);
-            let expanded = self.expand_scalar_assignment(assignment)?;
+            let expanded = self.expand_scalar_assignment(assignment, io)?;
             let value = if assignment.append {
                 let old = old_val.as_deref().unwrap_or("");
                 format!("{old}{expanded}")

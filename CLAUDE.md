@@ -119,7 +119,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `exec.rs` — Executor struct, main dispatch, alias expansion
   - `environment.rs` — variables, functions, scoping, arrays, aliases, declare attrs
   - `builtins.rs` — builtin commands (echo, cd, test, declare, printf, etc.)
-  - `special_builtins.rs` — eval, exec, source (need Executor access)
+  - `special_builtins.rs` — eval, exec, source (need Executor access). `exec` decides redirect-only mode *after* option parsing: if no command word survives, the redirections are adopted permanently — `exec --` and `exec -a name` reach that point with a non-empty argument list
   - `arithmetic.rs` — arithmetic expression evaluation
   - `bash_test.rs` — `[[ ]]` conditional evaluator
   - `printf.rs` — printf builtin formatter (custom, not Rust format!)
@@ -128,7 +128,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `compound.rs` — compound command execution (if/while/for/case)
   - `pipeline.rs` — pipeline execution
   - `external.rs` + `command_ex.rs` — external process spawning; `terminal_inherit` enables direct terminal inheritance for interactive programs
-  - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`
+  - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`. A redirect list is last-one-wins, so opening a descriptor cancels an earlier close of it and vice versa. `N>&M-` / `N<&M-` duplicate M onto N and then close M
   - `subshell.rs` — subshell payload types
   - `numeric.rs` — shared shell-style numeric parsing
   - `pattern.rs` — shell glob pattern matching
@@ -137,6 +137,63 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `error.rs` — ExecError types
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
 - `tests/parse.rs` + `tests/parse/` — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
-- `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash)
+- `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash, descriptors)
 - `tests/cli.rs` + `tests/cli/` — CLI output tests
 - `crates/testkit/` — test infrastructure (sh_yaml parser, Docker helpers, callgrind parser, test tool binaries, test_tools fixture)
+
+### Closed descriptors
+
+`IoContext` tracks descriptors the script closed with `N>&-` separately from ones it simply never
+held. The distinction matters because thaum is embeddable:
+
+- **Absent** — the shell never touched this number, so a redirect may resolve it against the host
+  process's real fd table (`dup_process_fd`). That is ordinary POSIX inheritance and bash behaves
+  the same; a child writing to an inherited descriptor is not a bug.
+- **Closed** — the script closed it. It is not resolvable by a later `>&N`, and every child fd
+  table gets an `Fd::Close` entry for it. Without that entry `posix_spawn` inherits the number and
+  the child reaches whatever the *host* had there. Rather than count the spawn sites here — a
+  number that has already gone stale once — the rule is that **every site building a child fd table
+  calls `CommandEx::close_fd_in_child`**; `grep` for it to find them. The one that is easy to miss
+  is `execute_command_substitution`, which builds its `CommandEx` from scratch rather than from
+  `IoContext`.
+
+thaum never calls `close(2)` on the host's descriptor — it is not thaum's to close. Recording the
+close and refusing to hand the number out is observably identical for the script and leaves the
+embedder intact.
+
+`Fd::Close` is implemented as `adddup2(/dev/null, fd)` followed by `addclose(fd)`. A bare
+`addclose` is not usable: if the number is not open, the child's `close(2)` fails and `posix_spawn`
+reports EBADF for the entire spawn (macOS). The dup2 makes the number open unconditionally, with no
+check-then-act against the process-global fd table.
+
+**Parent-side source descriptors are kept clear of every target before any file action is added**
+(`relocate_clear_of`, `F_DUPFD_CLOEXEC`). The child's actions dup2 *from* parent-side numbers and
+dup2/close *at* numbers in `cmd.fds`; if those sets overlap, an action destroys another's input and
+the spawn fails with EBADF. `cmd.fds` is a `HashMap`, so which entries collide depends on iteration
+order *and* on the host's fd table — the failure is nondeterministic and moves with the embedder.
+Actions are then emitted in a fixed order: every dup2, then every close.
+
+**A close never displaces a descriptor the runtime owns.** `CommandEx::reserve` claims the
+subshell's AST transport and the capture pipes; `CommandEx::close_fd_in_child` is the only way a
+script's `N>&-` reaches a child, and it refuses reserved numbers. Inserting `Fd::Close` directly
+would silently take the transport away — `exec 0<&-` did exactly that, and every subshell failed
+with "invalid JSON payload" while pointing the user at their data.
+
+A descriptor number the platform's spawn API refuses to name cannot be open in the child either, so
+that close is dropped rather than failing the spawn — bash prints `ok` for `exec 2000000>&-`. macOS
+rejects numbers from 10240 upward, a bound reachable through neither `sysconf(_SC_OPEN_MAX)`
+(1048576) nor `getdtablesize()` (245760), so the API is asked rather than guessed.
+
+On Windows, fds 3+ reach the child only through `build_lpreserved2`, where an absent entry already
+reads as closed. Descriptors 0-2 are **not** closed in the child on Windows: `close_in_child` gates
+them off, so that platform keeps its previous behaviour rather than gaining a change nobody can
+exercise (issue #46). The consequence is a platform divergence, not a new hole — `cmd 1>&-` already
+relayed the child's output to the host's stdout there, and still does.
+
+Closed descriptors 0-2 keep a `/dev/null` substitution for the shell's *own* reads and writes, so
+those succeed where bash reports EBADF (issue #41 — fixing it needs an error path through every
+`io.fd_mut(n)` site). The closed marker is still recorded for them, so the child half is not
+deferred: `cmd 1>&-` leaves the child with no stdout and `exec 0<&-` leaves it with no stdin.
+
+`exec` makes its redirections permanent only when it succeeds. A rejected option drops them, as
+bash does — `exec -q 3>q` creates `q` but leaves fd 3 closed.

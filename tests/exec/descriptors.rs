@@ -1,0 +1,881 @@
+//! Descriptor-state tests: what `exec` opens, what `>&-` closes, and what a
+//! child is allowed to inherit.
+//!
+//! These tests are about the boundary between the shell's fd table and the
+//! *host process's* fd table. thaum is embeddable, so a descriptor the host
+//! opened must never receive a write the script directed elsewhere — and a
+//! descriptor the script closed must not reappear through the host's table.
+//!
+//! Every expected value here was derived by running the equivalent script
+//! under GNU bash 5.3, never by running thaum and recording what it did.
+//!
+//! **A descriptor under test is never obtained with `dup2` onto a fixed
+//! number.** `HostFd` takes whatever number `into_raw_fd` hands back, which the
+//! OS guarantees is unused. The test harness holds open descriptors of its own
+//! — including skuld's cross-process coordination database — and stamping on a
+//! literal fd 3 would corrupt them.
+
+#![cfg(unix)]
+
+use std::path::{Path, PathBuf};
+
+use crate::*;
+
+/// A real file, open on a real descriptor of *this* process, which the shell
+/// under test never opened — the embedder's descriptor.
+///
+/// The number comes from `into_raw_fd`, so it is exclusively ours and no
+/// concurrent test can be holding it.
+struct HostFd {
+    fd: i32,
+    path: PathBuf,
+}
+
+impl HostFd {
+    fn new(path: PathBuf) -> Self {
+        use std::os::fd::{AsRawFd, IntoRawFd};
+        let file = std::fs::File::create(&path).expect("create host fd probe file");
+
+        // Rust opens files `O_CLOEXEC`, and `try_clone` preserves that. A
+        // descriptor an embedder hands us is not close-on-exec — the one in the
+        // original incident arrived through a shell redirect — so duplicate it
+        // with a plain `dup(2)`, which POSIX defines as clearing FD_CLOEXEC.
+        // Without this the probe vanishes at `exec` and every "the child could
+        // not reach it" assertion passes for the wrong reason.
+        let inheritable =
+            thaum::exec::buffered_file::dup_process_fd(file.as_raw_fd()).expect("dup host fd probe descriptor");
+        drop(file);
+
+        let fd = inheritable.into_raw_fd();
+        HostFd { fd, path }
+    }
+
+    /// What the host's file actually received. Empty means the escape is closed.
+    fn contents(&self) -> String {
+        std::fs::read_to_string(&self.path).expect("read host fd probe file")
+    }
+}
+
+impl Drop for HostFd {
+    fn drop(&mut self) {
+        use std::os::fd::FromRawFd;
+        // SAFETY: `self.fd` came from `into_raw_fd` and has not been closed.
+        drop(unsafe { std::fs::File::from_raw_fd(self.fd) });
+    }
+}
+
+fn shell_path(p: &Path) -> String {
+    p.to_string_lossy().replace('\\', "/")
+}
+
+/// Absolute path to a `test_tools` binary, for use inside a script.
+///
+/// Deliberately **not** invoked through `PATH`: thaum's external-command lookup
+/// does not consult the shell's `PATH` variable (issue #15), so a bare name
+/// would silently resolve against the process environment — or not at all.
+fn tool(tools: &Path, name: &str) -> String {
+    shell_path(&tools.join(name))
+}
+
+/// Run `script` in a real `thaum` process with `stdin_data` on descriptor 0.
+///
+/// The `exec!` harness cannot express this. `ExecMode::InProcess` gives the
+/// executor a `CapturedIo` pipe that carries no data, and `ExecMode::Subprocess`
+/// goes through `Command::output()`, which hands the child a null stdin. Either
+/// way an assertion about descriptor 0 holds whether or not the code under test
+/// works — which is exactly how the first version of
+/// `closed_stdin_not_inherited_by_child` came to pass against a reverted fix.
+fn run_with_stdin(script: &str, stdin_data: &[u8]) -> (String, String) {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let mut child = Command::new(crate::thaum_exe())
+        .args(["exec", "-c", script])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn thaum");
+    child
+        .stdin
+        .take()
+        .expect("stdin pipe")
+        .write_all(stdin_data)
+        .expect("write stdin");
+    let out = child.wait_with_output().expect("wait for thaum");
+    (
+        String::from_utf8_lossy(&out.stdout).into_owned(),
+        String::from_utf8_lossy(&out.stderr).into_owned(),
+    )
+}
+
+// Control: inherited descriptors are not the bug ======================================================================
+
+#[skuld::test]
+fn inherited_fd_is_writable_by_child(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // A child writing to a descriptor it legitimately inherited is ordinary
+    // POSIX, and bash does exactly the same:
+    //   bash -c 'sh -c "echo inherited >&3"; echo rc=$?' 3>probe
+    //     -> rc=0, probe contains "inherited"
+    // This must keep working. It is the behaviour issues #16 and #17 both
+    // single out as *not* the defect.
+    let probe = HostFd::new(dir.join("inherited.txt"));
+
+    let script = format!("{} {} inherited; echo rc=$?", tool(tools, "writefd"), probe.fd);
+    let r = exec!(&script);
+    assert_eq!(
+        r.stdout(),
+        "rc=0\n",
+        "child should be able to write to an inherited descriptor"
+    );
+    assert_eq!(probe.contents(), "inherited\n");
+}
+
+#[skuld::test]
+fn inherited_fd_is_writable_by_shell(#[fixture(temp_dir)] dir: &Path) {
+    // The shell's own redirection to an inherited descriptor also works in
+    // bash: `bash -c 'echo self >&3' 3>probe` puts "self" in probe.
+    let probe = HostFd::new(dir.join("shell-inherited.txt"));
+
+    let script = format!("echo self >&{}", probe.fd);
+    exec!(&script);
+    assert_eq!(probe.contents(), "self\n");
+}
+
+#[skuld::test]
+fn inherited_fd_survives_unrelated_close(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // Closing one descriptor must not disturb another.
+    let probe = HostFd::new(dir.join("survives.txt"));
+    let other = HostFd::new(dir.join("other.txt"));
+
+    let script = format!(
+        "exec {}>&-; {} {} inherited",
+        other.fd,
+        tool(tools, "writefd"),
+        probe.fd
+    );
+    exec!(&script);
+    assert_eq!(probe.contents(), "inherited\n");
+    assert_eq!(other.contents(), "", "the closed descriptor must not receive anything");
+}
+
+#[skuld::test]
+fn reopened_fd_is_inheritable_again(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; exec 3>r1; echo re >&3' leaves "re" in r1: a close
+    // is not permanent, and reopening the number restores it for children too.
+    let probe = HostFd::new(dir.join("reopened.txt"));
+    let target = dir.join("reopened-target.txt");
+
+    let script = format!(
+        "exec {fd}>&-; exec {fd}>{target}; {wf} {fd} re",
+        fd = probe.fd,
+        target = shell_path(&target),
+        wf = tool(tools, "writefd")
+    );
+    exec!(&script);
+    assert_eq!(std::fs::read_to_string(&target).unwrap(), "re\n");
+    assert_eq!(probe.contents(), "", "the host's file must not receive the write");
+}
+
+// `exec` must apply the redirections that follow its options (#16) ====================================================
+
+#[skuld::test]
+fn exec_dashdash_applies_redirections(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec -- 3>&1; echo hi 1>&3' 3>probe
+    //   -> "hi" on stdout, probe empty.
+    // thaum accepted the `--`, dropped `3>&1`, and the write landed in the
+    // host's file. This is the case that overwrote a live SQLite database.
+    let probe = HostFd::new(dir.join("dashdash.txt"));
+
+    let script = format!("exec -- {fd}>&1; echo hi 1>&{fd}", fd = probe.fd);
+    let r = exec!(&script);
+    assert_eq!(
+        r.stdout(),
+        "hi\n",
+        "`exec --` must apply the redirections that follow it"
+    );
+    assert_eq!(probe.contents(), "", "the host's descriptor must not receive the write");
+}
+
+#[skuld::test]
+fn exec_dash_a_with_no_command_applies_redirections(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec -a foo 3>&1; echo hi >&3; echo rc=$?' 3>probe
+    //   -> "hi", "rc=0", probe empty.
+    // Same defect reached through a different option.
+    let probe = HostFd::new(dir.join("dash-a.txt"));
+
+    let script = format!("exec -a foo {fd}>&1; echo hi >&{fd}; echo rc=$?", fd = probe.fd);
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "hi\nrc=0\n");
+    assert_eq!(probe.contents(), "");
+}
+
+#[skuld::test]
+fn exec_dash_a_dashdash_with_no_command_applies_redirections(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec -a foo -- 3>&1; echo hi >&3' 3>probe -> "hi", probe empty.
+    let probe = HostFd::new(dir.join("dash-a-dashdash.txt"));
+
+    let script = format!("exec -a foo -- {fd}>&1; echo hi >&{fd}", fd = probe.fd);
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "hi\n");
+    assert_eq!(probe.contents(), "");
+}
+
+#[skuld::test]
+fn exec_dashdash_alone_is_a_noop() {
+    // bash -c 'exec --; echo alive rc=$?' -> "alive rc=0". No command word, no
+    // redirections: nothing to do, and the shell survives.
+    let r = exec!("exec --; echo alive rc=$?");
+    assert_eq!(r.stdout(), "alive rc=0\n");
+}
+
+#[skuld::test]
+fn exec_dashdash_ends_option_parsing() {
+    // bash -c 'exec -- -a 3>&1' -> "exec: -a: not found".
+    // `--` must stop option parsing, so `-a` is a command name, not the
+    // argv0-override flag. Getting this wrong would silently swallow the word.
+    let r = exec!("exec -- -a", mode = ExecMode::Subprocess);
+    assert_ne!(r.status(), 0, "`-a` after `--` is a command name, not a flag");
+    assert!(
+        r.stderr().contains("-a"),
+        "expected `-a` to be reported as a command, got: {}",
+        r.stderr()
+    );
+    r.stdout();
+}
+
+#[skuld::test]
+fn exec_invalid_option_does_not_apply_redirections(#[fixture(temp_dir)] dir: &Path) {
+    // `exec` makes its redirections permanent only when it *succeeds*. A
+    // rejected option undoes them:
+    //   bash -c 'exec -q 3>q; echo AFTER >&3; echo rc=$?'
+    //     -> "exec: -q: invalid option" plus usage on stderr,
+    //        "3: Bad file descriptor", rc=1, and q is empty.
+    // The file is still created by the redirection itself; only the descriptor
+    // is dropped. An earlier revision of this test asserted the opposite,
+    // having misread `probe=[after]` — probe holding the text is precisely the
+    // evidence that fd 3 was *not* redirected.
+    let q = dir.join("invalid-option.txt");
+    let probe = HostFd::new(dir.join("invalid-option-probe.txt"));
+
+    let script = format!(
+        "exec -q {fd}>{q}; echo AFTER >&{fd}; echo rc=$?",
+        fd = probe.fd,
+        q = shell_path(&q)
+    );
+    let r = exec!(&script);
+    assert!(
+        r.stderr().contains("invalid option"),
+        "expected an invalid-option diagnostic, got: {}",
+        r.stderr()
+    );
+    assert_eq!(
+        std::fs::read_to_string(&q).unwrap(),
+        "",
+        "a rejected option must not leave the redirection in place"
+    );
+    r.stdout();
+    r.status();
+}
+
+// `>&-` must actually close, for the shell (#17) ======================================================================
+
+#[skuld::test]
+fn closed_fd_is_unreachable_from_shell(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 3>&-; echo self >&3; echo rc=$?; echo alive' 3>probe
+    //   -> "Bad file descriptor" on stderr, rc=1, "alive", probe empty.
+    // The failure is per-command: the script keeps running.
+    let probe = HostFd::new(dir.join("unreachable.txt"));
+
+    let script = format!("exec {fd}>&-; echo self >&{fd}; echo rc=$?; echo alive", fd = probe.fd);
+    let r = exec!(&script);
+    assert_eq!(
+        r.stdout(),
+        "rc=1\nalive\n",
+        "a closed descriptor must fail the command, not the script"
+    );
+    assert!(
+        r.stderr().contains("bad file descriptor"),
+        "expected a bad-descriptor diagnostic, got: {}",
+        r.stderr()
+    );
+    assert_eq!(
+        probe.contents(),
+        "",
+        "the host's descriptor must not be reachable after close"
+    );
+}
+
+#[skuld::test]
+fn closed_fd_is_unreachable_within_same_redirect_list(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 3>f.txt; { echo x >&4; } 3>&- 4>&3; echo done'
+    //   -> "3: Bad file descriptor" on stderr, "done" on stdout, f.txt empty.
+    // A close earlier in the same redirect list must make the number
+    // unresolvable to a later `>&N` in that list.
+    let target = dir.join("same-list.txt");
+
+    let script = format!(
+        "exec 3>{t}; {{ echo x >&4; }} 3>&- 4>&3; echo done",
+        t = shell_path(&target)
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "done\n");
+    assert!(
+        r.stderr().contains("bad file descriptor"),
+        "expected a bad-descriptor diagnostic, got: {}",
+        r.stderr()
+    );
+    assert_eq!(std::fs::read_to_string(&target).unwrap(), "");
+    let _ = dir;
+}
+
+// Within one redirect list, the last word about a descriptor wins =====================================================
+
+#[skuld::test]
+fn redirect_list_reopen_after_close_wins(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 3>f; echo first >&3; { echo second >&3; } 3>&- 3>g'
+    //   -> f holds "first", g holds "second", rc 0.
+    let f = dir.join("reopen-f.txt");
+    let g = dir.join("reopen-g.txt");
+
+    let script = format!(
+        "exec 3>{f}; echo first >&3; {{ echo second >&3; }} 3>&- 3>{g}",
+        f = shell_path(&f),
+        g = shell_path(&g)
+    );
+    exec!(&script);
+    assert_eq!(std::fs::read_to_string(&f).unwrap(), "first\n");
+    assert_eq!(
+        std::fs::read_to_string(&g).unwrap(),
+        "second\n",
+        "the later redirect must win"
+    );
+}
+
+#[skuld::test]
+fn redirect_list_close_after_reopen_wins(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 3>f; { echo x >&3; } 3>g 3>&-; echo done'
+    //   -> "3: Bad file descriptor" on stderr, "done" on stdout, both files
+    //      empty (g is still created and truncated), rc 0.
+    let f = dir.join("close-f.txt");
+    let g = dir.join("close-g.txt");
+
+    let script = format!(
+        "exec 3>{f}; {{ echo x >&3; }} 3>{g} 3>&-; echo done",
+        f = shell_path(&f),
+        g = shell_path(&g)
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "done\n");
+    assert!(
+        r.stderr().contains("bad file descriptor"),
+        "expected a bad-descriptor diagnostic, got: {}",
+        r.stderr()
+    );
+    assert_eq!(std::fs::read_to_string(&f).unwrap(), "");
+    assert_eq!(std::fs::read_to_string(&g).unwrap(), "", "the later close must win");
+}
+
+// `>&-` must actually close, for children (#17) =======================================================================
+
+#[skuld::test]
+fn closed_fd_not_inherited_by_external(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; sh -c "echo closed >&3"; echo rc=$?' 3>probe
+    //   -> "sh: 3: Bad file descriptor", rc=1, probe empty.
+    let probe = HostFd::new(dir.join("external.txt"));
+
+    let script = format!(
+        "exec {fd}>&-; {wf} {fd} escaped; echo rc=$?",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1\n", "the child must fail on the closed descriptor");
+    r.stderr();
+    assert_eq!(
+        probe.contents(),
+        "",
+        "the host's descriptor must not be inherited after close"
+    );
+}
+
+#[skuld::test]
+fn closed_fd_not_inherited_per_command(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'sh -c "echo x >&3" 3>&-; echo rc=$?' 3>probe
+    //   -> "sh: 3: Bad file descriptor", rc=1, probe empty.
+    // A per-command close, with no `exec` involved.
+    let probe = HostFd::new(dir.join("per-command.txt"));
+
+    let script = format!(
+        "{wf} {fd} escaped {fd}>&-; echo rc=$?",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1\n");
+    r.stderr();
+    assert_eq!(probe.contents(), "");
+}
+
+#[skuld::test]
+fn closed_fd_not_inherited_by_pipeline(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; sh -c "echo x >&3" | cat' 3>probe -> probe empty.
+    let probe = HostFd::new(dir.join("pipeline.txt"));
+
+    let script = format!(
+        "exec {fd}>&-; {wf} {fd} escaped | {ct}",
+        fd = probe.fd,
+        wf = tool(tools, "writefd"),
+        ct = tool(tools, "cat")
+    );
+    let r = exec!(&script);
+    r.stdout();
+    r.stderr();
+    r.status();
+    assert_eq!(
+        probe.contents(),
+        "",
+        "a pipeline stage must not inherit a closed descriptor"
+    );
+}
+
+#[skuld::test]
+fn closed_fd_not_inherited_by_subshell(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; (sh -c "echo x >&3")' 3>probe -> probe empty.
+    let probe = HostFd::new(dir.join("subshell.txt"));
+
+    let script = format!(
+        "exec {fd}>&-; ({wf} {fd} escaped)",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    r.stdout();
+    r.stderr();
+    r.status();
+    assert_eq!(probe.contents(), "", "a subshell must not inherit a closed descriptor");
+}
+
+#[skuld::test]
+fn closed_input_fd_not_inherited(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // The `<&-` spelling shares the path: bash -c 'exec 3<&-; sh -c "echo x >&3"'
+    // 3>probe leaves probe empty and reports "Bad file descriptor".
+    let probe = HostFd::new(dir.join("input-close.txt"));
+
+    let script = format!(
+        "exec {fd}<&-; {wf} {fd} escaped; echo rc=$?",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1\n");
+    r.stderr();
+    assert_eq!(probe.contents(), "");
+}
+
+#[skuld::test]
+fn close_of_unopened_fd_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // Closing a number the shell never opened is a no-op in bash:
+    //   bash -c 'exec 21>&-; echo ok'  ->  "ok"
+    // It must not break the *spawn* that follows, so the command has to be an
+    // external one.
+    //
+    // Two properties this test learned the hard way:
+    //
+    // * Swept, not pinned. The first version hardcoded fd 21 and passed while
+    //   fd 12 failed — which numbers collide depends on where /dev/null and the
+    //   capture pipes land.
+    // * Run as a *subprocess*. In-process it cannot fail: the test binary holds
+    //   ~10 descriptors open, so the internal /dev/null lands clear of every
+    //   number under test and the collision never happens. A real `thaum`
+    //   process starts with a near-empty fd table, which is the shape that
+    //   breaks.
+    //
+    // This is a breadth check and it is *probabilistic*: with the fix reverted
+    // it fails about one run in three. The reliable guard for the file-action
+    // collision is `closing_several_fds_does_not_break_spawn`, which fails
+    // every time. Do not treat this one as the regression test for it.
+    let marker = dir.join("spawn-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+
+    // Repeated per number: the collision depends on HashMap iteration order, so
+    // one attempt per fd caught it only about a third of the time.
+    for fd in 3..=20 {
+        let script = format!("exec {fd}>&-; {cat} {t}", t = shell_path(&marker));
+        for attempt in 0..3 {
+            let r = exec!(&script, mode = ExecMode::Subprocess);
+            assert_eq!(
+                r.stdout(),
+                "ok\n",
+                "closing fd {fd} broke the following spawn (attempt {attempt})"
+            );
+        }
+    }
+}
+
+#[skuld::test]
+fn closing_several_fds_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // Several closes in one command is the shape that exposed the file-action
+    // collision: the shared /dev/null source could itself sit on a number
+    // another entry closed, and `posix_spawn` then failed the whole spawn with
+    // EBADF. `bash -c 'exec 6>&- 7>&-; echo ok'` prints "ok".
+    //
+    // Subprocess mode and repeated, because the failure is nondeterministic —
+    // `cmd.fds` is a HashMap and its iteration order varies per process.
+    //
+    // This is the primary guard for the collision: with `relocate_clear_of`
+    // reverted it fails on every run (verified 3/3), where the single-close
+    // sweep above catches it only about a third of the time.
+    let marker = dir.join("multi-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+    let script = format!("exec 5>&- 6>&- 7>&- 8>&-; {cat} {t}", t = shell_path(&marker));
+
+    for attempt in 0..20 {
+        let r = exec!(&script, mode = ExecMode::Subprocess);
+        assert_eq!(r.stdout(), "ok\n", "multi-close broke the spawn on attempt {attempt}");
+    }
+}
+
+#[skuld::test]
+fn closing_several_fds_does_not_break_pipeline_or_subshell(
+    #[fixture(temp_dir)] dir: &Path,
+    #[fixture(test_tools)] tools: &Path,
+) {
+    // The same collision reached the pipeline and subshell spawn paths.
+    let marker = dir.join("multi-ps-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+    let t = shell_path(&marker);
+
+    for attempt in 0..10 {
+        let r = exec!(
+            &format!("exec 5>&- 6>&- 7>&-; {cat} {t} | {cat}"),
+            mode = ExecMode::Subprocess
+        );
+        assert_eq!(r.stdout(), "ok\n", "pipeline broke on attempt {attempt}");
+
+        let r = exec!(
+            &format!("exec 5>&- 6>&- 7>&-; ({cat} {t})"),
+            mode = ExecMode::Subprocess
+        );
+        assert_eq!(r.stdout(), "ok\n", "subshell broke on attempt {attempt}");
+    }
+}
+
+#[skuld::test]
+fn close_of_absurd_fd_number_is_a_noop(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // A descriptor number above RLIMIT_NOFILE cannot be open, so closing it is
+    // a no-op — `bash -c 'exec 2000000>&-; echo ok'` prints "ok". Relocating a
+    // spawn source above such a number instead pushed past the limit and
+    // `posix_spawn` rejected it with EINVAL, losing the command entirely.
+    // Swept across the boundary. macOS rejects fds from 10240 upward from
+    // `posix_spawn_file_actions_adddup2`, and that bound is not reachable via
+    // `sysconf(_SC_OPEN_MAX)` or `getdtablesize()` — so this pins the behaviour
+    // either side of it rather than the constant. bash prints "ok" for all.
+    let marker = dir.join("absurd-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+
+    for fd in [10239, 10240, 10241, 100_000, 1_048_575, 2_000_000] {
+        let script = format!("exec {fd}>&-; {cat} {t}", t = shell_path(&marker));
+        let r = exec!(&script, mode = ExecMode::Subprocess);
+        assert_eq!(
+            r.stdout(),
+            "ok\n",
+            "closing fd {fd} must be a no-op, not a spawn failure"
+        );
+    }
+}
+
+// A close must not displace the runtime's own plumbing ================================================================
+
+#[skuld::test]
+fn closed_stdin_does_not_break_subshells() {
+    // `exec 0<&-` is the standard way to harden a script against stdin, and in
+    // bash the subshells that follow still run:
+    //   bash -c 'exec 0<&-; (echo hi); echo rc=$?'  ->  "hi", "rc=0"
+    // thaum ships the subshell's AST to a `thaum exec-ast` child over fd 0, so
+    // closing descriptor 0 in the child destroyed the transport and every
+    // subshell silently failed with "invalid JSON payload".
+    let r = exec!("exec 0<&-; (echo hi); echo rc=$?");
+    assert_eq!(r.stdout(), "hi\nrc=0\n", "a closed stdin must not disable subshells");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdin_does_not_break_subshells_bare_form() {
+    // `exec <&-` is the same operation spelled without the number.
+    let r = exec!("exec <&-; (echo hi); echo rc=$?");
+    assert_eq!(r.stdout(), "hi\nrc=0\n");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdout_does_not_break_subshell_capture() {
+    // Closing stdout must not cost the subshell its capture pipe either: bash
+    // runs the subshell and discards its output, rather than losing the child.
+    let r = exec!("exec 1>&-; (echo hi); echo done >&2");
+    assert_eq!(r.stdout(), "", "a closed stdout discards output");
+    assert_eq!(r.stderr(), "done\n", "the subshell must still run");
+}
+
+// Closed standard descriptors are closed in the child too (#41's child half) ==========================================
+
+#[skuld::test]
+fn closed_stdout_not_inherited_by_child(#[fixture(test_tools)] tools: &Path) {
+    // bash -c 'sh -c "echo LEAKED" 1>&-' prints nothing: the child's stdout is
+    // gone. thaum handed the child a pipe wired to the host's stdout instead,
+    // so "LEAKED" came out — a write escape on descriptor 1.
+    //
+    // Unix only: `close_in_child` gates standard descriptors off on Windows,
+    // which keeps `main`'s behaviour there (issue #46). This whole module is
+    // `#![cfg(unix)]`, so the gate is invisible here.
+    //
+    // Only the absence of the leak is asserted, not the child's exit status.
+    // The Rust runtime reopens /dev/null over any of fds 0-2 it finds closed at
+    // startup, so a Rust observer cannot report EBADF on descriptor 1 and would
+    // exit 0 either way. A C observer does see it: through the real binary,
+    // `thaum exec -c 'sh -c "echo LEAKED" 1>&-; echo rc=$?'` gives
+    // "echo: write error: Bad file descriptor" and rc=1, matching bash.
+    let script = format!("{wf} 1 LEAKED 1>&-; echo done", wf = tool(tools, "writefd"));
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "done\n", "a closed stdout must not reach the host");
+    r.stderr();
+}
+
+// Command substitution is a spawn site too (#16's actual incident shape) ==============================================
+
+#[skuld::test]
+fn cmdsub_child_does_not_reach_host_fd(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // The shape that corrupted the corpus harness's database, verbatim:
+    //   bash -c 'exec 3>tgt; x=$(sh -c "echo REDIR >&3")' 3>probe
+    //     -> tgt holds "REDIR", probe empty.
+    // `execute_command_substitution` built its child's fd table from nothing but
+    // a stdout pipe, so the shell's `exec 3>tgt` was invisible to it and the
+    // write went to the host's descriptor instead.
+    let probe = HostFd::new(dir.join("cmdsub-probe.txt"));
+    let target = dir.join("cmdsub-target.txt");
+
+    let script = format!(
+        "exec {fd}>{t}; x=$({wf} {fd} REDIR)",
+        fd = probe.fd,
+        t = shell_path(&target),
+        wf = tool(tools, "writefd")
+    );
+    exec!(&script);
+    assert_eq!(std::fs::read_to_string(&target).unwrap(), "REDIR\n");
+    assert_eq!(probe.contents(), "", "the host's descriptor must not receive the write");
+}
+
+#[skuld::test]
+fn closed_fd_not_inherited_by_cmdsub(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // bash -c 'exec 3>&-; x=$(sh -c "echo LEAK >&3")' 3>probe -> probe empty.
+    let probe = HostFd::new(dir.join("cmdsub-closed.txt"));
+
+    let script = format!(
+        "exec {fd}>&-; x=$({wf} {fd} LEAK); echo \"x=[$x]\"",
+        fd = probe.fd,
+        wf = tool(tools, "writefd")
+    );
+    let r = exec!(&script);
+    r.stdout();
+    r.stderr();
+    assert_eq!(
+        probe.contents(),
+        "",
+        "command substitution must not inherit a closed descriptor"
+    );
+}
+
+// Closing by number, not by the direction of the operator =============================================================
+
+#[skuld::test]
+fn close_clears_the_slot_for_its_number_not_its_direction(#[fixture(temp_dir)] dir: &Path) {
+    // `0>&-` closes descriptor 0 even though `>` reads as an output operator:
+    //   bash -c 'exec 0<src 0>&-; read x; echo "rc=$? x=[$x]"'
+    //     -> "read: 0: read error: Bad file descriptor", rc=1, x empty.
+    // Routing by operator direction left stdin assigned, so the read succeeded.
+    let src = dir.join("close-direction.txt");
+    std::fs::write(&src, "DATA\n").unwrap();
+
+    let script = format!("exec 0<{s} 0>&-; read x; echo \"rc=$? x=[$x]\"", s = shell_path(&src));
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1 x=[]\n", "0>&- must close descriptor 0");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdin_not_inherited_by_child() {
+    // `exec 0<&-` must reach children as a genuine close. The descriptor being
+    // closed has to be one the child could otherwise *read*, so the host's real
+    // stdin carries data here:
+    //   printf HOST | bash -c 'exec 0<&-; cat'  ->  "cat: stdin: Bad file descriptor"
+    // Before the fix the child read "HOST": `adopt_redirects` substituted
+    // /dev/null for fds 0-2 without recording the close, so `io.closed_fds()`
+    // was empty for them.
+    //
+    // An earlier version of this test wrote `exec 0<src; exec 0<&-; cat` and
+    // asserted empty stdout. That could not fail: `exec 0<file` does not reach
+    // children at all (issue #47), so the child never had the file on
+    // descriptor 0 under any version, and the harness's stdin was empty anyway.
+    // `/bin/cat` rather than the Rust `test-cat`: the Rust runtime reopens
+    // /dev/null over any of fds 0-2 it finds closed at startup, so a Rust
+    // observer reads EOF and reports nothing whether the descriptor was closed
+    // or merely empty. A C observer distinguishes the two.
+    //
+    // Verified by mutation: with the closed marker removed from
+    // `adopt_redirects`, this reads "HOST"; with it, `cat` reports
+    // "stdin: Bad file descriptor".
+    let (stdout, stderr) = run_with_stdin("exec 0<&-; /bin/cat", b"HOST\n");
+    assert_eq!(
+        stdout, "",
+        "a closed stdin must not reach the child; it read the host's"
+    );
+    assert!(
+        stderr.contains("Bad file descriptor"),
+        "the child should report the closed descriptor, got: {stderr}"
+    );
+}
+
+#[skuld::test]
+fn inherited_stdin_still_reaches_child() {
+    // The control for the test above: with no close, the child reads the host's
+    // stdin, exactly as bash does. If this fails, the fix has over-reached.
+    let (stdout, _stderr) = run_with_stdin("/bin/cat", b"HOST\n");
+    assert_eq!(stdout, "HOST\n", "an un-closed stdin must still reach the child");
+}
+
+// Malformed move targets ==============================================================================================
+
+#[skuld::test]
+fn move_target_rejects_non_digits() {
+    // `exec 3>&-3-` must not parse as a move from descriptor -3. bash rejects
+    // the word outright ("exec: 3-: not found"); thaum reports a bad redirect.
+    // Either way the command fails and the script continues — what must not
+    // happen is a negative descriptor reaching the closed set and then `dup2`.
+    let r = exec!("exec 3>&-3-; echo alive");
+    assert_eq!(
+        r.stdout(),
+        "alive\n",
+        "a malformed move target must not abort the script"
+    );
+    r.stderr();
+    r.status();
+}
+
+// Numeric-move redirections `N>&M-` / `N<&M-` (#17's audit) ===========================================================
+
+#[skuld::test]
+fn move_output_fd_closes_source(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 5>f; echo hello5 >&5; exec 6>&5-; echo world5 >&5;
+    //          echo world6 >&6; exec 6>&-; cat f'
+    //   -> stderr "5: Bad file descriptor"; f holds "hello5\nworld6".
+    // The move duplicates 5 onto 6 and then closes 5.
+    let f = dir.join("move-out.txt");
+
+    let script = format!(
+        "exec 5>{f}; echo hello5 >&5; exec 6>&5-; echo world5 >&5; echo world6 >&6; exec 6>&-",
+        f = shell_path(&f)
+    );
+    let r = exec!(&script);
+    assert!(
+        r.stderr().contains("bad file descriptor"),
+        "the source descriptor must be closed by the move, got stderr: {}",
+        r.stderr()
+    );
+    assert_eq!(std::fs::read_to_string(&f).unwrap(), "hello5\nworld6\n");
+}
+
+#[skuld::test]
+fn move_output_fd_source_becomes_unusable(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 3>out; exec 4>&3-; echo moved >&4; echo after >&3; echo rc=$?'
+    //   -> out holds "moved"; stderr "3: Bad file descriptor"; rc=1.
+    // The destination takes over the file and the source is genuinely closed.
+    let out = dir.join("move-source.txt");
+
+    let script = format!(
+        "exec 3>{out}; exec 4>&3-; echo moved >&4; echo after >&3; echo rc=$?",
+        out = shell_path(&out)
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1\n", "writing to the moved-from descriptor must fail");
+    assert!(
+        r.stderr().contains("bad file descriptor"),
+        "expected a bad-descriptor diagnostic, got: {}",
+        r.stderr()
+    );
+    assert_eq!(std::fs::read_to_string(&out).unwrap(), "moved\n");
+}
+
+#[skuld::test]
+fn move_input_fd_closes_source(#[fixture(temp_dir)] dir: &Path) {
+    // bash -c 'exec 4<&3-; cat <&4' with 3 on a file reads the file, and
+    // descriptor 3 is then closed:
+    //   bash -c 'exec 4<&0-; cat <&4; sh -c "cat <&0"' < src
+    //     -> "DATA", then "cat: stdin: Bad file descriptor".
+    let src = dir.join("move-in.txt");
+    std::fs::write(&src, "DATA\n").unwrap();
+
+    let script = format!(
+        "exec 3<{src}; exec 4<&3-; read line <&4; echo \"got=$line\"; read x <&3; echo rc=$?",
+        src = shell_path(&src)
+    );
+    let r = exec!(&script);
+    assert_eq!(
+        r.stdout(),
+        "got=DATA\nrc=1\n",
+        "the move must transfer the read and close the source"
+    );
+    r.stderr();
+}
+
+#[skuld::test]
+fn move_fd_does_not_leak_to_host(#[fixture(temp_dir)] dir: &Path) {
+    // The move form failed with "ambiguous redirect" and applied nothing, so
+    // the host's descriptor stayed live and received the write — the same
+    // escape as #16 by another route.
+    //   bash -c 'exec 4>tgt; exec N>&4-; echo moved >&N; echo after >&4; echo rc=$?' N>probe
+    //     -> tgt holds "moved", probe empty, stderr "4: Bad file descriptor",
+    //        rc=1. Measured identically for N = 3, 5, 9, 12 and 21, so the
+    //        arbitrary number `HostFd` hands out is safe here.
+    let probe = HostFd::new(dir.join("move-leak.txt"));
+    // The scratch number the shell opens must not be a literal. `HostFd` takes
+    // whatever the OS hands out, which can be any low number, so a literal `4`
+    // here would collide with `probe.fd` on the runs where the OS picked 4.
+    // Reserving a second descriptor makes the two numbers distinct by
+    // construction rather than by luck.
+    let scratch = HostFd::new(dir.join("move-leak-scratch.txt"));
+    let target = dir.join("move-leak-target.txt");
+
+    let script = format!(
+        "exec {s}>{t}; exec {fd}>&{s}-; echo moved >&{fd}; echo after >&{s}; echo rc=$?",
+        s = scratch.fd,
+        t = shell_path(&target),
+        fd = probe.fd
+    );
+    let r = exec!(&script);
+    assert_eq!(r.stdout(), "rc=1\n");
+    r.stderr();
+    assert_eq!(
+        std::fs::read_to_string(&target).unwrap(),
+        "moved\n",
+        "the move must redirect to the source's file"
+    );
+    assert_eq!(probe.contents(), "", "the host's descriptor must not receive the write");
+}
+
+// Subprocess parity ===================================================================================================
+
+#[skuld::test]
+fn exec_dashdash_applies_redirections_in_subprocess(#[fixture(temp_dir)] dir: &Path) {
+    // The same case through a real `thaum` process, which is how issue #16
+    // reproduces it. Guards against the fix living only on the in-process path.
+    let target = dir.join("subprocess-dashdash.txt");
+    let script = format!("exec -- 3>{t}; echo hi 1>&3", t = shell_path(&target));
+    exec!(&script, mode = ExecMode::Subprocess);
+    assert_eq!(std::fs::read_to_string(&target).unwrap(), "hi\n");
+}

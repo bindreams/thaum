@@ -27,6 +27,10 @@ pub(crate) enum Fd {
     Pty,
     /// Redirect to/from this file.
     File(File),
+    /// Not open in the child. Used for descriptors the script closed with
+    /// `N>&-`: omitting them would silently hand the child whatever the *host*
+    /// process has at that number.
+    Close,
 }
 
 // CommandEx ===========================================================================================================
@@ -330,6 +334,11 @@ impl CommandEx {
                         // SAFETY: raw is valid and no longer needed (dup2 made a copy).
                         unsafe { nix::libc::close(raw) };
                     }
+                }
+                Fd::Close => {
+                    // SAFETY: close() is safe for any fd number; EBADF (the fd
+                    // was not open) is the expected no-op case and is ignored.
+                    unsafe { nix::libc::close(fd_num) };
                 }
                 Fd::Pipe | Fd::InputPipe | Fd::Pty => {} // Not meaningful for exec replacement.
             }
@@ -702,6 +711,8 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
     let mut pipes: HashMap<i32, File> = HashMap::new();
     // Raw FDs that must be closed in the parent after spawn (or on error).
     let mut raw_fds_to_close: Vec<std::os::fd::RawFd> = Vec::new();
+    // Lazily-opened /dev/null, shared by all `Fd::Close` entries.
+    let mut devnull_fd: Option<std::os::fd::RawFd> = None;
 
     for (&fd_num, fd_spec) in &cmd.fds {
         match fd_spec {
@@ -762,6 +773,36 @@ fn spawn_impl(cmd: CommandEx) -> io::Result<ChildEx> {
                 let raw_fd = file.try_clone()?.into_raw_fd();
                 raw_fds_to_close.push(raw_fd);
                 file_actions.add_dup2(raw_fd, fd_num).inspect_err(|_| {
+                    close_raw_fds(&raw_fds_to_close);
+                })?;
+            }
+            Fd::Close => {
+                // A bare `addclose` is not usable here: if `fd_num` is not open
+                // in this process, the child's close(2) fails and posix_spawn
+                // reports EBADF for the whole spawn (verified on macOS 15).
+                // Checking first would be a check-then-act on a process-global
+                // table, so instead dup /dev/null onto the number — which makes
+                // it open unconditionally — and close that.
+                let devnull_raw = match devnull_fd {
+                    Some(raw) => raw,
+                    None => {
+                        let file = File::options()
+                            .read(true)
+                            .write(true)
+                            .open("/dev/null")
+                            .inspect_err(|_| {
+                                close_raw_fds(&raw_fds_to_close);
+                            })?;
+                        let raw = file.into_raw_fd();
+                        raw_fds_to_close.push(raw);
+                        devnull_fd = Some(raw);
+                        raw
+                    }
+                };
+                file_actions.add_dup2(devnull_raw, fd_num).inspect_err(|_| {
+                    close_raw_fds(&raw_fds_to_close);
+                })?;
+                file_actions.add_close(fd_num).inspect_err(|_| {
                     close_raw_fds(&raw_fds_to_close);
                 })?;
             }

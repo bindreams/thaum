@@ -97,6 +97,10 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
                 make_inheritable(handle)?;
                 handle_table.insert(fd_num, (handle, FOPEN));
             }
+            // Absent from `handle_table` is exactly "closed": fds 3+ reach the
+            // child only through `build_lpreserved2`, and a number with no
+            // entry gets a zero flags byte, which the CRT reads as not open.
+            Fd::Close => {}
             Fd::Pty => unreachable!("Pty fds are handled by spawn_with_conpty"),
         }
     }
@@ -396,7 +400,8 @@ fn spawn_with_conpty(cmd: CommandEx) -> io::Result<ChildEx> {
 
     for (&fd_num, fd_spec) in &cmd.fds {
         match fd_spec {
-            Fd::Pty => {} // Handled by ConPTY
+            Fd::Close => {} // Absent from the handle table means closed.
+            Fd::Pty => {}   // Handled by ConPTY
             Fd::Pipe => {
                 let (read_handle, write_handle) = create_pipe()?;
                 let read_file = unsafe { File::from_raw_handle(read_handle.0 as _) };

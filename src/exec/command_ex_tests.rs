@@ -197,6 +197,72 @@ mod posix_quoting {
         assert_eq!(std::fs::read_to_string(&file_path).unwrap(), "hello\n");
     }
 
+    /// `Fd::Close` must make the number unusable in the child even though the
+    /// parent has it open — otherwise `posix_spawn` inherits it and a script
+    /// that closed the descriptor still reaches whatever the host had there.
+    ///
+    /// The descriptor number comes from `into_raw_fd`, never `dup2` onto a
+    /// literal: the test process has descriptors of its own.
+    #[skuld::test]
+    fn spawn_close_fd_denies_inherited_descriptor(#[fixture(temp_dir)] dir: &Path) {
+        use std::os::fd::{AsRawFd, FromRawFd, IntoRawFd};
+
+        let file_path = dir.join("closed.txt");
+        let file = std::fs::File::create(&file_path).unwrap();
+        // Rust opens files O_CLOEXEC; dup(2) clears it, so the child would
+        // genuinely inherit this were it not for `Fd::Close`.
+        let inheritable = crate::exec::buffered_file::dup_process_fd(file.as_raw_fd()).unwrap();
+        drop(file);
+        let raw = inheritable.into_raw_fd();
+
+        let mut cmd = super::super::CommandEx::new(vec![
+            OsString::from("sh"),
+            OsString::from("-c"),
+            OsString::from(format!("echo escaped >&{raw}")),
+        ]);
+        cmd.fds.insert(raw, super::super::Fd::Close);
+        let mut child = cmd.spawn().expect("spawn failed");
+        let status = child.wait().expect("wait failed");
+
+        assert_ne!(status, 0, "the child should fail on a closed descriptor");
+        assert_eq!(
+            std::fs::read_to_string(&file_path).unwrap(),
+            "",
+            "a closed descriptor must not be inherited"
+        );
+
+        // SAFETY: `raw` came from `into_raw_fd` and is still open in this process.
+        drop(unsafe { std::fs::File::from_raw_fd(raw) });
+    }
+
+    /// `Fd::Close` on a number that is *not* open must still spawn.
+    ///
+    /// A bare `posix_spawn_file_actions_addclose` fails the whole spawn with
+    /// EBADF in that case (verified on macOS), so the implementation dups
+    /// /dev/null onto the number first. Without that, any script closing a
+    /// descriptor it never opened would break every later external command.
+    #[skuld::test]
+    fn spawn_close_fd_on_unopened_number_still_spawns() {
+        use std::os::fd::{FromRawFd, IntoRawFd};
+
+        // Take a number from the OS, then release it: nothing else in this
+        // process can be holding it at the moment we release it, and the
+        // dup2-then-close construction is correct whether or not it is reused.
+        let placeholder = std::fs::File::open("/dev/null").unwrap();
+        let raw = placeholder.into_raw_fd();
+        // SAFETY: `raw` came from `into_raw_fd`; dropping closes it.
+        drop(unsafe { std::fs::File::from_raw_fd(raw) });
+
+        let mut cmd = super::super::CommandEx::new(vec![
+            OsString::from("sh"),
+            OsString::from("-c"),
+            OsString::from("exit 7"),
+        ]);
+        cmd.fds.insert(raw, super::super::Fd::Close);
+        let mut child = cmd.spawn().expect("spawn must succeed for an unopened fd");
+        assert_eq!(child.wait().expect("wait failed"), 7);
+    }
+
     /// Verify that `CommandEx.cwd` sets the child's working directory.
     #[skuld::test]
     fn spawn_with_cwd(#[fixture(temp_dir)] dir: &Path) {

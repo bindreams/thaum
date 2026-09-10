@@ -183,6 +183,12 @@ fn spawn_pipeline_stage(
                 }
             }
 
+            // Descriptors the script closed must not reach a pipeline stage
+            // either — posix_spawn would otherwise inherit the host's.
+            for &fd in io.closed_fds() {
+                child_cmd.fds.insert(fd, Fd::Close);
+            }
+
             if let Some(prev_out) = stdin {
                 child_cmd.fds.insert(0, Fd::File(prev_out));
             }

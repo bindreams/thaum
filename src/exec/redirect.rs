@@ -52,30 +52,37 @@ impl ActiveRedirects {
     pub fn apply(&mut self, io: &mut IoContext) -> SavedFds {
         let mut saved = SavedFds::new();
         if let Some(f) = self.stdin.take() {
-            saved.push(0, io.save_and_set(0, f.into_inner()));
+            saved.push(0, io.is_closed(0), io.save_and_set(0, f.into_inner()));
         }
         if let Some(f) = self.stdout.take() {
-            saved.push(1, io.save_and_set(1, f.into_inner()));
+            saved.push(1, io.is_closed(1), io.save_and_set(1, f.into_inner()));
         }
         if let Some(f) = self.stderr.take() {
-            saved.push(2, io.save_and_set(2, f.into_inner()));
+            saved.push(2, io.is_closed(2), io.save_and_set(2, f.into_inner()));
         }
         for (fd, file) in self.extra_fds.drain() {
-            saved.push(fd, io.save_and_set(fd, file.into_inner()));
+            saved.push(fd, io.is_closed(fd), io.save_and_set(fd, file.into_inner()));
         }
         for &fd in &self.closed_fds {
+            let was_closed = io.is_closed(fd);
             if fd <= 2 {
                 // Replace fds 0-2 with /dev/null instead of removing, so
                 // downstream code always finds a valid handle for these fds.
+                // The shell's own writes to a closed 0-2 therefore succeed
+                // where bash reports EBADF — tracked separately as issue #41;
+                // the child half is handled at the spawn sites.
                 let null = crate::exec::io_context::open_null_device();
-                saved.push(fd, io.save_and_set(fd, null));
+                saved.push(fd, was_closed, io.save_and_set(fd, null));
             } else {
-                saved.push(fd, io.remove_fd(fd));
+                let prev = io.remove_fd(fd);
+                io.close_fd(fd);
+                saved.push(fd, was_closed, prev);
             }
         }
         // Clear tty overrides for all touched fds so that redirected fds
         // don't falsely report as terminals.
-        for &(fd, _) in &saved.fds {
+        let touched: Vec<i32> = saved.fds.iter().map(|e| e.fd).collect();
+        for fd in touched {
             if io.has_tty_override(fd) {
                 saved.saved_tty_overrides.insert(fd);
                 io.clear_tty_override(fd);
@@ -88,8 +95,17 @@ impl ActiveRedirects {
 /// Saved fd entries for restore-on-completion. Restores in reverse order
 /// to correctly unwind chained dup redirects (e.g. `exec 3>&1 1>/dev/null`).
 pub(super) struct SavedFds {
-    fds: Vec<(i32, Option<File>)>,
+    fds: Vec<SavedFd>,
     saved_tty_overrides: HashSet<i32>,
+}
+
+/// One descriptor's pre-redirect state: its handle, and whether it was already
+/// marked closed. Both must come back, or a per-command `N>&-` would leak its
+/// close into the rest of the script.
+struct SavedFd {
+    fd: i32,
+    was_closed: bool,
+    file: Option<File>,
 }
 
 impl SavedFds {
@@ -100,15 +116,16 @@ impl SavedFds {
         }
     }
 
-    fn push(&mut self, fd: i32, saved: Option<File>) {
-        self.fds.push((fd, saved));
+    fn push(&mut self, fd: i32, was_closed: bool, file: Option<File>) {
+        self.fds.push(SavedFd { fd, was_closed, file });
     }
 
     /// Restore all saved fds back to the IoContext, in reverse order.
     /// Also restores tty overrides that were cleared during apply.
     pub fn restore(self, io: &mut IoContext) {
-        for (fd, saved) in self.fds.into_iter().rev() {
-            io.restore(fd, saved);
+        for entry in self.fds.into_iter().rev() {
+            io.restore(entry.fd, entry.file);
+            io.set_closed_marker(entry.fd, entry.was_closed);
         }
         for fd in self.saved_tty_overrides {
             io.set_tty_override(fd);
@@ -171,6 +188,13 @@ impl Executor {
                     if target == "-" {
                         // Close the FD: use sink for 0-2, remove for 3+.
                         close_write_fd(&mut active, dest_fd);
+                    } else if let Some(src_fd) = parse_move_target(&target) {
+                        // `N>&M-` — move: duplicate M onto N, then close M.
+                        let cloned = clone_fd_for_write(&active, io, src_fd)?;
+                        assign_write_fd(&mut active, dest_fd, cloned)?;
+                        if src_fd != dest_fd {
+                            close_write_fd(&mut active, src_fd);
+                        }
                     } else if let Ok(src_fd) = target.parse::<i32>() {
                         let cloned = clone_fd_for_write(&active, io, src_fd)?;
                         // Cloned FDs share OS position — don't buffer reads.
@@ -184,6 +208,13 @@ impl Executor {
                     let dest_fd = fd.unwrap_or(0);
                     if target == "-" {
                         close_read_fd(&mut active, dest_fd);
+                    } else if let Some(src_fd) = parse_move_target(&target) {
+                        // `N<&M-` — move: duplicate M onto N, then close M.
+                        let cloned = clone_fd_for_read(&active, io, src_fd)?;
+                        assign_read_bf(&mut active, dest_fd, BufferedFile::passthrough(cloned))?;
+                        if src_fd != dest_fd {
+                            close_read_fd(&mut active, src_fd);
+                        }
                     } else if let Ok(src_fd) = target.parse::<i32>() {
                         let cloned = clone_fd_for_read(&active, io, src_fd)?;
                         // Cloned FDs share OS position — don't buffer reads.
@@ -236,6 +267,16 @@ impl Executor {
     }
 }
 
+/// Recognise the move form of a dup target: `N-` means "duplicate N here, then
+/// close N". A bare `-` is the plain close form and is handled by the caller.
+fn parse_move_target(target: &str) -> Option<i32> {
+    let digits = target.strip_suffix('-')?;
+    if digits.is_empty() {
+        return None;
+    }
+    digits.parse::<i32>().ok()
+}
+
 /// Assign a file to the appropriate read FD slot (buffered).
 fn assign_read_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
     assign_read_bf(active, fd, BufferedFile::new(file))
@@ -243,6 +284,9 @@ fn assign_read_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(
 
 /// Assign a pre-wrapped BufferedFile to the appropriate read FD slot.
 fn assign_read_bf(active: &mut ActiveRedirects, fd: i32, bf: BufferedFile) -> Result<(), ExecError> {
+    // Redirects apply left to right and the last word about a descriptor wins,
+    // so reopening a number cancels an earlier close in the same list.
+    active.closed_fds.remove(&fd);
     match fd {
         0 => active.stdin = Some(bf),
         n => {
@@ -254,6 +298,8 @@ fn assign_read_bf(active: &mut ActiveRedirects, fd: i32, bf: BufferedFile) -> Re
 
 /// Assign a file to the appropriate write FD slot (passthrough — no read buffering).
 fn assign_write_fd(active: &mut ActiveRedirects, fd: i32, file: File) -> Result<(), ExecError> {
+    // Last one wins — see `assign_read_bf`.
+    active.closed_fds.remove(&fd);
     match fd {
         1 => active.stdout = Some(BufferedFile::passthrough(file)),
         2 => active.stderr = Some(BufferedFile::passthrough(file)),
@@ -292,6 +338,14 @@ fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
 /// Clone a file descriptor from the active redirects or IoContext
 /// for use as a write target.
 fn clone_fd_for_write(active: &ActiveRedirects, io: &IoContext, src_fd: i32) -> Result<File, ExecError> {
+    // A descriptor the script closed is gone, even though the host process may
+    // still have that number open. Without this check the `dup_process_fd`
+    // fallback below reaches past the close into the embedder's fd table —
+    // which is how `exec 3>&-` ended up writing to the host's descriptor 3.
+    if active.closed_fds.contains(&src_fd) || io.is_closed(src_fd) {
+        return Err(ExecError::BadRedirect(format!("{src_fd}: bad file descriptor")));
+    }
+
     // Check active redirects first (FDs opened earlier in this redirect list).
     if let Some(file) = active.stdout.as_ref().filter(|_| src_fd == 1) {
         return file.try_clone().map_err(ExecError::Io);

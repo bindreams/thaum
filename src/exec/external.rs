@@ -62,6 +62,14 @@ impl Executor {
             }
         }
 
+        // Descriptors the script closed must be closed in the child too.
+        // Leaving them out of the table is not enough: posix_spawn inherits
+        // every fd it is not told about, so the child would get whatever the
+        // *host* process has at that number.
+        for &fd in io.closed_fds() {
+            child_cmd.fds.insert(fd, Fd::Close);
+        }
+
         // Per-command redirects override persistent ones: FDs 0-2 from
         // redirect list, then FDs 3+ from extra_fds.
         if let Some(ref file) = active.stdin {
@@ -83,6 +91,14 @@ impl Executor {
             child_cmd
                 .fds
                 .insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
+        }
+        // Per-command closes, e.g. `cmd 3>&-`. Applied after the per-command
+        // opens so that within one redirect list the last word wins, and after
+        // the persistent set so a per-command reopen can override it.
+        // Standard descriptors are included: `cmd 1>&-` must leave the child
+        // without a stdout rather than with a pipe to the host's (issue #41).
+        for &fd in &active.closed_fds {
+            child_cmd.fds.insert(fd, Fd::Close);
         }
 
         // Set up stdout/stderr for the child. For unredirected fds:

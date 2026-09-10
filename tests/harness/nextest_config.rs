@@ -1,8 +1,8 @@
 //! Guards for the nextest filter expressions that CI and the timeout policy
-//! depend on.
+//! depend on, and for the rule that enumerating tests has no side effects.
 //!
-//! Both tests read their filter expression out of the file that actually
-//! governs it — `.config/nextest.toml` or the workflow — and ask nextest to
+//! Each guard reads its filter expression out of the file that actually
+//! governs it — `.config/nextest.toml` or the workflow — and asks nextest to
 //! evaluate it. Hardcoding the expressions here would let the guard drift away
 //! from what CI runs, which is the failure these tests exist to catch.
 
@@ -10,7 +10,7 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-use crate::common::labels::INFRA;
+use crate::common::labels::{DOCKER, INFRA};
 
 skuld::default_labels!(INFRA);
 
@@ -32,6 +32,14 @@ fn nextest_available() -> Result<(), String> {
         .ok_or_else(|| "cargo-nextest not installed".into())
 }
 
+fn docker_available() -> Result<(), String> {
+    if thaum_testkit::docker::available() {
+        Ok(())
+    } else {
+        Err("Docker not available".into())
+    }
+}
+
 fn project_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR"))
 }
@@ -39,6 +47,29 @@ fn project_root() -> &'static Path {
 fn read(rel: &str) -> String {
     let path: PathBuf = project_root().join(rel);
     std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()))
+}
+
+/// Strip ANSI SGR sequences.
+///
+/// Belt and braces: the cargo invocations below force colour off, but `ci.yml`
+/// sets `CARGO_TERM_COLOR: always` workflow-wide, and a guard that parses
+/// coloured output as if it were plain is exactly the failure mode that hid
+/// itself once already.
+fn strip_ansi(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut chars = s.chars();
+    while let Some(c) = chars.next() {
+        if c == '\x1b' {
+            for e in chars.by_ref() {
+                if e.is_ascii_alphabetic() {
+                    break;
+                }
+            }
+        } else {
+            out.push(c);
+        }
+    }
+    out
 }
 
 /// Extract the value of a `key = "value"` line, given the key.
@@ -49,8 +80,8 @@ fn quoted_value_after(line: &str, key: &str) -> Option<String> {
     Some(rest[..end].to_string())
 }
 
-/// The `filter` of the `[[profile.default.overrides]]` block that grants the
-/// long slow-timeout.
+/// The `filter` of the `[[profile.default.overrides]]` block granting the long
+/// slow-timeout.
 fn slow_timeout_override_filter() -> String {
     let toml = read(".config/nextest.toml");
     let mut in_override = false;
@@ -101,32 +132,35 @@ fn workflow_filter(job: &str) -> String {
     panic!("no `cargo nextest run` step found in workflow job `{job}`");
 }
 
-/// Run `cargo nextest list -E expr`, returning (stdout, stderr).
-fn nextest_list(expr: &str) -> (String, String) {
+/// Run a `cargo nextest` subcommand with colour forced off, returning stdout.
+///
+/// `CARGO_TERM_COLOR` is cleared explicitly: `--color never` governs only the
+/// invocation it is passed to, while the environment variable is inherited by
+/// everything underneath.
+fn nextest_stdout(args: &[&str]) -> String {
     let output = Command::new("cargo")
-        .args(["nextest", "list", "--features", "cli", "--cargo-quiet", "-E", expr])
+        .arg("nextest")
+        .args(args)
+        .args(["--features", "cli", "--color", "never", "--cargo-quiet"])
+        .env("CARGO_TERM_COLOR", "never")
         .current_dir(project_root())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .output()
-        .unwrap_or_else(|e| panic!("cargo nextest list failed to start: {e}"));
+        .unwrap_or_else(|e| panic!("cargo nextest failed to start: {e}"));
     assert!(
         output.status.success(),
-        "cargo nextest list -E {expr:?} failed:\n{}",
+        "cargo nextest {args:?} failed:\n{}",
         String::from_utf8_lossy(&output.stderr)
     );
-    (
-        String::from_utf8_lossy(&output.stdout).into_owned(),
-        String::from_utf8_lossy(&output.stderr).into_owned(),
-    )
+    strip_ansi(&String::from_utf8_lossy(&output.stdout))
 }
 
 /// Binary ids of every test nextest selects under `expr`.
 fn binaries_selected_by(expr: &str) -> BTreeSet<String> {
-    let (stdout, _) = nextest_list(expr);
     // Non-interactive listing prints one line per test: "<binary-id> <test name>".
     // Test names contain spaces, binary ids do not, so the id is the first field.
-    stdout
+    nextest_stdout(&["list", "-E", expr])
         .lines()
         .filter(|l| !l.trim().is_empty())
         .filter_map(|l| l.split_whitespace().next())
@@ -134,23 +168,17 @@ fn binaries_selected_by(expr: &str) -> BTreeSet<String> {
         .collect()
 }
 
-/// Listing tests must not build anything.
-///
-/// `cargo nextest list` runs every selected binary with `--list`, and the
-/// gauntlet binary used to warm up its Docker fixture from `main()` — so
-/// enumerating tests built an image (issue #20). The guards above evaluate a
-/// filter that selects the gauntlet binary, so a regression here would make
-/// them slow and Docker-dependent rather than cheap.
-#[skuld::test(requires = [nextest_available])]
-fn listing_tests_does_not_build_docker_images() {
-    let filter = slow_timeout_override_filter();
-    let (_, stderr) = nextest_list(&filter);
-    assert!(
-        !stderr.contains("building Docker image"),
-        "listing tests under `{filter}` built a Docker image — enumeration must have no side \
-         effects (issue #20).\nstderr:\n{stderr}"
-    );
+/// Filesystem path of a built test binary, from nextest's own metadata.
+fn test_binary_path(binary_id: &str) -> PathBuf {
+    let json = nextest_stdout(&["list", "--list-type", "binaries-only", "--message-format", "json"]);
+    let doc: serde_json::Value = serde_json::from_str(&json).expect("nextest binaries-only JSON");
+    let path = doc["rust-binaries"][binary_id]["binary-path"]
+        .as_str()
+        .unwrap_or_else(|| panic!("no binary-path for {binary_id} in nextest metadata"));
+    PathBuf::from(path)
 }
+
+// Filter guards -------------------------------------------------------------------------------------------------------
 
 #[skuld::test(requires = [nextest_available])]
 fn slow_timeout_override_covers_every_docker_building_binary() {
@@ -186,5 +214,59 @@ fn gating_job_runs_these_guards() {
         selected.contains("thaum::harness"),
         "the gating CI job's filter `{filter}` does not select `thaum::harness`, so these guards \
          would never run in CI.\nSelected: {selected:?}"
+    );
+}
+
+/// The guards must survive the environment CI actually runs them in.
+///
+/// `ci.yml` sets `CARGO_TERM_COLOR: always` workflow-wide. An earlier version
+/// of this file passed `--color never` to the outer command only, so the inner
+/// `cargo nextest list` inherited the variable and emitted ANSI codes into the
+/// output the assertions parse — and the guards failed in the one job they were
+/// written to protect.
+#[skuld::test(requires = [nextest_available])]
+fn filter_parsing_survives_forced_colour() {
+    let filter = workflow_filter("test");
+    let output = Command::new("cargo")
+        .args(["nextest", "list", "--features", "cli", "-E", &filter])
+        .env("CARGO_TERM_COLOR", "always")
+        .current_dir(project_root())
+        .output()
+        .expect("cargo nextest list");
+    let parsed: BTreeSet<String> = strip_ansi(&String::from_utf8_lossy(&output.stdout))
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .filter_map(|l| l.split_whitespace().next())
+        .map(str::to_owned)
+        .collect();
+    assert!(
+        parsed.contains("thaum::harness"),
+        "binary ids could not be parsed out of coloured output — the guards would fail in CI, \
+         where CARGO_TERM_COLOR=always.\nParsed: {parsed:?}"
+    );
+}
+
+// Side-effect guard ---------------------------------------------------------------------------------------------------
+
+/// Enumerating tests must build nothing (issue #20).
+///
+/// Asserts against the gauntlet binary's **own stderr**, not against
+/// `cargo nextest list`'s output: nextest discards a test binary's stderr when
+/// listing succeeds, so a guard phrased against the outer command's output can
+/// never fail and reports success forever.
+#[skuld::test(requires = [nextest_available, docker_available], labels = [DOCKER])]
+fn listing_does_not_warm_up_the_docker_fixture() {
+    let binary = test_binary_path("thaum::gauntlet");
+    let output = Command::new(&binary)
+        .arg("--list")
+        .current_dir(project_root())
+        .output()
+        .unwrap_or_else(|e| panic!("running {} --list: {e}", binary.display()));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stderr.contains("building Docker image"),
+        "`{} --list` warmed up the Docker fixture — enumerating tests must have no side effects \
+         (issue #20).\nstderr:\n{stderr}",
+        binary.display()
     );
 }

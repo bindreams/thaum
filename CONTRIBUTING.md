@@ -90,7 +90,8 @@ src/
     compound.rs        — compound command execution (if/while/for/case)
     pipeline.rs        — pipeline execution
     external.rs        — external process spawning
-    command_ex.rs      — cross-platform Command wrapper (FD mapping)
+    command_ex.rs      — cross-platform Command wrapper (FD mapping); performs no PATH search
+    command_lookup.rs  — command name → executable, using the shell's $PATH and cwd
     redirect.rs        — redirect resolution: opens files, builds ActiveRedirects, save/restore into IoContext
     subshell.rs        — subshell payload types (serialized state)
     numeric.rs         — shared shell-style numeric parsing (hex, octal, char)

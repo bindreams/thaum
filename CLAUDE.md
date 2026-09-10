@@ -128,6 +128,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `compound.rs` — compound command execution (if/while/for/case)
   - `pipeline.rs` — pipeline execution
   - `external.rs` + `command_ex.rs` — external process spawning; `terminal_inherit` enables direct terminal inheritance for interactive programs
+  - `command_lookup.rs` — resolves a command name against the shell's `$PATH` and cwd. Callers resolve before building a `CommandEx`; the spawn layer searches no `PATH` on either platform. An empty `PATH` entry means the cwd, so an absent or empty `PATH` searches the cwd and nothing else — no host environment, no `confstr` default.
   - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`
   - `subshell.rs` — subshell payload types
   - `numeric.rs` — shared shell-style numeric parsing

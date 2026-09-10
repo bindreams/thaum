@@ -165,6 +165,22 @@ impl Executor {
             .map(|(k, v)| (k.into(), v.into()))
             .collect();
 
+        match self.lookup_command(cmd_name, &cmd.env) {
+            Ok(path) => cmd.path = path.into_os_string(),
+            // bash words a missing `exec` target as "exec: NAME: not found",
+            // but reports an unusable one exactly as ordinary lookup does.
+            Err(crate::exec::command_lookup::LookupError::NotFound) => {
+                if let Some(stderr) = io.fd_mut(2) {
+                    let _ = writeln!(stderr, "exec: {cmd_name}: not found");
+                }
+                return Err(ExecError::ExitRequested(127));
+            }
+            Err(e) => {
+                let status = crate::exec::command_lookup::report(&e, cmd_name, io);
+                return Err(ExecError::ExitRequested(status));
+            }
+        }
+
         // Build FD table: IoContext fds 3+ first, per-command redirects override.
         for (&fd, file) in io.fds() {
             if fd >= 3 {
@@ -213,19 +229,6 @@ impl Executor {
 
         #[cfg(not(unix))]
         {
-            // Resolve command via PATH + PATHEXT on Windows (CreateProcessW
-            // does not search PATH when lpApplicationName is non-NULL).
-            #[cfg(windows)]
-            if !cmd_name.contains('/') && !cmd_name.contains('\\') {
-                let path_var = self.env.get_var("PATH").unwrap_or("");
-                let pathext = self.env.get_var("PATHEXT");
-                if let Some(resolved) =
-                    crate::exec::command_ex::resolve_windows::resolve_command(cmd_name.as_ref(), path_var, pathext)
-                {
-                    cmd.path = resolved.into_os_string();
-                }
-            }
-
             match cmd.spawn() {
                 Ok(mut child) => {
                     let code = child.wait().map_err(ExecError::Io)?;

@@ -381,6 +381,8 @@ mod expansion;
 mod external;
 #[path = "exec/interactive.rs"]
 mod interactive;
+#[path = "exec/path_lookup.rs"]
+mod path_lookup;
 #[path = "exec/printf.rs"]
 mod printf;
 #[path = "exec/variables.rs"]

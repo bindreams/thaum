@@ -175,6 +175,14 @@ fn spawn_pipeline_stage(
                 child_cmd.env.insert(assignment.name.clone().into(), value.into());
             }
 
+            match executor.lookup_command(cmd_name, &child_cmd.env) {
+                Ok(path) => child_cmd.path = path.into_os_string(),
+                Err(e) => {
+                    let status = crate::exec::command_lookup::report(&e, cmd_name, io);
+                    return Ok(Some(ChildEx::completed(status, std::collections::HashMap::new())));
+                }
+            }
+
             for (&fd, file) in io.fds() {
                 if fd >= 3 {
                     child_cmd
@@ -219,7 +227,7 @@ fn spawn_pipeline_stage(
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
                     if let Some(stderr) = io.fd_mut(2) {
-                        let _ = writeln!(stderr, "{cmd_name}: permission denied");
+                        let _ = writeln!(stderr, "{cmd_name}: Permission denied");
                     }
                     Ok(Some(ChildEx::completed(126, std::collections::HashMap::new())))
                 }

@@ -71,6 +71,11 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
 
     let mut pipes: HashMap<i32, File> = HashMap::new();
     let mut handle_table: HashMap<i32, (HANDLE, u8)> = HashMap::new();
+    // Standard descriptors the script closed. Absence from `handle_table` is
+    // not enough for 0-2: the STARTUPINFOW block below fills any missing one
+    // from the parent's `GetStdHandle`, which would hand the child the *host's*
+    // console or pipe — the very escape the close exists to prevent.
+    let mut closed_std: std::collections::HashSet<i32> = std::collections::HashSet::new();
 
     // Process the fd table: create pipes and collect handles.
     for (&fd_num, fd_spec) in &cmd.fds {
@@ -97,10 +102,15 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
                 make_inheritable(handle)?;
                 handle_table.insert(fd_num, (handle, FOPEN));
             }
-            // Absent from `handle_table` is exactly "closed": fds 3+ reach the
-            // child only through `build_lpreserved2`, and a number with no
-            // entry gets a zero flags byte, which the CRT reads as not open.
-            Fd::Close => {}
+            // For fds 3+, absence from `handle_table` is exactly "closed":
+            // they reach the child only through `build_lpreserved2`, and a
+            // number with no entry gets a zero flags byte, which the CRT reads
+            // as not open. Descriptors 0-2 are different — see `closed_std`.
+            Fd::Close => {
+                if fd_num <= 2 {
+                    closed_std.insert(fd_num);
+                }
+            }
             Fd::Pty => unreachable!("Pty fds are handled by spawn_with_conpty"),
         }
     }
@@ -113,22 +123,30 @@ pub(super) fn spawn_impl(mut cmd: CommandEx) -> io::Result<ChildEx> {
     // in the table, fall back to the parent's current std handles via
     // GetStdHandle (not INVALID_HANDLE_VALUE, which would leave the child
     // with a broken handle).
-    if handle_table.contains_key(&0) || handle_table.contains_key(&1) || handle_table.contains_key(&2) {
+    if handle_table.contains_key(&0)
+        || handle_table.contains_key(&1)
+        || handle_table.contains_key(&2)
+        || !closed_std.is_empty()
+    {
         use windows::Win32::System::Console::{GetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE};
 
+        // A closed standard descriptor gets INVALID_HANDLE_VALUE: the child has
+        // no handle there, which is what `1>&-` asks for. Anything still
+        // unspecified falls back to the parent's, as before.
+        let std_handle = |fd: i32, id| {
+            if closed_std.contains(&fd) {
+                return INVALID_HANDLE_VALUE;
+            }
+            handle_table
+                .get(&fd)
+                .map(|h| h.0)
+                .unwrap_or_else(|| unsafe { GetStdHandle(id) }.unwrap_or(INVALID_HANDLE_VALUE))
+        };
+
         si.dwFlags |= STARTF_USESTDHANDLES;
-        si.hStdInput = handle_table
-            .get(&0)
-            .map(|h| h.0)
-            .unwrap_or_else(|| unsafe { GetStdHandle(STD_INPUT_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
-        si.hStdOutput = handle_table
-            .get(&1)
-            .map(|h| h.0)
-            .unwrap_or_else(|| unsafe { GetStdHandle(STD_OUTPUT_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
-        si.hStdError = handle_table
-            .get(&2)
-            .map(|h| h.0)
-            .unwrap_or_else(|| unsafe { GetStdHandle(STD_ERROR_HANDLE) }.unwrap_or(INVALID_HANDLE_VALUE));
+        si.hStdInput = std_handle(0, STD_INPUT_HANDLE);
+        si.hStdOutput = std_handle(1, STD_OUTPUT_HANDLE);
+        si.hStdError = std_handle(2, STD_ERROR_HANDLE);
     }
 
     // Build lpReserved2 for FDs 3+ (CRT fd table).

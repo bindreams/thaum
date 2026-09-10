@@ -297,9 +297,13 @@ impl Executor {
         };
 
         let mut cmd = CommandEx::new(vec![exe.into(), "exec-ast".into()]);
-        cmd.fds.insert(0, Fd::InputPipe); // parent writes JSON payload
-        cmd.fds.insert(1, Fd::Pipe); // parent reads stdout
-        cmd.fds.insert(2, Fd::Pipe); // parent reads stderr
+        // Reserved, not merely inserted: these carry the AST payload and the
+        // child's captured output. A script's `exec 0<&-` must not be able to
+        // take the transport away — that made every subshell fail with
+        // "invalid JSON payload" while pointing the user at their data.
+        cmd.reserve(0, Fd::InputPipe); // parent writes JSON payload
+        cmd.reserve(1, Fd::Pipe); // parent reads stdout
+        cmd.reserve(2, Fd::Pipe); // parent reads stderr
         cmd.cwd = Some(self.env.cwd().to_path_buf());
         // Inherit the full process environment so the child has system vars.
         cmd.env = std::env::vars_os().collect();
@@ -314,8 +318,8 @@ impl Executor {
         // Closed descriptors are closed in the subshell process too, so its own
         // `dup_process_fd` fallback fails naturally and nothing needs to travel
         // in the payload.
-        for &fd in io.closed_fds().iter().filter(|&&fd| command_ex::close_in_child(fd)) {
-            cmd.fds.insert(fd, Fd::Close);
+        for &fd in io.closed_fds() {
+            cmd.close_fd_in_child(fd);
         }
 
         let mut child = cmd.spawn().map_err(ExecError::Io)?;
@@ -637,7 +641,7 @@ impl Executor {
                             .into_iter()
                             .map(|(k, v): (String, String)| (std::ffi::OsString::from(k), std::ffi::OsString::from(v)))
                             .collect();
-                        child_cmd.fds.insert(1, command_ex::Fd::Pipe);
+                        child_cmd.reserve(1, command_ex::Fd::Pipe);
                         // Command substitution is a fifth spawn site and needs
                         // the same descriptor state as the others: the shell's
                         // fds 3+, and a real close for anything the script
@@ -652,8 +656,8 @@ impl Executor {
                                     .insert(fd, command_ex::Fd::File(file.try_clone().map_err(ExecError::Io)?));
                             }
                         }
-                        for &fd in io.closed_fds().iter().filter(|&&fd| command_ex::close_in_child(fd)) {
-                            child_cmd.fds.entry(fd).or_insert(command_ex::Fd::Close);
+                        for &fd in io.closed_fds() {
+                            child_cmd.close_fd_in_child(fd);
                         }
 
                         match child_cmd.spawn() {

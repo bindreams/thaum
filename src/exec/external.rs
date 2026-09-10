@@ -12,7 +12,7 @@
 use std::io::Write;
 
 use crate::exec::child_io;
-use crate::exec::command_ex::{close_in_child, CommandEx, Fd};
+use crate::exec::command_ex::{CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::redirect::ActiveRedirects;
@@ -66,8 +66,8 @@ impl Executor {
         // Leaving them out of the table is not enough: posix_spawn inherits
         // every fd it is not told about, so the child would get whatever the
         // *host* process has at that number.
-        for &fd in io.closed_fds().iter().filter(|&&fd| close_in_child(fd)) {
-            child_cmd.fds.insert(fd, Fd::Close);
+        for &fd in io.closed_fds() {
+            child_cmd.close_fd_in_child(fd);
         }
 
         // Per-command redirects override persistent ones: FDs 0-2 from
@@ -97,8 +97,8 @@ impl Executor {
         // the persistent set so a per-command reopen can override it.
         // Standard descriptors are included: `cmd 1>&-` must leave the child
         // without a stdout rather than with a pipe to the host's (issue #41).
-        for &fd in active.closed_fds.iter().filter(|&&fd| close_in_child(fd)) {
-            child_cmd.fds.insert(fd, Fd::Close);
+        for &fd in &active.closed_fds {
+            child_cmd.close_fd_in_child(fd);
         }
 
         // Set up stdout/stderr for the child. For unredirected fds:

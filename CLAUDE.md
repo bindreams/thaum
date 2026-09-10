@@ -151,7 +151,10 @@ held. The distinction matters because thaum is embeddable:
   the same; a child writing to an inherited descriptor is not a bug.
 - **Closed** — the script closed it. It is not resolvable by a later `>&N`, and every child fd
   table gets an `Fd::Close` entry for it. Without that entry `posix_spawn` inherits the number and
-  the child reaches whatever the *host* had there.
+  the child reaches whatever the *host* had there. There are **five** spawn sites: `external.rs`,
+  `pipeline.rs`, the subshell in `exec.rs`, `builtin_exec`, and `execute_command_substitution` —
+  the last is easy to miss because it builds a `CommandEx` from scratch rather than from
+  `IoContext`.
 
 thaum never calls `close(2)` on the host's descriptor — it is not thaum's to close. Recording the
 close and refusing to hand the number out is observably identical for the script and leaves the
@@ -160,9 +163,23 @@ embedder intact.
 `Fd::Close` is implemented as `adddup2(/dev/null, fd)` followed by `addclose(fd)`. A bare
 `addclose` is not usable: if the number is not open, the child's `close(2)` fails and `posix_spawn`
 reports EBADF for the entire spawn (macOS). The dup2 makes the number open unconditionally, with no
-check-then-act against the process-global fd table. On Windows no action is needed — fds 3+ reach
-the child only through `build_lpreserved2`, where an absent entry already reads as closed.
+check-then-act against the process-global fd table.
 
-Closed descriptors 0-2 keep a `/dev/null` substitution for the shell's *own* writes, so those
-succeed where bash reports EBADF (issue #41 — fixing it needs an error path through every
-`io.fd_mut(n)` site). The child half is not deferred: `cmd 1>&-` leaves the child with no stdout.
+**Parent-side source descriptors are relocated above every target before any file action is
+added** (`relocate_above`, `F_DUPFD_CLOEXEC`). The child's actions dup2 *from* parent-side numbers
+and close *at* numbers in `cmd.fds`; if those sets overlap, an action destroys another's input and
+the spawn fails with EBADF. `cmd.fds` is a `HashMap`, so which entries collide depends on iteration
+order *and* on the host's fd table — the failure is nondeterministic and moves with the embedder.
+Actions are then emitted in a fixed order: every dup2, then every close.
+
+On Windows, fds 3+ reach the child only through `build_lpreserved2`, where an absent entry already
+reads as closed. Descriptors 0-2 need an explicit `INVALID_HANDLE_VALUE`, because the
+`STARTF_USESTDHANDLES` block otherwise fills any missing one from the parent's `GetStdHandle`.
+
+Closed descriptors 0-2 keep a `/dev/null` substitution for the shell's *own* reads and writes, so
+those succeed where bash reports EBADF (issue #41 — fixing it needs an error path through every
+`io.fd_mut(n)` site). The closed marker is still recorded for them, so the child half is not
+deferred: `cmd 1>&-` leaves the child with no stdout and `exec 0<&-` leaves it with no stdin.
+
+`exec` makes its redirections permanent only when it succeeds. A rejected option drops them, as
+bash does — `exec -q 3>q` creates `q` but leaves fd 3 closed.

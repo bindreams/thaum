@@ -82,6 +82,10 @@ harness = false
 name = "infra"
 harness = false
 
+[[test]]
+name = "harness"
+harness = false
+
 [[bench]]
 name = "bench"
 harness = false

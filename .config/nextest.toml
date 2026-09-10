@@ -2,7 +2,17 @@
 slow-timeout = { period = "30s", terminate-after = 2 }
 
 # Docker image builds can take minutes on first run (cached afterwards).
-# Gauntlet exec tests also trigger Docker builds via the gauntlet_sandbox fixture.
+# Gauntlet exec tests trigger a build via the gauntlet_sandbox fixture. Four of
+# the six tests in the infra binary build an image directly; the other two are
+# callgrind benchmarks that build nothing. The override is whole-binary because
+# nextest applies timeouts per binary far more legibly than per test name, and
+# because names are not a reliable proxy: the four image-building tests are named
+# "gauntlet", not "docker".
+# Note that the longer timeout does not currently make these tests pass: the
+# infra tests each build an image in their own process, so they contend for
+# one daemon and the per-test timeout is applied to queued work. They are
+# excluded from every CI job for that reason and so run nowhere — see #37,
+# which proposes serialising them with a nextest test group.
 [[profile.default.overrides]]
-filter = "test(~docker) | binary_id(~gauntlet)"
+filter = "binary_id(~gauntlet) | binary_id(~infra) | binary_id(~harness)"
 slow-timeout = { period = "120s", terminate-after = 2 }

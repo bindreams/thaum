@@ -436,16 +436,26 @@ fn main() {
     let no_sandbox = std::env::var("THAUM_GAUNTLET_NO_SANDBOX").is_ok_and(|v| v == "1");
     NO_SANDBOX.store(no_sandbox, std::sync::atomic::Ordering::Relaxed);
 
-    // Check if gauntlet execution is available. For Docker mode, this only runs
-    // `docker info` (fast, idempotent).
+    // Enumerating tests must have no side effects, so nothing below this point
+    // may touch the Docker daemon while listing. Parse with libtest-mimic rather
+    // than scanning argv, which also covers `--help`: `from_args` prints help
+    // and exits before returning.
+    let listing = libtest_mimic::Arguments::from_args().list;
+
+    // Whether exec tests can run. The probe shells out to `docker info`, which
+    // has no timeout and blocks indefinitely against an unresponsive DOCKER_HOST
+    // — so it is skipped while listing, and every test is listed instead. A test
+    // listed here but unavailable at run time is reported as such by skuld; a
+    // listing that hangs is not recoverable.
     let exec_available = no_sandbox
+        || listing
         || skuld::collect_fixture_requires(&["gauntlet_sandbox"])
             .iter()
             .all(|req| req.eval().is_ok());
 
     // Eagerly build the Docker image and start the container before tests run.
     // This avoids per-test timeout issues (Docker build can take minutes).
-    if exec_available && !no_sandbox {
+    if exec_available && !no_sandbox && !listing {
         skuld::warm_up("gauntlet_sandbox");
     }
 

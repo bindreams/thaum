@@ -4,8 +4,10 @@
 
 ```sh
 pip install pre-commit && pre-commit install   # one-time setup (installs pre-commit + commit-msg hooks)
-cargo nextest run --features cli               # all tests (excludes conformance)
-cargo nextest run -P conformance --features cli # conformance tests (requires Docker image)
+cargo nextest run --features cli               # everything, including Docker image builds
+cargo nextest run --features cli -E 'not (binary(gauntlet) | binary(infra))'  # skip Docker work
+THAUM_GAUNTLET_NO_SANDBOX=1 \
+  cargo nextest run --features cli -E 'binary(gauntlet)'                      # gauntlet on the host
 cargo test --features cli                      # also works (same harness)
 pre-commit run --all-files                     # lint + format + #[test] guard
 ```

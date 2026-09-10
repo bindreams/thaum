@@ -333,7 +333,8 @@ fn close_read_fd(active: &mut ActiveRedirects, fd: i32) {
 /// assigned, so `exec 0<src 0>&-; read x` still read the file (bash: EBADF).
 ///
 /// For FDs 0-2 the slot is only cleared here; `apply()` and `adopt_redirects`
-/// substitute /dev/null so downstream code always finds a valid handle.
+/// substitute /dev/null so downstream code always finds a valid handle, and
+/// record the closed marker separately so children are still denied the number.
 fn clear_fd_slot(active: &mut ActiveRedirects, fd: i32) {
     active.closed_fds.insert(fd);
     match fd {

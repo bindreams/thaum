@@ -224,7 +224,10 @@ impl Executor {
 
     /// Adopt redirects from `exec` redirect-only mode into persistent IoContext state.
     ///
-    /// All fds (0-2 and 3+) go into `io`. Explicitly closed fds are removed.
+    /// Opened fds (0-2 and 3+) go into `io`. Closed fds are *marked* closed, not
+    /// removed: 3+ lose their handle, while 0-2 keep a `/dev/null` handle so the
+    /// shell's own writers still find one. Either way the marker is what stops a
+    /// later `>&N` resolving the number and what denies it to children.
     fn adopt_redirects(&mut self, active: redirect::ActiveRedirects, io: &mut IoContext) {
         for fd in &active.closed_fds {
             if *fd <= 2 {

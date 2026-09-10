@@ -151,9 +151,10 @@ held. The distinction matters because thaum is embeddable:
   the same; a child writing to an inherited descriptor is not a bug.
 - **Closed** — the script closed it. It is not resolvable by a later `>&N`, and every child fd
   table gets an `Fd::Close` entry for it. Without that entry `posix_spawn` inherits the number and
-  the child reaches whatever the *host* had there. There are **five** spawn sites: `external.rs`,
-  `pipeline.rs`, the subshell in `exec.rs`, `builtin_exec`, and `execute_command_substitution` —
-  the last is easy to miss because it builds a `CommandEx` from scratch rather than from
+  the child reaches whatever the *host* had there. Rather than count the spawn sites here — a
+  number that has already gone stale once — the rule is that **every site building a child fd table
+  calls `CommandEx::close_fd_in_child`**; `grep` for it to find them. The one that is easy to miss
+  is `execute_command_substitution`, which builds its `CommandEx` from scratch rather than from
   `IoContext`.
 
 thaum never calls `close(2)` on the host's descriptor — it is not thaum's to close. Recording the

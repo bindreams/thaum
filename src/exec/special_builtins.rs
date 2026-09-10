@@ -6,7 +6,7 @@
 
 use std::io::Write;
 
-use crate::exec::command_ex::{CommandEx, Fd};
+use crate::exec::command_ex::{close_in_child, CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::redirect::ActiveRedirects;
@@ -190,10 +190,10 @@ impl Executor {
         for (&fd, file) in &active.extra_fds {
             cmd.fds.insert(fd, Fd::File(file.try_clone().map_err(ExecError::Io)?));
         }
-        for &fd in io.closed_fds() {
+        for &fd in io.closed_fds().iter().filter(|&&fd| close_in_child(fd)) {
             cmd.fds.entry(fd).or_insert(Fd::Close);
         }
-        for &fd in &active.closed_fds {
+        for &fd in active.closed_fds.iter().filter(|&&fd| close_in_child(fd)) {
             cmd.fds.insert(fd, Fd::Close);
         }
 

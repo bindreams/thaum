@@ -314,7 +314,7 @@ impl Executor {
         // Closed descriptors are closed in the subshell process too, so its own
         // `dup_process_fd` fallback fails naturally and nothing needs to travel
         // in the payload.
-        for &fd in io.closed_fds() {
+        for &fd in io.closed_fds().iter().filter(|&&fd| command_ex::close_in_child(fd)) {
             cmd.fds.insert(fd, Fd::Close);
         }
 
@@ -652,7 +652,7 @@ impl Executor {
                                     .insert(fd, command_ex::Fd::File(file.try_clone().map_err(ExecError::Io)?));
                             }
                         }
-                        for &fd in io.closed_fds() {
+                        for &fd in io.closed_fds().iter().filter(|&&fd| command_ex::close_in_child(fd)) {
                             child_cmd.fds.entry(fd).or_insert(command_ex::Fd::Close);
                         }
 

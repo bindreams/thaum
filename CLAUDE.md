@@ -173,8 +173,10 @@ order *and* on the host's fd table — the failure is nondeterministic and moves
 Actions are then emitted in a fixed order: every dup2, then every close.
 
 On Windows, fds 3+ reach the child only through `build_lpreserved2`, where an absent entry already
-reads as closed. Descriptors 0-2 need an explicit `INVALID_HANDLE_VALUE`, because the
-`STARTF_USESTDHANDLES` block otherwise fills any missing one from the parent's `GetStdHandle`.
+reads as closed. Descriptors 0-2 are **not** closed in the child on Windows: `close_in_child` gates
+them off, so that platform keeps its previous behaviour rather than gaining a change nobody can
+exercise (issue #46). The consequence is a platform divergence, not a new hole — `cmd 1>&-` already
+relayed the child's output to the host's stdout there, and still does.
 
 Closed descriptors 0-2 keep a `/dev/null` substitution for the shell's *own* reads and writes, so
 those succeed where bash reports EBADF (issue #41 — fixing it needs an error path through every

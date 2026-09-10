@@ -4,7 +4,7 @@
 use std::io::Write;
 
 use crate::ast::Expression;
-use crate::exec::command_ex::{ChildEx, CommandEx, Fd};
+use crate::exec::command_ex::{close_in_child, ChildEx, CommandEx, Fd};
 use crate::exec::error::ExecError;
 use crate::exec::io_context::IoContext;
 use crate::exec::Executor;
@@ -185,7 +185,7 @@ fn spawn_pipeline_stage(
 
             // Descriptors the script closed must not reach a pipeline stage
             // either — posix_spawn would otherwise inherit the host's.
-            for &fd in io.closed_fds() {
+            for &fd in io.closed_fds().iter().filter(|&&fd| close_in_child(fd)) {
                 child_cmd.fds.insert(fd, Fd::Close);
             }
 

@@ -514,6 +514,10 @@ fn closed_stdout_not_inherited_by_child(#[fixture(test_tools)] tools: &Path) {
     // gone. thaum handed the child a pipe wired to the host's stdout instead,
     // so "LEAKED" came out — a write escape on descriptor 1.
     //
+    // Unix only: `close_in_child` gates standard descriptors off on Windows,
+    // which keeps `main`'s behaviour there (issue #46). This whole module is
+    // `#![cfg(unix)]`, so the gate is invisible here.
+    //
     // Only the absence of the leak is asserted, not the child's exit status.
     // The Rust runtime reopens /dev/null over any of fds 0-2 it finds closed at
     // startup, so a Rust observer cannot report EBADF on descriptor 1 and would

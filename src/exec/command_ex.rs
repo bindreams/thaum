@@ -33,6 +33,18 @@ pub(crate) enum Fd {
     Close,
 }
 
+/// Whether a descriptor the script closed should also be closed in the child.
+///
+/// Descriptors 3+ on every platform. Standard descriptors only on Unix: routing
+/// 0-2 to [`Fd::Close`] on Windows would take an untested path through
+/// `STARTF_USESTDHANDLES`, and nobody working on this can run Windows. Gating
+/// leaves that platform behaving exactly as it did before — see issue #46,
+/// which also records that Windows therefore keeps the pre-existing
+/// `cmd 1>&-` divergence rather than gaining a new one.
+pub(crate) fn close_in_child(fd: i32) -> bool {
+    fd > 2 || cfg!(unix)
+}
+
 // CommandEx ===========================================================================================================
 
 /// Description of a child process to spawn. All fields are public; callers

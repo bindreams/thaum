@@ -448,38 +448,60 @@ fn close_of_unopened_fd_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[
     // It must not break the *spawn* that follows, so the command has to be an
     // external one.
     //
-    // Swept rather than pinned to one number. The first version of this test
-    // hardcoded 21 and passed while fd 12 failed: which numbers collide depends
-    // on where /dev/null and the capture pipes happen to land, so a single
-    // number tests almost nothing.
+    // Two properties this test learned the hard way:
+    //
+    // * Swept, not pinned. The first version hardcoded fd 21 and passed while
+    //   fd 12 failed — which numbers collide depends on where /dev/null and the
+    //   capture pipes land.
+    // * Run as a *subprocess*. In-process it cannot fail: the test binary holds
+    //   ~10 descriptors open, so the internal /dev/null lands clear of every
+    //   number under test and the collision never happens. A real `thaum`
+    //   process starts with a near-empty fd table, which is the shape that
+    //   breaks.
+    //
+    // This is a breadth check and it is *probabilistic*: with the fix reverted
+    // it fails about one run in three. The reliable guard for the file-action
+    // collision is `closing_several_fds_does_not_break_spawn`, which fails
+    // every time. Do not treat this one as the regression test for it.
     let marker = dir.join("spawn-marker.txt");
     std::fs::write(&marker, "ok\n").unwrap();
     let cat = tool(tools, "cat");
 
-    for fd in 3..=24 {
+    // Repeated per number: the collision depends on HashMap iteration order, so
+    // one attempt per fd caught it only about a third of the time.
+    for fd in 3..=20 {
         let script = format!("exec {fd}>&-; {cat} {t}", t = shell_path(&marker));
-        let r = exec!(&script);
-        assert_eq!(r.stdout(), "ok\n", "closing fd {fd} broke the following spawn");
+        for attempt in 0..3 {
+            let r = exec!(&script, mode = ExecMode::Subprocess);
+            assert_eq!(
+                r.stdout(),
+                "ok\n",
+                "closing fd {fd} broke the following spawn (attempt {attempt})"
+            );
+        }
     }
 }
 
 #[skuld::test]
 fn closing_several_fds_does_not_break_spawn(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
-    // Two or more closes in one command is the shape that exposed the
-    // file-action collision: the shared /dev/null source could itself sit on a
-    // number that another entry closed, and `posix_spawn` then failed the whole
-    // spawn with EBADF. `bash -c 'exec 6>&- 7>&-; echo ok'` prints "ok".
+    // Several closes in one command is the shape that exposed the file-action
+    // collision: the shared /dev/null source could itself sit on a number
+    // another entry closed, and `posix_spawn` then failed the whole spawn with
+    // EBADF. `bash -c 'exec 6>&- 7>&-; echo ok'` prints "ok".
     //
-    // Repeated because the failure was nondeterministic — `cmd.fds` is a
-    // HashMap and its iteration order varies per process, so a single
-    // invocation missed it most of the time.
+    // Subprocess mode and repeated, because the failure is nondeterministic —
+    // `cmd.fds` is a HashMap and its iteration order varies per process.
+    //
+    // This is the primary guard for the collision: with `relocate_clear_of`
+    // reverted it fails on every run (verified 3/3), where the single-close
+    // sweep above catches it only about a third of the time.
     let marker = dir.join("multi-marker.txt");
     std::fs::write(&marker, "ok\n").unwrap();
     let cat = tool(tools, "cat");
     let script = format!("exec 5>&- 6>&- 7>&- 8>&-; {cat} {t}", t = shell_path(&marker));
 
-    for attempt in 0..25 {
-        let r = exec!(&script);
+    for attempt in 0..20 {
+        let r = exec!(&script, mode = ExecMode::Subprocess);
         assert_eq!(r.stdout(), "ok\n", "multi-close broke the spawn on attempt {attempt}");
     }
 }
@@ -493,17 +515,78 @@ fn closing_several_fds_does_not_break_pipeline_or_subshell(
     let marker = dir.join("multi-ps-marker.txt");
     std::fs::write(&marker, "ok\n").unwrap();
     let cat = tool(tools, "cat");
+    let t = shell_path(&marker);
 
-    for attempt in 0..15 {
-        let r = exec!(&format!(
-            "exec 5>&- 6>&- 7>&-; {cat} {t} | {cat}",
-            t = shell_path(&marker)
-        ));
+    for attempt in 0..10 {
+        let r = exec!(
+            &format!("exec 5>&- 6>&- 7>&-; {cat} {t} | {cat}"),
+            mode = ExecMode::Subprocess
+        );
         assert_eq!(r.stdout(), "ok\n", "pipeline broke on attempt {attempt}");
 
-        let r = exec!(&format!("exec 5>&- 6>&- 7>&-; ({cat} {t})", t = shell_path(&marker)));
+        let r = exec!(
+            &format!("exec 5>&- 6>&- 7>&-; ({cat} {t})"),
+            mode = ExecMode::Subprocess
+        );
         assert_eq!(r.stdout(), "ok\n", "subshell broke on attempt {attempt}");
     }
+}
+
+#[skuld::test]
+fn close_of_absurd_fd_number_is_a_noop(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
+    // A descriptor number above RLIMIT_NOFILE cannot be open, so closing it is
+    // a no-op — `bash -c 'exec 2000000>&-; echo ok'` prints "ok". Relocating a
+    // spawn source above such a number instead pushed past the limit and
+    // `posix_spawn` rejected it with EINVAL, losing the command entirely.
+    // Swept across the boundary. macOS rejects fds from 10240 upward from
+    // `posix_spawn_file_actions_adddup2`, and that bound is not reachable via
+    // `sysconf(_SC_OPEN_MAX)` or `getdtablesize()` — so this pins the behaviour
+    // either side of it rather than the constant. bash prints "ok" for all.
+    let marker = dir.join("absurd-marker.txt");
+    std::fs::write(&marker, "ok\n").unwrap();
+    let cat = tool(tools, "cat");
+
+    for fd in [10239, 10240, 10241, 100_000, 1_048_575, 2_000_000] {
+        let script = format!("exec {fd}>&-; {cat} {t}", t = shell_path(&marker));
+        let r = exec!(&script, mode = ExecMode::Subprocess);
+        assert_eq!(
+            r.stdout(),
+            "ok\n",
+            "closing fd {fd} must be a no-op, not a spawn failure"
+        );
+    }
+}
+
+// A close must not displace the runtime's own plumbing ================================================================
+
+#[skuld::test]
+fn closed_stdin_does_not_break_subshells() {
+    // `exec 0<&-` is the standard way to harden a script against stdin, and in
+    // bash the subshells that follow still run:
+    //   bash -c 'exec 0<&-; (echo hi); echo rc=$?'  ->  "hi", "rc=0"
+    // thaum ships the subshell's AST to a `thaum exec-ast` child over fd 0, so
+    // closing descriptor 0 in the child destroyed the transport and every
+    // subshell silently failed with "invalid JSON payload".
+    let r = exec!("exec 0<&-; (echo hi); echo rc=$?");
+    assert_eq!(r.stdout(), "hi\nrc=0\n", "a closed stdin must not disable subshells");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdin_does_not_break_subshells_bare_form() {
+    // `exec <&-` is the same operation spelled without the number.
+    let r = exec!("exec <&-; (echo hi); echo rc=$?");
+    assert_eq!(r.stdout(), "hi\nrc=0\n");
+    r.stderr();
+}
+
+#[skuld::test]
+fn closed_stdout_does_not_break_subshell_capture() {
+    // Closing stdout must not cost the subshell its capture pipe either: bash
+    // runs the subshell and discards its output, rather than losing the child.
+    let r = exec!("exec 1>&-; (echo hi); echo done >&2");
+    assert_eq!(r.stdout(), "", "a closed stdout discards output");
+    assert_eq!(r.stderr(), "done\n", "the subshell must still run");
 }
 
 // Closed standard descriptors are closed in the child too (#41's child half) ==========================================

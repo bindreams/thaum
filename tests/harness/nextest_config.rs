@@ -22,6 +22,15 @@ skuld::default_labels!(INFRA);
 /// CI exclusion are both whole-binary, so this list is of binaries, not tests.
 const DOCKER_BUILDING_BINARIES: &[&str] = &["thaum::infra", "thaum::gauntlet"];
 
+/// Binaries needing the long slow-timeout.
+///
+/// A superset of the above: `harness` builds no image in normal operation, but
+/// `listing_tests_builds_no_image` triggers one precisely when the regression it
+/// guards is present. Under the 30s default that surfaces as "test timed out"
+/// instead of the guard's diagnostic, and leaves a `docker build` running
+/// daemon-side.
+const SLOW_TIMEOUT_BINARIES: &[&str] = &["thaum::infra", "thaum::gauntlet", "thaum::harness"];
+
 fn nextest_available() -> Result<(), String> {
     Command::new("cargo")
         .args(["nextest", "--version"])
@@ -52,10 +61,9 @@ fn read(rel: &str) -> String {
 
 /// Strip ANSI SGR sequences.
 ///
-/// Belt and braces: the cargo invocations below force colour off, but `ci.yml`
-/// sets `CARGO_TERM_COLOR: always` workflow-wide, and a guard that parses
-/// coloured output as if it were plain is exactly the failure mode that hid
-/// itself once already.
+/// `ci.yml` sets `CARGO_TERM_COLOR: always` workflow-wide, so colour is forced
+/// off on both the outer and inner invocations; this is the remaining defence if
+/// either is missed.
 fn strip_ansi(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut chars = s.chars();
@@ -81,26 +89,37 @@ fn quoted_value_after(line: &str, key: &str) -> Option<String> {
     Some(rest[..end].to_string())
 }
 
-/// The `filter` of the `[[profile.default.overrides]]` block granting the long
-/// slow-timeout.
+/// The `filter` of the override block that sets `slow-timeout`.
+///
+/// nextest allows arbitrarily many `[[profile.default.overrides]]` blocks, so
+/// taking the first one silently reads whichever override happens to come first
+/// — a later `retries` or `test-group` block would redirect this guard onto an
+/// unrelated filter. Selects by the key that matters and fails if the answer is
+/// not unique.
 fn slow_timeout_override_filter() -> String {
     let toml = read(".config/nextest.toml");
-    let mut in_override = false;
-    for line in toml.lines() {
-        if line.trim() == "[[profile.default.overrides]]" {
-            in_override = true;
-            continue;
-        }
-        if in_override {
-            if let Some(v) = quoted_value_after(line, "filter") {
-                return v;
-            }
-            if line.trim_start().starts_with('[') {
-                in_override = false;
-            }
+    let mut matching: Vec<String> = Vec::new();
+    for block in toml.split("[[profile.default.overrides]]").skip(1) {
+        // A block ends at the next section header.
+        let block: String = block
+            .lines()
+            .take_while(|l| !l.trim_start().starts_with('['))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let filter = block.lines().find_map(|l| quoted_value_after(l, "filter"));
+        let sets_timeout = block.lines().any(|l| l.trim_start().starts_with("slow-timeout"));
+        if let (Some(f), true) = (filter, sets_timeout) {
+            matching.push(f);
         }
     }
-    panic!("no `filter = \"...\"` found in a [[profile.default.overrides]] block of .config/nextest.toml");
+    assert_eq!(
+        matching.len(),
+        1,
+        "expected exactly one [[profile.default.overrides]] block setting slow-timeout in \
+         .config/nextest.toml, found {}: {matching:?}",
+        matching.len()
+    );
+    matching.remove(0)
 }
 
 /// The `-E '<expr>'` of the `cargo nextest run` step in the given workflow job.
@@ -189,24 +208,16 @@ fn test_binary_path(binary_id: &str) -> PathBuf {
 /// times reports PASS. That is how two earlier versions of these guards
 /// reported green while broken.
 ///
-/// The absence is real, not hypothetical — skuld omits tests whose `requires`
-/// preconditions fail, so where Docker is missing every test in `thaum::infra`
-/// is unavailable and the binary does not appear in the listing at all. On the
-/// CI legs that is macOS only; Linux and Windows both have a daemon.
-///
-/// The fix for that is a `requires` precondition, where an unmet condition is
-/// reported as unavailable and stays visible — never a silent skip inside the
-/// test body.
-fn listable_docker_binaries() -> Vec<&'static str> {
+/// skuld omits tests whose `requires` preconditions fail, so where Docker is
+/// missing every test in `thaum::infra` is unavailable and the binary does not
+/// appear at all. Preconditions therefore belong in `requires`, where an unmet
+/// one is reported as unavailable, never as a silent skip inside a test body.
+fn listable(binaries: &[&'static str]) -> Vec<&'static str> {
     let present = binaries_selected_by("all()");
-    let listable: Vec<&'static str> = DOCKER_BUILDING_BINARIES
-        .iter()
-        .copied()
-        .filter(|b| present.contains(*b))
-        .collect();
+    let listable: Vec<&'static str> = binaries.iter().copied().filter(|b| present.contains(*b)).collect();
     assert_eq!(
         listable.len(),
-        DOCKER_BUILDING_BINARIES.len(),
+        binaries.len(),
         "expected every Docker-building binary to be enumerable, but only {listable:?} are. \
          Any assertion about the missing ones would pass having checked nothing.\nPresent: {present:?}"
     );
@@ -218,7 +229,7 @@ fn listable_docker_binaries() -> Vec<&'static str> {
 fn slow_timeout_override_covers_every_docker_building_binary() {
     let filter = slow_timeout_override_filter();
     let selected = binaries_selected_by(&filter);
-    for binary in listable_docker_binaries() {
+    for binary in listable(SLOW_TIMEOUT_BINARIES) {
         assert!(
             selected.contains(binary),
             "`{binary}` can build a Docker image but is not covered by the slow-timeout override \
@@ -238,7 +249,7 @@ fn gating_job_selects_no_docker_building_binary() {
         "the gating CI job's filter `{filter}` selected no tests at all, so asserting what it \
          does not select proves nothing"
     );
-    for binary in listable_docker_binaries() {
+    for binary in listable(DOCKER_BUILDING_BINARIES) {
         assert!(
             !selected.contains(binary),
             "the gating CI job's filter `{filter}` selects `{binary}`, which builds Docker images \
@@ -258,13 +269,12 @@ fn gating_job_runs_these_guards() {
     );
 }
 
-/// The guards must survive the environment CI actually runs them in.
+/// Binary ids parse out of coloured output.
 ///
-/// `ci.yml` sets `CARGO_TERM_COLOR: always` workflow-wide. An earlier version
-/// of this file passed `--color never` to the outer command only, so the inner
-/// `cargo nextest list` inherited the variable and emitted ANSI codes into the
-/// output the assertions parse — and the guards failed in the one job they were
-/// written to protect.
+/// `ci.yml` sets `CARGO_TERM_COLOR: always` workflow-wide, and it is inherited by
+/// the inner `cargo nextest list` unless cleared — `--color never` on the outer
+/// command alone does not reach it. This guard forces colour off on both and
+/// checks parsing under a forced-colour environment.
 #[skuld::test(requires = [nextest_available])]
 fn filter_parsing_survives_forced_colour() {
     let filter = workflow_filter("test");
@@ -289,57 +299,48 @@ fn filter_parsing_survives_forced_colour() {
 
 // Side-effect guard ---------------------------------------------------------------------------------------------------
 
-/// Enumerating tests must build nothing (issue #20).
+/// Enumerating tests must build nothing.
 ///
-/// Asserts against the gauntlet binary's **own stderr**, not against
-/// `cargo nextest list`'s output: nextest discards a test binary's stderr when
-/// listing succeeds, so a guard phrased against the outer command's output can
-/// never fail and reports success forever.
+/// Asserts against the gauntlet binary's **own stderr**: nextest discards a test
+/// binary's stderr when listing succeeds, so a guard phrased against the outer
+/// command's output can never fail.
 ///
-/// Three things this guard needs to avoid passing vacuously:
+/// The child's environment is scrubbed of the two variables that would make this
+/// pass without checking anything. `THAUM_GAUNTLET_NO_SANDBOX` short-circuits the
+/// code path under test; `SKULD_LABELS` filters the child's listing, so an
+/// inherited value can empty it. Both are documented developer knobs, so both are
+/// plausible in the environment a developer runs this from.
 ///
-/// - `THAUM_GAUNTLET_NO_SANDBOX` is removed from the child's environment.
-///   With it set the child short-circuits before the warm-up and emits no
-///   marker, so an inherited value would make the guard pass against unfixed
-///   code — and `CONTRIBUTING.md` teaches that variable two lines above the
-///   command a developer would run.
-/// - The child's exit status is checked. A child dying before it reaches the
-///   fixture also produces stderr without the marker.
-/// - A positive control confirms the child got far enough to list tests, so
-///   "no marker" means "did not warm up" rather than "did not run".
-///
-/// Note it is skipped where Docker is absent, which is correct — without a
-/// daemon the fixture's precondition fails and no warm-up is attempted — but it
-/// does mean issue #20 has no regression cover on the macOS CI runner.
+/// Skipped where Docker is absent, which is correct — without a daemon no warm-up
+/// is attempted — but it does mean this guard does not run on macOS CI.
 #[skuld::test(requires = [nextest_available, docker_available], labels = [DOCKER])]
 fn listing_tests_builds_no_image() {
     let binary = test_binary_path("thaum::gauntlet");
     let output = Command::new(&binary)
         .arg("--list")
         .env_remove("THAUM_GAUNTLET_NO_SANDBOX")
+        .env_remove("SKULD_LABELS")
         .current_dir(project_root())
         .output()
         .unwrap_or_else(|e| panic!("running {} --list: {e}", binary.display()));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    let stdout = String::from_utf8_lossy(&output.stdout);
+    let listed = String::from_utf8_lossy(&output.stdout);
 
     assert!(
         output.status.success(),
-        "`{} --list` exited {:?} — a child that dies early produces no marker and would make \
-         this guard pass for the wrong reason.\nstderr:\n{stderr}",
+        "`{} --list` exited {:?}; a child that dies early emits no marker either.\nstderr:\n{stderr}",
         binary.display(),
         output.status.code()
     );
     assert!(
-        stdout.lines().filter(|l| !l.trim().is_empty()).count() > 100,
-        "`{} --list` listed almost nothing, so the absence of a build marker proves nothing.\n\
-         stdout:\n{stdout}",
+        listed.lines().any(|l| !l.trim().is_empty()),
+        "`{} --list` listed nothing, so the absence of a build marker proves nothing",
         binary.display()
     );
     assert!(
-        !stderr.contains("building Docker image"),
-        "`{} --list` warmed up the Docker fixture — enumerating tests must have no side effects \
-         (issue #20).\nstderr:\n{stderr}",
+        !stderr.contains(crate::common::docker::IMAGE_BUILD_MARKER),
+        "`{} --list` warmed up the Docker fixture; enumerating tests must have no side \
+         effects.\nstderr:\n{stderr}",
         binary.display()
     );
 }

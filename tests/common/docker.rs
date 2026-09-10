@@ -12,6 +12,12 @@
 use std::path::Path;
 use std::process::{Command, Stdio};
 
+/// Substring emitted when the gauntlet image is about to be built.
+///
+/// Shared so that a guard asserting a build did *not* happen cannot be silently
+/// defeated by rewording the message here.
+pub const IMAGE_BUILD_MARKER: &str = "building Docker image";
+
 // Precondition ========================================================================================================
 
 fn docker_available() -> Result<(), String> {
@@ -41,7 +47,7 @@ impl Drop for GauntletImage {
 fn gauntlet_image() -> Result<GauntletImage, String> {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let dockerfile = manifest_dir.join("tests/docker/Dockerfile");
-    eprintln!("gauntlet: building Docker image...");
+    eprintln!("gauntlet: {IMAGE_BUILD_MARKER}...");
     let id = thaum_testkit::docker::build_image(&dockerfile, manifest_dir, None)?;
     eprintln!("gauntlet: built Docker image {}", &id[..12.min(id.len())]);
     Ok(GauntletImage { id })

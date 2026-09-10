@@ -28,10 +28,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      # --no-fail-fast is required by the interim merge rule while main is red
-      # (#22): that rule compares complete failing sets against the merge base,
-      # and fail-fast truncates them at an arbitrary point. Reconsider once #22
-      # makes main green.
+      # Required while main is red (#22): the interim merge rule compares complete
+      # failing sets against the merge base, and fail-fast truncates them. #22
+      # closing is the condition for dropping this.
       - run: cargo nextest run --features cli --no-fail-fast -E 'not (binary(gauntlet) | binary(infra))'
 
   test-gauntlet:

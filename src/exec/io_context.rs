@@ -21,6 +21,18 @@ use crate::exec::platform::is_file_terminal;
 /// not a type-level constraint. TTY-ness is queried on-demand.
 pub struct IoContext {
     fds: HashMap<i32, File>,
+    /// Fds the script explicitly closed with `N>&-` / `N<&-`.
+    ///
+    /// Distinct from simply being absent from `fds`. An absent fd is one the
+    /// shell never touched, which it may still resolve against the host
+    /// process's real fd table — that is ordinary POSIX inheritance and bash
+    /// does the same. A *closed* fd must not be resolvable that way, and must
+    /// not be inherited by children.
+    ///
+    /// thaum never calls `close(2)` on the host's descriptor: it is not ours to
+    /// close. Recording the close and refusing to hand the number out is
+    /// observably equivalent for the script and leaves the embedder intact.
+    closed: HashSet<i32>,
     /// Fds that should report as terminals regardless of the underlying handle.
     /// Used in tests to exercise the PTY code path with pipe-backed fds.
     tty_overrides: HashSet<i32>,
@@ -31,6 +43,7 @@ impl IoContext {
     pub fn new(fds: HashMap<i32, File>) -> Self {
         IoContext {
             fds,
+            closed: HashSet::new(),
             tty_overrides: HashSet::new(),
         }
     }
@@ -46,13 +59,48 @@ impl IoContext {
     }
 
     /// Insert or replace a file descriptor.
+    ///
+    /// Reopening a number clears any closed marker: `exec 3>&-; exec 3>file`
+    /// leaves fd 3 usable again, in thaum as in bash.
     pub fn set_fd(&mut self, fd: i32, file: File) {
+        self.closed.remove(&fd);
         self.fds.insert(fd, file);
     }
 
     /// Remove a file descriptor, returning it if present.
+    ///
+    /// Bookkeeping only — this does **not** mark the fd closed. Use
+    /// [`close_fd`](IoContext::close_fd) for `N>&-`.
     pub fn remove_fd(&mut self, fd: i32) -> Option<File> {
         self.fds.remove(&fd)
+    }
+
+    /// Mark a file descriptor as explicitly closed by the script.
+    ///
+    /// Drops any handle the shell held and records the number so it is neither
+    /// resolvable by a later `>&N` nor inherited by a spawned child.
+    pub fn close_fd(&mut self, fd: i32) {
+        self.fds.remove(&fd);
+        self.closed.insert(fd);
+    }
+
+    /// Whether the script explicitly closed this descriptor.
+    pub fn is_closed(&self, fd: i32) -> bool {
+        self.closed.contains(&fd)
+    }
+
+    /// Every descriptor the script explicitly closed.
+    pub fn closed_fds(&self) -> &HashSet<i32> {
+        &self.closed
+    }
+
+    /// Set or clear the closed marker directly. For redirect save/restore only.
+    pub fn set_closed_marker(&mut self, fd: i32, closed: bool) {
+        if closed {
+            self.closed.insert(fd);
+        } else {
+            self.closed.remove(&fd);
+        }
     }
 
     /// Clone (dup) a file descriptor's OS handle.
@@ -105,6 +153,7 @@ impl IoContext {
     /// Used by redirect apply/restore: save the original, set the redirect,
     /// then later restore via [`restore()`](IoContext::restore).
     pub fn save_and_set(&mut self, fd: i32, file: File) -> Option<File> {
+        self.closed.remove(&fd);
         self.fds.insert(fd, file)
     }
 
@@ -113,6 +162,7 @@ impl IoContext {
     /// - `saved = Some(file)`: put back the original fd.
     /// - `saved = None`: the fd was newly added by a redirect — remove it.
     pub fn restore(&mut self, fd: i32, saved: Option<File>) {
+        self.closed.remove(&fd);
         match saved {
             Some(file) => {
                 self.fds.insert(fd, file);

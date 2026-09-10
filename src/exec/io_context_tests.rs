@@ -182,3 +182,46 @@ fn io_context_try_clone_fd() {
     drop(cloned);
     drop(capture.finish(io));
 }
+
+// Explicitly closed descriptors =======================================================================================
+
+#[skuld::test]
+fn close_fd_marks_closed_and_drops_handle() {
+    let mut io = IoContext::from_process();
+    io.set_fd(7, super::open_null_device());
+    io.close_fd(7);
+    assert!(io.fd(7).is_none(), "close_fd should drop the handle");
+    assert!(io.is_closed(7), "close_fd should record the close");
+    assert!(io.closed_fds().contains(&7));
+}
+
+#[skuld::test]
+fn set_fd_clears_closed_marker() {
+    // Derived from bash: `exec 3>&-; exec 3>r1; echo re >&3` writes to r1, so
+    // a close is not permanent — reopening the number restores it.
+    let mut io = IoContext::from_process();
+    io.close_fd(7);
+    io.set_fd(7, super::open_null_device());
+    assert!(!io.is_closed(7), "reopening a descriptor must clear the closed marker");
+    assert!(io.fd(7).is_some());
+}
+
+#[skuld::test]
+fn remove_fd_does_not_mark_closed() {
+    // Removal is bookkeeping; closing is a statement about the OS. Conflating
+    // them would make every restored redirect look like a close.
+    let mut io = IoContext::from_process();
+    io.set_fd(7, super::open_null_device());
+    io.remove_fd(7);
+    assert!(io.fd(7).is_none());
+    assert!(!io.is_closed(7), "remove_fd must not imply a close");
+}
+
+#[skuld::test]
+fn set_closed_marker_round_trips() {
+    let mut io = IoContext::from_process();
+    io.set_closed_marker(7, true);
+    assert!(io.is_closed(7));
+    io.set_closed_marker(7, false);
+    assert!(!io.is_closed(7));
+}

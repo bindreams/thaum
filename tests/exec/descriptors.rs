@@ -77,6 +77,40 @@ fn tool(tools: &Path, name: &str) -> String {
     shell_path(&tools.join(name))
 }
 
+/// Run `script` in a real `thaum` process with `stdin_data` on descriptor 0.
+///
+/// The `exec!` harness cannot express this. `ExecMode::InProcess` gives the
+/// executor a `CapturedIo` pipe that carries no data, and `ExecMode::Subprocess`
+/// goes through `Command::output()`, which hands the child a null stdin. Either
+/// way an assertion about descriptor 0 holds whether or not the code under test
+/// works — which is exactly how the first version of
+/// `closed_stdin_not_inherited_by_child` came to pass against a reverted fix.
+fn run_with_stdin(script: &str, stdin_data: &[u8]) -> (String, String) {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let mut child = Command::new(crate::thaum_exe())
+        .args(["exec", "-c", script])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn thaum");
+    child
+        .stdin
+        .take()
+        .expect("stdin pipe")
+        .write_all(stdin_data)
+        .expect("write stdin");
+    let out = child.wait_with_output().expect("wait for thaum");
+    (
+        String::from_utf8_lossy(&out.stdout).into_owned(),
+        String::from_utf8_lossy(&out.stderr).into_owned(),
+    )
+}
+
 // Control: inherited descriptors are not the bug ======================================================================
 
 #[skuld::test]
@@ -675,21 +709,44 @@ fn close_clears_the_slot_for_its_number_not_its_direction(#[fixture(temp_dir)] d
 }
 
 #[skuld::test]
-fn closed_stdin_not_inherited_by_child(#[fixture(temp_dir)] dir: &Path, #[fixture(test_tools)] tools: &Path) {
-    // `exec 0<&-` must reach children as a genuine close:
-    //   printf X | bash -c 'exec 0<&-; cat'  ->  "cat: stdin: Bad file descriptor"
-    // `adopt_redirects` substituted /dev/null for fds 0-2 without recording the
-    // close, so `io.closed_fds()` was empty for them and the child inherited the
-    // host's stdin.
-    let src = dir.join("closed-stdin.txt");
-    std::fs::write(&src, "HOSTDATA\n").unwrap();
-    let cat = tool(tools, "cat");
+fn closed_stdin_not_inherited_by_child() {
+    // `exec 0<&-` must reach children as a genuine close. The descriptor being
+    // closed has to be one the child could otherwise *read*, so the host's real
+    // stdin carries data here:
+    //   printf HOST | bash -c 'exec 0<&-; cat'  ->  "cat: stdin: Bad file descriptor"
+    // Before the fix the child read "HOST": `adopt_redirects` substituted
+    // /dev/null for fds 0-2 without recording the close, so `io.closed_fds()`
+    // was empty for them.
+    //
+    // An earlier version of this test wrote `exec 0<src; exec 0<&-; cat` and
+    // asserted empty stdout. That could not fail: `exec 0<file` does not reach
+    // children at all (issue #47), so the child never had the file on
+    // descriptor 0 under any version, and the harness's stdin was empty anyway.
+    // `/bin/cat` rather than the Rust `test-cat`: the Rust runtime reopens
+    // /dev/null over any of fds 0-2 it finds closed at startup, so a Rust
+    // observer reads EOF and reports nothing whether the descriptor was closed
+    // or merely empty. A C observer distinguishes the two.
+    //
+    // Verified by mutation: with the closed marker removed from
+    // `adopt_redirects`, this reads "HOST"; with it, `cat` reports
+    // "stdin: Bad file descriptor".
+    let (stdout, stderr) = run_with_stdin("exec 0<&-; /bin/cat", b"HOST\n");
+    assert_eq!(
+        stdout, "",
+        "a closed stdin must not reach the child; it read the host's"
+    );
+    assert!(
+        stderr.contains("Bad file descriptor"),
+        "the child should report the closed descriptor, got: {stderr}"
+    );
+}
 
-    let script = format!("exec 0<{s}; exec 0<&-; {cat}", s = shell_path(&src));
-    let r = exec!(&script);
-    assert_eq!(r.stdout(), "", "a closed stdin must not reach the child");
-    r.stderr();
-    r.status();
+#[skuld::test]
+fn inherited_stdin_still_reaches_child() {
+    // The control for the test above: with no close, the child reads the host's
+    // stdin, exactly as bash does. If this fails, the fix has over-reached.
+    let (stdout, _stderr) = run_with_stdin("/bin/cat", b"HOST\n");
+    assert_eq!(stdout, "HOST\n", "an un-closed stdin must still reach the child");
 }
 
 // Malformed move targets ==============================================================================================

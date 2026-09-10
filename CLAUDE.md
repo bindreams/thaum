@@ -119,7 +119,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `exec.rs` — Executor struct, main dispatch, alias expansion
   - `environment.rs` — variables, functions, scoping, arrays, aliases, declare attrs
   - `builtins.rs` — builtin commands (echo, cd, test, declare, printf, etc.)
-  - `special_builtins.rs` — eval, exec, source (need Executor access)
+  - `special_builtins.rs` — eval, exec, source (need Executor access). `exec` decides redirect-only mode *after* option parsing: if no command word survives, the redirections are adopted permanently — `exec --` and `exec -a name` reach that point with a non-empty argument list
   - `arithmetic.rs` — arithmetic expression evaluation
   - `bash_test.rs` — `[[ ]]` conditional evaluator
   - `printf.rs` — printf builtin formatter (custom, not Rust format!)
@@ -128,7 +128,7 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `compound.rs` — compound command execution (if/while/for/case)
   - `pipeline.rs` — pipeline execution
   - `external.rs` + `command_ex.rs` — external process spawning; `terminal_inherit` enables direct terminal inheritance for interactive programs
-  - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`
+  - `redirect.rs` — redirect resolution; `ActiveRedirects` uses save/restore into `IoContext`. A redirect list is last-one-wins, so opening a descriptor cancels an earlier close of it and vice versa. `N>&M-` / `N<&M-` duplicate M onto N and then close M
   - `subshell.rs` — subshell payload types
   - `numeric.rs` — shared shell-style numeric parsing
   - `pattern.rs` — shell glob pattern matching
@@ -137,6 +137,32 @@ See CONTRIBUTING.md for detailed architecture (AST naming, operator precedence, 
   - `error.rs` — ExecError types
 - `src/cli/` — CLI binary (yaml_writer, error_fmt, source_map, color)
 - `tests/parse.rs` + `tests/parse/` — parse tests (commands, pipelines, compound, redirects, errors, word_expansion, bash)
-- `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash)
+- `tests/exec.rs` + `tests/exec/` — execution tests (basic, expansion, arrays, printf, bash, descriptors)
 - `tests/cli.rs` + `tests/cli/` — CLI output tests
 - `crates/testkit/` — test infrastructure (sh_yaml parser, Docker helpers, callgrind parser, test tool binaries, test_tools fixture)
+
+### Closed descriptors
+
+`IoContext` tracks descriptors the script closed with `N>&-` separately from ones it simply never
+held. The distinction matters because thaum is embeddable:
+
+- **Absent** — the shell never touched this number, so a redirect may resolve it against the host
+  process's real fd table (`dup_process_fd`). That is ordinary POSIX inheritance and bash behaves
+  the same; a child writing to an inherited descriptor is not a bug.
+- **Closed** — the script closed it. It is not resolvable by a later `>&N`, and every child fd
+  table gets an `Fd::Close` entry for it. Without that entry `posix_spawn` inherits the number and
+  the child reaches whatever the *host* had there.
+
+thaum never calls `close(2)` on the host's descriptor — it is not thaum's to close. Recording the
+close and refusing to hand the number out is observably identical for the script and leaves the
+embedder intact.
+
+`Fd::Close` is implemented as `adddup2(/dev/null, fd)` followed by `addclose(fd)`. A bare
+`addclose` is not usable: if the number is not open, the child's `close(2)` fails and `posix_spawn`
+reports EBADF for the entire spawn (macOS). The dup2 makes the number open unconditionally, with no
+check-then-act against the process-global fd table. On Windows no action is needed — fds 3+ reach
+the child only through `build_lpreserved2`, where an absent entry already reads as closed.
+
+Closed descriptors 0-2 keep a `/dev/null` substitution for the shell's *own* writes, so those
+succeed where bash reports EBADF (issue #41 — fixing it needs an error path through every
+`io.fd_mut(n)` site). The child half is not deferred: `cmd 1>&-` leaves the child with no stdout.

@@ -8,6 +8,11 @@ slow-timeout = { period = "30s", terminate-after = 2 }
 # nextest applies timeouts per binary far more legibly than per test name, and
 # because a name-based rule is what issue #9 was: the four image-building tests
 # are named "gauntlet", not "docker".
+# Note that the longer timeout does not currently make these tests pass: the
+# infra tests each build an image in their own process, so they contend for
+# one daemon and the per-test timeout is applied to queued work. They are
+# excluded from every CI job for that reason and so run nowhere — see #37,
+# which proposes serialising them with a nextest test group.
 [[profile.default.overrides]]
 filter = "test(~docker) | binary_id(~gauntlet) | binary_id(~infra)"
 slow-timeout = { period = "120s", terminate-after = 2 }

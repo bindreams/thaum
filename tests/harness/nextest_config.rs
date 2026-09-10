@@ -181,50 +181,66 @@ fn test_binary_path(binary_id: &str) -> PathBuf {
 
 // Filter guards -------------------------------------------------------------------------------------------------------
 
-/// Every Docker-building binary that has listable tests is covered by the override.
+/// The Docker-building binaries, confirmed enumerable before anything is
+/// asserted about them.
 ///
-/// Compared against the *unfiltered* listing rather than a fixed expectation:
-/// skuld omits tests whose `requires` preconditions fail, so on a machine
-/// without Docker every test in `thaum::infra` is unavailable and the binary
-/// does not appear at all. Asserting it is present would then fail for a reason
-/// that has nothing to do with the timeout policy — which is what happened on
-/// the macOS CI runner.
-#[skuld::test(requires = [nextest_available])]
+/// Every guard below asserts something *about* these binaries, and an assertion
+/// over an absent binary passes having checked nothing: a loop that runs zero
+/// times reports PASS. That is how two earlier versions of these guards
+/// reported green while broken.
+///
+/// The absence is real, not hypothetical — skuld omits tests whose `requires`
+/// preconditions fail, so where Docker is missing every test in `thaum::infra`
+/// is unavailable and the binary does not appear in the listing at all. On the
+/// CI legs that is macOS only; Linux and Windows both have a daemon.
+///
+/// The fix for that is a `requires` precondition, where an unmet condition is
+/// reported as unavailable and stays visible — never a silent skip inside the
+/// test body.
+fn listable_docker_binaries() -> Vec<&'static str> {
+    let present = binaries_selected_by("all()");
+    let listable: Vec<&'static str> = DOCKER_BUILDING_BINARIES
+        .iter()
+        .copied()
+        .filter(|b| present.contains(*b))
+        .collect();
+    assert_eq!(
+        listable.len(),
+        DOCKER_BUILDING_BINARIES.len(),
+        "expected every Docker-building binary to be enumerable, but only {listable:?} are. \
+         Any assertion about the missing ones would pass having checked nothing.\nPresent: {present:?}"
+    );
+    listable
+}
+
+/// Every Docker-building binary is covered by the slow-timeout override.
+#[skuld::test(requires = [nextest_available, docker_available])]
 fn slow_timeout_override_covers_every_docker_building_binary() {
     let filter = slow_timeout_override_filter();
     let selected = binaries_selected_by(&filter);
-    let present = binaries_selected_by("all()");
-    assert!(
-        present.contains("thaum::gauntlet"),
-        "no Docker-building binary has listable tests here, so this guard checked nothing.\n\
-         Present: {present:?}"
-    );
-    for binary in DOCKER_BUILDING_BINARIES {
-        if !present.contains(*binary) {
-            continue;
-        }
+    for binary in listable_docker_binaries() {
         assert!(
-            selected.contains(*binary),
+            selected.contains(binary),
             "`{binary}` can build a Docker image but is not covered by the slow-timeout override \
              `{filter}`, so it gets the 30s default and is killed mid-build.\nSelected: {selected:?}"
         );
     }
 }
 
-#[skuld::test(requires = [nextest_available])]
+#[skuld::test(requires = [nextest_available, docker_available])]
 fn gating_job_selects_no_docker_building_binary() {
     let filter = workflow_filter("test");
     let selected = binaries_selected_by(&filter);
-    // Positive control: an assertion of absence passes trivially against an
-    // empty set, so confirm the filter selected something first.
+    // An assertion of absence is vacuous twice over: against an empty selection,
+    // and against a binary that cannot be enumerated here at all.
     assert!(
         !selected.is_empty(),
         "the gating CI job's filter `{filter}` selected no tests at all, so asserting what it \
          does not select proves nothing"
     );
-    for binary in DOCKER_BUILDING_BINARIES {
+    for binary in listable_docker_binaries() {
         assert!(
-            !selected.contains(*binary),
+            !selected.contains(binary),
             "the gating CI job's filter `{filter}` selects `{binary}`, which builds Docker images \
              — a required check must not depend on the Docker build cache"
         );
